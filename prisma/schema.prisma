@@ -281,6 +281,7 @@ model ClaimRequest {
 
   @@unique([userId, fighterId])
   @@index([status])
+  @@index([fighterId])
 }
 
 // Solicitud para pasar a ser ORGANIZER (publicar veladas y carteles). La aprueba un moderador.
@@ -310,6 +311,7 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([createdAt])
+  @@index([userId])
 }
 
 // Aviso de un usuario sobre un dato que cree incorrecto (combate o ficha). Lo revisa un moderador.
@@ -329,6 +331,7 @@ model Report {
 
   @@index([status, createdAt])
   @@index([entity, entityId])
+  @@index([userId])
 }
 
 // Un aficionado sigue a un peleador para ver sus próximas veladas y recibir avisos.

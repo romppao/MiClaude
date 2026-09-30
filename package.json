@@ -2,6 +2,7 @@
   "name": "ring-espana",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=22" },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -10,7 +11,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/cuenta.mjs",
+    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs",
     "test:a11y": "node tests/e2e/accesibilidad.mjs"
   },
   "prisma": {

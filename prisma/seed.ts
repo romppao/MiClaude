@@ -5,7 +5,26 @@ import { slugify } from "../src/lib/labels";
 const db = new PrismaClient();
 const day = 864e5;
 
+/**
+ * El seed BORRA fichas, combates, veladas, gimnasios y auras para cargar datos de demostración.
+ * Por eso no se ejecuta contra una base de datos real por accidente (por ejemplo con `prisma migrate reset`):
+ * solo corre si la base es local y está vacía de personas usuarias, o si se confirma expresamente con SEED_CONFIRMAR=si.
+ */
+async function comprobarQueEsSeguro() {
+  if (process.env.SEED_CONFIRMAR === "si") return;
+  const url = process.env.DATABASE_URL ?? "";
+  const local = /@(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(url);
+  if (process.env.NODE_ENV === "production" || !local) {
+    throw new Error("El seed borra datos y esta base de datos no parece local (o es producción). Si de verdad quieres cargarlo aquí, ejecuta con SEED_CONFIRMAR=si.");
+  }
+  const usuarios = await db.user.count();
+  if (usuarios > 0) {
+    throw new Error(`La base de datos tiene ${usuarios} cuentas: el seed borraría sus fichas y combates. Si es una base de pruebas y quieres seguir, ejecuta con SEED_CONFIRMAR=si.`);
+  }
+}
+
 async function main() {
+  await comprobarQueEsSeguro();
   await db.aura.deleteMany();
   await db.bout.deleteMany();
   await db.event.deleteMany();

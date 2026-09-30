@@ -1,3 +1,5 @@
+import { cache } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db";
@@ -5,9 +7,17 @@ import { LEVEL_LABEL } from "../../../lib/labels";
 
 export const dynamic = "force-dynamic";
 
+const getGym = cache((slug: string) => db.gym.findUnique({ where: { slug }, include: { fighters: { where: { listed: true, hiddenAt: null }, orderBy: { lastName: "asc" } }, trainers: true } }));
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const gym = await getGym((await params).slug);
+  if (!gym) return { title: "Gimnasio no encontrado" };
+  return { title: gym.name, description: `${gym.name}, gimnasio de deportes de contacto en ${gym.city} (${gym.province}): entrenadores y peleadores en Ring España.` };
+}
+
 export default async function GymPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const gym = await db.gym.findUnique({ where: { slug }, include: { fighters: { where: { listed: true, hiddenAt: null }, orderBy: { lastName: "asc" } }, trainers: true } });
+  const gym = await getGym(slug);
   if (!gym) notFound();
   return (
     <>

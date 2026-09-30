@@ -6,6 +6,7 @@ import { METHOD_LABEL, fmtDate } from "../../../lib/labels";
 import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/disciplines";
 import { addCartelBout, setBoutEvidence, setBoutResult } from "../../actions";
 
+export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 export default async function ManageEvent({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ error?: string }> }) {

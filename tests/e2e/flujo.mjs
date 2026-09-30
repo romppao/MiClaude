@@ -165,9 +165,9 @@ await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 const pub = await anon.locator("body").innerText();
 check("la ficha pública separa el récord por disciplina", pub.includes("MMA") && pub.includes("1 sumisión") && pub.includes("3 combates anteriores sin detallar") && pub.includes("Boxeo"));
-await anon.goto(B + "/peleadores?disciplina=MMA");
+await anon.goto(B + `/peleadores?disciplina=MMA&q=Veterano${rnd}`); // el listado está paginado: se acota con el nombre
 check("el filtro por disciplina incluye a quien la practica", await anon.locator("body").innerText().then((t) => t.includes(`Veterano${rnd}`)));
-await anon.goto(B + "/peleadores?disciplina=JIUJITSU");
+await anon.goto(B + `/peleadores?disciplina=JIUJITSU&q=Veterano${rnd}`);
 check("y excluye a quien no", await anon.locator("body").innerText().then((t) => !t.includes(`Veterano${rnd}`)));
 
 // Avisos a seguidores: un organizador publica un combate futuro de un peleador seguido

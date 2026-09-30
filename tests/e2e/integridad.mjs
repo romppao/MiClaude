@@ -33,7 +33,7 @@ check("una fecha a más de un año vista se rechaza con un mensaje", await seen(
 await anon.goto(B + `/peleadores?q=Tercero${rnd}`);
 check("la ficha creada por un tercero no sale en el listado", !(await cuerpo(anon)).includes(`Tercero${rnd}`));
 await anon.goto(B + `/buscar?q=Tercero${rnd}`);
-check("ni en la búsqueda", !(await cuerpo(anon)).includes(`Tercero${rnd}`));
+check("ni en la búsqueda", await anon.locator(`a[href*="bruno-tercero${rnd}"]`).count() === 0); // la página repite lo buscado, así que se comprueba que no haya enlace a la ficha
 await anon.goto(B + `/peleadores/bruno-tercero${rnd}`);
 const fichaRival = await cuerpo(anon);
 check("su ficha enseña solo la inicial del apellido y avisa de que no está reclamada", fichaRival.includes("Bruno T.") && !fichaRival.includes(`Tercero${rnd}`) && fichaRival.includes("sin reclamar"));

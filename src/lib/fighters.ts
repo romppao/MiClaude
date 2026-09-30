@@ -21,14 +21,3 @@ export async function findNameCandidates(first: string, last: string, client: Cl
   if (rows.length === 0) return [];
   return client.fighter.findMany({ where: { id: { in: rows.map((r) => r.id) } }, include: { gym: true, disciplines: true } });
 }
-
-/** Búsqueda por nombre: cada palabra escrita debe aparecer en el nombre, los apellidos o el alias («Ana Ruiz» encuentra a Ana Ruiz aunque estén en campos distintos). */
-export function nameSearchWhere(q: string): Prisma.FighterWhereInput {
-  const words = q.trim().split(/\s+/).filter(Boolean).slice(0, 6);
-  if (words.length === 0) return {};
-  return {
-    AND: words.map((w) => ({
-      OR: [{ firstName: { contains: w, mode: "insensitive" as const } }, { lastName: { contains: w, mode: "insensitive" as const } }, { alias: { contains: w, mode: "insensitive" as const } }],
-    })),
-  };
-}

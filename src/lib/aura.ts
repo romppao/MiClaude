@@ -37,22 +37,26 @@ export function rankByCategory(entries: AuraEntry[], discipline: Discipline): Ca
  * opcionalmente solo de una provincia y de los últimos `sinceDays` días. Devuelve el ránking ya agrupado por categoría.
  */
 export async function auraRanking(opts: { discipline: Discipline; province?: string; sinceDays?: number }): Promise<CategoryRanking[]> {
-  const auras = await db.aura.findMany({
+  // La base de datos suma las auras de cada peleador; en memoria solo quedan los peleadores que tienen aura, no cada aura.
+  const totals = await db.aura.groupBy({
+    by: ["fighterId"],
     where: {
       bout: { verification: { not: "DISPUTED" }, event: { discipline: opts.discipline, status: { not: "CANCELLED" } } },
       ...(opts.sinceDays && { createdAt: { gte: new Date(Date.now() - opts.sinceDays * 864e5) } }),
       fighter: { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }) },
     },
-    select: { fighterId: true, fighter: { select: { firstName: true, lastName: true, slug: true, disciplines: { where: { discipline: opts.discipline }, select: { weightClass: true } } } } },
+    _count: { _all: true },
   });
-  const byFighter = new Map<string, AuraEntry>();
-  for (const a of auras) {
-    const cur = byFighter.get(a.fighterId);
-    if (cur) cur.aura++;
-    else byFighter.set(a.fighterId, {
-      fighterId: a.fighterId, slug: a.fighter.slug, name: `${a.fighter.firstName} ${a.fighter.lastName}`,
-      weightClass: a.fighter.disciplines[0]?.weightClass ?? null, aura: 1,
-    });
+  if (totals.length === 0) return [];
+  const fighters = await db.fighter.findMany({
+    where: { id: { in: totals.map((t) => t.fighterId) } },
+    select: { id: true, firstName: true, lastName: true, slug: true, disciplines: { where: { discipline: opts.discipline }, select: { weightClass: true } } },
+  });
+  const byId = new Map(fighters.map((f) => [f.id, f]));
+  const entries: AuraEntry[] = [];
+  for (const t of totals) {
+    const f = byId.get(t.fighterId);
+    if (f) entries.push({ fighterId: f.id, slug: f.slug, name: `${f.firstName} ${f.lastName}`, weightClass: f.disciplines[0]?.weightClass ?? null, aura: t._count._all });
   }
-  return rankByCategory([...byFighter.values()], opts.discipline);
+  return rankByCategory(entries, opts.discipline);
 }

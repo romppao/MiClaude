@@ -8,3 +8,10 @@ export function lookup<T>(obj: Record<string, T>, key: string | null | undefined
 
 /** Un parámetro de la URL puede llegar repetido (?q=a&q=b) como lista: se toma el primero. */
 export const oneParam = (v: string | string[] | undefined): string | undefined => (Array.isArray(v) ? v[0] : v);
+
+/** Todos los parámetros de la URL con un solo valor cada uno (el primero si llegan repetidos): los listados los reciben ya «aplanados». */
+export function flatParams(raw: Record<string, string | string[] | undefined>): Record<string, string | undefined> {
+  const out: Record<string, string | undefined> = {};
+  for (const k of Object.keys(raw)) out[k] = oneParam(raw[k]);
+  return out;
+}

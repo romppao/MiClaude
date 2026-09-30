@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { db } from "../../lib/db";
+import { searchIds } from "../../lib/search";
+import { flatParams } from "../../lib/safe";
+import { pageNumber, pageWindow } from "../../lib/pagination";
+import Paginacion from "../Paginacion";
 import { plural } from "../../lib/text";
 import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disciplines";
@@ -8,17 +12,20 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disc
 export const metadata = { title: "Calendario de veladas" };
 export const dynamic = "force-dynamic";
 
-export default async function Events({ searchParams }: { searchParams: Promise<{ level?: string; province?: string; past?: string; q?: string; disciplina?: string }> }) {
-  const { level, province, past, q, disciplina } = await searchParams;
+export default async function Events({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const { level, province, past, q, disciplina, pagina } = flatParams(await searchParams);
+  const ids = await searchIds("event", q);
   const now = new Date();
   const where: Prisma.EventWhereInput = {
     date: past ? { lt: now } : { gte: new Date(now.getTime() - 864e5) },
     ...(level === "PRO" || level === "AMATEUR" ? { level } : {}),
     ...(province && { province }),
     ...(disciplina && isDiscipline(disciplina) ? { discipline: disciplina } : {}),
-    ...(q && { OR: [{ name: { contains: q, mode: "insensitive" } }, { city: { contains: q, mode: "insensitive" } }, { venue: { contains: q, mode: "insensitive" } }] }),
+    ...(ids && { id: { in: ids } }),
   };
-  const events = await db.event.findMany({ where, orderBy: { date: past ? "desc" : "asc" }, take: 100, include: { _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
+  const total = await db.event.count({ where });
+  const w = pageWindow(total, pageNumber(pagina));
+  const events = await db.event.findMany({ where, orderBy: [{ date: past ? "desc" : "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
   return (
     <>
       <h1>Calendario de veladas</h1>
@@ -40,7 +47,8 @@ export default async function Events({ searchParams }: { searchParams: Promise<{
           </Link>
         ))}
       </div>
-      {events.length === 0 && <p className="mut">No hay veladas con esos filtros.</p>}
+      {events.length === 0 && <p className="mut">No hay veladas con esos filtros. Prueba a quitar alguno, o a mirar las pasadas.</p>}
+      <Paginacion ruta="/veladas" params={{ q, disciplina, level, province, past }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["velada", "veladas"]} />
     </>
   );
 }

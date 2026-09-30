@@ -4,6 +4,14 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+# Una ejecución nueva de la misma rama cancela la anterior que siga en curso.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

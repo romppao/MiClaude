@@ -5,7 +5,7 @@ import { db } from "../../lib/db";
 import { PROVINCES, VERIFICATION_LABEL } from "../../lib/labels";
 import { LIMITS } from "../../lib/text";
 import { publicFighterName } from "../../lib/names";
-import { nameSearchWhere } from "../../lib/fighters";
+import { searchIds } from "../../lib/search";
 import { oneParam } from "../../lib/safe";
 import { eventDayReached } from "../../lib/dates";
 import { OUTCOME_TO_RESULT } from "../../lib/rules";
@@ -25,8 +25,9 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const me = user.fighter;
 
   if (!me) {
+    const claimIds = await searchIds("fighterUnclaimed", q);
     const [candidates, myClaims] = await Promise.all([
-      q ? db.fighter.findMany({ where: { userId: null, hiddenAt: null, ...nameSearchWhere(q) }, include: { gym: true, disciplines: true, _count: { select: { boutsAsA: true, boutsAsB: true } } }, take: 10 }) : Promise.resolve([]),
+      q ? db.fighter.findMany({ where: { id: { in: claimIds ?? [] } }, include: { gym: true, disciplines: true, _count: { select: { boutsAsA: true, boutsAsB: true } } }, take: 10 }) : Promise.resolve([]),
       db.claimRequest.findMany({ where: { userId: user.id }, include: { fighter: true }, orderBy: { createdAt: "desc" } }),
     ]);
     return (

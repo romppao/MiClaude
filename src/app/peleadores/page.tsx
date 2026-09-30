@@ -1,28 +1,31 @@
 import Link from "next/link";
 import type { Level, Prisma } from "@prisma/client";
 import { db } from "../../lib/db";
+import { searchIds } from "../../lib/search";
+import { flatParams } from "../../lib/safe";
+import { pageNumber, pageWindow } from "../../lib/pagination";
+import Paginacion from "../Paginacion";
 import { LEVEL_LABEL, PROVINCES } from "../../lib/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, isDiscipline } from "../../lib/disciplines";
 
 export const metadata = { title: "Peleadores" };
 export const dynamic = "force-dynamic";
 
-export default async function Fighters({ searchParams }: { searchParams: Promise<{ q?: string; level?: string; province?: string; disciplina?: string; categoria?: string }> }) {
-  const { q, level, province, disciplina, categoria } = await searchParams;
+export default async function Fighters({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const { q, level, province, disciplina, categoria, pagina } = flatParams(await searchParams);
+  const ids = await searchIds("fighter", q);
   const categorias = [...new Set(DISCIPLINE_ORDER.flatMap((d) => WEIGHT_CLASSES[d]))];
   const discipline = disciplina && isDiscipline(disciplina) ? disciplina : undefined;
   const where: Prisma.FighterWhereInput = {
     listed: true, hiddenAt: null,
-    ...(q && { OR: [
-      { firstName: { contains: q, mode: "insensitive" } },
-      { lastName: { contains: q, mode: "insensitive" } },
-      { alias: { contains: q, mode: "insensitive" } },
-    ] }),
+    ...(ids && { id: { in: ids } }),
     ...(level === "PRO" || level === "AMATEUR" ? { level: level as Level } : {}),
     ...(province && { province }),
     ...((discipline || categoria) && { disciplines: { some: { ...(discipline && { discipline }), ...(categoria && { weightClass: categoria }) } } }),
   };
-  const fighters = await db.fighter.findMany({ where, orderBy: [{ lastName: "asc" }], take: 100, include: { gym: true, disciplines: true } });
+  const total = await db.fighter.count({ where });
+  const w = pageWindow(total, pageNumber(pagina));
+  const fighters = await db.fighter.findMany({ where, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { gym: true, disciplines: true } });
   return (
     <>
       <h1>Peleadores</h1>
@@ -43,7 +46,8 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
           </Link>
         ))}
       </div>
-      {fighters.length === 0 && <p className="mut">Sin resultados.</p>}
+      {fighters.length === 0 && <p className="mut">No hay peleadores con esos filtros. Prueba a quitar alguno o a escribir solo una parte del nombre.</p>}
+      <Paginacion ruta="/peleadores" params={{ q, level, province, disciplina, categoria }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["peleador", "peleadores"]} />
     </>
   );
 }

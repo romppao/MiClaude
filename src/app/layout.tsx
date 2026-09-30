@@ -5,8 +5,10 @@ import { Suspense } from "react";
 import FlashNotice from "./FlashNotice";
 import { getUser } from "../lib/auth";
 import { logout } from "./actions";
+import { APP_URL } from "../lib/mail";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: { default: "Ring España", template: "%s · Ring España" },
   description: "La base de datos del boxeo español: peleadores profesionales y amateur, récords, veladas, gimnasios y entrenadores.",
 };
