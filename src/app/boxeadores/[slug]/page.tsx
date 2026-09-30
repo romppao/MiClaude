@@ -69,7 +69,7 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
                 <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.verification === "SELF_REPORTED" && <span className="tag">sin confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">disputado</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado"}</span>}</td>
                 <td>
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (
-                    user ? (
+                    user?.emailVerifiedAt ? (
                       <form action={rateBoxer} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="boxerId" value={boxer.id} />
                         <input type="hidden" name="back" value={`/boxeadores/${boxer.slug}`} />
@@ -78,7 +78,8 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
                         <label className="mut"><input type="checkbox" name="attended" defaultChecked={myRatings.find((r) => r.boutId === b.id)?.attended} /> lo vi en directo</label>
                         <button>{myRatings.some((r) => r.boutId === b.id) ? "Actualizar" : "Valorar"}</button>
                       </form>
-                    ) : <Link href="/entrar" className="mut">Entra para valorar</Link>
+                    ) : user ? <Link href="/verificar" className="mut">Verifica tu email para valorar</Link>
+                      : <Link href="/entrar" className="mut">Entra para valorar</Link>
                   )}
                 </td>
               </tr>

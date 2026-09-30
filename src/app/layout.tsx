@@ -26,7 +26,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
             {user ? (
               <>
+                {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu email</Link>}
                 <Link href="/mi-ficha">{user.boxer ? "Mi ficha" : user.name}</Link>
+                <Link href="/organizador">Organizadores</Link>
                 {user.role === "ADMIN" && <Link href="/admin">Moderación</Link>}
                 <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
               </>

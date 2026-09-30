@@ -20,10 +20,15 @@ Sin API REST separada en el MVP: las páginas leen de la base de datos en el ser
 | Visitante | Navegar, buscar, ver fichas, veladas y ránking |
 | `FAN` | Lo anterior + valorar boxeadores |
 | `BOXER` | Lo anterior + una ficha propia y registrar sus combates |
-| `ORGANIZER` | (Fase siguiente) Publicar veladas y carteles oficiales |
+| `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se obtiene solicitándolo; lo aprueba un `ADMIN` |
 | `ADMIN` | Verificar o rechazar combates (`/admin`). Se asigna manualmente en la base de datos |
 
-Un boxeador sin cuenta también existe (fichas «sin reclamar», p. ej. el rival de un combate). Cuando ese boxeador se registre, podrá reclamar su ficha (pendiente, ver hoja de ruta).
+Un boxeador sin cuenta también existe (fichas «sin reclamar», p. ej. el rival de un combate). Cuando ese boxeador se registra, la busca en `/mi-ficha` y **solicita reclamarla** (`ClaimRequest`); un `ADMIN` la aprueba. Al aprobar, la ficha pasa a su cuenta y las demás solicitudes sobre ella se rechazan.
+
+## Verificación de email
+
+Toda acción que publica contenido (valorar, crear ficha, registrar/confirmar combates, reclamar, pedir ser organizador) exige email verificado (`requireVerifiedUser`). El enlace del correo solo muestra un botón; la verificación se hace por POST para que los escáneres de enlaces no consuman el token. Tokens de un solo uso, 48 h, guardados como `sha256`.
+El envío está tras `src/lib/mail.ts`: hoy escribe en el log del servidor; **hay que conectar un proveedor real (Resend/SES/SMTP) y definir `APP_URL` antes de producción**.
 
 ## Modelo de datos (`prisma/schema.prisma`)
 
@@ -47,15 +52,16 @@ Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de domin
 
 ## Riesgos conocidos (a resolver antes de abrir al público)
 
-- **Manipulación de valoraciones** (cuentas falsas, brigading): falta verificación de email, límite de frecuencia por IP/usuario, detección de patrones y ponderar más las notas con «lo vi en directo» o de cuentas antiguas.
-- **Ficha falsa / suplantación**: falta el flujo de *reclamar ficha* con comprobación (email + validación de gimnasio o moderador).
+- **Manipulación de valoraciones** (cuentas falsas, brigading): mitigado con email verificado y límite de 20 valoraciones/día por usuario. Falta límite por IP, detección de patrones (p. ej. muchas cuentas nuevas votando al mismo boxeador) y ponderar más «lo vi en directo» y las cuentas antiguas.
+- **Ficha falsa / suplantación**: la reclamación pasa por un moderador, pero hoy la prueba de identidad es un texto libre. Falta un procedimiento claro (p. ej. confirmación del gimnasio o de la federación) y documentar qué se pide.
+- **Organizadores falsos**: mismo caso; la aprobación es manual.
 - **Combates inventados**: mitigado por la verificación, pero sin rival con cuenta solo puede validarlo un moderador.
 - **Menores de edad**: el amateur incluye juveniles. Hace falta política de privacidad y consentimiento parental antes de publicar datos personales (RGPD).
 - **Sin protección CSRF adicional** más allá de la que Next.js aplica a Server Actions (origen del mismo sitio).
 
 ## Hoja de ruta
 
-1. **Ahora (hecho):** cuentas, ficha propia, registro de combates, confirmación por el rival, moderación, valoraciones, ránking, portada amateur/Madrid.
-2. **Siguiente:** reclamar ficha existente; verificación de email; rol `ORGANIZER` y alta de veladas con cartel; tests automáticos y CI.
+1. **Hecho:** cuentas y roles, ficha propia, registro y confirmación de combates, moderación, valoraciones, ránking, portada amateur/Madrid, **verificación de email, reclamar ficha, rol organizador con cartel y resultados**.
+2. **Siguiente:** proveedor de correo real; tests automáticos (hoy solo hay pruebas de navegador ad hoc) y CI; despliegue con base de datos gestionada y migraciones (`prisma migrate`) en vez de `db push`; límites por IP y detección de patrones en valoraciones; edición/borrado de veladas y combates por el organizador.
 3. **Después:** seguir a boxeadores y avisos de veladas; fotos/vídeo; perfiles de gimnasio gestionados por su responsable; mapa de gimnasios de Madrid.
 4. **Escala:** SEO/sitemaps, API pública, app móvil, importación de datos federativos (Federación Madrileña / FEB), otras provincias.

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const e = await db.event.findUnique({ where: { slug }, include: { bouts: { orderBy: { order: "desc" }, include: { boxerA: true, boxerB: true } } } });
+  const e = await db.event.findUnique({ where: { slug }, include: { organizer: { select: { name: true } }, bouts: { orderBy: { order: "desc" }, include: { boxerA: true, boxerB: true } } } });
   if (!e) notFound();
   return (
     <>

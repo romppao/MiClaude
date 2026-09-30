@@ -1,23 +1,43 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { PROVINCES } from "../../lib/labels";
 import { computeRecords, formatRecord } from "../../lib/record";
-import { addBout, createMyBoxer, respondBout } from "../actions";
+import { addBout, createMyBoxer, requestClaim, respondBout } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
-const ERR: Record<string, string> = { nombre: "Nombre y apellidos son obligatorios.", combate: "Revisa los datos del combate (evento, fecha y rival)." };
+const ERR: Record<string, string> = { nombre: "Nombre y apellidos son obligatorios.", combate: "Revisa los datos del combate (evento, fecha y rival).", reclamar: "Esa ficha ya no está disponible." };
 
-export default async function MyProfile({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function MyProfile({ searchParams }: { searchParams: Promise<{ error?: string; ok?: string; q?: string }> }) {
   const user = await requireUser();
-  const { error } = await searchParams;
+  if (!user.emailVerifiedAt) redirect("/verificar");
+  const { error, ok, q } = await searchParams;
   const me = user.boxer;
 
   if (!me) {
+    const [candidates, myClaims] = await Promise.all([
+      q ? db.boxer.findMany({ where: { userId: null, OR: [{ firstName: { contains: q, mode: "insensitive" } }, { lastName: { contains: q, mode: "insensitive" } }] }, include: { gym: true }, take: 10 }) : Promise.resolve([]),
+      db.claimRequest.findMany({ where: { userId: user.id }, include: { boxer: true }, orderBy: { createdAt: "desc" } }),
+    ]);
     return (
       <>
-        <h1>Crea tu ficha de boxeador</h1>
+        <h1>¿Ya apareces en Ring España?</h1>
+        <p className="mut">Si alguien ya registró un combate tuyo, tu ficha existe. Búscala y reclámala; un moderador la revisará.</p>
+        {ok && <p className="W">Solicitud enviada. Te avisaremos cuando un moderador la revise.</p>}
+        <form className="search"><input name="q" defaultValue={q} placeholder="Tu nombre o apellidos" /><button>Buscar mi ficha</button></form>
+        {candidates.map((b) => (
+          <form key={b.id} action={requestClaim} className="card" style={{ marginBottom: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <input type="hidden" name="boxerId" value={b.id} />
+            <strong>{b.firstName} {b.lastName}</strong><span className="mut">{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
+            <input name="message" placeholder="¿Cómo podemos comprobar que eres tú? (gimnasio, entrenador, licencia…)" style={{ flex: 1, minWidth: 220 }} />
+            <button>Reclamar</button>
+          </form>
+        ))}
+        {q && candidates.length === 0 && <p className="mut">No hay fichas sin dueño con ese nombre.</p>}
+        {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.boxer.firstName} ${c.boxer.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
+        <h2>Si no apareces, crea tu ficha</h2>
         {error && <p className="L">{ERR[error]}</p>}
         <form className="search" action={createMyBoxer} style={{ flexDirection: "column", maxWidth: 360 }}>
           <input name="firstName" placeholder="Nombre" required />

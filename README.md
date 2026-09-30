@@ -23,6 +23,8 @@ las actuaciones y el calendario descubre veladas. Decisiones, roles, riesgos y h
 ## Qué incluye
 
 - **Cuentas** (`/registro`, `/entrar`): aficionado (`FAN`) o boxeador (`BOXER`). Para crear un administrador, cambia `role` a `ADMIN` en la tabla `User`.
+- **Verificación de email**: obligatoria para publicar. En desarrollo el enlace aparece en el log del servidor (`[mail] …`).
+- **Reclamar ficha** y **Organizadores** (`/organizador`): solicitudes que aprueba un moderador; los organizadores crean veladas, montan el cartel y ponen resultados verificados.
 - **Mi ficha** (`/mi-ficha`): el boxeador crea su ficha amateur, registra combates y confirma o disputa los que su rival declara.
 - **Valoraciones**: cada aficionado puntúa (1–5, comentario, «lo vi en directo») a un boxeador **por combate**; una nota por usuario/combate.
 - **Ránking** (`/ranking`): media bayesiana por provincia (Madrid por defecto).

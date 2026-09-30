@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { db } from "./db";
+import { APP_URL, sendMail } from "./mail";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
@@ -47,5 +48,33 @@ export async function getUser() {
 export async function requireUser() {
   const u = await getUser();
   if (!u) redirect("/entrar");
+  return u;
+}
+
+const VERIFY_HOURS = 48;
+
+/** Crea un token de un solo uso y envía el enlace de verificación por correo. */
+export async function sendVerificationEmail(user: { id: string; email: string; name: string }) {
+  const token = randomBytes(32).toString("hex");
+  await db.emailToken.deleteMany({ where: { userId: user.id } });
+  await db.emailToken.create({ data: { id: sha256(token), userId: user.id, expiresAt: new Date(Date.now() + VERIFY_HOURS * 36e5) } });
+  await sendMail(user.email, "Verifica tu email en Ring España", `Hola ${user.name},\n\nConfirma tu email aquí (caduca en ${VERIFY_HOURS} h):\n${APP_URL}/verificar?token=${token}\n`);
+}
+
+/** Consume el token y marca el email como verificado. Devuelve false si no es válido o ha caducado. */
+export async function consumeVerificationToken(token: string) {
+  const row = await db.emailToken.findUnique({ where: { id: sha256(token) } });
+  if (!row || row.expiresAt < new Date()) return false;
+  await db.$transaction([
+    db.user.update({ where: { id: row.userId }, data: { emailVerifiedAt: new Date() } }),
+    db.emailToken.deleteMany({ where: { userId: row.userId } }),
+  ]);
+  return true;
+}
+
+/** Igual que requireUser, pero exige email verificado. Lo usan las acciones que publican contenido. */
+export async function requireVerifiedUser() {
+  const u = await requireUser();
+  if (!u.emailVerifiedAt) redirect("/verificar");
   return u;
 }

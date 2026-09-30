@@ -54,6 +54,12 @@ enum Verification {
   DISPUTED
 }
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum EventStatus {
   SCHEDULED
   COMPLETED
@@ -85,49 +91,52 @@ model Trainer {
 }
 
 model Boxer {
-  id          String    @id @default(cuid())
-  slug        String    @unique
-  firstName   String
-  lastName    String
-  alias       String?
-  birthDate   DateTime?
-  city        String?
-  province    String?
-  nationality String    @default("España")
-  stance      Stance?
-  heightCm    Int?
-  reachCm     Int?
-  weightClass String?
-  level       Level     @default(AMATEUR)
-  bio         String?
-  gymId       String?
-  gym         Gym?      @relation(fields: [gymId], references: [id])
-  trainerId   String?
-  trainer     Trainer?  @relation(fields: [trainerId], references: [id])
-  userId      String?   @unique
-  user        User?     @relation(fields: [userId], references: [id])
-  ratings     Rating[]
-  boutsAsA    Bout[]    @relation("BoxerA")
-  boutsAsB    Bout[]    @relation("BoxerB")
-  createdAt   DateTime  @default(now())
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  firstName     String
+  lastName      String
+  alias         String?
+  birthDate     DateTime?
+  city          String?
+  province      String?
+  nationality   String         @default("España")
+  stance        Stance?
+  heightCm      Int?
+  reachCm       Int?
+  weightClass   String?
+  level         Level          @default(AMATEUR)
+  bio           String?
+  gymId         String?
+  gym           Gym?           @relation(fields: [gymId], references: [id])
+  trainerId     String?
+  trainer       Trainer?       @relation(fields: [trainerId], references: [id])
+  userId        String?        @unique
+  user          User?          @relation(fields: [userId], references: [id])
+  ratings       Rating[]
+  claimRequests ClaimRequest[]
+  boutsAsA      Bout[]         @relation("BoxerA")
+  boutsAsB      Bout[]         @relation("BoxerB")
+  createdAt     DateTime       @default(now())
 
   @@index([lastName, firstName])
   @@index([province])
 }
 
 model Event {
-  id        String      @id @default(cuid())
-  slug      String      @unique
-  name      String
-  date      DateTime
-  level     Level
-  venue     String
-  city      String
-  province  String
-  promoter  String?
-  ticketUrl String?
-  status    EventStatus @default(SCHEDULED)
-  bouts     Bout[]
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  name        String
+  date        DateTime
+  level       Level
+  venue       String
+  city        String
+  province    String
+  promoter    String?
+  ticketUrl   String?
+  status      EventStatus @default(SCHEDULED)
+  organizerId String?
+  organizer   User?       @relation("EventOrganizer", fields: [organizerId], references: [id])
+  bouts       Bout[]
 
   @@index([date])
   @@index([level, date])
@@ -159,16 +168,21 @@ model Bout {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  name         String
-  passwordHash String
-  role         Role      @default(FAN)
-  createdAt    DateTime  @default(now())
-  sessions     Session[]
-  boxer        Boxer?
-  boutsCreated Bout[]    @relation("BoutCreator")
-  ratings      Rating[]
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String
+  passwordHash     String
+  role             Role              @default(FAN)
+  emailVerifiedAt  DateTime?
+  createdAt        DateTime          @default(now())
+  sessions         Session[]
+  boxer            Boxer?
+  boutsCreated     Bout[]            @relation("BoutCreator")
+  ratings          Rating[]
+  emailTokens      EmailToken[]
+  claimRequests    ClaimRequest[]
+  organizerRequest OrganizerRequest?
+  events           Event[]           @relation("EventOrganizer")
 }
 
 model Session {
@@ -198,4 +212,40 @@ model Rating {
 
   @@unique([userId, boutId, boxerId])
   @@index([boxerId])
+}
+
+// Token de verificación de email (se guarda el sha256, como en Session).
+model EmailToken {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+// Un usuario BOXER pide que una ficha ya existente (sin dueño) pase a ser suya. Lo aprueba un moderador.
+model ClaimRequest {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  boxerId   String
+  boxer     Boxer         @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  message   String?
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  @@unique([userId, boxerId])
+  @@index([status])
+}
+
+// Solicitud para pasar a ser ORGANIZER (publicar veladas y carteles). La aprueba un moderador.
+model OrganizerRequest {
+  id        String        @id @default(cuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgName   String
+  message   String?
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime      @default(now())
 }
