@@ -187,7 +187,7 @@ Cada bloque se hizo con pruebas y se subió por separado.
 - Modelo `Report`, formulario «¿Hay un error? Avísanos», sección de avisos en `/admin`.
 - `/ayuda` con pasos por perfil y glosario de etiquetas; pie de página.
 - Modelo `Follow`, botón «Seguir a este boxeador» con contador, `/siguiendo` y avisos por correo (`lib/notify.ts`).
-- Tests: 25 unitarios y 28 comprobaciones de navegador (antes 20 y 15).
+- Tests: 25 unitarios y 30 comprobaciones de navegador (antes 20 y 15). *(Corrección: una primera versión de esta entrada decía 28; el recuento real es 30.)*
 - Commits: `1faa28d`, `1f74af7`, `46d3684` y el de esta entrada.
 
 ### Qué salió mal / qué se aprendió
@@ -195,6 +195,7 @@ Cada bloque se hizo con pruebas y se subió por separado.
 - **Un test fallaba por mi selector, no por la app:** Next.js añade su propio elemento `role="alert"`, así que contar «todas las alertas» daba 2. Solución: acotar al texto del mensaje.
 - **`networkidle` no es fiable para esperar a una acción:** el test del sello del gimnasio miraba la página antes de que terminara la acción. Solución: esperar a un estado concreto de la interfaz («Retirar sello»). Regla: esperar a lo visible, no al tráfico de red.
 - **Cambiar textos rompe pruebas que buscan textos:** al pasar a un lenguaje más claro (`Crear ficha` → `Crear mi ficha`) hubo que actualizar el e2e. Regla: cuando cambie un texto, buscar dónde lo usan las pruebas.
+- **El CI de GitHub falló dos veces y lo descubrí tarde.** Los runs 4 y 5 (commits `2214758` y `bc39c51`) fallaron en «gimnasio muestra el sello de verificado»: la misma carrera de sincronización que ya había detectado y corregido en local (`1faa28d`), pero yo aún no había mirado el CI de esos envíos. Los runs 6, 7 y 8 pasan. Lección: **comprobar el resultado del CI tras cada envío**, no dar por hecho que pasa porque en local pasa.
 - **Honestidad sobre el alcance de F9:** se aplicó a los flujos principales (registro, entrada, ficha, combates, valoración, seguir, ayuda). **No se ha auditado todavía** el panel del organizador ni el de moderación, ni se ha medido el contraste con una herramienta, ni se ha probado con personas reales. No debe darse F9 por cumplido.
 
 ### Estado y próximos pasos
