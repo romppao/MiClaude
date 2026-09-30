@@ -67,15 +67,17 @@ enum EventStatus {
 }
 
 model Gym {
-  id       String    @id @default(cuid())
-  slug     String    @unique
-  name     String
-  city     String
-  province String
-  address  String?
-  website  String?
-  boxers   Boxer[]
-  trainers Trainer[]
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  city         String
+  province     String
+  address      String?
+  website      String?
+  verifiedAt   DateTime?
+  verifiedNote String?
+  boxers       Boxer[]
+  trainers     Trainer[]
 
   @@index([province])
 }
@@ -161,6 +163,7 @@ model Bout {
   createdById  String?
   createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
   ratings      Rating[]
+  evidenceUrl  String?
 
   @@index([eventId])
   @@index([boxerAId])
@@ -182,6 +185,7 @@ model User {
   emailTokens      EmailToken[]
   claimRequests    ClaimRequest[]
   organizerRequest OrganizerRequest?
+  auditLogs        AuditLog[]
   events           Event[]           @relation("EventOrganizer")
 }
 
@@ -241,11 +245,29 @@ model ClaimRequest {
 
 // Solicitud para pasar a ser ORGANIZER (publicar veladas y carteles). La aprueba un moderador.
 model OrganizerRequest {
-  id        String        @id @default(cuid())
-  userId    String        @unique
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orgName   String
-  message   String?
-  status    RequestStatus @default(PENDING)
-  createdAt DateTime      @default(now())
+  id         String        @id @default(cuid())
+  userId     String        @unique
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgName    String
+  message    String?
+  status     RequestStatus @default(PENDING)
+  reviewNote String?
+  reviewedAt DateTime?
+  createdAt  DateTime      @default(now())
+}
+
+// Historial de cambios: nada relevante se modifica en silencio. `before`/`after` guardan lo que cambió.
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  entity    String // BOUT, EVENT, CLAIM, ORGANIZER, GYM…
+  entityId  String
+  action    String
+  before    Json?
+  after     Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
 }

@@ -7,13 +7,13 @@ export const dynamic = "force-dynamic";
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const e = await db.event.findUnique({ where: { slug }, include: { organizer: { select: { name: true } }, bouts: { orderBy: { order: "desc" }, include: { boxerA: true, boxerB: true } } } });
+  const e = await db.event.findUnique({ where: { slug }, include: { organizer: { select: { name: true, organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { boxerA: true, boxerB: true } } } });
   if (!e) notFound();
   return (
     <>
       <span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       <h1>{e.name}</h1>
-      <p className="mut">{fmtDate(e.date)} · {e.venue}, {e.city} ({e.province}){e.promoter ? ` · Organiza: ${e.promoter}` : ""}</p>
+      <p className="mut">{fmtDate(e.date)} · {e.venue}, {e.city} ({e.province}){e.promoter ? ` · Organiza: ${e.promoter}` : ""}{e.organizer?.organizerRequest?.status === "APPROVED" && <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span>}</p>
       {e.ticketUrl && <p><a className="tag PRO" href={e.ticketUrl} rel="noopener noreferrer">Entradas</a></p>}
       <h2>Cartel</h2>
       <table>

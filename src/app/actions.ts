@@ -6,6 +6,8 @@ import type { Method, Result } from "@prisma/client";
 import { db } from "../lib/db";
 import { consumeVerificationToken, createSession, destroySession, getUser, hashPassword, requireUser, requireVerifiedUser, sendVerificationEmail, verifyPassword } from "../lib/auth";
 import { slugify } from "../lib/labels";
+import { audit } from "../lib/audit";
+import { safeHttpUrl } from "../lib/url";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
@@ -111,12 +113,13 @@ export async function addBout(f: FormData) {
     (await db.boxer.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
   if (opponent.id === me.id) redirect("/mi-ficha?error=combate");
 
-  await db.bout.create({
+  const created = await db.bout.create({
     data: {
       eventId: event.id, boxerAId: me.id, boxerBId: opponent.id, result, method, rounds,
-      weightClass: me.weightClass, verification: "SELF_REPORTED", createdById: user.id,
+      weightClass: me.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")),
     },
   });
+  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED", after: { result, method, verification: "SELF_REPORTED", evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
   redirect("/mi-ficha");
 }
@@ -128,7 +131,11 @@ export async function respondBout(f: FormData) {
   const me = user.boxer;
   if (!bout || !me || bout.verification !== "SELF_REPORTED") redirect("/mi-ficha");
   if (bout.boxerBId !== me.id) redirect("/mi-ficha"); // solo el rival del creador
-  await db.bout.update({ where: { id: bout.id }, data: { verification: str(f, "decision") === "confirm" ? "CONFIRMED" : "DISPUTED" } });
+  const next = str(f, "decision") === "confirm" ? "CONFIRMED" : "DISPUTED";
+  await db.$transaction([
+    db.bout.update({ where: { id: bout.id }, data: { verification: next } }),
+    audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: `RIVAL_${next}`, before: { verification: bout.verification }, after: { verification: next } }, db),
+  ]);
   revalidatePath("/", "layout");
   redirect("/mi-ficha");
 }
@@ -137,7 +144,11 @@ export async function respondBout(f: FormData) {
 export async function adminDecide(f: FormData) {
   const user = await requireUser();
   if (user.role !== "ADMIN") redirect("/");
-  await db.bout.update({ where: { id: str(f, "boutId") }, data: { verification: str(f, "decision") === "verify" ? "VERIFIED" : "DISPUTED" } });
+  const before = await db.bout.findUnique({ where: { id: str(f, "boutId") } });
+  if (!before) redirect("/admin");
+  const next = str(f, "decision") === "verify" ? "VERIFIED" : "DISPUTED";
+  await db.bout.update({ where: { id: before.id }, data: { verification: next } });
+  await audit({ userId: user.id, entity: "BOUT", entityId: before.id, action: `ADMIN_${next}`, before: { verification: before.verification }, after: { verification: next } });
   revalidatePath("/", "layout");
   redirect("/admin");
 }
@@ -213,7 +224,9 @@ export async function decideClaim(f: FormData) {
   if (admin.role !== "ADMIN") redirect("/");
   const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { boxer: true, user: { include: { boxer: true } } } });
   if (!claim || claim.status !== "PENDING") redirect("/admin");
-  if (str(f, "decision") === "approve" && !claim.boxer.userId && !claim.user.boxer) {
+  // Solo se aprueba si se pidió aprobar Y la ficha sigue libre Y el usuario no tiene ya otra ficha.
+  const approved = str(f, "decision") === "approve" && !claim.boxer.userId && !claim.user.boxer;
+  if (approved) {
     await db.$transaction([
       db.boxer.update({ where: { id: claim.boxerId }, data: { userId: claim.userId } }),
       db.claimRequest.update({ where: { id: claim.id }, data: { status: "APPROVED" } }),
@@ -222,6 +235,10 @@ export async function decideClaim(f: FormData) {
   } else {
     await db.claimRequest.update({ where: { id: claim.id }, data: { status: "REJECTED" } });
   }
+  await audit({
+    userId: admin.id, entity: "CLAIM", entityId: claim.id, action: approved ? "APPROVED" : "REJECTED",
+    after: { userId: claim.userId, boxerId: claim.boxerId, requestedApproval: str(f, "decision") === "approve" },
+  });
   redirect("/admin");
 }
 
@@ -245,8 +262,9 @@ export async function decideOrganizer(f: FormData) {
   const req = await db.organizerRequest.findUnique({ where: { id: str(f, "requestId") }, include: { user: true } });
   if (!req || req.status !== "PENDING") redirect("/admin");
   const approve = str(f, "decision") === "approve";
+  await audit({ userId: admin.id, entity: "ORGANIZER", entityId: req.id, action: approve ? "APPROVED" : "REJECTED", after: { userId: req.userId, orgName: req.orgName, note: str(f, "note") || null } });
   await db.$transaction([
-    db.organizerRequest.update({ where: { id: req.id }, data: { status: approve ? "APPROVED" : "REJECTED" } }),
+    db.organizerRequest.update({ where: { id: req.id }, data: { status: approve ? "APPROVED" : "REJECTED", reviewNote: str(f, "note").slice(0, 500) || null, reviewedAt: new Date() } }),
     ...(approve && req.user.role === "FAN" ? [db.user.update({ where: { id: req.userId }, data: { role: "ORGANIZER" } })] : []),
   ]);
   redirect("/admin");
@@ -271,12 +289,13 @@ export async function createEvent(f: FormData) {
   if (!name || Number.isNaN(date.getTime())) redirect("/organizador?error=velada");
   const level = str(f, "level") === "PRO" ? "PRO" : "AMATEUR";
   const slug = await uniqueSlug(slugify(`${name} ${date.toISOString().slice(0, 10)}`), async (s) => !!(await db.event.findUnique({ where: { slug: s } })));
-  await db.event.create({
+  const created = await db.event.create({
     data: {
       slug, name, date, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || "Madrid", province: str(f, "province") || "Madrid",
       promoter: str(f, "promoter") || null, ticketUrl: /^https?:\/\//.test(str(f, "ticketUrl")) ? str(f, "ticketUrl") : null, organizerId: user.id,
     },
   });
+  await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level } });
   revalidatePath("/", "layout");
   redirect(`/organizador/${slug}`);
 }
@@ -292,9 +311,10 @@ export async function addCartelBout(f: FormData) {
   if (!a || !b || a.id === b.id) redirect(`/organizador/${event.slug}?error=cartel`);
   const rounds = parseInt(str(f, "rounds"), 10);
   const order = await db.bout.count({ where: { eventId: event.id } });
-  await db.bout.create({
-    data: { eventId: event.id, boxerAId: a.id, boxerBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id },
+  const created = await db.bout.create({
+    data: { eventId: event.id, boxerAId: a.id, boxerBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
   });
+  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, boxerA: a.slug, boxerB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
   redirect(`/organizador/${event.slug}`);
 }
@@ -309,10 +329,46 @@ export async function setBoutResult(f: FormData) {
   if (!(outcome in OUTCOMES)) redirect(`/organizador/${event.slug}`);
   const methodRaw = str(f, "method") as Method;
   const endRound = parseInt(str(f, "endRound"), 10);
+  await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound }, after: { result: OUTCOMES[outcome], method: METHODS.includes(methodRaw) ? methodRaw : null, endRound: endRound > 0 ? endRound : null } });
   await db.$transaction([
     db.bout.update({ where: { id: bout.id }, data: { result: OUTCOMES[outcome], method: METHODS.includes(methodRaw) ? methodRaw : null, endRound: endRound > 0 ? endRound : null, verification: "VERIFIED" } }),
     db.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } }),
   ]);
   revalidatePath("/", "layout");
   redirect(`/organizador/${event.slug}`);
+}
+
+// ---------- Evidencia y sello de verificado ----------
+
+/** Añade o cambia el enlace de evidencia (acta, cartel, publicación, vídeo) de un combate. */
+export async function setBoutEvidence(f: FormData) {
+  const user = await requireVerifiedUser();
+  const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
+  const back = str(f, "back").startsWith("/") && !str(f, "back").startsWith("//") ? str(f, "back") : "/mi-ficha";
+  if (!bout) redirect(back);
+  const mine = user.boxer?.id;
+  const allowed = user.role === "ADMIN" || bout.createdById === user.id || bout.event.organizerId === user.id || (!!mine && (mine === bout.boxerAId || mine === bout.boxerBId));
+  if (!allowed) redirect(back);
+  const raw = str(f, "evidenceUrl");
+  const url = raw ? safeHttpUrl(raw) : null;
+  if (raw && !url) redirect(`${back}?error=url`);
+  await db.bout.update({ where: { id: bout.id }, data: { evidenceUrl: url } });
+  await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "EVIDENCE_SET", before: { evidenceUrl: bout.evidenceUrl }, after: { evidenceUrl: url } });
+  revalidatePath("/", "layout");
+  redirect(back);
+}
+
+/** Un moderador concede o retira el sello de verificado a un gimnasio, anotando en qué evidencia se basa. */
+export async function setGymVerified(f: FormData) {
+  const admin = await requireUser();
+  if (admin.role !== "ADMIN") redirect("/");
+  const gym = await db.gym.findUnique({ where: { id: str(f, "gymId") } });
+  if (!gym) redirect("/admin");
+  const verify = str(f, "decision") === "verify";
+  const note = str(f, "note").slice(0, 500) || null;
+  if (verify && !note) redirect("/admin?error=nota"); // el sello siempre lleva la evidencia que lo justifica
+  await db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null } });
+  await audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } });
+  revalidatePath("/", "layout");
+  redirect("/admin");
 }

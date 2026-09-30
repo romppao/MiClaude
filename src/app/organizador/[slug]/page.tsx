@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getUser } from "../../../lib/auth";
 import { db } from "../../../lib/db";
 import { fmtDate } from "../../../lib/labels";
-import { addCartelBout, setBoutResult } from "../../actions";
+import { addCartelBout, setBoutEvidence, setBoutResult } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +27,12 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
           <tr key={b.id}>
             <td>{b.boxerA.firstName} {b.boxerA.lastName} <span className="mut">vs</span> {b.boxerB.firstName} {b.boxerB.lastName}</td>
             <td className="mut">{b.weightClass}</td>
+            <td>
+              <form action={setBoutEvidence} style={{ display: "flex", gap: 4 }}>
+                <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="back" value={`/organizador/${event.slug}`} />
+                <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} placeholder="Evidencia" /><button>Guardar</button>
+              </form>
+            </td>
             <td>
               {past ? (
                 <form action={setBoutResult} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -52,6 +58,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
         <datalist id="bx">{boxers.map((b) => <option key={b.id} value={b.slug}>{b.firstName} {b.lastName}</option>)}</datalist>
         <input name="weightClass" placeholder="Peso" />
         <input name="rounds" type="number" min={1} max={12} placeholder="Asaltos" />
+        <input name="evidenceUrl" placeholder="Evidencia (acta, cartel, publicación…)" style={{ flex: 1, minWidth: 240 }} />
         <button>Añadir</button>
       </form>
       <p className="mut">Escribe el nombre para elegir de la lista. Si un boxeador no aparece, debe crear o reclamar su ficha primero.</p>

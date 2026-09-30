@@ -66,7 +66,7 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
                 <td><Link href={`/boxeadores/${opp.slug}`}>{opp.firstName} {opp.lastName}</Link></td>
                 <td className={out === "NC" ? "D" : out}>{out || "—"}</td>
                 <td>{b.method ? METHOD_LABEL[b.method] : ""}{b.endRound ? ` (R${b.endRound})` : ""}</td>
-                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.verification === "SELF_REPORTED" && <span className="tag">sin confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">disputado</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado"}</span>}</td>
+                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">sin confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">disputado</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado"}</span>}</td>
                 <td>
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (
                     user?.emailVerifiedAt ? (

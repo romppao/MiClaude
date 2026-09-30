@@ -4,11 +4,11 @@ import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { PROVINCES } from "../../lib/labels";
 import { computeRecords, formatRecord } from "../../lib/record";
-import { addBout, createMyBoxer, requestClaim, respondBout } from "../actions";
+import { addBout, createMyBoxer, requestClaim, respondBout, setBoutEvidence } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
-const ERR: Record<string, string> = { nombre: "Nombre y apellidos son obligatorios.", combate: "Revisa los datos del combate (evento, fecha y rival).", reclamar: "Esa ficha ya no está disponible." };
+const ERR: Record<string, string> = { nombre: "Nombre y apellidos son obligatorios.", combate: "Revisa los datos del combate (evento, fecha y rival).", reclamar: "Esa ficha ya no está disponible.", url: "El enlace de evidencia no es válido (debe empezar por http:// o https://)." };
 
 export default async function MyProfile({ searchParams }: { searchParams: Promise<{ error?: string; ok?: string; q?: string }> }) {
   const user = await requireUser();
@@ -103,8 +103,26 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <option value="KO">KO</option><option value="TKO">TKO</option><option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
         </select>
         <input name="rounds" type="number" min={1} max={12} placeholder="Asaltos" />
+        <input name="evidenceUrl" placeholder="Evidencia (enlace a acta, cartel, vídeo o publicación)" style={{ flex: 1, minWidth: 260 }} />
         <button>Registrar</button>
       </form>
+      <h2>Mis combates y su evidencia</h2>
+      <table><tbody>
+        {bouts.map((b) => (
+          <tr key={b.id}>
+            <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
+            <td>vs {b.boxerAId === me.id ? `${b.boxerB.firstName} ${b.boxerB.lastName}` : `${b.boxerA.firstName} ${b.boxerA.lastName}`}</td>
+            <td><span className="tag">{b.verification === "SELF_REPORTED" ? "sin confirmar" : b.verification === "CONFIRMED" ? "confirmado" : b.verification === "VERIFIED" ? "verificado" : "disputado"}</span></td>
+            <td>
+              <form action={setBoutEvidence} style={{ display: "flex", gap: 4 }}>
+                <input type="hidden" name="boutId" value={b.id} />
+                <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} placeholder="Enlace de evidencia" />
+                <button>Guardar</button>
+              </form>
+            </td>
+          </tr>
+        ))}
+      </tbody></table>
       <p className="mut">Tus combates aparecen como «sin confirmar» hasta que tu rival (si tiene cuenta) o un moderador los verifique.</p>
     </>
   );

@@ -30,11 +30,22 @@ await unv.p.goto(B + "/mi-ficha"); check("sin verificar → redirige a /verifica
 // 2) Pepe crea ficha y registra combate contra un rival aún sin cuenta
 const pepe = (await newUser("Pepe", "BOXER")).p;
 await pepe.goto(B + "/mi-ficha");
-await pepe.fill("[name=firstName]", "Pepe"); await pepe.fill("[name=lastName]", `Uno${rnd}`); await btn(pepe, "Crear ficha");
+await pepe.fill("[name=firstName]", "Pepe"); await pepe.fill("[name=lastName]", `Uno${rnd}`); await pepe.fill("[name=gym]", `Gym Test ${rnd}`); await btn(pepe, "Crear ficha");
 await pepe.waitForSelector("text=Registrar un combate");
 await pepe.fill("[name=eventName]", "Velada Claim Test"); await pepe.fill("[name=date]", "2026-08-01");
-await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `Dos${rnd}`); await btn(pepe, "Registrar");
+await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `Dos${rnd}`); await pepe.fill("[name=evidenceUrl]", "javascript:alert(1)"); await btn(pepe, "Registrar");
 await pepe.waitForSelector("text=1-0-0");
+
+// Evidencia: una URL peligrosa no se guarda; una inválida da error; una válida aparece como enlace público
+await pepe.goto(B + `/boxeadores/pepe-uno${rnd}`);
+check("URL javascript: no se guarda como evidencia", await pepe.locator("a:has-text('evidencia')").count() === 0);
+await pepe.goto(B + "/mi-ficha");
+await pepe.fill("main table input[name=evidenceUrl]", "esto no es una url"); await pepe.click("main table button:has-text('Guardar')");
+await pepe.waitForSelector("text=no es válido");
+await pepe.fill("main table input[name=evidenceUrl]", `https://example.com/acta-${rnd}`); await pepe.click("main table button:has-text('Guardar')");
+await pepe.waitForLoadState("networkidle");
+await pepe.goto(B + `/boxeadores/pepe-uno${rnd}`);
+check("enlace de evidencia visible en la ficha pública", await pepe.locator(`a[href="https://example.com/acta-${rnd}"][rel*=noopener]`).count() === 1);
 
 // 3) Luis (con cuenta) reclama su ficha existente; admin aprueba
 const luis = (await newUser("Luis", "BOXER")).p;
@@ -78,5 +89,20 @@ check("velada pública con cartel y resultado", t.includes(`Uno${rnd}`) && t.inc
 // 6) un fan no puede entrar al panel de otra velada
 await fan.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
 check("fan no accede a gestionar velada ajena", !fan.url().includes("/gran-velada-org-"));
+// Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
+await admin.p.goto(B + "/admin");
+const gymRow = () => admin.p.locator("tr", { hasText: `Gym Test ${rnd}` });
+await gymRow().locator("button:has-text('Verificar')").click(); await admin.p.waitForLoadState("networkidle");
+check("sello sin nota se rechaza", await admin.p.locator("body").innerText().then((t) => t.includes("necesita una nota")));
+await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, llamada al responsable");
+await gymRow().locator("button:has-text('Verificar')").click(); await admin.p.waitForLoadState("networkidle");
+await pepe.goto(B + `/gimnasios/gym-test-${rnd}`);
+check("gimnasio muestra el sello de verificado", await pepe.locator("h1 .tag", { hasText: "verificado" }).count() === 1);
+check("la nota interna no se expone públicamente", !(await pepe.locator("body").innerText()).includes("Google Maps"));
+await admin.p.goto(B + "/admin/historial?entity=BOUT");
+const hist = await admin.p.locator("body").innerText();
+check("historial registra creación y evidencia del combate", hist.includes("CREATED") && hist.includes("EVIDENCE_SET"));
+await admin.p.goto(B + "/admin/historial?entity=GYM");
+check("historial registra el sello del gimnasio", await admin.p.locator("body").innerText().then((t) => t.includes("VERIFIED")));
 await browser.close();
 if (process.exitCode) console.error("\nE2E: hay comprobaciones fallidas");

@@ -28,9 +28,11 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Niveles de respaldo del combate (autodeclarado → confirmado → verificado) | Necesidad: el amateur se registra a sí mismo | 🟢 | Se muestra en la ficha |
 | Reclamar una ficha creada por otro | Necesidad: el rival ya existe sin cuenta | 🟢 | Aprobación de moderador |
 | Rol organizador (cartel y resultados verificados) | Necesidad: fuente natural de verdad | 🟢 | Aprobación de moderador |
-| Enlace de evidencia en el combate (acta, cartel, vídeo) | Estrategia de veracidad | 🔵 | Siguiente |
-| Historial de cambios (audit log) | Estrategia de veracidad | 🔵 | Siguiente |
-| Sello de verificado para gimnasios y organizadores, con avales cruzados | Estrategia de veracidad | 🔵 | Siguiente |
+| Enlace de evidencia en el combate (acta, cartel, vídeo) | Estrategia de veracidad | 🟢 | Solo http(s); editable por participantes, organizador y admin |
+| Historial de cambios (audit log) | Estrategia de veracidad | 🟢 | Solo visible para moderadores; ¿hacerlo público por combate? |
+| Sello de verificado para gimnasios y organizadores | Estrategia de veracidad | 🟢 | Nota de evidencia obligatoria, interna |
+| Avales cruzados entre entidades verificadas | Estrategia de veracidad | 🔵 | Requiere cuentas de responsable de gimnasio |
+| Historial de cambios público por combate | Transparencia | ⚪ | Decidir qué se muestra y qué no |
 | Comprobaciones automáticas de coherencia (mismo día, duplicados, edades) | Estrategia de veracidad | 🔵 | |
 | Botón «reportar dato» + puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
 | Detección de colusión en valoraciones y confirmaciones | Riesgo detectado | 🔵 | |

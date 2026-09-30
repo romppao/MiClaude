@@ -11,7 +11,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
   if (!gym) notFound();
   return (
     <>
-      <h1>{gym.name}</h1>
+      <h1>{gym.name} {gym.verifiedAt && <span className="tag PRO" title="Verificado por un moderador">✓ verificado</span>}</h1>
       <p className="mut">{[gym.address, gym.city, gym.province].filter(Boolean).join(", ")}</p>
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       <h2>Entrenadores</h2>

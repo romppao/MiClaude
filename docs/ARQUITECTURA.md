@@ -70,7 +70,7 @@ Principio: **no se intenta demostrar que un dato es verdad, sino acumular eviden
 | 0 | Lo declara el propio boxeador | hecho (`SELF_REPORTED`) |
 | 1 | Lo confirma el rival (cuenta verificada) | hecho (`CONFIRMED`) |
 | 2 | Lo publica o confirma el organizador de la velada, que estuvo allí | hecho (`VERIFIED` si lo introduce el organizador) |
-| 3 | Corroborado por terceros: gimnasio/organizador verificado, enlace a acta, cartel, redes o vídeo de la velada | pendiente |
+| 3 | Corroborado por terceros: enlace de evidencia (acta, cartel, redes, vídeo) y gimnasio/organizador con sello | **parcial**: enlace de evidencia y sellos hechos; falta que el sistema pondere el nivel automáticamente |
 | 4 | Federación (licencia, actas oficiales) | futuro |
 
 Regla de producto: **la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado** («12-2, 9 verificados»). El ránking de valoraciones puede exigir un mínimo de combates de nivel ≥ 1 para aparecer.
@@ -110,8 +110,8 @@ En Madrid, al principio, la moderación manual es viable y es una ventaja: se pu
 
 ### Orden de implementación sugerido
 
-1. Enlace de evidencia en el combate y **audit log** de cambios.
-2. **Sello de verificado** para gimnasios y organizadores, con la evidencia que anotó el moderador y quién los avaló.
+1. ~~Enlace de evidencia en el combate y audit log~~ **hecho** (`Bout.evidenceUrl`, `AuditLog`, `/admin/historial`).
+2. ~~Sello de verificado para gimnasios y organizadores~~ **hecho** con nota de evidencia interna; **falta el aval cruzado** (necesita cuentas de responsable de gimnasio).
 3. Comprobaciones automáticas de coherencia (fechas, duplicados) que envíen casos a moderación.
 4. Botón «reportar dato» y puntuación de fiabilidad de organizadores.
 5. Detección de colusión en valoraciones y confirmaciones.
