@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Level {
+  PRO
+  AMATEUR
+}
+
+enum Stance {
+  ORTODOXO
+  ZURDO
+  AMBIDIESTRO
+}
+
+enum Result {
+  A_WIN
+  B_WIN
+  DRAW
+  NO_CONTEST
+}
+
+enum Method {
+  KO
+  TKO
+  UD
+  SD
+  MD
+  RTD
+  DQ
+  DRAW
+  NC
+}
+
+enum EventStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model Gym {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  city     String
+  province String
+  address  String?
+  website  String?
+  boxers   Boxer[]
+  trainers Trainer[]
+
+  @@index([province])
+}
+
+model Trainer {
+  id     String  @id @default(cuid())
+  slug   String  @unique
+  name   String
+  bio    String?
+  gymId  String?
+  gym    Gym?    @relation(fields: [gymId], references: [id])
+  boxers Boxer[]
+}
+
+model Boxer {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  firstName   String
+  lastName    String
+  alias       String?
+  birthDate   DateTime?
+  city        String?
+  province    String?
+  nationality String   @default("España")
+  stance      Stance?
+  heightCm    Int?
+  reachCm     Int?
+  weightClass String?
+  level       Level    @default(AMATEUR)
+  bio         String?
+  gymId       String?
+  gym         Gym?     @relation(fields: [gymId], references: [id])
+  trainerId   String?
+  trainer     Trainer? @relation(fields: [trainerId], references: [id])
+  boutsAsA    Bout[]   @relation("BoxerA")
+  boutsAsB    Bout[]   @relation("BoxerB")
+  createdAt   DateTime @default(now())
+
+  @@index([lastName, firstName])
+  @@index([province])
+}
+
+model Event {
+  id        String      @id @default(cuid())
+  slug      String      @unique
+  name      String
+  date      DateTime
+  level     Level
+  venue     String
+  city      String
+  province  String
+  promoter  String?
+  ticketUrl String?
+  status    EventStatus @default(SCHEDULED)
+  bouts     Bout[]
+
+  @@index([date])
+  @@index([level, date])
+  @@index([province])
+}
+
+model Bout {
+  id          String  @id @default(cuid())
+  eventId     String
+  event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order       Int     @default(0)
+  boxerAId    String
+  boxerA      Boxer   @relation("BoxerA", fields: [boxerAId], references: [id])
+  boxerBId    String
+  boxerB      Boxer   @relation("BoxerB", fields: [boxerBId], references: [id])
+  weightClass String?
+  rounds      Int?
+  result      Result?
+  method      Method?
+  endRound    Int?
+
+  @@index([eventId])
+  @@index([boxerAId])
+  @@index([boxerBId])
+}

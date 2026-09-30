@@ -1,0 +1,26 @@
+:root{--bg:#0e0e10;--panel:#18181c;--line:#2a2a31;--text:#f2f2f4;--mut:#9a9aa6;--red:#c8102e;--gold:#f4c430}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--gold)}
+header.top{border-bottom:3px solid var(--red);background:var(--panel)}
+header.top .in{max-width:1000px;margin:auto;padding:12px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.logo{font-weight:900;letter-spacing:.05em;font-size:1.2rem}.logo b{color:var(--red)}
+nav{display:flex;gap:14px;flex-wrap:wrap;flex:1}
+main{max-width:1000px;margin:auto;padding:24px 16px 64px}
+h1{margin:0 0 4px}h2{margin:32px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.mut{color:var(--mut)}
+form.search{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+input,select,button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit}
+button{background:var(--red);border-color:var(--red);cursor:pointer;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:block}
+.card:hover{border-color:var(--gold)}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--line);margin-right:6px}
+.tag.PRO{background:var(--gold);color:#000}.tag.AMATEUR{background:#2d6cdf}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:.85rem}
+.W{color:#3fb950;font-weight:700}.L{color:#f85149;font-weight:700}.D{color:var(--mut);font-weight:700}
+.rec{font-size:1.6rem;font-weight:800}
+.hero{padding:32px 0}.hero h1{font-size:2.2rem}
