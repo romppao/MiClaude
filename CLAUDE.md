@@ -1,6 +1,6 @@
 # Ring España — instrucciones para Claude
 
-Aplicación web para la comunidad boxística española (amateur primero, Madrid como plaza inicial). Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
+Aplicación web para la comunidad española de deportes de contacto — boxeo en cabeza, más MMA, kickboxing, K-1 y jiu-jitsu (amateur primero, Madrid como plaza inicial). El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
 
 ## Documentación obligatoria (petición expresa del fundador)
 

@@ -18,8 +18,8 @@ Sin API REST separada en el MVP: las páginas leen de la base de datos en el ser
 | Rol | Puede |
 |---|---|
 | Visitante | Navegar, buscar, ver fichas, veladas y ránking |
-| `FAN` | Lo anterior + valorar boxeadores |
-| `BOXER` | Lo anterior + una ficha propia y registrar sus combates |
+| `FAN` | Lo anterior + dar aura a peleadores |
+| `FIGHTER` | Lo anterior + una ficha propia (con una o varias disciplinas) y registrar sus combates |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se obtiene solicitándolo; lo aprueba un `ADMIN` |
 | `ADMIN` | Verificar o rechazar combates (`/admin`). Se asigna manualmente en la base de datos |
 
@@ -54,13 +54,15 @@ Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de domin
 
 `AuditLog` (historial), `Report` (avisos de error), `Follow` (seguir boxeadores), `EmailToken`, `ClaimRequest`, `OrganizerRequest`. `Bout` incorpora `verification`, `evidenceUrl` y `flags` (señales de coherencia). Los avisos al usuario viajan como códigos en la URL y se traducen en `src/lib/messages.ts`.
 
-## Cambios de producto planificados (pendientes de decisiones)
+## Peleadores, disciplinas, récord de partida y aura (implementado)
 
-Directrices del fundador aún no implementadas; afectan al modelo de datos y conviene hacerlas juntas y pronto, mientras solo hay datos de demostración:
+*Nota de vocabulario:* el proyecto empezó hablando de «boxeadores»; desde que se amplió a otros deportes de contacto, todo (modelo, código, rutas e interfaz) usa **«peleador»** (`Fighter`, rol `FIGHTER`, `/peleadores`). Los apartados anteriores de este documento conservan la palabra original.
 
-- **Varias disciplinas** (boxeo, MMA, kickboxing, K-1, jiu-jitsu, otras de contacto). `Event` y `Bout` llevan disciplina; el récord se calcula **por disciplina y nivel**; los métodos de resultado se amplían (sumisión, puntos); divisiones y asaltos dependen de la disciplina. `Boxer` pasa a ser `Fighter` («peleador»/«deportista») con una sola ficha y varias disciplinas (a confirmar). El boxeo va en cabeza en navegación y ránking.
-- **Récord de partida.** Por peleador y disciplina: número de combates previos y, opcionalmente, victorias/derrotas/empates previos. Se muestra **aparte** del récord registrado en la app y marcado como declarado por el propio deportista (no verificable).
-- **Aura en lugar de estrellas.** El aficionado da aura a un peleador; el ránking se ordena por aura total **dentro de su disciplina y categoría de peso**. La regla anti-abuso (una por persona y combate, sin participantes, cuenta verificada, límite diario) se mantiene salvo que el fundador decida otra cosa; la media bayesiana deja de aplicarse porque ya no hay una media de notas, pero hay que evitar que gane quien simplemente lleve más tiempo en la app (p. ej. aura por periodo o ponderada).
+- **Disciplinas** (`Discipline`: BOXEO, MMA, KICKBOXING, K1, JIUJITSU). Una sola ficha por persona con varias disciplinas (`FighterDiscipline`: nivel, categoría de peso y récord de partida por disciplina). `Event` lleva la disciplina y `Bout` la hereda del evento. Todo lo específico de cada deporte (orden de presentación con el boxeo primero, categorías de peso, formas de terminar, si es deporte de torneo) vive en `src/lib/disciplines.ts`. Para añadir una disciplina: valor en el enum de Prisma y entradas en ese fichero.
+- **Récord calculado por disciplina y nivel** (`computeRecords`). Se añade `sub` (victorias por sumisión). En disciplinas de torneo (jiu-jitsu) no se aplican las señales de combates muy seguidos.
+- **Récord de partida:** total de combates anteriores y, si se recuerdan, victorias/derrotas/empates (`parsePrior`). La cifra principal solo lo suma si tiene detalle; siempre se muestra aparte y etiquetado como declarado por el propio deportista. Los cambios quedan en `AuditLog`.
+- **Aura** (`Aura`) sustituye a las estrellas: una por persona, combate y peleador (se puede quitar), con las mismas reglas anti-manipulación (correo verificado, combate celebrado y no disputado, participantes excluidos, 20 al día). El **ránking** (`lib/aura.ts`) agrupa por disciplina y categoría de peso, con zona y periodo, y empates en la misma posición.
+- **Categorías de peso** orientativas, pendientes de validar con las federaciones.
 
 ## Riesgos conocidos (a resolver antes de abrir al público)
 

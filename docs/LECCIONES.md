@@ -33,6 +33,10 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | Al cambiar textos de botones a lenguaje llano, el e2e dejó de encontrarlos | Las pruebas buscan por texto | Se actualizaron las pruebas. **Regla:** al cambiar un texto, buscar dónde lo usan las pruebas |
 | Varias acciones fallaban sin decir nada (p. ej. valorar un combate no permitido) | Se redirigía a la misma página sin mensaje | Todas devuelven un aviso o un problema claro. **Regla:** ningún fallo silencioso; toda acción responde |
 
+| Prisma se negó a hacer `db push --force-reset` | Prisma detecta que lo lanza una IA y exige el consentimiento explícito del usuario, porque destruye todos los datos | **No se forzó.** Se creó una base de datos nueva y vacía y se aplicó el esquema ahí, sin destruir nada. **Regla:** ante una protección destructiva, no rodearla con otro comando equivalente; buscar una vía que no destruya datos o pedir permiso |
+| Un script de edición falló con `missing 1 required positional argument` | La función auxiliar exigía una etiqueta que no pasé | Como el fichero solo se escribe al final, no quedaron cambios a medias. **Regla:** scripts de edición todo-o-nada, con aserciones que fallen si un patrón no existe |
+| Una comprobación e2e falló de forma intermitente tras acciones que cambian un contador | Se leía el contador antes de que la página terminara de actualizarse | Se **midió** el retraso (entre 4 y 30 ms tras el aviso) y se espera de forma explícita. **Regla:** medir antes de asignar una causa; y esperar al estado visible, no leerlo de inmediato |
+
 ## Del proceso de trabajo
 
 - El clasificador de permisos del entorno falló de forma intermitente y bloqueó varios comandos; mientras tanto se avanzó en tareas que no necesitaban shell (documentación). **Regla:** cuando algo externo se cae, avanzar en lo que no depende de ello.

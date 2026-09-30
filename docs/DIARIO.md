@@ -239,6 +239,43 @@ Nada roto. Observación: los tres cambios de producto (aura, disciplinas, récor
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Implementación: peleadores, varias disciplinas, récord de partida y aura
+
+### Qué se pidió / qué idea surgió
+
+Ejecución de las directrices de la entrada anterior. El fundador respondió a las tres preguntas abiertas:
+
+1. **Aura:** «un aura por persona y combate» (la opción recomendada). Su idea original era ordenar por «número de clics»; se reconcilió así: el total de aura es el número de personas distintas que la han dado, lo que mantiene la esencia (más aura = mejor posición) sin que un solo usuario pueda inflar el ránking pulsando sin límite.
+2. **Fichas:** una sola ficha por persona con varias disciplinas.
+3. **Disciplinas iniciales:** boxeo, MMA, kickboxing, K-1 y jiu-jitsu, dejando el sistema preparado para añadir más.
+
+### Qué se decidió y por qué
+
+- **«Boxeador» pasa a «peleador» en todo** (modelo, código, interfaz y rutas: `/peleadores`). Se hizo ahora porque solo hay datos de demostración y era el momento más barato. El boxeo sigue en cabeza (orden de presentación, ránking por defecto, portada).
+- **Categorías de peso y formas de terminar por disciplina** en un único fichero (`lib/disciplines.ts`). Las categorías son **orientativas**, sin validar con las federaciones de cada deporte.
+- **Récord de partida:** se guarda por disciplina (total y, si se recuerda, victorias/derrotas/empates; los huecos cuentan como 0 y si da el total y el detalle deben cuadrar). En la cifra principal solo suma si hay detalle; si solo se sabe el total, se muestra aparte («además, N combates anteriores sin detallar») y siempre como **declarado por el propio deportista**.
+- **Jiu-jitsu:** al ser deporte de torneo (varios combates el mismo día), no se le aplican las señales de combates muy seguidos.
+- **Ránking de aura:** por disciplina y zona, agrupado por categoría de peso (de menos a más peso), con empates en la misma posición y filtro de periodo (siempre / últimos 90 días) para que no gane solo quien lleva más tiempo en la app.
+
+### Qué se hizo
+
+Cuatro entregas, cada una con pruebas: `66edb2c` (renombrado a peleador), `f41f74e` (disciplinas y récord de partida), `d335b06` (aura y ránking) y esta documentación. Tests: 41 unitarios y 39 comprobaciones de navegador (antes 25 y 30).
+
+### Qué salió mal / qué se aprendió
+
+- **Prisma se negó a hacer un reset de la base de datos** al detectar que lo lanzaba una IA, y exige el consentimiento explícito del usuario. **No lo forcé**: creé una base de datos de pruebas nueva y vacía y apliqué el esquema ahí. La anterior (109 usuarios de pruebas) sigue existiendo en el entorno; solo habría que borrarla con permiso.
+- **Una comprobación intermitente volvió a aparecer** (contador de seguidores y contador de aura tras la acción). Esta vez **medí** la causa en lugar de suponerla: el contenido se actualiza entre 4 y 30 ms después del aviso, imperceptible; era solo sincronía del test.
+- **Un script de edición falló a medias** porque la función exigía un parámetro que olvidé; al no escribir nada hasta el final, no dejó cambios parciales. Regla: los scripts de edición deben ser todo-o-nada.
+
+### Estado y próximos pasos
+
+- Hecho: peleadores, cinco disciplinas, categorías por disciplina, récord de partida, aura y ránking por categoría.
+- **Riesgos que deben decidirse:** (1) el récord de partida se puede editar en cualquier momento (queda en el historial, pero alguien podría inflarlo después); habría que bloquear la edición tras el primer combate registrado o pedir confirmación de un moderador; (2) el aura absoluta favorece a quien compite más; hay que decidir si se normaliza; (3) las categorías de peso deben validarse con federaciones.
+- Pendiente de lo anterior: despliegue real (proveedor de correo, migraciones, variables de entorno, preferencias de aviso), auditoría de usabilidad del resto de pantallas y decisión «tú/usted».
+- Pendiente de decidir: el nombre de la marca (ya no encaja «Ring España» del todo con MMA/jiu-jitsu).
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

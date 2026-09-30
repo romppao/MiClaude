@@ -18,19 +18,22 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F7 | **Veracidad de los datos** sin depender de trámites federativos al principio; colaborar con las federaciones a medio plazo | Fundador | 🟡 (estrategia escrita) |
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
 | F10 | **El diseño visual se deja para el final** y debe tener **identidad propia**, sin el aspecto genérico que suele producir Claude, para que la app no se asocie con una IA. Se trabajará con briefing, varias direcciones y, a ser posible, un diseñador humano | Fundador (reiterado) | ⚪ (aplazado a propósito; principio documentado en `CLAUDE.md`) |
-| F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🔵 (decisiones de modelo pendientes de respuesta) |
+| F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🟡 (cinco disciplinas implementadas; falta validar categorías con federaciones y ampliar) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 
 ## Ideas de producto
 
 | Idea | Origen | Estado | Notas |
 |---|---|---|---|
-| **Aura en vez de estrellas:** los aficionados dan «aura» a un peleador (cultura de redes, público joven); el ránking se ordena por su aura **dentro de su categoría de peso y disciplina** | Fundador | 🔵 | Falta decidir el tope de clics (ver preguntas abiertas). Sustituye a las estrellas |
-| **Récord de partida:** al crear la ficha, el peleador indica cuántos combates lleva; si recuerda su récord, lo pone (V-D-E); si no, solo el total. Desde ahí registra los nuevos | Fundador | 🔵 | Es un dato autodeclarado y no comprobable: se muestra aparte y con su etiqueta |
-| **Varias disciplinas** con resultados y divisiones propias (KO/TKO/decisión; sumisión y puntos en jiu-jitsu/MMA) | Fundador | 🔵 | Una persona puede competir en varias; récord separado por disciplina |
+| **Aura en vez de estrellas:** los aficionados dan «aura» a un peleador (cultura de redes, público joven); el ránking se ordena por su aura **dentro de su categoría de peso y disciplina** | Fundador | 🟢 (v1) | Decisión del fundador: una aura por persona y combate. Se puede quitar. Ránking por disciplina, zona y periodo |
+| **Récord de partida:** al crear la ficha, el peleador indica cuántos combates lleva; si recuerda su récord, lo pone (V-D-E); si no, solo el total. Desde ahí registra los nuevos | Fundador | 🟢 (v1) | Autodeclarado y no comprobable: se muestra siempre etiquetado. Riesgo abierto: se puede editar después |
+| **Varias disciplinas** con resultados y divisiones propias (KO/TKO/decisión; sumisión y puntos en jiu-jitsu/MMA) | Fundador | 🟢 (v1) | Boxeo, MMA, kickboxing, K-1 y jiu-jitsu; una ficha por persona; récord separado por disciplina |
+| Aura ponderada o normalizada (por número de combates, por «lo vi en directo», por antigüedad de la cuenta) | Riesgo detectado | 🔵 | El aura absoluta favorece a quien compite más |
+| Bloquear o moderar la edición del récord de partida una vez hay combates registrados | Riesgo detectado | 🔵 | Evita inflarlo a posteriori |
+| Validar categorías de peso y formas de terminar con las federaciones de cada disciplina | Estrategia con federaciones | ⚪ | Hoy son orientativas |
 | Récord calculado desde los combates, nunca guardado | Diseño | 🟢 | Evita desincronización |
-| Valoración anclada a un combate concreto | Diseño (anti-manipulación) | 🟢 | Una por usuario/combate; participantes no votan |
-| Media bayesiana en el ránking | Diseño | 🟢 | Un solo 5 no supera 40 notas de 4,8 |
+| Valoración anclada a un combate concreto | Diseño (anti-manipulación) | 🟢 | Ahora aplicada al aura: una por persona/combate/peleador; participantes no la dan |
+| Media bayesiana en el ránking de estrellas | Diseño | 🔴 | Sustituida por el aura; con un total de aura ya no hay una media de notas |
 | Niveles de respaldo del combate (autodeclarado → confirmado → verificado) | Necesidad: el amateur se registra a sí mismo | 🟢 | Se muestra en la ficha |
 | Reclamar una ficha creada por otro | Necesidad: el rival ya existe sin cuenta | 🟢 | Aprobación de moderador |
 | Rol organizador (cartel y resultados verificados) | Necesidad: fuente natural de verdad | 🟢 | Aprobación de moderador |
@@ -67,10 +70,10 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 
 ## Preguntas abiertas
 
-- **Aura:** ¿un aura por aficionado y combate, varios clics con tope diario, o clics ilimitados? Los clics ilimitados hacen el ránking fácil de manipular (cualquiera podría pulsar miles de veces o crear cuentas para hacerlo).
-- **Varias disciplinas:** ¿una sola ficha por persona con varias disciplinas (recomendado) o una ficha por deporte?
-- **Nombre:** «Ring España» y el vocabulario «boxeador/púgil» dejan de encajar si entran MMA, kickboxing o jiu-jitsu (hay que hablar de «peleadores» o «deportistas»).
-- **Jiu-jitsu:** ¿se registran combates con resultado (sumisión/puntos) también en torneos con muchos combates el mismo día? Afecta a las comprobaciones de coherencia.
+- **Nombre:** «Ring España» encaja peor ahora que hay MMA, kickboxing, K-1 y jiu-jitsu. El vocabulario ya es «peleador»; falta decidir el nombre de la marca.
+- **Jiu-jitsu:** en torneos con muchos combates el mismo día se ha desactivado la señal de «combates muy seguidos»; falta decidir cómo modelar un torneo (varias eliminatorias) de forma más natural.
+- **Aura:** ¿se normaliza por número de combates o se pondera (lo vi en directo, antigüedad de la cuenta)? Hoy es el total absoluto, con filtro de periodo.
+- **Récord de partida:** ¿se bloquea su edición tras el primer combate registrado, o lo revisa un moderador?
 
 - **Usabilidad (F9):** ¿tratamiento de «tú» o de «usted»? Hoy la app tutea; para un público con personas mayores conviene decidirlo con criterio y mantenerlo en toda la app.
 - **Usabilidad (F9):** ¿qué grupos de personas reales (edades, familiaridad con la tecnología) probarán la app y cuándo?
