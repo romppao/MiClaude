@@ -6,6 +6,7 @@ const db = new PrismaClient();
 const day = 864e5;
 
 async function main() {
+  await db.rating.deleteMany();
   await db.bout.deleteMany();
   await db.event.deleteMany();
   await db.boxer.deleteMany();
@@ -54,7 +55,7 @@ async function main() {
     mkEvent("Copa Demo Amateur", 35, "AMATEUR", "Madrid", "Madrid", "Polideportivo Demo"),
   ]);
   const bout = (eventId: string, a: number, b: number, order: number, weightClass: string, result?: Result, method?: Method, endRound?: number) =>
-    db.bout.create({ data: { eventId, boxerAId: boxers[a].id, boxerBId: boxers[b].id, order, weightClass, rounds: 6, result, method, endRound } });
+    db.bout.create({ data: { eventId, boxerAId: boxers[a].id, boxerBId: boxers[b].id, order, weightClass, rounds: 6, result, method, endRound, verification: "VERIFIED" } });
   await bout(past1.id, 0, 1, 1, "Ligero", "A_WIN", "KO", 3);
   await bout(past2.id, 2, 3, 1, "Wélter", "B_WIN", "UD");
   await bout(next1.id, 0, 5, 1, "Ligero");

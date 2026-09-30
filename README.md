@@ -15,8 +15,18 @@ npm run db:seed             # datos FICTICIOS de demostración
 npm run dev                 # http://localhost:3000
 ```
 
-## Qué incluye el MVP
+## Enfoque
 
+Amateur primero y Madrid como plaza inicial. El boxeador amateur gestiona su ficha y récord, el público valora
+las actuaciones y el calendario descubre veladas. Decisiones, roles, riesgos y hoja de ruta: [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
+
+## Qué incluye
+
+- **Cuentas** (`/registro`, `/entrar`): aficionado (`FAN`) o boxeador (`BOXER`). Para crear un administrador, cambia `role` a `ADMIN` en la tabla `User`.
+- **Mi ficha** (`/mi-ficha`): el boxeador crea su ficha amateur, registra combates y confirma o disputa los que su rival declara.
+- **Valoraciones**: cada aficionado puntúa (1–5, comentario, «lo vi en directo») a un boxeador **por combate**; una nota por usuario/combate.
+- **Ránking** (`/ranking`): media bayesiana por provincia (Madrid por defecto).
+- **Moderación** (`/admin`): verificar o rechazar combates autodeclarados.
 - `/boxeadores` — búsqueda y filtros (nombre/alias, nivel, provincia, peso) y ficha con récord pro y amateur calculado desde los combates.
 - `/veladas` — calendario de próximas/pasadas, filtro por nivel (pro/amateur), provincia y texto; detalle con cartel y resultados.
 - `/gimnasios`, `/entrenadores` — listados, fichas y sus boxeadores.

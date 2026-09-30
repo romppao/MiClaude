@@ -37,6 +37,23 @@ enum Method {
   NC
 }
 
+enum Role {
+  FAN
+  BOXER
+  ORGANIZER
+  ADMIN
+}
+
+// Origen y fiabilidad de un combate registrado.
+// SELF_REPORTED: lo añadió un boxeador; CONFIRMED: el rival lo confirmó;
+// VERIFIED: lo validó un administrador/organizador/federación; DISPUTED: el rival o un admin lo rechazó.
+enum Verification {
+  SELF_REPORTED
+  CONFIRMED
+  VERIFIED
+  DISPUTED
+}
+
 enum EventStatus {
   SCHEDULED
   COMPLETED
@@ -68,28 +85,31 @@ model Trainer {
 }
 
 model Boxer {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String    @id @default(cuid())
+  slug        String    @unique
   firstName   String
   lastName    String
   alias       String?
   birthDate   DateTime?
   city        String?
   province    String?
-  nationality String   @default("España")
+  nationality String    @default("España")
   stance      Stance?
   heightCm    Int?
   reachCm     Int?
   weightClass String?
-  level       Level    @default(AMATEUR)
+  level       Level     @default(AMATEUR)
   bio         String?
   gymId       String?
-  gym         Gym?     @relation(fields: [gymId], references: [id])
+  gym         Gym?      @relation(fields: [gymId], references: [id])
   trainerId   String?
-  trainer     Trainer? @relation(fields: [trainerId], references: [id])
-  boutsAsA    Bout[]   @relation("BoxerA")
-  boutsAsB    Bout[]   @relation("BoxerB")
-  createdAt   DateTime @default(now())
+  trainer     Trainer?  @relation(fields: [trainerId], references: [id])
+  userId      String?   @unique
+  user        User?     @relation(fields: [userId], references: [id])
+  ratings     Rating[]
+  boutsAsA    Bout[]    @relation("BoxerA")
+  boutsAsB    Bout[]    @relation("BoxerB")
+  createdAt   DateTime  @default(now())
 
   @@index([lastName, firstName])
   @@index([province])
@@ -115,21 +135,67 @@ model Event {
 }
 
 model Bout {
-  id          String  @id @default(cuid())
-  eventId     String
-  event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  order       Int     @default(0)
-  boxerAId    String
-  boxerA      Boxer   @relation("BoxerA", fields: [boxerAId], references: [id])
-  boxerBId    String
-  boxerB      Boxer   @relation("BoxerB", fields: [boxerBId], references: [id])
-  weightClass String?
-  rounds      Int?
-  result      Result?
-  method      Method?
-  endRound    Int?
+  id           String       @id @default(cuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order        Int          @default(0)
+  boxerAId     String
+  boxerA       Boxer        @relation("BoxerA", fields: [boxerAId], references: [id])
+  boxerBId     String
+  boxerB       Boxer        @relation("BoxerB", fields: [boxerBId], references: [id])
+  weightClass  String?
+  rounds       Int?
+  result       Result?
+  method       Method?
+  endRound     Int?
+  verification Verification @default(SELF_REPORTED)
+  createdById  String?
+  createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
+  ratings      Rating[]
 
   @@index([eventId])
   @@index([boxerAId])
   @@index([boxerBId])
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(FAN)
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  boxer        Boxer?
+  boutsCreated Bout[]    @relation("BoutCreator")
+  ratings      Rating[]
+}
+
+model Session {
+  id        String   @id // sha256 del token de la cookie
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+// Valoración de un aficionado a un boxeador por su actuación en UN combate concreto.
+// Anclar la nota a un combate (y limitar a una por usuario/combate/boxeador) es la base anti-manipulación.
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  boxerId   String
+  boxer     Boxer    @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  boutId    String
+  bout      Bout     @relation(fields: [boutId], references: [id], onDelete: Cascade)
+  score     Int // 1..5
+  comment   String?
+  attended  Boolean  @default(false) // "lo vi en directo"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, boutId, boxerId])
+  @@index([boxerId])
 }
