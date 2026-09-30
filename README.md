@@ -22,17 +22,17 @@ las actuaciones y el calendario descubre veladas. Decisiones, roles, riesgos y h
 
 ## Qué incluye
 
-- **Cuentas** (`/registro`, `/entrar`): aficionado (`FAN`) o boxeador (`BOXER`). Para crear un administrador, cambia `role` a `ADMIN` en la tabla `User`.
+- **Cuentas** (`/registro`, `/entrar`): aficionado (`FAN`) o peleador (`FIGHTER`). Para crear un administrador, cambia `role` a `ADMIN` en la tabla `User`.
 - **Verificación de email**: obligatoria para publicar. En desarrollo el enlace aparece en el log del servidor (`[mail] …`).
 - **Reclamar ficha** y **Organizadores** (`/organizador`): solicitudes que aprueba un moderador; los organizadores crean veladas, montan el cartel y ponen resultados verificados.
-- **Mi ficha** (`/mi-ficha`): el boxeador crea su ficha amateur, registra combates y confirma o disputa los que su rival declara.
+- **Mi ficha** (`/mi-ficha`): el peleador crea su ficha amateur, registra combates y confirma o disputa los que su rival declara.
 - **Aura**: cada aficionado puede dar aura a un peleador **por combate** (una por persona, combate y peleador), con comentario opcional y «lo vi en directo».
 - **Ránking** (`/ranking`): por aura, dentro de cada disciplina (boxeo por defecto) y categoría de peso, con zona (Madrid por defecto) y periodo.
 - **Disciplinas**: boxeo, MMA, kickboxing, K-1 y jiu-jitsu. Una ficha por persona con varias disciplinas y **récord de partida** declarado para quien ya había competido.
 - **Moderación** (`/admin`): verificar o rechazar combates autodeclarados.
-- `/boxeadores` — búsqueda y filtros (nombre/alias, nivel, provincia, peso) y ficha con récord pro y amateur calculado desde los combates.
+- `/peleadores` — búsqueda y filtros (nombre/alias, nivel, provincia, disciplina y categoría de peso) y ficha con el récord por disciplina calculado desde los combates.
 - `/veladas` — calendario de próximas/pasadas, filtro por nivel (pro/amateur), provincia y texto; detalle con cartel y resultados.
-- `/gimnasios`, `/entrenadores` — listados, fichas y sus boxeadores.
+- `/gimnasios`, `/entrenadores` — listados, fichas y sus peleadores.
 - `/buscar` — búsqueda global.
 
 ## Modelo de datos
