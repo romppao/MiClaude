@@ -206,6 +206,39 @@ Cada bloque se hizo con pruebas y se subió por separado.
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Nuevas directrices: diseño al final, aura, varias disciplinas y récord de partida
+
+### Qué se pidió / qué idea surgió
+
+El fundador aportó cuatro directrices importantes:
+
+1. **Diseño visual al final (recordatorio).** «No me gustan nada los diseños que ofrece Claude… siempre hace los mismos diseños, siempre utiliza los mismos colores… esto lo vamos a trabajar muy bien para que no pueda ocurrir y no se asocie directamente el desarrollo de esa aplicación con una inteligencia artificial como Claude.» Pidió dejarlo **muy marcado y documentado** y pasar al diseño «cuando hayamos terminado todo el proceso de creación de la aplicación».
+2. **Aura en lugar de estrellas.** Quiere llevar la valoración «a un ambiente más actual, más juvenil, más de redes sociales»: valorar con **«aura»**. Quién tiene más o menos aura se define **por el número de clics** en el botón de aura del peleador; cuantos más clics, **mejor rankeado dentro de su categoría y su división**.
+3. **Ampliar a otros deportes de contacto:** MMA, kickboxing, K-1, jiu-jitsu… «Queremos ser los pioneros. Que todas esas disciplinas se sientan parte de un mismo ecosistema dentro de la comunidad española de deportes de contacto, en la que obviamente el boxeo tiene que estar en cabeza.»
+4. **Récord de partida.** Muchos peleadores no recuerdan su récord. Primero indicarán **cuántos combates llevan**; si no recuerdan el récord, solo ese número. **Desde ese punto de partida** registran los nuevos. Reconoce que no se puede comprobar: «es lo que hay».
+
+### Qué se decidió y por qué
+
+- **Diseño:** principio F10 documentado en `CLAUDE.md` (y a nivel de usuario) con un procedimiento para cuando llegue el momento: briefing con referencias del fundador, varias direcciones distintas, lista de tics de «diseño de IA» que evitar, recomendación de un diseñador humano para la marca y registro de decisiones en `docs/DISENO.md`. **La interfaz actual es provisional y no se pule.**
+- **Aura, récord de partida y varias disciplinas se registran como decisiones de producto** (ideas F11 y las tres filas nuevas de `IDEAS.md`), pero **no se implementan todavía**: hay dos decisiones que condicionan el modelo de datos y el fundador pidió que se le pregunte si no queda claro.
+- **Riesgo señalado con el aura por clics:** si los clics son ilimitados, un solo usuario (o varias cuentas falsas) puede inflar a un peleador sin límite, y el ránking pierde credibilidad, que es justo lo que se ha estado protegiendo. Se propone conservar la regla que ya existe (una valoración por persona y combate, sin participantes) y aplicarla al aura, o como mínimo un tope diario.
+- **Récord de partida:** se mostrará **separado** de lo registrado en la app y con su etiqueta de «declarado por el propio deportista», nunca mezclado sin distinguir, para no perder la honestidad del sistema de niveles de respaldo.
+
+### Qué se hizo
+
+Solo documentación: principio de diseño en `CLAUDE.md` y `~/.claude/CLAUDE.md`, ideas F10 y F11, tres ideas de producto nuevas y preguntas abiertas en `IDEAS.md`, y esta entrada. **No se ha tocado el código.**
+
+### Qué salió mal / qué se aprendió
+
+Nada roto. Observación: los tres cambios de producto (aura, disciplinas, récord de partida) **tocan el modelo de datos de arriba abajo** (el récord pasa a ser por disciplina, la valoración cambia de estrellas a aura, «boxeador» pasa a «peleador»). Cuanto antes se hagan, más barato es: hoy solo hay datos de demostración.
+
+### Estado y próximos pasos
+
+- Pendiente de respuesta del fundador: tope de clics del aura, una ficha por persona o por deporte.
+- Después: (1) disciplinas + rebautizar «boxeador» a «peleador» en el modelo y la interfaz, (2) récord de partida, (3) aura y ránking por categoría y disciplina, (4) adaptar tests y documentación.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

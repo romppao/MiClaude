@@ -33,6 +33,19 @@ Esto rige **todo lo que se haga**, no solo el diseño. Lista de comprobación an
 
 Matiz sobre el diseño gráfico: el fundador pidió aplazar el **diseño visual** (estilo, identidad, maquetación fina) y que primero se cuide la arquitectura. Este principio **no** es diseño visual: la claridad, el lenguaje, los flujos, los mensajes y la accesibilidad se aplican **ya**. Antes de cambiar el aspecto visual de forma notable (paleta, estilo), **consultar al fundador**, porque los diseños generados suelen no gustarle.
 
+## Principio de diseño visual: al final, y con identidad propia (no «aspecto de IA»)
+
+**Petición expresa y reiterada del fundador.** El diseño gráfico y visual se trabaja **en última instancia**, cuando esté terminado todo el proceso de creación de la aplicación. Hasta que el fundador lo pida, **no se hace trabajo de diseño visual**: la interfaz actual (fondo oscuro, rojo y dorado) es **provisional y no debe evolucionarse ni pulirse**.
+
+Motivo: al fundador **no le gustan los diseños que genera Claude**. Siempre salen iguales, con los mismos colores y patrones, y no quiere que la aplicación se asocie a simple vista con una IA. Cuando llegue el momento:
+
+1. **Empezar por un briefing con el fundador**, no por un diseño: referencias que le gusten (webs, marcas, carteles de boxeo, cultura del deporte de contacto español), lo que no quiere ver, y la personalidad de la marca. Mostrarle **varias direcciones claramente distintas** y dejarle elegir.
+2. **Evitar los «tics» de diseño genérico de IA:** degradados morados/azul índigo, tipografía por defecto (Inter/system-ui sin criterio), tarjetas redondeadas con sombra suave en cuadrículas idénticas, «hero + tres tarjetas», efectos de cristal/glassmorphism, iconos de emoji como decoración, paletas «seguras» sin carácter.
+3. **Buscar identidad propia** apoyada en la cultura del boxeo y los deportes de contacto en España (cartelería de veladas, tipografías de rótulo, materiales del ring, fotografía real), con paleta, tipografía y composición elegidas a propósito y justificadas por escrito.
+4. **Recomendar contar con un diseñador humano** para logotipo y marca; Claude implementa y ayuda, pero no decide solo la identidad.
+5. **Documentar cada decisión de diseño** (qué se eligió, qué se descartó y por qué) en `docs/DISENO.md`, que se crea al empezar esta fase.
+6. Mientras tanto se mantiene **todo lo que no es estilo**: claridad, lenguaje, flujos, accesibilidad (principio de usabilidad).
+
 ## Reglas del fundador
 
 - Ver contenido es público; votar, registrar récords y publicar exige cuenta (y email verificado).

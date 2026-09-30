@@ -17,12 +17,17 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F6 | Ver es público; **votar, registrar y publicar exige registro** | Fundador | 🟢 |
 | F7 | **Veracidad de los datos** sin depender de trámites federativos al principio; colaborar con las federaciones a medio plazo | Fundador | 🟡 (estrategia escrita) |
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
+| F10 | **El diseño visual se deja para el final** y debe tener **identidad propia**, sin el aspecto genérico que suele producir Claude, para que la app no se asocie con una IA. Se trabajará con briefing, varias direcciones y, a ser posible, un diseñador humano | Fundador (reiterado) | ⚪ (aplazado a propósito; principio documentado en `CLAUDE.md`) |
+| F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🔵 (decisiones de modelo pendientes de respuesta) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 
 ## Ideas de producto
 
 | Idea | Origen | Estado | Notas |
 |---|---|---|---|
+| **Aura en vez de estrellas:** los aficionados dan «aura» a un peleador (cultura de redes, público joven); el ránking se ordena por su aura **dentro de su categoría de peso y disciplina** | Fundador | 🔵 | Falta decidir el tope de clics (ver preguntas abiertas). Sustituye a las estrellas |
+| **Récord de partida:** al crear la ficha, el peleador indica cuántos combates lleva; si recuerda su récord, lo pone (V-D-E); si no, solo el total. Desde ahí registra los nuevos | Fundador | 🔵 | Es un dato autodeclarado y no comprobable: se muestra aparte y con su etiqueta |
+| **Varias disciplinas** con resultados y divisiones propias (KO/TKO/decisión; sumisión y puntos en jiu-jitsu/MMA) | Fundador | 🔵 | Una persona puede competir en varias; récord separado por disciplina |
 | Récord calculado desde los combates, nunca guardado | Diseño | 🟢 | Evita desincronización |
 | Valoración anclada a un combate concreto | Diseño (anti-manipulación) | 🟢 | Una por usuario/combate; participantes no votan |
 | Media bayesiana en el ránking | Diseño | 🟢 | Un solo 5 no supera 40 notas de 4,8 |
@@ -61,6 +66,11 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Guardar el récord como número en la ficha | Se desincroniza; se calcula |
 
 ## Preguntas abiertas
+
+- **Aura:** ¿un aura por aficionado y combate, varios clics con tope diario, o clics ilimitados? Los clics ilimitados hacen el ránking fácil de manipular (cualquiera podría pulsar miles de veces o crear cuentas para hacerlo).
+- **Varias disciplinas:** ¿una sola ficha por persona con varias disciplinas (recomendado) o una ficha por deporte?
+- **Nombre:** «Ring España» y el vocabulario «boxeador/púgil» dejan de encajar si entran MMA, kickboxing o jiu-jitsu (hay que hablar de «peleadores» o «deportistas»).
+- **Jiu-jitsu:** ¿se registran combates con resultado (sumisión/puntos) también en torneos con muchos combates el mismo día? Afecta a las comprobaciones de coherencia.
 
 - **Usabilidad (F9):** ¿tratamiento de «tú» o de «usted»? Hoy la app tutea; para un público con personas mayores conviene decidirlo con criterio y mantenerlo en toda la app.
 - **Usabilidad (F9):** ¿qué grupos de personas reales (edades, familiaridad con la tecnología) probarán la app y cuándo?
