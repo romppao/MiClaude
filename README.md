@@ -35,6 +35,10 @@ las actuaciones y el calendario descubre veladas. Decisiones, roles, riesgos y h
 - `/gimnasios`, `/entrenadores` — listados, fichas y sus peleadores.
 - `/buscar` — búsqueda global.
 
+## Documentación
+
+`docs/ARQUITECTURA.md` (estado técnico), `docs/DIARIO.md` (cómo hemos llegado hasta aquí), `docs/IDEAS.md` (ideas y su estado), `docs/LECCIONES.md` (errores y reglas) y `docs/COMPETENCIA.md` (análisis de la competencia).
+
 ## Modelo de datos
 
 `Boxer`, `Gym`, `Trainer`, `Event` (velada, nivel PRO/AMATEUR), `Bout` (combate con resultado y método).

@@ -46,6 +46,20 @@ Motivo: al fundador **no le gustan los diseños que genera Claude**. Siempre sal
 5. **Documentar cada decisión de diseño** (qué se eligió, qué se descartó y por qué) en `docs/DISENO.md`, que se crea al empezar esta fase.
 6. Mientras tanto se mantiene **todo lo que no es estilo**: claridad, lenguaje, flujos, accesibilidad (principio de usabilidad).
 
+## Idioma: todo en español (petición expresa del fundador)
+
+Todo lo que llegue a una persona va en **español**: la interfaz (textos, botones, avisos, errores, títulos, pantallas de «no encontrada» y de error), los correos, la documentación y los mensajes de commit. También las direcciones visibles (`/peleadores`, `/moderacion`…). Se usa «correo electrónico» y no «email» en los textos. Los identificadores internos del código (`Fighter`, `Bout`…) están en inglés por convención técnica; **si el fundador quiere también el código en español, hay que preguntárselo y planificarlo, porque supone un renombrado grande.**
+
+## Aura y funciones premium (decisiones del fundador)
+
+- **Aura: un clic por usuario y por combate**, y solo eso hasta que la estructura básica esté terminada.
+- Más adelante, **hasta tres clics como función premium**, dentro de las funcionalidades de pago. **No adelantarlo.** Riesgo a resolver antes: si pagar da más peso al aura, se desvirtúa el ránking («quien paga, gana»).
+- **La aplicación debe monetizarse.** Se harán las funciones premium **después** de terminar la estructura básica. Principio para elegirlas: **nunca se vende la verificación, el sello de verificado ni una posición en el ránking**; la consulta básica sigue siendo gratuita.
+
+## Competencia
+
+La competencia declarada es **Raunder** (raunder.es) y **BoxRec** (boxrec.com). El análisis vive en `docs/COMPETENCIA.md`; **no se afirma nada que no se haya podido comprobar**, y hay que completarlo cuando se pueda acceder a esas webs.
+
 ## Reglas del fundador
 
 - Ver contenido es público; votar, registrar récords y publicar exige cuenta (y email verificado).

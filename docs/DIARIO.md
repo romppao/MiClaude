@@ -276,6 +276,42 @@ Cuatro entregas, cada una con pruebas: `66edb2c` (renombrado a peleador), `f41f7
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Aura, monetización, todo en español y análisis de la competencia
+
+### Qué se pidió / qué idea surgió
+
+1. **Aura:** «principalmente va a ser un clic por usuario y por pelea. Y más adelante podremos introducir tres clics, pero eso ya sería una función premium.»
+2. **Monetizar:** una de las finalidades es «sacar dinero» con **funciones premium**, que se harán «una vez ya hayamos terminado toda la estructura básica».
+3. **«Todo debe estar en español.»**
+4. **Competencia:** Raunder (raunder.es) y BoxRec (boxrec.com): «mira en qué fallan y hazlo mejor; mira también lo que hacen bien y mejóralo».
+
+### Qué se decidió y por qué
+
+- **Aura a un clic por usuario y combate**: ya es lo que está implementado. Los tres clics quedan registrados como función premium **aplazada**, con un riesgo anotado: si pagar da más peso al aura, el ránking pasa a ser «quien paga, gana» y se pierde la credibilidad que se ha protegido hasta ahora.
+- **Principio de monetización**: la consulta básica sigue siendo gratuita y **nunca se vende la verificación, el sello ni una posición en el ránking**. Se listan candidatas (ficha ampliada, herramientas para organizadores, páginas de gimnasio, avisos y comparador ampliados, sin publicidad) para decidir después con el fundador.
+- **Español**: se aplicó a todo lo que ve una persona. Se interpretó que **el código interno sigue en inglés** (`Fighter`, `Bout`), y se dejó anotado que hay que preguntar si el fundador quiere también el código en español, por lo grande del renombrado.
+- **Competencia**: no se afirma nada que no se pueda comprobar (ver «qué salió mal»).
+
+### Qué se hizo
+
+- Español: páginas de «no encontrada» y de error propias (antes salían las de Next.js en inglés), «email» pasa a «correo electrónico» en textos y correos, y `/admin` pasa a `/moderacion` (`56a7a8e`).
+- `docs/COMPETENCIA.md` con lo comprobado, lo que es conocimiento general sin comprobar, y una lista de mejoras propuestas.
+- Reglas nuevas en `CLAUDE.md` (idioma, aura y premium, competencia) e ideas F12 y F13 más siete ideas nuevas.
+- Tests: 41 unitarios y 39 comprobaciones de navegador, sin fallos en 3 ejecuciones.
+
+### Qué salió mal / qué se aprendió
+
+- **No pude abrir ni Raunder ni BoxRec**: la política de red del entorno bloquea esos dominios (también Wikipedia), y las búsquedas no devuelven nada de Raunder. **No rodeé el bloqueo ni rellené los huecos con suposiciones.** El análisis de BoxRec se limita a quejas públicas de pocas reseñas y a un artículo de opinión con fecha, señalado como tal, y a conocimiento general marcado como «sin comprobar». **De Raunder no se dice nada.** Regla: cuando falta una fuente, decirlo, y no escribir un análisis que parezca completo.
+- Hay que pedir al fundador que habilite esos dominios en la red del entorno (o que aporte capturas o texto) para completar el análisis.
+
+### Estado y próximos pasos
+
+- Pendiente de acceso: completar el análisis de Raunder y confirmar lo general de BoxRec.
+- Mejoras propuestas a partir del análisis, por impacto: estadísticas de carrera por disciplina, comparador «cara a cara», tarjeta para compartir en redes, preparación para buscadores y avisos al propio peleador.
+- Sigue pendiente lo anterior: despliegue real (correo, migraciones), auditoría de usabilidad, decisiones sobre el récord de partida editable y la normalización del aura, nombre de la marca.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

@@ -19,6 +19,8 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
 | F10 | **El diseño visual se deja para el final** y debe tener **identidad propia**, sin el aspecto genérico que suele producir Claude, para que la app no se asocie con una IA. Se trabajará con briefing, varias direcciones y, a ser posible, un diseñador humano | Fundador (reiterado) | ⚪ (aplazado a propósito; principio documentado en `CLAUDE.md`) |
 | F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🟡 (cinco disciplinas implementadas; falta validar categorías con federaciones y ampliar) |
+| F12 | **Todo en español** (interfaz, correos, documentación, commits y direcciones visibles) | Fundador | 🟢 (aplicado a lo visible; el código interno sigue en inglés: preguntar si también debe cambiar) |
+| F13 | **Monetizar la aplicación** con funciones premium, **después** de terminar la estructura básica. Sin vender verificación ni posiciones de ránking | Fundador | ⚪ (aplazado a propósito) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 
 ## Ideas de producto
@@ -28,6 +30,13 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | **Aura en vez de estrellas:** los aficionados dan «aura» a un peleador (cultura de redes, público joven); el ránking se ordena por su aura **dentro de su categoría de peso y disciplina** | Fundador | 🟢 (v1) | Decisión del fundador: una aura por persona y combate. Se puede quitar. Ránking por disciplina, zona y periodo |
 | **Récord de partida:** al crear la ficha, el peleador indica cuántos combates lleva; si recuerda su récord, lo pone (V-D-E); si no, solo el total. Desde ahí registra los nuevos | Fundador | 🟢 (v1) | Autodeclarado y no comprobable: se muestra siempre etiquetado. Riesgo abierto: se puede editar después |
 | **Varias disciplinas** con resultados y divisiones propias (KO/TKO/decisión; sumisión y puntos en jiu-jitsu/MMA) | Fundador | 🟢 (v1) | Boxeo, MMA, kickboxing, K-1 y jiu-jitsu; una ficha por persona; récord separado por disciplina |
+| **Hasta 3 clics de aura por combate como función premium** | Fundador | ⚪ | Aplazado hasta terminar la estructura básica. Riesgo: que pagar dé más peso al aura desvirtúe el ránking |
+| Otras funciones premium candidatas (no se venden verificación ni ránking): ficha ampliada con galería y estadísticas avanzadas, herramientas para organizadores (carteles, entradas, estadísticas), páginas de gimnasio con más funciones, avisos y comparador ampliados, sin publicidad | Propuesta | ⚪ | Decidir con el fundador |
+| Estadísticas de carrera por disciplina (porcentaje de KO, racha, actividad) | Análisis de competencia | 🔵 | Falta hoy |
+| Comparador «cara a cara» e historial de rivales | Análisis de competencia | 🔵 | |
+| Tarjeta para compartir fichas y ránkings en redes | Análisis de competencia | 🔵 | Da audiencia a los peleadores |
+| Preparación para buscadores (mapa del sitio, datos estructurados) | Análisis de competencia | 🔵 | |
+| Avisos al propio peleador cuando alguien toca su ficha o le da aura | Análisis de competencia | 🔵 | |
 | Aura ponderada o normalizada (por número de combates, por «lo vi en directo», por antigüedad de la cuenta) | Riesgo detectado | 🔵 | El aura absoluta favorece a quien compite más |
 | Bloquear o moderar la edición del récord de partida una vez hay combates registrados | Riesgo detectado | 🔵 | Evita inflarlo a posteriori |
 | Validar categorías de peso y formas de terminar con las federaciones de cada disciplina | Estrategia con federaciones | ⚪ | Hoy son orientativas |

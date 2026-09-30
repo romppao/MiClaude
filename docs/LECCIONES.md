@@ -37,6 +37,9 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | Un script de edición falló con `missing 1 required positional argument` | La función auxiliar exigía una etiqueta que no pasé | Como el fichero solo se escribe al final, no quedaron cambios a medias. **Regla:** scripts de edición todo-o-nada, con aserciones que fallen si un patrón no existe |
 | Una comprobación e2e falló de forma intermitente tras acciones que cambian un contador | Se leía el contador antes de que la página terminara de actualizarse | Se **midió** el retraso (entre 4 y 30 ms tras el aviso) y se espera de forma explícita. **Regla:** medir antes de asignar una causa; y esperar al estado visible, no leerlo de inmediato |
 
+| No se pudo abrir ni raunder.es ni boxrec.com para analizar a la competencia | La política de red del entorno bloquea esos dominios (también Wikipedia) y las búsquedas no devuelven nada de Raunder | **No se rodeó el bloqueo ni se rellenó con suposiciones.** El análisis separa lo comprobado, lo general sin comprobar y lo no analizado, y se pide habilitar los dominios. **Regla:** si falta la fuente, decirlo; un análisis que parece completo pero no lo es engaña al fundador |
+| Al pedir «todo en español» aún salían pantallas en inglés | Las páginas de «no encontrada» y de error que genera Next.js por defecto están en inglés y no las habíamos creado | Se añadieron `not-found`, `error` y `global-error` en español. **Regla:** revisar también lo que el framework muestra por su cuenta |
+
 ## Del proceso de trabajo
 
 - El clasificador de permisos del entorno falló de forma intermitente y bloqueó varios comandos; mientras tanto se avanzó en tareas que no necesitaban shell (documentación). **Regla:** cuando algo externo se cae, avanzar en lo que no depende de ello.

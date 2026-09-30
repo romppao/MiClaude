@@ -64,6 +64,12 @@ Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de domin
 - **Aura** (`Aura`) sustituye a las estrellas: una por persona, combate y peleador (se puede quitar), con las mismas reglas anti-manipulación (correo verificado, combate celebrado y no disputado, participantes excluidos, 20 al día). El **ránking** (`lib/aura.ts`) agrupa por disciplina y categoría de peso, con zona y periodo, y empates en la misma posición.
 - **Categorías de peso** orientativas, pendientes de validar con las federaciones.
 
+## Idioma y modelo de negocio (decisiones del fundador)
+
+- **Todo lo que ve una persona va en español** (interfaz, correos, errores, direcciones como `/peleadores` o `/moderacion`). El código interno está en inglés por convención; queda por decidir si también debe ir en español.
+- **Aura:** un clic por usuario y combate. **Hasta tres clics será función premium** en el futuro, con el riesgo de que pagar dé más peso al aura y desvirtúe el ránking.
+- **Monetización:** funciones premium **después** de terminar la estructura básica. Nunca se venderá la verificación, el sello de verificado ni una posición en el ránking; la consulta básica sigue siendo gratuita. Candidatas y análisis de la competencia en `docs/IDEAS.md` y `docs/COMPETENCIA.md`.
+
 ## Riesgos conocidos (a resolver antes de abrir al público)
 
 - **Manipulación de valoraciones** (cuentas falsas, brigading): mitigado con email verificado y límite de 20 valoraciones/día por usuario. Falta límite por IP, detección de patrones (p. ej. muchas cuentas nuevas votando al mismo boxeador) y ponderar más «lo vi en directo» y las cuentas antiguas.
