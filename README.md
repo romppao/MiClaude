@@ -41,10 +41,7 @@ El récord no se guarda: se calcula a partir de los `Bout` (`src/lib/record.ts`)
 
 ## Hoja de ruta
 
-1. **Fase 2 – Cuentas y contribución:** registro/login, reclamar perfil de boxeador, altas de veladas y combates por promotores/gimnasios.
-2. **Fase 3 – Moderación y confianza:** cola de revisión, verificación por federación/promotor, historial de cambios.
-3. **Fase 4 – Comunidad:** fotos/vídeos, noticias, seguir boxeadores, avisos de veladas, ránking, mapas de gimnasios.
-4. **Fase 5 – Escala:** SEO/sitemaps, API pública, app móvil, importación de datos federativos.
+Ver [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md#hoja-de-ruta) (lo hecho, lo siguiente y los riesgos abiertos).
 
 > Los datos del seed son inventados. Cualquier dato real debe proceder de los propios interesados, promotores o federaciones.
 
