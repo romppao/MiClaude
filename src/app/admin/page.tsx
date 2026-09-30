@@ -3,7 +3,8 @@ import { getUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import Link from "next/link";
 import { FLAG_LABEL, type Flag } from "../../lib/coherence";
-import { adminDecide, decideClaim, decideOrganizer, setGymVerified } from "../actions";
+import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions";
+import { REPORT_REASONS } from "../../lib/reports";
 
 export const metadata = { title: "Moderación" };
 export const dynamic = "force-dynamic";
@@ -16,6 +17,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
     where: { verification: { in: ["SELF_REPORTED", "CONFIRMED"] } },
     include: { event: true, boxerA: true, boxerB: true }, orderBy: { event: { date: "desc" } }, take: 100,
   });
+  const reports = await db.report.findMany({ where: { status: "OPEN" }, include: { user: { select: { name: true, email: true } } }, orderBy: { createdAt: "asc" }, take: 100 });
+  const reportedBouts = await db.bout.findMany({ where: { id: { in: reports.filter((r) => r.entity === "BOUT").map((r) => r.entityId) } }, include: { event: true, boxerA: true, boxerB: true } });
+  const reportedBoxers = await db.boxer.findMany({ where: { id: { in: reports.filter((r) => r.entity === "BOXER").map((r) => r.entityId) } } });
   const [gyms, claims, organizers] = await Promise.all([
     db.gym.findMany({ orderBy: [{ verifiedAt: "asc" }, { name: "asc" }], take: 100 }),
     db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, boxer: true }, orderBy: { createdAt: "asc" } }),
@@ -35,6 +39,35 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       <h1>Moderación</h1>
       <p><Link href="/admin/historial">Ver historial de cambios</Link></p>
       {error === "nota" && <p className="L">El sello de verificado necesita una nota con la evidencia comprobada.</p>}
+      <h2>Avisos de error de usuarios ({reports.length})</h2>
+      <table><tbody>
+        {reports.map((r) => {
+          const bout = reportedBouts.find((b) => b.id === r.entityId);
+          const boxer = reportedBoxers.find((b) => b.id === r.entityId);
+          return (
+            <tr key={r.id}>
+              <td>
+                <strong>{REPORT_REASONS[r.reason] ?? r.reason}</strong>
+                <div className="mut">{r.user.name} · {r.user.email}</div>
+                {r.message && <div>{r.message}</div>}
+              </td>
+              <td>
+                {bout && <Link href={`/veladas/${bout.event.slug}`}>{bout.boxerA.firstName} {bout.boxerA.lastName} vs {bout.boxerB.firstName} {bout.boxerB.lastName} ({bout.event.name})</Link>}
+                {boxer && <Link href={`/boxeadores/${boxer.slug}`}>{boxer.firstName} {boxer.lastName}</Link>}
+              </td>
+              <td>
+                <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  <input type="hidden" name="reportId" value={r.id} />
+                  <input name="note" placeholder="Nota (opcional)" aria-label="Nota de resolución" />
+                  <button name="decision" value="resolve">Resuelto</button>
+                  <button name="decision" value="dismiss" className="secondary">Descartar</button>
+                </form>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody></table>
+      {reports.length === 0 && <p className="mut">No hay avisos pendientes.</p>}
       <h2>Reclamaciones de ficha ({claims.length})</h2>
       <table><tbody>
         {claims.map((c) => (

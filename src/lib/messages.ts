@@ -13,6 +13,7 @@ export const AVISOS: Record<string, string> = {
   velada_creada: "La velada se ha creado. Ahora puedes añadir los combates del cartel.",
   cartel_anadido: "El combate se ha añadido al cartel.",
   resultado_guardado: "El resultado se ha guardado.",
+  reporte_enviado: "Gracias. Hemos recibido tu aviso y un moderador lo revisará.",
   solicitud_enviada: "Solicitud enviada. Un moderador la revisará y te avisaremos.",
 };
 
@@ -29,6 +30,9 @@ export const PROBLEMAS: Record<string, string> = {
   valorar_limite: "Has llegado al límite de 20 valoraciones al día. Vuelve a intentarlo mañana.",
   valorar_no_existe: "No hemos encontrado ese combate. Inténtalo de nuevo desde la ficha del boxeador.",
   url_invalida: "El enlace no es válido. Debe empezar por http:// o https://.",
+  reporte_repetido: "Ya nos avisaste de esto y lo estamos revisando. Gracias por tu paciencia.",
+  reporte_limite: "Has enviado muchos avisos hoy. Inténtalo de nuevo mañana.",
+  reporte_datos: "Elige el motivo del aviso para poder enviarlo.",
   sin_permiso: "No tienes permiso para hacer esta acción.",
   cartel_boxeadores: "Elige dos boxeadores distintos de la lista.",
   resultado_futuro: "Solo puedes poner resultados cuando la velada ya se ha celebrado.",

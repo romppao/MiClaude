@@ -60,6 +60,12 @@ enum RequestStatus {
   REJECTED
 }
 
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
 enum EventStatus {
   SCHEDULED
   COMPLETED
@@ -163,7 +169,7 @@ model Bout {
   createdById  String?
   createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
   ratings      Rating[]
-  flags        String[] @default([])
+  flags        String[]     @default([])
   evidenceUrl  String?
 
   @@index([eventId])
@@ -187,6 +193,7 @@ model User {
   claimRequests    ClaimRequest[]
   organizerRequest OrganizerRequest?
   auditLogs        AuditLog[]
+  reports          Report[]
   events           Event[]           @relation("EventOrganizer")
 }
 
@@ -271,4 +278,23 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([createdAt])
+}
+
+// Aviso de un usuario sobre un dato que cree incorrecto (combate o ficha). Lo revisa un moderador.
+model Report {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity         String // BOUT | BOXER
+  entityId       String
+  reason         String
+  message        String?
+  status         ReportStatus @default(OPEN)
+  resolvedById   String?
+  resolvedAt     DateTime?
+  resolutionNote String?
+  createdAt      DateTime     @default(now())
+
+  @@index([status, createdAt])
+  @@index([entity, entityId])
 }

@@ -9,6 +9,7 @@ import { slugify } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
 import { proximityFlags, type Flag } from "../lib/coherence";
+import { MAX_REPORTS_PER_DAY, REPORT_ENTITIES, REPORT_REASONS } from "../lib/reports";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
@@ -407,5 +408,37 @@ export async function setGymVerified(f: FormData) {
   await db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null } });
   await audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } });
   revalidatePath("/", "layout");
+  redirect("/admin");
+}
+
+// ---------- Avisos de error de los usuarios ----------
+
+/** Cualquier usuario registrado puede avisar de un dato que cree incorrecto. Lo revisa un moderador. */
+export async function createReport(f: FormData) {
+  const user = await requireVerifiedUser();
+  const back = internalPath(str(f, "back"));
+  const entity = str(f, "entity");
+  const entityId = str(f, "entityId");
+  const reason = str(f, "reason");
+  if (!(REPORT_ENTITIES as readonly string[]).includes(entity) || !(reason in REPORT_REASONS)) go(back, { problema: "reporte_datos" });
+  const exists = entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } }) : await db.boxer.findUnique({ where: { id: entityId } });
+  if (!exists) go(back, { problema: "reporte_datos" });
+  if (await db.report.findFirst({ where: { userId: user.id, entity, entityId, status: "OPEN" } })) go(back, { problema: "reporte_repetido" });
+  const today = await db.report.count({ where: { userId: user.id, createdAt: { gte: new Date(Date.now() - 864e5) } } });
+  if (today >= MAX_REPORTS_PER_DAY) go(back, { problema: "reporte_limite" });
+  const report = await db.report.create({ data: { userId: user.id, entity, entityId, reason, message: str(f, "message").slice(0, 500) || null } });
+  await audit({ userId: user.id, entity: "REPORT", entityId: report.id, action: "CREATED", after: { entity, entityId, reason } });
+  go(back, { aviso: "reporte_enviado" });
+}
+
+export async function resolveReport(f: FormData) {
+  const admin = await requireUser();
+  if (admin.role !== "ADMIN") redirect("/");
+  const report = await db.report.findUnique({ where: { id: str(f, "reportId") } });
+  if (!report || report.status !== "OPEN") redirect("/admin");
+  const status = str(f, "decision") === "resolve" ? "RESOLVED" : "DISMISSED";
+  const note = str(f, "note").slice(0, 500) || null;
+  await db.report.update({ where: { id: report.id }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } });
+  await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: status, before: { status: report.status }, after: { status, note } });
   redirect("/admin");
 }

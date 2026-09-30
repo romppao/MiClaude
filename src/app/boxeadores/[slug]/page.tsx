@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/db";
 import { computeRecords, formatRecord } from "../../../lib/record";
 import { getUser } from "../../../lib/auth";
-import { rateBoxer } from "../../actions";
+import { createReport, rateBoxer } from "../../actions";
+import { REPORT_REASONS } from "../../../lib/reports";
 import { LEVEL_LABEL, METHOD_LABEL, STANCE_LABEL, fmtDate } from "../../../lib/labels";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,22 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
     user ? db.rating.findMany({ where: { boxerId: boxer.id, userId: user.id } }) : Promise.resolve([]),
   ]);
   const avg = ratings.length ? ratings.reduce((s, r) => s + r.score, 0) / ratings.length : null;
+  const reportForm = (entity: "BOUT" | "BOXER", entityId: string) =>
+    user?.emailVerifiedAt ? (
+      <details style={{ marginTop: 6 }}>
+        <summary className="mut">¿Hay un error? Avísanos</summary>
+        <form action={createReport} style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
+          <input type="hidden" name="entity" value={entity} /><input type="hidden" name="entityId" value={entityId} />
+          <input type="hidden" name="back" value={`/boxeadores/${boxer.slug}`} />
+          <select name="reason" aria-label="Motivo del aviso" defaultValue="">
+            <option value="" disabled>Motivo…</option>
+            {Object.entries(REPORT_REASONS).filter(([k]) => entity === "BOUT" ? k !== "SUPLANTACION" : k !== "NO_OCURRIO" && k !== "RESULTADO").map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <input name="message" aria-label="Detalles (opcional)" placeholder="Detalles (opcional)" maxLength={500} />
+          <button className="secondary">Enviar aviso</button>
+        </form>
+      </details>
+    ) : null;
   const isParticipant = (b: { boxerAId: string; boxerBId: string }) => !!user?.boxer && (user.boxer.id === b.boxerAId || user.boxer.id === b.boxerBId);
   const age = boxer.birthDate ? Math.floor((Date.now() - boxer.birthDate.getTime()) / 3.15576e10) : null;
   return (
@@ -52,6 +69,7 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
         {boxer.trainer && <tr><th>Entrenador</th><td><Link href={`/entrenadores/${boxer.trainer.slug}`}>{boxer.trainer.name}</Link></td></tr>}
       </tbody></table>
       {boxer.bio && <p>{boxer.bio}</p>}
+      {reportForm("BOXER", boxer.id)}
       <h2>Combates</h2>
       <table>
         <thead><tr><th>Fecha</th><th>Rival</th><th></th><th>Método</th><th>Velada</th><th>Tu valoración</th></tr></thead>
@@ -68,6 +86,7 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
                 <td>{b.method ? METHOD_LABEL[b.method] : ""}{b.endRound ? ` (R${b.endRound})` : ""}</td>
                 <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">pendiente de confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">en revisión</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado por el rival"}</span>}</td>
                 <td>
+                  {reportForm("BOUT", b.id)}
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (
                     user?.emailVerifiedAt ? (
                       <form action={rateBoxer} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>

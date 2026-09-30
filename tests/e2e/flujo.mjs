@@ -83,6 +83,28 @@ check("aviso claro tras valorar", await fan.locator("[role=status]", { hasText: 
 await fan.reload();
 check("valoración registrada", await fan.locator("body").innerText().then((t) => t.includes("4.0 / 5")));
 
+// 4a) un usuario avisa de un error; solo puede hacerlo una vez mientras siga abierto; el moderador lo resuelve
+await fan.goto(B + `/boxeadores/pepe-uno${rnd}`);
+const report = async () => {
+  const det = fan.locator("main table details").first();
+  await det.locator("summary").click();
+  await det.locator("select[name=reason]").selectOption("RESULTADO");
+  await det.locator("input[name=message]").fill(`Aviso ${rnd}`);
+  await det.locator("button").click();
+};
+await report();
+await fan.locator(".notice-ok", { hasText: "Hemos recibido tu aviso" }).waitFor();
+check("aviso de error enviado con confirmación clara", await fan.locator(".notice-ok").count() === 1);
+await report();
+await fan.locator(".notice-bad", { hasText: "Ya nos avisaste" }).waitFor();
+check("no se puede repetir un aviso abierto", await fan.locator(".notice-bad").count() === 1);
+await admin.p.goto(B + "/admin");
+const repRow = admin.p.locator("tr", { hasText: `Aviso ${rnd}` });
+check("el moderador ve el aviso con su motivo", await repRow.count() === 1 && (await repRow.innerText()).includes("El resultado no es correcto"));
+await repRow.locator("button:has-text('Resuelto')").click();
+await repRow.waitFor({ state: "detached" });
+check("el aviso resuelto sale de la cola", await admin.p.locator("tr", { hasText: `Aviso ${rnd}` }).count() === 0);
+
 // 4b) un visitante sin sesión que quiere valorar vuelve a la misma ficha tras entrar
 const visitor = await (await browser.newContext()).newPage();
 await visitor.goto(B + `/boxeadores/pepe-uno${rnd}`);
