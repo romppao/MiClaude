@@ -66,7 +66,13 @@ La competencia declarada es **Raunder** (raunder.es) y **BoxRec** (boxrec.com). 
 - Prioridad: arquitectura y estructura. **No trabajar diseño gráfico** hasta que lo pida.
 - Los datos de ejemplo del seed son ficticios: nunca inventar récords de personas reales.
 
+## Estado actual y cómo retomar
+
+**Lee [`docs/TRASLADO.md`](docs/TRASLADO.md) antes de empezar:** puesta en marcha, estado, lo que falta (bloques 5 a 7 de la auditoría), las decisiones que necesitan al fundador y las reglas técnicas del proyecto. La auditoría de código (99 hallazgos, con su estado) está en `docs/AUDITORIA.md`; los hallazgos 53 a 99 **no se verificaron**, comprueba que el problema existe antes de corregirlo.
+
+Reglas técnicas que no conviene olvidar: todo lo exportado de `src/app/actions.ts` es un punto de entrada público (los ayudantes van en `src/lib`); nunca uses `in` ni `obj[clave]` con claves del usuario (usa `hasOwn`/`lookup` de `src/lib/safe.ts`); importaciones relativas, sin alias `@/`; las pruebas de navegador esperan a un estado visible (`seen()`), usan datos únicos por ejecución y no dependen del volumen de la base; tras reiniciar el servidor local comprueba que no hay `EADDRINUSE`; Prisma se niega a `--force-reset` cuando lo lanza una IA: no lo sortees, pide al fundador que lo ejecute.
+
 ## Comandos
 
-- `npm run typecheck` · `npm test` · `npm run test:e2e` (ver README) · `npx prisma db push` · `npm run db:seed`
+- `npm run typecheck` · `npm test` · `npm run test:e2e` · `npm run test:a11y` (ver README: necesitan el servidor en marcha) · `npx prisma db push` · `npm run db:seed` (solo en base local y vacía)
 - Hay que fijar TypeScript en 5.x (Next 15 no es compatible con 7).

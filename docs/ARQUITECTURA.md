@@ -1,85 +1,103 @@
 # Arquitectura de Ring España
 
+Estado técnico vigente. La historia de cómo se llegó hasta aquí está en [`DIARIO.md`](DIARIO.md); cómo retomar el trabajo, en [`TRASLADO.md`](TRASLADO.md); la revisión de calidad del código, en [`AUDITORIA.md`](AUDITORIA.md).
+
 ## Propósito y enfoque
 
-Fomentar la afición al boxeo en España **empezando por el amateur** y por **Madrid**.
-El boxeador amateur gestiona su ficha y su récord; el público valora lo que ve; el calendario descubre veladas.
+Fomentar la afición a los deportes de contacto en España (boxeo en cabeza; también MMA, kickboxing, K-1 y jiu-jitsu) **empezando por el amateur** y por **Madrid**.
+El peleador amateur gestiona su ficha y su récord; el público da aura a lo que ve; el calendario descubre veladas.
 Cada decisión técnica se toma para que esto escale a otras provincias sin rehacer nada.
 
-Diseño gráfico: aplazado a propósito. La UI actual es funcional y provisional.
+Diseño gráfico: aplazado a propósito, por petición del fundador. La UI actual (fondo oscuro, rojo y dorado) es funcional y provisional.
 
 ## Stack
 
-Next.js 15 (App Router, Server Components + Server Actions) · TypeScript · PostgreSQL · Prisma.
-Sin API REST separada en el MVP: las páginas leen de la base de datos en el servidor y los formularios llaman a Server Actions (`src/app/actions.ts`). Si más adelante hace falta app móvil o API pública, se extrae una capa de servicios desde `actions.ts` y `src/lib`.
+Next.js 15 (App Router, Server Components y Server Actions) · TypeScript 5 · PostgreSQL 16 · Prisma 6. Sin API REST separada: las páginas leen de la base de datos en el servidor y los formularios llaman a Server Actions (`src/app/actions.ts`).
+Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibilidad). CI: GitHub Actions con PostgreSQL de servicio.
+
+## Estructura del código
+
+- `src/app/` — rutas (todas en español: `/peleadores`, `/veladas`, `/mi-cuenta`, `/moderacion`…), `actions.ts` (todas las acciones del servidor) y componentes compartidos.
+- `src/lib/` — reglas y utilidades sin interfaz: `rules.ts` (aura y resultados), `record.ts` (récord), `aura.ts` (ránking), `dates.ts` (día de Madrid), `search.ts` (búsqueda sin tildes), `auth.ts`/`password.ts`/`ratelimit.ts`/`mail.ts`/`notify.ts`/`retention.ts`/`env.ts` (cuentas, correo y mantenimiento), `safe.ts` y `paths.ts` (entrada del usuario), `messages.ts` (textos de avisos y errores), `anonymize.ts`.
+- `src/instrumentation.ts` — comprueba la configuración al arrancar en producción (sin `APP_URL` el servidor no arranca).
+- `prisma/schema.prisma` y `prisma/seed.ts` (datos ficticios; se niega a borrar una base real).
+- Reglas de las acciones del servidor: todo lo exportado de `actions.ts` es un punto de entrada público; los ayudantes van en `src/lib`. Patrones: `go()` (redirigir con mensaje), `guard()` (traduce errores previsibles de Prisma), `withLock()` (bloqueo consultivo de PostgreSQL para límites diarios) y `audit()` (historial, dentro de la misma transacción).
 
 ## Actores y roles
 
 | Rol | Puede |
 |---|---|
-| Visitante | Navegar, buscar, ver fichas, veladas y ránking |
-| `FAN` | Lo anterior + dar aura a peleadores |
-| `FIGHTER` | Lo anterior + una ficha propia (con una o varias disciplinas) y registrar sus combates |
-| `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se obtiene solicitándolo; lo aprueba un `ADMIN` |
-| `ADMIN` | Verificar o rechazar combates (`/moderacion`). Se asigna manualmente en la base de datos |
+| Visitante | Navegar, buscar, ver fichas, veladas y ránking (solo lo respaldado se muestra como hecho) |
+| `FAN` | Lo anterior + dar aura a peleadores (con el correo verificado) y seguirlos |
+| `FIGHTER` | Lo anterior + una ficha propia (una o varias disciplinas) y registrar sus combates |
+| `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita; lo aprueba un `ADMIN`. Puede ascender cualquier usuario que no sea administrador |
+| `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Se asigna a mano en la base de datos |
 
-Un boxeador sin cuenta también existe (fichas «sin reclamar», p. ej. el rival de un combate). Cuando ese boxeador se registra, la busca en `/mi-ficha` y **solicita reclamarla** (`ClaimRequest`); un `ADMIN` la aprueba. Al aprobar, la ficha pasa a su cuenta y las demás solicitudes sobre ella se rechazan.
+Un peleador sin cuenta también existe: cuando alguien registra un combate contra él se crea una **ficha provisional** (`listed: false`: solo nombre e inicial del apellido, sin listados ni buscadores, sin indexar). Cuando esa persona se registra, la busca en `/mi-ficha` y **solicita reclamarla** (`ClaimRequest`); un `ADMIN` la aprueba.
 
-## Verificación de email
+## Cuentas, acceso y correo
 
-Toda acción que publica contenido (valorar, crear ficha, registrar/confirmar combates, reclamar, pedir ser organizador) exige email verificado (`requireVerifiedUser`). El enlace del correo solo muestra un botón; la verificación se hace por POST para que los escáneres de enlaces no consuman el token. Tokens de un solo uso, 48 h, guardados como `sha256`.
-El envío está tras `src/lib/mail.ts`: hoy escribe en el log del servidor; **hay que conectar un proveedor real (Resend/SES/SMTP) y definir `APP_URL` antes de producción**.
+- **Contraseñas:** scrypt asíncrono (N=2^16, r=8, p=2, parámetros de OWASP) con los parámetros **guardados en el propio hash** (`scrypt$N$r$p$sal$hash`); los hashes del formato antiguo se verifican y se recalculan al entrar (`lib/password.ts`).
+- **Sesión:** token aleatorio de 256 bits en cookie `httpOnly`/`sameSite=lax` (`secure` en producción); en la base solo el `sha256`. 30 días.
+- **Límites de intentos** (`lib/ratelimit.ts`, tabla `RateHit`): acceso (8 fallos/15 min por correo y 40 por IP), registro (10/hora por IP), recuperación (3/hora por correo) y reenvío de verificación (3/hora). La IP solo se usa si el proxy la facilita (`X-Forwarded-For`): **en producción la aplicación debe ir detrás de un proxy que sustituya esa cabecera**. El acceso tarda lo mismo exista o no el correo.
+- **Enlaces de un solo uso** (`EmailToken`, tipos `VERIFY` 48 h, `RESET` 1 h y `UNSUB` 1 año; se guarda el `sha256`; el consumo es atómico y solo se gasta con un `POST`, para que los escáneres de enlaces no lo consuman). Recuperar la contraseña cierra todas las sesiones y verifica el correo (así quien registró un correo ajeno no lo retiene).
+- **Correo** (`lib/mail.ts`): Resend por HTTP con `RESEND_API_KEY` y `MAIL_FROM`; `MAIL_TRANSPORT=log` escribe los mensajes en el log (desarrollo y pruebas); en producción sin proveedor no se envía nada y las pantallas lo dicen. Los textos de usuario que entran en un mensaje se reducen a una línea. Los avisos a seguidores se envían tras responder (`after()`), respetan la preferencia `notifyEmails` y llevan enlace de baja.
+
+## Privacidad y retención
+
+- `/mi-cuenta`: corregir datos, cambiar contraseña, avisos por correo, **descargar una copia de todos los datos** (`/mi-cuenta/datos`) y **eliminar la cuenta**. Al eliminarla se borran sesiones, auras dadas, seguimientos, solicitudes y avisos; la ficha de peleador **se borra si no tiene combates y se anonimiza si los tiene** (los combates forman parte del récord de los rivales). Queda un apunte en el historial sin datos personales. No se puede eliminar la única cuenta de moderador.
+- `/privacidad`: datos, destinatarios, plazos y derechos. **Texto redactado por la IA a partir del comportamiento real; requiere revisión jurídica.**
+- **Retención** (`lib/retention.ts`, se ejecuta como mucho cada 30 minutos por proceso): sesiones y enlaces caducados, intentos de acceso a los 2 días, cuentas sin verificar a los 30 días, solicitudes de reclamación decididas a los 90 días, avisos resueltos a los 12 meses, historial a los 3 años. El texto con el que alguien demuestra quién es se borra al decidir la solicitud.
 
 ## Modelo de datos (`prisma/schema.prisma`)
 
-`User`/`Session` → `Boxer` (1:1 opcional con `User`) → `Bout` ← `Event`; `Gym`, `Trainer`; `Rating` (usuario × combate × boxeador).
+`User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con categoría de peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`.
 
 Decisiones clave:
 
-1. **El récord se calcula, no se guarda.** Sale de los `Bout` (`src/lib/record.ts`), por nivel (PRO/AMATEUR). No puede quedar desincronizado.
-2. **Fiabilidad del dato (`Bout.verification`).** Un amateur se registra a sí mismo, así que hay que distinguir lo que declara de lo que está comprobado:
-   `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (moderador/organizador/federación) · `DISPUTED` (rechazado; no cuenta).
-   La ficha muestra cuántos combates del récord están sin confirmar. Es la base de la confianza, que es lo que distingue a un producto así.
-3. **Valoraciones ancladas a un combate.** Una nota es «esta actuación en este combate», no «este boxeador en general». Restricciones (en `rateBoxer`):
-   una por usuario+combate+boxeador (editable) · requiere cuenta · solo combates ya celebrados y no disputados · los participantes no pueden valorar · comentario ≤ 500 caracteres · casilla «lo vi en directo» guardada como señal.
-4. **Ránking con media bayesiana** (`src/lib/ratings.ts`): un boxeador con una sola nota de 5 no supera a otro con 40 notas de 4,8.
-5. **Madrid como plaza inicial, no como límite.** Todo se filtra por `province`; la portada usa la constante `HOME_PROVINCE`. Expandir es cambiar un parámetro o añadir un selector, no una migración.
+1. **El récord se calcula, no se guarda** (`lib/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
+2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
+3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
+4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista.
+5. **Madrid como plaza inicial, no como límite:** todo se filtra por `province`.
+6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; todo lo específico de cada una (categorías, formas de terminar, si es de torneo) vive en `lib/disciplines.ts`. Una ficha por persona con varias disciplinas.
 
-## Autenticación
+## Aura y ránking
 
-Propia y mínima, sin dependencias: contraseñas con `scrypt` + sal; sesión con token aleatorio en cookie `httpOnly`/`sameSite=lax` (`secure` en producción); en la base solo se guarda el `sha256` del token (`src/lib/auth.ts`). Caducidad de 30 días.
-Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de dominio.
+El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura.ts`) suma en la base de datos por disciplina y categoría de peso, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
+Decisión del fundador: **un clic por usuario y combate**; hasta tres clics será función premium más adelante. Pregunta abierta: ¿por persona y combate, o por persona, combate y peleador? (hallazgo 41).
 
-## Modelos añadidos después del MVP
+## Seguridad
 
-`AuditLog` (historial), `Report` (avisos de error), `Follow` (seguir boxeadores), `EmailToken`, `ClaimRequest`, `OrganizerRequest`. `Bout` incorpora `verification`, `evidenceUrl` y `flags` (señales de coherencia). Los avisos al usuario viajan como códigos en la URL y se traducen en `src/lib/messages.ts`.
+- Validación en el servidor de todo lo que escribe el usuario: longitudes (`LIMITS`), fechas, provincias, resultado y método frente a la disciplina, y enlaces (solo `http`/`https`). Nada de claves heredadas de objetos (`safe.ts`). Enlaces de retorno solo a rutas internas (`paths.ts`).
+- Cabeceras (`next.config.mjs`): política de contenido (solo contenido propio; sin incrustación ni formularios hacia fuera), `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y HSTS (en producción); sin `X-Powered-By`.
+- Autorización: cada acción de moderación comprueba el rol `ADMIN`, las de organizador comprueban que la velada es suya, y las de peleador que participa en el combate. **Faltan pruebas de autorización por cada acción** (hallazgo 84).
+- Sin protección CSRF adicional más allá de la de Next.js para Server Actions (origen del mismo sitio) y la cookie `sameSite=lax`.
 
-## Peleadores, disciplinas, récord de partida y aura (implementado)
+## Búsqueda y listados
 
-*Nota de vocabulario:* el proyecto empezó hablando de «boxeadores»; desde que se amplió a otros deportes de contacto, todo (modelo, código, rutas e interfaz) usa **«peleador»** (`Fighter`, rol `FIGHTER`, `/peleadores`). Los apartados anteriores de este documento conservan la palabra original.
+`lib/search.ts`: sin tildes ni mayúsculas y con varias palabras en cualquier orden (cada palabra debe aparecer en algún campo) sobre peleadores, gimnasios, entrenadores y veladas; los peleadores provisionales y ocultos no aparecen. Se hace con `translate`/`strpos` de PostgreSQL (recorrido completo de la tabla: suficiente para empezar; si crece, `pg_trgm`). Listados paginados de 24 en 24 que conservan los filtros.
 
-- **Disciplinas** (`Discipline`: BOXEO, MMA, KICKBOXING, K1, JIUJITSU). Una sola ficha por persona con varias disciplinas (`FighterDiscipline`: nivel, categoría de peso y récord de partida por disciplina). `Event` lleva la disciplina y `Bout` la hereda del evento. Todo lo específico de cada deporte (orden de presentación con el boxeo primero, categorías de peso, formas de terminar, si es deporte de torneo) vive en `src/lib/disciplines.ts`. Para añadir una disciplina: valor en el enum de Prisma y entradas en ese fichero.
-- **Récord calculado por disciplina y nivel** (`computeRecords`). Se añade `sub` (victorias por sumisión). En disciplinas de torneo (jiu-jitsu) no se aplican las señales de combates muy seguidos.
-- **Récord de partida:** total de combates anteriores y, si se recuerdan, victorias/derrotas/empates (`parsePrior`). La cifra principal solo lo suma si tiene detalle; siempre se muestra aparte y etiquetado como declarado por el propio deportista. Los cambios quedan en `AuditLog`.
-- **Aura** (`Aura`) sustituye a las estrellas: una por persona, combate y peleador (se puede quitar), con las mismas reglas anti-manipulación (correo verificado, combate celebrado y no disputado, participantes excluidos, 20 al día). El **ránking** (`lib/aura.ts`) agrupa por disciplina y categoría de peso, con zona y periodo, y empates en la misma posición.
-- **Categorías de peso** orientativas, pendientes de validar con las federaciones.
+## Despliegue y entorno
+
+Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comprueba la aplicación y la base de datos; `robots.txt` y `sitemap.xml` se generan dinámicamente. **Falta:** migraciones con `prisma migrate` (hoy `db push`), alojamiento y proveedor de correo reales.
 
 ## Idioma y modelo de negocio (decisiones del fundador)
 
-- **Todo lo que ve una persona va en español** (interfaz, correos, errores, direcciones como `/peleadores` o `/moderacion`). El código interno está en inglés por convención; queda por decidir si también debe ir en español.
-- **Aura:** un clic por usuario y combate. **Hasta tres clics será función premium** en el futuro, con el riesgo de que pagar dé más peso al aura y desvirtúe el ránking.
-- **Monetización:** funciones premium **después** de terminar la estructura básica. Nunca se venderá la verificación, el sello de verificado ni una posición en el ránking; la consulta básica sigue siendo gratuita. Candidatas y análisis de la competencia en `docs/IDEAS.md` y `docs/COMPETENCIA.md`.
+- **Todo lo que ve una persona va en español** (interfaz, correos, errores, direcciones). El código interno está en inglés por convención; queda por decidir si también debe ir en español.
+- **Monetización:** funciones premium **después** de terminar la estructura básica. Nunca se venderá la verificación, el sello ni una posición en el ránking; la consulta básica sigue siendo gratuita. Candidatas en `docs/IDEAS.md`.
 
 ## Riesgos conocidos (a resolver antes de abrir al público)
 
-- **Manipulación de valoraciones** (cuentas falsas, brigading): mitigado con email verificado y límite de 20 valoraciones/día por usuario. Falta límite por IP, detección de patrones (p. ej. muchas cuentas nuevas votando al mismo boxeador) y ponderar más «lo vi en directo» y las cuentas antiguas.
-- **Ficha falsa / suplantación**: la reclamación pasa por un moderador, pero hoy la prueba de identidad es un texto libre. Falta un procedimiento claro (p. ej. confirmación del gimnasio o de la federación) y documentar qué se pide.
-- **Organizadores falsos**: mismo caso; la aprobación es manual.
-- **Correo a seguidores:** hoy solo escribe en el log. Antes de enviar correos reales hay que dar la opción de no recibirlos (baja/preferencias) y un proveedor con buena reputación de envío. Solo se avisa de combates publicados por organizadores para evitar spam por combates inventados.
-- **Usabilidad (principio F9)** aplicada a los flujos principales; falta el resto de pantallas, medición automática de accesibilidad y pruebas con usuarios reales.
-- **Combates inventados**: mitigado por la verificación, pero sin rival con cuenta solo puede validarlo un moderador.
-- **Menores de edad**: el amateur incluye juveniles. Hace falta política de privacidad y consentimiento parental antes de publicar datos personales (RGPD).
-- **Sin protección CSRF adicional** más allá de la que Next.js aplica a Server Actions (origen del mismo sitio).
+- **Menores de edad:** el amateur incluye juveniles. Hace falta una política (edad mínima, consentimiento de madre, padre o tutor, qué se muestra) y criterio jurídico. **Es el riesgo más importante.**
+- **Texto de privacidad sin revisión jurídica** y sin responsable ni contacto definidos.
+- **Manipulación del aura** (cuentas falsas, *brigading*): mitigada con correo verificado, límite diario y de intentos, y exclusión de participantes. Falta detección de patrones (muchas cuentas nuevas dando aura al mismo peleador) y ponderar «lo vi en directo» y la antigüedad.
+- **Ficha falsa o suplantación:** la reclamación pasa por un moderador, pero la prueba de identidad es un texto libre. Falta un procedimiento claro (p. ej. confirmación del gimnasio).
+- **Organizadores y veladas falsas:** la aprobación es manual y no exige nota de evidencia (hallazgo 93); cualquier usuario verificado publica veladas sin moderación previa (hallazgo 22).
+- **Sin migraciones:** `db push` no sirve para evolucionar una base con datos reales.
+- **Usabilidad:** aplicada a los flujos principales, pero la accesibilidad automática da 13 incumplimientos graves por corregir (Bloque 6) y **no se ha probado con personas reales**.
+- **Correo:** hasta conectar el proveedor real, nadie recibe los enlaces en producción. La reputación de envío (dominio, SPF/DKIM) es cosa del fundador.
+- **Revelar qué correos tienen cuenta** en el registro (decisión de usabilidad, mitigada con límites).
 
 ## Confianza y verificación de datos (sin depender de federaciones al principio)
 
@@ -89,13 +107,13 @@ Principio: **no se intenta demostrar que un dato es verdad, sino acumular eviden
 
 | Nivel | Fuente | Estado hoy |
 |---|---|---|
-| 0 | Lo declara el propio boxeador | hecho (`SELF_REPORTED`) |
+| 0 | Lo declara el propio peleador | hecho (`SELF_REPORTED`) |
 | 1 | Lo confirma el rival (cuenta verificada) | hecho (`CONFIRMED`) |
 | 2 | Lo publica o confirma el organizador de la velada, que estuvo allí | hecho (`VERIFIED` si lo introduce el organizador) |
 | 3 | Corroborado por terceros: enlace de evidencia (acta, cartel, redes, vídeo) y gimnasio/organizador con sello | **parcial**: enlace de evidencia y sellos hechos; falta que el sistema pondere el nivel automáticamente |
 | 4 | Federación (licencia, actas oficiales) | futuro |
 
-Regla de producto: **la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado** («12-2, 9 verificados»). El ránking de valoraciones puede exigir un mínimo de combates de nivel ≥ 1 para aparecer.
+Regla de producto: **la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado** («12-2, 9 verificados»). El ránking de aura puede exigir un mínimo de combates de nivel ≥ 1 para aparecer.
 
 ### Verificar también a quien verifica (gimnasios, promotoras, organizadores)
 
@@ -107,9 +125,9 @@ Un organizador o gimnasio que «verifica» solo vale lo que valga su propia cred
 
 ### Comprobaciones automáticas (baratas y muy eficaces)
 
-- Un boxeador no puede tener dos combates el mismo día ni con menos de N días entre ellos; edad y categoría de peso coherentes; el rival no puede ser él mismo.
-- Duplicados: mismo combate registrado por los dos boxeadores, o el mismo evento creado dos veces.
-- Colusión: confirmaciones cruzadas entre cuentas recién creadas, mismas IP/dispositivo, ráfagas de valoraciones a un mismo boxeador.
+- Un peleador no puede tener dos combates el mismo día ni con menos de N días entre ellos; edad y categoría de peso coherentes; el rival no puede ser él mismo.
+- Duplicados: mismo combate registrado por los dos peleadores, o el mismo evento creado dos veces.
+- Colusión: confirmaciones cruzadas entre cuentas recién creadas, mismas IP/dispositivo, ráfagas de auras a un mismo peleador.
 - Récords imposibles o saltos raros (p. ej. muchos combates en pocas semanas) → a la cola de moderación, no rechazo automático.
 
 ### Transparencia y reversibilidad
@@ -121,7 +139,7 @@ Un organizador o gimnasio que «verifica» solo vale lo que valga su propia cred
 
 ### Moderación humana con ventaja local
 
-En Madrid, al principio, la moderación manual es viable y es una ventaja: se puede llamar a un gimnasio, escribir a una promotora o preguntar a un entrenador conocido. Conviene formar un pequeño grupo de **moderadores de confianza** (entrenadores, exboxeadores, árbitros) en vez de que todo pase por una sola persona.
+En Madrid, al principio, la moderación manual es viable y es una ventaja: se puede llamar a un gimnasio, escribir a una promotora o preguntar a un entrenador conocido. Conviene formar un pequeño grupo de **moderadores de confianza** (entrenadores, antiguos deportistas, árbitros) en vez de que todo pase por una sola persona.
 
 ### Vía hacia las federaciones
 
@@ -136,11 +154,11 @@ En Madrid, al principio, la moderación manual es viable y es una ventaja: se pu
 2. ~~Sello de verificado para gimnasios y organizadores~~ **hecho** con nota de evidencia interna; **falta el aval cruzado** (necesita cuentas de responsable de gimnasio).
 3. Comprobaciones automáticas de coherencia (fechas, duplicados) que envíen casos a moderación.
 4. Botón «reportar dato» y puntuación de fiabilidad de organizadores.
-5. Detección de colusión en valoraciones y confirmaciones.
+5. Detección de colusión en auras y confirmaciones.
 
 ## Hoja de ruta
 
-1. **Hecho:** cuentas y roles, ficha propia, registro y confirmación de combates, moderación, valoraciones, ránking, portada amateur/Madrid, **verificación de email, reclamar ficha, rol organizador con cartel y resultados**.
-2. **Siguiente:** proveedor de correo real; tests automáticos (hoy solo hay pruebas de navegador ad hoc) y CI; despliegue con base de datos gestionada y migraciones (`prisma migrate`) en vez de `db push`; límites por IP y detección de patrones en valoraciones; edición/borrado de veladas y combates por el organizador.
-3. **Después:** seguir a boxeadores y avisos de veladas; fotos/vídeo; perfiles de gimnasio gestionados por su responsable; mapa de gimnasios de Madrid.
-4. **Escala:** SEO/sitemaps, API pública, app móvil, importación de datos federativos (Federación Madrileña / FEB), otras provincias.
+1. **Hecho:** cuentas, roles y acceso seguro; ficha con varias disciplinas y récord de partida; verificación de combates con niveles de respaldo y cola de rechazados; aura y ránking; veladas, cartel y resultados por organizadores; moderación con historial; correo verificado, recuperación y avisos con baja; privacidad (descarga y eliminación); búsqueda sin tildes y paginación; cabeceras de seguridad, `robots.txt`, mapa del sitio y `/salud`; CI con pruebas de navegador.
+2. **Siguiente (ver `TRASLADO.md`, sección 6):** migraciones y despliegue; accesibilidad y usabilidad (Bloque 6, incluida la prueba con personas reales); pruebas de autorización y documentación (Bloque 7); decisiones del fundador (sección 7 de `TRASLADO.md`).
+3. **Después:** funciones premium (sin vender verificación ni ránking); fase de diseño visual con *briefing* del fundador; fotos y vídeo; perfiles de gimnasio gestionados por su responsable; mapa de gimnasios de Madrid.
+4. **Escala:** API pública, app móvil, importación de datos federativos (Federación Madrileña / FEB), otras provincias.

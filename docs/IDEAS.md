@@ -35,7 +35,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Estadísticas de carrera por disciplina (porcentaje de KO, racha, actividad) | Análisis de competencia | 🔵 | Falta hoy |
 | Comparador «cara a cara» e historial de rivales | Análisis de competencia | 🔵 | |
 | Tarjeta para compartir fichas y ránkings en redes | Análisis de competencia | 🔵 | Da audiencia a los peleadores |
-| Preparación para buscadores (mapa del sitio, datos estructurados) | Análisis de competencia | 🔵 | |
+| Preparación para buscadores (mapa del sitio, datos estructurados) | Análisis de competencia | 🟡 | Mapa del sitio, `robots.txt` y títulos hechos; faltan datos estructurados |
 | Avisos al propio peleador cuando alguien toca su ficha o le da aura | Análisis de competencia | 🔵 | |
 | Aura ponderada o normalizada (por número de combates, por «lo vi en directo», por antigüedad de la cuenta) | Riesgo detectado | 🔵 | El aura absoluta favorece a quien compite más |
 | Bloquear o moderar la edición del récord de partida una vez hay combates registrados | Riesgo detectado | 🔵 | Evita inflarlo a posteriori |
@@ -57,7 +57,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
 | Detección de colusión en valoraciones y confirmaciones | Riesgo detectado | 🔵 | |
 | Seguir a boxeadores + avisos de veladas | Fomentar afición | 🟢 (v1) | «Mis boxeadores» y aviso por correo (aún al log); solo combates de organizador |
-| Preferencias de aviso por correo (poder darse de baja) | RGPD / usabilidad | 🔵 | Necesario antes de enviar correos reales |
+| Preferencias de aviso por correo (poder darse de baja) | RGPD / usabilidad | 🟢 | Interruptor en «Mi cuenta» y enlace de baja en cada correo (sin iniciar sesión) |
 | Página «¿Cómo funciona?» | Principio F9 | 🟢 | `/ayuda` |
 | Explicaciones en el primer uso de cada función (guías breves) | Principio F9 | 🔵 | |
 | Avisos dentro de la app (además del correo) | Fomentar afición | ⚪ | |
@@ -67,7 +67,29 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Grupo de moderadores locales de confianza (entrenadores, exboxeadores, árbitros) | Ventaja de operar en una ciudad | 🔵 | No es código: es organización |
 | Colaboración con Federación Madrileña / Española (actas y licencias como nivel máximo) | Fundador | ⚪ | Cuando haya tracción demostrable |
 | Campo opcional de nº de licencia (sin verificar hasta que haya acuerdo) | Estrategia de veracidad | ⚪ | |
-| API pública, app móvil, importación de datos federativos, SEO/sitemaps | Escala | ⚪ | |
+| API pública, app móvil, importación de datos federativos | Escala | ⚪ | |
+| SEO: mapa del sitio, `robots.txt`, títulos propios y comprobación de salud | Análisis de competencia / escala | 🟡 | Hecho; faltan favicon e imagen para compartir (son diseño) |
+
+### Ideas surgidas en la auditoría del código (30 de septiembre de 2026)
+
+Origen de todas: la auditoría multiagente (ver [`AUDITORIA.md`](AUDITORIA.md)) y el criterio del asistente al corregirla. El fundador pidió «arregla lo confirmado por prioridad»; estas ideas son **propuestas del asistente a validar**, salvo que se indique.
+
+| Idea | Origen | Estado | Notas |
+|---|---|---|---|
+| Recuperar la contraseña por correo (que además verifica el correo, para que nadie retenga un correo ajeno) | Auditoría (hallazgo 4) | 🟢 | `/recuperar` |
+| «Mi cuenta»: corregir datos, descargar una copia de los datos y eliminar la cuenta (la ficha con combates queda anónima) | Auditoría (RGPD, hallazgo 19) | 🟢 | Criterio del asistente: los combates pertenecen también al récord de los rivales, así que se conservan |
+| Cola de combates «en revisión» en moderación, con «Restaurar» | Auditoría (hallazgo 11) | 🟢 | |
+| Fichas provisionales de rivales: solo nombre e inicial, sin listados ni buscadores hasta que se reclamen o el combate se confirme | Auditoría (hallazgo 17) | 🟢 | Protege a quien no tiene cuenta |
+| Denunciar y retirar comentarios de aura | Auditoría (hallazgo 21) | 🟢 | |
+| Límite de intentos de acceso, registro y reenvío | Auditoría (hallazgo 2) | 🟢 | |
+| Plazos de conservación de datos (cuentas sin verificar 30 días, solicitudes 90 días, avisos 12 meses, historial 3 años) | Propuesta del asistente | 🟡 | **Los plazos los puso el asistente; el fundador debe validarlos** (con criterio jurídico) |
+| Texto de privacidad en `/privacidad` | Propuesta del asistente | 🟡 | **Requiere revisión jurídica** y definir responsable y contacto |
+| Búsqueda sin tildes y por varias palabras; listados paginados | Auditoría (hallazgos 42, 43, 50) | 🟢 | Si crece la base de datos, pasar a `pg_trgm` |
+| Informar a quien envía un aviso de cómo se ha resuelto | Auditoría (hallazgo 60) | 🔵 | |
+| Exigir nota de evidencia al aprobar a un organizador (como en el sello de gimnasio) | Auditoría (hallazgo 93) | 🔵 | |
+| Moderar las veladas publicadas por usuarios antes de que salgan en el calendario | Auditoría (hallazgo 22) | 🔵 | Decisión del fundador |
+| Conservar lo escrito en los formularios tras un error | Auditoría (hallazgo 77) y principio F9 | 🔵 | Bloque 6 |
+| Migraciones de Prisma en lugar de `db push` | Despliegue | 🔵 | Imprescindible antes de producción |
 
 ## Ideas descartadas
 
@@ -84,6 +106,10 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 - **Aura:** ¿se normaliza por número de combates o se pondera (lo vi en directo, antigüedad de la cuenta)? Hoy es el total absoluto, con filtro de periodo.
 - **Récord de partida:** ¿se bloquea su edición tras el primer combate registrado, o lo revisa un moderador?
 
+- **Privacidad:** ¿se validan los plazos de conservación y el texto de `/privacidad`? Hace falta revisión jurídica, definir el responsable del tratamiento y un correo de contacto.
+- **Registro:** hoy el formulario dice «ya hay una cuenta con ese correo» (claro para la persona, pero revela quién tiene cuenta; se limita por IP). ¿Se acepta?
+- **Veladas:** ¿se moderan antes de publicarse cuando no las crea un organizador aprobado?
+- **Aura:** ¿una por persona y combate, o por persona, combate y peleador? Hoy vale la segunda.
 - **Usabilidad (F9):** ¿tratamiento de «tú» o de «usted»? Hoy la app tutea; para un público con personas mayores conviene decidirlo con criterio y mantenerlo en toda la app.
 - **Usabilidad (F9):** ¿qué grupos de personas reales (edades, familiaridad con la tecnología) probarán la app y cuándo?
 

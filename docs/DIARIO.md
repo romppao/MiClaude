@@ -332,6 +332,50 @@ Reconozco que fue **la segunda vez** que un fallo del CI destapó una fragilidad
 
 Sin cambios de producto. Pendiente lo de siempre: acceso a las webs de la competencia, despliegue real, auditoría de usabilidad y decisiones sobre el récord de partida y el aura.
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Corrección de la auditoría (bloques 1 a 5) y traslado a Claude Code
+
+### Qué se pidió / qué idea surgió
+
+- Tras la medición de accesibilidad, el fundador pidió: «sigue avanzando en otras cosas que han quedado pendientes». Se lanzó una **auditoría exhaustiva de solo lectura** con 9 revisores independientes (seguridad, privacidad, lógica de acciones y de páginas, usabilidad, accesibilidad, despliegue, pruebas, documentación). Resultado: 175 hallazgos brutos → **99 únicos** (`docs/AUDITORIA.md`).
+- Ante el resultado: «**Arregla lo confirmado por prioridad**».
+- Al final de la sesión: «**Para un momento. Quiero trasladar este proyecto a Claude Code. Trabajar el proyecto entero a Claude Code.**» Se detuvo el trabajo nuevo y se preparó el traslado (`docs/TRASLADO.md`).
+
+### Qué se decidió y por qué
+
+Orden de los bloques, de más a menos grave: (1) validación y robustez del servidor, (2) integridad de la verificación y del aura, (3) acceso y correo, (4) privacidad, (5) búsqueda, rendimiento y despliegue; (6) accesibilidad y (7) pruebas y documentación quedan para Claude Code.
+
+Decisiones que conviene que el fundador conozca (las marcadas con ★ **las tomó el asistente y necesitan su validación**):
+- Los combates rechazados o sin confirmar **no se muestran como hechos ni cuentan** en récord ni aura; tienen su cola de moderación para restaurarlos.
+- ★ Una ficha creada por un tercero para su rival es **provisional** (solo nombre e inicial del apellido, sin listados ni buscadores) hasta que se reclame o el combate se confirme.
+- ★ **Eliminar la cuenta:** la ficha se borra si no tiene combates y se **anonimiza** si los tiene (los combates forman parte del récord de los rivales).
+- ★ **Plazos de conservación** (cuentas sin verificar 30 días, solicitudes 90 días, avisos 12 meses, historial 3 años) y **texto de privacidad**: los propuso el asistente; necesitan revisión jurídica.
+- ★ El formulario de registro sigue diciendo «ya hay una cuenta con ese correo» (mejor para la persona), con límites por IP, aunque revela qué correos tienen cuenta.
+- No se usa `cache()` de React en `getUser` (dejaría la sesión obsoleta tras cerrar sesión o eliminar la cuenta).
+- Contraseñas con parámetros de OWASP guardados en el hash (se pueden reforzar sin invalidar cuentas); el correo real será Resend por HTTP, y en producción el servidor no arranca sin `APP_URL`.
+
+### Qué se hizo
+
+Commits en la rama `claude/ring-espana-mvp`:
+- **Bloques 1 y 2** (`f8638f9`, `1f3f01c`): validación de fechas, longitudes, provincia y resultado frente a la disciplina; sin claves heredadas (`__proto__`…); enlaces de retorno solo internos; combates únicos por pareja y velada; bloqueo de concurrencia en los límites diarios; aura sin combates rechazados ni cancelados, comentarios denunciables; fichas provisionales; cola «en revisión».
+- **Bloque 3** (`f391e9d`): límites de intentos, scrypt asíncrono, recuperación de contraseña, enlaces de un solo uso con tipo, correo con Resend y modo registro explícito, comprobación del entorno al arrancar, limpieza periódica.
+- **Bloque 4** (`ecb6c04`): Mi cuenta (datos, contraseña, avisos), descarga y eliminación de datos, corrección de la ficha, página de privacidad, baja de avisos con enlace, avisos a seguidores tras responder y tolerantes a fallos, plazos de conservación.
+- **Bloque 5, parcial** (`4554379`, `5303086`): búsqueda sin tildes y por varias palabras, listados paginados, ránking sumado en la base de datos, cabeceras de seguridad (política de contenido, HSTS…), `robots.txt`, mapa del sitio, `/salud`, títulos propios, índices, seed protegido, higiene del repositorio y del CI.
+- **Pruebas:** de 73 a **103 unitarias** y de 39 a **146 comprobaciones de navegador** en cinco guiones (`flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`) con ayudas comunes.
+- **Traslado:** `README.md` y `docs/ARQUITECTURA.md` reescritos (describían el modelo antiguo), `docs/AUDITORIA.md` (los 99 hallazgos con su estado), `docs/TRASLADO.md` (puesta en marcha, pendientes y decisiones), ideas y lecciones actualizadas.
+
+### Qué salió mal / qué se aprendió
+
+- **La auditoría no se terminó de verificar:** el flujo (308 agentes, ~20 millones de tokens) agotó el límite de uso de la sesión. Los hallazgos 1 a 52 pasaron la verificación adversarial (ninguno se refutó); los **53 a 99 no**, y la pasada final de «huecos» no llegó a ejecutarse. Está dicho en `AUDITORIA.md`.
+- **El CI falló una vez (ejecución 25):** una prueba de paginación dependía de que la base local tuviera cientos de peleadores; en el CI está vacía. Se corrigió (`5303086`) y se probó sobre un **clon limpio con base vacía**.
+- **Una tabla de tildes desalineada** (la «ñ» daba «u») la cazaron las pruebas de navegador, no la lectura del código. Ahora se construye por pares y tiene prueba unitaria.
+- **Servidor antiguo sirviendo código viejo** (otra vez, por matar el proceso equivocado) y **PostgreSQL parado** tras una pausa del entorno: costaron varias vueltas.
+- **Incumplí la petición de documentar al cerrar cada bloque:** dejé README y ARQUITECTURA para el final y se quedaron describiendo el modelo antiguo (lo detectó la propia auditoría, hallazgo 91). Se corrigió al preparar el traslado.
+- Lecciones completas en `docs/LECCIONES.md` (sección «De la corrección de la auditoría»).
+
+### Estado y próximos pasos
+
+Sin trabajo a medias en el código: todo está commiteado y subido; las pruebas pasan (tipos, 103 unitarias y 146 de navegador). **Quedan** el resto del bloque 5 (migraciones de Prisma, colas de moderación paginadas), el bloque 6 (accesibilidad y usabilidad, con pruebas con personas reales) y el bloque 7 (pruebas de autorización, documentos). Hay **12 decisiones pendientes del fundador** y el **análisis de la competencia**, que necesita acceso a internet. Todo, en orden, en [`TRASLADO.md`](TRASLADO.md).
+
 ---
 
 ## Plantilla para nuevas entradas
