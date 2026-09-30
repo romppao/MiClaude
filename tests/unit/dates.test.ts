@@ -1,0 +1,33 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { dayKey, eventDayReached, parseDay, todayMadrid } from "../../src/lib/dates";
+
+const at = (iso: string) => new Date(iso);
+
+describe("fechas en Europe/Madrid", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("todayMadrid respeta el horario de verano e invierno", () => {
+    expect(todayMadrid(at("2026-07-14T22:30:00Z"))).toBe("2026-07-15"); // 00:30 en Madrid (CEST)
+    expect(todayMadrid(at("2026-07-14T21:30:00Z"))).toBe("2026-07-14"); // 23:30 en Madrid
+    expect(todayMadrid(at("2026-12-14T23:30:00Z"))).toBe("2026-12-15"); // 00:30 en Madrid (CET)
+    expect(todayMadrid(at("2026-12-14T22:30:00Z"))).toBe("2026-12-14");
+  });
+  it("una velada de hoy ya cuenta como celebrada aunque sean las 8:00 (antes de las 12:00 UTC)", () => {
+    const velada = new Date("2026-06-13T12:00:00Z");
+    expect(eventDayReached(velada, at("2026-06-13T06:00:00Z"))).toBe(true);
+    expect(eventDayReached(velada, at("2026-06-12T21:00:00Z"))).toBe(false); // 23:00 del día anterior en Madrid
+    expect(eventDayReached(velada, at("2026-06-12T22:00:00Z"))).toBe(true); // 00:00 en Madrid
+  });
+  it("dayKey usa la parte de fecha guardada", () => {
+    expect(dayKey(new Date("2026-06-13T12:00:00Z"))).toBe("2026-06-13");
+  });
+  it("parseDay acepta fechas reales dentro del rango", () => {
+    const now = at("2026-09-30T10:00:00Z");
+    expect(parseDay("2026-08-01", now)?.toISOString()).toBe("2026-08-01T12:00:00.000Z");
+    expect(parseDay("2027-09-01", now)).not.toBeNull(); // menos de un año vista
+  });
+  it("parseDay rechaza fechas imposibles, antiguas o demasiado lejanas", () => {
+    const now = at("2026-09-30T10:00:00Z");
+    for (const bad of ["2026-02-30", "2026-13-01", "2026-1-1", "hoy", "", "1979-12-31", "2062-01-01", "2026-09-30T12:00", "0000-01-01"]) expect(parseDay(bad, now)).toBeNull();
+  });
+});

@@ -39,9 +39,9 @@ export function rankByCategory(entries: AuraEntry[], discipline: Discipline): Ca
 export async function auraRanking(opts: { discipline: Discipline; province?: string; sinceDays?: number }): Promise<CategoryRanking[]> {
   const auras = await db.aura.findMany({
     where: {
-      bout: { event: { discipline: opts.discipline } },
+      bout: { verification: { not: "DISPUTED" }, event: { discipline: opts.discipline, status: { not: "CANCELLED" } } },
       ...(opts.sinceDays && { createdAt: { gte: new Date(Date.now() - opts.sinceDays * 864e5) } }),
-      fighter: { ...(opts.province && { province: opts.province }) },
+      fighter: { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }) },
     },
     select: { fighterId: true, fighter: { select: { firstName: true, lastName: true, slug: true, disciplines: { where: { discipline: opts.discipline }, select: { weightClass: true } } } } },
   });

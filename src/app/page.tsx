@@ -12,8 +12,8 @@ const HOME_PROVINCE = "Madrid";
 export default async function Home() {
   const [events, fighters, counts, topGroups] = await Promise.all([
     db.event.findMany({ where: { date: { gte: new Date() }, status: "SCHEDULED", level: "AMATEUR", province: HOME_PROVINCE }, orderBy: { date: "asc" }, take: 6 }),
-    db.fighter.findMany({ where: { level: "AMATEUR", province: HOME_PROVINCE }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
-    Promise.all([db.fighter.count({ where: { level: "AMATEUR" } }), db.event.count(), db.gym.count(), db.aura.count()]),
+    db.fighter.findMany({ where: { level: "AMATEUR", province: HOME_PROVINCE, listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
+    Promise.all([db.fighter.count({ where: { level: "AMATEUR", listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
     auraRanking({ discipline: "BOXEO", province: HOME_PROVINCE }), // el boxeo va en cabeza
   ]);
   const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, category: g.weightClass }))).sort((a, b) => b.aura - a.aura).slice(0, 5);

@@ -20,3 +20,19 @@ export const fmtDate = (d: Date) =>
 
 export const slugify = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+/** Cómo se llama en pantalla cada nivel de respaldo de un combate. */
+export const VERIFICATION_LABEL = {
+  SELF_REPORTED: "pendiente de confirmar",
+  CONFIRMED: "confirmado por el rival",
+  VERIFIED: "verificado",
+  DISPUTED: "en revisión",
+} as const;
+
+/** Resultado de un combate desde el punto de vista de un peleador, con palabras (no letras sueltas). */
+export function resultWord(result: "A_WIN" | "B_WIN" | "DRAW" | "NO_CONTEST" | null, isCornerA: boolean): { text: string; cls: "W" | "L" | "D" | "" } {
+  if (!result) return { text: "Sin resultado", cls: "" };
+  if (result === "DRAW") return { text: "Empate", cls: "D" };
+  if (result === "NO_CONTEST") return { text: "Sin decisión", cls: "D" };
+  return (result === "A_WIN") === isCornerA ? { text: "Victoria", cls: "W" } : { text: "Derrota", cls: "L" };
+}

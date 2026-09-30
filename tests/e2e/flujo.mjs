@@ -12,6 +12,18 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 const seen = (locator, timeout = 8000) => locator.waitFor({ timeout }).then(() => true, () => false);
 const check = (label, cond) => { console.log(cond ? "OK  " : "FAIL", label); if (!cond) process.exitCode = 1; };
 const btn = (p, t) => p.click(`main button:has-text("${t}")`);
+const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+const futura = enDias(120); // la aplicación no admite veladas a más de un año vista
+// Rellena y envía el formulario «Registrar un combate» con un resultado (por defecto, victoria por decisión unánime).
+const registrar = async (p, o) => {
+  await p.fill("[name=eventName]", o.evento); await p.fill("[name=date]", o.fecha);
+  await p.fill("[name=oppFirst]", o.rivalNombre); await p.fill("[name=oppLast]", o.rivalApellidos);
+  if (o.disciplina) await p.selectOption("select[name=discipline]", o.disciplina);
+  if (o.resultado !== null) { await p.selectOption("select[name=outcome]", o.resultado ?? "WIN"); if (o.metodo !== null) await p.selectOption("form select[name=method]", o.metodo ?? "UD"); }
+  if (o.evidencia) await p.fill("[name=evidenceUrl]", o.evidencia);
+  await btn(p, "Registrar este combate");
+};
 const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };
 
 async function newUser(name, role = "FAN", verify = true) {
@@ -33,14 +45,16 @@ const pepe = (await newUser("Pepe", "FIGHTER")).p;
 await pepe.goto(B + "/mi-ficha");
 await pepe.fill("[name=firstName]", "Pepe"); await pepe.fill("[name=lastName]", `Uno${rnd}`); await pepe.fill("[name=gym]", `Gym Test ${rnd}`); await btn(pepe, "Crear mi ficha");
 await pepe.waitForSelector("text=Registrar un combate");
-await pepe.fill("[name=eventName]", "Velada Claim Test"); await pepe.fill("[name=date]", "2026-08-01");
-await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `Dos${rnd}`); await pepe.fill("[name=evidenceUrl]", "javascript:alert(1)"); await btn(pepe, "Registrar");
+await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}`, evidencia: "javascript:alert(1)" });
+check("un enlace peligroso se rechaza con un mensaje claro y no se guarda nada", await seen(pepe.locator(".notice-bad", { hasText: "El enlace no es válido" })));
+await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}` });
 await pepe.waitForSelector("text=1-0-0");
 check("aviso claro tras registrar el combate", await pepe.locator("[role=status]", { hasText: "Combate registrado" }).count() === 1);
 
 // Coherencia: el mismo enfrentamiento no se puede registrar dos veces en la misma velada
-await pepe.fill("[name=eventName]", "Velada Claim Test"); await pepe.fill("[name=date]", "2026-08-01");
-await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `Dos${rnd}`); await btn(pepe, "Registrar este combate");
+await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}` });
+check("si ya hay fichas con el nombre del rival se pide elegir cuál es", await seen(pepe.locator("h1", { hasText: "¿Quién es tu rival?" })));
+await btn(pepe, "Es esta persona");
 await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
 check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
 
@@ -48,9 +62,9 @@ check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".noti
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
 check("URL javascript: no se guarda como evidencia", await pepe.locator("a:has-text('evidencia')").count() === 0);
 await pepe.goto(B + "/mi-ficha");
-await pepe.fill("main table input[name=evidenceUrl]", "esto no es una url"); await pepe.click("main table button:has-text('Guardar')");
+await pepe.fill("main table input[name=evidenceUrl]", "esto no es una url"); await pepe.click("main table button:has-text('Guardar enlace')");
 await pepe.waitForSelector("[role=alert]:has-text('no es válido')");
-await pepe.fill("main table input[name=evidenceUrl]", `https://example.com/acta-${rnd}`); await pepe.click("main table button:has-text('Guardar')");
+await pepe.fill("main table input[name=evidenceUrl]", `https://example.com/acta-${rnd}`); await pepe.click("main table button:has-text('Guardar enlace')");
 await pepe.locator(".notice-ok", { hasText: "enlace de evidencia se ha guardado" }).waitFor();
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
 check("enlace de evidencia visible en la ficha pública", await pepe.locator(`a[href="https://example.com/acta-${rnd}"][rel*=noopener]`).count() === 1);
@@ -149,7 +163,7 @@ await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("s
 await org.locator(".notice-ok", { hasText: "resultado se ha guardado" }).waitFor();
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
 const t = await fan.locator("body").innerText();
-check("velada pública con cartel y resultado", t.includes(`Uno${rnd}`) && t.includes("Gana rojo") && t.includes("KO"));
+check("velada pública con cartel y resultado", t.includes(`Gana Pepe Uno${rnd}`) && t.includes("KO"));
 // 6) un fan no puede entrar al panel de otra velada
 await fan.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
 check("fan no accede a gestionar velada ajena", !fan.url().includes("/gran-velada-org-"));
@@ -166,12 +180,10 @@ await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "
 await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 check("el récord de partida detallado se muestra como declarado", await seen(vet.locator("text=10-3-1").first()) && await seen(vet.locator("text=Incluye 14 combates anteriores declarados por el propio deportista")));
-await vet.fill("[name=eventName]", `Velada Vet ${rnd}`); await vet.fill("[name=date]", "2026-06-01");
-await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Rival${rnd}`); await btn(vet, "Registrar este combate");
+await registrar(vet, { evento: `Velada Vet ${rnd}`, fecha: "2026-06-01", rivalNombre: "Vet", rivalApellidos: `Rival${rnd}` });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await seen(vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first()));
-await vet.fill("[name=eventName]", `Velada Vet dos ${rnd}`); await vet.fill("[name=date]", "2026-04-01");
-await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Otro${rnd}`); await vet.selectOption("[name=method]", "SUBMISSION"); await btn(vet, "Registrar este combate");
+await registrar(vet, { evento: `Velada Vet dos ${rnd}`, fecha: "2026-04-01", rivalNombre: "Vet", rivalApellidos: `Otro${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).waitFor();
 check("una sumisión no se acepta en boxeo", await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).count() === 1);
 const addDisc = vet.locator("details", { hasText: "Añadir otra disciplina" });
@@ -180,9 +192,7 @@ await addDisc.locator("select[name=disciplineChoice]").selectOption("MMA:Ligero"
 await addDisc.locator("input[name=priorTotal]").fill("3");
 await addDisc.locator("button:has-text('Añadir disciplina')").click();
 await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor();
-await vet.selectOption("select[name=discipline]", "MMA");
-await vet.fill("[name=eventName]", `Velada MMA Vet ${rnd}`); await vet.fill("[name=date]", "2026-05-01");
-await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Rival mma${rnd}`); await vet.selectOption("[name=method]", "SUBMISSION"); await btn(vet, "Registrar este combate");
+await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 const pub = await anon.locator("body").innerText();
@@ -194,8 +204,8 @@ check("y excluye a quien no", await anon.locator("body").innerText().then((t) =>
 
 // Avisos a seguidores: un organizador publica un combate futuro de un peleador seguido
 await org.goto(B + "/organizador");
-await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", "2030-01-15"); await btn(org, "Crear velada");
-await org.waitForURL(`**/organizador/velada-futura-${rnd}-2030-01-15?*`);
+await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await btn(org, "Crear velada");
+await org.waitForURL(`**/organizador/velada-futura-${rnd}-${futura}?*`);
 await org.fill("[name=fighterA]", `pepe-uno${rnd}`); await org.fill("[name=fighterB]", `luis-dos${rnd}`); await btn(org, "Añadir");
 await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor();
 let mailed = false;
@@ -212,7 +222,7 @@ check("sello sin nota se rechaza", await seen(admin.p.locator("text=necesita una
 await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, llamada al responsable");
 await gymRow().locator("button:has-text('Verificar')").click();
 await gymRow().locator("button:has-text('Retirar sello')").waitFor(); // la acción ha terminado
-await pepe.goto(B + `/gimnasios/gym-test-${rnd}`);
+await pepe.goto(B + `/gimnasios/gym-test-${rnd}-madrid`);
 check("gimnasio muestra el sello de verificado", await pepe.locator("h1 .tag", { hasText: "verificado" }).count() === 1);
 check("la nota interna no se expone públicamente", !(await pepe.locator("body").innerText()).includes("Google Maps"));
 await admin.p.goto(B + "/moderacion/historial?entity=BOUT");
@@ -222,8 +232,7 @@ await admin.p.goto(B + "/moderacion/historial?entity=GYM");
 check("historial registra el sello del gimnasio", await admin.p.locator("body").innerText().then((t) => t.includes("VERIFIED")));
 // Coherencia: un segundo combate a 2 días del primero se guarda, pero queda marcado para el moderador
 await pepe.goto(B + "/mi-ficha");
-await pepe.fill("[name=eventName]", "Velada Cercana"); await pepe.fill("[name=date]", "2026-08-03");
-await pepe.fill("[name=oppFirst]", "Tercero"); await pepe.fill("[name=oppLast]", `Tres${rnd}`); await btn(pepe, "Registrar este combate");
+await registrar(pepe, { evento: "Velada Cercana", fecha: "2026-08-03", rivalNombre: "Tercero", rivalApellidos: `Tres${rnd}` });
 await pepe.waitForSelector("[role=status]:has-text('Combate registrado')");
 await admin.p.goto(B + "/moderacion");
 const adminText = await admin.p.locator("body").innerText();

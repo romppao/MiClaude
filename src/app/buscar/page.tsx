@@ -9,7 +9,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<{
   const c = { contains: q, mode: "insensitive" as const };
   const [fighters, gyms, trainers, events] = q
     ? await Promise.all([
-        db.fighter.findMany({ where: { OR: [{ firstName: c }, { lastName: c }, { alias: c }] }, take: 20 }),
+        db.fighter.findMany({ where: { listed: true, hiddenAt: null, OR: [{ firstName: c }, { lastName: c }, { alias: c }] }, take: 20 }),
         db.gym.findMany({ where: { OR: [{ name: c }, { city: c }] }, take: 20 }),
         db.trainer.findMany({ where: { name: c }, take: 20 }),
         db.event.findMany({ where: { OR: [{ name: c }, { city: c }, { venue: c }] }, orderBy: { date: "desc" }, take: 20 }),

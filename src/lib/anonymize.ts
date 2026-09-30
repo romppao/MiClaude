@@ -1,0 +1,18 @@
+import type { Prisma } from "@prisma/client";
+
+/**
+ * Oculta los datos personales de una ficha conservando los combates (forman parte del récord de otras personas).
+ * El nombre pasa a «Peleador anónimo», se borran alias, fecha de nacimiento, ciudad, provincia, gimnasio, entrenador,
+ * medidas y biografía, y la ficha deja de salir en listados y buscadores.
+ */
+export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: string) {
+  await tx.fighter.update({
+    where: { id: fighterId },
+    data: {
+      slug: `peleador-anonimo-${fighterId.slice(-8)}`,
+      firstName: "Peleador", lastName: "anónimo", alias: null, birthDate: null, city: null, province: null, bio: null,
+      gymId: null, trainerId: null, heightCm: null, reachCm: null, stance: null,
+      listed: false, hiddenAt: new Date(),
+    },
+  });
+}

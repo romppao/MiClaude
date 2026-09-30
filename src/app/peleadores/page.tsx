@@ -12,6 +12,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
   const categorias = [...new Set(DISCIPLINE_ORDER.flatMap((d) => WEIGHT_CLASSES[d]))];
   const discipline = disciplina && isDiscipline(disciplina) ? disciplina : undefined;
   const where: Prisma.FighterWhereInput = {
+    listed: true, hiddenAt: null,
     ...(q && { OR: [
       { firstName: { contains: q, mode: "insensitive" } },
       { lastName: { contains: q, mode: "insensitive" } },

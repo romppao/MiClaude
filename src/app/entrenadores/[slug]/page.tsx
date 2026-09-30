@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TrainerPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const t = await db.trainer.findUnique({ where: { slug }, include: { gym: true, fighters: { orderBy: { lastName: "asc" } } } });
+  const t = await db.trainer.findUnique({ where: { slug }, include: { gym: true, fighters: { where: { listed: true, hiddenAt: null }, orderBy: { lastName: "asc" } } } });
   if (!t) notFound();
   return (
     <>

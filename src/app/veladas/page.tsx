@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { db } from "../../lib/db";
+import { plural } from "../../lib/text";
 import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disciplines";
 
@@ -17,7 +18,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<{
     ...(disciplina && isDiscipline(disciplina) ? { discipline: disciplina } : {}),
     ...(q && { OR: [{ name: { contains: q, mode: "insensitive" } }, { city: { contains: q, mode: "insensitive" } }, { venue: { contains: q, mode: "insensitive" } }] }),
   };
-  const events = await db.event.findMany({ where, orderBy: { date: past ? "desc" : "asc" }, take: 100, include: { _count: { select: { bouts: true } } } });
+  const events = await db.event.findMany({ where, orderBy: { date: past ? "desc" : "asc" }, take: 100, include: { _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
   return (
     <>
       <h1>Calendario de veladas</h1>
@@ -35,7 +36,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<{
             <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
             <strong>{e.name}</strong>
-            <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{e._count.bouts} combates</div>
+            <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
           </Link>
         ))}
       </div>

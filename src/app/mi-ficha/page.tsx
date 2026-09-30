@@ -2,52 +2,55 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
-import { PROVINCES } from "../../lib/labels";
+import { PROVINCES, VERIFICATION_LABEL } from "../../lib/labels";
+import { LIMITS } from "../../lib/text";
+import { publicFighterName } from "../../lib/names";
+import { nameSearchWhere } from "../../lib/fighters";
+import { oneParam } from "../../lib/safe";
+import { eventDayReached } from "../../lib/dates";
+import { OUTCOME_TO_RESULT } from "../../lib/rules";
 import { computeRecords } from "../../lib/record";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/disciplines";
 import DisciplineFields from "../DisciplineFields";
 import RecordCards from "../RecordCards";
-import { addBout, createMyFighter, requestClaim, respondBout, saveDiscipline, setBoutEvidence } from "../actions";
+import { addBout, createMyFighter, requestClaim, respondBout, saveDiscipline, setBoutEvidence, setMyBoutResult } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
-const ERR: Record<string, string> = { nombre: "Nombre y apellidos son obligatorios.", combate: "Revisa los datos del combate (evento, fecha y rival).", reclamar: "Esa ficha ya no está disponible.", url: "El enlace de evidencia no es válido (debe empezar por http:// o https://)." };
 
-export default async function MyProfile({ searchParams }: { searchParams: Promise<{ error?: string; ok?: string; q?: string }> }) {
+export default async function MyProfile({ searchParams }: { searchParams: Promise<{ q?: string | string[] }> }) {
   const user = await requireUser();
   if (!user.emailVerifiedAt) redirect("/verificar");
-  const { error, ok, q } = await searchParams;
+  const q = oneParam((await searchParams).q)?.slice(0, 100);
   const me = user.fighter;
 
   if (!me) {
     const [candidates, myClaims] = await Promise.all([
-      q ? db.fighter.findMany({ where: { userId: null, OR: [{ firstName: { contains: q, mode: "insensitive" } }, { lastName: { contains: q, mode: "insensitive" } }] }, include: { gym: true }, take: 10 }) : Promise.resolve([]),
+      q ? db.fighter.findMany({ where: { userId: null, hiddenAt: null, ...nameSearchWhere(q) }, include: { gym: true, disciplines: true, _count: { select: { boutsAsA: true, boutsAsB: true } } }, take: 10 }) : Promise.resolve([]),
       db.claimRequest.findMany({ where: { userId: user.id }, include: { fighter: true }, orderBy: { createdAt: "desc" } }),
     ]);
     return (
       <>
         <h1>¿Ya apareces en Ring España?</h1>
         <p className="mut">Si alguien ya registró un combate tuyo, tu ficha existe. Búscala y reclámala; un moderador la revisará.</p>
-        {ok && <p className="W">Solicitud enviada. Te avisaremos cuando un moderador la revise.</p>}
         <form className="search"><input name="q" defaultValue={q} placeholder="Tu nombre o apellidos" /><button>Buscar mi ficha</button></form>
         {candidates.map((b) => (
           <form key={b.id} action={requestClaim} className="card" style={{ marginBottom: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <input type="hidden" name="fighterId" value={b.id} />
-            <strong>{b.firstName} {b.lastName}</strong><span className="mut">{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
-            <input name="message" placeholder="¿Cómo podemos comprobar que eres tú? (gimnasio, entrenador, licencia…)" style={{ flex: 1, minWidth: 220 }} />
+            <strong>{publicFighterName(b)}</strong><span className="mut">{b.disciplines.map((d) => DISCIPLINE_LABEL[d.discipline]).join(", ")} · {b._count.boutsAsA + b._count.boutsAsB} combates registrados{b.city ? ` · ${b.city}` : ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
+            <label className="field" style={{ flex: 1, minWidth: 220 }}><span>¿Cómo podemos comprobar que eres tú?</span><input name="message" maxLength={LIMITS.message} placeholder="Gimnasio, entrenador, velada donde combatiste…" /><span className="hint">No escribas números de documento.</span></label>
             <button>Reclamar</button>
           </form>
         ))}
         {q && candidates.length === 0 && <p className="mut">No hay fichas sin dueño con ese nombre.</p>}
         {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.fighter.firstName} ${c.fighter.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
         <h2>Si no apareces, crea tu ficha</h2>
-        {error && <p className="L">{ERR[error]}</p>}
         <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
-          <label className="field"><span>Nombre</span><input name="firstName" required /></label>
-          <label className="field"><span>Apellidos</span><input name="lastName" required /></label>
-          <label className="field"><span>Alias (opcional)</span><input name="alias" /></label>
-          <label className="field"><span>Gimnasio (opcional)</span><input name="gym" /></label>
-          <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" /></label>
+          <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
+          <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
+          <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
+          <label className="field"><span>Gimnasio (opcional)</span><input name="gym" maxLength={LIMITS.gym} /></label>
+          <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" maxLength={LIMITS.city} /></label>
           <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <DisciplineFields />
           <button>Crear mi ficha</button>
@@ -68,7 +71,6 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     <>
       <h1>{me.firstName} {me.lastName}</h1>
       <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
-      {error && <p className="L">{ERR[error]}</p>}
       <RecordCards records={records} disciplines={me.disciplines} />
 
       <h2>Mis disciplinas</h2>
@@ -117,45 +119,88 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             {me.disciplines.map((d) => <option key={d.discipline} value={d.discipline}>{DISCIPLINE_LABEL[d.discipline]}</option>)}
           </select>
         </label>
-        <label className="field"><span>Nombre de la velada</span><input name="eventName" required /></label>
-        <label className="field"><span>Fecha</span><input name="date" type="date" required /></label>
-        <label className="field"><span>Recinto (opcional)</span><input name="venue" /></label>
-        <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" /></label>
-        <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" required /></label>
-        <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" required /></label>
+        <label className="field"><span>Nombre de la velada</span><input name="eventName" required maxLength={LIMITS.eventName} /></label>
+        <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>
+        <label className="field"><span>Recinto (opcional)</span><input name="venue" maxLength={LIMITS.venue} /></label>
+        <label className="field"><span>Ciudad</span><input name="city" defaultValue={me.city ?? "Madrid"} maxLength={LIMITS.city} /></label>
+        <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? "Madrid"}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+        <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" required maxLength={LIMITS.firstName} /></label>
+        <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" required maxLength={LIMITS.lastName} /></label>
         <label className="field"><span>Resultado</span>
-          <select name="outcome" defaultValue="WIN"><option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option></select>
+          <select name="outcome" defaultValue="">
+            <option value="">Elige el resultado…</option>
+            <option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>
+          </select>
+          <span className="hint">Si el combate todavía no se ha celebrado, déjalo sin elegir: podrás añadirlo después.</span>
         </label>
         <label className="field"><span>Cómo terminó</span>
-          <select name="method" defaultValue="UD">
+          <select name="method" defaultValue="">
+            <option value="">Elige cómo terminó…</option>
             <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
             <option value="KO">KO</option><option value="TKO">TKO</option><option value="SUBMISSION">Sumisión</option><option value="POINTS">Puntos</option><option value="ADVANTAGE">Ventajas</option>
-            <option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
+            <option value="RTD">Abandono</option><option value="DQ">Descalificación</option>
           </select>
-          <span className="hint">Elige la que corresponda a tu disciplina (la sumisión, los puntos y las ventajas solo existen en MMA y jiu-jitsu).</span>
+          <span className="hint">Elige la que corresponda a tu disciplina (la sumisión, los puntos y las ventajas solo existen en MMA y jiu-jitsu). En empates no hace falta.</span>
         </label>
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
-        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
+        <label className="field"><span>Asalto en que terminó (opcional)</span><input name="endRound" type="number" min={1} max={12} /><span className="hint">Solo si acabó por KO, TKO, abandono, sumisión o descalificación.</span></label>
+        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" maxLength={LIMITS.url} placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
         <button>Registrar este combate</button>
       </form>
-      <h2>Mis combates y su evidencia</h2>
-      <table><tbody>
-        {bouts.map((b) => (
-          <tr key={b.id}>
-            <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-            <td>vs {b.fighterAId === me.id ? `${b.fighterB.firstName} ${b.fighterB.lastName}` : `${b.fighterA.firstName} ${b.fighterA.lastName}`}</td>
-            <td><span className="tag">{b.verification === "SELF_REPORTED" ? "pendiente de confirmar" : b.verification === "CONFIRMED" ? "confirmado por el rival" : b.verification === "VERIFIED" ? "verificado" : "en revisión"}</span></td>
-            <td>
-              <form action={setBoutEvidence} style={{ display: "flex", gap: 4 }}>
-                <input type="hidden" name="boutId" value={b.id} />
-                <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} placeholder="Enlace que lo demuestre" aria-label="Enlace que demuestra este combate" />
-                <button>Guardar enlace</button>
-              </form>
-            </td>
-          </tr>
-        ))}
-      </tbody></table>
-      <p className="mut">Tus combates aparecen como «sin confirmar» hasta que tu rival (si tiene cuenta) o un moderador los verifique.</p>
+      <h2>Mis combates</h2>
+      <div className="table-wrap">
+        <table>
+          <caption className="sr-only">Tus combates con su estado, su resultado y su enlace de evidencia</caption>
+          <thead><tr><th scope="col">Combate</th><th scope="col">Estado</th><th scope="col">Resultado</th><th scope="col">Enlace que lo demuestra</th></tr></thead>
+          <tbody>
+            {bouts.map((b) => {
+              const isA = b.fighterAId === me.id;
+              const soyAutor = b.createdById === user.id;
+              const opp = isA ? b.fighterB : b.fighterA;
+              const puedeCorregir = soyAutor && b.verification === "SELF_REPORTED" && eventDayReached(b.event.date);
+              return (
+                <tr key={b.id}>
+                  <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div></td>
+                  <td><span className="tag">{VERIFICATION_LABEL[b.verification]}</span></td>
+                  <td>
+                    {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
+                    {puedeCorregir && (
+                      <details style={{ marginTop: 6 }}>
+                        <summary className="mut">{b.result ? "Corregir el resultado" : "Añadir el resultado"}</summary>
+                        <form action={setMyBoutResult} style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
+                          <input type="hidden" name="boutId" value={b.id} />
+                          <select name="outcome" aria-label="Resultado" defaultValue="">
+                            <option value="">Elige el resultado…</option>
+                            {Object.keys(OUTCOME_TO_RESULT).map((k) => <option key={k} value={k}>{k === "WIN" ? "Gané" : k === "LOSS" ? "Perdí" : k === "DRAW" ? "Empate" : "Sin decisión"}</option>)}
+                          </select>
+                          <select name="method" aria-label="Cómo terminó" defaultValue="">
+                            <option value="">Cómo terminó…</option>
+                            <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
+                            <option value="KO">KO</option><option value="TKO">TKO</option><option value="SUBMISSION">Sumisión</option><option value="POINTS">Puntos</option><option value="ADVANTAGE">Ventajas</option>
+                            <option value="RTD">Abandono</option><option value="DQ">Descalificación</option>
+                          </select>
+                          <input name="endRound" type="number" min={1} max={12} aria-label="Asalto en que terminó (opcional)" placeholder="Asalto" style={{ width: 90 }} />
+                          <button className="secondary">Guardar resultado</button>
+                        </form>
+                      </details>
+                    )}
+                  </td>
+                  <td>
+                    {b.verification === "SELF_REPORTED" ? (
+                      <form action={setBoutEvidence} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                        <input type="hidden" name="boutId" value={b.id} />
+                        <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} maxLength={LIMITS.url} placeholder="Enlace que lo demuestre" aria-label={`Enlace que demuestra el combate ${b.event.name}`} />
+                        <button className="secondary" aria-label={`Guardar el enlace del combate ${b.event.name}`}>Guardar enlace</button>
+                      </form>
+                    ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia ↗</a> : <span className="mut">Combate ya confirmado o verificado</span>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mut">Tus combates aparecen como «pendiente de confirmar» hasta que tu rival (si tiene cuenta) o un moderador los verifique. Lo que declaras sobre tu rival no cuenta en su récord hasta que él lo confirme.</p>
     </>
   );
 }

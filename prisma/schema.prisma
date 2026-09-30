@@ -123,6 +123,9 @@ model Fighter {
   heightCm      Int?
   reachCm       Int?
   level         Level               @default(AMATEUR)
+  // false = ficha creada por un tercero (rival) que aún no ha sido reclamada ni confirmada: no sale en listados ni buscadores.
+  listed        Boolean             @default(true)
+  hiddenAt      DateTime?
   bio           String?
   gymId         String?
   gym           Gym?                @relation(fields: [gymId], references: [id])
@@ -138,6 +141,9 @@ model Fighter {
   boutsAsB      Bout[]              @relation("FighterB")
   createdAt     DateTime            @default(now())
 
+  @@index([gymId])
+  @@index([trainerId])
+  @@index([listed])
   @@index([lastName, firstName])
   @@index([province])
 }
@@ -155,11 +161,13 @@ model Event {
   promoter    String?
   ticketUrl   String?
   status      EventStatus @default(SCHEDULED)
+  createdById String?
   organizerId String?
   organizer   User?       @relation("EventOrganizer", fields: [organizerId], references: [id])
   bouts       Bout[]
 
   @@index([discipline, date])
+  @@index([organizerId])
   @@index([date])
   @@index([level, date])
   @@index([province])
@@ -185,7 +193,11 @@ model Bout {
   auras        Aura[]
   flags        String[]     @default([])
   evidenceUrl  String?
+  // Pareja canónica (ids ordenados): impide registrar dos veces el mismo enfrentamiento en una velada, en cualquier esquina.
+  pairKey      String?
 
+  @@unique([eventId, pairKey])
+  @@index([createdById])
   @@index([eventId])
   @@index([fighterAId])
   @@index([fighterBId])
@@ -197,6 +209,7 @@ model User {
   name             String
   passwordHash     String
   role             Role              @default(FAN)
+  notifyEmails     Boolean           @default(true)
   emailVerifiedAt  DateTime?
   createdAt        DateTime          @default(now())
   sessions         Session[]
@@ -224,17 +237,18 @@ model Session {
 // Aura: reconocimiento del público a un peleador por su actuación en UN combate concreto.
 // Una por persona, combate y peleador (se puede quitar). El total de aura ordena el ránking por disciplina y categoría.
 model Aura {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   fighterId String
-  fighter   Fighter  @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  fighter   Fighter   @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   boutId    String
-  bout      Bout     @relation(fields: [boutId], references: [id], onDelete: Cascade)
+  bout      Bout      @relation(fields: [boutId], references: [id], onDelete: Cascade)
   comment   String?
-  attended  Boolean  @default(false) // "lo vi en directo"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  attended  Boolean   @default(false) // "lo vi en directo"
+  hiddenAt  DateTime? // ocultada por un moderador
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@unique([userId, boutId, fighterId])
   @@index([fighterId])
@@ -246,6 +260,7 @@ model EmailToken {
   id        String   @id
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String   @default("VERIFY") // VERIFY | RESET
   expiresAt DateTime
 
   @@index([userId])
@@ -343,4 +358,13 @@ model FighterDiscipline {
 
   @@id([fighterId, discipline])
   @@index([discipline, weightClass])
+}
+
+// Registro de intentos para limitar la frecuencia (inicio de sesión, registro, reenvíos…). Clave = acción + correo o IP.
+model RateHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }
