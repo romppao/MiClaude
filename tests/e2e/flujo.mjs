@@ -1,40 +1,8 @@
-import { chromium } from "playwright-core";
-import { readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { B, rnd, MAIL_LOG, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
-//   BASE_URL      servidor (por defecto http://localhost:3111)
-//   MAIL_LOG      fichero donde el servidor escribe su salida (los enlaces de verificación salen en el log de correo)
-//   DATABASE_URL  para promover a un usuario a ADMIN (única acción que no se puede hacer desde la web)
-//   CHROMIUM_PATH ejecutable de Chromium (opcional)
-const B = process.env.BASE_URL ?? "http://localhost:3111", rnd = Date.now();
-const MAIL_LOG = process.env.MAIL_LOG ?? "/tmp/next.log";
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--no-sandbox"] });
-const seen = (locator, timeout = 8000) => locator.waitFor({ timeout }).then(() => true, () => false);
-const check = (label, cond) => { console.log(cond ? "OK  " : "FAIL", label); if (!cond) process.exitCode = 1; };
-const btn = (p, t) => p.click(`main button:has-text("${t}")`);
-const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
-const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+// Variables de entorno: ver tests/e2e/ayudas.mjs.
+import { readFileSync } from "node:fs";
 const futura = enDias(120); // la aplicación no admite veladas a más de un año vista
-// Rellena y envía el formulario «Registrar un combate» con un resultado (por defecto, victoria por decisión unánime).
-const registrar = async (p, o) => {
-  await p.fill("[name=eventName]", o.evento); await p.fill("[name=date]", o.fecha);
-  await p.fill("[name=oppFirst]", o.rivalNombre); await p.fill("[name=oppLast]", o.rivalApellidos);
-  if (o.disciplina) await p.selectOption("select[name=discipline]", o.disciplina);
-  if (o.resultado !== null) { await p.selectOption("select[name=outcome]", o.resultado ?? "WIN"); if (o.metodo !== null) await p.selectOption("form select[name=method]", o.metodo ?? "UD"); }
-  if (o.evidencia) await p.fill("[name=evidenceUrl]", o.evidencia);
-  await btn(p, "Registrar este combate");
-};
-const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };
-
-async function newUser(name, role = "FAN", verify = true) {
-  const email = `${name.toLowerCase()}${rnd}@test.es`;
-  const p = await (await browser.newContext()).newPage();
-  await p.goto(B + "/registro");
-  await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123"); await p.selectOption("[name=role]", role);
-  await btn(p, "Crear mi cuenta"); await p.waitForURL("**/verificar");
-  if (verify) { await p.goto(B + link(email)); await btn(p, "Confirmar"); await p.waitForSelector("text=Correo electrónico verificado"); }
-  return { p, email };
-}
 
 // 1) email sin verificar: no puede dar aura ni crear ficha
 const unv = await newUser("Sinverificar", "FIGHTER", false);
@@ -75,7 +43,7 @@ await luis.goto(B + `/mi-ficha?q=Dos${rnd}`);
 await luis.fill("[name=message]", "Entreno en el mismo gimnasio"); await btn(luis, "Reclamar");
 await luis.waitForSelector("text=Solicitud enviada");
 const admin = await newUser("Admin");
-execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${admin.email}'"`);
+hacerAdmin(admin.email);
 await admin.p.goto(B + "/moderacion");
 check("admin ve la reclamación", await admin.p.locator("body").innerText().then((t) => t.includes(`Dos${rnd}`)));
 await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
