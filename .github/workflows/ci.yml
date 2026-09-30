@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ringespana
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ringespana
+      BASE_URL: http://localhost:3111
+      MAIL_LOG: ${{ github.workspace }}/server.log
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma db push
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Instalar Chromium
+        run: npx playwright-core install --with-deps chromium
+      - name: Arrancar servidor
+        run: |
+          npx next start -p 3111 > "$MAIL_LOG" 2>&1 &
+          npx wait-on -t 60000 http://localhost:3111/registro
+      - name: Prueba de extremo a extremo
+        run: npm run test:e2e
+      - name: Log del servidor si algo falla
+        if: failure()
+        run: tail -n 100 "$MAIL_LOG" || true

@@ -8,7 +8,9 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e/flujo.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,6 +28,8 @@
     "playwright-core": "^1.63.0",
     "prisma": "^6.19.3",
     "tsx": "^4.23.15",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.2",
+    "wait-on": "^9.5.1"
   }
 }

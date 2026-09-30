@@ -47,3 +47,15 @@ El récord no se guarda: se calcula a partir de los `Bout` (`src/lib/record.ts`)
 4. **Fase 5 – Escala:** SEO/sitemaps, API pública, app móvil, importación de datos federativos.
 
 > Los datos del seed son inventados. Cualquier dato real debe proceder de los propios interesados, promotores o federaciones.
+
+## Tests
+
+```bash
+npm run typecheck   # tipos
+npm test            # unitarios (récord, ránking bayesiano, slugs, contraseñas)
+npm run test:e2e    # flujo completo en navegador (ver cabecera de tests/e2e/flujo.mjs)
+```
+
+El e2e necesita el servidor en marcha (`npm run build && npm start`) con `MAIL_LOG` apuntando al fichero donde se redirige su salida
+(los enlaces de verificación se leen del log de correo) y `DATABASE_URL` para promover un usuario a administrador.
+`.github/workflows/ci.yml` ejecuta todo esto en cada push y pull request.

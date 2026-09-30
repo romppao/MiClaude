@@ -1,25 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { db } from "./db";
+export { hashPassword, verifyPassword } from "./password";
 import { APP_URL, sendMail } from "./mail";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
-
-export function hashPassword(password: string) {
-  const salt = randomBytes(16);
-  return `${salt.toString("hex")}:${scryptSync(password, salt, 64).toString("hex")}`;
-}
-
-export function verifyPassword(password: string, stored: string) {
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
-  const a = scryptSync(password, Buffer.from(salt, "hex"), 64);
-  const b = Buffer.from(hash, "hex");
-  return a.length === b.length && timingSafeEqual(a, b);
-}
 
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString("hex");
