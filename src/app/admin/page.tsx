@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import Link from "next/link";
+import { FLAG_LABEL, type Flag } from "../../lib/coherence";
 import { adminDecide, decideClaim, decideOrganizer, setGymVerified } from "../actions";
 
 export const metadata = { title: "Moderación" };
@@ -20,6 +21,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
     db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, boxer: true }, orderBy: { createdAt: "asc" } }),
     db.organizerRequest.findMany({ where: { status: "PENDING" }, include: { user: true }, orderBy: { createdAt: "asc" } }),
   ]);
+  pending.sort((a, b) => b.flags.length - a.flags.length); // primero los que tienen señales de coherencia
   const decide = (action: (f: FormData) => Promise<void>, name: string, id: string) => (
     <form action={action} style={{ display: "flex", gap: 6 }}>
       <input type="hidden" name={name} value={id} />
@@ -77,7 +79,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           {pending.map((b) => (
             <tr key={b.id}>
               <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-              <td>{b.boxerA.firstName} {b.boxerA.lastName} vs {b.boxerB.firstName} {b.boxerB.lastName}</td>
+              <td>{b.boxerA.firstName} {b.boxerA.lastName} vs {b.boxerB.firstName} {b.boxerB.lastName}{b.flags.map((f) => <div key={f} className="L" style={{ fontSize: ".8rem" }}>⚠ {FLAG_LABEL[f as Flag] ?? f}</div>)}</td>
               <td>{b.verification}{b.evidenceUrl && <> · <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a></>}</td>
               <td>
                 <form action={adminDecide} style={{ display: "flex", gap: 6 }}>

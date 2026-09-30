@@ -18,6 +18,8 @@ export const AVISOS: Record<string, string> = {
 
 export const PROBLEMAS: Record<string, string> = {
   combate_datos: "Revisa los datos del combate: hacen falta el nombre de la velada, la fecha y el nombre y los apellidos de tu rival.",
+  combate_duplicado: "Este combate ya está registrado en esa velada. Si lo registró tu rival, respóndele desde «Mi ficha».",
+  cartel_duplicado: "Ese combate ya está en el cartel de esta velada.",
   combate_mismo: "Tu rival no puede ser tú mismo. Escribe el nombre de la otra persona.",
   nombre_ficha: "Escribe tu nombre y tus apellidos para crear la ficha.",
   valorar_nota: "Elige una nota de 1 a 5 estrellas.",

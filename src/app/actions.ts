@@ -8,6 +8,7 @@ import { consumeVerificationToken, createSession, destroySession, getUser, hashP
 import { slugify } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
+import { proximityFlags, type Flag } from "../lib/coherence";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
@@ -24,6 +25,22 @@ function go(path: string, mensaje?: { aviso?: string; problema?: string }): neve
 /** Solo permite volver a rutas internas (evita redirecciones abiertas). */
 function internalPath(raw: string, fallback = "/") {
   return raw.startsWith("/") && !raw.startsWith("//") ? raw : fallback;
+}
+
+/** ¿Ya existe este mismo enfrentamiento (en cualquiera de las dos esquinas) en la velada? */
+async function boutExists(eventId: string, a: string, b: string) {
+  return !!(await db.bout.findFirst({
+    where: { eventId, verification: { not: "DISPUTED" }, OR: [{ boxerAId: a, boxerBId: b }, { boxerAId: b, boxerBId: a }] },
+  }));
+}
+
+/** Señales de coherencia de un combate nuevo respecto a los demás combates de sus dos boxeadores. */
+async function coherenceFlagsFor(eventId: string, eventDate: Date, boxerIds: string[]): Promise<Flag[]> {
+  const others = await db.bout.findMany({
+    where: { eventId: { not: eventId }, verification: { not: "DISPUTED" }, OR: [{ boxerAId: { in: boxerIds } }, { boxerBId: { in: boxerIds } }] },
+    select: { event: { select: { date: true } } },
+  });
+  return proximityFlags(eventDate, others.map((o) => o.event.date));
 }
 
 async function uniqueSlug(base: string, exists: (slug: string) => Promise<boolean>) {
@@ -129,13 +146,15 @@ export async function addBout(f: FormData) {
     (await db.boxer.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
   if (opponent.id === me.id) go("/mi-ficha", { problema: "combate_mismo" });
 
+  if (await boutExists(event.id, me.id, opponent.id)) go("/mi-ficha", { problema: "combate_duplicado" });
+  const flags = await coherenceFlagsFor(event.id, event.date, [me.id, opponent.id]);
   const created = await db.bout.create({
     data: {
-      eventId: event.id, boxerAId: me.id, boxerBId: opponent.id, result, method, rounds,
+      flags, eventId: event.id, boxerAId: me.id, boxerBId: opponent.id, result, method, rounds,
       weightClass: me.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")),
     },
   });
-  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED", after: { result, method, verification: "SELF_REPORTED", evidenceUrl: created.evidenceUrl } });
+  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED", after: { result, method, verification: "SELF_REPORTED", evidenceUrl: created.evidenceUrl, flags } });
   revalidatePath("/", "layout");
   go("/mi-ficha", { aviso: "combate_registrado" });
 }
@@ -326,9 +345,11 @@ export async function addCartelBout(f: FormData) {
   ]);
   if (!a || !b || a.id === b.id) redirect(`/organizador/${event.slug}?error=cartel`);
   const rounds = parseInt(str(f, "rounds"), 10);
+  if (await boutExists(event.id, a.id, b.id)) go(`/organizador/${event.slug}`, { problema: "cartel_duplicado" });
+  const flags = await coherenceFlagsFor(event.id, event.date, [a.id, b.id]);
   const order = await db.bout.count({ where: { eventId: event.id } });
   const created = await db.bout.create({
-    data: { eventId: event.id, boxerAId: a.id, boxerBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
+    data: { flags, eventId: event.id, boxerAId: a.id, boxerBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, boxerA: a.slug, boxerB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");

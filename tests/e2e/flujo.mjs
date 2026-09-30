@@ -37,6 +37,12 @@ await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `D
 await pepe.waitForSelector("text=1-0-0");
 check("aviso claro tras registrar el combate", await pepe.locator("[role=status]", { hasText: "Combate registrado" }).count() === 1);
 
+// Coherencia: el mismo enfrentamiento no se puede registrar dos veces en la misma velada
+await pepe.fill("[name=eventName]", "Velada Claim Test"); await pepe.fill("[name=date]", "2026-08-01");
+await pepe.fill("[name=oppFirst]", "Luis"); await pepe.fill("[name=oppLast]", `Dos${rnd}`); await btn(pepe, "Registrar este combate");
+await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
+check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
+
 // Evidencia: una URL peligrosa no se guarda; una inválida da error; una válida aparece como enlace público
 await pepe.goto(B + `/boxeadores/pepe-uno${rnd}`);
 check("URL javascript: no se guarda como evidencia", await pepe.locator("a:has-text('evidencia')").count() === 0);
@@ -118,5 +124,13 @@ const hist = await admin.p.locator("body").innerText();
 check("historial registra creación y evidencia del combate", hist.includes("CREATED") && hist.includes("EVIDENCE_SET"));
 await admin.p.goto(B + "/admin/historial?entity=GYM");
 check("historial registra el sello del gimnasio", await admin.p.locator("body").innerText().then((t) => t.includes("VERIFIED")));
+// Coherencia: un segundo combate a 2 días del primero se guarda, pero queda marcado para el moderador
+await pepe.goto(B + "/mi-ficha");
+await pepe.fill("[name=eventName]", "Velada Cercana"); await pepe.fill("[name=date]", "2026-08-03");
+await pepe.fill("[name=oppFirst]", "Tercero"); await pepe.fill("[name=oppLast]", `Tres${rnd}`); await btn(pepe, "Registrar este combate");
+await pepe.waitForSelector("[role=status]:has-text('Combate registrado')");
+await admin.p.goto(B + "/admin");
+const adminText = await admin.p.locator("body").innerText();
+check("la cola de moderación marca los combates muy seguidos", adminText.includes("Menos de 7 días"));
 await browser.close();
 if (process.exitCode) console.error("\nE2E: hay comprobaciones fallidas");

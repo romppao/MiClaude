@@ -163,6 +163,7 @@ model Bout {
   createdById  String?
   createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
   ratings      Rating[]
+  flags        String[] @default([])
   evidenceUrl  String?
 
   @@index([eventId])
