@@ -1,6 +1,6 @@
 // Pruebas de búsqueda, paginación, cabeceras de seguridad y buscadores (robots, mapa del sitio, salud).
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const anon = await (await browser.newContext()).newPage();
@@ -32,14 +32,15 @@ check("una búsqueda repetida en la dirección (?q=a&q=b) no rompe la página", 
 await anon.goto(B + `/peleadores?q=${encodeURIComponent(`pérez${rnd}`)}`);
 check("el listado de peleadores también busca sin tildes", (await cuerpo(anon)).includes(`Álvaro Pérez${rnd} Núñez`));
 
-// 2) Paginación de los listados
-await anon.goto(B + "/peleadores?level=AMATEUR");
+// 2) Paginación de los listados. Se preparan 30 peleadores propios para no depender de cuántos haya en la base de datos.
+sql(`insert into "Fighter"(id, slug, "firstName", "lastName") select 'pag${rnd}-' || i, 'paginado-${rnd}-' || i, 'Pag', 'Paginado${rnd}' from generate_series(1, 30) i;`);
+await anon.goto(B + `/peleadores?q=Paginado${rnd}&level=AMATEUR`);
 const siguiente = anon.locator("a", { hasText: "Página siguiente" });
-check("los listados largos se paginan y dicen cuántos resultados hay", await seen(siguiente.first()) && /Mostrando del 1 al 24 de \d+ peleadores · página 1 de \d+/.test(await cuerpo(anon)));
+check("los listados largos se paginan y dicen cuántos resultados hay", await seen(siguiente.first()) && (await cuerpo(anon)).includes("Mostrando del 1 al 24 de 30 peleadores · página 1 de 2"));
 const href = await siguiente.first().getAttribute("href");
-check("el enlace a la página siguiente conserva los filtros", /level=AMATEUR/.test(href) && /pagina=2/.test(href));
+check("el enlace a la página siguiente conserva los filtros", href.includes(`q=Paginado${rnd}`) && /level=AMATEUR/.test(href) && /pagina=2/.test(href));
 await siguiente.first().click();
-check("la segunda página ofrece volver a la anterior", await seen(anon.locator("a", { hasText: "Página anterior" }).first()) && /pagina=2/.test(anon.url()));
+check("la segunda página muestra el resto y ofrece volver a la anterior", await seen(anon.locator("a", { hasText: "Página anterior" }).first()) && /pagina=2/.test(anon.url()) && (await cuerpo(anon)).includes("Mostrando del 25 al 30 de 30 peleadores"));
 check("una página que no existe muestra la última en lugar de fallar", (await anon.goto(B + "/peleadores?pagina=9999")).status() === 200 && /Mostrando del \d+ al \d+ de/.test(await cuerpo(anon)));
 check("un número de página inválido equivale a la primera", (await anon.goto(B + "/peleadores?pagina=abc")).status() === 200 && (await cuerpo(anon)).includes("Mostrando del 1 al"));
 

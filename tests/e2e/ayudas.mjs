@@ -57,5 +57,8 @@ export async function newUser(name, role = "FAN", verify = true) {
   return { p, email };
 }
 
+/** Ejecuta SQL directamente en la base de pruebas (solo para preparar datos que la web no permite crear en bloque). */
+export const sql = (sentencias) => execSync('psql "$DATABASE_URL" -v ON_ERROR_STOP=1', { input: sentencias, env: process.env, stdio: ["pipe", "ignore", "inherit"] });
+
 /** Convierte a un usuario en moderador (solo posible con acceso a la base de datos). */
 export const hacerAdmin = (email) => execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${email}'"`);
