@@ -10,14 +10,16 @@ export default async function Register({ searchParams }: { searchParams: Promise
       <h1>Crear cuenta</h1>
       {error && <p className="L">{ERR[error]}</p>}
       <form className="search" action={register} style={{ flexDirection: "column", maxWidth: 360 }}>
-        <input name="name" placeholder="Nombre" required />
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="password" type="password" placeholder="Contraseña (mín. 8)" required minLength={8} />
-        <select name="role" defaultValue="FAN">
-          <option value="FAN">Soy aficionado (quiero valorar boxeadores)</option>
-          <option value="BOXER">Soy boxeador amateur (quiero mi ficha y récord)</option>
-        </select>
-        <button>Crear cuenta</button>
+        <label className="field"><span>Nombre</span><input name="name" autoComplete="name" required /></label>
+        <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required /></label>
+        <label className="field"><span>Contraseña</span><input name="password" type="password" autoComplete="new-password" required minLength={8} /><span className="hint">Mínimo 8 caracteres.</span></label>
+        <label className="field"><span>¿Qué quieres hacer en Ring España?</span>
+          <select name="role" defaultValue="FAN">
+            <option value="FAN">Valorar a boxeadores y consultar veladas</option>
+            <option value="BOXER">Tener mi ficha de boxeador y registrar mi récord</option>
+          </select>
+        </label>
+        <button>Crear mi cuenta</button>
       </form>
     </>
   );

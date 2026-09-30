@@ -33,7 +33,7 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
       {boxer.alias && <p className="mut">“{boxer.alias}”</p>}
       <div className="grid">
         {(["PRO", "AMATEUR"] as const).map((l) => (
-          <div key={l} className="card"><div className="mut">Récord {LEVEL_LABEL[l].toLowerCase()} (V-D-E)</div><div className="rec">{formatRecord(records[l])}</div><div className="mut">{records[l].ko} por KO{records[l].unverified ? ` · ${records[l].unverified} sin confirmar` : ""}</div></div>
+          <div key={l} className="card"><div className="mut">Récord {LEVEL_LABEL[l].toLowerCase()} (V-D-E)</div><div className="rec">{formatRecord(records[l])}</div><div className="mut">{records[l].ko} por KO{records[l].unverified ? ` · ${records[l].unverified} pendientes de confirmar` : ""}</div></div>
         ))}
       </div>
       <div className="card" style={{ marginTop: 12 }}>
@@ -66,20 +66,20 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
                 <td><Link href={`/boxeadores/${opp.slug}`}>{opp.firstName} {opp.lastName}</Link></td>
                 <td className={out === "NC" ? "D" : out}>{out || "—"}</td>
                 <td>{b.method ? METHOD_LABEL[b.method] : ""}{b.endRound ? ` (R${b.endRound})` : ""}</td>
-                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">sin confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">disputado</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado"}</span>}</td>
+                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">pendiente de confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">en revisión</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado por el rival"}</span>}</td>
                 <td>
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (
                     user?.emailVerifiedAt ? (
                       <form action={rateBoxer} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="boxerId" value={boxer.id} />
                         <input type="hidden" name="back" value={`/boxeadores/${boxer.slug}`} />
-                        <select name="score" defaultValue={myRatings.find((r) => r.boutId === b.id)?.score ?? 5}>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} ★</option>)}</select>
-                        <input name="comment" placeholder="Comentario" defaultValue={myRatings.find((r) => r.boutId === b.id)?.comment ?? ""} maxLength={500} />
+                        <select name="score" aria-label="Tu nota" defaultValue={myRatings.find((r) => r.boutId === b.id)?.score ?? 5}>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} {n === 1 ? "estrella" : "estrellas"}</option>)}</select>
+                        <input name="comment" aria-label="Tu comentario (opcional)" placeholder="Tu comentario (opcional)" defaultValue={myRatings.find((r) => r.boutId === b.id)?.comment ?? ""} maxLength={500} />
                         <label className="mut"><input type="checkbox" name="attended" defaultChecked={myRatings.find((r) => r.boutId === b.id)?.attended} /> lo vi en directo</label>
-                        <button>{myRatings.some((r) => r.boutId === b.id) ? "Actualizar" : "Valorar"}</button>
+                        <button>{myRatings.some((r) => r.boutId === b.id) ? "Actualizar mi valoración" : "Valorar a este boxeador"}</button>
                       </form>
-                    ) : user ? <Link href="/verificar" className="mut">Verifica tu email para valorar</Link>
-                      : <Link href="/entrar" className="mut">Entra para valorar</Link>
+                    ) : user ? <Link href="/verificar">Confirma tu correo electrónico para valorar</Link>
+                      : <Link href={`/entrar?next=${encodeURIComponent(`/boxeadores/${boxer.slug}`)}`}>Entra para valorar</Link>
                   )}
                 </td>
               </tr>

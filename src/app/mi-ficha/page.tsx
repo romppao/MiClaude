@@ -40,14 +40,14 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         <h2>Si no apareces, crea tu ficha</h2>
         {error && <p className="L">{ERR[error]}</p>}
         <form className="search" action={createMyBoxer} style={{ flexDirection: "column", maxWidth: 360 }}>
-          <input name="firstName" placeholder="Nombre" required />
-          <input name="lastName" placeholder="Apellidos" required />
-          <input name="alias" placeholder="Alias (opcional)" />
-          <input name="weightClass" placeholder="Categoría (ej. Wélter)" />
-          <input name="gym" placeholder="Gimnasio (opcional)" />
-          <input name="city" placeholder="Ciudad" defaultValue="Madrid" />
-          <select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select>
-          <button>Crear ficha</button>
+          <label className="field"><span>Nombre</span><input name="firstName" required /></label>
+          <label className="field"><span>Apellidos</span><input name="lastName" required /></label>
+          <label className="field"><span>Alias (opcional)</span><input name="alias" /></label>
+          <label className="field"><span>Categoría de peso (opcional)</span><input name="weightClass" placeholder="Por ejemplo: Wélter" /></label>
+          <label className="field"><span>Gimnasio (opcional)</span><input name="gym" /></label>
+          <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" /></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <button>Crear mi ficha</button>
         </form>
       </>
     );
@@ -65,12 +65,12 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     <>
       <h1>{me.firstName} {me.lastName}</h1>
       <p><Link href={`/boxeadores/${me.slug}`}>Ver mi ficha pública</Link></p>
-      <p className="rec">{formatRecord(rec)} <span className="mut" style={{ fontSize: "1rem" }}>({rec.unverified} sin confirmar)</span></p>
+      <p className="rec">{formatRecord(rec)} <span className="mut" style={{ fontSize: "1rem" }}>({rec.unverified} pendientes de confirmar)</span></p>
       {error && <p className="L">{ERR[error]}</p>}
 
       {toConfirm.length > 0 && (
         <>
-          <h2>Combates pendientes de que los confirmes</h2>
+          <h2>Combates que tu rival ha registrado y necesitan tu respuesta</h2>
           <table><tbody>
             {toConfirm.map((b) => (
               <tr key={b.id}>
@@ -79,8 +79,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                 <td>
                   <form action={respondBout} style={{ display: "flex", gap: 6 }}>
                     <input type="hidden" name="boutId" value={b.id} />
-                    <button name="decision" value="confirm">Confirmar</button>
-                    <button name="decision" value="dispute" style={{ background: "transparent" }}>Disputar</button>
+                    <button name="decision" value="confirm">Sí, es correcto</button>
+                    <button name="decision" value="dispute" className="secondary">No es correcto</button>
                   </form>
                 </td>
               </tr>
@@ -91,20 +91,24 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
       <h2>Registrar un combate</h2>
       <form className="search" action={addBout}>
-        <input name="eventName" placeholder="Velada / evento" required />
-        <input name="date" type="date" required />
-        <input name="venue" placeholder="Recinto" />
-        <input name="city" placeholder="Ciudad" defaultValue="Madrid" />
-        <input name="oppFirst" placeholder="Rival: nombre" required />
-        <input name="oppLast" placeholder="Rival: apellidos" required />
-        <select name="outcome" defaultValue="WIN"><option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option></select>
-        <select name="method" defaultValue="UD">
-          <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
-          <option value="KO">KO</option><option value="TKO">TKO</option><option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
-        </select>
-        <input name="rounds" type="number" min={1} max={12} placeholder="Asaltos" />
-        <input name="evidenceUrl" placeholder="Evidencia (enlace a acta, cartel, vídeo o publicación)" style={{ flex: 1, minWidth: 260 }} />
-        <button>Registrar</button>
+        <label className="field"><span>Nombre de la velada</span><input name="eventName" required /></label>
+        <label className="field"><span>Fecha</span><input name="date" type="date" required /></label>
+        <label className="field"><span>Recinto (opcional)</span><input name="venue" /></label>
+        <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" /></label>
+        <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" required /></label>
+        <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" required /></label>
+        <label className="field"><span>Resultado</span>
+          <select name="outcome" defaultValue="WIN"><option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option></select>
+        </label>
+        <label className="field"><span>Cómo terminó</span>
+          <select name="method" defaultValue="UD">
+            <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
+            <option value="KO">KO</option><option value="TKO">TKO</option><option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
+          </select>
+        </label>
+        <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
+        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
+        <button>Registrar este combate</button>
       </form>
       <h2>Mis combates y su evidencia</h2>
       <table><tbody>
@@ -112,12 +116,12 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <tr key={b.id}>
             <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
             <td>vs {b.boxerAId === me.id ? `${b.boxerB.firstName} ${b.boxerB.lastName}` : `${b.boxerA.firstName} ${b.boxerA.lastName}`}</td>
-            <td><span className="tag">{b.verification === "SELF_REPORTED" ? "sin confirmar" : b.verification === "CONFIRMED" ? "confirmado" : b.verification === "VERIFIED" ? "verificado" : "disputado"}</span></td>
+            <td><span className="tag">{b.verification === "SELF_REPORTED" ? "pendiente de confirmar" : b.verification === "CONFIRMED" ? "confirmado por el rival" : b.verification === "VERIFIED" ? "verificado" : "en revisión"}</span></td>
             <td>
               <form action={setBoutEvidence} style={{ display: "flex", gap: 4 }}>
                 <input type="hidden" name="boutId" value={b.id} />
-                <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} placeholder="Enlace de evidencia" />
-                <button>Guardar</button>
+                <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} placeholder="Enlace que lo demuestre" aria-label="Enlace que demuestra este combate" />
+                <button>Guardar enlace</button>
               </form>
             </td>
           </tr>

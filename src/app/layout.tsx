@@ -1,6 +1,8 @@
 import "./globals.css";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import FlashNotice from "./FlashNotice";
 import { getUser } from "../lib/auth";
 import { logout } from "./actions";
 
@@ -14,6 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es">
       <body>
+        <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
             <Link href="/" className="logo">RING <b>ESPAÑA</b></Link>
@@ -38,7 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <form action="/buscar"><input name="q" placeholder="Buscar…" aria-label="Buscar" /></form>
           </div>
         </header>
-        <main>{children}</main>
+        <main id="contenido"><Suspense fallback={null}><FlashNotice /></Suspense>{children}</main>
       </body>
     </html>
   );

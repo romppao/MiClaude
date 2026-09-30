@@ -11,6 +11,21 @@ import { safeHttpUrl } from "../lib/url";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
+/** Redirige a `path` añadiendo un mensaje para el usuario (aviso de éxito o problema). */
+function go(path: string, mensaje?: { aviso?: string; problema?: string }): never {
+  if (!mensaje) redirect(path);
+  const [base, query = ""] = path.split("?");
+  const params = new URLSearchParams(query);
+  if (mensaje.aviso) params.set("aviso", mensaje.aviso);
+  if (mensaje.problema) params.set("problema", mensaje.problema);
+  redirect(`${base}?${params.toString()}`);
+}
+
+/** Solo permite volver a rutas internas (evita redirecciones abiertas). */
+function internalPath(raw: string, fallback = "/") {
+  return raw.startsWith("/") && !raw.startsWith("//") ? raw : fallback;
+}
+
 async function uniqueSlug(base: string, exists: (slug: string) => Promise<boolean>) {
   let slug = base || "sin-nombre";
   for (let i = 2; await exists(slug); i++) slug = `${base}-${i}`;
@@ -35,9 +50,10 @@ export async function register(f: FormData) {
 
 export async function login(f: FormData) {
   const user = await db.user.findUnique({ where: { email: str(f, "email").toLowerCase() } });
-  if (!user || !verifyPassword(str(f, "password"), user.passwordHash)) redirect("/entrar?error=1");
+  const next = internalPath(str(f, "next"), "");
+  if (!user || !verifyPassword(str(f, "password"), user.passwordHash)) redirect(`/entrar?error=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   await createSession(user.id);
-  redirect(user.role === "BOXER" ? "/mi-ficha" : "/");
+  redirect(next || (user.role === "BOXER" ? "/mi-ficha" : "/"));
 }
 
 export async function logout() {
@@ -52,7 +68,7 @@ export async function createMyBoxer(f: FormData) {
   if (user.boxer) redirect("/mi-ficha");
   const firstName = str(f, "firstName");
   const lastName = str(f, "lastName");
-  if (!firstName || !lastName) redirect("/mi-ficha?error=nombre");
+  if (!firstName || !lastName) go("/mi-ficha", { problema: "nombre_ficha" });
   const city = str(f, "city") || "Madrid";
   const province = str(f, "province") || "Madrid";
   const gymName = str(f, "gym");
@@ -70,7 +86,7 @@ export async function createMyBoxer(f: FormData) {
       weightClass: str(f, "weightClass") || null, level: "AMATEUR", gymId, userId: user.id,
     },
   });
-  redirect("/mi-ficha");
+  go("/mi-ficha", { aviso: "ficha_creada" });
 }
 
 // ---------- Combates ----------
@@ -88,7 +104,7 @@ export async function addBout(f: FormData) {
   const date = new Date(`${str(f, "date")}T12:00:00Z`);
   const oppFirst = str(f, "oppFirst");
   const oppLast = str(f, "oppLast");
-  if (!eventName || Number.isNaN(date.getTime()) || !oppFirst || !oppLast) redirect("/mi-ficha?error=combate");
+  if (!eventName || Number.isNaN(date.getTime()) || !oppFirst || !oppLast) go("/mi-ficha", { problema: "combate_datos" });
   const past = date.getTime() <= Date.now();
 
   const outcome = str(f, "outcome") as keyof typeof OUTCOMES;
@@ -111,7 +127,7 @@ export async function addBout(f: FormData) {
   const opponent =
     (await db.boxer.findUnique({ where: { slug: oppSlug } })) ??
     (await db.boxer.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
-  if (opponent.id === me.id) redirect("/mi-ficha?error=combate");
+  if (opponent.id === me.id) go("/mi-ficha", { problema: "combate_mismo" });
 
   const created = await db.bout.create({
     data: {
@@ -121,7 +137,7 @@ export async function addBout(f: FormData) {
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED", after: { result, method, verification: "SELF_REPORTED", evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
-  redirect("/mi-ficha");
+  go("/mi-ficha", { aviso: "combate_registrado" });
 }
 
 /** El rival (si tiene cuenta) confirma o disputa un combate declarado por el otro boxeador. */
@@ -137,7 +153,7 @@ export async function respondBout(f: FormData) {
     audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: `RIVAL_${next}`, before: { verification: bout.verification }, after: { verification: next } }, db),
   ]);
   revalidatePath("/", "layout");
-  redirect("/mi-ficha");
+  go("/mi-ficha", { aviso: next === "CONFIRMED" ? "combate_confirmado" : "combate_rechazado" });
 }
 
 /** Cola de moderación: solo administradores. */
@@ -164,21 +180,21 @@ export async function adminDecide(f: FormData) {
  */
 export async function rateBoxer(f: FormData) {
   const user = await getUser();
-  const backRaw = str(f, "back");
-  const back = backRaw.startsWith("/") && !backRaw.startsWith("//") ? backRaw : "/";
-  if (!user) redirect("/entrar");
+  const back = internalPath(str(f, "back"));
+  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
   if (!user.emailVerifiedAt) redirect("/verificar");
   const score = parseInt(str(f, "score"), 10);
-  if (!(score >= 1 && score <= 5)) redirect(back);
+  if (!(score >= 1 && score <= 5)) go(back, { problema: "valorar_nota" });
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
   const boxerId = str(f, "boxerId");
-  if (!bout || bout.verification === "DISPUTED" || bout.event.date.getTime() > Date.now()) redirect(back);
-  if (boxerId !== bout.boxerAId && boxerId !== bout.boxerBId) redirect(back);
-  if (user.boxer && (user.boxer.id === bout.boxerAId || user.boxer.id === bout.boxerBId)) redirect(back);
+  if (!bout || (boxerId !== bout.boxerAId && boxerId !== bout.boxerBId)) go(back, { problema: "valorar_no_existe" });
+  if (bout.verification === "DISPUTED") go(back, { problema: "valorar_revision" });
+  if (bout.event.date.getTime() > Date.now()) go(back, { problema: "valorar_futuro" });
+  if (user.boxer && (user.boxer.id === bout.boxerAId || user.boxer.id === bout.boxerBId)) go(back, { problema: "valorar_propio" });
 
   // Límite anti-abuso: máximo 20 valoraciones nuevas o editadas al día por usuario.
   const recent = await db.rating.count({ where: { userId: user.id, updatedAt: { gte: new Date(Date.now() - 864e5) } } });
-  if (recent >= 20) redirect(back);
+  if (recent >= 20) go(back, { problema: "valorar_limite" });
 
   const comment = str(f, "comment").slice(0, 500) || null;
   const attended = f.get("attended") === "on";
@@ -188,7 +204,7 @@ export async function rateBoxer(f: FormData) {
     update: { score, comment, attended },
   });
   revalidatePath("/", "layout");
-  redirect(back);
+  go(back, { aviso: "valoracion_guardada" });
 }
 
 // ---------- Verificación de email ----------
@@ -297,7 +313,7 @@ export async function createEvent(f: FormData) {
   });
   await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level } });
   revalidatePath("/", "layout");
-  redirect(`/organizador/${slug}`);
+  go(`/organizador/${slug}`, { aviso: "velada_creada" });
 }
 
 /** Añade un combate al cartel. Lo introduce el organizador del evento, así que nace VERIFIED. */
@@ -316,7 +332,7 @@ export async function addCartelBout(f: FormData) {
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, boxerA: a.slug, boxerB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
-  redirect(`/organizador/${event.slug}`);
+  go(`/organizador/${event.slug}`, { aviso: "cartel_anadido" });
 }
 
 export async function setBoutResult(f: FormData) {
@@ -335,7 +351,7 @@ export async function setBoutResult(f: FormData) {
     db.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } }),
   ]);
   revalidatePath("/", "layout");
-  redirect(`/organizador/${event.slug}`);
+  go(`/organizador/${event.slug}`, { aviso: "resultado_guardado" });
 }
 
 // ---------- Evidencia y sello de verificado ----------
@@ -344,18 +360,18 @@ export async function setBoutResult(f: FormData) {
 export async function setBoutEvidence(f: FormData) {
   const user = await requireVerifiedUser();
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
-  const back = str(f, "back").startsWith("/") && !str(f, "back").startsWith("//") ? str(f, "back") : "/mi-ficha";
+  const back = internalPath(str(f, "back"), "/mi-ficha");
   if (!bout) redirect(back);
   const mine = user.boxer?.id;
   const allowed = user.role === "ADMIN" || bout.createdById === user.id || bout.event.organizerId === user.id || (!!mine && (mine === bout.boxerAId || mine === bout.boxerBId));
-  if (!allowed) redirect(back);
+  if (!allowed) go(back, { problema: "sin_permiso" });
   const raw = str(f, "evidenceUrl");
   const url = raw ? safeHttpUrl(raw) : null;
-  if (raw && !url) redirect(`${back}?error=url`);
+  if (raw && !url) go(back, { problema: "url_invalida" });
   await db.bout.update({ where: { id: bout.id }, data: { evidenceUrl: url } });
   await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "EVIDENCE_SET", before: { evidenceUrl: bout.evidenceUrl }, after: { evidenceUrl: url } });
   revalidatePath("/", "layout");
-  redirect(back);
+  go(back, { aviso: url ? "evidencia_guardada" : "evidencia_quitada" });
 }
 
 /** Un moderador concede o retira el sello de verificado a un gimnasio, anotando en qué evidencia se basa. */
