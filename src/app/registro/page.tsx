@@ -16,7 +16,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         <label className="field"><span>Contraseña</span><input name="password" type="password" autoComplete="new-password" required minLength={8} /><span className="hint">Mínimo 8 caracteres.</span></label>
         <label className="field"><span>¿Qué quieres hacer en Ring España?</span>
           <select name="role" defaultValue="FAN">
-            <option value="FAN">Valorar a peleadores y consultar veladas</option>
+            <option value="FAN">Dar aura a peleadores y consultar veladas</option>
             <option value="FIGHTER">Tener mi ficha de peleador y registrar mi récord</option>
           </select>
         </label>

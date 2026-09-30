@@ -7,16 +7,16 @@ export default function Help() {
     <>
       <h1>¿Cómo funciona Ring España?</h1>
       <p>Ring España reúne los deportes de contacto de España en un solo lugar, con el boxeo en cabeza: boxeo, MMA, kickboxing, K-1 y jiu-jitsu. Aquí encontrarás a los peleadores, sus récords, las veladas, los gimnasios y los entrenadores. Damos especial importancia al deporte amateur, que es donde nacen los campeones del futuro.</p>
-      <p className="mut">No necesitas una cuenta para consultar veladas, fichas y el ránking. Para valorar, registrar combates o publicar sí es necesario registrarse.</p>
+      <p className="mut">No necesitas una cuenta para consultar veladas, fichas y el ránking. Para dar aura, registrar combates o publicar sí es necesario registrarse.</p>
 
       <h2>Si eres aficionado</h2>
       <ol>
         <li><Link href="/registro">Crea tu cuenta</Link> y confirma tu correo electrónico.</li>
         <li>Busca a un peleador en <Link href="/peleadores">Peleadores</Link> o mira quién compite en <Link href="/veladas">Veladas</Link>.</li>
-        <li>En la ficha del peleador, elige el combate que viste y pulsa <strong>«Valorar a este peleador»</strong>. Puedes poner de 1 a 5 estrellas, escribir un comentario e indicar si lo viste en directo.</li>
-        <li>Las mejores valoraciones aparecen en el <Link href="/ranking">Ránking</Link>.</li>
+        <li>En la ficha del peleador, elige el combate que viste y pulsa <strong>«Dar aura»</strong>. El aura es tu forma de reconocer a un peleador que te ha impresionado. Puedes añadir un comentario e indicar si lo viste en directo.</li>
+        <li>Los peleadores con más aura aparecen en el <Link href="/ranking">Ránking</Link>, ordenados dentro de su disciplina y de su categoría de peso.</li>
       </ol>
-      <p className="mut">Solo se puede valorar un combate que ya se ha celebrado, una vez por combate, y no pueden valorar quienes han participado en él.</p>
+      <p className="mut">Solo se puede dar aura por un combate que ya se ha celebrado, una vez por combate y peleador, y no pueden darla quienes han participado en él. Si cambias de opinión, puedes quitar tu aura.</p>
 
       <h2>Si eres peleador</h2>
       <ol>
@@ -44,7 +44,7 @@ export default function Help() {
       </table>
 
       <h2>Cómo cuidamos que los datos sean fiables</h2>
-      <p>Mostramos siempre cuánto respaldo tiene cada dato. Las valoraciones están ligadas a un combate concreto, se limitan por usuario y solo pueden hacerlas personas registradas con el correo confirmado. Todos los cambios importantes quedan registrados.</p>
+      <p>Mostramos siempre cuánto respaldo tiene cada dato. El aura está ligada a un combate concreto, se limitan por usuario y solo pueden hacerlas personas registradas con el correo confirmado. Todos los cambios importantes quedan registrados.</p>
 
       <h2>¿Has visto un error?</h2>
       <p>En la ficha de cualquier peleador encontrarás la opción <strong>«¿Hay un error? Avísanos»</strong>, disponible para usuarios registrados. Un moderador revisará tu aviso.</p>

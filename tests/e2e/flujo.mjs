@@ -23,7 +23,7 @@ async function newUser(name, role = "FAN", verify = true) {
   return { p, email };
 }
 
-// 1) email sin verificar: no puede valorar ni crear ficha
+// 1) email sin verificar: no puede dar aura ni crear ficha
 const unv = await newUser("Sinverificar", "FIGHTER", false);
 await unv.p.goto(B + "/mi-ficha"); check("sin verificar → redirige a /verificar", unv.p.url().includes("/verificar"));
 
@@ -71,17 +71,26 @@ check("aviso claro tras confirmar el combate", await luis.locator("[role=status]
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
 check("combate confirmado por el rival", await pepe.locator(".tag", { hasText: "confirmado" }).count() > 0);
 
-// 4) valorar: fan sin verificar no puede; verificado sí
+// 4) dar aura: fan sin verificar no puede; verificado sí
 const fanU = await newUser("Fanuno", "FAN", false);
 await fanU.p.goto(B + `/peleadores/pepe-uno${rnd}`);
-check("fan sin verificar no ve el formulario de valoración", await fanU.p.locator("button:has-text('Valorar')").count() === 0 && await fanU.p.locator("text=Confirma tu correo electrónico para valorar").count() > 0);
+check("fan sin verificar no ve el botón de dar aura", await fanU.p.locator("button:has-text('Dar aura')").count() === 0 && await fanU.p.locator("text=Confirma tu correo electrónico para dar aura").count() > 0);
 const fanAcc = await newUser("Fandos");
 const fan = fanAcc.p;
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
-await fan.selectOption("select[name=score]", "4"); await fan.click("button:has-text('Valorar')"); await fan.waitForLoadState("networkidle");
-check("aviso claro tras valorar", await fan.locator("[role=status]", { hasText: "Tu valoración se ha guardado" }).count() === 1);
+await fan.fill("input[name=comment]", "Increíble, alucinante"); await fan.click("button:has-text('Dar aura')");
+await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
+check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "Has dado aura" }).count() === 1);
 await fan.reload();
-check("valoración registrada", await fan.locator("body").innerText().then((t) => t.includes("4.0 / 5")));
+check("el aura queda registrada y suma en la ficha", await fan.locator("body").innerText().then((t) => t.includes("1 aura recibida") && t.includes("Increíble, alucinante")));
+await fan.click("button:has-text('Quitar mi aura')");
+await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
+check("se puede quitar el aura", await fan.locator("text=0 auras recibidas").waitFor({ timeout: 8000 }).then(() => true, () => false));
+await fan.click("button:has-text('Dar aura')");
+await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
+await fan.goto(B + "/ranking");
+const rk = await fan.locator("body").innerText();
+check("el ránking de boxeo lista al peleador con su aura dentro de su categoría", rk.includes(`Uno${rnd}`) && rk.includes("Boxeo ·"));
 
 // 4a) un usuario avisa de un error; solo puede hacerlo una vez mientras siga abierto; el moderador lo resuelve
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
@@ -115,13 +124,13 @@ const anon = await (await browser.newContext()).newPage();
 await anon.goto(B + "/ayuda");
 check("la ayuda es pública y explica las etiquetas", await anon.locator("body").innerText().then((t) => t.includes("Qué significan las etiquetas") && t.includes("Pendiente de confirmar")));
 
-// 4b) un visitante sin sesión que quiere valorar vuelve a la misma ficha tras entrar
+// 4b) un visitante sin sesión que quiere dar aura vuelve a la misma ficha tras entrar
 const visitor = await (await browser.newContext()).newPage();
 await visitor.goto(B + `/peleadores/pepe-uno${rnd}`);
-await visitor.click("text=Entra para valorar");
+await visitor.click("text=Entra para dar aura");
 await visitor.fill("[name=email]", fanAcc.email); await visitor.fill("[name=password]", "contraseña123"); await btn(visitor, "Entrar");
 await visitor.waitForURL(`**/peleadores/pepe-uno${rnd}`);
-check("tras entrar vuelve a la ficha donde iba a valorar", visitor.url().endsWith(`/peleadores/pepe-uno${rnd}`));
+check("tras entrar vuelve a la ficha donde iba a dar aura", visitor.url().endsWith(`/peleadores/pepe-uno${rnd}`));
 
 // 5) organizador
 const org = (await newUser("Orga")).p;

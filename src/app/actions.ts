@@ -236,42 +236,49 @@ export async function adminDecide(f: FormData) {
   redirect("/admin");
 }
 
-// ---------- Valoraciones del público ----------
+// ---------- Aura del público ----------
 
 /**
- * Reglas anti-manipulación:
- *  - hace falta cuenta; una nota por usuario + combate + peleador (se puede editar);
+ * Dar aura a un peleador por su actuación en un combate. Reglas anti-manipulación:
+ *  - hace falta cuenta con el correo verificado;
+ *  - una aura por persona, combate y peleador (volver a pulsar solo actualiza el comentario);
  *  - solo combates ya celebrados y no disputados;
- *  - los participantes del combate no pueden valorar;
- *  - la nota va ligada a un combate concreto, no al peleador "en general".
+ *  - los participantes del combate no pueden dar aura;
+ *  - máximo 20 auras nuevas o editadas al día por persona.
  */
-export async function rateFighter(f: FormData) {
+export async function giveAura(f: FormData) {
   const user = await getUser();
   const back = internalPath(str(f, "back"));
   if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
   if (!user.emailVerifiedAt) redirect("/verificar");
-  const score = parseInt(str(f, "score"), 10);
-  if (!(score >= 1 && score <= 5)) go(back, { problema: "valorar_nota" });
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
   const fighterId = str(f, "fighterId");
-  if (!bout || (fighterId !== bout.fighterAId && fighterId !== bout.fighterBId)) go(back, { problema: "valorar_no_existe" });
-  if (bout.verification === "DISPUTED") go(back, { problema: "valorar_revision" });
-  if (bout.event.date.getTime() > Date.now()) go(back, { problema: "valorar_futuro" });
-  if (user.fighter && (user.fighter.id === bout.fighterAId || user.fighter.id === bout.fighterBId)) go(back, { problema: "valorar_propio" });
+  if (!bout || (fighterId !== bout.fighterAId && fighterId !== bout.fighterBId)) go(back, { problema: "aura_no_existe" });
+  if (bout.verification === "DISPUTED") go(back, { problema: "aura_revision" });
+  if (bout.event.date.getTime() > Date.now()) go(back, { problema: "aura_futuro" });
+  if (user.fighter && (user.fighter.id === bout.fighterAId || user.fighter.id === bout.fighterBId)) go(back, { problema: "aura_propio" });
 
-  // Límite anti-abuso: máximo 20 valoraciones nuevas o editadas al día por usuario.
-  const recent = await db.rating.count({ where: { userId: user.id, updatedAt: { gte: new Date(Date.now() - 864e5) } } });
-  if (recent >= 20) go(back, { problema: "valorar_limite" });
+  const recent = await db.aura.count({ where: { userId: user.id, updatedAt: { gte: new Date(Date.now() - 864e5) } } });
+  if (recent >= 20) go(back, { problema: "aura_limite" });
 
   const comment = str(f, "comment").slice(0, 500) || null;
   const attended = f.get("attended") === "on";
-  await db.rating.upsert({
+  await db.aura.upsert({
     where: { userId_boutId_fighterId: { userId: user.id, boutId: bout.id, fighterId } },
-    create: { userId: user.id, boutId: bout.id, fighterId, score, comment, attended },
-    update: { score, comment, attended },
+    create: { userId: user.id, boutId: bout.id, fighterId, comment, attended },
+    update: { comment, attended },
   });
   revalidatePath("/", "layout");
-  go(back, { aviso: "valoracion_guardada" });
+  go(back, { aviso: "aura_dada" });
+}
+
+export async function removeAura(f: FormData) {
+  const user = await getUser();
+  const back = internalPath(str(f, "back"));
+  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
+  await db.aura.deleteMany({ where: { userId: user.id, boutId: str(f, "boutId"), fighterId: str(f, "fighterId") } });
+  revalidatePath("/", "layout");
+  go(back, { aviso: "aura_quitada" });
 }
 
 // ---------- Verificación de email ----------

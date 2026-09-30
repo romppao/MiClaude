@@ -131,7 +131,7 @@ model Fighter {
   userId        String?             @unique
   user          User?               @relation(fields: [userId], references: [id])
   disciplines   FighterDiscipline[]
-  ratings       Rating[]
+  auras         Aura[]
   followers     Follow[]
   claimRequests ClaimRequest[]
   boutsAsA      Bout[]              @relation("FighterA")
@@ -182,7 +182,7 @@ model Bout {
   verification Verification @default(SELF_REPORTED)
   createdById  String?
   createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
-  ratings      Rating[]
+  auras        Aura[]
   flags        String[]     @default([])
   evidenceUrl  String?
 
@@ -202,7 +202,7 @@ model User {
   sessions         Session[]
   fighter          Fighter?
   boutsCreated     Bout[]            @relation("BoutCreator")
-  ratings          Rating[]
+  auras            Aura[]
   emailTokens      EmailToken[]
   claimRequests    ClaimRequest[]
   organizerRequest OrganizerRequest?
@@ -221,9 +221,9 @@ model Session {
   @@index([userId])
 }
 
-// Valoración de un aficionado a un peleador por su actuación en UN combate concreto.
-// Anclar la nota a un combate (y limitar a una por usuario/combate/peleador) es la base anti-manipulación.
-model Rating {
+// Aura: reconocimiento del público a un peleador por su actuación en UN combate concreto.
+// Una por persona, combate y peleador (se puede quitar). El total de aura ordena el ránking por disciplina y categoría.
+model Aura {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -231,7 +231,6 @@ model Rating {
   fighter   Fighter  @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   boutId    String
   bout      Bout     @relation(fields: [boutId], references: [id], onDelete: Cascade)
-  score     Int // 1..5
   comment   String?
   attended  Boolean  @default(false) // "lo vi en directo"
   createdAt DateTime @default(now())
@@ -239,6 +238,7 @@ model Rating {
 
   @@unique([userId, boutId, fighterId])
   @@index([fighterId])
+  @@index([boutId])
 }
 
 // Token de verificación de email (se guarda el sha256, como en Session).

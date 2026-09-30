@@ -6,7 +6,7 @@ const db = new PrismaClient();
 const day = 864e5;
 
 async function main() {
-  await db.rating.deleteMany();
+  await db.aura.deleteMany();
   await db.bout.deleteMany();
   await db.event.deleteMany();
   await db.fighter.deleteMany();

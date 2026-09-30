@@ -5,7 +5,7 @@ import { computeRecords } from "../../../lib/record";
 import { DISCIPLINE_LABEL } from "../../../lib/disciplines";
 import RecordCards from "../../RecordCards";
 import { getUser } from "../../../lib/auth";
-import { createReport, rateFighter, toggleFollow } from "../../actions";
+import { createReport, giveAura, removeAura, toggleFollow } from "../../actions";
 import { REPORT_REASONS } from "../../../lib/reports";
 import { LEVEL_LABEL, METHOD_LABEL, STANCE_LABEL, fmtDate } from "../../../lib/labels";
 
@@ -26,11 +26,11 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
     db.follow.count({ where: { fighterId: fighter.id } }),
     user ? db.follow.findUnique({ where: { userId_fighterId: { userId: user.id, fighterId: fighter.id } } }) : Promise.resolve(null),
   ]);
-  const [ratings, myRatings] = await Promise.all([
-    db.rating.findMany({ where: { fighterId: fighter.id }, include: { user: { select: { name: true } }, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
-    user ? db.rating.findMany({ where: { fighterId: fighter.id, userId: user.id } }) : Promise.resolve([]),
+  const [auraTotal, auras, myAuras] = await Promise.all([
+    db.aura.count({ where: { fighterId: fighter.id } }),
+    db.aura.findMany({ where: { fighterId: fighter.id }, include: { user: { select: { name: true } }, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
+    user ? db.aura.findMany({ where: { fighterId: fighter.id, userId: user.id } }) : Promise.resolve([]),
   ]);
-  const avg = ratings.length ? ratings.reduce((s, r) => s + r.score, 0) / ratings.length : null;
   const reportForm = (entity: "BOUT" | "FIGHTER", entityId: string) =>
     user?.emailVerifiedAt ? (
       <details style={{ marginTop: 6 }}>
@@ -66,9 +66,9 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
 
       <RecordCards records={records} disciplines={fighter.disciplines} />
       <div className="card" style={{ marginTop: 12 }}>
-        <div className="mut">Valoración del público</div>
-        <div className="rec">{avg ? `${avg.toFixed(1)} / 5` : "—"}</div>
-        <div className="mut">{ratings.length} {ratings.length === 1 ? "valoración" : "valoraciones"}</div>
+        <div className="mut">Aura del público</div>
+        <div className="rec">{auraTotal}</div>
+        <div className="mut">{auraTotal === 1 ? "1 aura recibida" : `${auraTotal} auras recibidas`}. El aura es el reconocimiento del público: cada persona puede darla una vez por combate.</div>
       </div>
       <h2>Ficha</h2>
       <table><tbody>
@@ -84,7 +84,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       {reportForm("FIGHTER", fighter.id)}
       <h2>Combates</h2>
       <table>
-        <thead><tr><th>Fecha</th><th>Rival</th><th></th><th>Método</th><th>Velada</th><th>Tu valoración</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Rival</th><th></th><th>Método</th><th>Velada</th><th>Aura</th></tr></thead>
         <tbody>
           {bouts.map((b) => {
             const isA = b.fighterAId === fighter.id;
@@ -101,16 +101,24 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                   {reportForm("BOUT", b.id)}
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (
                     user?.emailVerifiedAt ? (
-                      <form action={rateFighter} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                        <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />
-                        <input type="hidden" name="back" value={`/peleadores/${fighter.slug}`} />
-                        <select name="score" aria-label="Tu nota" defaultValue={myRatings.find((r) => r.boutId === b.id)?.score ?? 5}>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} {n === 1 ? "estrella" : "estrellas"}</option>)}</select>
-                        <input name="comment" aria-label="Tu comentario (opcional)" placeholder="Tu comentario (opcional)" defaultValue={myRatings.find((r) => r.boutId === b.id)?.comment ?? ""} maxLength={500} />
-                        <label className="mut"><input type="checkbox" name="attended" defaultChecked={myRatings.find((r) => r.boutId === b.id)?.attended} /> lo vi en directo</label>
-                        <button>{myRatings.some((r) => r.boutId === b.id) ? "Actualizar mi valoración" : "Valorar a este peleador"}</button>
-                      </form>
-                    ) : user ? <Link href="/verificar">Confirma tu correo electrónico para valorar</Link>
-                      : <Link href={`/entrar?next=${encodeURIComponent(`/peleadores/${fighter.slug}`)}`}>Entra para valorar</Link>
+                      myAuras.some((r) => r.boutId === b.id) ? (
+                        <form action={removeAura} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                          <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />
+                          <input type="hidden" name="back" value={`/peleadores/${fighter.slug}`} />
+                          <span className="W">Has dado aura</span>
+                          <button className="secondary">Quitar mi aura</button>
+                        </form>
+                      ) : (
+                        <form action={giveAura} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />
+                          <input type="hidden" name="back" value={`/peleadores/${fighter.slug}`} />
+                          <input name="comment" aria-label="Tu comentario (opcional)" placeholder="Tu comentario (opcional)" maxLength={500} />
+                          <label className="mut"><input type="checkbox" name="attended" /> Lo vi en directo</label>
+                          <button>Dar aura</button>
+                        </form>
+                      )
+                    ) : user ? <Link href="/verificar">Confirma tu correo electrónico para dar aura</Link>
+                      : <Link href={`/entrar?next=${encodeURIComponent(`/peleadores/${fighter.slug}`)}`}>Entra para dar aura</Link>
                   )}
                 </td>
               </tr>
@@ -120,13 +128,13 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       </table>
       {bouts.length === 0 && <p className="mut">Sin combates registrados.</p>}
       <h2>Lo que dice el público</h2>
-      {ratings.map((r) => (
+      {auras.map((r) => (
         <div key={r.id} className="card" style={{ marginBottom: 8 }}>
-          <strong>{r.score} ★</strong> <span className="mut">· {r.user.name} · {r.bout.event.name}{r.attended ? " · lo vio en directo" : ""}</span>
+          <strong>{r.user.name}</strong> <span className="mut">dio aura en «{r.bout.event.name}»{r.attended ? " · lo vio en directo" : ""}</span>
           {r.comment && <div>{r.comment}</div>}
         </div>
       ))}
-      {ratings.length === 0 && <p className="mut">Todavía nadie ha valorado a este peleador.</p>}
+      {auras.length === 0 && <p className="mut">Todavía nadie ha dado aura a este peleador. Si has visto uno de sus combates, puedes ser la primera persona.</p>}
     </>
   );
 }
