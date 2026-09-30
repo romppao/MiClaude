@@ -27,6 +27,11 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | El registro de auditoría de reclamaciones decía «aprobada» aunque la aprobación podía rechazarse por las condiciones | Se escribió el `audit` antes de pensar en las ramas de decisión | Se calcula el resultado real (`approved`) y se registra junto con lo que se pidió. Detectado al releer. **Regla:** un registro de auditoría refleja lo ocurrido, no lo intentado |
 | Un cambio de texto con `replace` no se aplicó y no dio error | El patrón no coincidía con el formato (Prisma reformatea el esquema); el fallo solo apareció después en tipos | Editar con la herramienta de edición o verificar con `grep` tras cada sustitución. **Regla:** comprobar que un reemplazo automático se aplicó |
 
+| Un test contaba «todos los `role=alert`» y daba 2 | Next.js añade su propio elemento con ese rol | Se acota el selector al texto del mensaje. **Regla:** en tests de navegador, seleccionar por contenido o clase propia, no por roles genéricos que el framework también usa |
+| El test del sello de gimnasio falló de forma intermitente | Se esperaba con `networkidle`, que puede volver antes de que termine la acción del servidor | Se espera a un estado visible («Retirar sello»). **Regla:** esperar al resultado en pantalla, no al tráfico de red |
+| Al cambiar textos de botones a lenguaje llano, el e2e dejó de encontrarlos | Las pruebas buscan por texto | Se actualizaron las pruebas. **Regla:** al cambiar un texto, buscar dónde lo usan las pruebas |
+| Varias acciones fallaban sin decir nada (p. ej. valorar un combate no permitido) | Se redirigía a la misma página sin mensaje | Todas devuelven un aviso o un problema claro. **Regla:** ningún fallo silencioso; toda acción responde |
+
 ## Del proceso de trabajo
 
 - El clasificador de permisos del entorno falló de forma intermitente y bloqueó varios comandos; mientras tanto se avanzó en tareas que no necesitaban shell (documentación). **Regla:** cuando algo externo se cae, avanzar en lo que no depende de ello.

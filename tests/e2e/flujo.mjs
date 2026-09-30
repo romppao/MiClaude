@@ -105,6 +105,16 @@ await repRow.locator("button:has-text('Resuelto')").click();
 await repRow.waitFor({ state: "detached" });
 check("el aviso resuelto sale de la cola", await admin.p.locator("tr", { hasText: `Aviso ${rnd}` }).count() === 0);
 
+// 4c) seguir a un boxeador y ver la página de ayuda sin cuenta
+await fan.goto(B + `/boxeadores/pepe-uno${rnd}`);
+await fan.click("main button:has-text('Seguir a este boxeador')");
+await fan.locator(".notice-ok", { hasText: "Ahora sigues a este boxeador" }).waitFor();
+check("seguir a un boxeador con aviso claro y contador", await fan.locator("text=1 seguidor").count() === 1);
+check("el propio boxeador no ve el botón de seguirse", await (async () => { await pepe.goto(B + `/boxeadores/pepe-uno${rnd}`); return pepe.locator("button:has-text('Seguir a este boxeador')").count(); })() === 0);
+const anon = await (await browser.newContext()).newPage();
+await anon.goto(B + "/ayuda");
+check("la ayuda es pública y explica las etiquetas", await anon.locator("body").innerText().then((t) => t.includes("Qué significan las etiquetas") && t.includes("Pendiente de confirmar")));
+
 // 4b) un visitante sin sesión que quiere valorar vuelve a la misma ficha tras entrar
 const visitor = await (await browser.newContext()).newPage();
 await visitor.goto(B + `/boxeadores/pepe-uno${rnd}`);
@@ -130,6 +140,18 @@ check("velada pública con cartel y resultado", t.includes(`Uno${rnd}`) && t.inc
 // 6) un fan no puede entrar al panel de otra velada
 await fan.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
 check("fan no accede a gestionar velada ajena", !fan.url().includes("/gran-velada-org-"));
+// Avisos a seguidores: un organizador publica un combate futuro de un boxeador seguido
+await org.goto(B + "/organizador");
+await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", "2030-01-15"); await btn(org, "Crear velada");
+await org.waitForURL(`**/organizador/velada-futura-${rnd}-2030-01-15?*`);
+await org.fill("[name=boxerA]", `pepe-uno${rnd}`); await org.fill("[name=boxerB]", `luis-dos${rnd}`); await btn(org, "Añadir");
+await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor();
+let mailed = false;
+for (let i = 0; i < 20 && !mailed; i++) { mailed = readFileSync(MAIL_LOG, "utf8").includes(`to=${fanAcc.email} subject="Pepe Uno${rnd} tiene un nuevo combate"`); if (!mailed) await new Promise((r) => setTimeout(r, 250)); }
+check("el seguidor recibe un aviso por correo del nuevo combate", mailed);
+await fan.goto(B + "/siguiendo");
+check("«Mis boxeadores» muestra el próximo combate", await fan.locator("body").innerText().then((t) => t.includes(`Velada Futura ${rnd}`)));
+
 // Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
 await admin.p.goto(B + "/admin");
 const gymRow = () => admin.p.locator("tr", { hasText: `Gym Test ${rnd}` });

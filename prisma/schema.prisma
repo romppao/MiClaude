@@ -121,6 +121,7 @@ model Boxer {
   userId        String?        @unique
   user          User?          @relation(fields: [userId], references: [id])
   ratings       Rating[]
+  followers     Follow[]
   claimRequests ClaimRequest[]
   boutsAsA      Bout[]         @relation("BoxerA")
   boutsAsB      Bout[]         @relation("BoxerB")
@@ -194,6 +195,7 @@ model User {
   organizerRequest OrganizerRequest?
   auditLogs        AuditLog[]
   reports          Report[]
+  follows          Follow[]
   events           Event[]           @relation("EventOrganizer")
 }
 
@@ -297,4 +299,16 @@ model Report {
 
   @@index([status, createdAt])
   @@index([entity, entityId])
+}
+
+// Un aficionado sigue a un boxeador para ver sus próximas veladas y recibir avisos.
+model Follow {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  boxerId   String
+  boxer     Boxer    @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, boxerId])
+  @@index([boxerId])
 }

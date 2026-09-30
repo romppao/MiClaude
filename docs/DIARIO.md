@@ -152,6 +152,59 @@ Reconocimiento honesto del estado actual: **lo construido hasta ahora no cumple 
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Ejecución por prioridades: flujos claros, coherencia, avisos de error, ayuda y seguir boxeadores
+
+### Qué se pidió / qué idea surgió
+
+El fundador dio autonomía: «tú vete actuando… con un orden de prioridades de mayor a menor. Primero las funcionalidades importantes, después otras cosas de menor importancia en el funcionamiento básico».
+
+### Cómo se priorizó y por qué
+
+Criterio: primero lo que afecta al funcionamiento básico (registrar récords, votar, consultar veladas) y a que los datos sean creíbles; después lo complementario. Orden ejecutado:
+
+1. **Flujos principales en lenguaje claro** (principio F9): antes de esto, varias acciones fallaban en silencio (p. ej. valorar un combate no permitido no decía nada).
+2. **Volver a donde estabas tras entrar** (se pierde al usuario justo al valorar, que es la función estrella).
+3. **Comprobaciones automáticas de coherencia** de los combates.
+4. **«Reportar un error»** sobre combates y fichas.
+5. **Página «¿Cómo funciona?»**.
+6. **Seguir a boxeadores** con «Mis boxeadores» y aviso por correo.
+
+Cada bloque se hizo con pruebas y se subió por separado.
+
+### Qué se decidió y por qué
+
+- **Avisos como códigos en la URL** (`?aviso=` / `?problema=`) traducidos en un solo fichero (`lib/messages.ts`): el texto vive en un único sitio, es revisable de un vistazo y mantiene un tono claro y profesional.
+- **Duplicados se bloquean; lo sospechoso se marca, no se rechaza.** Un combate el mismo día o a menos de 7 días de otro se guarda con una señal para el moderador, porque puede haber explicaciones legítimas.
+- **Avisos de error:** un aviso abierto por usuario y elemento y máximo 10 al día, para que el mecanismo no sea un arma de acoso.
+- **Avisos por correo a seguidores solo de combates publicados por organizadores**, nunca de los autodeclarados: si no, cualquiera podría inventarse combates para llenar de correos a los seguidores de otra persona.
+- **Navegación principal reducida a 5 elementos**; el resto (organizadores, registro) pasa al pie y a la zona de cuenta, siguiendo la regla del principio F9.
+
+### Qué se hizo
+
+- Avisos de éxito/problema en todas las acciones; etiquetas visibles en registro, entrada, ficha y registro de combates; lenguaje llano («pendiente de confirmar», «en revisión», «Sí, es correcto» / «No es correcto»); foco visible, enlace «Saltar al contenido» y tamaños mínimos de 44 px.
+- Regreso a la página de origen tras iniciar sesión (con validación de rutas internas).
+- `Bout.flags`, bloqueo de duplicados y señales en la cola de moderación (`lib/coherence.ts`).
+- Modelo `Report`, formulario «¿Hay un error? Avísanos», sección de avisos en `/admin`.
+- `/ayuda` con pasos por perfil y glosario de etiquetas; pie de página.
+- Modelo `Follow`, botón «Seguir a este boxeador» con contador, `/siguiendo` y avisos por correo (`lib/notify.ts`).
+- Tests: 25 unitarios y 28 comprobaciones de navegador (antes 20 y 15).
+- Commits: `1faa28d`, `1f74af7`, `46d3684` y el de esta entrada.
+
+### Qué salió mal / qué se aprendió
+
+- **Un test fallaba por mi selector, no por la app:** Next.js añade su propio elemento `role="alert"`, así que contar «todas las alertas» daba 2. Solución: acotar al texto del mensaje.
+- **`networkidle` no es fiable para esperar a una acción:** el test del sello del gimnasio miraba la página antes de que terminara la acción. Solución: esperar a un estado concreto de la interfaz («Retirar sello»). Regla: esperar a lo visible, no al tráfico de red.
+- **Cambiar textos rompe pruebas que buscan textos:** al pasar a un lenguaje más claro (`Crear ficha` → `Crear mi ficha`) hubo que actualizar el e2e. Regla: cuando cambie un texto, buscar dónde lo usan las pruebas.
+- **Honestidad sobre el alcance de F9:** se aplicó a los flujos principales (registro, entrada, ficha, combates, valoración, seguir, ayuda). **No se ha auditado todavía** el panel del organizador ni el de moderación, ni se ha medido el contraste con una herramienta, ni se ha probado con personas reales. No debe darse F9 por cumplido.
+
+### Estado y próximos pasos
+
+- Hecho: los 6 puntos.
+- **Limitaciones abiertas:** los correos siguen saliendo al log (falta proveedor real); antes de enviar correos de verdad hace falta que el usuario pueda **elegir no recibir avisos** (RGPD); la comprobación de edades no se hizo (casi nadie rellena la fecha de nacimiento); «mismo día/menos de 7 días» solo mira combates ya registrados.
+- **Siguiente por prioridad:** (a) preparar el despliegue real: proveedor de correo, migraciones de base de datos, variables de entorno y preferencias de aviso; (b) auditoría de usabilidad del resto de pantallas (organizador, moderación, listados) y medición de contraste/accesibilidad automática; (c) decidir «tú» o «usted»; (d) pruebas con usuarios reales.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

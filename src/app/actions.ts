@@ -9,6 +9,7 @@ import { slugify } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
 import { proximityFlags, type Flag } from "../lib/coherence";
+import { notifyFollowersOfBout } from "../lib/notify";
 import { MAX_REPORTS_PER_DAY, REPORT_ENTITIES, REPORT_REASONS } from "../lib/reports";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -354,6 +355,7 @@ export async function addCartelBout(f: FormData) {
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, boxerA: a.slug, boxerB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
+  await notifyFollowersOfBout(created.id); // solo combates de organizador y futuros
   go(`/organizador/${event.slug}`, { aviso: "cartel_anadido" });
 }
 
@@ -441,4 +443,21 @@ export async function resolveReport(f: FormData) {
   await db.report.update({ where: { id: report.id }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } });
   await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: status, before: { status: report.status }, after: { status, note } });
   redirect("/admin");
+}
+
+// ---------- Seguir a boxeadores ----------
+
+export async function toggleFollow(f: FormData) {
+  const back = internalPath(str(f, "back"));
+  const user = await getUser();
+  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
+  const boxer = await db.boxer.findUnique({ where: { id: str(f, "boxerId") } });
+  if (!boxer) go(back, { problema: "seguir_no_existe" });
+  if (user.boxer?.id === boxer.id) go(back, { problema: "seguir_propio" });
+  const key = { userId_boxerId: { userId: user.id, boxerId: boxer.id } };
+  const existing = await db.follow.findUnique({ where: key });
+  if (existing) await db.follow.delete({ where: key });
+  else await db.follow.create({ data: { userId: user.id, boxerId: boxer.id } });
+  revalidatePath("/", "layout");
+  go(back, { aviso: existing ? "siguiendo_quitado" : "siguiendo" });
 }

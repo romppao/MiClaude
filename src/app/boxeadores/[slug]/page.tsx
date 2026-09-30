@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/db";
 import { computeRecords, formatRecord } from "../../../lib/record";
 import { getUser } from "../../../lib/auth";
-import { createReport, rateBoxer } from "../../actions";
+import { createReport, rateBoxer, toggleFollow } from "../../actions";
 import { REPORT_REASONS } from "../../../lib/reports";
 import { LEVEL_LABEL, METHOD_LABEL, STANCE_LABEL, fmtDate } from "../../../lib/labels";
 
@@ -20,6 +20,10 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
   });
   const records = computeRecords(boxer.id, bouts);
   const user = await getUser();
+  const [followerCount, following] = await Promise.all([
+    db.follow.count({ where: { boxerId: boxer.id } }),
+    user ? db.follow.findUnique({ where: { userId_boxerId: { userId: user.id, boxerId: boxer.id } } }) : Promise.resolve(null),
+  ]);
   const [ratings, myRatings] = await Promise.all([
     db.rating.findMany({ where: { boxerId: boxer.id }, include: { user: { select: { name: true } }, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
     user ? db.rating.findMany({ where: { boxerId: boxer.id, userId: user.id } }) : Promise.resolve([]),
@@ -48,6 +52,15 @@ export default async function BoxerPage({ params }: { params: Promise<{ slug: st
       <span className={`tag ${boxer.level}`}>{LEVEL_LABEL[boxer.level]}</span>
       <h1>{boxer.firstName} {boxer.lastName}</h1>
       {boxer.alias && <p className="mut">“{boxer.alias}”</p>}
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "8px 0 16px" }}>
+        {user?.boxer?.id !== boxer.id && (user ? (
+          <form action={toggleFollow}>
+            <input type="hidden" name="boxerId" value={boxer.id} /><input type="hidden" name="back" value={`/boxeadores/${boxer.slug}`} />
+            <button className={following ? "secondary" : undefined}>{following ? "Dejar de seguir" : "Seguir a este boxeador"}</button>
+          </form>
+        ) : <Link href={`/entrar?next=${encodeURIComponent(`/boxeadores/${boxer.slug}`)}`}>Entra para seguir a este boxeador</Link>)}
+        <span className="mut">{followerCount} {followerCount === 1 ? "seguidor" : "seguidores"}</span>
+      </div>
       <div className="grid">
         {(["PRO", "AMATEUR"] as const).map((l) => (
           <div key={l} className="card"><div className="mut">Récord {LEVEL_LABEL[l].toLowerCase()} (V-D-E)</div><div className="rec">{formatRecord(records[l])}</div><div className="mut">{records[l].ko} por KO{records[l].unverified ? ` · ${records[l].unverified} pendientes de confirmar` : ""}</div></div>

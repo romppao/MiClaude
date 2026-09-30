@@ -50,11 +50,17 @@ Decisiones clave:
 Propia y mínima, sin dependencias: contraseñas con `scrypt` + sal; sesión con token aleatorio en cookie `httpOnly`/`sameSite=lax` (`secure` en producción); en la base solo se guarda el `sha256` del token (`src/lib/auth.ts`). Caducidad de 30 días.
 Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de dominio.
 
+## Modelos añadidos después del MVP
+
+`AuditLog` (historial), `Report` (avisos de error), `Follow` (seguir boxeadores), `EmailToken`, `ClaimRequest`, `OrganizerRequest`. `Bout` incorpora `verification`, `evidenceUrl` y `flags` (señales de coherencia). Los avisos al usuario viajan como códigos en la URL y se traducen en `src/lib/messages.ts`.
+
 ## Riesgos conocidos (a resolver antes de abrir al público)
 
 - **Manipulación de valoraciones** (cuentas falsas, brigading): mitigado con email verificado y límite de 20 valoraciones/día por usuario. Falta límite por IP, detección de patrones (p. ej. muchas cuentas nuevas votando al mismo boxeador) y ponderar más «lo vi en directo» y las cuentas antiguas.
 - **Ficha falsa / suplantación**: la reclamación pasa por un moderador, pero hoy la prueba de identidad es un texto libre. Falta un procedimiento claro (p. ej. confirmación del gimnasio o de la federación) y documentar qué se pide.
 - **Organizadores falsos**: mismo caso; la aprobación es manual.
+- **Correo a seguidores:** hoy solo escribe en el log. Antes de enviar correos reales hay que dar la opción de no recibirlos (baja/preferencias) y un proveedor con buena reputación de envío. Solo se avisa de combates publicados por organizadores para evitar spam por combates inventados.
+- **Usabilidad (principio F9)** aplicada a los flujos principales; falta el resto de pantallas, medición automática de accesibilidad y pruebas con usuarios reales.
 - **Combates inventados**: mitigado por la verificación, pero sin rival con cuenta solo puede validarlo un moderador.
 - **Menores de edad**: el amateur incluye juveniles. Hace falta política de privacidad y consentimiento parental antes de publicar datos personales (RGPD).
 - **Sin protección CSRF adicional** más allá de la que Next.js aplica a Server Actions (origen del mismo sitio).

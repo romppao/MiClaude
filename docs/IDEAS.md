@@ -17,7 +17,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F6 | Ver es público; **votar, registrar y publicar exige registro** | Fundador | 🟢 |
 | F7 | **Veracidad de los datos** sin depender de trámites federativos al principio; colaborar con las federaciones a medio plazo | Fundador | 🟡 (estrategia escrita) |
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
-| F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (principio fijado; falta auditar y adaptar lo construido) |
+| F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 
 ## Ideas de producto
 
@@ -34,11 +34,16 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Sello de verificado para gimnasios y organizadores | Estrategia de veracidad | 🟢 | Nota de evidencia obligatoria, interna |
 | Avales cruzados entre entidades verificadas | Estrategia de veracidad | 🔵 | Requiere cuentas de responsable de gimnasio |
 | Historial de cambios público por combate | Transparencia | ⚪ | Decidir qué se muestra y qué no |
-| Auditoría de usabilidad de lo ya construido frente al principio F9 (lenguaje llano, mensajes de confirmación y de error, etiquetas, contraste, accesibilidad) | Fundador | 🔵 | Sin cambiar el estilo visual sin consultar |
-| Comprobaciones automáticas de coherencia (mismo día, duplicados, edades) | Estrategia de veracidad | 🔵 | |
-| Botón «reportar dato» + puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
+| Auditoría de usabilidad de lo ya construido frente al principio F9 (lenguaje llano, mensajes de confirmación y de error, etiquetas, contraste, accesibilidad) | Fundador | 🟡 | Hecha en los flujos principales; pendiente el resto y la medición | Sin cambiar el estilo visual sin consultar |
+| Comprobaciones automáticas de coherencia (mismo día, duplicados, edades) | Estrategia de veracidad | 🟡 | Duplicados bloqueados y señales de proximidad hechas; falta la de edades |
+| Botón «reportar dato» | Estrategia de veracidad | 🟢 | Un aviso abierto por usuario/elemento, máx. 10 al día |
+| Puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
 | Detección de colusión en valoraciones y confirmaciones | Riesgo detectado | 🔵 | |
-| Seguir a boxeadores + avisos de veladas | Fomentar afición | 🔵 | Candidato tras la verificación |
+| Seguir a boxeadores + avisos de veladas | Fomentar afición | 🟢 (v1) | «Mis boxeadores» y aviso por correo (aún al log); solo combates de organizador |
+| Preferencias de aviso por correo (poder darse de baja) | RGPD / usabilidad | 🔵 | Necesario antes de enviar correos reales |
+| Página «¿Cómo funciona?» | Principio F9 | 🟢 | `/ayuda` |
+| Explicaciones en el primer uso de cada función (guías breves) | Principio F9 | 🔵 | |
+| Avisos dentro de la app (además del correo) | Fomentar afición | ⚪ | |
 | Fotos y vídeo de combates | Comunidad | ⚪ | Cuidado con menores y derechos |
 | Perfiles de gimnasio gestionados por su responsable | Comunidad | ⚪ | |
 | Mapa de gimnasios de Madrid | Descubrimiento | ⚪ | |

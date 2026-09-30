@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { register } from "../actions";
 
 export const metadata = { title: "Crear cuenta" };
@@ -21,6 +22,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         </label>
         <button>Crear mi cuenta</button>
       </form>
+      <p className="mut">¿Dudas? Consulta <Link href="/ayuda">cómo funciona Ring España</Link>.</p>
     </>
   );
 }

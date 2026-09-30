@@ -14,6 +14,8 @@ export const AVISOS: Record<string, string> = {
   cartel_anadido: "El combate se ha añadido al cartel.",
   resultado_guardado: "El resultado se ha guardado.",
   reporte_enviado: "Gracias. Hemos recibido tu aviso y un moderador lo revisará.",
+  siguiendo: "Ahora sigues a este boxeador. Verás sus próximas veladas en «Mis boxeadores».",
+  siguiendo_quitado: "Has dejado de seguir a este boxeador.",
   solicitud_enviada: "Solicitud enviada. Un moderador la revisará y te avisaremos.",
 };
 
@@ -33,6 +35,8 @@ export const PROBLEMAS: Record<string, string> = {
   reporte_repetido: "Ya nos avisaste de esto y lo estamos revisando. Gracias por tu paciencia.",
   reporte_limite: "Has enviado muchos avisos hoy. Inténtalo de nuevo mañana.",
   reporte_datos: "Elige el motivo del aviso para poder enviarlo.",
+  seguir_propio: "Tu propia ficha no se puede seguir.",
+  seguir_no_existe: "No hemos encontrado a ese boxeador.",
   sin_permiso: "No tienes permiso para hacer esta acción.",
   cartel_boxeadores: "Elige dos boxeadores distintos de la lista.",
   resultado_futuro: "Solo puedes poner resultados cuando la velada ya se ha celebrado.",

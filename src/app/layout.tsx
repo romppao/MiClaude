@@ -27,11 +27,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/gimnasios">Gimnasios</Link>
               <Link href="/entrenadores">Entrenadores</Link>
             </nav>
+            <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
             {user ? (
               <>
                 {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu email</Link>}
+                <Link href="/siguiendo">Mis boxeadores</Link>
                 <Link href="/mi-ficha">{user.boxer ? "Mi ficha" : user.name}</Link>
-                <Link href="/organizador">Organizadores</Link>
                 {user.role === "ADMIN" && <Link href="/admin">Moderación</Link>}
                 <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
               </>
@@ -42,6 +43,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </header>
         <main id="contenido"><Suspense fallback={null}><FlashNotice /></Suspense>{children}</main>
+        <footer className="foot">
+          <Link href="/ayuda">¿Cómo funciona?</Link>
+          <Link href="/organizador">Para organizadores de veladas</Link>
+          <Link href="/registro">Crear una cuenta</Link>
+        </footer>
       </body>
     </html>
   );
