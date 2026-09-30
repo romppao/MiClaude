@@ -19,6 +19,7 @@ export default function Register() {
           </select>
         </label>
         <button>Crear mi cuenta</button>
+        <span className="hint">Al crear tu cuenta aceptas que tratemos tus datos como explicamos en la <Link href="/privacidad">política de privacidad</Link>.</span>
       </form>
       <p>¿Ya tienes cuenta? <Link href="/entrar">Entra en tu cuenta</Link>. ¿La contraseña? <Link href="/recuperar">Elige una nueva</Link>.</p>
       <p className="mut">¿Dudas? Consulta <Link href="/ayuda">cómo funciona Ring España</Link>.</p>

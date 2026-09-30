@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { dayKey, eventDayReached, parseDay, todayMadrid } from "../../src/lib/dates";
+import { dayKey, eventDayReached, parseBirthDate, parseDay, todayMadrid } from "../../src/lib/dates";
 
 const at = (iso: string) => new Date(iso);
 
@@ -29,5 +29,16 @@ describe("fechas en Europe/Madrid", () => {
   it("parseDay rechaza fechas imposibles, antiguas o demasiado lejanas", () => {
     const now = at("2026-09-30T10:00:00Z");
     for (const bad of ["2026-02-30", "2026-13-01", "2026-1-1", "hoy", "", "1979-12-31", "2062-01-01", "2026-09-30T12:00", "0000-01-01"]) expect(parseDay(bad, now)).toBeNull();
+  });
+});
+
+describe("fecha de nacimiento", () => {
+  const ahora = at("2026-09-30T10:00:00Z");
+  it("acepta un día real del pasado", () => {
+    expect(parseBirthDate("1998-03-12", ahora)?.toISOString()).toBe("1998-03-12T12:00:00.000Z");
+    expect(parseBirthDate("2026-09-30", ahora)).not.toBeNull(); // hoy
+  });
+  it("rechaza el futuro, lo anterior a 1920, días inexistentes y formatos raros", () => {
+    for (const raw of ["2026-10-01", "1919-12-31", "1998-02-30", "12/03/1998", "1998-3-2", "", "abc"]) expect(parseBirthDate(raw, ahora)).toBeNull();
   });
 });

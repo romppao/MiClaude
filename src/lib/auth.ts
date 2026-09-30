@@ -44,16 +44,35 @@ export async function requireUser() {
 
 export const VERIFY_HOURS = 48;
 export const RESET_HOURS = 1;
-type TokenKind = "VERIFY" | "RESET";
+type TokenKind = "VERIFY" | "RESET" | "UNSUB";
 
 /** Crea un enlace de un solo uso del tipo indicado (sustituye al anterior del mismo tipo) y devuelve el token en claro. */
-async function issueToken(userId: string, kind: TokenKind, hours: number): Promise<string> {
+async function issueToken(userId: string, kind: TokenKind, hours: number, replacePrevious = true): Promise<string> {
   const token = randomBytes(32).toString("hex");
   await db.$transaction([
-    db.emailToken.deleteMany({ where: { userId, kind } }),
+    ...(replacePrevious ? [db.emailToken.deleteMany({ where: { userId, kind } })] : []),
     db.emailToken.create({ data: { id: sha256(token), userId, kind, expiresAt: new Date(Date.now() + hours * 36e5) } }),
   ]);
   return token;
+}
+
+/** Enlace para dejar de recibir avisos por correo desde el propio mensaje (vale un año; cada correo lleva el suyo y no anula los anteriores). */
+export async function unsubscribeLink(userId: string): Promise<string> {
+  return `${APP_URL}/baja?token=${await issueToken(userId, "UNSUB", 24 * 365, false)}`;
+}
+
+/** Desactiva los avisos por correo con el enlace de baja. Devuelve false si el enlace no es válido o ha caducado. */
+export async function unsubscribeWithToken(token: string): Promise<boolean> {
+  const row = await db.emailToken.findUnique({ where: { id: sha256(token) } });
+  if (!row || row.kind !== "UNSUB" || row.expiresAt < new Date()) return false;
+  await db.user.update({ where: { id: row.userId }, data: { notifyEmails: false } });
+  return true;
+}
+
+/** Cierra todas las sesiones de la persona salvo la que está usando ahora (tras cambiar la contraseña). */
+export async function destroyOtherSessions(userId: string) {
+  const token = (await cookies()).get(COOKIE)?.value;
+  await db.session.deleteMany({ where: { userId, ...(token ? { id: { not: sha256(token) } } : {}) } });
 }
 
 /** Crea el enlace de verificación y lo envía por correo. Devuelve false si el correo no ha podido enviarse. */

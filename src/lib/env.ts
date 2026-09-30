@@ -17,5 +17,6 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): { errors: str
   } else if (env.MAIL_TRANSPORT !== "log") {
     warnings.push("No hay proveedor de correo (RESEND_API_KEY): no se enviará ningún correo de verificación ni de recuperación de contraseña. Para pruebas, use MAIL_TRANSPORT=log.");
   }
+  if (!env.CONTACT_EMAIL) warnings.push("Falta CONTACT_EMAIL: la página de privacidad no indica ningún contacto para ejercer los derechos sobre los datos (y RESPONSABLE_NOMBRE, el responsable del tratamiento).");
   return { errors, warnings };
 }

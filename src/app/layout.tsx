@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <>
                 {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu correo electrónico</Link>}
                 <Link href="/siguiendo">Mis peleadores</Link>
-                <Link href="/mi-ficha">{user.fighter ? "Mi ficha" : user.name}</Link>
+                {user.fighter ? <Link href="/mi-ficha">Mi ficha</Link> : <Link href="/mi-cuenta">Mi cuenta</Link>}
                 {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
                 <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
               </>
@@ -46,7 +46,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <footer className="foot">
           <Link href="/ayuda">¿Cómo funciona?</Link>
           <Link href="/organizador">Para organizadores de veladas</Link>
-          <Link href="/registro">Crear una cuenta</Link>
+          {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
+          <Link href="/privacidad">Privacidad</Link>
         </footer>
       </body>
     </html>

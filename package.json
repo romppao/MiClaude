@@ -10,7 +10,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs",
+    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/cuenta.mjs",
     "test:a11y": "node tests/e2e/accesibilidad.mjs"
   },
   "prisma": {

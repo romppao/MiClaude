@@ -13,7 +13,7 @@ export const APP_URL = (process.env.APP_URL ?? "http://localhost:3000").replace(
 const logMode = () => process.env.MAIL_TRANSPORT === "log" || process.env.NODE_ENV !== "production";
 
 /** Devuelve true si el mensaje se ha entregado al proveedor (o escrito en el log); false si no ha podido enviarse. Nunca lanza. */
-export async function sendMail(to: string, subject: string, text: string): Promise<boolean> {
+export async function sendMail(to: string, subject: string, text: string, opts: { unsubscribeUrl?: string } = {}): Promise<boolean> {
   const asunto = oneLine(subject);
   if (!isEmail(to)) {
     console.error("[mail] destinatario no válido, mensaje descartado");
@@ -30,7 +30,7 @@ export async function sendMail(to: string, subject: string, text: string): Promi
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to: [to], subject: asunto, text }),
+        body: JSON.stringify({ from, to: [to], subject: asunto, text, ...(opts.unsubscribeUrl && { headers: { "List-Unsubscribe": `<${opts.unsubscribeUrl}>` } }) }),
         signal: AbortSignal.timeout(8000),
       });
       if (!res.ok) console.error(`[mail] el proveedor rechazó el mensaje «${asunto}» (código ${res.status})`);

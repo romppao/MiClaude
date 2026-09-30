@@ -13,7 +13,7 @@ import { computeRecords } from "../../lib/record";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/disciplines";
 import DisciplineFields from "../DisciplineFields";
 import RecordCards from "../RecordCards";
-import { addBout, createMyFighter, requestClaim, respondBout, saveDiscipline, setBoutEvidence, setMyBoutResult } from "../actions";
+import { addBout, createMyFighter, requestClaim, respondBout, saveDiscipline, setBoutEvidence, setMyBoutResult, updateMyFighter } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
@@ -65,6 +65,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     orderBy: { event: { date: "desc" } },
   });
   const records = computeRecords(me.id, bouts);
+  const gym = me.gymId ? await db.gym.findUnique({ where: { id: me.gymId } }) : null;
   const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
 
   return (
@@ -72,6 +73,28 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h1>{me.firstName} {me.lastName}</h1>
       <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
       <RecordCards records={records} disciplines={me.disciplines} />
+
+      <h2>Mis datos</h2>
+      <details className="card" style={{ marginBottom: 8 }}>
+        <summary><strong>Corregir los datos de mi ficha</strong> <span className="mut">— nombre, alias, procedencia, gimnasio, medidas y presentación</span></summary>
+        <form className="search" action={updateMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
+          <label className="field"><span>Nombre</span><input name="firstName" defaultValue={me.firstName} required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
+          <label className="field"><span>Apellidos</span><input name="lastName" defaultValue={me.lastName} required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
+          <label className="field"><span>Alias (opcional)</span><input name="alias" defaultValue={me.alias ?? ""} maxLength={LIMITS.alias} /></label>
+          <label className="field"><span>Gimnasio (opcional)</span><input name="gym" defaultValue={gym?.name ?? ""} maxLength={LIMITS.gym} /></label>
+          <label className="field"><span>Ciudad</span><input name="city" defaultValue={me.city ?? ""} maxLength={LIMITS.city} /></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? "Madrid"}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Fecha de nacimiento (opcional)</span><input name="birthDate" type="date" defaultValue={me.birthDate ? me.birthDate.toISOString().slice(0, 10) : ""} min="1920-01-01" /><span className="hint">En público solo se muestra tu edad.</span></label>
+          <label className="field"><span>Guardia (opcional)</span>
+            <select name="stance" defaultValue={me.stance ?? ""}><option value="">Sin indicar</option><option value="ORTODOXO">Ortodoxo</option><option value="ZURDO">Zurdo</option><option value="AMBIDIESTRO">Ambidiestro</option></select>
+          </label>
+          <label className="field"><span>Altura en centímetros (opcional)</span><input name="heightCm" inputMode="numeric" defaultValue={me.heightCm ?? ""} maxLength={3} /></label>
+          <label className="field"><span>Envergadura en centímetros (opcional)</span><input name="reachCm" inputMode="numeric" defaultValue={me.reachCm ?? ""} maxLength={3} /></label>
+          <label className="field"><span>Presentación (opcional)</span><textarea name="bio" defaultValue={me.bio ?? ""} maxLength={LIMITS.bio} rows={4} /></label>
+          <button>Guardar los datos de mi ficha</button>
+        </form>
+      </details>
+      <p className="mut">Tu correo electrónico, tu contraseña, tus avisos y la eliminación de tu cuenta están en <Link href="/mi-cuenta">Mi cuenta</Link>.</p>
 
       <h2>Mis disciplinas</h2>
       {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (

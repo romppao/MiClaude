@@ -21,3 +21,12 @@ export function parseDay(raw: string, now: Date = new Date()): Date | null {
   if (d.getTime() > now.getTime() + 366 * 864e5) return null;
   return d;
 }
+
+export const MIN_BIRTH_DAY = "1920-01-01";
+
+/** Interpreta una fecha de nacimiento AAAA-MM-DD: debe existir de verdad, ser posterior a 1920 y no estar en el futuro. */
+export function parseBirthDate(raw: string, now: Date = new Date()): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || raw < MIN_BIRTH_DAY || raw > todayMadrid(now)) return null;
+  const d = new Date(`${raw}T12:00:00Z`);
+  return Number.isNaN(d.getTime()) || dayKey(d) !== raw ? null : d;
+}

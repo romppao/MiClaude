@@ -37,6 +37,11 @@ export const AVISOS: Record<string, string> = {
   recuperar_enviado: "Si hay una cuenta con ese correo electrónico, te hemos enviado un enlace para elegir una contraseña nueva. Caduca en 1 hora. Revisa también la carpeta de correo no deseado.",
   contrasena_cambiada: "Tu contraseña se ha cambiado y has entrado con ella. Hemos cerrado las sesiones abiertas en otros dispositivos.",
   sesion_cerrada: "Has cerrado la sesión. Hasta pronto.",
+  cuenta_guardada: "Los cambios de tu cuenta se han guardado.",
+  contrasena_guardada: "Tu contraseña se ha cambiado. Hemos cerrado las sesiones abiertas en otros dispositivos.",
+  avisos_desactivados: "Listo: ya no recibirás avisos por correo electrónico. Puedes volver a activarlos cuando quieras desde «Mi cuenta».",
+  cuenta_eliminada: "Tu cuenta y tus datos personales se han eliminado. Gracias por haber formado parte de Ring España.",
+  ficha_actualizada: "Los datos de tu ficha se han guardado.",
 };
 
 export const PROBLEMAS: Record<string, string> = {
@@ -49,6 +54,12 @@ export const PROBLEMAS: Record<string, string> = {
   correo_no_enviado: "No hemos podido enviar el correo electrónico en este momento. Inténtalo de nuevo en unos minutos con «Reenviar el enlace».",
   correo_no_valido: "Escribe una dirección de correo electrónico completa, como nombre@ejemplo.es.",
   contrasenas_distintas: "Las dos contraseñas no coinciden. Escríbelas de nuevo.",
+  contrasena_actual_incorrecta: "La contraseña actual no es correcta. Revísala e inténtalo de nuevo.",
+  eliminar_sin_confirmar: "Marca la casilla para confirmar que quieres eliminar tu cuenta. Es una acción que no se puede deshacer.",
+  ultimo_moderador: "No puedes eliminar la cuenta porque eres la única persona moderadora. Nombra antes a otra.",
+  datos_ficha: "Alguno de los datos de tu ficha no es válido. Revísalos e inténtalo de nuevo.",
+  nacimiento_invalido: "La fecha de nacimiento no es válida. Escribe un día real del pasado.",
+  medida_invalida: "La altura o la envergadura no es válida. Escríbela en centímetros, por ejemplo 178.",
   token_invalido: "El enlace no es válido o ha caducado. Puedes pedir uno nuevo.",
   combate_futuro_resultado: "Ese combate todavía no se ha celebrado, así que no puedes indicar el resultado. Déjalo sin elegir y añádelo cuando ocurra.",
   reclamar_no_disponible: "Esa ficha ya no está disponible para reclamar.",

@@ -87,7 +87,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         <p className="mut">
           {fighter.hiddenAt
             ? "Los datos personales de esta ficha se han ocultado. Se conservan los combates porque forman parte del récord de otras personas."
-            : "Esta ficha la ha creado otra persona al registrar un combate. Solo se muestra el nombre abreviado hasta que su titular la reclame o el combate se confirme."}
+            : "Esta ficha la ha creado otra persona al registrar un combate. Solo se muestra el nombre abreviado hasta que su titular la reclame o el combate se confirme. Si eres esta persona, puedes reclamarla desde «Mi ficha» o pedir que se retiren tus datos: consulta la página de privacidad."}
         </p>
       )}
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "8px 0 16px" }}>

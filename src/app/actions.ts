@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import type { Discipline } from "@prisma/client";
 import { db } from "../lib/db";
-import { consumeVerificationToken, createSession, destroySession, getUser, requireUser, requireVerifiedUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail } from "../lib/auth";
+import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, getUser, requireUser, requireVerifiedUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../lib/auth";
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../lib/password";
 import { HORA, MINUTO, addHit, allow, clearHits, clientIp, isBlocked } from "../lib/ratelimit";
 import { maybePurge } from "../lib/retention";
@@ -16,7 +16,7 @@ import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
 import { internalPath } from "../lib/paths";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../lib/coherence";
-import { dayKey, eventDayReached, parseDay } from "../lib/dates";
+import { dayKey, eventDayReached, parseBirthDate, parseDay } from "../lib/dates";
 import { isTournamentStyle, isDiscipline, parseDisciplineChoice, WEIGHT_CLASSES } from "../lib/disciplines";
 import { notifyFollowersOfBout } from "../lib/notify";
 import { parsePrior } from "../lib/prior";
@@ -212,6 +212,78 @@ export async function resetPassword(f: FormData) {
   go("/", { aviso: "contrasena_cambiada" });
 }
 
+// ---------- Mi cuenta: datos, contraseña, baja de avisos y eliminación ----------
+
+/**
+ * Comprueba la contraseña actual antes de una operación delicada (cambiar la contraseña, eliminar la cuenta). Cuenta como un
+ * intento de acceso: si se falla varias veces seguidas, se bloquea durante unos minutos (evita adivinarla desde una sesión abierta).
+ */
+async function confirmOwnPassword(user: { email: string; passwordHash: string }, password: string, back: string) {
+  const clave = `acceso:correo:${user.email}`;
+  if (await isBlocked(clave, LOGIN_MAX_POR_CORREO, 15 * MINUTO)) go(back, { problema: "demasiados_intentos" });
+  if (password.length > LIMITS.password || !(await verifyPassword(password, user.passwordHash))) {
+    await addHit(clave);
+    go(back, { problema: "contrasena_actual_incorrecta" });
+  }
+  await clearHits(clave);
+}
+
+export async function updateAccount(f: FormData) {
+  const user = await requireUser();
+  const back = "/mi-cuenta";
+  const name = oneLine(str(f, "name"));
+  if (!name || name.length > LIMITS.name) go(back, { problema: "registro_datos" });
+  const notifyEmails = f.get("notifyEmails") === "on";
+  await db.user.update({ where: { id: user.id }, data: { name, notifyEmails } });
+  await audit({ userId: user.id, entity: "USER", entityId: user.id, action: "ACCOUNT_UPDATED", before: { name: user.name, notifyEmails: user.notifyEmails }, after: { name, notifyEmails } });
+  revalidatePath("/", "layout");
+  go(back, { aviso: "cuenta_guardada" });
+}
+
+export async function changePassword(f: FormData) {
+  const user = await requireUser();
+  const back = "/mi-cuenta";
+  const password = String(f.get("password") ?? "");
+  if (password !== String(f.get("repeat") ?? "")) go(back, { problema: "contrasenas_distintas" });
+  checkNewPassword(password, back);
+  await confirmOwnPassword(user, String(f.get("current") ?? ""), back);
+  await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
+  await destroyOtherSessions(user.id);
+  await sendMail(user.email, "Tu contraseña de Ring España se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
+  go(back, { aviso: "contrasena_guardada" });
+}
+
+/** Baja de los avisos por correo desde el enlace del propio mensaje (no hace falta iniciar sesión). */
+export async function unsubscribeEmails(f: FormData) {
+  const ok = await unsubscribeWithToken(str(f, "token"));
+  go("/baja", ok ? { aviso: "avisos_desactivados" } : { problema: "token_invalido" });
+}
+
+/**
+ * Elimina la cuenta y sus datos personales: sesiones, auras dadas, seguimientos, solicitudes y avisos enviados.
+ * La ficha de peleador se borra si no tiene combates; si los tiene, se anonimiza (los combates forman parte del récord de sus rivales).
+ * Las veladas publicadas se conservan, sin organizador. Queda un apunte en el historial sin datos personales.
+ */
+export async function deleteAccount(f: FormData) {
+  const user = await requireUser();
+  const back = "/mi-cuenta/eliminar";
+  if (f.get("confirm") !== "on") go(back, { problema: "eliminar_sin_confirmar" });
+  await confirmOwnPassword(user, String(f.get("current") ?? ""), back);
+  await guard(back, () => db.$transaction(async (tx) => {
+    if (user.role === "ADMIN" && (await tx.user.count({ where: { role: "ADMIN" } })) <= 1) throw new Rechazo("ultimo_moderador");
+    const fighter = await tx.fighter.findUnique({ where: { userId: user.id }, include: { _count: { select: { boutsAsA: true, boutsAsB: true } } } });
+    let ficha: "borrada" | "anonimizada" | null = null;
+    if (fighter) {
+      if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await tx.fighter.delete({ where: { id: fighter.id } }); ficha = "borrada"; }
+      else { await anonymizeFighter(tx, fighter.id); ficha = "anonimizada"; }
+    }
+    await audit({ userId: null, entity: "USER", entityId: user.id, action: "ACCOUNT_DELETED", after: { role: user.role, ficha } }, tx);
+    await tx.user.delete({ where: { id: user.id } });
+  }));
+  await destroySession();
+  go("/", { aviso: "cuenta_eliminada" });
+}
+
 // ---------- Ficha del peleador (autogestionada) ----------
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
@@ -253,6 +325,47 @@ export async function createMyFighter(f: FormData) {
   });
   await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, weightClass: choice.weightClass, priorDeclared: prior.prior } });
   go(back, { aviso: "ficha_creada" });
+}
+
+/** Corrige los datos personales de la propia ficha. Cada cambio queda en el historial con el valor anterior. */
+export async function updateMyFighter(f: FormData) {
+  const user = await requireVerifiedUser();
+  const back = "/mi-ficha";
+  const me = user.fighter;
+  if (!me) go(back);
+  checkLengths(f, back, { firstName: LIMITS.firstName, lastName: LIMITS.lastName, alias: LIMITS.alias, gym: LIMITS.gym, city: LIMITS.city, bio: LIMITS.bio });
+  const firstName = str(f, "firstName");
+  const lastName = str(f, "lastName");
+  if (!firstName || !lastName) go(back, { problema: "nombre_ficha" });
+  const province = readProvince(f, "province", back, me.province);
+  const city = str(f, "city") || province;
+  const stance = str(f, "stance");
+  if (stance && !["ORTODOXO", "ZURDO", "AMBIDIESTRO"].includes(stance)) go(back, { problema: "datos_ficha" });
+  const rawBirth = str(f, "birthDate");
+  const birthDate = rawBirth ? parseBirthDate(rawBirth) : null;
+  if (rawBirth && !birthDate) go(back, { problema: "nacimiento_invalido" });
+  const measure = (key: string, min: number, max: number) => {
+    const raw = str(f, key);
+    if (!raw) return null;
+    const n = /^\d{2,3}$/.test(raw) ? parseInt(raw, 10) : NaN;
+    if (!(n >= min && n <= max)) go(back, { problema: "medida_invalida" });
+    return n;
+  };
+  const heightCm = measure("heightCm", 100, 250);
+  const reachCm = measure("reachCm", 100, 260);
+  const gymName = str(f, "gym");
+  const patch = { firstName, lastName, alias: str(f, "alias") || null, city, province, bio: str(f, "bio") || null, stance: (stance || null) as "ORTODOXO" | "ZURDO" | "AMBIDIESTRO" | null, birthDate, heightCm, reachCm };
+  await guard(back, () => db.$transaction(async (tx) => {
+    let gymId: string | null = null;
+    if (gymName) {
+      const gymSlug = slugify(`${gymName} ${city}`) || slugify(gymName) || "gimnasio";
+      gymId = (await tx.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} })).id;
+    }
+    await tx.fighter.update({ where: { id: me.id }, data: { ...patch, gymId } });
+    await audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: "PROFILE_UPDATED", before: { firstName: me.firstName, lastName: me.lastName, alias: me.alias, city: me.city, province: me.province, gymId: me.gymId }, after: { firstName, lastName, alias: patch.alias, city, province, gymId } }, tx);
+  }));
+  revalidatePath("/", "layout");
+  go(back, { aviso: "ficha_actualizada" });
 }
 
 /** Añade una disciplina a la ficha, o actualiza su categoría y su récord de partida (declarado). Cada cambio queda en el historial. */
@@ -659,7 +772,10 @@ export async function addCartelBout(f: FormData) {
     "cartel_duplicado",
   );
   revalidatePath("/", "layout");
-  await notifyFollowersOfBout(created.id); // solo combates de organizador y futuros
+  // Solo combates de organizador y futuros. Se avisa después de responder: un fallo del correo no debe afectar a un combate ya guardado.
+  after(async () => {
+    try { await notifyFollowersOfBout(created.id); } catch (e) { console.error(`[avisos] no se pudieron enviar los avisos del combate: ${e instanceof Error ? e.message : String(e)}`); }
+  });
   go(back, { aviso: "cartel_anadido" });
 }
 
