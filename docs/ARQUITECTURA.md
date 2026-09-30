@@ -59,6 +59,63 @@ Se puede sustituir por Auth.js/un proveedor externo sin tocar el modelo de domin
 - **Menores de edad**: el amateur incluye juveniles. Hace falta política de privacidad y consentimiento parental antes de publicar datos personales (RGPD).
 - **Sin protección CSRF adicional** más allá de la que Next.js aplica a Server Actions (origen del mismo sitio).
 
+## Confianza y verificación de datos (sin depender de federaciones al principio)
+
+Principio: **no se intenta demostrar que un dato es verdad, sino acumular evidencia independiente y mostrar siempre cuánta hay.** Nadie ve un récord como «verdadero/falso», sino con su nivel de respaldo. Las federaciones serán el nivel más alto cuando colaboren, pero el sistema funciona sin ellas.
+
+### Niveles de respaldo de un combate
+
+| Nivel | Fuente | Estado hoy |
+|---|---|---|
+| 0 | Lo declara el propio boxeador | hecho (`SELF_REPORTED`) |
+| 1 | Lo confirma el rival (cuenta verificada) | hecho (`CONFIRMED`) |
+| 2 | Lo publica o confirma el organizador de la velada, que estuvo allí | hecho (`VERIFIED` si lo introduce el organizador) |
+| 3 | Corroborado por terceros: gimnasio/organizador verificado, enlace a acta, cartel, redes o vídeo de la velada | pendiente |
+| 4 | Federación (licencia, actas oficiales) | futuro |
+
+Regla de producto: **la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado** («12-2, 9 verificados»). El ránking de valoraciones puede exigir un mínimo de combates de nivel ≥ 1 para aparecer.
+
+### Verificar también a quien verifica (gimnasios, promotoras, organizadores)
+
+Un organizador o gimnasio que «verifica» solo vale lo que valga su propia credibilidad, así que también tienen niveles:
+- **Presencia pública comprobable:** web, Instagram/Facebook con actividad real, ficha de Google Maps, teléfono. Un moderador lo comprueba una vez y anota la evidencia.
+- **Avales cruzados:** una entidad verificada puede avalar a otra (un gimnasio conocido avala a su promotora). Se guarda quién avaló a quién.
+- **Historial:** puntuación interna de fiabilidad = combates suyos confirmados por terceros frente a disputados o retirados. Baja la puntuación y pierde peso o el sello.
+- **Periodo de prueba:** un organizador nuevo pasa un tiempo con sus datos marcados «pendiente» hasta que acumula historial limpio.
+
+### Comprobaciones automáticas (baratas y muy eficaces)
+
+- Un boxeador no puede tener dos combates el mismo día ni con menos de N días entre ellos; edad y categoría de peso coherentes; el rival no puede ser él mismo.
+- Duplicados: mismo combate registrado por los dos boxeadores, o el mismo evento creado dos veces.
+- Colusión: confirmaciones cruzadas entre cuentas recién creadas, mismas IP/dispositivo, ráfagas de valoraciones a un mismo boxeador.
+- Récords imposibles o saltos raros (p. ej. muchos combates en pocas semanas) → a la cola de moderación, no rechazo automático.
+
+### Transparencia y reversibilidad
+
+- **Historial de cambios (audit log)** de cada dato: quién, cuándo, qué cambió. Nada se edita en silencio.
+- **Botón «reportar dato»** en fichas, combates y veladas, con seguimiento del caso.
+- **Evidencia adjunta** opcional en cada combate (enlace a acta, cartel, publicación, vídeo).
+- Los datos disputados dejan de contar en el récord hasta resolverse (ya ocurre con `DISPUTED`).
+
+### Moderación humana con ventaja local
+
+En Madrid, al principio, la moderación manual es viable y es una ventaja: se puede llamar a un gimnasio, escribir a una promotora o preguntar a un entrenador conocido. Conviene formar un pequeño grupo de **moderadores de confianza** (entrenadores, exboxeadores, árbitros) en vez de que todo pase por una sola persona.
+
+### Vía hacia las federaciones
+
+- No hace falta su permiso para empezar: solo se publican datos aportados por los propios interesados y organizadores.
+- Se les ofrece algo que hoy no tienen: **un calendario y unos resultados limpios y visibles**. Con tracción demostrable en Madrid, la conversación con la Federación Madrileña pasa a ser una colaboración (acceso a actas o licencias como nivel 4), no una petición.
+- El campo de **nº de licencia** se puede añadir de forma opcional y sin verificar hasta que exista acuerdo.
+- Datos sensibles: cualquier documento de identidad o licencia debe tratarse conforme al RGPD (mínimos datos, borrado tras la comprobación) y con especial cuidado con menores.
+
+### Orden de implementación sugerido
+
+1. Enlace de evidencia en el combate y **audit log** de cambios.
+2. **Sello de verificado** para gimnasios y organizadores, con la evidencia que anotó el moderador y quién los avaló.
+3. Comprobaciones automáticas de coherencia (fechas, duplicados) que envíen casos a moderación.
+4. Botón «reportar dato» y puntuación de fiabilidad de organizadores.
+5. Detección de colusión en valoraciones y confirmaciones.
+
 ## Hoja de ruta
 
 1. **Hecho:** cuentas y roles, ficha propia, registro y confirmación de combates, moderación, valoraciones, ránking, portada amateur/Madrid, **verificación de email, reclamar ficha, rol organizador con cartel y resultados**.
