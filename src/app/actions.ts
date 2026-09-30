@@ -228,12 +228,12 @@ export async function adminDecide(f: FormData) {
   const user = await requireUser();
   if (user.role !== "ADMIN") redirect("/");
   const before = await db.bout.findUnique({ where: { id: str(f, "boutId") } });
-  if (!before) redirect("/admin");
+  if (!before) redirect("/moderacion");
   const next = str(f, "decision") === "verify" ? "VERIFIED" : "DISPUTED";
   await db.bout.update({ where: { id: before.id }, data: { verification: next } });
   await audit({ userId: user.id, entity: "BOUT", entityId: before.id, action: `ADMIN_${next}`, before: { verification: before.verification }, after: { verification: next } });
   revalidatePath("/", "layout");
-  redirect("/admin");
+  redirect("/moderacion");
 }
 
 // ---------- Aura del público ----------
@@ -313,7 +313,7 @@ export async function decideClaim(f: FormData) {
   const admin = await requireUser();
   if (admin.role !== "ADMIN") redirect("/");
   const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { fighter: true, user: { include: { fighter: true } } } });
-  if (!claim || claim.status !== "PENDING") redirect("/admin");
+  if (!claim || claim.status !== "PENDING") redirect("/moderacion");
   // Solo se aprueba si se pidió aprobar Y la ficha sigue libre Y el usuario no tiene ya otra ficha.
   const approved = str(f, "decision") === "approve" && !claim.fighter.userId && !claim.user.fighter;
   if (approved) {
@@ -329,7 +329,7 @@ export async function decideClaim(f: FormData) {
     userId: admin.id, entity: "CLAIM", entityId: claim.id, action: approved ? "APPROVED" : "REJECTED",
     after: { userId: claim.userId, fighterId: claim.fighterId, requestedApproval: str(f, "decision") === "approve" },
   });
-  redirect("/admin");
+  redirect("/moderacion");
 }
 
 // ---------- Organizadores ----------
@@ -350,14 +350,14 @@ export async function decideOrganizer(f: FormData) {
   const admin = await requireUser();
   if (admin.role !== "ADMIN") redirect("/");
   const req = await db.organizerRequest.findUnique({ where: { id: str(f, "requestId") }, include: { user: true } });
-  if (!req || req.status !== "PENDING") redirect("/admin");
+  if (!req || req.status !== "PENDING") redirect("/moderacion");
   const approve = str(f, "decision") === "approve";
   await audit({ userId: admin.id, entity: "ORGANIZER", entityId: req.id, action: approve ? "APPROVED" : "REJECTED", after: { userId: req.userId, orgName: req.orgName, note: str(f, "note") || null } });
   await db.$transaction([
     db.organizerRequest.update({ where: { id: req.id }, data: { status: approve ? "APPROVED" : "REJECTED", reviewNote: str(f, "note").slice(0, 500) || null, reviewedAt: new Date() } }),
     ...(approve && req.user.role === "FAN" ? [db.user.update({ where: { id: req.userId }, data: { role: "ORGANIZER" } })] : []),
   ]);
-  redirect("/admin");
+  redirect("/moderacion");
 }
 
 async function requireOrganizer() {
@@ -462,14 +462,14 @@ export async function setGymVerified(f: FormData) {
   const admin = await requireUser();
   if (admin.role !== "ADMIN") redirect("/");
   const gym = await db.gym.findUnique({ where: { id: str(f, "gymId") } });
-  if (!gym) redirect("/admin");
+  if (!gym) redirect("/moderacion");
   const verify = str(f, "decision") === "verify";
   const note = str(f, "note").slice(0, 500) || null;
-  if (verify && !note) redirect("/admin?error=nota"); // el sello siempre lleva la evidencia que lo justifica
+  if (verify && !note) redirect("/moderacion?error=nota"); // el sello siempre lleva la evidencia que lo justifica
   await db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null } });
   await audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } });
   revalidatePath("/", "layout");
-  redirect("/admin");
+  redirect("/moderacion");
 }
 
 // ---------- Avisos de error de los usuarios ----------
@@ -496,12 +496,12 @@ export async function resolveReport(f: FormData) {
   const admin = await requireUser();
   if (admin.role !== "ADMIN") redirect("/");
   const report = await db.report.findUnique({ where: { id: str(f, "reportId") } });
-  if (!report || report.status !== "OPEN") redirect("/admin");
+  if (!report || report.status !== "OPEN") redirect("/moderacion");
   const status = str(f, "decision") === "resolve" ? "RESOLVED" : "DISMISSED";
   const note = str(f, "note").slice(0, 500) || null;
   await db.report.update({ where: { id: report.id }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } });
   await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: status, before: { status: report.status }, after: { status, note } });
-  redirect("/admin");
+  redirect("/moderacion");
 }
 
 // ---------- Seguir a peleadores ----------

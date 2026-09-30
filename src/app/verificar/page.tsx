@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getUser } from "../../lib/auth";
 import { resendVerification, verifyEmail } from "../actions";
 
-export const metadata = { title: "Verificar email" };
+export const metadata = { title: "Verificar correo electrónico" };
 export const dynamic = "force-dynamic";
 
 export default async function Verify({ searchParams }: { searchParams: Promise<{ token?: string; ok?: string; sent?: string; error?: string }> }) {
@@ -13,15 +13,15 @@ export default async function Verify({ searchParams }: { searchParams: Promise<{
   if (token) {
     return (
       <>
-        <h1>Confirmar email</h1>
-        <form action={verifyEmail}><input type="hidden" name="token" value={token} /><button>Confirmar mi email</button></form>
+        <h1>Confirmar correo electrónico</h1>
+        <form action={verifyEmail}><input type="hidden" name="token" value={token} /><button>Confirmar mi correo electrónico</button></form>
       </>
     );
   }
   return (
     <>
-      <h1>Verificación de email</h1>
-      {ok && <p className="W">Email verificado. Ya puedes dar aura, registrar combates y reclamar tu ficha.</p>}
+      <h1>Verificación del correo electrónico</h1>
+      {ok && <p className="W">Correo electrónico verificado. Ya puedes dar aura, registrar combates y reclamar tu ficha.</p>}
       {error && <p className="L">El enlace no es válido o ha caducado. Pide uno nuevo.</p>}
       {sent && <p className="W">Te hemos enviado un nuevo enlace.</p>}
       {!user ? <p><Link href="/entrar">Entra</Link> para continuar.</p>

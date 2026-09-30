@@ -37,7 +37,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <h1>Moderación</h1>
-      <p><Link href="/admin/historial">Ver historial de cambios</Link></p>
+      <p><Link href="/moderacion/historial">Ver historial de cambios</Link></p>
       {error === "nota" && <p className="L">El sello de verificado necesita una nota con la evidencia comprobada.</p>}
       <h2>Avisos de error de usuarios ({reports.length})</h2>
       <table><tbody>

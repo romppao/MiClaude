@@ -8,7 +8,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <h1>Entrar</h1>
-      {error && <p className="L">Email o contraseña incorrectos.</p>}
+      {error && <p className="L">El correo electrónico o la contraseña no son correctos.</p>}
       <form className="search" action={login} style={{ flexDirection: "column", maxWidth: 360 }}>
         {next && <input type="hidden" name="next" value={next} />}
         <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required /></label>

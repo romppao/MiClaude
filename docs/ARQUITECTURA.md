@@ -21,7 +21,7 @@ Sin API REST separada en el MVP: las páginas leen de la base de datos en el ser
 | `FAN` | Lo anterior + dar aura a peleadores |
 | `FIGHTER` | Lo anterior + una ficha propia (con una o varias disciplinas) y registrar sus combates |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se obtiene solicitándolo; lo aprueba un `ADMIN` |
-| `ADMIN` | Verificar o rechazar combates (`/admin`). Se asigna manualmente en la base de datos |
+| `ADMIN` | Verificar o rechazar combates (`/moderacion`). Se asigna manualmente en la base de datos |
 
 Un boxeador sin cuenta también existe (fichas «sin reclamar», p. ej. el rival de un combate). Cuando ese boxeador se registra, la busca en `/mi-ficha` y **solicita reclamarla** (`ClaimRequest`); un `ADMIN` la aprueba. Al aprobar, la ficha pasa a su cuenta y las demás solicitudes sobre ella se rechazan.
 
@@ -126,7 +126,7 @@ En Madrid, al principio, la moderación manual es viable y es una ventaja: se pu
 
 ### Orden de implementación sugerido
 
-1. ~~Enlace de evidencia en el combate y audit log~~ **hecho** (`Bout.evidenceUrl`, `AuditLog`, `/admin/historial`).
+1. ~~Enlace de evidencia en el combate y audit log~~ **hecho** (`Bout.evidenceUrl`, `AuditLog`, `/moderacion/historial`).
 2. ~~Sello de verificado para gimnasios y organizadores~~ **hecho** con nota de evidencia interna; **falta el aval cruzado** (necesita cuentas de responsable de gimnasio).
 3. Comprobaciones automáticas de coherencia (fechas, duplicados) que envíen casos a moderación.
 4. Botón «reportar dato» y puntuación de fiabilidad de organizadores.

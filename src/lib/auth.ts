@@ -46,7 +46,7 @@ export async function sendVerificationEmail(user: { id: string; email: string; n
   const token = randomBytes(32).toString("hex");
   await db.emailToken.deleteMany({ where: { userId: user.id } });
   await db.emailToken.create({ data: { id: sha256(token), userId: user.id, expiresAt: new Date(Date.now() + VERIFY_HOURS * 36e5) } });
-  await sendMail(user.email, "Verifica tu email en Ring España", `Hola ${user.name},\n\nConfirma tu email aquí (caduca en ${VERIFY_HOURS} h):\n${APP_URL}/verificar?token=${token}\n`);
+  await sendMail(user.email, "Confirma tu correo electrónico en Ring España", `Hola ${user.name},\n\nConfirma tu correo electrónico aquí (caduca en ${VERIFY_HOURS} h):\n${APP_URL}/verificar?token=${token}\n`);
 }
 
 /** Consume el token y marca el email como verificado. Devuelve false si no es válido o ha caducado. */

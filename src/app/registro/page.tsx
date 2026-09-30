@@ -2,7 +2,7 @@ import Link from "next/link";
 import { register } from "../actions";
 
 export const metadata = { title: "Crear cuenta" };
-const ERR: Record<string, string> = { datos: "Revisa nombre y email.", password: "La contraseña necesita 8 caracteres como mínimo.", email: "Ese email ya tiene cuenta." };
+const ERR: Record<string, string> = { datos: "Revisa tu nombre y tu correo electrónico.", password: "La contraseña necesita 8 caracteres como mínimo.", email: "Ya existe una cuenta con ese correo electrónico." };
 
 export default async function Register({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;

@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu email</Link>}
                 <Link href="/siguiendo">Mis peleadores</Link>
                 <Link href="/mi-ficha">{user.fighter ? "Mi ficha" : user.name}</Link>
-                {user.role === "ADMIN" && <Link href="/admin">Moderación</Link>}
+                {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
                 <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
               </>
             ) : (

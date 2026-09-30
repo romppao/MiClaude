@@ -29,7 +29,7 @@ las actuaciones y el calendario descubre veladas. Decisiones, roles, riesgos y h
 - **Aura**: cada aficionado puede dar aura a un peleador **por combate** (una por persona, combate y peleador), con comentario opcional y «lo vi en directo».
 - **Ránking** (`/ranking`): por aura, dentro de cada disciplina (boxeo por defecto) y categoría de peso, con zona (Madrid por defecto) y periodo.
 - **Disciplinas**: boxeo, MMA, kickboxing, K-1 y jiu-jitsu. Una ficha por persona con varias disciplinas y **récord de partida** declarado para quien ya había competido.
-- **Moderación** (`/admin`): verificar o rechazar combates autodeclarados.
+- **Moderación** (`/moderacion`): verificar o rechazar combates autodeclarados.
 - `/peleadores` — búsqueda y filtros (nombre/alias, nivel, provincia, disciplina y categoría de peso) y ficha con el récord por disciplina calculado desde los combates.
 - `/veladas` — calendario de próximas/pasadas, filtro por nivel (pro/amateur), provincia y texto; detalle con cartel y resultados.
 - `/gimnasios`, `/entrenadores` — listados, fichas y sus peleadores.
