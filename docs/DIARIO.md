@@ -125,6 +125,33 @@ Las tres primeras ejecuciones del CI en GitHub (runs 1, 2 y 3) terminaron **con 
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Principio fundacional de usabilidad
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió guardar «en lo más profundo» un principio para esta y cualquier aplicación futura: que sea **muy, pero que muy intuitiva para todo tipo de usuario** — niños, gente joven, adultos y personas de edad avanzada — sin importar su nivel tecnológico, con **botones coloridos e intuitivos, enlaces e información fáciles de encontrar**, y **manteniendo siempre la profesionalidad** («que nos vea como gente seria»; nada vulgar ni coloquial). Lo calificó de «súper importante».
+
+### Qué se decidió y por qué
+
+- Se elevó a **principio fundacional F9** y se convirtió en una **lista de comprobación de 11 puntos** en `CLAUDE.md`, para que rija todo el trabajo futuro y no dependa de la memoria de una conversación.
+- Se distingue la **usabilidad** (lenguaje, flujos, mensajes, accesibilidad: se aplica ya) del **diseño visual** (estilo e identidad: aplazado por petición previa del fundador). Antes de cambiar el aspecto visual de forma notable se le consulta.
+- También se guardó a nivel de usuario (`~/.claude/CLAUDE.md`) para que valga en otras aplicaciones, teniendo en cuenta que ese fichero vive en este entorno de trabajo, no en el repositorio.
+
+### Qué se hizo
+
+Solo documentación: principio y lista en `CLAUDE.md`, idea F9 y dos preguntas abiertas en `IDEAS.md`, y esta entrada. No se ha cambiado todavía ninguna pantalla.
+
+### Qué salió mal / qué se aprendió
+
+Reconocimiento honesto del estado actual: **lo construido hasta ahora no cumple el principio.** Hay términos técnicos visibles («disputar», «sin confirmar»), varios formularios con solo texto de ejemplo y sin etiqueta, acciones que redirigen sin ningún mensaje de confirmación y una interfaz sin cuidado de contraste ni tamaños. Era esperable (se priorizó la arquitectura) pero hay que corregirlo antes de que lo use gente real.
+
+### Estado y próximos pasos
+
+- Propuesto: una **auditoría de usabilidad** de lo ya construido frente a la lista de 11 puntos, con los cambios ordenados por impacto (mensajes de confirmación y de error, etiquetas, lenguaje llano, accesibilidad), sin tocar el estilo visual sin consultar.
+- Sigue pendiente lo anterior: comprobaciones de coherencia, «reportar dato», seguimiento de boxeadores.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

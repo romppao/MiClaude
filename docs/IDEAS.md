@@ -17,6 +17,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F6 | Ver es público; **votar, registrar y publicar exige registro** | Fundador | 🟢 |
 | F7 | **Veracidad de los datos** sin depender de trámites federativos al principio; colaborar con las federaciones a medio plazo | Fundador | 🟡 (estrategia escrita) |
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
+| F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (principio fijado; falta auditar y adaptar lo construido) |
 
 ## Ideas de producto
 
@@ -33,6 +34,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Sello de verificado para gimnasios y organizadores | Estrategia de veracidad | 🟢 | Nota de evidencia obligatoria, interna |
 | Avales cruzados entre entidades verificadas | Estrategia de veracidad | 🔵 | Requiere cuentas de responsable de gimnasio |
 | Historial de cambios público por combate | Transparencia | ⚪ | Decidir qué se muestra y qué no |
+| Auditoría de usabilidad de lo ya construido frente al principio F9 (lenguaje llano, mensajes de confirmación y de error, etiquetas, contraste, accesibilidad) | Fundador | 🔵 | Sin cambiar el estilo visual sin consultar |
 | Comprobaciones automáticas de coherencia (mismo día, duplicados, edades) | Estrategia de veracidad | 🔵 | |
 | Botón «reportar dato» + puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
 | Detección de colusión en valoraciones y confirmaciones | Riesgo detectado | 🔵 | |
@@ -54,6 +56,9 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Guardar el récord como número en la ficha | Se desincroniza; se calcula |
 
 ## Preguntas abiertas
+
+- **Usabilidad (F9):** ¿tratamiento de «tú» o de «usted»? Hoy la app tutea; para un público con personas mayores conviene decidirlo con criterio y mantenerlo en toda la app.
+- **Usabilidad (F9):** ¿qué grupos de personas reales (edades, familiaridad con la tecnología) probarán la app y cuándo?
 
 - ¿Qué prueba concreta de identidad se pide al reclamar una ficha o pedir ser organizador (sin burocracia federativa)?
 - ¿Cuántos combates confirmados exige el ránking para que un boxeador aparezca?
