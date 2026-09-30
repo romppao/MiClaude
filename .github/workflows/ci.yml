@@ -24,6 +24,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ringespana
       BASE_URL: http://localhost:3111
+      APP_URL: http://localhost:3111
+      MAIL_TRANSPORT: log
       MAIL_LOG: ${{ github.workspace }}/server.log
     steps:
       - uses: actions/checkout@v4

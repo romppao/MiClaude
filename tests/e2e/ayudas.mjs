@@ -30,6 +30,22 @@ export const registrar = async (p, o) => {
 
 export const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };
 
+/** Espera el último correo enviado a `email` que contenga un enlace a `ruta` (por ejemplo «/recuperar/nueva») y devuelve ese enlace, o null. */
+export async function esperarEnlace(email, ruta, intentos = 40) {
+  const patron = new RegExp(`https?://[^\\s/]+(${ruta}\\?token=\\w+)`);
+  for (let i = 0; i < intentos; i++) {
+    const bloques = readFileSync(MAIL_LOG, "utf8").split("[mail] to=").filter((b) => b.startsWith(`${email} `));
+    for (const b of bloques.reverse()) { const m = b.match(patron); if (m) return m[1]; }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return null;
+}
+/** ¿Se ha enviado algún correo a esta dirección? (espera un poco por si el envío se hace después de responder) */
+export async function hayCorreoPara(email, espera = 1500) {
+  await new Promise((r) => setTimeout(r, espera));
+  return readFileSync(MAIL_LOG, "utf8").includes(`[mail] to=${email} `);
+}
+
 /** Crea una cuenta nueva (y, salvo que se pida lo contrario, verifica su correo). */
 export async function newUser(name, role = "FAN", verify = true) {
   const email = `${name.toLowerCase()}${rnd}@test.es`;

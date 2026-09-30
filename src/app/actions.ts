@@ -1,11 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import type { Discipline } from "@prisma/client";
 import { db } from "../lib/db";
-import { consumeVerificationToken, createSession, destroySession, getUser, hashPassword, requireUser, requireVerifiedUser, sendVerificationEmail, verifyPassword } from "../lib/auth";
+import { consumeVerificationToken, createSession, destroySession, getUser, requireUser, requireVerifiedUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail } from "../lib/auth";
+import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../lib/password";
+import { HORA, MINUTO, addHit, allow, clearHits, clientIp, isBlocked } from "../lib/ratelimit";
+import { maybePurge } from "../lib/retention";
+import { sendMail } from "../lib/mail";
 import { slugify, PROVINCES } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
@@ -20,7 +25,7 @@ import { anonymizeFighter } from "../lib/anonymize";
 import { hasOwn } from "../lib/safe";
 import { findNameCandidates } from "../lib/fighters";
 import { AURA_COMMENT_MAX, AURA_PER_DAY, canGiveAura, pairKey, validateOutcome } from "../lib/rules";
-import { LIMITS, isEmail } from "../lib/text";
+import { LIMITS, isEmail, oneLine } from "../lib/text";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const intOrNull = (f: FormData, k: string) => {
@@ -115,31 +120,96 @@ async function uniqueSlug(base: string, exists: (slug: string) => Promise<boolea
 
 // ---------- Cuentas ----------
 
-export async function register(f: FormData) {
-  const email = str(f, "email").toLowerCase();
-  const name = str(f, "name");
-  const password = String(f.get("password") ?? "");
-  const role = str(f, "role") === "FIGHTER" ? "FIGHTER" : "FAN";
-  if (!name || name.length > LIMITS.name || !isEmail(email)) redirect("/registro?error=datos");
-  if (password.length < 8 || password.length > LIMITS.password) redirect("/registro?error=password");
-  if (await db.user.findUnique({ where: { email } })) redirect("/registro?error=email");
-  const user = await db.user.create({ data: { email, name, role, passwordHash: hashPassword(password) } });
-  await sendVerificationEmail(user);
-  await createSession(user.id);
-  redirect("/verificar");
+const MIN_PASSWORD = 8;
+
+/** Comprueba la contraseña elegida (registro y cambio); si no vale, vuelve a `back` con el motivo. */
+function checkNewPassword(password: string, back: string) {
+  if (password.length < MIN_PASSWORD) go(back, { problema: "registro_password" });
+  if (password.length > LIMITS.password) go(back, { problema: "contrasena_larga" });
 }
 
-export async function login(f: FormData) {
-  const user = await db.user.findUnique({ where: { email: str(f, "email").toLowerCase() } });
-  const next = internalPath(str(f, "next"), "");
-  if (!user || !verifyPassword(String(f.get("password") ?? ""), user.passwordHash)) redirect(`/entrar?error=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
+export async function register(f: FormData) {
+  const back = "/registro";
+  const email = str(f, "email").toLowerCase();
+  const name = oneLine(str(f, "name"));
+  const password = String(f.get("password") ?? "");
+  const role = str(f, "role") === "FIGHTER" ? "FIGHTER" : "FAN";
+  const ip = await clientIp();
+  if (ip && !(await allow(`registro:ip:${ip}`, 10, HORA))) go(back, { problema: "demasiados_intentos" });
+  if (!name || name.length > LIMITS.name || !isEmail(email)) go(back, { problema: "registro_datos" });
+  checkNewPassword(password, back);
+  if (await db.user.findUnique({ where: { email }, select: { id: true } })) go(back, { problema: "registro_email_existe" });
+  await maybePurge();
+  const passwordHash = await hashPassword(password);
+  const user = await guard(back, () => db.user.create({ data: { email, name, role, passwordHash } }), "registro_email_existe");
+  const enviado = await sendVerificationEmail(user);
   await createSession(user.id);
-  redirect(next || (user.role === "FIGHTER" ? "/mi-ficha" : "/"));
+  go("/verificar", enviado ? undefined : { problema: "correo_no_enviado" });
+}
+
+// Límites del inicio de sesión: intentos fallidos en 15 minutos por correo y por dirección IP (si el proxy la facilita).
+const LOGIN_MAX_POR_CORREO = 8;
+const LOGIN_MAX_POR_IP = 40;
+
+export async function login(f: FormData) {
+  const email = str(f, "email").toLowerCase().slice(0, LIMITS.email);
+  const password = String(f.get("password") ?? "");
+  const next = internalPath(str(f, "next"), "");
+  const back = `/entrar${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+  const ip = await clientIp();
+  const claves: [string, number][] = [[`acceso:correo:${email}`, LOGIN_MAX_POR_CORREO], ...(ip ? [[`acceso:ip:${ip}`, LOGIN_MAX_POR_IP] as [string, number]] : [])];
+  for (const [clave, max] of claves) if (await isBlocked(clave, max, 15 * MINUTO)) go(back, { problema: "demasiados_intentos" });
+
+  const user = await db.user.findUnique({ where: { email } });
+  // Con un correo que no existe se verifica igualmente contra un hash de mentira: así tarda lo mismo y no se puede averiguar qué correos hay registrados.
+  const ok = await verifyPassword(password.length <= LIMITS.password ? password : "", user?.passwordHash ?? (await dummyHash()));
+  if (!user || !ok) {
+    await Promise.all(claves.map(([clave]) => addHit(clave)));
+    go(back, { problema: "login_incorrecto" });
+  }
+  await clearHits(`acceso:correo:${email}`);
+  if (needsRehash(user.passwordHash)) await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
+  await createSession(user.id);
+  go(next || (user.role === "FIGHTER" ? "/mi-ficha" : "/"));
 }
 
 export async function logout() {
   await destroySession();
-  redirect("/");
+  go("/", { aviso: "sesion_cerrada" });
+}
+
+/**
+ * Petición de una contraseña nueva. La respuesta es siempre la misma exista o no la cuenta (no se puede averiguar
+ * qué correos están registrados), y el envío se hace después de responder para que tampoco lo delate el tiempo.
+ */
+export async function requestPasswordReset(f: FormData) {
+  const back = "/recuperar";
+  const email = str(f, "email").toLowerCase();
+  if (!isEmail(email)) go(back, { problema: "correo_no_valido" });
+  const ip = await clientIp();
+  if (!(await allow(`recuperar:correo:${email}`, 3, HORA)) || (ip && !(await allow(`recuperar:ip:${ip}`, 10, HORA)))) go(back, { problema: "demasiados_intentos" });
+  after(async () => {
+    try {
+      const user = await db.user.findUnique({ where: { email } });
+      if (user) await sendPasswordResetEmail(user);
+    } catch (e) {
+      console.error(`[recuperar] no se pudo enviar el enlace: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  });
+  go(back, { aviso: "recuperar_enviado" });
+}
+
+export async function resetPassword(f: FormData) {
+  const token = str(f, "token");
+  const back = `/recuperar/nueva?token=${encodeURIComponent(token)}`;
+  const password = String(f.get("password") ?? "");
+  if (password !== String(f.get("repeat") ?? "")) go(back, { problema: "contrasenas_distintas" });
+  checkNewPassword(password, back);
+  const user = await resetPasswordWithToken(token, await hashPassword(password));
+  if (!user) go("/recuperar", { problema: "token_invalido" });
+  await sendMail(user.email, "Tu contraseña de Ring España se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
+  await createSession(user.id);
+  go("/", { aviso: "contrasena_cambiada" });
 }
 
 // ---------- Ficha del peleador (autogestionada) ----------
@@ -417,13 +487,14 @@ export async function removeAura(f: FormData) {
 
 export async function verifyEmail(f: FormData) {
   const ok = await consumeVerificationToken(str(f, "token"));
-  redirect(ok ? "/verificar?ok=1" : "/verificar?error=token");
+  go("/verificar", ok ? { aviso: "correo_verificado" } : { problema: "token_invalido" });
 }
 
 export async function resendVerification() {
   const user = await requireUser();
-  if (!user.emailVerifiedAt) await sendVerificationEmail(user);
-  redirect("/verificar?sent=1");
+  if (user.emailVerifiedAt) go("/verificar");
+  if (!(await allow(`reenvio:usuario:${user.id}`, 3, HORA))) go("/verificar", { problema: "demasiados_intentos" });
+  go("/verificar", (await sendVerificationEmail(user)) ? { aviso: "correo_reenviado" } : { problema: "correo_no_enviado" });
 }
 
 // ---------- Reclamar una ficha existente ----------

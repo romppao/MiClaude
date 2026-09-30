@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { login } from "../actions";
+import { LIMITS } from "../../lib/text";
 
 export const metadata = { title: "Entrar" };
 
-export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
-  const { error, next } = await searchParams;
+export default async function Login({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
   return (
     <>
-      <h1>Entrar</h1>
-      {error && <p className="L">El correo electrónico o la contraseña no son correctos.</p>}
+      <h1>Entrar en tu cuenta</h1>
       <form className="search" action={login} style={{ flexDirection: "column", maxWidth: 360 }}>
         {next && <input type="hidden" name="next" value={next} />}
-        <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required /></label>
-        <label className="field"><span>Contraseña</span><input name="password" type="password" autoComplete="current-password" required /></label>
-        <button>Entrar</button>
+        <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required maxLength={LIMITS.email} /></label>
+        <label className="field"><span>Contraseña</span><input name="password" type="password" autoComplete="current-password" required maxLength={LIMITS.password} /></label>
+        <button>Entrar en mi cuenta</button>
       </form>
-      <p className="mut">¿Sin cuenta? <Link href="/registro">Crea tu cuenta</Link></p>
+      <p><Link href="/recuperar">¿Has olvidado tu contraseña? Elige una nueva</Link></p>
+      <p className="mut">¿Todavía no tienes cuenta? <Link href="/registro">Crea tu cuenta</Link></p>
     </>
   );
 }

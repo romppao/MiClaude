@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
             {user ? (
               <>
-                {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu email</Link>}
+                {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu correo electrónico</Link>}
                 <Link href="/siguiendo">Mis peleadores</Link>
                 <Link href="/mi-ficha">{user.fighter ? "Mi ficha" : user.name}</Link>
                 {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}

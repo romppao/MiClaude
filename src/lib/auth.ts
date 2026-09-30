@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { db } from "./db";
 export { hashPassword, verifyPassword } from "./password";
 import { APP_URL, sendMail } from "./mail";
+import { oneLine } from "./text";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
@@ -39,28 +40,70 @@ export async function requireUser() {
   return u;
 }
 
-const VERIFY_HOURS = 48;
+// ---------- Enlaces de un solo uso enviados por correo ----------
 
-/** Crea un token de un solo uso y envía el enlace de verificación por correo. */
-export async function sendVerificationEmail(user: { id: string; email: string; name: string }) {
+export const VERIFY_HOURS = 48;
+export const RESET_HOURS = 1;
+type TokenKind = "VERIFY" | "RESET";
+
+/** Crea un enlace de un solo uso del tipo indicado (sustituye al anterior del mismo tipo) y devuelve el token en claro. */
+async function issueToken(userId: string, kind: TokenKind, hours: number): Promise<string> {
   const token = randomBytes(32).toString("hex");
-  await db.emailToken.deleteMany({ where: { userId: user.id } });
-  await db.emailToken.create({ data: { id: sha256(token), userId: user.id, expiresAt: new Date(Date.now() + VERIFY_HOURS * 36e5) } });
-  await sendMail(user.email, "Confirma tu correo electrónico en Ring España", `Hola ${user.name},\n\nConfirma tu correo electrónico aquí (caduca en ${VERIFY_HOURS} h):\n${APP_URL}/verificar?token=${token}\n`);
-}
-
-/** Consume el token y marca el email como verificado. Devuelve false si no es válido o ha caducado. */
-export async function consumeVerificationToken(token: string) {
-  const row = await db.emailToken.findUnique({ where: { id: sha256(token) } });
-  if (!row || row.expiresAt < new Date()) return false;
   await db.$transaction([
-    db.user.update({ where: { id: row.userId }, data: { emailVerifiedAt: new Date() } }),
-    db.emailToken.deleteMany({ where: { userId: row.userId } }),
+    db.emailToken.deleteMany({ where: { userId, kind } }),
+    db.emailToken.create({ data: { id: sha256(token), userId, kind, expiresAt: new Date(Date.now() + hours * 36e5) } }),
   ]);
-  return true;
+  return token;
 }
 
-/** Igual que requireUser, pero exige email verificado. Lo usan las acciones que publican contenido. */
+/** Crea el enlace de verificación y lo envía por correo. Devuelve false si el correo no ha podido enviarse. */
+export async function sendVerificationEmail(user: { id: string; email: string; name: string }): Promise<boolean> {
+  const token = await issueToken(user.id, "VERIFY", VERIFY_HOURS);
+  return sendMail(user.email, "Confirma tu correo electrónico en Ring España", `Hola ${oneLine(user.name)},\n\nConfirma tu correo electrónico aquí (el enlace caduca en ${VERIFY_HOURS} horas):\n${APP_URL}/verificar?token=${token}\n\nSi no has creado una cuenta en Ring España, ignora este mensaje: no se activará nada.\n`);
+}
+
+/** Consume el enlace de verificación y marca el correo como verificado. Devuelve false si no es válido, ya se usó o ha caducado. */
+export async function consumeVerificationToken(token: string): Promise<boolean> {
+  return db.$transaction(async (tx) => {
+    const row = await tx.emailToken.findUnique({ where: { id: sha256(token) } });
+    if (!row || row.kind !== "VERIFY" || row.expiresAt < new Date()) return false;
+    // Solo una petición puede gastar el enlace: si otra se adelantó, esta no encuentra nada que borrar.
+    if ((await tx.emailToken.deleteMany({ where: { id: row.id } })).count === 0) return false;
+    await tx.user.update({ where: { id: row.userId }, data: { emailVerifiedAt: new Date() } });
+    return true;
+  });
+}
+
+/** Crea el enlace para elegir una contraseña nueva y lo envía por correo (caduca en 1 hora). */
+export async function sendPasswordResetEmail(user: { id: string; email: string; name: string }): Promise<boolean> {
+  const token = await issueToken(user.id, "RESET", RESET_HOURS);
+  return sendMail(user.email, "Elige una contraseña nueva en Ring España", `Hola ${oneLine(user.name)},\n\nHemos recibido una petición para elegir una contraseña nueva. Puedes hacerlo aquí (el enlace caduca en ${RESET_HOURS} hora y solo sirve una vez):\n${APP_URL}/recuperar/nueva?token=${token}\n\nSi no lo has pedido tú, ignora este mensaje: tu contraseña actual sigue siendo la misma.\n`);
+}
+
+/** ¿Es un enlace de recuperación que todavía se puede usar? (solo lectura, para decidir qué enseñar). */
+export async function isResetTokenUsable(token: string): Promise<boolean> {
+  const row = await db.emailToken.findUnique({ where: { id: sha256(token) } });
+  return !!row && row.kind === "RESET" && row.expiresAt >= new Date();
+}
+
+/**
+ * Cambia la contraseña con un enlace de recuperación. Solo sirve una vez; al usarlo se cierran todas las sesiones abiertas y
+ * se da por verificado el correo (quien recibe el enlace demuestra que controla ese buzón). Devuelve la persona o null si el enlace no vale.
+ */
+export async function resetPasswordWithToken(token: string, passwordHash: string) {
+  return db.$transaction(async (tx) => {
+    const row = await tx.emailToken.findUnique({ where: { id: sha256(token) } });
+    if (!row || row.kind !== "RESET" || row.expiresAt < new Date()) return null;
+    if ((await tx.emailToken.deleteMany({ where: { id: row.id } })).count === 0) return null;
+    const current = await tx.user.findUnique({ where: { id: row.userId }, select: { emailVerifiedAt: true } });
+    const user = await tx.user.update({ where: { id: row.userId }, data: { passwordHash, emailVerifiedAt: current?.emailVerifiedAt ?? new Date() } });
+    await tx.emailToken.deleteMany({ where: { userId: row.userId } });
+    await tx.session.deleteMany({ where: { userId: row.userId } });
+    return user;
+  });
+}
+
+/** Igual que requireUser, pero exige el correo electrónico verificado. Lo usan las acciones que publican contenido. */
 export async function requireVerifiedUser() {
   const u = await requireUser();
   if (!u.emailVerifiedAt) redirect("/verificar");

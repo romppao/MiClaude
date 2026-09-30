@@ -232,6 +232,7 @@ model Session {
   expiresAt DateTime
 
   @@index([userId])
+  @@index([expiresAt])
 }
 
 // Aura: reconocimiento del público a un peleador por su actuación en UN combate concreto.
@@ -255,15 +256,16 @@ model Aura {
   @@index([boutId])
 }
 
-// Token de verificación de email (se guarda el sha256, como en Session).
+// Token de un solo uso enviado por correo (se guarda el sha256, como en Session).
 model EmailToken {
   id        String   @id
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind      String   @default("VERIFY") // VERIFY | RESET
+  kind      String   @default("VERIFY") // VERIFY (confirmar el correo) | RESET (crear una contraseña nueva)
   expiresAt DateTime
 
-  @@index([userId])
+  @@index([userId, kind])
+  @@index([expiresAt])
 }
 
 // Un usuario FIGHTER pide que una ficha ya existente (sin dueño) pase a ser suya. Lo aprueba un moderador.
@@ -367,4 +369,5 @@ model RateHit {
   createdAt DateTime @default(now())
 
   @@index([key, createdAt])
+  @@index([createdAt])
 }
