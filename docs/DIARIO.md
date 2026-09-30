@@ -365,7 +365,7 @@ Commits en la rama `claude/ring-espana-mvp`:
 
 ### Qué salió mal / qué se aprendió
 
-- **La auditoría no se terminó de verificar:** el flujo (308 agentes, ~20 millones de tokens) agotó el límite de uso de la sesión. Los hallazgos 1 a 52 pasaron la verificación adversarial (ninguno se refutó); los **53 a 99 no**, y la pasada final de «huecos» no llegó a ejecutarse. Está dicho en `AUDITORIA.md`.
+- **La auditoría no se terminó de verificar:** el flujo (308 agentes, ~20 millones de tokens) agotó el límite de uso de la sesión. Los hallazgos 1 a 90 pasaron la verificación adversarial (3 se refutaron: 81, 83 y 90); los **91 a 99 no**, y la pasada final de «huecos» no llegó a ejecutarse. **Al escribir el traslado afirmé por error que eran los 53 a 99 los no verificados y que ninguno se había refutado**: mi copia de los datos era anterior al final del proceso. Lo detecté al retomar la sesión y lo corregí en todos los documentos.
 - **El CI falló una vez (ejecución 25):** una prueba de paginación dependía de que la base local tuviera cientos de peleadores; en el CI está vacía. Se corrigió (`5303086`) y se probó sobre un **clon limpio con base vacía**.
 - **Una tabla de tildes desalineada** (la «ñ» daba «u») la cazaron las pruebas de navegador, no la lectura del código. Ahora se construye por pares y tiene prueba unitaria.
 - **Servidor antiguo sirviendo código viejo** (otra vez, por matar el proceso equivocado) y **PostgreSQL parado** tras una pausa del entorno: costaron varias vueltas.

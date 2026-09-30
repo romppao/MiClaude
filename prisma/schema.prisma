@@ -107,6 +107,8 @@ model Trainer {
   gymId    String?
   gym      Gym?      @relation(fields: [gymId], references: [id])
   fighters Fighter[]
+
+  @@index([gymId])
 }
 
 model Fighter {

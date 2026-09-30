@@ -66,8 +66,8 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 
 **Producto (todo implementado y probado):** cuentas con correo verificado y recuperación de contraseña; ficha de peleador con varias disciplinas y récord de partida; registro de combates con confirmación del rival; niveles de respaldo (autodeclarado → confirmado → verificado, y rechazado); aura (una por persona y combate) y ránking por disciplina y categoría; veladas, cartel y resultados por organizadores; moderación con cola de combates, avisos, reclamaciones y sello de gimnasios; historial de cambios; búsqueda sin tildes; listados paginados; cuenta con descarga y eliminación de datos; privacidad y baja de avisos.
 
-**Auditoría de código** (`docs/AUDITORIA.md`): 99 hallazgos — **49 corregidos, 19 parciales, 28 pendientes, 2 a decidir por el fundador, 1 descartado con motivo**. Los bloques 1 a 4 están completos; el 5 está a medias.
-Importante: los hallazgos **53 a 99 no pasaron la verificación adversarial** (se acabó el límite de uso de la sesión) y la pasada de «huecos» no llegó a ejecutarse. Antes de corregir uno de ellos, comprueba que el problema existe.
+**Auditoría de código** (`docs/AUDITORIA.md`): 99 hallazgos — **48 corregidos, 18 parciales, 28 pendientes, 2 a decidir por el fundador y 3 descartados con motivo**. Los bloques 1 a 4 están completos; el 5 está a medias.
+Verificación: los hallazgos **1 a 90** pasaron una verificación adversarial con tres comprobadores (3 se refutaron: 81, 83 y 90). Los **91 a 99** no se pudieron verificar en la primera pasada (se acabó el límite de uso de la sesión); comprueba que el problema existe antes de corregirlos. El documento `AUDITORIA.md` indica el estado de esta verificación.
 
 **Pruebas:** 103 unitarias (`tests/unit`) y 146 comprobaciones de navegador en cinco guiones (`tests/e2e/flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`, con ayudas comunes en `ayudas.mjs`), más la medición de accesibilidad `test:a11y` (fuera del CI todavía).
 
@@ -103,7 +103,7 @@ Sin cambiar el estilo visual (se consulta al fundador antes):
 - Meter `test:a11y` en el CI (hoy da 13 incumplimientos graves, que es lo que hay que corregir primero).
 - **Probar con personas reales de distintas edades** (incluida gente mayor): la regla 11 del principio fundacional; no la puede hacer una IA.
 
-### Bloque 7 — pruebas y documentación (hallazgos 84–98)
+### Bloque 7 — pruebas y documentación (hallazgos 84–99)
 - Pruebas de autorización por cada acción del servidor (qué rol puede y cuál no).
 - Pruebas unitarias de caducidad de sesiones y enlaces; casos límite de `parsePrior`.
 - Diagnóstico al fallar las pruebas de navegador (capturas) y base de datos aislada por ejecución.

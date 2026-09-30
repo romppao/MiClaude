@@ -68,7 +68,7 @@ La competencia declarada es **Raunder** (raunder.es) y **BoxRec** (boxrec.com). 
 
 ## Estado actual y cómo retomar
 
-**Lee [`docs/TRASLADO.md`](docs/TRASLADO.md) antes de empezar:** puesta en marcha, estado, lo que falta (bloques 5 a 7 de la auditoría), las decisiones que necesitan al fundador y las reglas técnicas del proyecto. La auditoría de código (99 hallazgos, con su estado) está en `docs/AUDITORIA.md`; los hallazgos 53 a 99 **no se verificaron**, comprueba que el problema existe antes de corregirlo.
+**Lee [`docs/TRASLADO.md`](docs/TRASLADO.md) antes de empezar:** puesta en marcha, estado, lo que falta (bloques 5 a 7 de la auditoría), las decisiones que necesitan al fundador y las reglas técnicas del proyecto. La auditoría de código (99 hallazgos, con su estado) está en `docs/AUDITORIA.md`; los hallazgos 1 a 90 se verificaron con tres comprobadores (3 se refutaron); para los 91 a 99 consulta en ese documento si ya se verificaron, y si no, comprueba que el problema existe antes de corregirlo.
 
 Reglas técnicas que no conviene olvidar: todo lo exportado de `src/app/actions.ts` es un punto de entrada público (los ayudantes van en `src/lib`); nunca uses `in` ni `obj[clave]` con claves del usuario (usa `hasOwn`/`lookup` de `src/lib/safe.ts`); importaciones relativas, sin alias `@/`; las pruebas de navegador esperan a un estado visible (`seen()`), usan datos únicos por ejecución y no dependen del volumen de la base; tras reiniciar el servidor local comprueba que no hay `EADDRINUSE`; Prisma se niega a `--force-reset` cuando lo lanza una IA: no lo sortees, pide al fundador que lo ejecute.
 
