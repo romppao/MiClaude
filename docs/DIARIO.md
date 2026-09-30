@@ -312,6 +312,28 @@ Cuatro entregas, cada una con pruebas: `66edb2c` (renombrado a peleador), `f41f7
 
 ---
 
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — El CI vuelve a avisar: pruebas deterministas
+
+### Qué pasó
+
+Al revisar el CI, el run 17 (el del cambio a español) **falló** y el 18, con exactamente el mismo código, **pasó**: era una comprobación intermitente más. La causa era la misma que ya había medido (el contenido se actualiza unos milisegundos después del aviso), pero en una comprobación que no había revisado.
+
+### Qué se hizo
+
+- En lugar de parchear solo la línea que falló, se revisaron **todas** las esperas del test de navegador y se sustituyeron por esperas a un estado visible concreto. Ya no queda ningún `networkidle`.
+- Al ejecutar dos pruebas a la vez para simular un CI lento, apareció otro fallo de aislamiento (nombre de organización repetido); ahora es único por ejecución.
+- Resultado: 8 ejecuciones simultáneas consecutivas con 39/39, y 6 secuenciales sin fallos.
+
+### Qué salió mal / qué se aprendió
+
+Reconozco que fue **la segunda vez** que un fallo del CI destapó una fragilidad que en local «pasaba». La lección (ya escrita en `LECCIONES.md`) es buscar la raíz en todo el fichero y probar también bajo carga o en paralelo, no solo repetir en serie.
+
+### Estado
+
+Sin cambios de producto. Pendiente lo de siempre: acceso a las webs de la competencia, despliegue real, auditoría de usabilidad y decisiones sobre el récord de partida y el aura.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

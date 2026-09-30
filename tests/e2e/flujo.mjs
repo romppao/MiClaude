@@ -9,6 +9,7 @@ import { execSync } from "node:child_process";
 const B = process.env.BASE_URL ?? "http://localhost:3111", rnd = Date.now();
 const MAIL_LOG = process.env.MAIL_LOG ?? "/tmp/next.log";
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--no-sandbox"] });
+const seen = (locator, timeout = 8000) => locator.waitFor({ timeout }).then(() => true, () => false);
 const check = (label, cond) => { console.log(cond ? "OK  " : "FAIL", label); if (!cond) process.exitCode = 1; };
 const btn = (p, t) => p.click(`main button:has-text("${t}")`);
 const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };
@@ -50,7 +51,7 @@ await pepe.goto(B + "/mi-ficha");
 await pepe.fill("main table input[name=evidenceUrl]", "esto no es una url"); await pepe.click("main table button:has-text('Guardar')");
 await pepe.waitForSelector("[role=alert]:has-text('no es válido')");
 await pepe.fill("main table input[name=evidenceUrl]", `https://example.com/acta-${rnd}`); await pepe.click("main table button:has-text('Guardar')");
-await pepe.waitForLoadState("networkidle");
+await pepe.locator(".notice-ok", { hasText: "enlace de evidencia se ha guardado" }).waitFor();
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
 check("enlace de evidencia visible en la ficha pública", await pepe.locator(`a[href="https://example.com/acta-${rnd}"][rel*=noopener]`).count() === 1);
 
@@ -63,11 +64,12 @@ const admin = await newUser("Admin");
 execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${admin.email}'"`);
 await admin.p.goto(B + "/moderacion");
 check("admin ve la reclamación", await admin.p.locator("body").innerText().then((t) => t.includes(`Dos${rnd}`)));
-await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click(); await admin.p.waitForLoadState("networkidle");
+await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
+await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" }); // la acción ha terminado
 await luis.goto(B + "/mi-ficha");
 check("Luis ya tiene la ficha reclamada", await luis.locator("body").innerText().then((t) => t.includes("Registrar un combate")));
-await btn(luis, "Sí, es correcto"); await luis.waitForLoadState("networkidle");
-check("aviso claro tras confirmar el combate", await luis.locator("[role=status]", { hasText: "Has confirmado el combate" }).count() === 1);
+await btn(luis, "Sí, es correcto");
+check("aviso claro tras confirmar el combate", await seen(luis.locator("[role=status]", { hasText: "Has confirmado el combate" })));
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
 check("combate confirmado por el rival", await pepe.locator(".tag", { hasText: "confirmado" }).count() > 0);
 
@@ -134,15 +136,17 @@ check("tras entrar vuelve a la ficha donde iba a dar aura", visitor.url().endsWi
 
 // 5) organizador
 const org = (await newUser("Orga")).p;
-await org.goto(B + "/organizador"); await org.fill("[name=orgName]", "Club Demo Madrid"); await btn(org, "Solicitar");
+await org.goto(B + "/organizador"); await org.fill("[name=orgName]", `Club Demo Madrid ${rnd}`); await btn(org, "Solicitar");
 await org.waitForSelector("text=Solicitud enviada");
-await admin.p.goto(B + "/moderacion"); await admin.p.locator("tr", { hasText: "Club Demo Madrid" }).locator("button:has-text('Aprobar')").click(); await admin.p.waitForLoadState("networkidle");
+await admin.p.goto(B + "/moderacion"); await admin.p.locator("tr", { hasText: `Club Demo Madrid ${rnd}` }).locator("button:has-text('Aprobar')").click();
+await admin.p.locator("tr", { hasText: `Club Demo Madrid ${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" });
 await org.goto(B + "/organizador");
 await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await btn(org, "Crear velada");
 await org.waitForURL(`**/organizador/gran-velada-org-${rnd}-2026-07-20?*`);
 await org.fill("[name=fighterA]", `pepe-uno${rnd}`); await org.fill("[name=fighterB]", `luis-dos${rnd}`); await btn(org, "Añadir");
 await org.waitForSelector("text=vs");
-await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("select[name=method]", "KO"); await btn(org, "Guardar resultado"); await org.waitForLoadState("networkidle");
+await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("select[name=method]", "KO"); await btn(org, "Guardar resultado");
+await org.locator(".notice-ok", { hasText: "resultado se ha guardado" }).waitFor();
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
 const t = await fan.locator("body").innerText();
 check("velada pública con cartel y resultado", t.includes(`Uno${rnd}`) && t.includes("Gana rojo") && t.includes("KO"));
@@ -161,12 +165,11 @@ await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Ve
 await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1");
 await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
-const vetText = await vet.locator("body").innerText();
-check("el récord de partida detallado se muestra como declarado", vetText.includes("10-3-1") && vetText.includes("Incluye 14 combates anteriores declarados por el propio deportista"));
+check("el récord de partida detallado se muestra como declarado", await seen(vet.locator("text=10-3-1").first()) && await seen(vet.locator("text=Incluye 14 combates anteriores declarados por el propio deportista")));
 await vet.fill("[name=eventName]", `Velada Vet ${rnd}`); await vet.fill("[name=date]", "2026-06-01");
 await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Rival${rnd}`); await btn(vet, "Registrar este combate");
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
-check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await vet.locator(".rec").first().innerText().then((t) => t.trim() === "11-3-1"));
+check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await seen(vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first()));
 await vet.fill("[name=eventName]", `Velada Vet dos ${rnd}`); await vet.fill("[name=date]", "2026-04-01");
 await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Otro${rnd}`); await vet.selectOption("[name=method]", "SUBMISSION"); await btn(vet, "Registrar este combate");
 await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).waitFor();
@@ -204,8 +207,8 @@ check("«Mis peleadores» muestra el próximo combate", await fan.locator("body"
 // Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
 await admin.p.goto(B + "/moderacion");
 const gymRow = () => admin.p.locator("tr", { hasText: `Gym Test ${rnd}` });
-await gymRow().locator("button:has-text('Verificar')").click(); await admin.p.waitForLoadState("networkidle");
-check("sello sin nota se rechaza", await admin.p.locator("body").innerText().then((t) => t.includes("necesita una nota")));
+await gymRow().locator("button:has-text('Verificar')").click();
+check("sello sin nota se rechaza", await seen(admin.p.locator("text=necesita una nota")));
 await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, llamada al responsable");
 await gymRow().locator("button:has-text('Verificar')").click();
 await gymRow().locator("button:has-text('Retirar sello')").waitFor(); // la acción ha terminado
