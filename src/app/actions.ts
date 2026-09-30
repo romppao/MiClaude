@@ -2,14 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import type { Method, Result } from "@prisma/client";
+import type { Discipline, Method, Result } from "@prisma/client";
 import { db } from "../lib/db";
 import { consumeVerificationToken, createSession, destroySession, getUser, hashPassword, requireUser, requireVerifiedUser, sendVerificationEmail, verifyPassword } from "../lib/auth";
 import { slugify } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
-import { proximityFlags, type Flag } from "../lib/coherence";
+import { proximityAppliesTo, proximityFlags, type Flag } from "../lib/coherence";
+import { isTournamentStyle } from "../lib/disciplines";
 import { notifyFollowersOfBout } from "../lib/notify";
+import { DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES, isDiscipline, parseDisciplineChoice } from "../lib/disciplines";
+import { parsePrior } from "../lib/prior";
 import { MAX_REPORTS_PER_DAY, REPORT_ENTITIES, REPORT_REASONS } from "../lib/reports";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -37,12 +40,18 @@ async function boutExists(eventId: string, a: string, b: string) {
 }
 
 /** Señales de coherencia de un combate nuevo respecto a los demás combates de sus dos peleadores. */
-async function coherenceFlagsFor(eventId: string, eventDate: Date, fighterIds: string[]): Promise<Flag[]> {
+async function coherenceFlagsFor(eventId: string, eventDate: Date, discipline: Discipline, fighterIds: string[]): Promise<Flag[]> {
+  if (!proximityAppliesTo(discipline)) return []; // torneos (jiu-jitsu): varios combates el mismo día son normales
   const others = await db.bout.findMany({
     where: { eventId: { not: eventId }, verification: { not: "DISPUTED" }, OR: [{ fighterAId: { in: fighterIds } }, { fighterBId: { in: fighterIds } }] },
-    select: { event: { select: { date: true } } },
+    select: { event: { select: { date: true, discipline: true } } },
   });
-  return proximityFlags(eventDate, others.map((o) => o.event.date));
+  return proximityFlags(eventDate, others.filter((o) => !isTournamentStyle(o.event.discipline)).map((o) => o.event.date));
+}
+
+/** Se asegura de que el peleador tenga la disciplina en su ficha (sin tocar categoría ni récord si ya existe). */
+async function ensureDiscipline(fighterId: string, discipline: Discipline) {
+  await db.fighterDiscipline.upsert({ where: { fighterId_discipline: { fighterId, discipline } }, create: { fighterId, discipline }, update: {} });
 }
 
 async function uniqueSlug(base: string, exists: (slug: string) => Promise<boolean>) {
@@ -82,12 +91,22 @@ export async function logout() {
 
 // ---------- Ficha del peleador (autogestionada) ----------
 
+/** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
+function readDisciplineForm(f: FormData) {
+  const choice = parseDisciplineChoice(str(f, "disciplineChoice"));
+  const prior = parsePrior({ total: str(f, "priorTotal"), wins: str(f, "priorWins"), losses: str(f, "priorLosses"), draws: str(f, "priorDraws") });
+  return { choice, prior };
+}
+
 export async function createMyFighter(f: FormData) {
   const user = await requireVerifiedUser();
   if (user.fighter) redirect("/mi-ficha");
   const firstName = str(f, "firstName");
   const lastName = str(f, "lastName");
   if (!firstName || !lastName) go("/mi-ficha", { problema: "nombre_ficha" });
+  const { choice, prior } = readDisciplineForm(f);
+  if (!choice) go("/mi-ficha", { problema: "disciplina_no_valida" });
+  if (!prior.ok) go("/mi-ficha", { problema: prior.error });
   const city = str(f, "city") || "Madrid";
   const province = str(f, "province") || "Madrid";
   const gymName = str(f, "gym");
@@ -99,19 +118,38 @@ export async function createMyFighter(f: FormData) {
     gymId = gym.id;
   }
   const slug = await uniqueSlug(slugify(`${firstName} ${lastName}`), async (s) => !!(await db.fighter.findUnique({ where: { slug: s } })));
-  await db.fighter.create({
+  const created = await db.fighter.create({
     data: {
-      slug, firstName, lastName, alias: str(f, "alias") || null, city, province,
-      weightClass: str(f, "weightClass") || null, level: "AMATEUR", gymId, userId: user.id,
+      slug, firstName, lastName, alias: str(f, "alias") || null, city, province, level: "AMATEUR", gymId, userId: user.id,
+      disciplines: { create: { discipline: choice.discipline, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
     },
   });
+  await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, weightClass: choice.weightClass, priorDeclared: prior.prior } });
   go("/mi-ficha", { aviso: "ficha_creada" });
+}
+
+/** Añade una disciplina a la ficha, o actualiza su categoría y su récord de partida (declarado). Cada cambio queda en el historial. */
+export async function saveDiscipline(f: FormData) {
+  const user = await requireVerifiedUser();
+  const me = user.fighter;
+  if (!me) redirect("/mi-ficha");
+  const { choice, prior } = readDisciplineForm(f);
+  if (!choice) go("/mi-ficha", { problema: "disciplina_no_valida" });
+  if (!prior.ok) go("/mi-ficha", { problema: prior.error });
+  const before = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } } });
+  const data = { weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
+  await db.fighterDiscipline.upsert({
+    where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } },
+    create: { fighterId: me.id, discipline: choice.discipline, ...data }, update: data,
+  });
+  await audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: before ? "DISCIPLINE_UPDATED" : "DISCIPLINE_ADDED", before: before ?? undefined, after: { discipline: choice.discipline, ...data } });
+  revalidatePath("/", "layout");
+  go("/mi-ficha", { aviso: "disciplina_guardada" });
 }
 
 // ---------- Combates ----------
 
 const OUTCOMES = { WIN: "A_WIN", LOSS: "B_WIN", DRAW: "DRAW" } as const;
-const METHODS: Method[] = ["KO", "TKO", "UD", "SD", "MD", "RTD", "DQ", "DRAW"];
 
 /** El peleador registra un combate propio. Queda SELF_REPORTED hasta que el rival lo confirme o un admin lo verifique. */
 export async function addBout(f: FormData) {
@@ -124,22 +162,29 @@ export async function addBout(f: FormData) {
   const oppFirst = str(f, "oppFirst");
   const oppLast = str(f, "oppLast");
   if (!eventName || Number.isNaN(date.getTime()) || !oppFirst || !oppLast) go("/mi-ficha", { problema: "combate_datos" });
+  const disciplineRaw = str(f, "discipline");
+  const myDiscipline = isDiscipline(disciplineRaw) ? me.disciplines.find((d) => d.discipline === disciplineRaw) : undefined;
+  if (!myDiscipline) go("/mi-ficha", { problema: "combate_sin_disciplina" });
+  const discipline = myDiscipline.discipline;
   const past = date.getTime() <= Date.now();
 
   const outcome = str(f, "outcome") as keyof typeof OUTCOMES;
   const result: Result | null = past && outcome in OUTCOMES ? OUTCOMES[outcome] : null;
   const methodRaw = str(f, "method") as Method;
-  const method = result && METHODS.includes(methodRaw) ? methodRaw : null;
+  if (result && methodRaw && !METHODS_BY_DISCIPLINE[discipline].includes(methodRaw)) go("/mi-ficha", { problema: "combate_metodo" });
+  const method = result && METHODS_BY_DISCIPLINE[discipline].includes(methodRaw) ? methodRaw : null;
   const roundsN = parseInt(str(f, "rounds"), 10);
   const rounds = roundsN > 0 && roundsN <= 12 ? roundsN : null;
   const city = str(f, "city") || "Madrid";
   const province = str(f, "province") || "Madrid";
 
   const eventSlug = slugify(`${eventName} ${date.toISOString().slice(0, 10)}`);
+  const existingEvent = await db.event.findUnique({ where: { slug: eventSlug } });
+  if (existingEvent && existingEvent.discipline !== discipline) go("/mi-ficha", { problema: "combate_disciplina" });
   const event =
-    (await db.event.findUnique({ where: { slug: eventSlug } })) ??
+    existingEvent ??
     (await db.event.create({
-      data: { slug: eventSlug, name: eventName, date, level: "AMATEUR", venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED" },
+      data: { slug: eventSlug, name: eventName, date, discipline, level: "AMATEUR", venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED" },
     }));
 
   const oppSlug = slugify(`${oppFirst} ${oppLast}`);
@@ -147,13 +192,14 @@ export async function addBout(f: FormData) {
     (await db.fighter.findUnique({ where: { slug: oppSlug } })) ??
     (await db.fighter.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
   if (opponent.id === me.id) go("/mi-ficha", { problema: "combate_mismo" });
+  await ensureDiscipline(opponent.id, discipline);
 
   if (await boutExists(event.id, me.id, opponent.id)) go("/mi-ficha", { problema: "combate_duplicado" });
-  const flags = await coherenceFlagsFor(event.id, event.date, [me.id, opponent.id]);
+  const flags = await coherenceFlagsFor(event.id, event.date, discipline, [me.id, opponent.id]);
   const created = await db.bout.create({
     data: {
       flags, eventId: event.id, fighterAId: me.id, fighterBId: opponent.id, result, method, rounds,
-      weightClass: me.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")),
+      weightClass: myDiscipline.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")),
     },
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED", after: { result, method, verification: "SELF_REPORTED", evidenceUrl: created.evidenceUrl, flags } });
@@ -325,14 +371,16 @@ export async function createEvent(f: FormData) {
   const date = new Date(`${str(f, "date")}T12:00:00Z`);
   if (!name || Number.isNaN(date.getTime())) redirect("/organizador?error=velada");
   const level = str(f, "level") === "PRO" ? "PRO" : "AMATEUR";
+  const disciplineRaw = str(f, "discipline");
+  const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : "BOXEO";
   const slug = await uniqueSlug(slugify(`${name} ${date.toISOString().slice(0, 10)}`), async (s) => !!(await db.event.findUnique({ where: { slug: s } })));
   const created = await db.event.create({
     data: {
-      slug, name, date, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || "Madrid", province: str(f, "province") || "Madrid",
+      slug, name, date, discipline, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || "Madrid", province: str(f, "province") || "Madrid",
       promoter: str(f, "promoter") || null, ticketUrl: /^https?:\/\//.test(str(f, "ticketUrl")) ? str(f, "ticketUrl") : null, organizerId: user.id,
     },
   });
-  await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level } });
+  await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level, discipline } });
   revalidatePath("/", "layout");
   go(`/organizador/${slug}`, { aviso: "velada_creada" });
 }
@@ -348,10 +396,13 @@ export async function addCartelBout(f: FormData) {
   if (!a || !b || a.id === b.id) redirect(`/organizador/${event.slug}?error=cartel`);
   const rounds = parseInt(str(f, "rounds"), 10);
   if (await boutExists(event.id, a.id, b.id)) go(`/organizador/${event.slug}`, { problema: "cartel_duplicado" });
-  const flags = await coherenceFlagsFor(event.id, event.date, [a.id, b.id]);
+  const weightClassRaw = str(f, "weightClass");
+  if (weightClassRaw && !WEIGHT_CLASSES[event.discipline].includes(weightClassRaw)) go(`/organizador/${event.slug}`, { problema: "cartel_categoria" });
+  await Promise.all([ensureDiscipline(a.id, event.discipline), ensureDiscipline(b.id, event.discipline)]);
+  const flags = await coherenceFlagsFor(event.id, event.date, event.discipline, [a.id, b.id]);
   const order = await db.bout.count({ where: { eventId: event.id } });
   const created = await db.bout.create({
-    data: { flags, eventId: event.id, fighterAId: a.id, fighterBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
+    data: { flags, eventId: event.id, fighterAId: a.id, fighterBId: b.id, order: order + 1, weightClass: weightClassRaw || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
   });
   await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, fighterA: a.slug, fighterB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
@@ -368,10 +419,11 @@ export async function setBoutResult(f: FormData) {
   const outcome = str(f, "outcome") as keyof typeof OUTCOMES;
   if (!(outcome in OUTCOMES)) redirect(`/organizador/${event.slug}`);
   const methodRaw = str(f, "method") as Method;
+  const method = METHODS_BY_DISCIPLINE[event.discipline].includes(methodRaw) ? methodRaw : null;
   const endRound = parseInt(str(f, "endRound"), 10);
-  await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound }, after: { result: OUTCOMES[outcome], method: METHODS.includes(methodRaw) ? methodRaw : null, endRound: endRound > 0 ? endRound : null } });
+  await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound }, after: { result: OUTCOMES[outcome], method, endRound: endRound > 0 ? endRound : null } });
   await db.$transaction([
-    db.bout.update({ where: { id: bout.id }, data: { result: OUTCOMES[outcome], method: METHODS.includes(methodRaw) ? methodRaw : null, endRound: endRound > 0 ? endRound : null, verification: "VERIFIED" } }),
+    db.bout.update({ where: { id: bout.id }, data: { result: OUTCOMES[outcome], method, endRound: endRound > 0 ? endRound : null, verification: "VERIFIED" } }),
     db.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } }),
   ]);
   revalidatePath("/", "layout");

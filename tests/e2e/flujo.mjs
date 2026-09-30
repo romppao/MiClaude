@@ -140,6 +140,46 @@ check("velada pública con cartel y resultado", t.includes(`Uno${rnd}`) && t.inc
 // 6) un fan no puede entrar al panel de otra velada
 await fan.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
 check("fan no accede a gestionar velada ajena", !fan.url().includes("/gran-velada-org-"));
+// 6) Récord de partida (declarado) y varias disciplinas en una misma ficha
+const vet = (await newUser("Vet", "FIGHTER")).p;
+await vet.goto(B + "/mi-ficha");
+await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Veterano${rnd}`);
+await vet.fill("[name=priorTotal]", "20"); await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1");
+await btn(vet, "Crear mi ficha");
+await vet.locator(".notice-bad", { hasText: "no coincide" }).waitFor();
+check("un récord de partida que no suma se rechaza con un mensaje claro", await vet.locator(".notice-bad", { hasText: "no coincide" }).count() === 1);
+await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Veterano${rnd}`);
+await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1");
+await btn(vet, "Crear mi ficha");
+await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+const vetText = await vet.locator("body").innerText();
+check("el récord de partida detallado se muestra como declarado", vetText.includes("10-3-1") && vetText.includes("Incluye 14 combates anteriores declarados por el propio deportista"));
+await vet.fill("[name=eventName]", `Velada Vet ${rnd}`); await vet.fill("[name=date]", "2026-06-01");
+await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Rival${rnd}`); await btn(vet, "Registrar este combate");
+await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
+check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await vet.locator(".rec").first().innerText().then((t) => t.trim() === "11-3-1"));
+await vet.fill("[name=eventName]", `Velada Vet dos ${rnd}`); await vet.fill("[name=date]", "2026-04-01");
+await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Otro${rnd}`); await vet.selectOption("[name=method]", "SUBMISSION"); await btn(vet, "Registrar este combate");
+await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).waitFor();
+check("una sumisión no se acepta en boxeo", await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).count() === 1);
+const addDisc = vet.locator("details", { hasText: "Añadir otra disciplina" });
+await addDisc.locator("summary").click();
+await addDisc.locator("select[name=disciplineChoice]").selectOption("MMA:Ligero");
+await addDisc.locator("input[name=priorTotal]").fill("3");
+await addDisc.locator("button:has-text('Añadir disciplina')").click();
+await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor();
+await vet.selectOption("select[name=discipline]", "MMA");
+await vet.fill("[name=eventName]", `Velada MMA Vet ${rnd}`); await vet.fill("[name=date]", "2026-05-01");
+await vet.fill("[name=oppFirst]", "Vet"); await vet.fill("[name=oppLast]", `Rival mma${rnd}`); await vet.selectOption("[name=method]", "SUBMISSION"); await btn(vet, "Registrar este combate");
+await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
+await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
+const pub = await anon.locator("body").innerText();
+check("la ficha pública separa el récord por disciplina", pub.includes("MMA") && pub.includes("1 sumisión") && pub.includes("3 combates anteriores sin detallar") && pub.includes("Boxeo"));
+await anon.goto(B + "/peleadores?disciplina=MMA");
+check("el filtro por disciplina incluye a quien la practica", await anon.locator("body").innerText().then((t) => t.includes(`Veterano${rnd}`)));
+await anon.goto(B + "/peleadores?disciplina=JIUJITSU");
+check("y excluye a quien no", await anon.locator("body").innerText().then((t) => !t.includes(`Veterano${rnd}`)));
+
 // Avisos a seguidores: un organizador publica un combate futuro de un peleador seguido
 await org.goto(B + "/organizador");
 await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", "2030-01-15"); await btn(org, "Crear velada");

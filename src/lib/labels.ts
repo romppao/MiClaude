@@ -3,6 +3,7 @@ export const STANCE_LABEL = { ORTODOXO: "Ortodoxo", ZURDO: "Zurdo", AMBIDIESTRO:
 export const METHOD_LABEL = {
   KO: "KO", TKO: "TKO", UD: "Decisión unánime", SD: "Decisión dividida",
   MD: "Decisión mayoritaria", RTD: "Abandono", DQ: "Descalificación", DRAW: "Empate", NC: "Sin decisión",
+  SUBMISSION: "Sumisión", POINTS: "Puntos", ADVANTAGE: "Ventajas",
 } as const;
 
 export const PROVINCES = [

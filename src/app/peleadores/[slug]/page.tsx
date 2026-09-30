@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db";
-import { computeRecords, formatRecord } from "../../../lib/record";
+import { computeRecords } from "../../../lib/record";
+import { DISCIPLINE_LABEL } from "../../../lib/disciplines";
+import RecordCards from "../../RecordCards";
 import { getUser } from "../../../lib/auth";
 import { createReport, rateFighter, toggleFollow } from "../../actions";
 import { REPORT_REASONS } from "../../../lib/reports";
@@ -11,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function FighterPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const fighter = await db.fighter.findUnique({ where: { slug }, include: { gym: true, trainer: true } });
+  const fighter = await db.fighter.findUnique({ where: { slug }, include: { gym: true, trainer: true, disciplines: true } });
   if (!fighter) notFound();
   const bouts = await db.bout.findMany({
     where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] },
@@ -61,11 +63,8 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         ) : <Link href={`/entrar?next=${encodeURIComponent(`/peleadores/${fighter.slug}`)}`}>Entra para seguir a este peleador</Link>)}
         <span className="mut">{followerCount} {followerCount === 1 ? "seguidor" : "seguidores"}</span>
       </div>
-      <div className="grid">
-        {(["PRO", "AMATEUR"] as const).map((l) => (
-          <div key={l} className="card"><div className="mut">Récord {LEVEL_LABEL[l].toLowerCase()} (V-D-E)</div><div className="rec">{formatRecord(records[l])}</div><div className="mut">{records[l].ko} por KO{records[l].unverified ? ` · ${records[l].unverified} pendientes de confirmar` : ""}</div></div>
-        ))}
-      </div>
+
+      <RecordCards records={records} disciplines={fighter.disciplines} />
       <div className="card" style={{ marginTop: 12 }}>
         <div className="mut">Valoración del público</div>
         <div className="rec">{avg ? `${avg.toFixed(1)} / 5` : "—"}</div>
@@ -74,7 +73,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       <h2>Ficha</h2>
       <table><tbody>
         {[
-          ["Categoría", fighter.weightClass], ["Guardia", fighter.stance && STANCE_LABEL[fighter.stance]],
+          ["Guardia", fighter.stance && STANCE_LABEL[fighter.stance]],
           ["Edad", age], ["Altura", fighter.heightCm && `${fighter.heightCm} cm`], ["Envergadura", fighter.reachCm && `${fighter.reachCm} cm`],
           ["Procedencia", [fighter.city, fighter.province].filter(Boolean).join(", ")],
         ].filter(([, v]) => v).map(([k, v]) => <tr key={k as string}><th>{k}</th><td>{v}</td></tr>)}
@@ -97,7 +96,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                 <td><Link href={`/peleadores/${opp.slug}`}>{opp.firstName} {opp.lastName}</Link></td>
                 <td className={out === "NC" ? "D" : out}>{out || "—"}</td>
                 <td>{b.method ? METHOD_LABEL[b.method] : ""}{b.endRound ? ` (R${b.endRound})` : ""}</td>
-                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">pendiente de confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">en revisión</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado por el rival"}</span>}</td>
+                <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>{b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a>}{b.verification === "SELF_REPORTED" && <span className="tag">pendiente de confirmar</span>}{b.verification === "DISPUTED" && <span className="tag">en revisión</span>}{(b.verification === "VERIFIED" || b.verification === "CONFIRMED") && <span className="tag">{b.verification === "VERIFIED" ? "verificado" : "confirmado por el rival"}</span>}</td>
                 <td>
                   {reportForm("BOUT", b.id)}
                   {b.result && b.verification !== "DISPUTED" && b.event.date <= new Date() && !isParticipant(b) && (

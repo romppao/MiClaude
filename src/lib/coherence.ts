@@ -2,6 +2,9 @@
  * Comprobaciones de coherencia de los combates. Son señales para el moderador, no rechazos automáticos:
  * un dato raro se guarda, pero queda marcado para revisarlo.
  */
+import type { Discipline } from "@prisma/client";
+import { isTournamentStyle } from "./disciplines";
+
 export type Flag = "MISMO_DIA" | "MUY_SEGUIDOS";
 
 export const FLAG_LABEL: Record<Flag, string> = {
@@ -23,3 +26,6 @@ export function proximityFlags(eventDate: Date, otherDates: Date[], minDays = MI
   }
   return [...flags];
 }
+
+/** Las señales de proximidad no se aplican a disciplinas de torneo (varios combates el mismo día son normales). */
+export const proximityAppliesTo = (discipline: Discipline) => !isTournamentStyle(discipline);

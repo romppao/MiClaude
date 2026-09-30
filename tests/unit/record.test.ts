@@ -7,7 +7,7 @@ const bout = (over: Partial<BoutForRecord> & { level?: "PRO" | "AMATEUR"; status
   method: "UD",
   verification: "VERIFIED",
   ...over,
-  event: { level: over.level ?? "AMATEUR", status: over.status ?? "COMPLETED" },
+  event: { level: over.level ?? "AMATEUR", status: over.status ?? "COMPLETED", discipline: "BOXEO" },
 });
 
 describe("computeRecords", () => {
@@ -17,12 +17,12 @@ describe("computeRecords", () => {
       bout({ fighterAId: "otro", result: "B_WIN" }), // gana como B
       bout({ result: "B_WIN" }), // pierde como A
       bout({ fighterAId: "otro", result: "A_WIN" }), // pierde como B
-    ]).AMATEUR;
+    ]).BOXEO!.AMATEUR;
     expect(r).toMatchObject({ w: 2, l: 2, d: 0 });
   });
 
   it("cuenta empates y sin decisión aparte", () => {
-    const r = computeRecords("me", [bout({ result: "DRAW" }), bout({ result: "NO_CONTEST" })]).AMATEUR;
+    const r = computeRecords("me", [bout({ result: "DRAW" }), bout({ result: "NO_CONTEST" })]).BOXEO!.AMATEUR;
     expect(r).toMatchObject({ w: 0, l: 0, d: 1, nc: 1 });
   });
 
@@ -30,34 +30,34 @@ describe("computeRecords", () => {
     const r = computeRecords("me", [
       bout({ method: "KO" }), bout({ method: "TKO" }), bout({ method: "RTD" }), bout({ method: "UD" }),
       bout({ result: "B_WIN", method: "KO" }),
-    ]).AMATEUR;
+    ]).BOXEO!.AMATEUR;
     expect(r).toMatchObject({ w: 4, l: 1, ko: 3 });
   });
 
   it("separa profesional y amateur", () => {
     const r = computeRecords("me", [bout({ level: "PRO" }), bout({ level: "AMATEUR", result: "B_WIN" })]);
-    expect(r.PRO).toMatchObject({ w: 1, l: 0 });
-    expect(r.AMATEUR).toMatchObject({ w: 0, l: 1 });
+    expect(r.BOXEO!.PRO).toMatchObject({ w: 1, l: 0 });
+    expect(r.BOXEO!.AMATEUR).toMatchObject({ w: 0, l: 1 });
   });
 
   it("ignora combates sin resultado, disputados o de eventos cancelados", () => {
     const r = computeRecords("me", [
       bout({ result: null }), bout({ verification: "DISPUTED" }), bout({ status: "CANCELLED" }),
-    ]).AMATEUR;
-    expect(r).toMatchObject({ w: 0, l: 0, d: 0, nc: 0 });
+    ]);
+    expect(r).toEqual({}); // nada cuenta: ni siquiera aparece la disciplina
   });
 
   it("marca como sin confirmar solo los autodeclarados", () => {
     const r = computeRecords("me", [
       bout({ verification: "SELF_REPORTED" }), bout({ verification: "CONFIRMED" }), bout({ verification: "VERIFIED" }),
-    ]).AMATEUR;
+    ]).BOXEO!.AMATEUR;
     expect(r).toMatchObject({ w: 3, unverified: 1 });
   });
 });
 
 describe("formatRecord", () => {
   it("formatea V-D-E y añade NC solo si hay", () => {
-    expect(formatRecord({ w: 5, l: 2, d: 1, nc: 0, ko: 3, unverified: 0 })).toBe("5-2-1");
-    expect(formatRecord({ w: 5, l: 2, d: 1, nc: 2, ko: 3, unverified: 0 })).toBe("5-2-1 (2 NC)");
+    expect(formatRecord({ w: 5, l: 2, d: 1, nc: 0 })).toBe("5-2-1");
+    expect(formatRecord({ w: 5, l: 2, d: 1, nc: 2 })).toBe("5-2-1 (2 NC)");
   });
 });

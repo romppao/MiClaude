@@ -34,6 +34,9 @@ enum Method {
   RTD
   DQ
   DRAW
+  SUBMISSION
+  POINTS
+  ADVANTAGE
   NC
 }
 
@@ -64,6 +67,14 @@ enum ReportStatus {
   OPEN
   RESOLVED
   DISMISSED
+}
+
+enum Discipline {
+  BOXEO
+  MMA
+  KICKBOXING
+  K1
+  JIUJITSU
 }
 
 enum EventStatus {
@@ -99,33 +110,33 @@ model Trainer {
 }
 
 model Fighter {
-  id            String         @id @default(cuid())
-  slug          String         @unique
+  id            String              @id @default(cuid())
+  slug          String              @unique
   firstName     String
   lastName      String
   alias         String?
   birthDate     DateTime?
   city          String?
   province      String?
-  nationality   String         @default("España")
+  nationality   String              @default("España")
   stance        Stance?
   heightCm      Int?
   reachCm       Int?
-  weightClass   String?
-  level         Level          @default(AMATEUR)
+  level         Level               @default(AMATEUR)
   bio           String?
   gymId         String?
-  gym           Gym?           @relation(fields: [gymId], references: [id])
+  gym           Gym?                @relation(fields: [gymId], references: [id])
   trainerId     String?
-  trainer       Trainer?       @relation(fields: [trainerId], references: [id])
-  userId        String?        @unique
-  user          User?          @relation(fields: [userId], references: [id])
+  trainer       Trainer?            @relation(fields: [trainerId], references: [id])
+  userId        String?             @unique
+  user          User?               @relation(fields: [userId], references: [id])
+  disciplines   FighterDiscipline[]
   ratings       Rating[]
   followers     Follow[]
   claimRequests ClaimRequest[]
-  boutsAsA      Bout[]         @relation("FighterA")
-  boutsAsB      Bout[]         @relation("FighterB")
-  createdAt     DateTime       @default(now())
+  boutsAsA      Bout[]              @relation("FighterA")
+  boutsAsB      Bout[]              @relation("FighterB")
+  createdAt     DateTime            @default(now())
 
   @@index([lastName, firstName])
   @@index([province])
@@ -136,6 +147,7 @@ model Event {
   slug        String      @unique
   name        String
   date        DateTime
+  discipline  Discipline  @default(BOXEO)
   level       Level
   venue       String
   city        String
@@ -147,6 +159,7 @@ model Event {
   organizer   User?       @relation("EventOrganizer", fields: [organizerId], references: [id])
   bouts       Bout[]
 
+  @@index([discipline, date])
   @@index([date])
   @@index([level, date])
   @@index([province])
@@ -311,4 +324,23 @@ model Follow {
 
   @@id([userId, fighterId])
   @@index([fighterId])
+}
+
+// Disciplinas que practica un peleador: categoría de peso y récord de partida (declarado por él) en cada una.
+// Una sola ficha por persona; el récord registrado en la app se calcula aparte, a partir de los combates.
+model FighterDiscipline {
+  fighterId   String
+  fighter     Fighter    @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  discipline  Discipline
+  level       Level      @default(AMATEUR)
+  weightClass String?
+  // Récord de partida: combates anteriores a usar la app. Datos declarados, no comprobables.
+  priorTotal  Int?
+  priorWins   Int?
+  priorLosses Int?
+  priorDraws  Int?
+  createdAt   DateTime   @default(now())
+
+  @@id([fighterId, discipline])
+  @@index([discipline, weightClass])
 }

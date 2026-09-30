@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "../../../lib/auth";
 import { db } from "../../../lib/db";
-import { fmtDate } from "../../../lib/labels";
+import { METHOD_LABEL, fmtDate } from "../../../lib/labels";
+import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/disciplines";
 import { addCartelBout, setBoutEvidence, setBoutResult } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -13,12 +14,12 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
   const event = await db.event.findUnique({ where: { slug }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } });
   if (!event) notFound();
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador");
-  const fighters = await db.fighter.findMany({ where: { level: event.level }, orderBy: { lastName: "asc" }, take: 500 });
+  const fighters = await db.fighter.findMany({ where: { disciplines: { some: { discipline: event.discipline } } }, orderBy: { lastName: "asc" }, take: 500 });
   const past = event.date.getTime() <= Date.now();
   return (
     <>
       <h1>{event.name}</h1>
-      <p className="mut">{fmtDate(event.date)} · {event.venue}, {event.city} · <Link href={`/veladas/${event.slug}`}>ver página pública</Link></p>
+      <p className="mut"><span className="tag">{DISCIPLINE_LABEL[event.discipline]}</span> {fmtDate(event.date)} · {event.venue}, {event.city} · <Link href={`/veladas/${event.slug}`}>ver página pública</Link></p>
       {error === "cartel" && <p className="L">Elige dos peleadores distintos de la lista.</p>}
       {error === "futuro" && <p className="L">Solo puedes poner resultados cuando la velada ya se ha celebrado.</p>}
       <h2>Cartel</h2>
@@ -40,7 +41,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
                   <select name="outcome" defaultValue={b.result === "A_WIN" ? "WIN" : b.result === "B_WIN" ? "LOSS" : b.result === "DRAW" ? "DRAW" : "WIN"}>
                     <option value="WIN">Gana rojo</option><option value="LOSS">Gana azul</option><option value="DRAW">Empate</option>
                   </select>
-                  <select name="method" defaultValue={b.method ?? "UD"}>{["UD", "SD", "MD", "KO", "TKO", "RTD", "DQ", "DRAW"].map((m) => <option key={m}>{m}</option>)}</select>
+                  <select name="method" defaultValue={b.method ?? METHODS_BY_DISCIPLINE[event.discipline][0]} aria-label="Cómo terminó">{METHODS_BY_DISCIPLINE[event.discipline].map((m) => <option key={m} value={m}>{METHOD_LABEL[m]}</option>)}</select>
                   <input name="endRound" type="number" min={1} max={12} placeholder="Asalto" defaultValue={b.endRound ?? ""} style={{ width: 80 }} />
                   <button>{b.result ? "Actualizar" : "Guardar resultado"}</button>
                 </form>
@@ -56,7 +57,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
         <input name="fighterA" list="bx" placeholder="Esquina roja" required />
         <input name="fighterB" list="bx" placeholder="Esquina azul" required />
         <datalist id="bx">{fighters.map((b) => <option key={b.id} value={b.slug}>{b.firstName} {b.lastName}</option>)}</datalist>
-        <input name="weightClass" placeholder="Peso" />
+        <select name="weightClass" defaultValue="" aria-label="Categoría de peso"><option value="">Categoría (opcional)</option>{WEIGHT_CLASSES[event.discipline].map((w) => <option key={w}>{w}</option>)}</select>
         <input name="rounds" type="number" min={1} max={12} placeholder="Asaltos" />
         <input name="evidenceUrl" placeholder="Evidencia (acta, cartel, publicación…)" style={{ flex: 1, minWidth: 240 }} />
         <button>Añadir</button>

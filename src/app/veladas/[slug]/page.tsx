@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db";
 import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../../lib/labels";
+import { DISCIPLINE_LABEL } from "../../../lib/disciplines";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   if (!e) notFound();
   return (
     <>
-      <span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
+      <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       <h1>{e.name}</h1>
       <p className="mut">{fmtDate(e.date)} · {e.venue}, {e.city} ({e.province}){e.promoter ? ` · Organiza: ${e.promoter}` : ""}{e.organizer?.organizerRequest?.status === "APPROVED" && <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span>}</p>
       {e.ticketUrl && <p><a className="tag PRO" href={e.ticketUrl} rel="noopener noreferrer">Entradas</a></p>}

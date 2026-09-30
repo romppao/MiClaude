@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { PROVINCES, fmtDate } from "../../lib/labels";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/disciplines";
 import { createEvent, requestOrganizer } from "../actions";
 
 export const metadata = { title: "Organizadores" };
@@ -47,6 +48,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
       <form className="search" action={createEvent}>
         <input name="name" placeholder="Nombre de la velada" required />
         <input name="date" type="date" required />
+        <label className="field"><span>Disciplina</span><select name="discipline" defaultValue="BOXEO">{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></label>
         <select name="level" defaultValue="AMATEUR"><option value="AMATEUR">Amateur</option><option value="PRO">Profesional</option></select>
         <input name="venue" placeholder="Recinto" />
         <input name="city" placeholder="Ciudad" defaultValue="Madrid" />

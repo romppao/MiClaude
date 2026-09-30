@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "../lib/db";
 import { LEVEL_LABEL, fmtDate } from "../lib/labels";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/disciplines";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,12 @@ export default async function Home() {
   return (
     <>
       <section className="hero">
-        <h1>Descubre al boxeo amateur de {HOME_PROVINCE}</h1>
-        <p className="mut">Registra tu récord, valora a quien has visto pelear y encuentra las próximas veladas. Los campeones del futuro empiezan aquí.</p>
+        <h1>Descubre los deportes de contacto amateur de {HOME_PROVINCE}</h1>
+        <p className="mut">Boxeo, MMA, kickboxing, K-1 y jiu-jitsu en un mismo lugar. Registra tu récord, valora a quien has visto pelear y encuentra las próximas veladas. Los campeones del futuro empiezan aquí.</p>
         <form className="search" action="/buscar"><input name="q" placeholder="Busca un peleador, gimnasio, entrenador…" style={{ flex: 1 }} /><button>Buscar</button></form>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "8px 0" }}>
+          {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "8px 14px", fontWeight: d === "BOXEO" ? 800 : 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
+        </div>
         <p className="mut">{counts[0]} peleadores amateur · {counts[1]} veladas · {counts[2]} gimnasios · {counts[3]} valoraciones</p>
       </section>
       <h2>Mejor valorados por el público <Link href="/ranking" className="mut" style={{ fontSize: ".9rem" }}>ver ránking</Link></h2>

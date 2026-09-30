@@ -1,5 +1,5 @@
 // DATOS FICTICIOS de demostración. No corresponden a personas, gimnasios ni veladas reales.
-import { PrismaClient, type Method, type Result } from "@prisma/client";
+import { PrismaClient, type Discipline, type Method, type Result } from "@prisma/client";
 import { slugify } from "../src/lib/labels";
 
 const db = new PrismaClient();
@@ -25,34 +25,38 @@ async function main() {
       db.trainer.create({ data: { name, slug: slugify(name), gymId: gyms[i].id } }),
     ),
   );
-  const names: [string, string, string | null, "PRO" | "AMATEUR", string, number][] = [
-    ["Álvaro", "Demo Ruiz", "El Toro", "PRO", "Ligero", 0],
-    ["Iker", "Demo Etxeberria", null, "PRO", "Ligero", 0],
-    ["Sergio", "Demo Molina", "Puño de Hierro", "AMATEUR", "Wélter", 1],
-    ["Hugo", "Demo Santos", null, "AMATEUR", "Wélter", 1],
-    ["Marcos", "Demo Ortega", "Rayo", "AMATEUR", "Pluma", 2],
-    ["Daniel", "Demo Vega", null, "PRO", "Pluma", 2],
+  const names: [string, string, string | null, "PRO" | "AMATEUR", string, number, Discipline][] = [
+    ["Álvaro", "Demo Ruiz", "El Toro", "PRO", "Ligero", 0, "BOXEO"],
+    ["Iker", "Demo Etxeberria", null, "PRO", "Ligero", 0, "BOXEO"],
+    ["Sergio", "Demo Molina", "Puño de Hierro", "AMATEUR", "Wélter", 1, "BOXEO"],
+    ["Hugo", "Demo Santos", null, "AMATEUR", "Wélter", 1, "BOXEO"],
+    ["Marcos", "Demo Ortega", "Rayo", "AMATEUR", "Pluma", 2, "BOXEO"],
+    ["Daniel", "Demo Vega", null, "PRO", "Pluma", 2, "BOXEO"],
+    ["Nico", "Demo Bravo", null, "AMATEUR", "Ligero", 1, "MMA"],
+    ["Ismael", "Demo Cano", "El Cerrojo", "AMATEUR", "Ligero", 1, "MMA"],
   ];
   const fighters: Awaited<ReturnType<typeof db.fighter.create>>[] = [];
-  for (const [firstName, lastName, alias, level, weightClass, g] of names) {
+  for (const [firstName, lastName, alias, level, weightClass, g, discipline] of names) {
     fighters.push(await db.fighter.create({ data: {
-      firstName, lastName, alias, level, weightClass, stance: "ORTODOXO",
+      firstName, lastName, alias, level, stance: discipline === "BOXEO" ? "ORTODOXO" : undefined,
+      disciplines: { create: { discipline, level, weightClass } },
       slug: slugify(`${firstName} ${lastName}`), city: gyms[g].city, province: gyms[g].province,
       gymId: gyms[g].id, trainerId: trainers[g].id, heightCm: 175, birthDate: new Date("2000-05-01"),
     } }));
   }
 
   const now = Date.now();
-  const mkEvent = (name: string, offset: number, level: "PRO" | "AMATEUR", city: string, province: string, venue: string) =>
+  const mkEvent = (name: string, offset: number, level: "PRO" | "AMATEUR", city: string, province: string, venue: string, discipline: Discipline = "BOXEO") =>
     db.event.create({ data: {
-      name, slug: slugify(name), date: new Date(now + offset * day), level, city, province, venue,
+      name, slug: slugify(name), date: new Date(now + offset * day), discipline, level, city, province, venue,
       status: offset < 0 ? "COMPLETED" : "SCHEDULED",
     } });
-  const [past1, past2, next1, next2] = await Promise.all([
+  const [past1, past2, next1, next2, mma1] = await Promise.all([
     mkEvent("Velada Demo Profesional I", -60, "PRO", "Bilbao", "Bizkaia", "Pabellón Demo"),
     mkEvent("Velada Demo Amateur I", -30, "AMATEUR", "Madrid", "Madrid", "Polideportivo Demo"),
     mkEvent("Gran Velada Demo de Otoño", 21, "PRO", "Sevilla", "Sevilla", "Palacio Demo"),
     mkEvent("Copa Demo Amateur", 35, "AMATEUR", "Madrid", "Madrid", "Polideportivo Demo"),
+    mkEvent("Velada MMA Demo Madrid", -15, "AMATEUR", "Madrid", "Madrid", "Pabellón Demo Sur", "MMA"),
   ]);
   const bout = (eventId: string, a: number, b: number, order: number, weightClass: string, result?: Result, method?: Method, endRound?: number) =>
     db.bout.create({ data: { eventId, fighterAId: fighters[a].id, fighterBId: fighters[b].id, order, weightClass, rounds: 6, result, method, endRound, verification: "VERIFIED" } });
@@ -60,6 +64,7 @@ async function main() {
   await bout(past2.id, 2, 3, 1, "Wélter", "B_WIN", "UD");
   await bout(next1.id, 0, 5, 1, "Ligero");
   await bout(next2.id, 2, 4, 1, "Wélter");
+  await bout(mma1.id, 6, 7, 1, "Ligero", "A_WIN", "SUBMISSION", 2);
 }
 
 main().finally(() => db.$disconnect());

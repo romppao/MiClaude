@@ -3,8 +3,11 @@ import { redirect } from "next/navigation";
 import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { PROVINCES } from "../../lib/labels";
-import { computeRecords, formatRecord } from "../../lib/record";
-import { addBout, createMyFighter, requestClaim, respondBout, setBoutEvidence } from "../actions";
+import { computeRecords } from "../../lib/record";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/disciplines";
+import DisciplineFields from "../DisciplineFields";
+import RecordCards from "../RecordCards";
+import { addBout, createMyFighter, requestClaim, respondBout, saveDiscipline, setBoutEvidence } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
@@ -39,14 +42,14 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.fighter.firstName} ${c.fighter.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
         <h2>Si no apareces, crea tu ficha</h2>
         {error && <p className="L">{ERR[error]}</p>}
-        <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 360 }}>
+        <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" required /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" /></label>
-          <label className="field"><span>Categoría de peso (opcional)</span><input name="weightClass" placeholder="Por ejemplo: Wélter" /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" /></label>
           <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" /></label>
           <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <DisciplineFields />
           <button>Crear mi ficha</button>
         </form>
       </>
@@ -58,15 +61,33 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     include: { event: true, fighterA: true, fighterB: true },
     orderBy: { event: { date: "desc" } },
   });
-  const rec = computeRecords(me.id, bouts).AMATEUR;
+  const records = computeRecords(me.id, bouts);
   const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
 
   return (
     <>
       <h1>{me.firstName} {me.lastName}</h1>
       <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
-      <p className="rec">{formatRecord(rec)} <span className="mut" style={{ fontSize: "1rem" }}>({rec.unverified} pendientes de confirmar)</span></p>
       {error && <p className="L">{ERR[error]}</p>}
+      <RecordCards records={records} disciplines={me.disciplines} />
+
+      <h2>Mis disciplinas</h2>
+      {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (
+        <details key={d.discipline} className="card" style={{ marginBottom: 8 }}>
+          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${d.weightClass}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
+          <form className="search" action={saveDiscipline}>
+            <DisciplineFields defaults={d} />
+            <button>Guardar cambios</button>
+          </form>
+        </details>
+      ))}
+      <details className="card" style={{ marginBottom: 8 }}>
+        <summary><strong>Añadir otra disciplina</strong> <span className="mut">— por ejemplo MMA, kickboxing, K-1 o jiu-jitsu</span></summary>
+        <form className="search" action={saveDiscipline}>
+          <DisciplineFields defaults={{ discipline: DISCIPLINE_ORDER.find((d) => !me.disciplines.some((x) => x.discipline === d)) ?? "BOXEO" }} />
+          <button>Añadir disciplina</button>
+        </form>
+      </details>
 
       {toConfirm.length > 0 && (
         <>
@@ -91,6 +112,11 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
       <h2>Registrar un combate</h2>
       <form className="search" action={addBout}>
+        <label className="field"><span>Disciplina</span>
+          <select name="discipline" defaultValue={me.disciplines[0]?.discipline}>
+            {me.disciplines.map((d) => <option key={d.discipline} value={d.discipline}>{DISCIPLINE_LABEL[d.discipline]}</option>)}
+          </select>
+        </label>
         <label className="field"><span>Nombre de la velada</span><input name="eventName" required /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" required /></label>
         <label className="field"><span>Recinto (opcional)</span><input name="venue" /></label>
@@ -103,8 +129,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         <label className="field"><span>Cómo terminó</span>
           <select name="method" defaultValue="UD">
             <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
-            <option value="KO">KO</option><option value="TKO">TKO</option><option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
+            <option value="KO">KO</option><option value="TKO">TKO</option><option value="SUBMISSION">Sumisión</option><option value="POINTS">Puntos</option><option value="ADVANTAGE">Ventajas</option>
+            <option value="RTD">Abandono</option><option value="DQ">Descalificación</option><option value="DRAW">Empate</option>
           </select>
+          <span className="hint">Elige la que corresponda a tu disciplina (la sumisión, los puntos y las ventajas solo existen en MMA y jiu-jitsu).</span>
         </label>
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
         <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>

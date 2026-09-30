@@ -16,6 +16,7 @@ export const AVISOS: Record<string, string> = {
   reporte_enviado: "Gracias. Hemos recibido tu aviso y un moderador lo revisará.",
   siguiendo: "Ahora sigues a este peleador. Verás sus próximas veladas en «Mis peleadores».",
   siguiendo_quitado: "Has dejado de seguir a este peleador.",
+  disciplina_guardada: "Se ha guardado la disciplina en tu ficha.",
   solicitud_enviada: "Solicitud enviada. Un moderador la revisará y te avisaremos.",
 };
 
@@ -37,6 +38,13 @@ export const PROBLEMAS: Record<string, string> = {
   reporte_datos: "Elige el motivo del aviso para poder enviarlo.",
   seguir_propio: "Tu propia ficha no se puede seguir.",
   seguir_no_existe: "No hemos encontrado a ese peleador.",
+  disciplina_no_valida: "Elige una disciplina y una categoría de peso de la lista.",
+  combate_disciplina: "Esa velada ya existe en otra disciplina. Cambia el nombre o la fecha, o elige la disciplina correcta.",
+  combate_sin_disciplina: "Elige una disciplina de tu ficha, o añade primero la disciplina en la que competiste.",
+  combate_metodo: "Esa forma de terminar el combate no existe en la disciplina elegida.",
+  prior_numero: "En los combates anteriores escribe solo números enteros (0 o más).",
+  prior_suma: "La suma de victorias, derrotas y empates no coincide con el total de combates que has indicado.",
+  cartel_categoria: "Esa categoría de peso no existe en la disciplina de esta velada.",
   sin_permiso: "No tienes permiso para hacer esta acción.",
   cartel_peleadores: "Elige dos peleadores distintos de la lista.",
   resultado_futuro: "Solo puedes poner resultados cuando la velada ya se ha celebrado.",
