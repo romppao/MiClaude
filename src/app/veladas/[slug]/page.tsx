@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const e = await db.event.findUnique({ where: { slug }, include: { organizer: { select: { name: true, organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { boxerA: true, boxerB: true } } } });
+  const e = await db.event.findUnique({ where: { slug }, include: { organizer: { select: { name: true, organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { fighterA: true, fighterB: true } } } });
   if (!e) notFound();
   return (
     <>
@@ -21,9 +21,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <tbody>
           {e.bouts.map((b) => (
             <tr key={b.id}>
-              <td className={b.result === "A_WIN" ? "W" : ""}><Link href={`/boxeadores/${b.boxerA.slug}`}>{b.boxerA.firstName} {b.boxerA.lastName}</Link></td>
+              <td className={b.result === "A_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterA.slug}`}>{b.fighterA.firstName} {b.fighterA.lastName}</Link></td>
               <td className="mut">vs</td>
-              <td className={b.result === "B_WIN" ? "W" : ""}><Link href={`/boxeadores/${b.boxerB.slug}`}>{b.boxerB.firstName} {b.boxerB.lastName}</Link></td>
+              <td className={b.result === "B_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterB.slug}`}>{b.fighterB.firstName} {b.fighterB.lastName}</Link></td>
               <td>{b.weightClass}{b.rounds ? ` · ${b.rounds}x` : ""}</td>
               <td>{b.result ? `${b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : b.result === "A_WIN" ? "Gana rojo" : "Gana azul"}${b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? ` R${b.endRound}` : ""})` : ""}` : "—"}</td>
             </tr>

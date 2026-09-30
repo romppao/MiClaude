@@ -32,14 +32,14 @@ function internalPath(raw: string, fallback = "/") {
 /** ¿Ya existe este mismo enfrentamiento (en cualquiera de las dos esquinas) en la velada? */
 async function boutExists(eventId: string, a: string, b: string) {
   return !!(await db.bout.findFirst({
-    where: { eventId, verification: { not: "DISPUTED" }, OR: [{ boxerAId: a, boxerBId: b }, { boxerAId: b, boxerBId: a }] },
+    where: { eventId, verification: { not: "DISPUTED" }, OR: [{ fighterAId: a, fighterBId: b }, { fighterAId: b, fighterBId: a }] },
   }));
 }
 
-/** Señales de coherencia de un combate nuevo respecto a los demás combates de sus dos boxeadores. */
-async function coherenceFlagsFor(eventId: string, eventDate: Date, boxerIds: string[]): Promise<Flag[]> {
+/** Señales de coherencia de un combate nuevo respecto a los demás combates de sus dos peleadores. */
+async function coherenceFlagsFor(eventId: string, eventDate: Date, fighterIds: string[]): Promise<Flag[]> {
   const others = await db.bout.findMany({
-    where: { eventId: { not: eventId }, verification: { not: "DISPUTED" }, OR: [{ boxerAId: { in: boxerIds } }, { boxerBId: { in: boxerIds } }] },
+    where: { eventId: { not: eventId }, verification: { not: "DISPUTED" }, OR: [{ fighterAId: { in: fighterIds } }, { fighterBId: { in: fighterIds } }] },
     select: { event: { select: { date: true } } },
   });
   return proximityFlags(eventDate, others.map((o) => o.event.date));
@@ -57,7 +57,7 @@ export async function register(f: FormData) {
   const email = str(f, "email").toLowerCase();
   const name = str(f, "name");
   const password = str(f, "password");
-  const role = str(f, "role") === "BOXER" ? "BOXER" : "FAN";
+  const role = str(f, "role") === "FIGHTER" ? "FIGHTER" : "FAN";
   if (!name || !/^\S+@\S+\.\S+$/.test(email)) redirect("/registro?error=datos");
   if (password.length < 8) redirect("/registro?error=password");
   if (await db.user.findUnique({ where: { email } })) redirect("/registro?error=email");
@@ -72,7 +72,7 @@ export async function login(f: FormData) {
   const next = internalPath(str(f, "next"), "");
   if (!user || !verifyPassword(str(f, "password"), user.passwordHash)) redirect(`/entrar?error=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   await createSession(user.id);
-  redirect(next || (user.role === "BOXER" ? "/mi-ficha" : "/"));
+  redirect(next || (user.role === "FIGHTER" ? "/mi-ficha" : "/"));
 }
 
 export async function logout() {
@@ -80,11 +80,11 @@ export async function logout() {
   redirect("/");
 }
 
-// ---------- Ficha del boxeador (autogestionada) ----------
+// ---------- Ficha del peleador (autogestionada) ----------
 
-export async function createMyBoxer(f: FormData) {
+export async function createMyFighter(f: FormData) {
   const user = await requireVerifiedUser();
-  if (user.boxer) redirect("/mi-ficha");
+  if (user.fighter) redirect("/mi-ficha");
   const firstName = str(f, "firstName");
   const lastName = str(f, "lastName");
   if (!firstName || !lastName) go("/mi-ficha", { problema: "nombre_ficha" });
@@ -98,8 +98,8 @@ export async function createMyBoxer(f: FormData) {
     const gym = (await db.gym.findUnique({ where: { slug: gymSlug } })) ?? (await db.gym.create({ data: { name: gymName, slug: gymSlug, city, province } }));
     gymId = gym.id;
   }
-  const slug = await uniqueSlug(slugify(`${firstName} ${lastName}`), async (s) => !!(await db.boxer.findUnique({ where: { slug: s } })));
-  await db.boxer.create({
+  const slug = await uniqueSlug(slugify(`${firstName} ${lastName}`), async (s) => !!(await db.fighter.findUnique({ where: { slug: s } })));
+  await db.fighter.create({
     data: {
       slug, firstName, lastName, alias: str(f, "alias") || null, city, province,
       weightClass: str(f, "weightClass") || null, level: "AMATEUR", gymId, userId: user.id,
@@ -113,10 +113,10 @@ export async function createMyBoxer(f: FormData) {
 const OUTCOMES = { WIN: "A_WIN", LOSS: "B_WIN", DRAW: "DRAW" } as const;
 const METHODS: Method[] = ["KO", "TKO", "UD", "SD", "MD", "RTD", "DQ", "DRAW"];
 
-/** El boxeador registra un combate propio. Queda SELF_REPORTED hasta que el rival lo confirme o un admin lo verifique. */
+/** El peleador registra un combate propio. Queda SELF_REPORTED hasta que el rival lo confirme o un admin lo verifique. */
 export async function addBout(f: FormData) {
   const user = await requireVerifiedUser();
-  const me = user.boxer;
+  const me = user.fighter;
   if (!me) redirect("/mi-ficha");
 
   const eventName = str(f, "eventName");
@@ -144,15 +144,15 @@ export async function addBout(f: FormData) {
 
   const oppSlug = slugify(`${oppFirst} ${oppLast}`);
   const opponent =
-    (await db.boxer.findUnique({ where: { slug: oppSlug } })) ??
-    (await db.boxer.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
+    (await db.fighter.findUnique({ where: { slug: oppSlug } })) ??
+    (await db.fighter.create({ data: { slug: oppSlug, firstName: oppFirst, lastName: oppLast, level: "AMATEUR", city, province } }));
   if (opponent.id === me.id) go("/mi-ficha", { problema: "combate_mismo" });
 
   if (await boutExists(event.id, me.id, opponent.id)) go("/mi-ficha", { problema: "combate_duplicado" });
   const flags = await coherenceFlagsFor(event.id, event.date, [me.id, opponent.id]);
   const created = await db.bout.create({
     data: {
-      flags, eventId: event.id, boxerAId: me.id, boxerBId: opponent.id, result, method, rounds,
+      flags, eventId: event.id, fighterAId: me.id, fighterBId: opponent.id, result, method, rounds,
       weightClass: me.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")),
     },
   });
@@ -161,13 +161,13 @@ export async function addBout(f: FormData) {
   go("/mi-ficha", { aviso: "combate_registrado" });
 }
 
-/** El rival (si tiene cuenta) confirma o disputa un combate declarado por el otro boxeador. */
+/** El rival (si tiene cuenta) confirma o disputa un combate declarado por el otro peleador. */
 export async function respondBout(f: FormData) {
   const user = await requireVerifiedUser();
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") } });
-  const me = user.boxer;
+  const me = user.fighter;
   if (!bout || !me || bout.verification !== "SELF_REPORTED") redirect("/mi-ficha");
-  if (bout.boxerBId !== me.id) redirect("/mi-ficha"); // solo el rival del creador
+  if (bout.fighterBId !== me.id) redirect("/mi-ficha"); // solo el rival del creador
   const next = str(f, "decision") === "confirm" ? "CONFIRMED" : "DISPUTED";
   await db.$transaction([
     db.bout.update({ where: { id: bout.id }, data: { verification: next } }),
@@ -194,12 +194,12 @@ export async function adminDecide(f: FormData) {
 
 /**
  * Reglas anti-manipulación:
- *  - hace falta cuenta; una nota por usuario + combate + boxeador (se puede editar);
+ *  - hace falta cuenta; una nota por usuario + combate + peleador (se puede editar);
  *  - solo combates ya celebrados y no disputados;
  *  - los participantes del combate no pueden valorar;
- *  - la nota va ligada a un combate concreto, no al boxeador "en general".
+ *  - la nota va ligada a un combate concreto, no al peleador "en general".
  */
-export async function rateBoxer(f: FormData) {
+export async function rateFighter(f: FormData) {
   const user = await getUser();
   const back = internalPath(str(f, "back"));
   if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
@@ -207,11 +207,11 @@ export async function rateBoxer(f: FormData) {
   const score = parseInt(str(f, "score"), 10);
   if (!(score >= 1 && score <= 5)) go(back, { problema: "valorar_nota" });
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
-  const boxerId = str(f, "boxerId");
-  if (!bout || (boxerId !== bout.boxerAId && boxerId !== bout.boxerBId)) go(back, { problema: "valorar_no_existe" });
+  const fighterId = str(f, "fighterId");
+  if (!bout || (fighterId !== bout.fighterAId && fighterId !== bout.fighterBId)) go(back, { problema: "valorar_no_existe" });
   if (bout.verification === "DISPUTED") go(back, { problema: "valorar_revision" });
   if (bout.event.date.getTime() > Date.now()) go(back, { problema: "valorar_futuro" });
-  if (user.boxer && (user.boxer.id === bout.boxerAId || user.boxer.id === bout.boxerBId)) go(back, { problema: "valorar_propio" });
+  if (user.fighter && (user.fighter.id === bout.fighterAId || user.fighter.id === bout.fighterBId)) go(back, { problema: "valorar_propio" });
 
   // Límite anti-abuso: máximo 20 valoraciones nuevas o editadas al día por usuario.
   const recent = await db.rating.count({ where: { userId: user.id, updatedAt: { gte: new Date(Date.now() - 864e5) } } });
@@ -220,8 +220,8 @@ export async function rateBoxer(f: FormData) {
   const comment = str(f, "comment").slice(0, 500) || null;
   const attended = f.get("attended") === "on";
   await db.rating.upsert({
-    where: { userId_boutId_boxerId: { userId: user.id, boutId: bout.id, boxerId } },
-    create: { userId: user.id, boutId: bout.id, boxerId, score, comment, attended },
+    where: { userId_boutId_fighterId: { userId: user.id, boutId: bout.id, fighterId } },
+    create: { userId: user.id, boutId: bout.id, fighterId, score, comment, attended },
     update: { score, comment, attended },
   });
   revalidatePath("/", "layout");
@@ -245,12 +245,12 @@ export async function resendVerification() {
 
 export async function requestClaim(f: FormData) {
   const user = await requireVerifiedUser();
-  if (user.boxer) redirect("/mi-ficha");
-  const boxer = await db.boxer.findUnique({ where: { id: str(f, "boxerId") } });
-  if (!boxer || boxer.userId) redirect("/mi-ficha?error=reclamar");
+  if (user.fighter) redirect("/mi-ficha");
+  const fighter = await db.fighter.findUnique({ where: { id: str(f, "fighterId") } });
+  if (!fighter || fighter.userId) redirect("/mi-ficha?error=reclamar");
   await db.claimRequest.upsert({
-    where: { userId_boxerId: { userId: user.id, boxerId: boxer.id } },
-    create: { userId: user.id, boxerId: boxer.id, message: str(f, "message").slice(0, 500) || null },
+    where: { userId_fighterId: { userId: user.id, fighterId: fighter.id } },
+    create: { userId: user.id, fighterId: fighter.id, message: str(f, "message").slice(0, 500) || null },
     update: { message: str(f, "message").slice(0, 500) || null, status: "PENDING" },
   });
   redirect("/mi-ficha?ok=reclamacion");
@@ -259,22 +259,22 @@ export async function requestClaim(f: FormData) {
 export async function decideClaim(f: FormData) {
   const admin = await requireUser();
   if (admin.role !== "ADMIN") redirect("/");
-  const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { boxer: true, user: { include: { boxer: true } } } });
+  const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { fighter: true, user: { include: { fighter: true } } } });
   if (!claim || claim.status !== "PENDING") redirect("/admin");
   // Solo se aprueba si se pidió aprobar Y la ficha sigue libre Y el usuario no tiene ya otra ficha.
-  const approved = str(f, "decision") === "approve" && !claim.boxer.userId && !claim.user.boxer;
+  const approved = str(f, "decision") === "approve" && !claim.fighter.userId && !claim.user.fighter;
   if (approved) {
     await db.$transaction([
-      db.boxer.update({ where: { id: claim.boxerId }, data: { userId: claim.userId } }),
+      db.fighter.update({ where: { id: claim.fighterId }, data: { userId: claim.userId } }),
       db.claimRequest.update({ where: { id: claim.id }, data: { status: "APPROVED" } }),
-      db.claimRequest.updateMany({ where: { boxerId: claim.boxerId, id: { not: claim.id }, status: "PENDING" }, data: { status: "REJECTED" } }),
+      db.claimRequest.updateMany({ where: { fighterId: claim.fighterId, id: { not: claim.id }, status: "PENDING" }, data: { status: "REJECTED" } }),
     ]);
   } else {
     await db.claimRequest.update({ where: { id: claim.id }, data: { status: "REJECTED" } });
   }
   await audit({
     userId: admin.id, entity: "CLAIM", entityId: claim.id, action: approved ? "APPROVED" : "REJECTED",
-    after: { userId: claim.userId, boxerId: claim.boxerId, requestedApproval: str(f, "decision") === "approve" },
+    after: { userId: claim.userId, fighterId: claim.fighterId, requestedApproval: str(f, "decision") === "approve" },
   });
   redirect("/admin");
 }
@@ -342,8 +342,8 @@ export async function addCartelBout(f: FormData) {
   const user = await requireOrganizer();
   const event = await ownEvent(str(f, "eventId"), user);
   const [a, b] = await Promise.all([
-    db.boxer.findUnique({ where: { slug: str(f, "boxerA") } }),
-    db.boxer.findUnique({ where: { slug: str(f, "boxerB") } }),
+    db.fighter.findUnique({ where: { slug: str(f, "fighterA") } }),
+    db.fighter.findUnique({ where: { slug: str(f, "fighterB") } }),
   ]);
   if (!a || !b || a.id === b.id) redirect(`/organizador/${event.slug}?error=cartel`);
   const rounds = parseInt(str(f, "rounds"), 10);
@@ -351,9 +351,9 @@ export async function addCartelBout(f: FormData) {
   const flags = await coherenceFlagsFor(event.id, event.date, [a.id, b.id]);
   const order = await db.bout.count({ where: { eventId: event.id } });
   const created = await db.bout.create({
-    data: { flags, eventId: event.id, boxerAId: a.id, boxerBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
+    data: { flags, eventId: event.id, fighterAId: a.id, fighterBId: b.id, order: order + 1, weightClass: str(f, "weightClass") || null, rounds: rounds > 0 && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl: safeHttpUrl(str(f, "evidenceUrl")) },
   });
-  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, boxerA: a.slug, boxerB: b.slug, evidenceUrl: created.evidenceUrl } });
+  await audit({ userId: user.id, entity: "BOUT", entityId: created.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, fighterA: a.slug, fighterB: b.slug, evidenceUrl: created.evidenceUrl } });
   revalidatePath("/", "layout");
   await notifyFollowersOfBout(created.id); // solo combates de organizador y futuros
   go(`/organizador/${event.slug}`, { aviso: "cartel_anadido" });
@@ -386,8 +386,8 @@ export async function setBoutEvidence(f: FormData) {
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
   const back = internalPath(str(f, "back"), "/mi-ficha");
   if (!bout) redirect(back);
-  const mine = user.boxer?.id;
-  const allowed = user.role === "ADMIN" || bout.createdById === user.id || bout.event.organizerId === user.id || (!!mine && (mine === bout.boxerAId || mine === bout.boxerBId));
+  const mine = user.fighter?.id;
+  const allowed = user.role === "ADMIN" || bout.createdById === user.id || bout.event.organizerId === user.id || (!!mine && (mine === bout.fighterAId || mine === bout.fighterBId));
   if (!allowed) go(back, { problema: "sin_permiso" });
   const raw = str(f, "evidenceUrl");
   const url = raw ? safeHttpUrl(raw) : null;
@@ -423,7 +423,7 @@ export async function createReport(f: FormData) {
   const entityId = str(f, "entityId");
   const reason = str(f, "reason");
   if (!(REPORT_ENTITIES as readonly string[]).includes(entity) || !(reason in REPORT_REASONS)) go(back, { problema: "reporte_datos" });
-  const exists = entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } }) : await db.boxer.findUnique({ where: { id: entityId } });
+  const exists = entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } }) : await db.fighter.findUnique({ where: { id: entityId } });
   if (!exists) go(back, { problema: "reporte_datos" });
   if (await db.report.findFirst({ where: { userId: user.id, entity, entityId, status: "OPEN" } })) go(back, { problema: "reporte_repetido" });
   const today = await db.report.count({ where: { userId: user.id, createdAt: { gte: new Date(Date.now() - 864e5) } } });
@@ -445,19 +445,19 @@ export async function resolveReport(f: FormData) {
   redirect("/admin");
 }
 
-// ---------- Seguir a boxeadores ----------
+// ---------- Seguir a peleadores ----------
 
 export async function toggleFollow(f: FormData) {
   const back = internalPath(str(f, "back"));
   const user = await getUser();
   if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
-  const boxer = await db.boxer.findUnique({ where: { id: str(f, "boxerId") } });
-  if (!boxer) go(back, { problema: "seguir_no_existe" });
-  if (user.boxer?.id === boxer.id) go(back, { problema: "seguir_propio" });
-  const key = { userId_boxerId: { userId: user.id, boxerId: boxer.id } };
+  const fighter = await db.fighter.findUnique({ where: { id: str(f, "fighterId") } });
+  if (!fighter) go(back, { problema: "seguir_no_existe" });
+  if (user.fighter?.id === fighter.id) go(back, { problema: "seguir_propio" });
+  const key = { userId_fighterId: { userId: user.id, fighterId: fighter.id } };
   const existing = await db.follow.findUnique({ where: key });
   if (existing) await db.follow.delete({ where: key });
-  else await db.follow.create({ data: { userId: user.id, boxerId: boxer.id } });
+  else await db.follow.create({ data: { userId: user.id, fighterId: fighter.id } });
   revalidatePath("/", "layout");
   go(back, { aviso: existing ? "siguiendo_quitado" : "siguiendo" });
 }

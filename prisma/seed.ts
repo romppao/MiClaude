@@ -9,7 +9,7 @@ async function main() {
   await db.rating.deleteMany();
   await db.bout.deleteMany();
   await db.event.deleteMany();
-  await db.boxer.deleteMany();
+  await db.fighter.deleteMany();
   await db.trainer.deleteMany();
   await db.gym.deleteMany();
 
@@ -33,9 +33,9 @@ async function main() {
     ["Marcos", "Demo Ortega", "Rayo", "AMATEUR", "Pluma", 2],
     ["Daniel", "Demo Vega", null, "PRO", "Pluma", 2],
   ];
-  const boxers: Awaited<ReturnType<typeof db.boxer.create>>[] = [];
+  const fighters: Awaited<ReturnType<typeof db.fighter.create>>[] = [];
   for (const [firstName, lastName, alias, level, weightClass, g] of names) {
-    boxers.push(await db.boxer.create({ data: {
+    fighters.push(await db.fighter.create({ data: {
       firstName, lastName, alias, level, weightClass, stance: "ORTODOXO",
       slug: slugify(`${firstName} ${lastName}`), city: gyms[g].city, province: gyms[g].province,
       gymId: gyms[g].id, trainerId: trainers[g].id, heightCm: 175, birthDate: new Date("2000-05-01"),
@@ -55,7 +55,7 @@ async function main() {
     mkEvent("Copa Demo Amateur", 35, "AMATEUR", "Madrid", "Madrid", "Polideportivo Demo"),
   ]);
   const bout = (eventId: string, a: number, b: number, order: number, weightClass: string, result?: Result, method?: Method, endRound?: number) =>
-    db.bout.create({ data: { eventId, boxerAId: boxers[a].id, boxerBId: boxers[b].id, order, weightClass, rounds: 6, result, method, endRound, verification: "VERIFIED" } });
+    db.bout.create({ data: { eventId, fighterAId: fighters[a].id, fighterBId: fighters[b].id, order, weightClass, rounds: 6, result, method, endRound, verification: "VERIFIED" } });
   await bout(past1.id, 0, 1, 1, "Ligero", "A_WIN", "KO", 3);
   await bout(past2.id, 2, 3, 1, "Wélter", "B_WIN", "UD");
   await bout(next1.id, 0, 5, 1, "Ligero");

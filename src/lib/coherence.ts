@@ -5,15 +5,15 @@
 export type Flag = "MISMO_DIA" | "MUY_SEGUIDOS";
 
 export const FLAG_LABEL: Record<Flag, string> = {
-  MISMO_DIA: "Otro combate del mismo boxeador el mismo día",
-  MUY_SEGUIDOS: "Menos de 7 días desde otro combate del mismo boxeador",
+  MISMO_DIA: "Otro combate del mismo peleador el mismo día",
+  MUY_SEGUIDOS: "Menos de 7 días desde otro combate del mismo peleador",
 };
 
 export const MIN_DAYS_BETWEEN_BOUTS = 7;
 
 const dayNumber = (d: Date) => Math.floor(d.getTime() / 864e5);
 
-/** Señales para un combate en `eventDate` dado el resto de fechas de combates (de otros eventos) del mismo boxeador. */
+/** Señales para un combate en `eventDate` dado el resto de fechas de combates (de otros eventos) del mismo peleador. */
 export function proximityFlags(eventDate: Date, otherDates: Date[], minDays = MIN_DAYS_BETWEEN_BOUTS): Flag[] {
   const flags = new Set<Flag>();
   for (const other of otherDates) {

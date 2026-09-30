@@ -28,7 +28,7 @@ export async function destroySession() {
 export async function getUser() {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
-  const s = await db.session.findUnique({ where: { id: sha256(token) }, include: { user: { include: { boxer: true } } } });
+  const s = await db.session.findUnique({ where: { id: sha256(token) }, include: { user: { include: { fighter: true } } } });
   if (!s || s.expiresAt < new Date()) return null;
   return s.user;
 }

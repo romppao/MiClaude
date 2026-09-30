@@ -4,7 +4,7 @@ import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { PROVINCES } from "../../lib/labels";
 import { computeRecords, formatRecord } from "../../lib/record";
-import { addBout, createMyBoxer, requestClaim, respondBout, setBoutEvidence } from "../actions";
+import { addBout, createMyFighter, requestClaim, respondBout, setBoutEvidence } from "../actions";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
@@ -14,12 +14,12 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const user = await requireUser();
   if (!user.emailVerifiedAt) redirect("/verificar");
   const { error, ok, q } = await searchParams;
-  const me = user.boxer;
+  const me = user.fighter;
 
   if (!me) {
     const [candidates, myClaims] = await Promise.all([
-      q ? db.boxer.findMany({ where: { userId: null, OR: [{ firstName: { contains: q, mode: "insensitive" } }, { lastName: { contains: q, mode: "insensitive" } }] }, include: { gym: true }, take: 10 }) : Promise.resolve([]),
-      db.claimRequest.findMany({ where: { userId: user.id }, include: { boxer: true }, orderBy: { createdAt: "desc" } }),
+      q ? db.fighter.findMany({ where: { userId: null, OR: [{ firstName: { contains: q, mode: "insensitive" } }, { lastName: { contains: q, mode: "insensitive" } }] }, include: { gym: true }, take: 10 }) : Promise.resolve([]),
+      db.claimRequest.findMany({ where: { userId: user.id }, include: { fighter: true }, orderBy: { createdAt: "desc" } }),
     ]);
     return (
       <>
@@ -29,17 +29,17 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         <form className="search"><input name="q" defaultValue={q} placeholder="Tu nombre o apellidos" /><button>Buscar mi ficha</button></form>
         {candidates.map((b) => (
           <form key={b.id} action={requestClaim} className="card" style={{ marginBottom: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <input type="hidden" name="boxerId" value={b.id} />
+            <input type="hidden" name="fighterId" value={b.id} />
             <strong>{b.firstName} {b.lastName}</strong><span className="mut">{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
             <input name="message" placeholder="¿Cómo podemos comprobar que eres tú? (gimnasio, entrenador, licencia…)" style={{ flex: 1, minWidth: 220 }} />
             <button>Reclamar</button>
           </form>
         ))}
         {q && candidates.length === 0 && <p className="mut">No hay fichas sin dueño con ese nombre.</p>}
-        {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.boxer.firstName} ${c.boxer.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
+        {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.fighter.firstName} ${c.fighter.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
         <h2>Si no apareces, crea tu ficha</h2>
         {error && <p className="L">{ERR[error]}</p>}
-        <form className="search" action={createMyBoxer} style={{ flexDirection: "column", maxWidth: 360 }}>
+        <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 360 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" required /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" /></label>
@@ -54,17 +54,17 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   }
 
   const bouts = await db.bout.findMany({
-    where: { OR: [{ boxerAId: me.id }, { boxerBId: me.id }] },
-    include: { event: true, boxerA: true, boxerB: true },
+    where: { OR: [{ fighterAId: me.id }, { fighterBId: me.id }] },
+    include: { event: true, fighterA: true, fighterB: true },
     orderBy: { event: { date: "desc" } },
   });
   const rec = computeRecords(me.id, bouts).AMATEUR;
-  const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.boxerBId === me.id);
+  const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
 
   return (
     <>
       <h1>{me.firstName} {me.lastName}</h1>
-      <p><Link href={`/boxeadores/${me.slug}`}>Ver mi ficha pública</Link></p>
+      <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
       <p className="rec">{formatRecord(rec)} <span className="mut" style={{ fontSize: "1rem" }}>({rec.unverified} pendientes de confirmar)</span></p>
       {error && <p className="L">{ERR[error]}</p>}
 
@@ -75,7 +75,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             {toConfirm.map((b) => (
               <tr key={b.id}>
                 <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-                <td>vs {b.boxerA.firstName} {b.boxerA.lastName}</td>
+                <td>vs {b.fighterA.firstName} {b.fighterA.lastName}</td>
                 <td>
                   <form action={respondBout} style={{ display: "flex", gap: 6 }}>
                     <input type="hidden" name="boutId" value={b.id} />
@@ -115,7 +115,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         {bouts.map((b) => (
           <tr key={b.id}>
             <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-            <td>vs {b.boxerAId === me.id ? `${b.boxerB.firstName} ${b.boxerB.lastName}` : `${b.boxerA.firstName} ${b.boxerA.lastName}`}</td>
+            <td>vs {b.fighterAId === me.id ? `${b.fighterB.firstName} ${b.fighterB.lastName}` : `${b.fighterA.firstName} ${b.fighterA.lastName}`}</td>
             <td><span className="tag">{b.verification === "SELF_REPORTED" ? "pendiente de confirmar" : b.verification === "CONFIRMED" ? "confirmado por el rival" : b.verification === "VERIFIED" ? "verificado" : "en revisión"}</span></td>
             <td>
               <form action={setBoutEvidence} style={{ display: "flex", gap: 4 }}>

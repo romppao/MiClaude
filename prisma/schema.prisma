@@ -39,13 +39,13 @@ enum Method {
 
 enum Role {
   FAN
-  BOXER
+  FIGHTER
   ORGANIZER
   ADMIN
 }
 
 // Origen y fiabilidad de un combate registrado.
-// SELF_REPORTED: lo añadió un boxeador; CONFIRMED: el rival lo confirmó;
+// SELF_REPORTED: lo añadió un peleador; CONFIRMED: el rival lo confirmó;
 // VERIFIED: lo validó un administrador/organizador/federación; DISPUTED: el rival o un admin lo rechazó.
 enum Verification {
   SELF_REPORTED
@@ -82,23 +82,23 @@ model Gym {
   website      String?
   verifiedAt   DateTime?
   verifiedNote String?
-  boxers       Boxer[]
+  fighters     Fighter[]
   trainers     Trainer[]
 
   @@index([province])
 }
 
 model Trainer {
-  id     String  @id @default(cuid())
-  slug   String  @unique
-  name   String
-  bio    String?
-  gymId  String?
-  gym    Gym?    @relation(fields: [gymId], references: [id])
-  boxers Boxer[]
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  bio      String?
+  gymId    String?
+  gym      Gym?      @relation(fields: [gymId], references: [id])
+  fighters Fighter[]
 }
 
-model Boxer {
+model Fighter {
   id            String         @id @default(cuid())
   slug          String         @unique
   firstName     String
@@ -123,8 +123,8 @@ model Boxer {
   ratings       Rating[]
   followers     Follow[]
   claimRequests ClaimRequest[]
-  boutsAsA      Bout[]         @relation("BoxerA")
-  boutsAsB      Bout[]         @relation("BoxerB")
+  boutsAsA      Bout[]         @relation("FighterA")
+  boutsAsB      Bout[]         @relation("FighterB")
   createdAt     DateTime       @default(now())
 
   @@index([lastName, firstName])
@@ -157,10 +157,10 @@ model Bout {
   eventId      String
   event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   order        Int          @default(0)
-  boxerAId     String
-  boxerA       Boxer        @relation("BoxerA", fields: [boxerAId], references: [id])
-  boxerBId     String
-  boxerB       Boxer        @relation("BoxerB", fields: [boxerBId], references: [id])
+  fighterAId   String
+  fighterA     Fighter      @relation("FighterA", fields: [fighterAId], references: [id])
+  fighterBId   String
+  fighterB     Fighter      @relation("FighterB", fields: [fighterBId], references: [id])
   weightClass  String?
   rounds       Int?
   result       Result?
@@ -174,8 +174,8 @@ model Bout {
   evidenceUrl  String?
 
   @@index([eventId])
-  @@index([boxerAId])
-  @@index([boxerBId])
+  @@index([fighterAId])
+  @@index([fighterBId])
 }
 
 model User {
@@ -187,7 +187,7 @@ model User {
   emailVerifiedAt  DateTime?
   createdAt        DateTime          @default(now())
   sessions         Session[]
-  boxer            Boxer?
+  fighter          Fighter?
   boutsCreated     Bout[]            @relation("BoutCreator")
   ratings          Rating[]
   emailTokens      EmailToken[]
@@ -208,14 +208,14 @@ model Session {
   @@index([userId])
 }
 
-// Valoración de un aficionado a un boxeador por su actuación en UN combate concreto.
-// Anclar la nota a un combate (y limitar a una por usuario/combate/boxeador) es la base anti-manipulación.
+// Valoración de un aficionado a un peleador por su actuación en UN combate concreto.
+// Anclar la nota a un combate (y limitar a una por usuario/combate/peleador) es la base anti-manipulación.
 model Rating {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  boxerId   String
-  boxer     Boxer    @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  fighterId String
+  fighter   Fighter  @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   boutId    String
   bout      Bout     @relation(fields: [boutId], references: [id], onDelete: Cascade)
   score     Int // 1..5
@@ -224,8 +224,8 @@ model Rating {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, boutId, boxerId])
-  @@index([boxerId])
+  @@unique([userId, boutId, fighterId])
+  @@index([fighterId])
 }
 
 // Token de verificación de email (se guarda el sha256, como en Session).
@@ -238,18 +238,18 @@ model EmailToken {
   @@index([userId])
 }
 
-// Un usuario BOXER pide que una ficha ya existente (sin dueño) pase a ser suya. Lo aprueba un moderador.
+// Un usuario FIGHTER pide que una ficha ya existente (sin dueño) pase a ser suya. Lo aprueba un moderador.
 model ClaimRequest {
   id        String        @id @default(cuid())
   userId    String
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  boxerId   String
-  boxer     Boxer         @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  fighterId String
+  fighter   Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   message   String?
   status    RequestStatus @default(PENDING)
   createdAt DateTime      @default(now())
 
-  @@unique([userId, boxerId])
+  @@unique([userId, fighterId])
   @@index([status])
 }
 
@@ -287,7 +287,7 @@ model Report {
   id             String       @id @default(cuid())
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entity         String // BOUT | BOXER
+  entity         String // BOUT | FIGHTER
   entityId       String
   reason         String
   message        String?
@@ -301,14 +301,14 @@ model Report {
   @@index([entity, entityId])
 }
 
-// Un aficionado sigue a un boxeador para ver sus próximas veladas y recibir avisos.
+// Un aficionado sigue a un peleador para ver sus próximas veladas y recibir avisos.
 model Follow {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  boxerId   String
-  boxer     Boxer    @relation(fields: [boxerId], references: [id], onDelete: Cascade)
+  fighterId String
+  fighter   Fighter  @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
-  @@id([userId, boxerId])
-  @@index([boxerId])
+  @@id([userId, fighterId])
+  @@index([fighterId])
 }

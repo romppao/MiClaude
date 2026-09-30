@@ -9,7 +9,7 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<{ q
   const { q, province } = await searchParams;
   const gyms = await db.gym.findMany({
     where: { ...(province && { province }), ...(q && { OR: [{ name: { contains: q, mode: "insensitive" } }, { city: { contains: q, mode: "insensitive" } }] }) },
-    orderBy: { name: "asc" }, take: 100, include: { _count: { select: { boxers: true } } },
+    orderBy: { name: "asc" }, take: 100, include: { _count: { select: { fighters: true } } },
   });
   return (
     <>
@@ -21,7 +21,7 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<{ q
       </form>
       <div className="grid">
         {gyms.map((g) => (
-          <Link key={g.id} href={`/gimnasios/${g.slug}`} className="card"><strong>{g.name}</strong>{g.verifiedAt && <span className="tag PRO" style={{ marginLeft: 6 }}>✓</span>}<div className="mut">{g.city} ({g.province}) · {g._count.boxers} boxeadores</div></Link>
+          <Link key={g.id} href={`/gimnasios/${g.slug}`} className="card"><strong>{g.name}</strong>{g.verifiedAt && <span className="tag PRO" style={{ marginLeft: 6 }}>✓</span>}<div className="mut">{g.city} ({g.province}) · {g._count.fighters} peleadores</div></Link>
         ))}
       </div>
       {gyms.length === 0 && <p className="mut">Sin resultados.</p>}

@@ -9,13 +9,13 @@ export const dynamic = "force-dynamic";
 export default async function Ranking({ searchParams }: { searchParams: Promise<{ province?: string }> }) {
   const province = (await searchParams).province ?? "Madrid";
   const groups = await db.rating.groupBy({
-    by: ["boxerId"], _avg: { score: true }, _count: { _all: true },
-    where: { boxer: { level: "AMATEUR", ...(province !== "all" && { province }) } },
+    by: ["fighterId"], _avg: { score: true }, _count: { _all: true },
+    where: { fighter: { level: "AMATEUR", ...(province !== "all" && { province }) } },
   });
   const prior = groups.length ? groups.reduce((s, g) => s + (g._avg.score ?? 0), 0) / groups.length : 3;
-  const boxers = await db.boxer.findMany({ where: { id: { in: groups.map((g) => g.boxerId) } }, include: { gym: true } });
+  const fighters = await db.fighter.findMany({ where: { id: { in: groups.map((g) => g.fighterId) } }, include: { gym: true } });
   const rows = groups
-    .map((g) => ({ boxer: boxers.find((b) => b.id === g.boxerId)!, avg: g._avg.score ?? 0, n: g._count._all }))
+    .map((g) => ({ fighter: fighters.find((b) => b.id === g.fighterId)!, avg: g._avg.score ?? 0, n: g._count._all }))
     .map((r) => ({ ...r, rank: bayesian(r.avg, r.n, prior) }))
     .sort((a, b) => b.rank - a.rank);
   return (
@@ -26,12 +26,12 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <button>Filtrar</button>
       </form>
       <table>
-        <thead><tr><th>#</th><th>Boxeador</th><th>Nota</th><th>Votos</th></tr></thead>
+        <thead><tr><th>#</th><th>Peleador</th><th>Nota</th><th>Votos</th></tr></thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={r.boxer.id}>
+            <tr key={r.fighter.id}>
               <td>{i + 1}</td>
-              <td><Link href={`/boxeadores/${r.boxer.slug}`}>{r.boxer.firstName} {r.boxer.lastName}</Link> <span className="mut">{r.boxer.gym?.name}</span></td>
+              <td><Link href={`/peleadores/${r.fighter.slug}`}>{r.fighter.firstName} {r.fighter.lastName}</Link> <span className="mut">{r.fighter.gym?.name}</span></td>
               <td>{r.avg.toFixed(2)}</td><td>{r.n}</td>
             </tr>
           ))}

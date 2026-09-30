@@ -6,5 +6,5 @@ export const REPORT_REASONS: Record<string, string> = {
   OTRO: "Otro motivo",
 };
 
-export const REPORT_ENTITIES = ["BOUT", "BOXER"] as const;
+export const REPORT_ENTITIES = ["BOUT", "FIGHTER"] as const;
 export const MAX_REPORTS_PER_DAY = 10;

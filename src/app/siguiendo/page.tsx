@@ -3,36 +3,36 @@ import { requireUser } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { LEVEL_LABEL, fmtDate } from "../../lib/labels";
 
-export const metadata = { title: "Mis boxeadores" };
+export const metadata = { title: "Mis peleadores" };
 export const dynamic = "force-dynamic";
 
 export default async function Following() {
   const user = await requireUser();
-  const follows = await db.follow.findMany({ where: { userId: user.id }, include: { boxer: { include: { gym: true } } }, orderBy: { createdAt: "desc" } });
-  const ids = follows.map((f) => f.boxerId);
+  const follows = await db.follow.findMany({ where: { userId: user.id }, include: { fighter: { include: { gym: true } } }, orderBy: { createdAt: "desc" } });
+  const ids = follows.map((f) => f.fighterId);
   const bouts = ids.length
     ? await db.bout.findMany({
-        where: { verification: { not: "DISPUTED" }, event: { status: { not: "CANCELLED" } }, OR: [{ boxerAId: { in: ids } }, { boxerBId: { in: ids } }] },
-        include: { event: true, boxerA: true, boxerB: true }, orderBy: { event: { date: "asc" } },
+        where: { verification: { not: "DISPUTED" }, event: { status: { not: "CANCELLED" } }, OR: [{ fighterAId: { in: ids } }, { fighterBId: { in: ids } }] },
+        include: { event: true, fighterA: true, fighterB: true }, orderBy: { event: { date: "asc" } },
       })
     : [];
   const now = Date.now();
   const upcoming = bouts.filter((b) => b.event.date.getTime() >= now - 864e5);
   const recent = bouts.filter((b) => b.event.date.getTime() < now - 864e5 && b.result).slice(-10).reverse();
-  const fights = (b: (typeof bouts)[number]) => `${b.boxerA.firstName} ${b.boxerA.lastName} vs ${b.boxerB.firstName} ${b.boxerB.lastName}`;
+  const fights = (b: (typeof bouts)[number]) => `${b.fighterA.firstName} ${b.fighterA.lastName} vs ${b.fighterB.firstName} ${b.fighterB.lastName}`;
 
   return (
     <>
-      <h1>Mis boxeadores</h1>
+      <h1>Mis peleadores</h1>
       {follows.length === 0 ? (
         <>
-          <p>Todavía no sigues a ningún boxeador. Cuando sigas a alguien, aquí verás sus próximas veladas y sus últimos resultados.</p>
-          <p><Link href="/ranking">Ver el ránking</Link> · <Link href="/boxeadores">Buscar boxeadores</Link></p>
+          <p>Todavía no sigues a ningún peleador. Cuando sigas a alguien, aquí verás sus próximas veladas y sus últimos resultados.</p>
+          <p><Link href="/ranking">Ver el ránking</Link> · <Link href="/peleadores">Buscar peleadores</Link></p>
         </>
       ) : (
         <>
           <h2>Próximos combates</h2>
-          {upcoming.length === 0 ? <p className="mut">Ninguno de los boxeadores que sigues tiene un combate programado por ahora.</p> : (
+          {upcoming.length === 0 ? <p className="mut">Ninguno de los peleadores que sigues tiene un combate programado por ahora.</p> : (
             <table><tbody>
               {upcoming.map((b) => (
                 <tr key={b.id}>
@@ -50,17 +50,17 @@ export default async function Following() {
                 <tr key={b.id}>
                   <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
                   <td>{fights(b)}</td>
-                  <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${b.result === "A_WIN" ? b.boxerA.firstName + " " + b.boxerA.lastName : b.boxerB.firstName + " " + b.boxerB.lastName}`}</td>
+                  <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${b.result === "A_WIN" ? b.fighterA.firstName + " " + b.fighterA.lastName : b.fighterB.firstName + " " + b.fighterB.lastName}`}</td>
                 </tr>
               ))}
             </tbody></table>
           )}
-          <h2>Boxeadores que sigues ({follows.length})</h2>
+          <h2>Peleadores que sigues ({follows.length})</h2>
           <div className="grid">
             {follows.map((f) => (
-              <Link key={f.boxerId} href={`/boxeadores/${f.boxer.slug}`} className="card">
-                <strong>{f.boxer.firstName} {f.boxer.lastName}</strong>
-                <div className="mut">{f.boxer.gym?.name ?? f.boxer.city ?? ""}</div>
+              <Link key={f.fighterId} href={`/peleadores/${f.fighter.slug}`} className="card">
+                <strong>{f.fighter.firstName} {f.fighter.lastName}</strong>
+                <div className="mut">{f.fighter.gym?.name ?? f.fighter.city ?? ""}</div>
               </Link>
             ))}
           </div>

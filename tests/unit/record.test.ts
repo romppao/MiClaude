@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { computeRecords, formatRecord, type BoutForRecord } from "../../src/lib/record";
 
 const bout = (over: Partial<BoutForRecord> & { level?: "PRO" | "AMATEUR"; status?: string }): BoutForRecord => ({
-  boxerAId: "me",
+  fighterAId: "me",
   result: "A_WIN",
   method: "UD",
   verification: "VERIFIED",
@@ -11,12 +11,12 @@ const bout = (over: Partial<BoutForRecord> & { level?: "PRO" | "AMATEUR"; status
 });
 
 describe("computeRecords", () => {
-  it("cuenta victorias y derrotas según la esquina en la que estaba el boxeador", () => {
+  it("cuenta victorias y derrotas según la esquina en la que estaba el peleador", () => {
     const r = computeRecords("me", [
       bout({ result: "A_WIN" }), // gana como A
-      bout({ boxerAId: "otro", result: "B_WIN" }), // gana como B
+      bout({ fighterAId: "otro", result: "B_WIN" }), // gana como B
       bout({ result: "B_WIN" }), // pierde como A
-      bout({ boxerAId: "otro", result: "A_WIN" }), // pierde como B
+      bout({ fighterAId: "otro", result: "A_WIN" }), // pierde como B
     ]).AMATEUR;
     expect(r).toMatchObject({ w: 2, l: 2, d: 0 });
   });

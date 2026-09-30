@@ -8,7 +8,7 @@ import { logout } from "./actions";
 
 export const metadata: Metadata = {
   title: { default: "Ring España", template: "%s · Ring España" },
-  description: "La base de datos del boxeo español: boxeadores profesionales y amateur, récords, veladas, gimnasios y entrenadores.",
+  description: "La base de datos del boxeo español: peleadores profesionales y amateur, récords, veladas, gimnasios y entrenadores.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="in">
             <Link href="/" className="logo">RING <b>ESPAÑA</b></Link>
             <nav>
-              <Link href="/boxeadores">Boxeadores</Link>
+              <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>
               <Link href="/veladas">Veladas</Link>
               <Link href="/gimnasios">Gimnasios</Link>
@@ -31,8 +31,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {user ? (
               <>
                 {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu email</Link>}
-                <Link href="/siguiendo">Mis boxeadores</Link>
-                <Link href="/mi-ficha">{user.boxer ? "Mi ficha" : user.name}</Link>
+                <Link href="/siguiendo">Mis peleadores</Link>
+                <Link href="/mi-ficha">{user.fighter ? "Mi ficha" : user.name}</Link>
                 {user.role === "ADMIN" && <Link href="/admin">Moderación</Link>}
                 <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
               </>

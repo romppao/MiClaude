@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function GymPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const gym = await db.gym.findUnique({ where: { slug }, include: { boxers: { orderBy: { lastName: "asc" } }, trainers: true } });
+  const gym = await db.gym.findUnique({ where: { slug }, include: { fighters: { orderBy: { lastName: "asc" } }, trainers: true } });
   if (!gym) notFound();
   return (
     <>
@@ -16,9 +16,9 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       <h2>Entrenadores</h2>
       <ul>{gym.trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</ul>
-      <h2>Boxeadores</h2>
+      <h2>Peleadores</h2>
       <div className="grid">
-        {gym.boxers.map((b) => <Link key={b.id} href={`/boxeadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><strong>{b.firstName} {b.lastName}</strong></Link>)}
+        {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>
     </>
   );

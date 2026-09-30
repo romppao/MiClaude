@@ -15,14 +15,14 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (user?.role !== "ADMIN") redirect("/");
   const pending = await db.bout.findMany({
     where: { verification: { in: ["SELF_REPORTED", "CONFIRMED"] } },
-    include: { event: true, boxerA: true, boxerB: true }, orderBy: { event: { date: "desc" } }, take: 100,
+    include: { event: true, fighterA: true, fighterB: true }, orderBy: { event: { date: "desc" } }, take: 100,
   });
   const reports = await db.report.findMany({ where: { status: "OPEN" }, include: { user: { select: { name: true, email: true } } }, orderBy: { createdAt: "asc" }, take: 100 });
-  const reportedBouts = await db.bout.findMany({ where: { id: { in: reports.filter((r) => r.entity === "BOUT").map((r) => r.entityId) } }, include: { event: true, boxerA: true, boxerB: true } });
-  const reportedBoxers = await db.boxer.findMany({ where: { id: { in: reports.filter((r) => r.entity === "BOXER").map((r) => r.entityId) } } });
+  const reportedBouts = await db.bout.findMany({ where: { id: { in: reports.filter((r) => r.entity === "BOUT").map((r) => r.entityId) } }, include: { event: true, fighterA: true, fighterB: true } });
+  const reportedFighters = await db.fighter.findMany({ where: { id: { in: reports.filter((r) => r.entity === "FIGHTER").map((r) => r.entityId) } } });
   const [gyms, claims, organizers] = await Promise.all([
     db.gym.findMany({ orderBy: [{ verifiedAt: "asc" }, { name: "asc" }], take: 100 }),
-    db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, boxer: true }, orderBy: { createdAt: "asc" } }),
+    db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, fighter: true }, orderBy: { createdAt: "asc" } }),
     db.organizerRequest.findMany({ where: { status: "PENDING" }, include: { user: true }, orderBy: { createdAt: "asc" } }),
   ]);
   pending.sort((a, b) => b.flags.length - a.flags.length); // primero los que tienen señales de coherencia
@@ -43,7 +43,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       <table><tbody>
         {reports.map((r) => {
           const bout = reportedBouts.find((b) => b.id === r.entityId);
-          const boxer = reportedBoxers.find((b) => b.id === r.entityId);
+          const fighter = reportedFighters.find((b) => b.id === r.entityId);
           return (
             <tr key={r.id}>
               <td>
@@ -52,8 +52,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                 {r.message && <div>{r.message}</div>}
               </td>
               <td>
-                {bout && <Link href={`/veladas/${bout.event.slug}`}>{bout.boxerA.firstName} {bout.boxerA.lastName} vs {bout.boxerB.firstName} {bout.boxerB.lastName} ({bout.event.name})</Link>}
-                {boxer && <Link href={`/boxeadores/${boxer.slug}`}>{boxer.firstName} {boxer.lastName}</Link>}
+                {bout && <Link href={`/veladas/${bout.event.slug}`}>{bout.fighterA.firstName} {bout.fighterA.lastName} vs {bout.fighterB.firstName} {bout.fighterB.lastName} ({bout.event.name})</Link>}
+                {fighter && <Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link>}
               </td>
               <td>
                 <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -73,7 +73,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         {claims.map((c) => (
           <tr key={c.id}>
             <td><strong>{c.user.name}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " ✓" : ""}</span></td>
-            <td>quiere la ficha de {c.boxer.firstName} {c.boxer.lastName}</td>
+            <td>quiere la ficha de {c.fighter.firstName} {c.fighter.lastName}</td>
             <td className="mut">{c.message}</td>
             <td>{decide(decideClaim, "claimId", c.id)}</td>
           </tr>
@@ -112,7 +112,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           {pending.map((b) => (
             <tr key={b.id}>
               <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-              <td>{b.boxerA.firstName} {b.boxerA.lastName} vs {b.boxerB.firstName} {b.boxerB.lastName}{b.flags.map((f) => <div key={f} className="L" style={{ fontSize: ".8rem" }}>⚠ {FLAG_LABEL[f as Flag] ?? f}</div>)}</td>
+              <td>{b.fighterA.firstName} {b.fighterA.lastName} vs {b.fighterB.firstName} {b.fighterB.lastName}{b.flags.map((f) => <div key={f} className="L" style={{ fontSize: ".8rem" }}>⚠ {FLAG_LABEL[f as Flag] ?? f}</div>)}</td>
               <td>{b.verification}{b.evidenceUrl && <> · <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">evidencia ↗</a></>}</td>
               <td>
                 <form action={adminDecide} style={{ display: "flex", gap: 6 }}>
