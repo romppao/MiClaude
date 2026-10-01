@@ -19,10 +19,13 @@ import { createMyFighter, requestClaim, saveDiscipline, updateMyFighter } from "
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
 
-export default async function MyProfile({ searchParams }: { searchParams: Promise<{ q?: string | string[] }> }) {
+export default async function MyProfile({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser("/mi-ficha");
   if (!user.emailVerifiedAt) redirect("/verificar");
-  const q = oneParam((await searchParams).q)?.slice(0, 100);
+  const sp = await searchParams;
+  const q = oneParam(sp.q)?.slice(0, 100);
+  // Al volver desde «¿Quién es tu rival?» con «Corregir los datos del combate», el formulario se rellena con lo que se había escrito.
+  const previo = (campo: string) => (oneParam(sp[campo]) ?? "").slice(0, 500);
   const me = user.fighter;
 
   if (!me) {
@@ -157,26 +160,26 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Registrar un combate</h2>
       <form className="search" action={addBout}>
         <label className="field"><span>Disciplina</span>
-          <select name="discipline" defaultValue={me.disciplines[0]?.discipline}>
+          <select name="discipline" defaultValue={previo("discipline") || me.disciplines[0]?.discipline}>
             {me.disciplines.map((d) => <option key={d.discipline} value={d.discipline}>{DISCIPLINE_LABEL[d.discipline]}</option>)}
           </select>
         </label>
-        <label className="field"><span>Nombre de la velada</span><input name="eventName" required maxLength={LIMITS.eventName} /></label>
-        <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>
-        <label className="field"><span>Recinto (opcional)</span><input name="venue" maxLength={LIMITS.venue} /></label>
-        <label className="field"><span>Ciudad</span><input name="city" defaultValue={me.city ?? "Madrid"} maxLength={LIMITS.city} /></label>
-        <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? "Madrid"}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
-        <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" required maxLength={LIMITS.firstName} /></label>
-        <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" required maxLength={LIMITS.lastName} /></label>
+        <label className="field"><span>Nombre de la velada</span><input name="eventName" defaultValue={previo("eventName")} required maxLength={LIMITS.eventName} /></label>
+        <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={previo("date")} required min="1980-01-01" /></label>
+        <label className="field"><span>Recinto (opcional)</span><input name="venue" defaultValue={previo("venue")} maxLength={LIMITS.venue} /></label>
+        <label className="field"><span>Ciudad</span><input name="city" defaultValue={previo("city") || (me.city ?? "Madrid")} maxLength={LIMITS.city} /></label>
+        <label className="field"><span>Provincia</span><select name="province" defaultValue={previo("province") || (me.province ?? "Madrid")}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+        <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" defaultValue={previo("oppFirst")} required maxLength={LIMITS.firstName} /></label>
+        <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" defaultValue={previo("oppLast")} required maxLength={LIMITS.lastName} /></label>
         <label className="field"><span>Resultado</span>
-          <select name="outcome" defaultValue="">
+          <select name="outcome" defaultValue={previo("outcome")}>
             <option value="">Elige el resultado…</option>
             <option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>
           </select>
           <span className="hint">Si el combate todavía no se ha celebrado, déjalo sin elegir: podrás añadirlo después.</span>
         </label>
         <label className="field"><span>Cómo terminó</span>
-          <select name="method" defaultValue="">
+          <select name="method" defaultValue={previo("method")}>
             <option value="">Elige cómo terminó…</option>
             <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
             <option value="KO">KO</option><option value="TKO">TKO</option><option value="SUBMISSION">Sumisión</option><option value="POINTS">Puntos</option><option value="ADVANTAGE">Ventajas</option>
@@ -184,9 +187,9 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           </select>
           <span className="hint">Elige la que corresponda a tu disciplina (la sumisión, los puntos y las ventajas solo existen en MMA y jiu-jitsu). En empates no hace falta.</span>
         </label>
-        <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
-        <label className="field"><span>Asalto en que terminó (opcional)</span><input name="endRound" type="number" min={1} max={12} /><span className="hint">Solo si acabó por KO, TKO, abandono, sumisión o descalificación.</span></label>
-        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" maxLength={LIMITS.url} placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
+        <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" defaultValue={previo("rounds")} type="number" min={1} max={12} /></label>
+        <label className="field"><span>Asalto en que terminó (opcional)</span><input name="endRound" defaultValue={previo("endRound")} type="number" min={1} max={12} /><span className="hint">Solo si acabó por KO, TKO, abandono, sumisión o descalificación.</span></label>
+        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" defaultValue={previo("evidenceUrl")} maxLength={LIMITS.url} placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
         <button>Registrar este combate</button>
       </form>
       <h2>Mis combates</h2>

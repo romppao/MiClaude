@@ -69,7 +69,11 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 **Auditoría de código** (`docs/AUDITORIA.md`): 99 hallazgos — **49 corregidos, 18 parciales, 27 pendientes, 2 a decidir por el fundador y 3 descartados con motivo**. Los bloques 1 a 4 están completos; el 5 está a medias.
 Verificación: **96 de los 99** pasaron una verificación adversarial con tres comprobadores. Se refutaron 5: el 81, el 83 y el 90 por ser falsos o exagerados, y el 91 y el 92 porque, al comprobarlos, ya estaban corregidos. Los **97, 98 y 99** no se pudieron verificar (se acabó el límite de uso de la sesión dos veces); comprueba que el problema existe antes de corregirlos. La pasada final de «huecos» tampoco llegó a ejecutarse. `AUDITORIA.md` indica el estado de esta verificación.
 
-**Pruebas:** 103 unitarias (`tests/unit`) y 146 comprobaciones de navegador en cinco guiones (`tests/e2e/flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`, con ayudas comunes en `ayudas.mjs`), más la medición de accesibilidad `test:a11y` (fuera del CI todavía).
+**Pruebas (todas en el CI):** 266 unitarias (`tests/unit`: reglas, seguridad, autorización de cada acción, mensajes, dependencias entre carpetas…), 193 comprobaciones de navegador en seis guiones (`tests/e2e/flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`, `usabilidad`, con ayudas comunes en `ayudas.mjs`) y la medición de accesibilidad `test:a11y` (axe-core, WCAG 2.2 AA, 0 incumplimientos).
+
+**Organización del código (1 de octubre):** acciones en módulos por dominio, lógica en `src/lib/<dominio>`, reglas de dependencias comprobadas por prueba y un mapa funcional generado. Guía en [`DESARROLLO.md`](DESARROLLO.md); mapa en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
+
+**Pruebas por personas y revisión de código (1 de octubre):** dos flujos de agentes que se cortaron por el límite de uso; los hallazgos disponibles (19 de la persona «visitante», 44 de tres revisores) están **corregidos o clasificados** en [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md), que también cuenta qué quedó sin ejecutar.
 
 ## 5. Reglas técnicas que conviene no olvidar
 
@@ -86,32 +90,14 @@ Verificación: **96 de los 99** pasaron una verificación adversarial con tres c
 
 ## 6. Lo que queda por hacer, en orden
 
-### Bloque 5 — resto (búsqueda, rendimiento, despliegue)
-- **Migraciones:** el proyecto usa `prisma db push`. Antes de producción hay que crear la migración de referencia (`prisma migrate`) y cambiar el CI y el despliegue a `migrate deploy`. Sin hacer.
-- Colas de moderación con paginación real (hoy limitadas a 100 con aviso) — hallazgo 50.
-- Alinear `@types/node` con Node 22 y añadir *lint* al CI — hallazgo 82.
-- Favicon e imagen para compartir: **son diseño; se dejan para la fase de diseño** (hallazgo 51).
-- Elegir alojamiento y desplegar (la base de datos gestionada y el proveedor de correo Resend necesitan cuentas del fundador).
+Prioridad del fundador: **funcionalidad completa y sin fallos; el diseño, después.**
 
-### Bloque 6 — accesibilidad y usabilidad (hallazgos 53–78 y `test:a11y`)
-Sin cambiar el estilo visual (se consulta al fundador antes):
-- Contraste del texto (`.tag.AMATEUR`), contraste de campos y botones secundarios, enlaces dentro del texto solo distinguibles por color, tamaño mínimo de 16 px y zonas táctiles de 44 px, `color-scheme` para los controles nativos.
-- Desplegables y campos sin etiqueta visible ni nombre accesible; botones dentro de enlaces (páginas «no encontrada» y de error); anuncio de avisos a lectores de pantalla; nombres de enlaces repetidos o ambiguos; cabeceras de tabla.
-- **No perder lo escrito tras un error** en los formularios largos (hoy la redirección lo borra).
-- Cabecera con demasiados controles («Mis peleadores» se confunde con «Mi ficha»); un organizador aprobado no tiene enlace visible a su panel; la portada no ofrece un botón para registrarse; secciones vacías sin mensaje; tablas que no se adaptan al móvil.
-- Los rechazos y resoluciones de moderación no dicen el motivo y se promete un aviso que no existe (hallazgo 53).
-- Meter `test:a11y` en el CI (hoy da 13 incumplimientos graves, que es lo que hay que corregir primero).
-- **Probar con personas reales de distintas edades** (incluida gente mayor): la regla 11 del principio fundacional; no la puede hacer una IA.
-
-### Bloque 7 — pruebas y documentación (hallazgos 84–99)
-- Pruebas de autorización por cada acción del servidor (qué rol puede y cuál no).
-- Pruebas unitarias de caducidad de sesiones y enlaces; casos límite de `parsePrior`.
-- Diagnóstico al fallar las pruebas de navegador (capturas) y base de datos aislada por ejecución.
-- Documentos que describen cosas antiguas: `docs/ARQUITECTURA.md` (se actualizó parte en este traslado), vocabulario residual («boxeador», «valoración», «email»), la descripción del sitio solo habla de boxeo.
-- La aprobación de organizador no exige nota de evidencia (hallazgo 93).
-
-### Después de la estructura básica (decisión del fundador)
-Funciones premium (hasta tres clics de aura, herramientas para organizadores…), **sin vender nunca verificación, sello ni posición en el ránking**. Y la **fase de diseño visual**, que el fundador pide al final: empezar por un *briefing* con él (ver `CLAUDE.md`), varias direcciones distintas, diseñador humano para la marca y decisiones en `docs/DISENO.md` (se crea entonces).
+1. **Terminar las pruebas por personas** (guion en [`pruebas/personas.md`](pruebas/personas.md)): se ejecutó la persona «visitante» y se lanzó una segunda tanda (aficionado, peleador, rival, organizador, moderadora); faltan **seguridad, móvil y teclado, persona mayor y exploración destructiva**, y los revisores de código que no llegaron a ejecutarse (pruebas, documentos, datos y privacidad). Cada hallazgo se reproduce, se corrige con su prueba y se anota en [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md) (o en un fichero nuevo por fecha).
+2. **Mejoras ya identificadas y no hechas:** colas de moderación con paginación real (hallazgo 50); alinear `@types/node` con Node 22 y añadir *lint* al CI (hallazgo 82); comprobar los hallazgos 97, 98 y 99 de la auditoría, que no se verificaron, y la pasada de «huecos», que no llegó a ejecutarse.
+3. **Antes de publicar:** elegir alojamiento y desplegar (la base de datos gestionada y el proveedor de correo Resend necesitan cuentas del fundador); definir `APP_URL`, `CONTACT_EMAIL`, `RESPONSABLE_NOMBRE` y **`TRUSTED_PROXY_HOPS`** (cuántos proxies hay delante: si está mal, los límites por IP no protegen o bloquean a todos); revisión jurídica del texto de privacidad y política de menores (sección 7).
+4. **Probar con personas reales de distintas edades**, incluida gente mayor (regla 11 del principio fundacional): no lo puede hacer una IA.
+5. **Análisis de la competencia** (sección 8) cuando haya acceso a internet.
+6. **Después de la estructura básica (decisión del fundador):** funciones premium (hasta tres clics de aura, herramientas para organizadores…), **sin vender nunca verificación, sello ni posición en el ránking**; y la **fase de diseño visual**, que el fundador pide al final: empezar por un *briefing* con él (ver `CLAUDE.md`), varias direcciones distintas, diseñador humano para la marca y decisiones en `docs/DISENO.md` (se crea entonces). El favicon y la imagen para compartir son diseño y entran en esa fase.
 
 ## 7. Decisiones que necesitan al fundador
 
@@ -127,6 +113,9 @@ Funciones premium (hasta tres clics de aura, herramientas para organizadores…)
 10. **Nombre de la marca** («Ring España» encaja peor ahora que hay MMA, K-1…) y **si el código también debe ir en español** (supone un renombrado grande).
 11. **Alojamiento y correo:** dónde se despliega, cuenta de Resend y dominio para los correos.
 12. **Personas para probar la usabilidad** (edades y familiaridad con la tecnología).
+13. **Correo de contacto y responsable** (`CONTACT_EMAIL`, `RESPONSABLE_NOMBRE`): hoy, sin ellos, la privacidad no ofrece ningún medio de contacto a quien no tiene cuenta. Hay que decidir cuál es.
+14. **Carteles oficiales y fichas provisionales:** cuando un organizador añade a un cartel una ficha que creó otra persona al registrar un combate, esa ficha pasa a ser pública con nombre completo (hoy se acepta porque un cartel de una velada es público). Revisión pendiente: ¿debe confirmar antes la persona afectada?
+15. **Ocultar una ficha** (moderación) borra sus datos personales de forma irreversible: hoy exige anotar el motivo y solo vale para fichas sin titular. ¿Debe existir una forma de restaurarla durante unos días?
 
 ## 8. Pendiente que solo se puede hacer con acceso a internet
 

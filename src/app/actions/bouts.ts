@@ -14,13 +14,11 @@ import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
 import { isDiscipline } from "../../lib/common/disciplines";
 import { findNameCandidates } from "../../lib/fighters/fighters";
 import { boutVersion, pairKey, validateOutcome } from "../../lib/bouts/rules";
+import { boutQuery } from "../../lib/bouts/form";
 import { LIMITS } from "../../lib/common/text";
 import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, readProvince, Rechazo, str, uniqueSlug } from "./shared";
 
 const MAX_BOUTS_PER_DAY = 10;
-
-/** Campos del formulario «Registrar un combate» que se reenvían al elegir al rival. */
-const BOUT_FIELDS = ["discipline", "eventName", "date", "venue", "city", "province", "oppFirst", "oppLast", "outcome", "method", "rounds", "endRound", "evidenceUrl"] as const;
 
 /**
  * El peleador registra un combate propio. Queda «pendiente de confirmar» hasta que el rival lo confirme o un moderador lo verifique.
@@ -73,16 +71,16 @@ export async function addBout(f: FormData) {
   } else if (!rivalId) {
     // Como en la pantalla de elección: la propia ficha del peleador no cuenta como candidata (si fuera la única, se perdería el combate en una redirección muda).
     if ((await findNameCandidates(oppFirst, oppLast)).some((c) => c.id !== me.id)) {
-      const qs = new URLSearchParams();
-      for (const k of BOUT_FIELDS) if (str(f, k)) qs.set(k, str(f, k));
-      go(`/mi-ficha/rival?${qs.toString()}`);
+      go(`/mi-ficha/rival?${boutQuery((k) => str(f, k))}`);
     }
   }
   if (rivalExisting && rivalExisting.id === me.id) go(back, { problema: "combate_mismo" });
 
   const slugBase = slugName(eventName, dayKey(date));
 
-  const created = await guard(back, () =>
+  // Si la persona venía de elegir entre homónimos, un error posterior la devuelve a esa pantalla con sus datos (no a un formulario vacío).
+  const retry = rivalId ? `/mi-ficha/rival?${boutQuery((k) => str(f, k))}` : back;
+  const created = await guard(retry, () =>
     db.$transaction(async (tx) => {
       // El tope diario se vuelve a comprobar dentro de la transacción y con un bloqueo: peticiones simultáneas no pueden saltárselo.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`combate:${user.id}`}))`;

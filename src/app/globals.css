@@ -37,6 +37,7 @@ button{background:var(--red);border-color:var(--red);cursor:pointer;font-weight:
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
 th{color:var(--mut);font-weight:600}
+th.celda-fila{color:var(--text);font-weight:400} /* cabecera de fila: es la primera celda de los datos, se ve como una celda normal */
 .W{color:#3fb950;font-weight:700}.L{color:#f85149;font-weight:700}.D{color:var(--mut);font-weight:700}
 .rec{font-size:1.6rem;font-weight:800}
 .hero{padding:32px 0}.hero h1{font-size:2.2rem}

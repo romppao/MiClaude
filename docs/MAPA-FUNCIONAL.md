@@ -158,6 +158,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `form.ts` | `BOUT_FIELDS`, `boutQuery` |
 | `rules.ts` | `OUTCOME_TO_RESULT`, `OutcomeKey`, `OutcomeProblema`, `boutVersion`, `pairKey`, `validateOutcome` |
 
 ### `lib/common`

@@ -158,7 +158,7 @@ Crea la carpeta, añádela a `PERMITIDAS` en `tests/unit/arquitectura.test.ts` c
 | Unitarias | `npm test` | siempre (reglas, seguridad, autorización, mensajes, organización del código) |
 | Navegador | `npm run test:e2e` y `npm run test:a11y` con el servidor en marcha (README) | cuando cambia una pantalla o una acción |
 | Entorno propio | `scripts/entorno-aislado.sh iniciar <nombre> <puerto> --semilla` | para probar sin pisar a otra persona (cada una tiene su base y su servidor) |
-| Recorridos por personas | `docs/pruebas/personas.md` | antes de dar por bueno un bloque de funcionalidad |
+| Recorridos por personas | Guion en `docs/pruebas/personas.md`; con Claude Code, `docs/pruebas/qa-por-personas.workflow.js` lanza agentes que lo recorren en navegador real (instrucciones en el propio fichero). Cada hallazgo se reproduce antes de corregirlo y se anota en `docs/pruebas/hallazgos-<fecha>.md` | antes de dar por bueno un bloque de funcionalidad |
 
 Reglas aprendidas (detalle en [`LECCIONES.md`](LECCIONES.md)): las pruebas de navegador **esperan a un estado visible** (`seen()`), usan **datos únicos por ejecución** y no dependen del volumen de la base; una comprobación negativa solo vale si se ha visto fallar contra el código roto; tras reiniciar el servidor local se comprueba que no hay `EADDRINUSE`.
 

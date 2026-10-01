@@ -6,11 +6,12 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/common/discipli
 import { publicFighterName } from "../../../lib/common/names";
 import { oneParam } from "../../../lib/common/safe";
 import { addBout } from "../../actions/bouts";
+import { BOUT_FIELDS, boutQuery } from "../../../lib/bouts/form";
 
 export const metadata = { title: "¿Quién es tu rival?", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-const CAMPOS = ["discipline", "eventName", "date", "venue", "city", "province", "oppFirst", "oppLast", "outcome", "method", "rounds", "endRound", "evidenceUrl"] as const;
+const CAMPOS = BOUT_FIELDS;
 
 /**
  * Paso intermedio de «Registrar un combate»: ya hay fichas con el nombre del rival. Se pide a la persona que elija cuál es
@@ -58,7 +59,7 @@ export default async function ChooseRival({ searchParams }: { searchParams: Prom
           <button className="secondary" style={{ marginTop: 8 }} aria-label={`Crear una ficha nueva para ${valores.oppFirst} ${valores.oppLast}`}>Crear una ficha nueva</button>
         </form>
       </div>
-      <p><Link href="/mi-ficha">Volver a «Mi ficha» sin registrar el combate</Link></p>
+      <p className="acciones"><Link className="btn secondary" href={`/mi-ficha?${boutQuery((k) => valores[k] ?? "")}`}>Corregir los datos del combate</Link><Link href="/mi-ficha">Volver a «Mi ficha» sin registrar el combate</Link></p>
     </>
   );
 }

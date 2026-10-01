@@ -411,9 +411,44 @@ Decisiones que tomó el asistente y que el fundador debe conocer (★ = necesita
 
 ### Estado y próximos pasos
 
-(Se completa abajo con los resultados de la revisión independiente.)
+Los resultados de la revisión independiente y de la primera pasada de pruebas por personas están en la entrada siguiente (1 de octubre, funcionalidad completa y organización).
 
 ---
+
+## Sesión 1 (continuación) — 1 de octubre de 2026 — Funcionalidad completa y organización escalable
+
+### Qué se pidió / qué idea surgió
+
+Palabras del fundador: «No quiero que te centres ahora mismo en diseños, colores. Lo que quiero es que te centres en la funcionalidad completa de la aplicación. No quiero fallas en el sistema, funcionalidades inservibles, botones que no funcionan… que un usuario pueda entrar, entienda absolutamente todo, le funcione todo correctamente y esté todo organizado. Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo.» Y sobre la forma de trabajar: «como estamos haciendo vibe coding, es muy importante la organización, la estructura […] para que pueda ser escalable […] una buena base, un buen hábito de desarrollo, documentando todo, esquematizando todas las cosas. Que haya una red clara de a dónde seguir, qué rutas tomar para hacer X cosas. En algún momento ampliaré el equipo […]. No puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado.»
+
+### Qué se decidió y por qué
+
+- **Prioridad única: funcionalidad.** Nada de diseño visual. Se recorrió la aplicación «como lo haría una persona», con agentes que hacen de personas de prueba en navegador real (guion en `docs/pruebas/personas.md`, entorno aislado por persona con `scripts/entorno-aislado.sh`) y una revisión de código independiente.
+- **Estructura por dominios** en lugar de un fichero de acciones de 931 líneas y 27 ficheros planos en `src/lib`: acciones en módulos por dominio, lógica agrupada por dominio, **reglas de dependencia comprobadas por una prueba** (así no se pueden romper sin que falle el CI), una guía con recetas («cómo hago X»), un índice de documentación y un **mapa funcional generado del código** (se comprueba en el CI, así nunca queda desfasado). Se hizo con un script que usa el analizador de TypeScript y se validó primero en una copia (tipos, 237 pruebas, compilación y 174 comprobaciones de navegador) antes de tocar el repositorio. El movimiento fue un commit aparte, sin cambios de comportamiento.
+- **Cada hallazgo se reproduce antes de corregirse** y se corrige con su prueba. Todo queda registrado en `docs/pruebas/hallazgos-2026-10-01.md`.
+
+### Qué se hizo
+
+- **Reorganización** (commit `0576eb5`): ver arriba y `docs/DESARROLLO.md`, `docs/README.md`, `docs/MAPA-FUNCIONAL.md`.
+- **Lo que salió de las pruebas por personas** (solo terminó la persona «visitante», 19 hallazgos): error 500 con `?constructor=` (y con `%00` y parámetros repetidos) en todas las pantallas con filtros → `src/middleware.ts`; fichas de peleador y de velada ilegibles en el móvil → tablas apiladas; redirecciones mudas a «Entrar» → `requireUser(ruta)` y guardas de permisos en un solo sitio; quien se registra desde «Entra para dar aura» perdía el sitio → ruta de vuelta; resultados pendientes mostrados de forma incoherente; formularios en columna torcidos por una regresión de CSS mía; textos que explican por qué algo no se puede hacer.
+- **Lo que salió de la revisión de código** (44 hallazgos de 3 revisores, sin verificación adversarial): límite de intentos de acceso que se saltaba con peticiones simultáneas (`reservar()`); `resetPassword` que calculaba el hash antes de validar el enlace; confirmación del rival no ligada al resultado que vio y combates confirmados sin resultado que quedaban atascados; decisiones de moderación que se pisaban; datos personales que quedaban en el historial al eliminar la cuenta; IP del cliente falsificable; limpieza de datos que solo corría al registrarse y podía borrar moderadores; nombres no latinos que fundían veladas y gimnasios; y 19 de interfaz (restauración de lo escrito, desplegables cerrados tras el error, nombres accesibles, etc.).
+- **Pruebas:** de 194 a **266 unitarias** y de 174 a **193 comprobaciones de navegador**; axe sigue en 0 incumplimientos.
+
+### Qué salió mal / qué se aprendió
+
+- **Los dos flujos de agentes se cortaron por el límite de uso de la sesión**: de 10 personas terminó 1; de 6 revisores, 3, y ninguna de las 91 verificaciones adversariales. No se debe presentar como una revisión completa: los hallazgos de la revisión los reproduje o razoné yo antes de corregir. Una segunda tanda de personas se lanzó después, por fases (ver «Estado»).
+- **Una regresión de CSS mía** (de un bloque anterior) dejó nueve formularios torcidos y no lo vio ninguna prueba automática: solo lo vio un revisor. Ahora se miran capturas tras tocar CSS global.
+- **La prueba móvil pasaba mientras la velada se salía de la pantalla**: no medía las fichas con datos. Ahora la prueba crea sus datos.
+- Al volcar la copia reorganizada al repositorio olvidé `prisma/seed.ts` (no había `rsync`): `tsc` lo detectó. Ahora se comparan los árboles con `diff -rq`.
+- El servidor local y PostgreSQL desaparecieron otra vez al reiniciarse el entorno.
+- Lecciones completas (con la regla de cada una) en `docs/LECCIONES.md`, sección del 1 de octubre.
+
+### Estado y próximos pasos
+
+- CI en verde en los commits de la reorganización y de las correcciones de interfaz; el último se estaba ejecutando al escribir esto.
+- **En marcha:** segunda tanda de personas de prueba (aficionado, peleador, rival, organizador, moderadora) sobre la versión corregida; después, la tercera (seguridad, móvil y teclado, persona mayor, exploración destructiva) y los revisores que no llegaron a ejecutarse. Lo que salga se anota en `docs/pruebas/`.
+- **Decisiones del fundador nuevas** (en `docs/TRASLADO.md` §7): correo de contacto y responsable, carteles oficiales con fichas provisionales, restaurar fichas ocultadas.
+- **Antes de publicar:** definir `TRUSTED_PROXY_HOPS` según el alojamiento, `CONTACT_EMAIL` y `RESPONSABLE_NOMBRE`, y probar con personas reales de distintas edades.
 
 ---
 

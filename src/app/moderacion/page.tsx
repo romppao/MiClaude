@@ -39,11 +39,11 @@ function BoutTable({ rows, acciones, vacio }: { rows: BoutRow[]; acciones: (b: B
         <tbody>
           {rows.map((b) => (
             <tr key={b.id}>
-              <td>
+              <th scope="row" className="celda-fila">
                 <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className="mut">· {DISCIPLINE_LABEL[b.event.discipline]} · {fmtDate(b.event.date)}</span>
                 <div>Rojo: {b.fighterA.firstName} {b.fighterA.lastName} · Azul: {b.fighterB.firstName} {b.fighterB.lastName}</div>
                 {b.flags.map((f) => <div key={f} className="L">⚠ {lookup(FLAG_LABEL, f as Flag) ?? f}</div>)}
-              </td>
+              </th>
               <td>{declarado(b)}{b.evidenceUrl && <> · <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a></>}</td>
               <td>{b.createdBy ? <>{publicUserName(b.createdBy.name)}<div className="mut">{b.createdBy.email}</div></> : <span className="mut">—</span>}</td>
               <td>{VERIFICATION_LABEL[b.verification]}</td>
@@ -112,11 +112,11 @@ export default async function Moderation() {
               const aura = reportedAuras.find((b) => b.id === r.entityId);
               return (
                 <tr key={r.id}>
-                  <td>
+                  <th scope="row" className="celda-fila">
                     <strong>{lookup(REPORT_REASONS, r.reason) ?? "Motivo no reconocido"}</strong>
                     <div className="mut">{publicUserName(r.user.name)} · {r.user.email}</div>
                     {r.message && <div>{r.message}</div>}
-                  </td>
+                  </th>
                   <td>
                     {bout && <><span className="mut">Combate: </span><Link href={`/veladas/${bout.event.slug}`}>{bout.fighterA.firstName} {bout.fighterA.lastName} contra {bout.fighterB.firstName} {bout.fighterB.lastName} ({bout.event.name})</Link></>}
                     {fighter && <><span className="mut">Ficha: </span><Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link></>}
@@ -148,7 +148,7 @@ export default async function Moderation() {
           <tbody>
             {claims.map((c) => (
               <tr key={c.id}>
-                <td><strong>{publicUserName(c.user.name)}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " (correo verificado)" : ""}</span></td>
+                <th scope="row" className="celda-fila"><strong>{publicUserName(c.user.name)}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " (correo verificado)" : ""}</span></th>
                 <td><Link href={`/peleadores/${c.fighter.slug}`}>{c.fighter.firstName} {c.fighter.lastName}</Link></td>
                 <td className="mut">{c.message}</td>
                 <td>{aprobarRechazar(decideClaim, "claimId", c.id, `${publicUserName(c.user.name)} sobre la ficha de ${c.fighter.firstName} ${c.fighter.lastName}`)}</td>
@@ -165,7 +165,7 @@ export default async function Moderation() {
           <tbody>
             {organizers.map((o) => (
               <tr key={o.id}>
-                <td><strong>{o.orgName}</strong> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></td>
+                <th scope="row" className="celda-fila"><strong>{o.orgName}</strong> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></th>
                 <td className="mut">{o.message}</td>
                 <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, `${o.orgName}`, true)}</td>
               </tr>
@@ -181,7 +181,7 @@ export default async function Moderation() {
         <tbody>
           {gyms.map((g) => (
             <tr key={g.id}>
-              <td><strong>{g.name}</strong> <span className="mut">{g.city}</span> {g.verifiedAt && <span className="tag PRO">✓ verificado</span>}</td>
+              <th scope="row" className="celda-fila"><strong>{g.name}</strong> <span className="mut">{g.city}</span> {g.verifiedAt && <span className="tag PRO">✓ verificado</span>}</th>
               <td className="mut">{g.verifiedNote}{g.website && <> · <a href={g.website} rel="noopener noreferrer nofollow">sitio web de {g.name}</a></>}</td>
               <td>
                 <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

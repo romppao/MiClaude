@@ -22,6 +22,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F12 | **Todo en español** (interfaz, correos, documentación, commits y direcciones visibles) | Fundador | 🟢 (aplicado a lo visible; el código interno sigue en inglés: preguntar si también debe cambiar) |
 | F13 | **Monetizar la aplicación** con funciones premium, **después** de terminar la estructura básica. Sin vender verificación ni posiciones de ránking | Fundador | ⚪ (aplazado a propósito) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
+| F14 | **Funcionalidad completa y sin fallos antes que diseño; organización clara para poder ampliar el equipo.** «Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo»; «no puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado» | Fundador, 1 de octubre de 2026 | 🟡 (código por dominios, guía `DESARROLLO.md`, mapa funcional generado y pruebas por personas en marcha) |
 
 ## Ideas de producto
 
@@ -86,10 +87,26 @@ Origen de todas: la auditoría multiagente (ver [`AUDITORIA.md`](AUDITORIA.md)) 
 | Texto de privacidad en `/privacidad` | Propuesta del asistente | 🟡 | **Requiere revisión jurídica** y definir responsable y contacto |
 | Búsqueda sin tildes y por varias palabras; listados paginados | Auditoría (hallazgos 42, 43, 50) | 🟢 | Si crece la base de datos, pasar a `pg_trgm` |
 | Informar a quien envía un aviso de cómo se ha resuelto | Auditoría (hallazgo 60) | 🔵 | |
-| Exigir nota de evidencia al aprobar a un organizador (como en el sello de gimnasio) | Auditoría (hallazgo 93) | 🔵 | |
+| Exigir nota de evidencia al aprobar a un organizador (como en el sello de gimnasio) | Auditoría (hallazgo 93) | 🟢 | |
 | Moderar las veladas publicadas por usuarios antes de que salgan en el calendario | Auditoría (hallazgo 22) | 🔵 | Decisión del fundador |
-| Conservar lo escrito en los formularios tras un error | Auditoría (hallazgo 77) y principio F9 | 🔵 | Bloque 6 |
-| Migraciones de Prisma en lugar de `db push` | Despliegue | 🔵 | Imprescindible antes de producción |
+| Conservar lo escrito en los formularios tras un error | Auditoría (hallazgo 77) y principio F9 | 🟢 | Bloque 6; mejorada el 1 de octubre (también si el error se repite y se abre el desplegable) |
+| Migraciones de Prisma en lugar de `db push` | Despliegue | 🟢 | `prisma/migrations`; el CI comprueba que reproducen el esquema |
+
+### Ideas surgidas de las pruebas por personas y la revisión (1 de octubre de 2026)
+
+Origen: el flujo de personas de prueba (ver [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md)) y el criterio del asistente.
+
+| Idea | Origen | Estado | Notas |
+|---|---|---|---|
+| Recordar a dónde iba la persona (sin sesión, o al registrarse desde «Entra para…») y devolverla allí | Persona «visitante» | 🟢 | Cookie de 2 horas con la ruta interna; `/verificar` ofrece volver |
+| Tablas de combates que se apilan en el móvil, con la acción principal siempre a la vista | Persona «visitante» | 🟢 | `table.apilada` |
+| Mostrar siempre por qué algo no se puede hacer (por ejemplo, «Se podrá dar aura cuando se celebre») en lugar de dejar un hueco | Persona «visitante» | 🟢 | |
+| Mapa funcional generado del código (pantallas → acciones → permisos → tablas) y comprobado en el CI | Fundador (1 de octubre: «una red clara de a dónde seguir») | 🟢 | `npm run mapa` |
+| Guion de personas de prueba como práctica fija antes de dar por bueno un bloque | Fundador y asistente | 🟡 | Primera tanda incompleta por el límite de uso; repetir por fases |
+| Restaurar una ficha ocultada por moderación durante unos días | Revisión de acciones (hallazgo A6) | 🔵 | Decisión del fundador: choca con el derecho de supresión |
+| Devolver a la pantalla de elegir rival (con los datos) cuando hay un error tras elegir entre homónimos | Revisión de interfaz (I5) | 🔵 | |
+| Icono de la pestaña (favicon) e imagen para compartir | Persona «visitante» (V17) | ⚪ | Es diseño: entra en la fase de diseño visual |
+| Una persona de moderación distinta a quien denuncia: hoy puede resolver sus propios avisos | Propuesta del asistente | 🔵 | Cuando haya más de una persona en moderación |
 
 ## Ideas descartadas
 

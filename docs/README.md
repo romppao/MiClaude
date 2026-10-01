@@ -12,6 +12,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Entender las decisiones técnicas**: modelo de datos, roles, flujos, seguridad, riesgos y hoja de ruta | [`ARQUITECTURA.md`](ARQUITECTURA.md) |
 | **Saber qué se sabe roto** o mejorable (los 99 hallazgos de la auditoría y su estado) | [`AUDITORIA.md`](AUDITORIA.md) |
 | **Probar la aplicación como lo haría una persona real** (guiones por perfil: visitante, peleador, organizador, moderación, móvil, persona mayor…) | [`pruebas/personas.md`](pruebas/personas.md) |
+| **Ver qué han encontrado las pruebas por personas y qué se hizo con cada cosa** | [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md) |
 | **Saber cómo hemos llegado hasta aquí**, sesión a sesión | [`DIARIO.md`](DIARIO.md) |
 | **Ver las ideas** (y las descartadas, con su porqué) | [`IDEAS.md`](IDEAS.md) |
 | **Evitar repetir un error** ya cometido | [`LECCIONES.md`](LECCIONES.md) |

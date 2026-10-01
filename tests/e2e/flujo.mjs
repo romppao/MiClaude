@@ -25,6 +25,10 @@ check("si ya hay fichas con el nombre del rival se pide elegir cuál es", await 
 await btn(pepe, "Es esta persona");
 await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
 check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
+check("y se vuelve a la pantalla de elegir rival con los datos escritos, no a un formulario vacío", pepe.url().includes("/mi-ficha/rival") && pepe.url().includes("eventName=Velada+Claim+Test") && await pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" }).count() === 1);
+await pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" }).click();
+await pepe.waitForURL("**/mi-ficha?*");
+check("«Corregir los datos del combate» devuelve el formulario relleno para cambiar lo que haga falta", await pepe.inputValue("[name=eventName]") === "Velada Claim Test" && await pepe.inputValue("[name=oppLast]") === `Dos${rnd}` && await pepe.inputValue("[name=date]") === "2026-08-01");
 
 // Evidencia: una URL peligrosa no se guarda; una inválida da error; una válida aparece como enlace público
 await pepe.goto(B + `/peleadores/pepe-uno${rnd}`);
