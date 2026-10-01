@@ -376,6 +376,45 @@ Commits en la rama `claude/ring-espana-mvp`:
 
 Sin trabajo a medias en el código: todo está commiteado y subido; las pruebas pasan (tipos, 103 unitarias y 146 de navegador). **Quedan** el resto del bloque 5 (migraciones de Prisma, colas de moderación paginadas), el bloque 6 (accesibilidad y usabilidad, con pruebas con personas reales) y el bloque 7 (pruebas de autorización, documentos). Hay **12 decisiones pendientes del fundador** y el **análisis de la competencia**, que necesita acceso a internet. Todo, en orden, en [`TRASLADO.md`](TRASLADO.md).
 
+## Sesión 1 (continuación) — 1 de octubre de 2026 — Bloques 5 y 6 (accesibilidad y usabilidad), migraciones y revisión independiente
+
+### Qué se pidió / qué idea surgió
+
+- Tras preparar el traslado a Claude Code, el fundador aclaró: «**Aún así quiero seguir trabajando aquí la aplicación y para ciertas cosas lo haré en code terminal**», y después «**Continúa**». Se retomó la lista de pendientes por prioridad.
+
+### Qué se decidió y por qué
+
+Decisiones que tomó el asistente y que el fundador debe conocer (★ = necesitan su validación):
+- ★ **Ajustes de accesibilidad en el estilo, con el menor cambio posible**: el borde de campos y botones secundarios pasa de casi invisible a un gris que se distingue (3:1), los enlaces del texto van subrayados, las etiquetas y los estados tienen 16 px, las zonas táctiles 44 px, la etiqueta «Amateur» cambia a un azul más oscuro, y los controles nativos pasan a modo oscuro. La paleta (fondo oscuro, rojo y dorado) no cambia. Todo está concentrado en `globals.css`, marcado como «A11Y» y se puede revertir. Se considera accesibilidad (se aplica ya), no diseño visual (se deja para el final), pero el fundador debe confirmar que no le parece un cambio de estilo notable.
+- ★ **Cabecera más corta:** cinco enlaces de navegación, «Mi cuenta», «Salir» y un buscador con botón. «Mis peleadores» pasa a «Peleadores que sigo», dentro de «Mi cuenta», que ahora reúne los accesos directos y los avisos de error enviados con su respuesta. «Mi ficha» solo sale a quien es peleador; «Mis veladas», a quien organiza; «Moderación», a la moderación.
+- ★ **Quien recibe un «no» tiene derecho a saber por qué:** el motivo es obligatorio al rechazar una reclamación de ficha o una solicitud de organizador; lo ve la persona en la aplicación y por correo electrónico (así deja de ser falso el «te avisaremos»). Al **aprobar** a un organizador se exige anotar la evidencia comprobada (el sello de organizador se apoya en ella).
+- ★ La solicitud de organizador pide ahora **cómo podemos comprobarlo** de forma obligatoria.
+- En el cartel, cada esquina se elige de una **lista con alias, ciudad y gimnasio** (el valor es el identificador, no un texto que haya que escribir igual).
+- **Lo escrito no se pierde tras un error** (lo guarda el navegador de esa pestaña hasta la siguiente pantalla); nunca se conservan contraseñas ni casillas (las casillas suelen ser confirmaciones de acciones sin vuelta atrás: hay que marcarlas de nuevo a propósito).
+- **Migraciones de Prisma** (`prisma/migrations`): el CI las aplica sobre una base vacía y comprueba que reproducen exactamente `schema.prisma`.
+
+### Qué se hizo
+
+- **Bloque 5 (resto):** migración inicial verificada, `test:a11y` en el CI, índices que faltaban, descripción del sitio, vocabulario residual (hallazgos 80, 82, 89, 96, 97 y parte de 88).
+- **Bloque 6:** `axe-core` pasa de 14 incumplimientos graves a **0 en 40 pantallas**; filtros y formularios con etiqueta visible; nombres accesibles con el objeto («Dar aura a X por el combate en Y»); avisos en regiones permanentes para lectores de pantalla; enlaces con aspecto de botón (nunca un botón dentro de un enlace); tablas con cabeceras y títulos; portada con botón de crear cuenta; historial en español; combate pendiente de confirmar como tarjeta; sin desbordamiento a 360 px.
+- **Pruebas:** de 103 a **113 unitarias** (incluye una que exige texto para cada código de mensaje) y de 146 a **174 comprobaciones de navegador** (nuevo guion de usabilidad: navegación, tamaños, contraste calculado, enlaces subrayados, lo escrito que se conserva, respuestas a solicitudes, reflujo en móvil).
+- **Revisión independiente** (flujo de 6 revisores y verificación adversarial de cada hallazgo) sobre todo lo corregido desde la auditoría; sus resultados, abajo en «Estado».
+
+### Qué salió mal / qué se aprendió
+
+- **Una prueba mía no podía fallar:** comprobaba que la página no dijera «Algo ha salido mal», una frase que la aplicación nunca usa. Ocultó un error real: con `?problema=__proto__` el aviso rompía la página en el navegador. Lo corregí (ahora se busca con `lookup`) y arreglé la prueba, comprobando antes que **fallaba** con el código antiguo.
+- **React 19 vacía los campos de un formulario cuando termina su acción**, así que la primera versión de «no perder lo escrito» no funcionaba (se rellenaba y se volvía a vaciar). Se escucha el evento de reinicio y se rellena justo después.
+- **Restaurar casillas era peligroso:** la confirmación de «eliminar mi cuenta» volvía marcada tras un error de contraseña, y la prueba eliminó la cuenta sin querer. Las casillas ya no se recuerdan.
+- Otra vez el servidor local y PostgreSQL desaparecieron entre dos pasos (el entorno se detiene); un código de mensaje que usaban las acciones (`cartel_boxeadores`) **no tenía texto** y la persona no veía nada: ahora una prueba lo impide.
+- Los hallazgos 91 y 92 salieron «refutados» en la segunda pasada de verificación **porque ya estaban corregidos** cuando se comprobaron; no porque fueran falsos. Está anotado en `AUDITORIA.md`.
+- Lecciones completas en `docs/LECCIONES.md`.
+
+### Estado y próximos pasos
+
+(Se completa abajo con los resultados de la revisión independiente.)
+
+---
+
 ---
 
 ## Plantilla para nuevas entradas

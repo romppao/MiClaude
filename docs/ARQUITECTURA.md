@@ -30,8 +30,10 @@ Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibili
 | Visitante | Navegar, buscar, ver fichas, veladas y ránking (solo lo respaldado se muestra como hecho) |
 | `FAN` | Lo anterior + dar aura a peleadores (con el correo verificado) y seguirlos |
 | `FIGHTER` | Lo anterior + una ficha propia (una o varias disciplinas) y registrar sus combates |
-| `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita; lo aprueba un `ADMIN`. Puede ascender cualquier usuario que no sea administrador |
+| `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita (con una comprobación obligatoria); lo aprueba un `ADMIN` anotando la evidencia comprobada. Puede ascender cualquier usuario que no sea administrador |
 | `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Se asigna a mano en la base de datos |
+
+**Solicitudes:** las reclamaciones de ficha y las solicitudes de organizador las decide un `ADMIN`; rechazar exige un **motivo**, que ve la persona en la aplicación y recibe por correo (también la aprobación). El motivo de las reclamaciones se guarda en `ClaimRequest.reviewNote` (el texto con el que se justificó se borra al decidir).
 
 Un peleador sin cuenta también existe: cuando alguien registra un combate contra él se crea una **ficha provisional** (`listed: false`: solo nombre e inicial del apellido, sin listados ni buscadores, sin indexar). Cuando esa persona se registra, la busca en `/mi-ficha` y **solicita reclamarla** (`ClaimRequest`); un `ADMIN` la aprueba.
 
@@ -74,13 +76,22 @@ Decisión del fundador: **un clic por usuario y combate**; hasta tres clics ser�
 - Autorización: cada acción de moderación comprueba el rol `ADMIN`, las de organizador comprueban que la velada es suya, y las de peleador que participa en el combate. **Faltan pruebas de autorización por cada acción** (hallazgo 84).
 - Sin protección CSRF adicional más allá de la de Next.js para Server Actions (origen del mismo sitio) y la cookie `sameSite=lax`.
 
+## Interfaz y accesibilidad
+
+Estilo **provisional** (el diseño visual es al final, por petición del fundador); aquí solo hay accesibilidad y claridad, en `globals.css` (los ajustes de accesibilidad llevan la marca «A11Y»).
+- **Medición automática:** `npm run test:a11y` pasa axe-core (WCAG 2.2 AA) por unas 40 pantallas (públicas, con sesión, moderación y organizador) y debe dar **0 incumplimientos graves**; se ejecuta también en el CI. Axe no mide todo: `tests/e2e/usabilidad.mjs` comprueba además navegación corta, tamaños de 16 px y 44 px, contraste calculado de los controles, enlaces subrayados, lo escrito que se conserva, avisos para lectores de pantalla y que ninguna pantalla se salga del ancho a 360 px.
+- **Avisos** (`FlashNotice`): regiones permanentes (`role=status` educada para éxitos y `role=alert` asertiva para problemas) que se rellenan con el código de la dirección (`?aviso=` / `?problema=`) traducido por `lookup` (nunca claves heredadas).
+- **Lo escrito no se pierde** (`RecordarCampos`): al enviar un formulario se guardan sus campos de texto en `sessionStorage` y, si la acción vuelve a la misma pantalla con un problema, se devuelven a su sitio (también tras el reinicio que hace React al terminar la acción). Nunca contraseñas, campos ocultos ni casillas.
+- **Convenciones:** cada campo con etiqueta visible (`label.field`), filtros con «Aplicar filtros» y «Quitar filtros» (`Filtros.tsx`), enlaces con aspecto de botón con la clase `.btn` (nunca un botón dentro de un enlace), nombres accesibles que incluyen el objeto en los botones repetidos, tablas con `scope` y título, y contenedor desplazable en las anchas.
+- **Pendiente:** probar con un lector de pantalla real y con personas reales de distintas edades (regla 11 del principio fundacional).
+
 ## Búsqueda y listados
 
 `lib/search.ts`: sin tildes ni mayúsculas y con varias palabras en cualquier orden (cada palabra debe aparecer en algún campo) sobre peleadores, gimnasios, entrenadores y veladas; los peleadores provisionales y ocultos no aparecen. Se hace con `translate`/`strpos` de PostgreSQL (recorrido completo de la tabla: suficiente para empezar; si crece, `pg_trgm`). Listados paginados de 24 en 24 que conservan los filtros.
 
 ## Despliegue y entorno
 
-Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comprueba la aplicación y la base de datos; `robots.txt` y `sitemap.xml` se generan dinámicamente. **Falta:** migraciones con `prisma migrate` (hoy `db push`), alojamiento y proveedor de correo reales.
+Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comprueba la aplicación y la base de datos; `robots.txt` y `sitemap.xml` se generan dinámicamente. **Migraciones:** `prisma/migrations` (la inicial reproduce el esquema; el CI las aplica sobre una base vacía y falla si difieren de `schema.prisma`); `db push` queda para pruebas desechables. **Falta:** alojamiento y proveedor de correo reales.
 
 ## Idioma y modelo de negocio (decisiones del fundador)
 
@@ -94,8 +105,7 @@ Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comp
 - **Manipulación del aura** (cuentas falsas, *brigading*): mitigada con correo verificado, límite diario y de intentos, y exclusión de participantes. Falta detección de patrones (muchas cuentas nuevas dando aura al mismo peleador) y ponderar «lo vi en directo» y la antigüedad.
 - **Ficha falsa o suplantación:** la reclamación pasa por un moderador, pero la prueba de identidad es un texto libre. Falta un procedimiento claro (p. ej. confirmación del gimnasio).
 - **Organizadores y veladas falsas:** la aprobación es manual y no exige nota de evidencia (hallazgo 93); cualquier usuario verificado publica veladas sin moderación previa (hallazgo 22).
-- **Sin migraciones:** `db push` no sirve para evolucionar una base con datos reales.
-- **Usabilidad:** aplicada a los flujos principales, pero la accesibilidad automática da 13 incumplimientos graves por corregir (Bloque 6) y **no se ha probado con personas reales**.
+- **Usabilidad:** la accesibilidad automática da 0 incumplimientos graves, pero **no se ha probado con un lector de pantalla real ni con personas reales** de distintas edades (incluida gente mayor): sin eso, la regla 11 del principio fundacional no está cumplida.
 - **Correo:** hasta conectar el proveedor real, nadie recibe los enlaces en producción. La reputación de envío (dominio, SPF/DKIM) es cosa del fundador.
 - **Revelar qué correos tienen cuenta** en el registro (decisión de usabilidad, mitigada con límites).
 
