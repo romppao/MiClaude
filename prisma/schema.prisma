@@ -279,6 +279,9 @@ model ClaimRequest {
   fighter   Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   message   String?
   status    RequestStatus @default(PENDING)
+  // Respuesta del moderador (motivo del rechazo o nota): la ve quien hizo la solicitud.
+  reviewNote String?
+  reviewedAt DateTime?
   createdAt DateTime      @default(now())
 
   @@unique([userId, fighterId])

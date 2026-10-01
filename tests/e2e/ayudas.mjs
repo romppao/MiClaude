@@ -40,6 +40,15 @@ export async function esperarEnlace(email, ruta, intentos = 40) {
   }
   return null;
 }
+/** Espera un correo enviado a `email` que contenga `fragmento` y devuelve su texto, o null. */
+export async function esperarCorreo(email, fragmento, intentos = 40) {
+  for (let i = 0; i < intentos; i++) {
+    const bloque = readFileSync(MAIL_LOG, "utf8").split("[mail] to=").filter((b) => b.startsWith(`${email} `) && b.includes(fragmento)).pop();
+    if (bloque) return bloque;
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return null;
+}
 /** ¿Se ha enviado algún correo a esta dirección? (espera un poco por si el envío se hace después de responder) */
 export async function hayCorreoPara(email, espera = 1500) {
   await new Promise((r) => setTimeout(r, espera));
@@ -62,3 +71,28 @@ export const sql = (sentencias) => execSync('psql "$DATABASE_URL" -v ON_ERROR_ST
 
 /** Convierte a un usuario en moderador (solo posible con acceso a la base de datos). */
 export const hacerAdmin = (email) => execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${email}'"`);
+
+/** Pide ser organizador (la comprobación es obligatoria) y espera a la confirmación. */
+export async function solicitarOrganizador(p, nombreOrg) {
+  await p.goto(B + "/organizador");
+  await p.fill("[name=orgName]", nombreOrg); await p.fill("[name=message]", `Web y redes de ${nombreOrg}`);
+  await btn(p, "Solicitar");
+  await p.locator("[role=status]", { hasText: "Solicitud enviada" }).waitFor();
+}
+
+/** Añade un combate al cartel eligiendo a cada peleador por su nombre en las listas desplegables. */
+export async function anadirAlCartel(p, nombreRojo, nombreAzul) {
+  const valor = (campo, texto) => p.$eval(`select[name=${campo}]`, (sel, t) => [...sel.options].find((o) => o.textContent.includes(t))?.value, texto);
+  await p.selectOption("select[name=fighterA]", await valor("fighterA", nombreRojo));
+  await p.selectOption("select[name=fighterB]", await valor("fighterB", nombreAzul));
+  await btn(p, "Añadir al cartel");
+}
+
+/** Un moderador aprueba la solicitud de organizador anotando la evidencia comprobada (es obligatoria) y espera a que salga de la cola. */
+export async function aprobarOrganizador(mod, nombreOrg) {
+  await mod.goto(B + "/moderacion");
+  const fila = mod.locator("tr", { hasText: nombreOrg });
+  await fila.locator("input[name=note]").fill("Web y redes comprobadas");
+  await fila.locator("button:has-text('Aprobar')").click();
+  await fila.waitFor({ state: "detached" });
+}

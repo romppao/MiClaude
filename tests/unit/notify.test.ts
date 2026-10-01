@@ -36,7 +36,8 @@ describe("avisos a seguidores", () => {
     expect(mail.sendMail).toHaveBeenCalledTimes(2);
     const [to, subject, text, opts] = mail.sendMail.mock.calls[0];
     expect(to).toBe("a@x.es");
-    expect(subject).toBe("Ana Ruiz y Luis Gil tiene un nuevo combate");
+    expect(subject).toBe("Ana Ruiz y Luis Gil tienen un nuevo combate");
+    expect(text).toContain("dejar de seguir a cada uno");
     expect(text).toContain("https://ring.test/baja?token=u1");
     expect(opts).toEqual({ unsubscribeUrl: "https://ring.test/baja?token=u1" });
   });

@@ -25,6 +25,7 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
       {t.gym && <p className="mut">Gimnasio: <Link href={`/gimnasios/${t.gym.slug}`}>{t.gym.name}</Link></p>}
       {t.bio && <p>{t.bio}</p>}
       <h2>Peleadores</h2>
+      {t.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este entrenador en Ring España.</p>}
       <div className="grid">
         {t.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>

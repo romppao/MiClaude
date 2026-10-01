@@ -40,11 +40,24 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             <input type="hidden" name="fighterId" value={b.id} />
             <strong>{publicFighterName(b)}</strong><span className="mut">{b.disciplines.map((d) => DISCIPLINE_LABEL[d.discipline]).join(", ")} · {b._count.boutsAsA + b._count.boutsAsB} combates registrados{b.city ? ` · ${b.city}` : ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
             <label className="field" style={{ flex: 1, minWidth: 220 }}><span>¿Cómo podemos comprobar que eres tú?</span><input name="message" maxLength={LIMITS.message} placeholder="Gimnasio, entrenador, velada donde combatiste…" /><span className="hint">No escribas números de documento.</span></label>
-            <button>Reclamar</button>
+            <button aria-label={`Reclamar la ficha de ${publicFighterName(b)}`}>Reclamar esta ficha</button>
           </form>
         ))}
         {q && candidates.length === 0 && <p className="mut">No hay fichas sin dueño con ese nombre.</p>}
-        {myClaims.length > 0 && <p className="mut">Tus solicitudes: {myClaims.map((c) => `${c.fighter.firstName} ${c.fighter.lastName} (${c.status === "PENDING" ? "pendiente" : c.status === "APPROVED" ? "aprobada" : "rechazada"})`).join(", ")}</p>}
+        {myClaims.length > 0 && (
+          <>
+            <h2>Tus solicitudes</h2>
+            <ul>
+              {myClaims.map((c) => (
+                <li key={c.id}>
+                  <strong>{publicFighterName(c.fighter)}</strong>:{" "}
+                  {c.status === "PENDING" ? "pendiente de revisión por un moderador (vuelve a esta página para ver la respuesta)" : c.status === "APPROVED" ? "aprobada" : "rechazada"}
+                  {c.status === "REJECTED" && c.reviewNote ? <> — motivo: {c.reviewNote}</> : null}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
         <h2>Si no apareces, crea tu ficha</h2>
         <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
@@ -118,21 +131,24 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       {toConfirm.length > 0 && (
         <>
           <h2>Combates que tu rival ha registrado y necesitan tu respuesta</h2>
-          <table><tbody>
-            {toConfirm.map((b) => (
-              <tr key={b.id}>
-                <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}</td>
-                <td>vs {b.fighterA.firstName} {b.fighterA.lastName}</td>
-                <td>
-                  <form action={respondBout} style={{ display: "flex", gap: 6 }}>
+          <p className="mut">Tu rival dice que combatisteis y que el resultado fue el que ves aquí. Si es correcto, confírmalo; si no, indícalo.</p>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {toConfirm.map((b) => {
+              const rival = `${b.fighterA.firstName} ${b.fighterA.lastName}`;
+              const resultado = !b.result ? "sin resultado indicado" : b.result === "DRAW" ? "empate" : b.result === "NO_CONTEST" ? "sin decisión" : b.result === "A_WIN" ? `gana ${rival}` : `ganas tú`;
+              return (
+                <li key={b.id} className="card" style={{ marginBottom: 8 }}>
+                  <strong>{b.event.name}</strong> · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}
+                  <div className="mut">Combate contra {rival}: {resultado}.</div>
+                  <form action={respondBout} style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                     <input type="hidden" name="boutId" value={b.id} />
-                    <button name="decision" value="confirm">Sí, es correcto</button>
-                    <button name="decision" value="dispute" className="secondary">No es correcto</button>
+                    <button name="decision" value="confirm" aria-label={`Confirmar que es correcto el combate contra ${rival} en ${b.event.name}`}>Sí, es correcto</button>
+                    <button name="decision" value="dispute" className="secondary" aria-label={`Indicar que no es correcto el combate contra ${rival} en ${b.event.name}`}>No es correcto</button>
                   </form>
-                </td>
-              </tr>
-            ))}
-          </tbody></table>
+                </li>
+              );
+            })}
+          </ul>
         </>
       )}
 
@@ -216,7 +232,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                         <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} maxLength={LIMITS.url} placeholder="Enlace que lo demuestre" aria-label={`Enlace que demuestra el combate ${b.event.name}`} />
                         <button className="secondary" aria-label={`Guardar el enlace del combate ${b.event.name}`}>Guardar enlace</button>
                       </form>
-                    ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia ↗</a> : <span className="mut">Combate ya confirmado o verificado</span>}
+                    ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a> : <span className="mut">Combate ya confirmado o verificado</span>}
                   </td>
                 </tr>
               );

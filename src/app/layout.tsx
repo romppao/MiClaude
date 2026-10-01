@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import FlashNotice from "./FlashNotice";
+import RecordarCampos from "./RecordarCampos";
 import { getUser } from "../lib/auth";
 import { logout } from "./actions";
 import { APP_URL } from "../lib/mail";
@@ -10,11 +11,12 @@ import { APP_URL } from "../lib/mail";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: { default: "Ring España", template: "%s · Ring España" },
-  description: "La base de datos del boxeo español: peleadores profesionales y amateur, récords, veladas, gimnasios y entrenadores.",
+  description: "Los deportes de contacto en España: peleadores, récords, aura del público, veladas, gimnasios y entrenadores de boxeo, MMA, kickboxing, K-1 y jiu-jitsu.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
+  const tieneFicha = !!user && (!!user.fighter || user.role === "FIGHTER");
   return (
     <html lang="es">
       <body>
@@ -22,32 +24,40 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="top">
           <div className="in">
             <Link href="/" className="logo">RING <b>ESPAÑA</b></Link>
-            <nav>
+            <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>
               <Link href="/veladas">Veladas</Link>
               <Link href="/gimnasios">Gimnasios</Link>
               <Link href="/entrenadores">Entrenadores</Link>
             </nav>
-            <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
-            {user ? (
-              <>
-                {!user.emailVerifiedAt && <Link href="/verificar" className="L">Verifica tu correo electrónico</Link>}
-                <Link href="/siguiendo">Mis peleadores</Link>
-                {user.fighter ? <Link href="/mi-ficha">Mi ficha</Link> : <Link href="/mi-cuenta">Mi cuenta</Link>}
-                {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
-                <form action={logout}><button style={{ background: "transparent" }}>Salir</button></form>
-              </>
-            ) : (
-              <><Link href="/entrar">Entrar</Link><Link href="/registro">Registrarse</Link></>
-            )}
-            <form action="/buscar"><input name="q" placeholder="Buscar…" aria-label="Buscar" /></form>
+            <div className="cuenta">
+              <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
+              {user ? (
+                <>
+                  {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
+                  {user.role === "ORGANIZER" && <Link href="/organizador">Mis veladas</Link>}
+                  {tieneFicha && <Link href="/mi-ficha">Mi ficha</Link>}
+                  <Link href="/mi-cuenta">Mi cuenta</Link>
+                  <form action={logout}><button className="secondary">Salir</button></form>
+                </>
+              ) : (
+                <><Link href="/entrar">Entrar</Link><Link href="/registro" className="btn">Registrarse</Link></>
+              )}
+            </div>
+            <form action="/buscar" role="search" className="buscador">
+              <input name="q" aria-label="Buscar peleadores, gimnasios, entrenadores o veladas" placeholder="Buscar…" maxLength={80} />
+              <button className="secondary">Buscar</button>
+            </form>
           </div>
         </header>
-        <main id="contenido"><Suspense fallback={null}><FlashNotice /></Suspense>{children}</main>
+        {user && !user.emailVerifiedAt && (
+          <div className="barra-aviso"><div className="notice notice-bad" style={{ margin: 0 }}><span aria-hidden="true">⚠ </span>Falta confirmar tu correo electrónico para poder dar aura y registrar combates. <Link href="/verificar">Confirmarlo ahora</Link></div></div>
+        )}
+        <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense>{children}</main>
         <footer className="foot">
           <Link href="/ayuda">¿Cómo funciona?</Link>
-          <Link href="/organizador">Para organizadores de veladas</Link>
+          <Link href="/organizador">Organizar una velada</Link>
           {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
           <Link href="/privacidad">Privacidad</Link>
         </footer>

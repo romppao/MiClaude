@@ -51,7 +51,7 @@ check("no se puede dar aura dos veces al mismo combate", await fan.locator("butt
 
 const filaCombate = () => mod.locator("tr", { hasText: `Velada de Hoy ${rnd}` });
 await mod.goto(B + "/moderacion");
-await filaCombate().locator("button:has-text('Rechazar')").click();
+await filaCombate().locator("button:has-text('Marcar como no correcto')").click();
 await filaCombate().locator("button:has-text('Restaurar')").waitFor();
 await anon.goto(B + `/peleadores/ana-integra${rnd}`);
 const rechazado = await cuerpo(anon);
@@ -61,7 +61,7 @@ check("y no se muestra el resultado como un hecho", rechazado.includes("Sin most
 await mod.goto(B + "/moderacion");
 check("los combates rechazados aparecen en la cola «en revisión» de moderación", await seen(filaCombate().locator("button:has-text('Restaurar')")));
 await filaCombate().locator("button:has-text('Restaurar')").click();
-await filaCombate().locator("button:has-text('Rechazar')").waitFor();
+await filaCombate().locator("button:has-text('Marcar como no correcto')").waitFor();
 await anon.goto(B + `/peleadores/ana-integra${rnd}`);
 check("al restaurarlo vuelve a contar el aura recibida", await seen(anon.locator(".rec", { hasText: /^\s*1\s*$/ }).first()) && (await cuerpo(anon)).includes(`Gran pelea ${rnd}`));
 
@@ -84,8 +84,9 @@ check("el comentario retirado deja de verse, pero el aura sigue contando", trasR
 // 5) Valores como «constructor» o «__proto__» en las direcciones no rompen ninguna pantalla
 for (const ruta of ["/peleadores?disciplina=constructor&level=__proto__&province=toString", "/?aviso=constructor&problema=__proto__", "/ranking?disciplina=constructor&categoria=__proto__&periodo=toString", "/veladas?disciplina=hasOwnProperty&past=constructor", `/mi-ficha?aviso=valueOf`]) {
   const r = await anon.goto(B + ruta);
+  await anon.waitForTimeout(1000); // el error de una pantalla de cliente solo aparece después de cargarla en el navegador
   const texto = await cuerpo(anon);
-  check(`la dirección ${ruta.slice(0, 40)}… no falla con claves heredadas`, r.status() < 500 && !texto.includes("function") && !texto.includes("Algo ha salido mal"));
+  check(`la dirección ${ruta.slice(0, 40)}… no falla con claves heredadas`, r.status() < 500 && !texto.includes("function") && !texto.includes("Algo no ha salido como esperábamos"));
 }
 
 await browser.close();

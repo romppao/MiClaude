@@ -1,0 +1,122 @@
+// Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
+// enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
+import { B, rnd, browser, seen, check, btn, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador } from "./ayudas.mjs";
+
+const cuerpo = (p) => p.locator("body").innerText();
+const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+const malo = (p, t) => p.locator("[role=alert]", { hasText: t });
+const bueno = (p, t) => p.locator("[role=status]", { hasText: t });
+
+/** Relación de contraste WCAG entre dos colores «rgb(r, g, b)». */
+const luz = (c) => { const [r, g, b] = c.match(/\d+(\.\d+)?/g).slice(0, 3).map(Number).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+const contraste = (a, b) => { const [x, y] = [luz(a), luz(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+
+const visitante = await nueva();
+
+// 1) Navegación corta y clara
+await visitante.goto(B + "/");
+check("la navegación principal tiene 5 elementos como máximo", await visitante.locator("nav[aria-label=Principal] a").count() <= 5);
+check("la portada ofrece un botón claro para crear la cuenta y otro para ver cómo funciona", await visitante.locator("main a.btn", { hasText: "Crear mi cuenta" }).count() === 1 && await visitante.locator("main a.btn", { hasText: "Ver cómo funciona" }).count() === 1);
+check("el buscador de la portada tiene etiqueta visible", await visitante.locator("main label", { hasText: "Busca un peleador" }).count() === 1);
+check("el buscador de la cabecera tiene su botón visible", await visitante.locator("header form[role=search] button", { hasText: "Buscar" }).count() === 1);
+const aficionada = await newUser("Usabilidad", "FAN");
+await aficionada.p.goto(B + "/");
+const cab = await aficionada.p.locator("header").innerText();
+check("la cabecera de una persona con sesión es corta: «Mi cuenta» y «Salir», sin «Mis peleadores» ni su nombre como enlace", cab.includes("Mi cuenta") && cab.includes("Salir") && !cab.includes("Mis peleadores") && !cab.includes("Usabilidad"));
+check("a quien acaba de registrarse no se le muestra el botón de crear cuenta", await aficionada.p.locator("main a.btn", { hasText: "Crear mi cuenta" }).count() === 0);
+await aficionada.p.goto(B + "/mi-cuenta");
+check("«Mi cuenta» reúne los accesos directos (peleadores que sigo, organizar veladas) y los avisos enviados", await seen(aficionada.p.locator("main a", { hasText: "Peleadores que sigo" })) && await aficionada.p.locator("main a", { hasText: "Organizar veladas" }).count() === 1 && (await cuerpo(aficionada.p)).includes("Avisos de error que he enviado"));
+
+// 2) Lo escrito no se pierde tras un error (nunca la contraseña)
+await visitante.goto(B + "/registro");
+await visitante.evaluate(() => document.querySelectorAll("input[minlength]").forEach((i) => i.removeAttribute("minlength")));
+await visitante.fill("[name=name]", "Memoria Prueba"); await visitante.fill("[name=email]", `memoria${rnd}@test.es`); await visitante.fill("[name=password]", "corta");
+await btn(visitante, "Crear mi cuenta");
+check("el error de la contraseña corta se explica", await seen(malo(visitante, "8 caracteres")));
+check("y el nombre y el correo escritos siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]").value === v[0] && document.querySelector("[name=email]").value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
+check("pero la contraseña nunca se conserva", await visitante.inputValue("[name=password]") === "");
+await visitante.fill("[name=password]", "contraseña-larga-1");
+await btn(visitante, "Crear mi cuenta");
+await visitante.waitForURL("**/verificar");
+await visitante.goto(B + "/registro");
+check("una pantalla nueva no hereda lo escrito de otro envío", await visitante.inputValue("[name=name]") === "");
+
+// 3) Los avisos están en regiones permanentes para lectores de pantalla
+await visitante.goto(B + "/entrar");
+check("existen las regiones permanentes de aviso (educada para éxitos, asertiva para errores)", await visitante.locator("[role=status][aria-live=polite]").count() >= 1 && await visitante.locator("[role=alert][aria-live=assertive]").count() >= 1);
+
+// 4) Tamaños, enlaces y contraste de los controles
+await visitante.goto(B + "/registro");
+const medidas = await visitante.evaluate(() => {
+  const alto = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null).map((e) => Math.round(e.getBoundingClientRect().height));
+  const px = (sel) => [...document.querySelectorAll(sel)].map((e) => parseFloat(getComputedStyle(e).fontSize));
+  const campo = document.querySelector("main input[name=name]");
+  const estilo = getComputedStyle(campo);
+  return {
+    altoCabecera: alto("header a, header button, header input"), altoPie: alto("footer a"), altoControles: alto("main button, main input, main select"),
+    etiquetas: px(".field > span:not(.hint)"), ayudas: px(".field .hint"), bordeCampo: estilo.borderTopColor, fondo: getComputedStyle(document.body).backgroundColor, relleno: estilo.backgroundColor,
+    enlaceTexto: (() => { const a = document.querySelector("main p a"); return a ? getComputedStyle(a).textDecorationLine : "sin enlace"; })(),
+  };
+});
+check("los enlaces y controles de la cabecera y del pie miden 44 px o más", medidas.altoCabecera.every((h) => h >= 44) && medidas.altoPie.every((h) => h >= 44));
+check("los botones y campos del formulario miden 44 px o más", medidas.altoControles.length > 0 && medidas.altoControles.every((h) => h >= 44));
+check("las etiquetas y las ayudas de los campos tienen 15 px o más (16 px las etiquetas)", medidas.etiquetas.every((f) => f >= 16) && medidas.ayudas.every((f) => f >= 15));
+check("el borde de los campos se distingue del fondo (contraste de 3:1 como mínimo)", contraste(medidas.bordeCampo, medidas.fondo) >= 3);
+check("los enlaces dentro del texto van subrayados", medidas.enlaceTexto.includes("underline"));
+const etiq = await visitante.evaluate(() => { const t = document.createElement("span"); t.className = "tag AMATEUR"; t.textContent = "Amateur"; document.body.appendChild(t); const e = getComputedStyle(t); return { c: e.color, f: e.backgroundColor, px: parseFloat(e.fontSize) }; });
+check("la etiqueta «Amateur» tiene texto de 16 px y contraste de 4,5:1 como mínimo", etiq.px >= 16 && contraste(etiq.c, etiq.f) >= 4.5);
+
+// 5) Un solo elemento interactivo por acción (nunca un botón dentro de un enlace)
+const noEncontrada = await nueva();
+await noEncontrada.goto(B + "/pagina-que-no-existe");
+check("la pantalla «no encontrada» ofrece enlaces con aspecto de botón, sin botones dentro de enlaces", await noEncontrada.locator("a button, button a").count() === 0 && await noEncontrada.locator("main a.btn", { hasText: "Ir al inicio" }).count() === 1);
+
+// 6) Los filtros tienen etiqueta visible y un botón claro
+await visitante.goto(B + "/peleadores");
+const filtros = await visitante.evaluate(() => [...document.querySelectorAll("main form[role=search] select, main form[role=search] input[name=q]")].map((c) => !!c.closest("label")?.querySelector("span")?.textContent?.trim()));
+check("todos los filtros del listado tienen etiqueta visible", filtros.length >= 5 && filtros.every(Boolean));
+check("el formulario de filtros ofrece «Aplicar filtros» y «Quitar filtros»", await visitante.locator("main button", { hasText: "Aplicar filtros" }).count() === 1 && await visitante.locator("main a", { hasText: "Quitar filtros" }).count() === 1);
+
+// 7) Solicitudes: el motivo del rechazo es obligatorio, se muestra a quien lo recibe y se le responde por correo
+const solicitante = await newUser("Solicitante", "FAN");
+const nombreOrg = `Club Respuesta ${rnd}`;
+await solicitarOrganizador(solicitante.p, nombreOrg);
+const mod = await newUser("Moderadorausa", "FAN"); hacerAdmin(mod.email);
+await mod.p.goto(B + "/moderacion");
+const fila = () => mod.p.locator("tr", { hasText: nombreOrg });
+await fila().locator("button:has-text('Rechazar')").click();
+check("rechazar sin escribir el motivo no se permite y se explica por qué", await seen(malo(mod.p, "Escribe el motivo")));
+await fila().locator("input[name=note]").fill("No encontramos la web del club");
+await fila().locator("button:has-text('Rechazar')").click();
+await fila().waitFor({ state: "detached" });
+await solicitante.p.goto(B + "/organizador");
+check("quien recibe el rechazo ve el motivo en la propia página", await seen(solicitante.p.locator(".notice-bad", { hasText: "Motivo: No encontramos la web del club" })));
+check("y recibe un correo con el motivo", !!(await esperarCorreo(solicitante.email, "Motivo: No encontramos la web del club")));
+await solicitante.p.fill("[name=message]", "Nueva web del club y su perfil público");
+await btn(solicitante.p, "Solicitar");
+await bueno(solicitante.p, "Solicitud enviada").waitFor();
+await mod.p.goto(B + "/moderacion");
+await fila().locator("button:has-text('Aprobar')").click();
+check("aprobar a un organizador sin anotar la evidencia comprobada tampoco se permite", await seen(malo(mod.p, "anota qué has comprobado")));
+await aprobarOrganizador(mod.p, nombreOrg);
+check("al aprobar, se avisa por correo de que ya puede publicar veladas", !!(await esperarCorreo(solicitante.email, "Ya puedes publicar veladas en Ring España")));
+await solicitante.p.goto(B + "/");
+check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(solicitante.p.locator("header a", { hasText: "Mis veladas" })));
+
+// 8) Móvil: ninguna pantalla se sale del ancho a 360 px (WCAG 1.4.10, reflujo)
+const movil = await (await browser.newContext({ viewport: { width: 360, height: 740 } })).newPage();
+const conSesion = async (rol, ruta) => { const u = await newUser(`Movil${rol}`, rol === "FIGHTER" ? "FIGHTER" : "FAN"); if (rol === "ADMIN") hacerAdmin(u.email); await u.p.setViewportSize({ width: 360, height: 740 }); await u.p.goto(B + ruta); return u.p; };
+const anchoDesbordado = (p) => p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+const fuera = [];
+for (const ruta of ["/", "/peleadores", "/veladas", "/ranking", "/gimnasios", "/buscar?q=ana", "/registro", "/entrar", "/ayuda", "/privacidad", "/organizador"]) {
+  await movil.goto(B + ruta);
+  const d = await anchoDesbordado(movil); if (d > 1) fuera.push(`${ruta} (+${d}px)`);
+}
+for (const [rol, rutas] of [["FIGHTER", ["/mi-ficha", "/mi-cuenta"]], ["ADMIN", ["/moderacion", "/moderacion/historial"]]]) {
+  const p = await conSesion(rol, rutas[0]);
+  for (const ruta of rutas) { await p.goto(B + ruta); await p.waitForLoadState("load"); const d = await anchoDesbordado(p); if (d > 1) fuera.push(`${ruta} (+${d}px)`); }
+}
+check(`ninguna pantalla se sale del ancho en un móvil de 360 px${fuera.length ? ": " + fuera.join(", ") : ""}`, fuera.length === 0);
+
+await browser.close();
+if (process.exitCode) console.error("\nUsabilidad: hay comprobaciones fallidas");

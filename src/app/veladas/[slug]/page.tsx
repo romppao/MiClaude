@@ -40,7 +40,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         {oficial && <> · Publicada por <strong>{org?.orgName}</strong> <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span></>}
         {e.promoter && <> · Promotor indicado por el organizador: {e.promoter}</>}
       </p>
-      {e.ticketUrl && <p><a className="tag PRO" href={e.ticketUrl} rel="noopener noreferrer nofollow" style={{ padding: "10px 16px", display: "inline-block" }}>Comprar entradas ↗</a></p>}
+      {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
       <h2>Cartel</h2>
       <table>
         <caption className="mut" style={{ textAlign: "left" }}>Combates de la velada. La esquina roja aparece primero.</caption>

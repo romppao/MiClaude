@@ -24,6 +24,29 @@ describe("parsePrior (récord de partida declarado)", () => {
   });
 });
 
+describe("parsePrior: casos límite", () => {
+  it("acepta el 0 como cifra válida y los espacios alrededor", () => {
+    expect(parsePrior({ total: " 0 " })).toEqual({ ok: true, prior: { total: 0, wins: null, losses: null, draws: null } });
+    expect(parsePrior({ wins: "0", losses: "0", draws: "0" })).toEqual({ ok: true, prior: { total: 0, wins: 0, losses: 0, draws: 0 } });
+  });
+  it("acepta ceros a la izquierda y rechaza dígitos que no son ASCII", () => {
+    expect(parsePrior({ total: "007" })).toEqual({ ok: true, prior: { total: 7, wins: null, losses: null, draws: null } });
+    expect(parsePrior({ total: "１２" })).toEqual({ ok: false, error: "prior_numero" });
+  });
+  it("el tope de 1000 vale para cada cifra y también para la suma", () => {
+    expect(parsePrior({ total: "1000" }).ok).toBe(true);
+    expect(parsePrior({ total: "1001" })).toEqual({ ok: false, error: "prior_numero" });
+    expect(parsePrior({ wins: "600", losses: "600" })).toEqual({ ok: false, error: "prior_numero" });
+    expect(parsePrior({ wins: "500", losses: "500" }).ok).toBe(true);
+  });
+  it("una cifra en blanco con las demás vacías no inventa un récord", () => {
+    expect(parsePrior({ total: "", wins: " ", losses: "", draws: "" })).toEqual({ ok: true, prior: { total: null, wins: null, losses: null, draws: null } });
+  });
+  it("el total solo y un récord que no suma dan el error de la suma, no el del número", () => {
+    expect(parsePrior({ total: "5", wins: "2" })).toEqual({ ok: false, error: "prior_suma" });
+  });
+});
+
 describe("combinedRecord", () => {
   const t = { ...emptyTally(), w: 2, l: 1, d: 0 };
   it("suma el récord de partida solo si tiene detalle", () => {

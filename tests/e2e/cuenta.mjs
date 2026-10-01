@@ -1,6 +1,6 @@
 // Pruebas de privacidad y cuenta: corregir datos, contraseña, descarga de datos, baja de avisos, eliminación de la cuenta.
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -62,12 +62,9 @@ check("sin iniciar sesión no se entrega nada", sinSesion.status() >= 300 && sin
 
 // 5) Avisos por correo: respetan la preferencia y todo correo lleva un enlace de baja que funciona
 const orga = (await newUser("Orgadatos", "FAN")).p;
-await orga.goto(B + "/organizador"); await orga.fill("[name=orgName]", `Club Datos ${rnd}`); await btn(orga, "Solicitar");
-await orga.waitForSelector("text=Solicitud enviada");
+await solicitarOrganizador(orga, `Club Datos ${rnd}`);
 const mod = await newUser("Moddatos", "FAN"); hacerAdmin(mod.email);
-await mod.p.goto(B + "/moderacion");
-await mod.p.locator("tr", { hasText: `Club Datos ${rnd}` }).locator("button:has-text('Aprobar')").click();
-await mod.p.locator("tr", { hasText: `Club Datos ${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" });
+await aprobarOrganizador(mod.p, `Club Datos ${rnd}`);
 await crearFicha((await newUser("Rival", "FIGHTER")).p, "Rival", `Aviso${rnd}`);
 const seguidor = await newUser("Seguidor", "FAN");
 const apagado = await newUser("Silencio", "FAN");
@@ -82,7 +79,7 @@ await bueno(apagado.p, "cambios de tu cuenta").waitFor();
 await orga.goto(B + "/organizador");
 await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await btn(orga, "Crear velada");
 await orga.waitForURL(`**/organizador/velada-avisos-${rnd}-*`);
-await orga.fill("[name=fighterA]", `ana-corregida${rnd}`); await orga.fill("[name=fighterB]", `rival-aviso${rnd}`); await btn(orga, "Añadir");
+await anadirAlCartel(orga, `Ana Corregida${rnd}`, `Rival Aviso${rnd}`);
 await bueno(orga, "se ha añadido al cartel").waitFor();
 const enlaceBaja = await esperarEnlace(seguidor.email, "/baja");
 check("quien sigue al peleador recibe el aviso con un enlace para darse de baja", !!enlaceBaja);

@@ -4,6 +4,7 @@ import { searchIds } from "../../lib/search";
 import { flatParams } from "../../lib/safe";
 import { pageNumber, pageWindow } from "../../lib/pagination";
 import Paginacion from "../Paginacion";
+import { BotonesFiltro, CampoFiltro } from "../Filtros";
 import { PROVINCES } from "../../lib/labels";
 
 export const metadata = { title: "Gimnasios" };
@@ -19,14 +20,14 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <h1>Gimnasios</h1>
-      <form className="search">
-        <input name="q" defaultValue={q} placeholder="Nombre o ciudad" />
-        <select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select>
-        <button>Filtrar</button>
+      <form className="search" role="search">
+        <CampoFiltro etiqueta="Nombre o ciudad"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
+        <BotonesFiltro ruta="/gimnasios" />
       </form>
       <div className="grid">
         {gyms.map((g) => (
-          <Link key={g.id} href={`/gimnasios/${g.slug}`} className="card"><strong>{g.name}</strong>{g.verifiedAt && <span className="tag PRO" style={{ marginLeft: 6 }}>✓</span>}<div className="mut">{g.city} ({g.province}) · {g._count.fighters} peleadores</div></Link>
+          <Link key={g.id} href={`/gimnasios/${g.slug}`} className="card"><strong>{g.name}</strong>{g.verifiedAt && <span className="tag PRO" style={{ marginLeft: 6 }} title="Verificado por un moderador"><span aria-hidden="true">✓ </span>Verificado</span>}<div className="mut">{g.city} ({g.province}) · {g._count.fighters} peleadores</div></Link>
         ))}
       </div>
       {gyms.length === 0 && <p className="mut">No hay gimnasios con esos filtros. Prueba a quitar alguno o a escribir solo una parte del nombre.</p>}

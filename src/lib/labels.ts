@@ -36,3 +36,18 @@ export function resultWord(result: "A_WIN" | "B_WIN" | "DRAW" | "NO_CONTEST" | n
   if (result === "NO_CONTEST") return { text: "Sin decisión", cls: "D" };
   return (result === "A_WIN") === isCornerA ? { text: "Victoria", cls: "W" } : { text: "Derrota", cls: "L" };
 }
+
+/** Historial de cambios: nombres en español de lo que cambia y de la acción (lo desconocido se muestra en palabras sueltas). */
+export const AUDIT_ENTITY_LABEL: Record<string, string> = {
+  BOUT: "Combate", EVENT: "Velada", FIGHTER: "Ficha de peleador", GYM: "Gimnasio", CLAIM: "Reclamación de ficha",
+  ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta",
+};
+export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  CREATED: "creado", CREATED_BY_ORGANIZER: "añadido al cartel por el organizador", RESULT_SET: "resultado indicado", RESULT_SET_BY_AUTHOR: "resultado indicado por quien lo registró",
+  EVIDENCE_SET: "enlace de evidencia cambiado", RIVAL_CONFIRMED: "confirmado por el rival", RIVAL_DISPUTED: "rechazado por el rival", ADMIN_VERIFIED: "verificado por un moderador",
+  ADMIN_DISPUTED: "marcado como no correcto por un moderador", ADMIN_SELF_REPORTED: "restaurado como pendiente por un moderador",
+  APPROVED: "aprobada", REJECTED: "rechazada", VERIFIED: "sello de verificado concedido", VERIFICATION_REVOKED: "sello de verificado retirado",
+  DISCIPLINE_ADDED: "disciplina añadida", DISCIPLINE_UPDATED: "disciplina modificada", PROFILE_UPDATED: "datos de la ficha modificados",
+  RESOLVED: "cerrado como corregido", DISMISSED: "cerrado sin error", RESOLVED_AND_HIDDEN: "cerrado y contenido ocultado",
+  ACCOUNT_UPDATED: "datos de la cuenta modificados", ACCOUNT_DELETED: "cuenta eliminada",
+};

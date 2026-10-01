@@ -1,4 +1,4 @@
-import { B, rnd, MAIL_LOG, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin } from "./ayudas.mjs";
+import { B, rnd, MAIL_LOG, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
@@ -94,7 +94,7 @@ check("no se puede repetir un aviso abierto", await fan.locator(".notice-bad").c
 await admin.p.goto(B + "/moderacion");
 const repRow = admin.p.locator("tr", { hasText: `Aviso ${rnd}` });
 check("el moderador ve el aviso con su motivo", await repRow.count() === 1 && (await repRow.innerText()).includes("El resultado no es correcto"));
-await repRow.locator("button:has-text('Resuelto')").click();
+await repRow.locator("button:has-text('Cerrar: ya está corregido')").click();
 await repRow.waitFor({ state: "detached" });
 check("el aviso resuelto sale de la cola", await admin.p.locator("tr", { hasText: `Aviso ${rnd}` }).count() === 0);
 
@@ -118,15 +118,13 @@ check("tras entrar vuelve a la ficha donde iba a dar aura", visitor.url().endsWi
 
 // 5) organizador
 const org = (await newUser("Orga")).p;
-await org.goto(B + "/organizador"); await org.fill("[name=orgName]", `Club Demo Madrid ${rnd}`); await btn(org, "Solicitar");
-await org.waitForSelector("text=Solicitud enviada");
-await admin.p.goto(B + "/moderacion"); await admin.p.locator("tr", { hasText: `Club Demo Madrid ${rnd}` }).locator("button:has-text('Aprobar')").click();
-await admin.p.locator("tr", { hasText: `Club Demo Madrid ${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" });
+await solicitarOrganizador(org, `Club Demo Madrid ${rnd}`);
+await aprobarOrganizador(admin.p, `Club Demo Madrid ${rnd}`);
 await org.goto(B + "/organizador");
 await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await btn(org, "Crear velada");
 await org.waitForURL(`**/organizador/gran-velada-org-${rnd}-2026-07-20?*`);
-await org.fill("[name=fighterA]", `pepe-uno${rnd}`); await org.fill("[name=fighterB]", `luis-dos${rnd}`); await btn(org, "Añadir");
-await org.waitForSelector("text=vs");
+await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
+await org.locator("[role=status]", { hasText: "se ha añadido al cartel" }).waitFor();
 await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("select[name=method]", "KO"); await btn(org, "Guardar resultado");
 await org.locator(".notice-ok", { hasText: "resultado se ha guardado" }).waitFor();
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
@@ -174,7 +172,7 @@ check("y excluye a quien no", await anon.locator("body").innerText().then((t) =>
 await org.goto(B + "/organizador");
 await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await btn(org, "Crear velada");
 await org.waitForURL(`**/organizador/velada-futura-${rnd}-${futura}?*`);
-await org.fill("[name=fighterA]", `pepe-uno${rnd}`); await org.fill("[name=fighterB]", `luis-dos${rnd}`); await btn(org, "Añadir");
+await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor();
 let mailed = false;
 for (let i = 0; i < 20 && !mailed; i++) { mailed = readFileSync(MAIL_LOG, "utf8").includes(`to=${fanAcc.email} subject="Pepe Uno${rnd} tiene un nuevo combate"`); if (!mailed) await new Promise((r) => setTimeout(r, 250)); }
@@ -195,9 +193,9 @@ check("gimnasio muestra el sello de verificado", await pepe.locator("h1 .tag", {
 check("la nota interna no se expone públicamente", !(await pepe.locator("body").innerText()).includes("Google Maps"));
 await admin.p.goto(B + "/moderacion/historial?entity=BOUT");
 const hist = await admin.p.locator("body").innerText();
-check("historial registra creación y evidencia del combate", hist.includes("CREATED") && hist.includes("EVIDENCE_SET"));
+check("historial registra creación y evidencia del combate", hist.includes("creado") && hist.includes("enlace de evidencia cambiado"));
 await admin.p.goto(B + "/moderacion/historial?entity=GYM");
-check("historial registra el sello del gimnasio", await admin.p.locator("body").innerText().then((t) => t.includes("VERIFIED")));
+check("historial registra el sello del gimnasio", await admin.p.locator("body").innerText().then((t) => t.includes("sello de verificado concedido")));
 // Coherencia: un segundo combate a 2 días del primero se guarda, pero queda marcado para el moderador
 await pepe.goto(B + "/mi-ficha");
 await registrar(pepe, { evento: "Velada Cercana", fecha: "2026-08-03", rivalNombre: "Tercero", rivalApellidos: `Tres${rnd}` });

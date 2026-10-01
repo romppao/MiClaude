@@ -59,10 +59,10 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   const nombre = publicFighterName(fighter);
   const publica = fighter.listed && !fighter.hiddenAt; // sin reclamar u oculta: solo se muestran nombre abreviado, récord y combates
 
-  const reportForm = (entity: ReportEntity, entityId: string, etiqueta = "¿Hay un error? Avísanos") =>
+  const reportForm = (entity: ReportEntity, entityId: string, etiqueta: string | undefined, sobre: string) =>
     user?.emailVerifiedAt ? (
       <details style={{ marginTop: 6 }}>
-        <summary className="mut">{etiqueta}</summary>
+        <summary className="mut" aria-label={`${etiqueta ?? "¿Hay un error? Avísanos"}: ${sobre}`}>{etiqueta ?? "¿Hay un error? Avísanos"}</summary>
         <form action={createReport} style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
           <input type="hidden" name="entity" value={entity} /><input type="hidden" name="entityId" value={entityId} />
           <input type="hidden" name="back" value={back} />
@@ -71,7 +71,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             {REASONS_BY_ENTITY[entity].map((k) => <option key={k} value={k}>{REPORT_REASONS[k]}</option>)}
           </select>
           <input name="message" aria-label="Detalles (opcional)" placeholder="Detalles (opcional)" maxLength={500} />
-          <button className="secondary">Enviar aviso</button>
+          <button className="secondary" aria-label={`Enviar el aviso sobre ${sobre}`}>Enviar aviso</button>
         </form>
       </details>
     ) : null;
@@ -121,9 +121,10 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           {fighter.bio && <p>{fighter.bio}</p>}
         </>
       )}
-      {reportForm("FIGHTER", fighter.id)}
+      {reportForm("FIGHTER", fighter.id, undefined, `la ficha de ${nombre}`)}
 
       <h2>Combates</h2>
+      <div className="table-wrap" tabIndex={0} role="region" aria-label={`Combates de ${nombre}`}>
       <table>
         <caption className="mut" style={{ textAlign: "left" }}>Combates de {nombre}, del más reciente al más antiguo</caption>
         <thead><tr><th scope="col">Fecha</th><th scope="col">Rival</th><th scope="col">Resultado</th><th scope="col">Cómo terminó</th><th scope="col">Velada</th><th scope="col">Aura</th></tr></thead>
@@ -147,17 +148,17 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
                   <VerificationTag verification={b.verification} />
-                  {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">ver evidencia ↗</a>}
+                  {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
                 </td>
                 <td>
-                  {reportForm("BOUT", b.id)}
+                  {reportForm("BOUT", b.id, undefined, `el combate contra ${publicFighterName(opp)}`)}
                   {aura.ok && (user?.emailVerifiedAt ? (
                     mine ? (
                       <form action={removeAura} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />
                         <input type="hidden" name="back" value={back} />
                         <span className="W">Has dado aura</span>
-                        <button className="secondary">Quitar mi aura</button>
+                        <button className="secondary" aria-label={`Quitar mi aura del combate de ${nombre} en ${b.event.name}`}>Quitar mi aura</button>
                       </form>
                     ) : (
                       <form action={giveAura} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -165,8 +166,8 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                         <input type="hidden" name="back" value={back} />
                         <input name="comment" aria-label="Tu comentario (opcional)" placeholder="Tu comentario (opcional)" maxLength={500} />
                         <label className="mut"><input type="checkbox" name="attended" /> Lo vi en directo</label>
-                        <button>Dar aura</button>
-                        <span className="hint mut" style={{ flexBasis: "100%", fontSize: ".85rem" }}>Se mostrará tu nombre ({publicUserName(user.name)}) y tu comentario, si lo escribes.</span>
+                        <button aria-label={`Dar aura a ${nombre} por el combate en ${b.event.name}`}>Dar aura</button>
+                        <span className="hint mut" style={{ flexBasis: "100%" }}>Se mostrará tu nombre ({publicUserName(user.name)}) y tu comentario, si lo escribes.</span>
                       </form>
                     )
                   ) : user ? <Link href="/verificar">Confirma tu correo electrónico para dar aura</Link>
@@ -177,6 +178,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           })}
         </tbody>
       </table>
+      </div>
       {bouts.length === 0 && <p className="mut">Sin combates registrados.</p>}
 
       <h2>Lo que dice el público</h2>
@@ -184,7 +186,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         <div key={r.id} className="card" style={{ marginBottom: 8 }}>
           <strong>{publicUserName(r.user.name)}</strong> <span className="mut">dio aura en «{r.bout.event.name}»{r.attended ? " · lo vio en directo" : ""}</span>
           {r.hiddenAt ? <div className="mut">Comentario retirado por moderación.</div> : r.comment && <div>{r.comment}</div>}
-          {!r.hiddenAt && r.comment && reportForm("AURA", r.id, "Avisar de este comentario")}
+          {!r.hiddenAt && r.comment && reportForm("AURA", r.id, "Avisar de este comentario", `el comentario de ${publicUserName(r.user.name)}`)}
         </div>
       ))}
       {auras.length === 0 && <p className="mut">Todavía nadie ha dado aura a este peleador. Si has visto uno de sus combates, puedes ser la primera persona.</p>}

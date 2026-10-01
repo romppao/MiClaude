@@ -29,6 +29,7 @@ export function parsePrior(raw: { total?: string; wins?: string; losses?: string
   if (parts.every((x) => x === null)) return { ok: true, prior: { total: t, wins: null, losses: null, draws: null } };
   const [wins, losses, draws] = parts.map((x) => x ?? 0);
   const sum = wins + losses + draws;
+  if (sum > MAX) return { ok: false, error: "prior_numero" }; // el tope vale también para la suma, no solo para cada cifra
   if (t !== null && t !== sum) return { ok: false, error: "prior_suma" };
   return { ok: true, prior: { total: sum, wins, losses, draws } };
 }

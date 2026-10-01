@@ -43,9 +43,9 @@ function BoutTable({ rows, acciones, vacio }: { rows: BoutRow[]; acciones: (b: B
               <td>
                 <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className="mut">· {DISCIPLINE_LABEL[b.event.discipline]} · {fmtDate(b.event.date)}</span>
                 <div>Rojo: {b.fighterA.firstName} {b.fighterA.lastName} · Azul: {b.fighterB.firstName} {b.fighterB.lastName}</div>
-                {b.flags.map((f) => <div key={f} className="L" style={{ fontSize: ".85rem" }}>⚠ {lookup(FLAG_LABEL, f as Flag) ?? f}</div>)}
+                {b.flags.map((f) => <div key={f} className="L">⚠ {lookup(FLAG_LABEL, f as Flag) ?? f}</div>)}
               </td>
-              <td>{declarado(b)}{b.evidenceUrl && <> · <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">ver evidencia ↗</a></>}</td>
+              <td>{declarado(b)}{b.evidenceUrl && <> · <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a></>}</td>
               <td>{b.createdBy ? <>{publicUserName(b.createdBy.name)}<div className="mut">{b.createdBy.email}</div></> : <span className="mut">—</span>}</td>
               <td>{VERIFICATION_LABEL[b.verification]}</td>
               <td>{acciones(b)}</td>
@@ -83,12 +83,15 @@ export default async function Moderation() {
   ]);
   const [nPorVerificar, nRevision, nGimnasios, nSinSello] = totales;
 
-  const aprobarRechazar = (action: (f: FormData) => Promise<void>, name: string, id: string, conNota = false) => (
-    <form action={action} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+  // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
+  // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
+  // En los organizadores, la nota es siempre obligatoria: al aprobar recoge la evidencia comprobada, que respalda el sello.
+  const aprobarRechazar = (action: (f: FormData) => Promise<void>, name: string, id: string, quien: string, notaSiempre = false) => (
+    <form action={action} style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-end" }}>
       <input type="hidden" name={name} value={id} />
-      {conNota && <input name="note" aria-label="Evidencia comprobada" placeholder="Evidencia comprobada (web, redes, llamada…)" maxLength={500} />}
-      <button name="decision" value="approve">Aprobar</button>
-      <button name="decision" value="reject" className="secondary">Rechazar</button>
+      <label className="field"><span>{notaSiempre ? "Evidencia comprobada, o motivo si rechazas (obligatorio)" : "Motivo (obligatorio si rechazas)"}</span><input name="note" maxLength={500} /></label>
+      <button name="decision" value="approve" aria-label={`Aprobar la solicitud de ${quien}`}>Aprobar</button>
+      <button name="decision" value="reject" className="secondary" aria-label={`Rechazar la solicitud de ${quien}`}>Rechazar</button>
     </form>
   );
 
@@ -123,11 +126,11 @@ export default async function Moderation() {
                     <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       <input type="hidden" name="reportId" value={r.id} />
                       <input name="note" placeholder="Nota (opcional)" aria-label="Nota de resolución" maxLength={500} />
-                      <button name="decision" value="resolve">Resuelto</button>
+                      <button name="decision" value="resolve">Cerrar: ya está corregido</button>
                       <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Oculta los datos personales de la ficha" : "Retira el comentario"}>
                         {bout ? "Resolver y rechazar el combate" : fighter ? "Resolver y ocultar la ficha" : "Resolver y retirar el comentario"}
                       </button>
-                      <button name="decision" value="dismiss" className="secondary">Descartar</button>
+                      <button name="decision" value="dismiss" className="secondary">Cerrar: no hay error</button>
                     </form>
                   </td>
                 </tr>
@@ -147,7 +150,7 @@ export default async function Moderation() {
                 <td><strong>{publicUserName(c.user.name)}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " (correo verificado)" : ""}</span></td>
                 <td><Link href={`/peleadores/${c.fighter.slug}`}>{c.fighter.firstName} {c.fighter.lastName}</Link></td>
                 <td className="mut">{c.message}</td>
-                <td>{aprobarRechazar(decideClaim, "claimId", c.id)}</td>
+                <td>{aprobarRechazar(decideClaim, "claimId", c.id, `${publicUserName(c.user.name)} sobre la ficha de ${c.fighter.firstName} ${c.fighter.lastName}`)}</td>
               </tr>
             ))}
           </tbody>
@@ -163,7 +166,7 @@ export default async function Moderation() {
               <tr key={o.id}>
                 <td><strong>{o.orgName}</strong> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></td>
                 <td className="mut">{o.message}</td>
-                <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, true)}</td>
+                <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, `${o.orgName}`, true)}</td>
               </tr>
             ))}
           </tbody>
@@ -178,7 +181,7 @@ export default async function Moderation() {
           {gyms.map((g) => (
             <tr key={g.id}>
               <td><strong>{g.name}</strong> <span className="mut">{g.city}</span> {g.verifiedAt && <span className="tag PRO">✓ verificado</span>}</td>
-              <td className="mut">{g.verifiedNote}{g.website && <> · <a href={g.website} rel="noopener noreferrer nofollow">web</a></>}</td>
+              <td className="mut">{g.verifiedNote}{g.website && <> · <a href={g.website} rel="noopener noreferrer nofollow">sitio web de {g.name}</a></>}</td>
               <td>
                 <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <input type="hidden" name="gymId" value={g.id} />
@@ -192,11 +195,12 @@ export default async function Moderation() {
       </table></div>
 
       <h2>Combates con señales de coherencia ({conSenales.length})</h2>
+      <p className="mut"><strong>Verificar</strong>: el combate cuenta como respaldado por un moderador. <strong>Marcar como no correcto</strong>: deja de contar en el récord y en el ránking y de mostrarse como hecho hasta que se aclare; puede restaurarse desde «Combates en revisión».</p>
       <BoutTable rows={conSenales} vacio="No hay combates con señales." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
           <button name="decision" value="verify">Verificar</button>
-          <button name="decision" value="dispute" className="secondary">Rechazar</button>
+          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare">Marcar como no correcto</button>
         </form>
       )} />
 
@@ -206,7 +210,7 @@ export default async function Moderation() {
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
           <button name="decision" value="verify">Verificar</button>
-          <button name="decision" value="dispute" className="secondary">Rechazar</button>
+          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare">Marcar como no correcto</button>
         </form>
       )} />
 

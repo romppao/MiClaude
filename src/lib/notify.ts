@@ -31,8 +31,8 @@ export async function notifyFollowersOfBout(boutId: string): Promise<number> {
       const baja = await unsubscribeLink(u.id);
       const ok = await sendMail(
         u.email,
-        `${u.fighters.join(" y ")} tiene un nuevo combate`,
-        `Hola ${oneLine(u.name)},\n\n${fullName(bout.fighterA)} y ${fullName(bout.fighterB)} combatirán en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}, ${oneLine(bout.event.venue)}, ${oneLine(bout.event.city)}).\n\nMás información: ${APP_URL}/veladas/${bout.event.slug}\n\nRecibes este aviso porque sigues a ${u.fighters.join(" y ")}. Puedes dejar de seguirle en ${APP_URL}/siguiendo\nSi no quieres recibir más avisos por correo electrónico, pulsa aquí: ${baja}\n`,
+        `${u.fighters.join(" y ")} ${u.fighters.length > 1 ? "tienen" : "tiene"} un nuevo combate`,
+        `Hola ${oneLine(u.name)},\n\n${fullName(bout.fighterA)} y ${fullName(bout.fighterB)} combatirán en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}, ${oneLine(bout.event.venue)}, ${oneLine(bout.event.city)}).\n\nMás información: ${APP_URL}/veladas/${bout.event.slug}\n\nRecibes este aviso porque sigues a ${u.fighters.join(" y ")}. Puedes dejar de seguir ${u.fighters.length > 1 ? "a cada uno" : "a este peleador"} en ${APP_URL}/siguiendo\nSi no quieres recibir más avisos por correo electrónico, pulsa aquí: ${baja}\n`,
         { unsubscribeUrl: baja },
       );
       if (ok) sent++;
@@ -41,4 +41,20 @@ export async function notifyFollowersOfBout(boutId: string): Promise<number> {
     }
   }
   return sent;
+}
+
+/**
+ * Responde por correo a quien hizo una solicitud (reclamar una ficha, ser organizador) cuando un moderador decide.
+ * Es un mensaje del servicio, no publicidad: se envía aunque la persona haya desactivado los avisos de nuevos combates.
+ * Nunca lanza: si el correo falla, la decisión ya está guardada y la persona la verá igualmente en la aplicación.
+ */
+export async function notifyDecision(userId: string, asunto: string, cuerpo: string): Promise<boolean> {
+  try {
+    const u = await db.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
+    if (!u) return false;
+    return await sendMail(u.email, asunto, `Hola ${oneLine(u.name)},\n\n${cuerpo}\n\nUn saludo,\nRing España\n`);
+  } catch (e) {
+    console.error(`[avisos] no se pudo responder a una solicitud: ${e instanceof Error ? e.message : String(e)}`);
+    return false;
+  }
 }

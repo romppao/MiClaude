@@ -1,26 +1,39 @@
-:root{--bg:#0e0e10;--panel:#18181c;--line:#2a2a31;--text:#f2f2f4;--mut:#9a9aa6;--red:#c8102e;--gold:#f4c430}
+/* Estilo PROVISIONAL (el diseño visual se hace al final, con el fundador). Aquí solo hay accesibilidad y claridad: los colores base
+   (fondo oscuro, rojo y dorado) no se han cambiado. Los ajustes de accesibilidad están marcados como «A11Y» y usan el menor cambio posible. */
+:root{--bg:#0e0e10;--panel:#18181c;--line:#2a2a31;--text:#f2f2f4;--mut:#9a9aa6;--red:#c8102e;--gold:#f4c430;
+  --field-border:#8a8a96; /* A11Y: borde de campos y botones secundarios (3:1 como mínimo frente al fondo; --line queda para separadores) */
+  color-scheme:dark} /* A11Y: controles nativos (calendario, barras de desplazamiento) en oscuro */
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,sans-serif}
 a{color:inherit;text-decoration:none}
 a:hover{color:var(--gold)}
+/* A11Y: los enlaces dentro del contenido se distinguen del texto por el subrayado, no solo por el color (WCAG 1.4.1) */
+main a:not(.card):not(.btn),footer.foot a,.notice a{text-decoration:underline;text-underline-offset:.15em}
 header.top{border-bottom:3px solid var(--red);background:var(--panel)}
-header.top .in{max-width:1000px;margin:auto;padding:12px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header.top .in{max-width:1000px;margin:auto;padding:8px 16px;display:flex;gap:4px 16px;align-items:center;flex-wrap:wrap}
+/* A11Y: zonas táctiles de 44 px también en enlaces de la cabecera y del pie */
+header.top a,footer.foot a{display:inline-flex;align-items:center;min-height:44px}
 .logo{font-weight:900;letter-spacing:.05em;font-size:1.2rem}.logo b{color:var(--red)}
-nav{display:flex;gap:14px;flex-wrap:wrap;flex:1}
+nav{display:flex;gap:4px 14px;flex-wrap:wrap;flex:1}
+header.top .cuenta{display:flex;gap:4px 14px;align-items:center;flex-wrap:wrap}
+header.top form.buscador{display:flex;gap:6px;align-items:center}
 main{max-width:1000px;margin:auto;padding:24px 16px 64px}
 h1{margin:0 0 4px}h2{margin:32px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
 .mut{color:var(--mut)}
-form.search{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
-input,select,button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit}
+form.search{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:flex-end}
+input,select,textarea,button{background:var(--panel);color:var(--text);border:1px solid var(--field-border);border-radius:6px;padding:8px 10px;font:inherit}
+textarea{width:100%}
+input,select,textarea{max-width:100%;min-width:0} /* A11Y: ningún campo ensancha la pantalla en móvil */
 button{background:var(--red);border-color:var(--red);cursor:pointer;font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:block}
 .card:hover{border-color:var(--gold)}
-.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--line);margin-right:6px}
-.tag.PRO{background:var(--gold);color:#000}.tag.AMATEUR{background:#2d6cdf}
+/* A11Y: las etiquetas llevan el texto de color fijo (también al pasar el ratón por la tarjeta) y 16 px */
+.tag{display:inline-block;font-size:1rem;line-height:1.4;padding:2px 8px;border-radius:99px;background:var(--line);color:var(--text);margin-right:6px}
+.tag.PRO{background:var(--gold);color:#000}.tag.AMATEUR{background:#1f56c0;color:#fff}
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
-th{color:var(--mut);font-weight:600;font-size:.85rem}
+th{color:var(--mut);font-weight:600}
 .W{color:#3fb950;font-weight:700}.L{color:#f85149;font-weight:700}.D{color:var(--mut);font-weight:700}
 .rec{font-size:1.6rem;font-weight:800}
 .hero{padding:32px 0}.hero h1{font-size:2.2rem}
@@ -30,16 +43,24 @@ th{color:var(--mut);font-weight:600;font-size:.85rem}
 .skip{position:absolute;left:-999px;top:0;background:var(--gold);color:#000;padding:8px 12px;z-index:10}
 .skip:focus{left:8px;top:8px}
 button,input,select{min-height:44px}
-input[type=checkbox]{min-height:0;width:20px;height:20px}
+input[type=checkbox]{min-height:0;width:24px;height:24px;accent-color:var(--red);flex:none}
+label:has(>input[type=checkbox]){display:flex;align-items:center;gap:8px;min-height:44px}
+summary{cursor:pointer;padding:8px 0;min-height:44px}
 .notice{border-radius:8px;padding:12px 16px;margin:0 0 16px;font-weight:600}
 .notice-ok{background:#12301c;border:1px solid #3fb950}
 .notice-bad{background:#3a1416;border:1px solid #f85149}
-.field{display:flex;flex-direction:column;gap:4px;min-width:160px}
-.field>span{font-size:.9rem;color:var(--mut)}
-.field .hint{font-size:.8rem;color:var(--mut)}
+.field{display:flex;flex-direction:column;gap:4px;min-width:160px;max-width:100%}
+.field>span{font-size:1rem;color:var(--mut)}
+.field .hint{font-size:.9375rem;color:var(--mut)}
 .mut{color:#b4b4c0}
-button.secondary{background:transparent;border-color:var(--line)}
-footer.foot{max-width:1000px;margin:auto;padding:24px 16px 48px;display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line)}
+button.secondary{background:transparent;border-color:var(--field-border)}
+/* Enlaces con aspecto de botón (un solo elemento interactivo: nunca un botón dentro de un enlace) */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 14px;border-radius:6px;background:var(--red);border:1px solid var(--red);color:var(--text);font-weight:700;text-decoration:none}
+.btn:hover{color:var(--text);filter:brightness(1.15)}
+.btn.secondary{background:transparent;border-color:var(--field-border)}
+.acciones{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+footer.foot{max-width:1000px;margin:auto;padding:24px 16px 48px;display:flex;gap:4px 20px;flex-wrap:wrap;border-top:1px solid var(--line)}
 ol li{margin-bottom:8px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.barra-aviso{max-width:1000px;margin:12px auto 0;padding:0 16px}

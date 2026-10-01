@@ -5,6 +5,7 @@ import { searchIds } from "../../lib/search";
 import { flatParams } from "../../lib/safe";
 import { pageNumber, pageWindow } from "../../lib/pagination";
 import Paginacion from "../Paginacion";
+import { BotonesFiltro, CampoFiltro } from "../Filtros";
 import { LEVEL_LABEL, PROVINCES } from "../../lib/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, isDiscipline } from "../../lib/disciplines";
 
@@ -29,13 +30,13 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
   return (
     <>
       <h1>Peleadores</h1>
-      <form className="search">
-        <input name="q" defaultValue={q} placeholder="Nombre o alias" />
-        <select name="level" defaultValue={level ?? ""}><option value="">Todos los niveles</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-        <select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select>
-        <select name="disciplina" defaultValue={disciplina ?? ""} aria-label="Disciplina"><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
-        <select name="categoria" defaultValue={categoria ?? ""} aria-label="Categoría de peso"><option value="">Todas las categorías</option>{categorias.map((c) => <option key={c}>{c}</option>)}</select>
-        <button>Filtrar</button>
+      <form className="search" role="search">
+        <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Todos los niveles</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Categoría de peso"><select name="categoria" defaultValue={categoria ?? ""}><option value="">Todas las categorías</option>{categorias.map((c) => <option key={c}>{c}</option>)}</select></CampoFiltro>
+        <BotonesFiltro ruta="/peleadores" />
       </form>
       <div className="grid">
         {fighters.map((b) => (

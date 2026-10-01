@@ -11,7 +11,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 |---|---|---|---|
 | F1 | Hacer crecer la comunidad boxística española y dar visibilidad a sus boxeadores | Visión inicial del fundador | 🟡 |
 | F2 | **Amateur primero**: hoy son aficionados, mañana la cara del boxeo español en el mundo | Giro tras ver el primer MVP | 🟡 |
-| F3 | **El público valora**: un aficionado puede puntuar a un boxeador después de verlo pelear | Giro tras ver el primer MVP | 🟢 (v1) |
+| F3 | **El público valora**: un aficionado puede reconocer a un peleador después de verlo pelear (idea original: puntuarlo con estrellas; hoy es el aura) | Giro tras ver el primer MVP | 🟢 |
 | F4 | **Madrid primero**, luego España; adelantarse a la competencia de Barcelona | Fundador | 🟡 |
 | F5 | **Arquitectura y estructura antes que diseño gráfico** | Fundador | 🟢 (se aplaza el diseño) |
 | F6 | Ver es público; **votar, registrar y publicar exige registro** | Fundador | 🟢 |
@@ -55,8 +55,8 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Comprobaciones automáticas de coherencia (mismo día, duplicados, edades) | Estrategia de veracidad | 🟡 | Duplicados bloqueados y señales de proximidad hechas; falta la de edades |
 | Botón «reportar dato» | Estrategia de veracidad | 🟢 | Un aviso abierto por usuario/elemento, máx. 10 al día |
 | Puntuación de fiabilidad de organizadores | Estrategia de veracidad | 🔵 | |
-| Detección de colusión en valoraciones y confirmaciones | Riesgo detectado | 🔵 | |
-| Seguir a boxeadores + avisos de veladas | Fomentar afición | 🟢 (v1) | «Mis boxeadores» y aviso por correo (aún al log); solo combates de organizador |
+| Detección de colusión en auras y confirmaciones | Riesgo detectado | 🔵 | |
+| Seguir a peleadores + avisos de veladas | Fomentar afición | 🟢 | «Peleadores que sigo» (en Mi cuenta) y aviso por correo con enlace de baja; solo combates de organizador |
 | Preferencias de aviso por correo (poder darse de baja) | RGPD / usabilidad | 🟢 | Interruptor en «Mi cuenta» y enlace de baja en cada correo (sin iniciar sesión) |
 | Página «¿Cómo funciona?» | Principio F9 | 🟢 | `/ayuda` |
 | Explicaciones en el primer uso de cada función (guías breves) | Principio F9 | 🔵 | |
@@ -64,7 +64,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Fotos y vídeo de combates | Comunidad | ⚪ | Cuidado con menores y derechos |
 | Perfiles de gimnasio gestionados por su responsable | Comunidad | ⚪ | |
 | Mapa de gimnasios de Madrid | Descubrimiento | ⚪ | |
-| Grupo de moderadores locales de confianza (entrenadores, exboxeadores, árbitros) | Ventaja de operar en una ciudad | 🔵 | No es código: es organización |
+| Grupo de moderadores locales de confianza (entrenadores, antiguos peleadores, árbitros) | Ventaja de operar en una ciudad | 🔵 | No es código: es organización |
 | Colaboración con Federación Madrileña / Española (actas y licencias como nivel máximo) | Fundador | ⚪ | Cuando haya tracción demostrable |
 | Campo opcional de nº de licencia (sin verificar hasta que haya acuerdo) | Estrategia de veracidad | ⚪ | |
 | API pública, app móvil, importación de datos federativos | Escala | ⚪ | |
@@ -114,7 +114,7 @@ Origen de todas: la auditoría multiagente (ver [`AUDITORIA.md`](AUDITORIA.md)) 
 - **Usabilidad (F9):** ¿qué grupos de personas reales (edades, familiaridad con la tecnología) probarán la app y cuándo?
 
 - ¿Qué prueba concreta de identidad se pide al reclamar una ficha o pedir ser organizador (sin burocracia federativa)?
-- ¿Cuántos combates confirmados exige el ránking para que un boxeador aparezca?
-- ¿Cómo se trata a los boxeadores menores de edad (privacidad, consentimiento parental, visibilidad de su ficha)?
+- ¿Cuántos combates confirmados exige el ránking para que un peleador aparezca?
+- ¿Cómo se trata a los peleadores menores de edad (privacidad, consentimiento parental, visibilidad de su ficha)?
 - ¿Modelo de sostenibilidad del proyecto (gratis, patrocinio de gimnasios y promotoras, entradas…)?
 - ¿Nombre definitivo y marca? («Ring España» es un nombre de trabajo.)

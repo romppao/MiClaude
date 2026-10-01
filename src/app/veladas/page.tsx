@@ -5,6 +5,7 @@ import { searchIds } from "../../lib/search";
 import { flatParams } from "../../lib/safe";
 import { pageNumber, pageWindow } from "../../lib/pagination";
 import Paginacion from "../Paginacion";
+import { BotonesFiltro, CampoFiltro } from "../Filtros";
 import { plural } from "../../lib/text";
 import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disciplines";
@@ -29,13 +30,13 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Calendario de veladas</h1>
-      <form className="search">
-        <input name="q" defaultValue={q} placeholder="Velada, ciudad o recinto" />
-        <select name="disciplina" defaultValue={disciplina ?? ""} aria-label="Disciplina"><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
-        <select name="level" defaultValue={level ?? ""}><option value="">Pro y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-        <select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select>
-        <select name="past" defaultValue={past ?? ""}><option value="">Próximas</option><option value="1">Pasadas</option></select>
-        <button>Filtrar</button>
+      <form className="search" role="search">
+        <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Cuándo"><select name="past" defaultValue={past ?? ""}><option value="">Próximas</option><option value="1">Ya celebradas</option></select></CampoFiltro>
+        <BotonesFiltro ruta="/veladas" />
       </form>
       <div className="grid">
         {events.map((e) => (

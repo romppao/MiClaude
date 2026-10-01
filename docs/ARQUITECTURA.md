@@ -113,7 +113,7 @@ Principio: **no se intenta demostrar que un dato es verdad, sino acumular eviden
 | 3 | Corroborado por terceros: enlace de evidencia (acta, cartel, redes, vídeo) y gimnasio/organizador con sello | **parcial**: enlace de evidencia y sellos hechos; falta que el sistema pondere el nivel automáticamente |
 | 4 | Federación (licencia, actas oficiales) | futuro |
 
-Regla de producto: **la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado** («12-2, 9 verificados»). El ránking de aura puede exigir un mínimo de combates de nivel ≥ 1 para aparecer.
+Regla de producto: **la ficha distingue siempre lo respaldado de lo autodeclarado** (etiqueta de respaldo en cada combate y récord de partida aparte). **El ránking de aura aún no lo distingue**: cuenta el aura de todo combate que no esté rechazado ni cancelado, sea cual sea su nivel de respaldo. Pendiente de decidir si el ránking exige un mínimo de combates confirmados (pregunta abierta en `IDEAS.md`).
 
 ### Verificar también a quien verifica (gimnasios, promotoras, organizadores)
 

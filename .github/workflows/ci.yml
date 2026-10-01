@@ -42,7 +42,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx prisma db push
+      - name: Aplicar las migraciones a la base de datos vacía
+        run: npx prisma migrate deploy
+      - name: Comprobar que las migraciones reproducen exactamente el esquema
+        run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
@@ -54,6 +57,8 @@ jobs:
           npx wait-on -t 60000 http://localhost:3111/registro
       - name: Prueba de extremo a extremo
         run: npm run test:e2e
+      - name: Medición de accesibilidad (WCAG 2.2 AA)
+        run: npm run test:a11y
       - name: Log del servidor si algo falla
         if: failure()
         run: tail -n 100 "$MAIL_LOG" || true

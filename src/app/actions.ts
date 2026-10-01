@@ -10,7 +10,7 @@ import { consumeVerificationToken, createSession, destroyOtherSessions, destroyS
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../lib/password";
 import { HORA, MINUTO, addHit, allow, clearHits, clientIp, isBlocked } from "../lib/ratelimit";
 import { maybePurge } from "../lib/retention";
-import { sendMail } from "../lib/mail";
+import { APP_URL, sendMail } from "../lib/mail";
 import { slugify, PROVINCES } from "../lib/labels";
 import { audit } from "../lib/audit";
 import { safeHttpUrl } from "../lib/url";
@@ -18,7 +18,7 @@ import { internalPath } from "../lib/paths";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../lib/coherence";
 import { dayKey, eventDayReached, parseBirthDate, parseDay } from "../lib/dates";
 import { isTournamentStyle, isDiscipline, parseDisciplineChoice, WEIGHT_CLASSES } from "../lib/disciplines";
-import { notifyFollowersOfBout } from "../lib/notify";
+import { notifyDecision, notifyFollowersOfBout } from "../lib/notify";
 import { parsePrior } from "../lib/prior";
 import { MAX_REPORTS_PER_DAY, REASONS_BY_ENTITY, REPORT_ENTITIES, REPORT_REASONS, type ReportEntity } from "../lib/reports";
 import { anonymizeFighter } from "../lib/anonymize";
@@ -635,9 +635,11 @@ export async function requestClaim(f: FormData) {
 export async function decideClaim(f: FormData) {
   const admin = await requireAdmin();
   const back = "/moderacion";
-  const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") } });
+  const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { fighter: true } });
   if (!claim || claim.status !== "PENDING") go(back, { problema: "no_existe" });
   const wantsApprove = str(f, "decision") === "approve";
+  const note = str(f, "note").slice(0, LIMITS.note) || null;
+  if (!wantsApprove && !note) go(back, { problema: "motivo_falta" }); // quien recibe un «no» tiene derecho a saber por qué
   const approved = await db.$transaction(async (tx) => {
     let ok = false;
     // Asignación condicional: si dos moderadores aprueban a la vez, solo una gana; y una persona no puede tener dos fichas.
@@ -645,7 +647,7 @@ export async function decideClaim(f: FormData) {
       ok = (await tx.fighter.updateMany({ where: { id: claim.fighterId, userId: null, hiddenAt: null }, data: { userId: claim.userId, listed: true } })).count === 1;
     }
     // Se borra el texto con el que la persona justificó su identidad: ya no hace falta y no debe conservarse.
-    await tx.claimRequest.update({ where: { id: claim.id }, data: { status: ok ? "APPROVED" : "REJECTED", message: null } });
+    await tx.claimRequest.update({ where: { id: claim.id }, data: { status: ok ? "APPROVED" : "REJECTED", message: null, reviewNote: note, reviewedAt: new Date() } });
     if (ok) {
       await tx.claimRequest.updateMany({ where: { fighterId: claim.fighterId, id: { not: claim.id }, status: "PENDING" }, data: { status: "REJECTED", message: null } });
       // Quien reclama una ficha no puede conservar el aura ni el seguimiento que dio a esa misma persona antes de ser ella.
@@ -656,6 +658,12 @@ export async function decideClaim(f: FormData) {
     return ok;
   });
   revalidatePath("/", "layout");
+  const nombreFicha = `${claim.fighter.firstName} ${claim.fighter.lastName}`;
+  after(async () => {
+    await notifyDecision(claim.userId, approved ? "Tu solicitud de ficha en Ring España ha sido aprobada" : "Tu solicitud de ficha en Ring España no se ha aprobado",
+      approved ? `Un moderador ha aprobado tu solicitud: la ficha de ${nombreFicha} ya es tuya. Puedes verla y corregir sus datos aquí: ${APP_URL}/mi-ficha`
+        : `Un moderador no ha podido aprobar tu solicitud para reclamar la ficha de ${nombreFicha}.${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nSi crees que es un error, puedes enviar otra solicitud con más información aquí: ${APP_URL}/mi-ficha`);
+  });
   if (wantsApprove && !approved) go(back, { problema: "reclamacion_no_aprobable" });
   go(back, { aviso: approved ? "reclamacion_aprobada" : "reclamacion_rechazada" });
 }
@@ -669,6 +677,7 @@ export async function requestOrganizer(f: FormData) {
   const orgName = str(f, "orgName");
   if (!orgName) go(back, { problema: "nombre_organizacion" });
   const message = str(f, "message") || null;
+  if (!message) go(back, { problema: "organizador_sin_datos" });
   await db.organizerRequest.upsert({
     where: { userId: user.id },
     create: { userId: user.id, orgName, message },
@@ -684,6 +693,8 @@ export async function decideOrganizer(f: FormData) {
   if (!req || req.status !== "PENDING") go(back, { problema: "no_existe" });
   const approve = str(f, "decision") === "approve";
   const note = str(f, "note").slice(0, LIMITS.note) || null;
+  // El sello de organizador se apoya en una evidencia: se anota qué se ha comprobado al aprobar y el motivo al rechazar (quien recibe un «no» tiene derecho a saber por qué).
+  if (!note) go(back, { problema: approve ? "evidencia_falta" : "motivo_falta" });
   await db.$transaction(async (tx) => {
     await tx.organizerRequest.update({ where: { id: req.id }, data: { status: approve ? "APPROVED" : "REJECTED", reviewNote: note, reviewedAt: new Date(), message: null } });
     // Los permisos de organizador salen del rol: se concede a cualquier persona que no sea ya moderadora (un peleador también puede organizar).
@@ -691,6 +702,11 @@ export async function decideOrganizer(f: FormData) {
     await audit({ userId: admin.id, entity: "ORGANIZER", entityId: req.id, action: approve ? "APPROVED" : "REJECTED", after: { userId: req.userId, orgName: req.orgName, note } }, tx);
   });
   revalidatePath("/", "layout");
+  after(async () => {
+    await notifyDecision(req.userId, approve ? "Ya puedes publicar veladas en Ring España" : "Tu solicitud de organizador en Ring España no se ha aprobado",
+      approve ? `Un moderador ha aprobado tu solicitud como organizador de «${oneLine(req.orgName)}». Ya puedes crear veladas y montar sus carteles aquí: ${APP_URL}/organizador`
+        : `Un moderador no ha podido aprobar tu solicitud como organizador de «${oneLine(req.orgName)}».${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nPuedes enviar otra solicitud con más información aquí: ${APP_URL}/organizador`);
+  });
   go(back, { aviso: approve ? "organizador_aprobado" : "organizador_rechazado" });
 }
 
@@ -744,9 +760,10 @@ export async function addCartelBout(f: FormData) {
   const event = await ownEvent(str(f, "eventId"), user);
   const back = `/organizador/${event.slug}`;
   checkLengths(f, back, { evidenceUrl: LIMITS.url });
+  // Cada esquina se elige de una lista que lleva el identificador de la ficha (no un texto que haya que escribir igual).
   const [a, b] = await Promise.all([
-    db.fighter.findFirst({ where: { slug: str(f, "fighterA"), hiddenAt: null } }),
-    db.fighter.findFirst({ where: { slug: str(f, "fighterB"), hiddenAt: null } }),
+    db.fighter.findFirst({ where: { id: str(f, "fighterA"), hiddenAt: null } }),
+    db.fighter.findFirst({ where: { id: str(f, "fighterB"), hiddenAt: null } }),
   ]);
   if (!a || !b || a.id === b.id) go(back, { problema: "cartel_boxeadores" });
   const rounds = intOrNull(f, "rounds");

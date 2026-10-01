@@ -15,13 +15,20 @@ Requisitos: Node 22, PostgreSQL 16 y `psql` (las pruebas lo usan para nombrar a 
 ```bash
 npm ci
 cp .env.example .env         # ajusta DATABASE_URL (ver «Variables de entorno»)
-npx prisma db push           # crea las tablas
+npm run db:migrate            # crea las tablas (aplica las migraciones de prisma/migrations)
 npm run db:seed              # datos FICTICIOS de demostración (solo en una base local y vacía)
 npm run dev                  # http://localhost:3000
 ```
 
 Si no tienes PostgreSQL: `docker run --name ring-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16`
 y `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"`.
+
+### Base de datos y migraciones
+
+El esquema evoluciona con **migraciones** (`prisma/migrations`): `npm run db:migrate` las aplica y el CI comprueba que reproducen exactamente `schema.prisma`.
+Para cambiar el esquema: edita `prisma/schema.prisma`, ejecuta `npx prisma migrate dev --name descripcion_del_cambio` (genera la migración) y súbela al repositorio.
+Una base de datos creada antes con `db push` se «adopta» una sola vez con `npx prisma migrate resolve --applied 20260930000000_inicial`.
+`npm run db:push` sigue existiendo, pero solo para pruebas desechables.
 
 ## Variables de entorno
 
@@ -44,7 +51,7 @@ Para una base PostgreSQL gestionada con conexiones limitadas (entornos serverles
 ```bash
 npm run typecheck    # tipos
 npm test             # unitarias (vitest): reglas, fechas, contraseñas, correo, búsqueda…
-npm run test:e2e     # navegador real: flujo, integridad, acceso, cuenta y búsqueda
+npm run test:e2e     # navegador real: flujo, integridad, acceso, cuenta, búsqueda y usabilidad
 npm run test:a11y    # accesibilidad (axe-core, WCAG 2.2 AA) sobre todas las pantallas
 ```
 
@@ -58,8 +65,8 @@ npm run test:e2e
 ```
 
 `MAIL_LOG` es el fichero donde se redirige la salida del servidor: las pruebas leen de ahí los enlaces de los correos.
-`.github/workflows/ci.yml` hace todo esto (con un PostgreSQL de servicio) en cada push y pull request.
-`test:a11y` todavía **no** está en el CI (ver `docs/AUDITORIA.md`, hallazgo 89); la primera medición dio 13 incumplimientos graves por corregir.
+`.github/workflows/ci.yml` hace todo esto (con un PostgreSQL de servicio y las migraciones) en cada push y pull request.
+`test:a11y` también se ejecuta en el CI: debe dar 0 incumplimientos graves o críticos en todas las pantallas.
 
 ## Qué incluye
 

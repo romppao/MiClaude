@@ -3,6 +3,7 @@ import { db } from "../lib/db";
 import { LEVEL_LABEL, fmtDate } from "../lib/labels";
 import { auraRanking } from "../lib/aura";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/disciplines";
+import { getUser } from "../lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 const HOME_PROVINCE = "Madrid";
 
 export default async function Home() {
+  const user = await getUser();
   const [events, fighters, counts, topGroups] = await Promise.all([
     db.event.findMany({ where: { date: { gte: new Date() }, status: "SCHEDULED", level: "AMATEUR", province: HOME_PROVINCE }, orderBy: { date: "asc" }, take: 6 }),
     db.fighter.findMany({ where: { level: "AMATEUR", province: HOME_PROVINCE, listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
@@ -22,17 +24,28 @@ export default async function Home() {
       <section className="hero">
         <h1>Descubre los deportes de contacto amateur de {HOME_PROVINCE}</h1>
         <p className="mut">Boxeo, MMA, kickboxing, K-1 y jiu-jitsu en un mismo lugar. Registra tu récord, da aura a quien has visto pelear y encuentra las próximas veladas. Los campeones del futuro empiezan aquí.</p>
-        <form className="search" action="/buscar"><input name="q" placeholder="Busca un peleador, gimnasio, entrenador…" style={{ flex: 1 }} /><button>Buscar</button></form>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "8px 0" }}>
-          {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "8px 14px", fontWeight: d === "BOXEO" ? 800 : 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
+        {!user && (
+          <p className="acciones">
+            <Link href="/registro" className="btn">Crear mi cuenta</Link>
+            <Link href="/ayuda" className="btn secondary">Ver cómo funciona</Link>
+          </p>
+        )}
+        <form className="search" action="/buscar" role="search">
+          <label className="field" style={{ flex: 1 }}><span>Busca un peleador, un gimnasio, un entrenador o una velada</span><input name="q" maxLength={80} /></label>
+          <button className="secondary">Buscar</button>
+        </form>
+        <p style={{ margin: "8px 0 4px", fontWeight: 700 }}>O elige una disciplina</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "0 0 8px" }}>
+          {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "10px 14px", fontWeight: d === "BOXEO" ? 800 : 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
         </div>
-        <p className="mut">{counts[0]} peleadores amateur · {counts[1]} veladas · {counts[2]} gimnasios · {counts[3]} auras dadas</p>
+        <p className="mut">{counts[0]} peleadores amateur · {counts[1]} veladas · {counts[2]} gimnasios · {counts[3]} auras dadas. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
       </section>
-      <h2>Más aura en boxeo <Link href="/ranking" className="mut" style={{ fontSize: ".9rem" }}>ver ránking</Link></h2>
+      <h2>Más aura en boxeo</h2>
       <div className="grid">
         {top.map((t) => <Link key={t.fighterId} href={`/peleadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{t.aura} de aura{t.category ? ` · ${t.category}` : ""}</div></Link>)}
         {top.length === 0 && <p className="mut">Todavía no hay aura en {HOME_PROVINCE}. Sé la primera persona en darla a un peleador tras verlo competir.</p>}
       </div>
+      <p><Link href="/ranking">Ver el ránking completo</Link></p>
       <h2>Próximas veladas amateur</h2>
       <div className="grid">
         {events.map((e) => (
@@ -52,6 +65,7 @@ export default async function Home() {
             <div className="mut">{b.alias ? `“${b.alias}” · ` : ""}{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</div>
           </Link>
         ))}
+        {fighters.length === 0 && <p className="mut">Todavía no hay peleadores amateur en {HOME_PROVINCE}. <Link href="/registro">Crea tu cuenta</Link> y sé el primero.</p>}
       </div>
     </>
   );

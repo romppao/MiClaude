@@ -25,8 +25,9 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       <p className="mut">{[gym.address, gym.city, gym.province].filter(Boolean).join(", ")}</p>
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       <h2>Entrenadores</h2>
-      <ul>{gym.trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</ul>
+      {gym.trainers.length === 0 ? <p className="mut">Este gimnasio todavía no tiene entrenadores registrados.</p> : <ul>{gym.trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</ul>}
       <h2>Peleadores</h2>
+      {gym.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este gimnasio en Ring España.</p>}
       <div className="grid">
         {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>
