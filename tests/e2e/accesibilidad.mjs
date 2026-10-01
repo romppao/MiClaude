@@ -1,36 +1,8 @@
 // Medición automática de accesibilidad (WCAG 2.2 AA) con axe-core sobre el navegador real.
-// Recorre las pantallas públicas y las de usuario, moderador y organizador.
-//   BASE_URL      servidor (por defecto http://localhost:3111)
-//   MAIL_LOG      fichero con la salida del servidor (para leer los enlaces de verificación)
-//   DATABASE_URL  para promover a un usuario a moderador
-//   CHROMIUM_PATH ejecutable de Chromium (opcional)
+// Recorre las pantallas públicas y las de usuario, moderador y organizador. Requiere el servidor en marcha (ver ayudas.mjs).
 // Sale con código 1 si hay incumplimientos de impacto «serious» o «critical».
-import { chromium } from "playwright-core";
 import AxeBuilder from "@axe-core/playwright";
-import { readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
-
-const B = process.env.BASE_URL ?? "http://localhost:3111";
-const MAIL_LOG = process.env.MAIL_LOG ?? "/tmp/next.log";
-const rnd = Date.now();
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--no-sandbox"] });
-
-const link = (email) => {
-  const log = readFileSync(MAIL_LOG, "utf8");
-  return log.slice(log.lastIndexOf(`to=${email}`)).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1];
-};
-
-async function newUser(name, role) {
-  const email = `${name.toLowerCase()}${rnd}@test.es`;
-  const p = await (await browser.newContext()).newPage();
-  await p.goto(B + "/registro");
-  await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
-  await p.selectOption("[name=role]", role);
-  await p.click("main form button"); await p.waitForURL("**/verificar");
-  await p.goto(B + link(email)); await p.click("main form button");
-  await p.locator("text=Correo electrónico verificado").waitFor();
-  return { p, email };
-}
+import { B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql } from "./ayudas.mjs";
 
 const problemas = [];
 async function analizar(page, ruta, etiqueta) {
@@ -40,16 +12,14 @@ async function analizar(page, ruta, etiqueta) {
   console.log(`${r.violations.length === 0 ? "OK  " : "FALLA"} ${etiqueta ?? ruta} (${r.violations.length} reglas incumplidas)`);
 }
 
-// Datos: un peleador con combate, una velada, un gimnasio y un entrenador para tener fichas que analizar
+// Datos: un peleador con un combate, una velada, un gimnasio y un organizador para tener fichas que analizar
 const pepe = await newUser("Accesible", "FIGHTER");
 await pepe.p.goto(B + "/mi-ficha");
 await pepe.p.fill("[name=firstName]", "Accesible"); await pepe.p.fill("[name=lastName]", `Prueba${rnd}`); await pepe.p.fill("[name=gym]", `Gimnasio Accesible ${rnd}`);
-await pepe.p.click("main form button:has-text('Crear mi ficha')");
+await btn(pepe.p, "Crear mi ficha");
 await pepe.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
-await pepe.p.fill("[name=eventName]", `Velada Accesible ${rnd}`); await pepe.p.fill("[name=date]", "2026-05-01");
-await pepe.p.fill("[name=oppFirst]", "Rival"); await pepe.p.fill("[name=oppLast]", `Accesible${rnd}`);
-await pepe.p.click("main form button:has-text('Registrar este combate')");
-await pepe.p.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
+await registrar(pepe.p, { evento: `Velada Accesible ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Accesible${rnd}` });
+await pepe.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
 
 const anon = await (await browser.newContext()).newPage();
 const primer = async (ruta, patron) => {
@@ -59,22 +29,31 @@ const primer = async (ruta, patron) => {
 const fichaPeleador = `/peleadores/accesible-prueba${rnd}`;
 const fichaVelada = await primer("/veladas?past=1", "/veladas/");
 const fichaGimnasio = await primer("/gimnasios", "/gimnasios/");
+sql(`insert into "Trainer"(id, slug, name) values ('ent${rnd}', 'entrenador-accesible-${rnd}', 'Entrenador Accesible ${rnd}');`); // los entrenadores no se crean desde la web
+const fichaEntrenador = `/entrenadores/entrenador-accesible-${rnd}`;
 
 console.log("— Pantallas públicas —");
 for (const [ruta, etiqueta] of [
-  ["/", "Portada"], ["/peleadores", "Peleadores"], [fichaPeleador, "Ficha de peleador"], ["/veladas", "Veladas"],
+  ["/", "Portada"], ["/peleadores", "Peleadores"], ["/peleadores?level=AMATEUR&pagina=2", "Peleadores (página 2)"], [fichaPeleador, "Ficha de peleador"], ["/veladas", "Veladas"],
   ...(fichaVelada ? [[fichaVelada, "Ficha de velada"]] : []), ["/gimnasios", "Gimnasios"],
-  ...(fichaGimnasio ? [[fichaGimnasio, "Ficha de gimnasio"]] : []), ["/entrenadores", "Entrenadores"], ["/ranking", "Ránking"],
-  ["/ayuda", "Ayuda"], ["/buscar?q=accesible", "Búsqueda"], ["/registro", "Registro"], ["/entrar", "Entrar"],
-  ["/verificar", "Verificar correo"], ["/organizador", "Organizadores (sin sesión)"], ["/pagina-que-no-existe", "Página no encontrada"],
+  ...(fichaGimnasio ? [[fichaGimnasio, "Ficha de gimnasio"]] : []), ["/entrenadores", "Entrenadores"], [fichaEntrenador, "Ficha de entrenador"],
+  ["/ranking", "Ránking"], ["/ayuda", "Ayuda"], ["/buscar", "Búsqueda (vacía)"], ["/buscar?q=accesible", "Búsqueda (con resultados)"], ["/buscar?q=zzzzqq", "Búsqueda (sin resultados)"],
+  ["/registro", "Registro"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
+  ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/organizador", "Organizadores (sin sesión)"],
+  ["/pagina-que-no-existe", "Página no encontrada"],
 ]) await analizar(anon, ruta, etiqueta);
 
 console.log("— Con sesión —");
-for (const [ruta, etiqueta] of [["/mi-ficha", "Mi ficha"], ["/siguiendo", "Mis peleadores"], [fichaPeleador, "Ficha de peleador (con sesión)"]]) await analizar(pepe.p, ruta, etiqueta);
+for (const [ruta, etiqueta] of [
+  ["/mi-ficha", "Mi ficha"], ["/mi-cuenta", "Mi cuenta"], ["/mi-cuenta/eliminar", "Eliminar mi cuenta"], ["/siguiendo", "Mis peleadores"], [fichaPeleador, "Ficha de peleador (con sesión)"],
+]) await analizar(pepe.p, ruta, etiqueta);
+const sinFicha = await newUser("Sinficha", "FIGHTER");
+await analizar(sinFicha.p, "/mi-ficha", "Mi ficha (sin crear todavía)");
+const sinVerificar = await newUser("Sinverificar", "FAN", false);
+await analizar(sinVerificar.p, "/verificar", "Verificar correo (con sesión)");
 
 console.log("— Moderación y organizador —");
-const admin = await newUser("Moderadora", "FAN");
-execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${admin.email}'"`);
+const admin = await newUser("Moderadora", "FAN"); hacerAdmin(admin.email);
 for (const [ruta, etiqueta] of [["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
 
 await browser.close();

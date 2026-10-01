@@ -3,11 +3,11 @@
 Auditoría exhaustiva de solo lectura hecha con 9 revisores independientes (seguridad y autorización, privacidad, lógica de acciones, lógica de páginas, usabilidad, accesibilidad, despliegue, pruebas, y documentación e idioma): 175 hallazgos brutos que se consolidaron en **99 hallazgos únicos**.
 
 **Qué está verificado y qué no (honestidad sobre el proceso).**
-- **90 de los 99 hallazgos** pasaron una verificación adversarial: tres comprobadores independientes intentaron refutar cada uno con el código delante. **3 se refutaron por mayoría** (n.º 81, n.º 83, n.º 90); el resto sobrevivió, algunos con la gravedad rebajada.
-- Los hallazgos **91, 92, 93, 94, 95, 96, 97, 98, 99** **no se pudieron verificar** (el proceso agotó el límite de uso de la sesión). Son «hallazgos de un revisor»: comprueba que el problema existe antes de corregirlos.
+- **96 de los 99 hallazgos** pasaron una verificación adversarial: tres comprobadores independientes intentaron refutar cada uno con el código delante. **5 se refutaron por mayoría** (n.º 81, n.º 83, n.º 90, n.º 91, n.º 92); el resto sobrevivió, algunos con la gravedad rebajada.
+- Los hallazgos **97, 98, 99** **no se pudieron verificar** (el proceso agotó el límite de uso de la sesión). Son «hallazgos de un revisor»: comprueba que el problema existe antes de corregirlos.
 - La pasada de «huecos» (qué áreas no ha mirado nadie) **no llegó a ejecutarse**.
 
-**Estado a fecha del traslado (commit 5303086 y los de documentación del traslado).** Corregido: 48, Parcial: 18, Pendiente: 28, Decisión del fundador: 2, Descartado: 3.
+**Estado a fecha del traslado (commit 5303086 y los de documentación del traslado).** Corregido: 49, Parcial: 18, Pendiente: 27, Decisión del fundador: 2, Descartado: 3.
 
 Leyenda: **Corregido** (hecho y con prueba), **Parcial** (hecho en parte; la nota dice qué falta), **Pendiente** (sin hacer), **Decisión del fundador** (no se puede resolver sin su criterio), **Descartado** (con motivo: refutado por los comprobadores o rechazado a propósito).
 
@@ -105,7 +105,7 @@ Leyenda: **Corregido** (hecho y con prueba), **Parcial** (hecho en parte; la not
 | 88 | baja | Pendiente | `src/lib/prior.ts:30` | parsePrior: casos límite sin fijar y tope aplicado por campo, no a la suma |
 | 89 | media | Pendiente | `tests/e2e/accesibilidad.mjs:36` | La medición de accesibilidad (test:a11y) no se ejecuta en el CI, no está documentada, da «OK» a pantallas a las que no llegó y no cubre los mensajes de error y confirmación |
 | 90 | baja | Descartado | `tests/e2e/flujo.mjs:197` | Datos de prueba que caducan o apuntan a terceros: velada «futura» fija en 2030 y dominio @test.es |
-| 91 | media | Pendiente | `README.md:44` | README y ARQUITECTURA describen el proyecto anterior (Boxer, Rating, rateBoxer, ratings.ts, ránking bayesiano, solo boxeo) y una hoja de ruta desfasada, sin sección de variables ni despliegue |
+| 91 | media | Corregido | `README.md:44` | README y ARQUITECTURA describen el proyecto anterior (Boxer, Rating, rateBoxer, ratings.ts, ránking bayesiano, solo boxeo) y una hoja de ruta desfasada, sin sección de variables ni despliegue |
 | 92 | media | Corregido | `src/app/actions.ts:132` | Ficha «gestionada por el peleador» en los documentos, pero solo se pueden editar disciplina, categoría y récord de partida |
 | 93 | media | Pendiente | `src/app/actions.ts:355` | El sello de organizador verificado no exige nota de evidencia, aunque IDEAS y ARQUITECTURA dicen que es obligatoria |
 | 94 | baja | Pendiente | `src/lib/aura.ts:40` | El documento dice que el ránking distingue siempre lo respaldado de lo autodeclarado, pero auraRanking no filtra ni etiqueta por verificación |
@@ -782,23 +782,11 @@ VERIFICADO
 - El comando no está documentado. `test:a11y` solo aparece en `package.json`. No está en el README (líneas 56-58), ni en la lista de comandos de `CLAUDE.md` (línea 71).
 - El trabajo no
 
-### 91. README y ARQUITECTURA describen el proyecto anterior (Boxer, Rating, rateBoxer, ratings.ts, ránking bayesiano, solo boxeo) y una hoja de ruta desfasada, sin sección de variables ni despliegue
-
-- **Gravedad:** media · **Estado:** Pendiente — Revisar README y ARQUITECTURA: se reescribieron en el traslado; repasar el resto de documentos.
-- **Dónde:** `README.md:44` · **Categoría:** documentacion-vs-codigo
-- **Verificación:** sin verificar (no hubo comprobadores)
-
-README.md:3-4 presenta el proyecto solo como boxeo «inspirado en BoxRec» (contra CLAUDE.md e IDEAS), L20-21 dice «El boxeador amateur gestiona…», L44 cita el modelo `Boxer` (ahora Fighter; faltan FighterDiscipline, Aura, Follow) y dice récord «por nivel» (es por disciplina y nivel), y L57 dice que npm test cubre el «ránking bayesiano», que no existe (hay pruebas de aura, disciplinas, prior, coherencia, url y rankByCategory); tampoco lista /siguiendo, /ayuda, los avisos ni el historial, ni test:a11y, y no incluye sección de variables de entorno ni de despliegue. docs/ARQUITECTURA.md:35, 43-45 cita Boxer, Rating, rateBoxer y src/lib/ratings.ts (que no existen; lo real es Fighter, Aura, giveAura y src/lib/aura.ts, total sin media) y contradice IDEAS.md:45 (media bayesiana descartada); L75, L112 y L143 hablan de «valoraciones». Su hoja de ruta (L144) pone como «Siguiente» tests y CI que ya existen (8 ficheros unitarios, e2e y ci.yml), L145 pone «seguir a boxeadores y avisos» que ya está hecho (/siguiendo, Follow, notify.ts), L137-138 no marcan lo hecho, L118 dice que el botón de reportar está «en fichas, combates y veladas» cuando REPORT_ENTITIES solo admite BOUT y FIGHTER y el formulario solo está en la ficha, y L143 no recoge aura, disciplinas, seguir, avisos ni CI.
-
-**Escenario:** Quien retome el proyecto para desplegarlo sigue el README, busca `Boxer` y `ratings.ts` sin encontrarlos, cree que el ránking es bayesiano con notas de 1 a 5 y que no hay CI, no encuentra qué variables definir en producción y puede planificar montar tests y CI que ya existen o prometer un botón de aviso en veladas que no está.
-
-**Arreglo propuesto:** Reescribir la introducción, el modelo de datos (Fighter, FighterDiscipline, Aura…), la lista de tests con lo real y añadir tabla de variables de entorno y pasos de despliegue con migraciones y aviso sobre el seed; reescribir las decisiones 3 y 4 de ARQUITECTURA (aura, sin media) o marcarlas como sustituidas; actualizar la hoja de ruta y L118; anotarlo en DIARIO y LECCIONES como pide CLAUDE.md.
-
 ### 93. El sello de organizador verificado no exige nota de evidencia, aunque IDEAS y ARQUITECTURA dicen que es obligatoria
 
 - **Gravedad:** media · **Estado:** Pendiente — La aprobación de organizador no exige nota de evidencia (solo el sello de gimnasio).
 - **Dónde:** `src/app/actions.ts:355` · **Categoría:** documentacion-vs-codigo
-- **Verificación:** sin verificar (no hubo comprobadores)
+- **Verificación:** 3 comprobadores, 0 refutaciones; gravedad según ellos: baja, baja, baja
 
 IDEAS.md:51 («nota de evidencia obligatoria, interna») y ARQUITECTURA.md:136 valen solo para gimnasios: setGymVerified (468) redirige con error si falta la nota, pero en decideOrganizer la nota es opcional (`note: str(f, "note") || null`, `reviewNote … || null`) y el input de moderacion/page.tsx:32 no lleva required. Al aprobar, la velada muestra «✓ organizador verificado» (veladas/[slug]/page.tsx:17) con el título «Organizador verificado por un moderador», sin evidencia registrada.
 
@@ -806,11 +794,13 @@ IDEAS.md:51 («nota de evidencia obligatoria, interna») y ARQUITECTURA.md:136 v
 
 **Arreglo propuesto:** Exigir la nota al aprobar (`if (approve && !note) redirect('/moderacion?error=nota')` y required en el input), o corregir IDEAS.md:51 y ARQUITECTURA.md:136 para decir que solo aplica a gimnasios.
 
+**Lo que dijo un comprobador:** El comportamiento existe, pero las referencias de línea están desfasadas y el impacto es menor que «media». Confirmado en el código real: (1) decideOrganizer (src/app/actions.ts:680-695, no la línea 355, que es `reachCm`) toma `const note = str(f,"note").slice(0, LIMITS.note) || null` y no comprueba `approve && !note`. Guarda `reviewNote: note` (null si está vacía) y registra `after: {..., note}` en el AuditLog. Al aprobar pone el rol ORGANIZER. (2) setGymVerified (actions.ts:834-848, no la 468) sí hace `if (verify && !note) go(back, {problema:"sello_sin_nota"})` en la línea 841, así que la as
+
 ### 94. El documento dice que el ránking distingue siempre lo respaldado de lo autodeclarado, pero auraRanking no filtra ni etiqueta por verificación
 
 - **Gravedad:** baja · **Estado:** Pendiente — Documentación: el ránking no distingue lo respaldado de lo autodeclarado.
 - **Dónde:** `src/lib/aura.ts:40` · **Categoría:** documentacion-vs-codigo
-- **Verificación:** sin verificar (no hubo comprobadores)
+- **Verificación:** 3 comprobadores, 0 refutaciones; gravedad según ellos: baja, baja, baja
 
 ARQUITECTURA.md:98 fija como regla que «la ficha y el ránking distinguen siempre lo respaldado de lo autodeclarado», pero auraRanking solo filtra por disciplina, fecha y provincia: un aura sobre un combate SELF_REPORTED cuenta igual que sobre uno VERIFIED y /ranking no muestra señal de respaldo (la misma tabla, L95, admite que falta ponderar el nivel). Tampoco existe la cifra «12-2, 9 verificados»: la ficha muestra cuántos están pendientes de confirmar, no cuántos están verificados.
 
@@ -818,11 +808,13 @@ ARQUITECTURA.md:98 fija como regla que «la ficha y el ránking distinguen siemp
 
 **Arreglo propuesto:** Reformular la regla como objetivo pendiente o implementar un filtro o marca de respaldo (contar solo auras de combates ≥ CONFIRMED o mostrar el nivel en el ránking) y actualizar el documento.
 
+**Lo que dijo un comprobador:** El hallazgo se sostiene al leer el código real. (1) `auraRanking` en src/lib/aura.ts (L41-49) solo excluye combates `DISPUTED` y eventos cancelados, y filtra por disciplina, fecha y provincia. Un aura sobre un combate `SELF_REPORTED` cuenta igual que sobre uno `VERIFIED`. (2) src/app/ranking/page.tsx solo pinta Puesto, Peleador y Aura, sin ninguna marca de respaldo. (3) `canGiveAura` (src/lib/rules.ts) solo rechaza `DISPUTED`, cancelado, futuro, sin resultado y participante, así que se puede dar aura a un combate sin confirmar. (4) El escenario se reproduce paso a paso. En actions.ts L468-479
+
 ### 95. COMPETENCIA.md da por hecho un enlace estable por combate que no existe y lista como pendiente lo que el ránking ya hace
 
 - **Gravedad:** baja · **Estado:** Pendiente
 - **Dónde:** `docs/COMPETENCIA.md:31` · **Categoría:** documentacion-vs-codigo
-- **Verificación:** sin verificar (no hubo comprobadores)
+- **Verificación:** 3 comprobadores, 0 refutaciones; gravedad según ellos: baja, baja, baja
 
 L31: «Identificador único y enlace estable por peleador y por combate — Ya lo tenemos». No hay ruta por combate en src/app (solo /peleadores/[slug], /veladas/[slug], /gimnasios/[slug], /entrenadores/[slug] y /organizador/[slug]); los combates se muestran dentro de la ficha o la velada. L34 propone mejorar el ránking «por disciplina y categoría, y explicando cómo se calcula», y ranking/page.tsx:18-33 ya lo hace.
 
@@ -830,17 +822,23 @@ L31: «Identificador único y enlace estable por peleador y por combate — Ya l
 
 **Arreglo propuesto:** Corregir L31 a «enlace por peleador y velada; por combate, pendiente», ajustar la fila de ránkings y añadir la ruta por combate a IDEAS si se quiere.
 
+**Lo que dijo un comprobador:** El hallazgo se sostiene leyendo el código real. 1) docs/COMPETENCIA.md L31 dice literalmente «Identificador único y enlace estable por peleador y por combate | Ya lo tenemos (enlaces con nombre)». En src/app solo hay páginas dinámicas para peleadores, veladas, gimnasios, entrenadores y organizador; no existe ninguna ruta de combate (ni /combates/[id] ni otra). Tampoco hay anclas por combate: la búsqueda de `id=` en las páginas de peleador y velada y en RecordCards.tsx no da resultados, y sitemap.ts solo lista peleadores, veladas, gimnasios y entrenadores, sin combates. Por eso no se puede comp
+
 ### 96. Textos públicos que no reflejan el alcance actual: descripción del sitio solo de boxeo y gimnasio de ejemplo con palabra inglesa
 
 - **Gravedad:** baja · **Estado:** Pendiente — La descripción del sitio solo habla de boxeo.
 - **Dónde:** `src/app/layout.tsx:11` · **Categoría:** idioma
-- **Verificación:** sin verificar (no hubo comprobadores)
+- **Verificación:** 3 comprobadores, 0 refutaciones; gravedad según ellos: baja, baja, baja
 
 La descripción que ven buscadores y vistas previas dice «La base de datos del boxeo español: peleadores profesionales y amateur, récords, veladas, gimnasios y entrenadores», lo que contradice portada y ayuda (boxeo, MMA, kickboxing, K-1 y jiu-jitsu, amateur primero, Madrid). El seed crea el gimnasio «Boxing Demo Sevilla» (prisma/seed.ts:20), que sale en /gimnasios, /buscar y las fichas con la palabra inglesa «Boxing», contra la regla de que todo lo visible vaya en español.
 
 **Escenario:** Al compartir el enlace, la vista previa habla solo de boxeo profesional y amateur; quien abre /gimnasios en la demo ve «Boxing Demo Sevilla» entre nombres en español.
 
 **Arreglo propuesto:** Ajustar la descripción («Comunidad de los deportes de contacto en España: boxeo, MMA, kickboxing, K-1 y jiu-jitsu…») y renombrar el gimnasio de ejemplo («Gimnasio Demo Sevilla»).
+
+**Lo que dijo un comprobador:** El hallazgo se sostiene en lo esencial, pero las dos líneas citadas están mal. La descripción del sitio está en src/app/layout.tsx línea 13 (la línea 11 es `metadataBase`) y dice literalmente «La base de datos del boxeo español: peleadores profesionales y amateur, récords, veladas, gimnasios y entrenadores.». El gimnasio de ejemplo está en prisma/seed.ts línea 39 (la línea 20 es código de `comprobarQueEsSeguro`): `["Boxing Demo Sevilla", "Sevilla", "Sevilla"]`. Se crea con `db.gym.create` y el nombre es lo que se muestra en la interfaz, sin traducirlo.
+
+Contradicción con el alcance actual, com
 
 ### 97. Vocabulario residual en CLAUDE.md, IDEAS y ARQUITECTURA («boxeador», «valoración», «email») y fila mal formada en IDEAS
 
@@ -871,3 +869,5 @@ requestClaim (304-309) permite a un usuario verificado crear una solicitud por c
 - **81. Faltan índices en claves foráneas que las páginas consultan (Fighter.gymId y trainerId, Event.organizerId, Bout.createdById, Report.userId, ClaimRequest.fighterId)** — Refutado por mayoría: casi todos esos índices ya existían. Se añadieron los que sí faltaban (`Report.userId`, `ClaimRequest.fighterId`, `AuditLog.userId`, `Trainer.gymId`).
 - **83. Hash de contraseña con parámetros por defecto de scrypt y formato sin versión ni parámetros: no se puede reforzar sin invalidar todas las cuentas** — Los tres comprobadores lo refutaron (los parámetros por defecto eran aceptables), pero en el Bloque 3 se reforzó igualmente: parámetros de OWASP guardados en el hash y recalculado al entrar.
 - **90. Datos de prueba que caducan o apuntan a terceros: velada «futura» fija en 2030 y dominio @test.es** — Refutado por mayoría (2 de 3). De todos modos, la velada «futura» de las pruebas ya es relativa a la fecha de hoy.
+- **91. README y ARQUITECTURA describen el proyecto anterior (Boxer, Rating, rateBoxer, ratings.ts, ránking bayesiano, solo boxeo) y una hoja de ruta desfasada, sin sección de variables ni despliegue** — Refutado por los comprobadores porque, al verificarlo (después del traslado), ya estaba corregido: README y ARQUITECTURA se reescribieron.
+- **92. Ficha «gestionada por el peleador» en los documentos, pero solo se pueden editar disciplina, categoría y récord de partida** — Bloque 4: «Corregir los datos de mi ficha». Refutado por los comprobadores porque, al verificarlo, ya estaba corregido.
