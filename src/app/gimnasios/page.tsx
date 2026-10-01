@@ -20,7 +20,7 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <h1>Gimnasios</h1>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Filtrar gimnasios">
         <CampoFiltro etiqueta="Nombre o ciudad"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <BotonesFiltro ruta="/gimnasios" />

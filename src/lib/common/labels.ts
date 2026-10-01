@@ -13,13 +13,28 @@ export const PROVINCES = [
   "Málaga","Murcia","Navarra","Ourense","Palencia","Pontevedra","Salamanca","Santa Cruz de Tenerife",
   "Segovia","Sevilla","Soria","Tarragona","Teruel","Toledo","Valencia","Valladolid","Bizkaia","Zamora",
   "Zaragoza","Ceuta","Melilla",
-];
+].sort((a, b) => a.localeCompare(b, "es")); // por el nombre que se muestra (Bizkaia entre Badajoz y Burgos, no entre Valladolid y Zamora)
 
 export const fmtDate = (d: Date) =>
   d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" });
 
 export const slugify = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+/** Huella corta y estable de un texto (FNV-1a de 32 bits, en hexadecimal): distingue nombres que el slug dejaría iguales. */
+export const shortHash = (s: string): string => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, "0");
+};
+
+/**
+ * Slug de un nombre con datos que lo acompañan (ciudad, fecha…). Si el nombre no tiene ninguna letra latina (por ejemplo «Ёлка» o «拳道»),
+ * `slugify` lo dejaría vacío y dos nombres distintos acabarían con el mismo slug (y se fundirían en una sola velada o gimnasio):
+ * en ese caso el slug lleva además una huella corta del nombre.
+ */
+export const slugName = (name: string, ...acompanantes: string[]): string =>
+  slugify(name) ? slugify([name, ...acompanantes].join(" ")) : `${slugify(acompanantes.join(" ")) || "sin-nombre"}-${shortHash(name)}`;
 
 /** Cómo se llama en pantalla cada nivel de respaldo de un combate. */
 export const VERIFICATION_LABEL = {

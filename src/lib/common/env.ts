@@ -9,7 +9,7 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): { errors: str
 
   if (!env.DATABASE_URL) errors.push("Falta DATABASE_URL (dirección de la base de datos PostgreSQL).");
   if (!env.APP_URL) errors.push("Falta APP_URL (dirección pública de la web, por ejemplo https://ringespana.es): los enlaces de los correos apuntarían a localhost.");
-  else if (!/^https?:\/\/[^/\s]+/.test(env.APP_URL)) errors.push("APP_URL debe empezar por http:// o https:// y no puede tener espacios.");
+  else if (!/^https?:\/\/[^/\s]+\/?$/.test(env.APP_URL)) errors.push("APP_URL debe ser solo la dirección de la web (por ejemplo https://ringespana.es): empieza por http:// o https://, sin espacios ni saltos de línea y sin ruta.");
   else if (!env.APP_URL.startsWith("https://") && !/^http:\/\/localhost(:\d+)?/.test(env.APP_URL)) warnings.push("APP_URL no usa https: las cuentas y las sesiones deberían servirse siempre por una conexión cifrada.");
 
   if (env.RESEND_API_KEY) {

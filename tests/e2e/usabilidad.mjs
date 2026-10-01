@@ -22,7 +22,7 @@ check("el buscador de la cabecera tiene su botón visible", await visitante.loca
 const aficionada = await newUser("Usabilidad", "FAN");
 await aficionada.p.goto(B + "/");
 const cab = await aficionada.p.locator("header").innerText();
-check("la cabecera de una persona con sesión es corta: «Mi cuenta» y «Salir», sin «Mis peleadores» ni su nombre como enlace", cab.includes("Mi cuenta") && cab.includes("Salir") && !cab.includes("Mis peleadores") && !cab.includes("Usabilidad"));
+check("la cabecera de una persona con sesión es corta: «Mi cuenta» y «Salir», sin «Peleadores que sigo» ni su nombre como enlace", cab.includes("Mi cuenta") && cab.includes("Salir") && !cab.includes("Mis peleadores") && !cab.includes("Usabilidad"));
 check("a quien acaba de registrarse no se le muestra el botón de crear cuenta", await aficionada.p.locator("main a.btn", { hasText: "Crear mi cuenta" }).count() === 0);
 await aficionada.p.goto(B + "/mi-cuenta");
 check("«Mi cuenta» reúne los accesos directos (peleadores que sigo, organizar veladas) y los avisos enviados", await seen(aficionada.p.locator("main a", { hasText: "Peleadores que sigo" })) && await aficionada.p.locator("main a", { hasText: "Organizar veladas" }).count() === 1 && (await cuerpo(aficionada.p)).includes("Avisos de error que he enviado"));
@@ -35,6 +35,11 @@ await btn(visitante, "Crear mi cuenta");
 check("el error de la contraseña corta se explica", await seen(malo(visitante, "8 caracteres")));
 check("y el nombre y el correo escritos siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]").value === v[0] && document.querySelector("[name=email]").value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
 check("pero la contraseña nunca se conserva", await visitante.inputValue("[name=password]") === "");
+// El mismo error dos veces seguidas (la dirección no cambia): lo escrito tampoco se pierde la segunda vez
+await visitante.fill("[name=password]", "otra");
+await btn(visitante, "Crear mi cuenta");
+await visitante.waitForFunction(() => document.querySelector("[name=password]").value === "", null, { timeout: 4000 }); // la acción terminó y React vació el formulario
+check("y si el mismo error se repite, el nombre y el correo siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]").value === v[0] && document.querySelector("[name=email]").value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
 await visitante.fill("[name=password]", "contraseña-larga-1");
 await btn(visitante, "Crear mi cuenta");
 await visitante.waitForURL("**/verificar");

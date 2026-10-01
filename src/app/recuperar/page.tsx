@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requestPasswordReset } from "../actions/accounts";
 import { LIMITS } from "../../lib/common/text";
 
-export const metadata = { title: "Elegir una contraseña nueva" };
+export const metadata = { title: "¿Has olvidado tu contraseña?" };
 
 export default function Recover() {
   return (

@@ -31,7 +31,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Calendario de veladas</h1>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Filtrar veladas">
         <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>

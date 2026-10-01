@@ -48,14 +48,14 @@ export default async function ChooseRival({ searchParams }: { searchParams: Prom
               {c.listed && c.city ? ` · ${c.city}` : ""}{c.listed && c.gym ? ` · ${c.gym.name}` : ""}
               {c.userId ? " · ficha con titular" : " · ficha sin reclamar"}
             </div>
-            <button style={{ marginTop: 8 }}>Es esta persona</button>
+            <button style={{ marginTop: 8 }} aria-label={`Es esta persona: ${publicFighterName(c)}${c.userId ? " (ficha con titular)" : " (ficha sin reclamar)"}`}>Es esta persona</button>
           </form>
         ))}
         <form action={addBout} className="card">
           {ocultos("nuevo")}
           <strong>Es otra persona</strong>
           <div className="mut">Se creará una ficha nueva para {valores.oppFirst} {valores.oppLast}.</div>
-          <button className="secondary" style={{ marginTop: 8 }}>Crear una ficha nueva</button>
+          <button className="secondary" style={{ marginTop: 8 }} aria-label={`Crear una ficha nueva para ${valores.oppFirst} ${valores.oppLast}`}>Crear una ficha nueva</button>
         </form>
       </div>
       <p><Link href="/mi-ficha">Volver a «Mi ficha» sin registrar el combate</Link></p>

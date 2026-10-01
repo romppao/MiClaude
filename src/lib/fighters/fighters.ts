@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "../common/db";
 import { normalizeName } from "../common/names";
+import { ACCENT_FROM, ACCENT_TO } from "../common/search";
 
 type Client = Prisma.TransactionClient | typeof db;
 
@@ -10,8 +11,9 @@ type Client = Prisma.TransactionClient | typeof db;
  * Vive fuera de los ficheros de acciones a propósito: una acción exportada sería un punto de entrada público.
  */
 export async function findNameCandidates(first: string, last: string, client: Client = db) {
-  const from = "áàäâéèëêíìïîóòöôúùüûñ";
-  const to = "aaaaeeeeiiiioooouuuun";
+  // La misma tabla de letras que la búsqueda (con ç, ã, õ, å…): si difiriera, un homónimo con esas letras no se encontraría y se crearía una ficha duplicada.
+  const from = ACCENT_FROM;
+  const to = ACCENT_TO;
   const rows = await client.$queryRaw<{ id: string }[]>`
     SELECT id FROM "Fighter"
     WHERE "hiddenAt" IS NULL

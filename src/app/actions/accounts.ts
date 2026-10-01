@@ -4,15 +4,16 @@
 
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
-import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
+import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, isResetTokenUsable, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../lib/accounts/password";
-import { HORA, MINUTO, addHit, allow, clearHits, clientIp, isBlocked } from "../../lib/accounts/ratelimit";
+import { HORA, MINUTO, allow, clearHits, clientIp, reservar } from "../../lib/accounts/ratelimit";
 import { maybePurge } from "../../lib/accounts/retention";
 import { sendMail } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
 import { internalPath } from "../../lib/common/paths";
-import { anonymizeFighter } from "../../lib/fighters/anonymize";
+import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
 import { go, guard, Rechazo, str } from "./shared";
 
@@ -57,15 +58,16 @@ export async function login(f: FormData) {
   const back = `/entrar${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   const ip = await clientIp();
   const claves: [string, number][] = [[`acceso:correo:${email}`, LOGIN_MAX_POR_CORREO], ...(ip ? [[`acceso:ip:${ip}`, LOGIN_MAX_POR_IP] as [string, number]] : [])];
-  for (const [clave, max] of claves) if (await isBlocked(clave, max, 15 * MINUTO)) go(back, { problema: "demasiados_intentos" });
+  await maybePurge(); // la limpieza de datos caducados no depende de que alguien se registre (como mucho una vez cada 30 minutos)
+  // El intento se reserva ANTES de calcular el hash (si se anotara al terminar, peticiones simultáneas se saltarían el límite).
+  const reservas = await Promise.all(claves.map(([clave, max]) => reservar(clave, max, 15 * MINUTO)));
+  if (reservas.some((r) => !r.permitido)) go(back, { problema: "demasiados_intentos" });
 
   const user = await db.user.findUnique({ where: { email } });
   // Con un correo que no existe se verifica igualmente contra un hash de mentira: así tarda lo mismo y no se puede averiguar qué correos hay registrados.
   const ok = await verifyPassword(password.length <= LIMITS.password ? password : "", user?.passwordHash ?? (await dummyHash()));
-  if (!user || !ok) {
-    await Promise.all(claves.map(([clave]) => addHit(clave)));
-    go(back, { problema: "login_incorrecto" });
-  }
+  if (!user || !ok) go(back, { problema: "login_incorrecto" }); // la reserva se queda como intento fallido
+  await Promise.all(reservas.map((r) => r.devolver()));
   await clearHits(`acceso:correo:${email}`);
   if (needsRehash(user.passwordHash)) await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
   await createSession(user.id);
@@ -104,8 +106,12 @@ export async function resetPassword(f: FormData) {
   const password = String(f.get("password") ?? "");
   if (password !== String(f.get("repeat") ?? "")) go(back, { problema: "contrasenas_distintas" });
   checkNewPassword(password, back);
+  // El hash cuesta 64 MiB y unos 100–200 ms y la acción es pública: primero se limita la frecuencia y se comprueba que el enlace sirve, y solo entonces se calcula.
+  const ip = await clientIp();
+  if (ip && !(await allow(`restablecer:ip:${ip}`, 20, HORA))) go(back, { problema: "demasiados_intentos" });
+  if (!(await isResetTokenUsable(token))) go("/recuperar", { problema: "token_invalido" });
   const user = await resetPasswordWithToken(token, await hashPassword(password));
-  if (!user) go("/recuperar", { problema: "token_invalido" });
+  if (!user) go("/recuperar", { problema: "token_invalido" }); // alguien gastó el enlace justo antes
   await sendMail(user.email, "Tu contraseña de Ring España se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
   await createSession(user.id);
   go("/", { aviso: "contrasena_cambiada" });
@@ -117,11 +123,10 @@ export async function resetPassword(f: FormData) {
  */
 async function confirmOwnPassword(user: { email: string; passwordHash: string }, password: string, back: string) {
   const clave = `acceso:correo:${user.email}`;
-  if (await isBlocked(clave, LOGIN_MAX_POR_CORREO, 15 * MINUTO)) go(back, { problema: "demasiados_intentos" });
-  if (password.length > LIMITS.password || !(await verifyPassword(password, user.passwordHash))) {
-    await addHit(clave);
-    go(back, { problema: "contrasena_actual_incorrecta" });
-  }
+  const reserva = await reservar(clave, LOGIN_MAX_POR_CORREO, 15 * MINUTO); // antes de calcular el hash: ver login
+  if (!reserva.permitido) go(back, { problema: "demasiados_intentos" });
+  if (password.length > LIMITS.password || !(await verifyPassword(password, user.passwordHash))) go(back, { problema: "contrasena_actual_incorrecta" });
+  await reserva.devolver();
   await clearHits(clave);
 }
 
@@ -153,7 +158,7 @@ export async function changePassword(f: FormData) {
 /** Baja de los avisos por correo desde el enlace del propio mensaje (no hace falta iniciar sesión). */
 export async function unsubscribeEmails(f: FormData) {
   const ok = await unsubscribeWithToken(str(f, "token"));
-  go("/baja", ok ? { aviso: "avisos_desactivados" } : { problema: "token_invalido" });
+  go("/baja", ok ? { aviso: "avisos_desactivados" } : { problema: "baja_invalida" });
 }
 
 /**
@@ -171,9 +176,11 @@ export async function deleteAccount(f: FormData) {
     const fighter = await tx.fighter.findUnique({ where: { userId: user.id }, include: { _count: { select: { boutsAsA: true, boutsAsB: true } } } });
     let ficha: "borrada" | "anonimizada" | null = null;
     if (fighter) {
-      if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await tx.fighter.delete({ where: { id: fighter.id } }); ficha = "borrada"; }
+      if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await tx.fighter.delete({ where: { id: fighter.id } }); await scrubFighterHistory(tx, fighter.id); ficha = "borrada"; }
       else { await anonymizeFighter(tx, fighter.id); ficha = "anonimizada"; }
     }
+    // El historial guardaba su nombre real «antes» y «después» de cada cambio: se vacían esos datos (queda constancia de qué pasó y cuándo).
+    await tx.auditLog.updateMany({ where: { entity: "USER", entityId: user.id }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
     await audit({ userId: null, entity: "USER", entityId: user.id, action: "ACCOUNT_DELETED", after: { role: user.role, ficha } }, tx);
     await tx.user.delete({ where: { id: user.id } });
   }));

@@ -8,7 +8,7 @@ import { plural } from "../../lib/common/text";
 import VerificationTag from "../components/VerificationTag";
 import { toggleFollow } from "../actions/community";
 
-export const metadata = { title: "Mis peleadores" };
+export const metadata = { title: "Peleadores que sigo" };
 export const dynamic = "force-dynamic";
 
 export default async function Following() {
@@ -28,7 +28,7 @@ export default async function Following() {
 
   return (
     <>
-      <h1>Mis peleadores</h1>
+      <h1>Peleadores que sigo</h1>
       {follows.length === 0 ? (
         <>
           <p>Todavía no sigues a ningún peleador. Cuando sigas a alguien, aquí verás sus próximas veladas y sus últimos resultados.</p>
@@ -38,7 +38,8 @@ export default async function Following() {
         <>
           <h2>Próximos combates</h2>
           {upcoming.length === 0 ? <p className="mut">Ninguno de los peleadores que sigues tiene un combate programado por ahora.</p> : (
-            <table>
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Próximos combates de los peleadores que sigues">
+<table>
               <caption className="sr-only">Próximos combates de los peleadores que sigues</caption>
               <thead><tr><th scope="col">Fecha</th><th scope="col">Combate</th><th scope="col">Velada</th><th scope="col">Respaldo</th></tr></thead>
               <tbody>
@@ -52,10 +53,12 @@ export default async function Following() {
                 ))}
               </tbody>
             </table>
+</div>
           )}
           <h2>Últimos resultados</h2>
           {recent.length === 0 ? <p className="mut">Aún no hay resultados recientes.</p> : (
-            <table>
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Combates recientes de los peleadores que sigues">
+<table>
               <caption className="sr-only">Últimos resultados de los peleadores que sigues</caption>
               <thead><tr><th scope="col">Fecha</th><th scope="col">Combate</th><th scope="col">Resultado</th><th scope="col">Respaldo</th></tr></thead>
               <tbody>
@@ -69,6 +72,7 @@ export default async function Following() {
                 ))}
               </tbody>
             </table>
+</div>
           )}
           <h2>Peleadores que sigues ({follows.length})</h2>
           <div className="grid">

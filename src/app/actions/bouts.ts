@@ -6,14 +6,14 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
-import { slugify } from "../../lib/common/labels";
+import { slugName, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
 import { internalPath } from "../../lib/common/paths";
 import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
 import { isDiscipline } from "../../lib/common/disciplines";
 import { findNameCandidates } from "../../lib/fighters/fighters";
-import { pairKey, validateOutcome } from "../../lib/bouts/rules";
+import { boutVersion, pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
 import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, readProvince, Rechazo, str, uniqueSlug } from "./shared";
 
@@ -46,6 +46,9 @@ export async function addBout(f: FormData) {
   const province = readProvince(f, "province", back, me.province);
   const city = str(f, "city") || me.city || province;
   const rounds = (() => { const n = intOrNull(f, "rounds"); return n && n <= 12 ? n : null; })();
+  // Toda comprobación que no depende del rival va ANTES del paso de «¿quién es tu rival?»: un error posterior perdería lo escrito.
+  const evidenceUrl = safeHttpUrl(str(f, "evidenceUrl"));
+  if (str(f, "evidenceUrl") && !evidenceUrl) go(back, { problema: "url_invalida" });
 
   // Resultado: solo si el día del combate ya ha llegado; se valida contra la disciplina. Nada se descarta en silencio.
   const past = eventDayReached(date);
@@ -68,7 +71,8 @@ export async function addBout(f: FormData) {
     rivalExisting = await db.fighter.findFirst({ where: { id: rivalId, hiddenAt: null }, select: { id: true } });
     if (!rivalExisting) go(back, { problema: "no_existe" });
   } else if (!rivalId) {
-    if ((await findNameCandidates(oppFirst, oppLast)).length > 0) {
+    // Como en la pantalla de elección: la propia ficha del peleador no cuenta como candidata (si fuera la única, se perdería el combate en una redirección muda).
+    if ((await findNameCandidates(oppFirst, oppLast)).some((c) => c.id !== me.id)) {
       const qs = new URLSearchParams();
       for (const k of BOUT_FIELDS) if (str(f, k)) qs.set(k, str(f, k));
       go(`/mi-ficha/rival?${qs.toString()}`);
@@ -76,12 +80,13 @@ export async function addBout(f: FormData) {
   }
   if (rivalExisting && rivalExisting.id === me.id) go(back, { problema: "combate_mismo" });
 
-  const slugBase = slugify(`${eventName} ${dayKey(date)}`) || `velada-${dayKey(date)}`;
-  const evidenceUrl = safeHttpUrl(str(f, "evidenceUrl"));
-  if (str(f, "evidenceUrl") && !evidenceUrl) go(back, { problema: "url_invalida" });
+  const slugBase = slugName(eventName, dayKey(date));
 
   const created = await guard(back, () =>
     db.$transaction(async (tx) => {
+      // El tope diario se vuelve a comprobar dentro de la transacción y con un bloqueo: peticiones simultáneas no pueden saltárselo.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`combate:${user.id}`}))`;
+      if ((await tx.auditLog.count({ where: { userId: user.id, entity: "BOUT", action: "CREATED", createdAt: { gte: new Date(Date.now() - 864e5) } } })) >= MAX_BOUTS_PER_DAY) throw new Rechazo("combate_limite_dia");
       let event = await tx.event.findUnique({ where: { slug: slugBase } });
       if (event) {
         if (event.discipline !== discipline) throw new Rechazo("combate_disciplina");
@@ -123,16 +128,24 @@ export async function setMyBoutResult(f: FormData) {
   const back = "/mi-ficha";
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
   if (!bout) go(back, { problema: "no_existe" });
-  if (bout.createdById !== user.id || bout.verification !== "SELF_REPORTED") go(back, { problema: "sin_permiso" });
+  // El autor puede poner el resultado mientras esté pendiente de confirmar, o si el rival solo confirmó el combate cuando aún no tenía resultado.
+  const soloEmparejamientoConfirmado = bout.verification === "CONFIRMED" && !bout.result;
+  if (bout.createdById !== user.id || (bout.verification !== "SELF_REPORTED" && !soloEmparejamientoConfirmado)) go(back, { problema: "sin_permiso" });
   if (!eventDayReached(bout.event.date)) go(back, { problema: "resultado_futuro" });
   const v = validateOutcome({ discipline: bout.event.discipline, outcome: str(f, "outcome"), method: str(f, "method"), endRound: intOrNull(f, "endRound"), rounds: bout.rounds });
   if (!v.ok) go(back, { problema: v.problema });
-  await db.$transaction(async (tx) => {
-    await tx.bout.update({ where: { id: bout.id }, data: { result: v.result, method: v.method, endRound: v.endRound } });
-    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET_BY_AUTHOR", before: { result: bout.result, method: bout.method }, after: { result: v.result, method: v.method, endRound: v.endRound } }, tx);
-  });
+  await guard(back, () => db.$transaction(async (tx) => {
+    // Solo se escribe si el combate sigue como lo leímos (nadie lo confirmó ni lo rechazó mientras tanto).
+    const r = await tx.bout.updateMany({
+      where: { id: bout.id, verification: bout.verification, result: bout.result },
+      // El rival solo había confirmado el combate, no este resultado: vuelve a «pendiente de confirmar» para que lo confirme.
+      data: { result: v.result, method: v.method, endRound: v.endRound, ...(soloEmparejamientoConfirmado ? { verification: "SELF_REPORTED" as const } : {}) },
+    });
+    if (r.count === 0) throw new Rechazo("combate_cambiado");
+    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET_BY_AUTHOR", before: { result: bout.result, method: bout.method, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification: soloEmparejamientoConfirmado ? "SELF_REPORTED" : bout.verification } }, tx);
+  }));
   revalidatePath("/", "layout");
-  go(back, { aviso: "resultado_guardado" });
+  go(back, { aviso: soloEmparejamientoConfirmado ? "resultado_guardado_confirmar" : "resultado_guardado" });
 }
 
 /** El rival (si tiene cuenta) confirma o rechaza un combate declarado por el otro peleador. */
@@ -145,11 +158,14 @@ export async function respondBout(f: FormData) {
   if (bout.verification !== "SELF_REPORTED") go(back, { problema: "moderacion_estado" });
   if (bout.fighterBId !== me.id) go(back, { problema: "sin_permiso" }); // solo el rival del creador
   const next = str(f, "decision") === "confirm" ? "CONFIRMED" : "DISPUTED";
-  await db.$transaction(async (tx) => {
-    await tx.bout.update({ where: { id: bout.id }, data: { verification: next } });
+  // La confirmación solo vale para el resultado que el rival tenía delante: si el autor lo corrigió entretanto, debe revisarlo de nuevo.
+  if (next === "CONFIRMED" && str(f, "version") !== boutVersion(bout)) go(back, { problema: "combate_cambiado" });
+  await guard(back, () => db.$transaction(async (tx) => {
+    const r = await tx.bout.updateMany({ where: { id: bout.id, verification: "SELF_REPORTED", result: bout.result, method: bout.method, endRound: bout.endRound }, data: { verification: next } });
+    if (r.count === 0) throw new Rechazo("combate_cambiado");
     if (next === "CONFIRMED") await tx.fighter.updateMany({ where: { id: { in: [bout.fighterAId, bout.fighterBId] } }, data: { listed: true } });
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: `RIVAL_${next}`, before: { verification: bout.verification }, after: { verification: next } }, tx);
-  });
+  }));
   revalidatePath("/", "layout");
   go(back, { aviso: next === "CONFIRMED" ? "combate_confirmado" : "combate_rechazado" });
 }

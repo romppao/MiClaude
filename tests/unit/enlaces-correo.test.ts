@@ -57,13 +57,13 @@ describe("enlace de verificación del correo", () => {
 });
 
 describe("enlace para elegir una contraseña nueva", () => {
-  it("uno válido cambia la contraseña, gasta todos los enlaces, cierra todas las sesiones y verifica el correo", async () => {
+  it("uno válido cambia la contraseña, gasta los enlaces de verificación y recuperación (no los de baja de avisos), cierra todas las sesiones y verifica el correo", async () => {
     db.emailToken.findUnique.mockResolvedValue(fila("RESET"));
     const u = await resetPasswordWithToken("t", "hash-nuevo");
     expect(u).toEqual({ id: "u1" });
     expect(db.user.update.mock.calls[0][0].data.passwordHash).toBe("hash-nuevo");
     expect(db.user.update.mock.calls[0][0].data.emailVerifiedAt).toBeInstanceOf(Date);
-    expect(db.emailToken.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
+    expect(db.emailToken.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1", kind: { in: ["VERIFY", "RESET"] } } }); // los enlaces de baja de los correos ya enviados siguen valiendo
     expect(db.session.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
   });
   it("si el correo ya estaba verificado, conserva la fecha original", async () => {

@@ -14,6 +14,9 @@ describe("comprobación del entorno", () => {
     expect(validateEnv(prod({ APP_URL: "" })).errors.join()).toContain("APP_URL");
     expect(validateEnv(prod({ DATABASE_URL: "" })).errors.join()).toContain("DATABASE_URL");
     expect(validateEnv(prod({ APP_URL: "ringespana.es" })).errors.join()).toContain("http");
+    // espacios o saltos de línea al final (un error típico al copiar la variable) romperían todos los enlaces de los correos
+    for (const mala of ["https://ringespana.es ", "https://ringespana.es\n", "https://ring espana.es", "https://ringespana.es/ruta"]) expect(validateEnv(prod({ APP_URL: mala })).errors.join(), JSON.stringify(mala)).toContain("APP_URL");
+    expect(validateEnv(prod({ APP_URL: "https://ringespana.es/" })).errors).toEqual([]);
   });
   it("con proveedor de correo hace falta el remitente", () => {
     expect(validateEnv(prod({ MAIL_FROM: "" })).errors.join()).toContain("MAIL_FROM");

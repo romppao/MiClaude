@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "../../../lib/accounts/auth";
 import { loginPath } from "../../../lib/common/paths";
+import { eventDayReached } from "../../../lib/common/dates";
 import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/common/disciplines";
@@ -21,7 +22,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
   if (!event) notFound();
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");
   const fighters = await db.fighter.findMany({ where: { hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }], take: MAX_LISTA + 1, include: { gym: true } });
-  const past = event.date.getTime() <= Date.now();
+  const past = eventDayReached(event.date);
   const nombre = (b: { firstName: string; lastName: string }) => `${b.firstName} ${b.lastName}`;
   // En la lista se distinguen los homónimos con el alias, la ciudad y el gimnasio.
   const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
@@ -78,7 +79,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
                           </select>
                           <select name="method" aria-label={`Cómo terminó ${cual}`} defaultValue={b.method ?? METHODS_BY_DISCIPLINE[event.discipline][0]}>{METHODS_BY_DISCIPLINE[event.discipline].filter((m) => m !== "DRAW" && m !== "NC").map((m) => <option key={m} value={m}>{METHOD_LABEL[m]}</option>)}</select>
                           <input name="endRound" type="number" min={1} max={12} aria-label={`Asalto en que terminó ${cual}`} placeholder="Asalto" defaultValue={b.endRound ?? ""} style={{ width: 96 }} />
-                          <button aria-label={`${b.result ? "Actualizar" : "Guardar"} el resultado de ${cual}`}>{b.result ? "Actualizar resultado" : "Guardar resultado"}</button>
+                          <button aria-label={`${b.result ? "Actualizar" : "Guardar"} resultado de ${cual}`}>{b.result ? "Actualizar resultado" : "Guardar resultado"}</button>
                         </form>
                       ) : <span className="mut">Se podrá indicar cuando se celebre la velada.</span>}
                     </td>

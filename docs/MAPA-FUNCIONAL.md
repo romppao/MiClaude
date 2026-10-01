@@ -34,7 +34,7 @@
 | `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
 | `/registro` | Crear cuenta | Pública | `accounts.register` | — |
 | `/salud` | Comprobación de salud para el alojamiento: responde 200 si la aplicación y la base de datos funcionan, y 503 si no. | Pública | — | — |
-| `/siguiendo` | Mis peleadores | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
+| `/siguiendo` | Peleadores que sigo | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
 | `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Event |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail` | — |
@@ -56,7 +56,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `register` | Cualquiera | EmailToken, RateHit, Session, User | — | Sí | — |
 | `requestPasswordReset` | Cualquiera | EmailToken, RateHit | — | Sí | recuperar_enviado |
 | `resendVerification` | Cuenta con sesión iniciada | EmailToken, RateHit | — | Sí | correo_reenviado |
-| `resetPassword` | Cualquiera | EmailToken, Session, User | — | Sí | contrasena_cambiada |
+| `resetPassword` | Cualquiera | EmailToken, RateHit, Session, User | — | Sí | contrasena_cambiada |
 | `unsubscribeEmails` | Cualquiera | User | — | — | avisos_desactivados |
 | `updateAccount` | Cuenta con sesión iniciada | AuditLog, User | USER: ACCOUNT_UPDATED | — | cuenta_guardada |
 | `verifyEmail` | Cualquiera | EmailToken, User | — | — | correo_verificado |
@@ -75,7 +75,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `addBout` | Cuenta con correo verificado | AuditLog, Bout, Event, Fighter, FighterDiscipline | BOUT: CREATED | — | — |
 | `respondBout` | Cuenta con correo verificado | AuditLog, Bout, Fighter | BOUT: (varias) | — | — |
 | `setBoutEvidence` | Cuenta con correo verificado | AuditLog, Bout | BOUT: EVIDENCE_SET | — | — |
-| `setMyBoutResult` | Cuenta con correo verificado | AuditLog, Bout | BOUT: RESULT_SET_BY_AUTHOR | — | resultado_guardado |
+| `setMyBoutResult` | Cuenta con correo verificado | AuditLog, Bout | BOUT: RESULT_SET_BY_AUTHOR | — | — |
 
 ### `community`
 
@@ -131,7 +131,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Report | `community.createReport`, `moderation.resolveReport` |
 | Follow | `community.toggleFollow`, `moderation.decideClaim` |
 | FighterDiscipline | `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline` |
-| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification` |
+| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -144,7 +144,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
 | `permissions.ts` | `requireAdmin`, `requireOrganizer` |
-| `ratelimit.ts` | `HORA`, `MINUTO`, `addHit`, `allow`, `clearHits`, `clientIp`, `countHits`, `isBlocked`, `normalizeIp` |
+| `ratelimit.ts` | `HORA`, `MINUTO`, `addHit`, `allow`, `clearHits`, `clientIp`, `countHits`, `isBlocked`, `normalizeIp`, `reservar` |
 | `retention.ts` | `DIAS_CUENTA_SIN_VERIFICAR`, `maybePurge`, `purgeStale` |
 
 ### `lib/aura`
@@ -158,7 +158,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `rules.ts` | `OUTCOME_TO_RESULT`, `OutcomeKey`, `OutcomeProblema`, `pairKey`, `validateOutcome` |
+| `rules.ts` | `OUTCOME_TO_RESULT`, `OutcomeKey`, `OutcomeProblema`, `boutVersion`, `pairKey`, `validateOutcome` |
 
 ### `lib/common`
 
@@ -169,7 +169,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `db.ts` | `db` |
 | `disciplines.ts` | `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `METHODS_BY_DISCIPLINE`, `WEIGHT_CLASSES`, `isDiscipline`, `isTournamentStyle`, `parseDisciplineChoice` |
 | `env.ts` | `validateEnv` |
-| `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `resultWord`, `slugify` |
+| `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
 | `names.ts` | `normalizeName`, `publicFighterName`, `publicUserName` |
@@ -191,7 +191,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `anonymize.ts` | `anonymizeFighter` |
+| `anonymize.ts` | `anonymizeFighter`, `scrubFighterHistory` |
 | `coherence.ts` | `FLAG_LABEL`, `Flag`, `MIN_DAYS_BETWEEN_BOUTS`, `proximityAppliesTo`, `proximityFlags` |
 | `fighters.ts` | `findNameCandidates` |
 | `prior.ts` | `PriorError`, `PriorParse`, `parsePrior` |

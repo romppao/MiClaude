@@ -8,7 +8,7 @@ import { publicFighterName } from "../../lib/common/names";
 import { searchIds } from "../../lib/common/search";
 import { oneParam } from "../../lib/common/safe";
 import { eventDayReached } from "../../lib/common/dates";
-import { OUTCOME_TO_RESULT } from "../../lib/bouts/rules";
+import { OUTCOME_TO_RESULT, boutVersion } from "../../lib/bouts/rules";
 import { computeRecords } from "../../lib/fighters/record";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
@@ -35,13 +35,13 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <>
         <h1>¿Ya apareces en Ring España?</h1>
         <p className="mut">Si alguien ya registró un combate tuyo, tu ficha existe. Búscala y reclámala; un moderador la revisará.</p>
-        <form className="search"><input name="q" defaultValue={q} placeholder="Tu nombre o apellidos" /><button>Buscar mi ficha</button></form>
+        <form className="search" role="search" aria-label="Buscar mi ficha"><label className="field"><span>Tu nombre o apellidos</span><input name="q" defaultValue={q} maxLength={80} /></label><button>Buscar mi ficha</button></form>
         {candidates.map((b) => (
           <form key={b.id} action={requestClaim} className="card" style={{ marginBottom: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <input type="hidden" name="fighterId" value={b.id} />
             <strong>{publicFighterName(b)}</strong><span className="mut">{b.disciplines.map((d) => DISCIPLINE_LABEL[d.discipline]).join(", ")} · {b._count.boutsAsA + b._count.boutsAsB} combates registrados{b.city ? ` · ${b.city}` : ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
             <label className="field" style={{ flex: 1, minWidth: 220 }}><span>¿Cómo podemos comprobar que eres tú?</span><input name="message" maxLength={LIMITS.message} placeholder="Gimnasio, entrenador, velada donde combatiste…" /><span className="hint">No escribas números de documento.</span></label>
-            <button aria-label={`Reclamar la ficha de ${publicFighterName(b)}`}>Reclamar esta ficha</button>
+            <button aria-label={`Reclamar esta ficha de ${publicFighterName(b)}`}>Reclamar esta ficha</button>
           </form>
         ))}
         {q && candidates.length === 0 && <p className="mut">No hay fichas sin dueño con ese nombre.</p>}
@@ -143,8 +143,9 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                   <div className="mut">Combate contra {rival}: {resultado}.</div>
                   <form action={respondBout} style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                     <input type="hidden" name="boutId" value={b.id} />
-                    <button name="decision" value="confirm" aria-label={`Confirmar que es correcto el combate contra ${rival} en ${b.event.name}`}>Sí, es correcto</button>
-                    <button name="decision" value="dispute" className="secondary" aria-label={`Indicar que no es correcto el combate contra ${rival} en ${b.event.name}`}>No es correcto</button>
+                    <input type="hidden" name="version" value={boutVersion(b)} />
+                    <button name="decision" value="confirm" aria-label={`Sí, es correcto: combate contra ${rival} en ${b.event.name}`}>Sí, es correcto</button>
+                    <button name="decision" value="dispute" className="secondary" aria-label={`No es correcto: combate contra ${rival} en ${b.event.name}`}>No es correcto</button>
                   </form>
                 </li>
               );
@@ -198,7 +199,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
               const isA = b.fighterAId === me.id;
               const soyAutor = b.createdById === user.id;
               const opp = isA ? b.fighterB : b.fighterA;
-              const puedeCorregir = soyAutor && b.verification === "SELF_REPORTED" && eventDayReached(b.event.date);
+              const puedeCorregir = soyAutor && (b.verification === "SELF_REPORTED" || (b.verification === "CONFIRMED" && !b.result)) && eventDayReached(b.event.date);
               return (
                 <tr key={b.id}>
                   <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div></td>
@@ -231,7 +232,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                       <form action={setBoutEvidence} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} />
                         <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} maxLength={LIMITS.url} placeholder="Enlace que lo demuestre" aria-label={`Enlace que demuestra el combate ${b.event.name}`} />
-                        <button className="secondary" aria-label={`Guardar el enlace del combate ${b.event.name}`}>Guardar enlace</button>
+                        <button className="secondary" aria-label={`Guardar enlace del combate ${b.event.name}`}>Guardar enlace</button>
                       </form>
                     ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a> : <span className="mut">Combate ya confirmado o verificado</span>}
                   </td>

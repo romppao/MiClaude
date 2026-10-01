@@ -45,7 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <><Link href="/entrar">Entrar</Link><Link href="/registro" className="btn">Registrarse</Link></>
               )}
             </div>
-            <form action="/buscar" role="search" className="buscador">
+            <form action="/buscar" role="search" aria-label="Búsqueda rápida" className="buscador">
               <input name="q" aria-label="Buscar peleadores, gimnasios, entrenadores o veladas" placeholder="Buscar…" maxLength={80} />
               <button className="secondary">Buscar</button>
             </form>

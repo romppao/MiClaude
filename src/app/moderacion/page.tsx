@@ -56,6 +56,10 @@ function BoutTable({ rows, acciones, vacio }: { rows: BoutRow[]; acciones: (b: B
   );
 }
 
+/** Nombre de un combate para los lectores de pantalla: cada botón repetido en una fila lleva su contexto. */
+const nombreCombate = (b: { fighterA: { firstName: string; lastName: string }; fighterB: { firstName: string; lastName: string }; event: { name: string } }) =>
+  `${b.fighterA.firstName} ${b.fighterA.lastName} contra ${b.fighterB.firstName} ${b.fighterB.lastName} en ${b.event.name}`;
+
 export default async function Moderation() {
   const user = await requireAdmin("/moderacion");
 
@@ -122,12 +126,12 @@ export default async function Moderation() {
                   <td>
                     <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       <input type="hidden" name="reportId" value={r.id} />
-                      <input name="note" placeholder="Nota (opcional)" aria-label="Nota de resolución" maxLength={500} />
-                      <button name="decision" value="resolve">Cerrar: ya está corregido</button>
-                      <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Oculta los datos personales de la ficha" : "Retira el comentario"}>
+                      <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar)" : "Nota (opcional)"} aria-label="Nota de resolución" maxLength={500} />
+                      <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${publicUserName(r.user.name)})`}>Cerrar: ya está corregido</button>
+                      <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : "Retira el comentario"}>
                         {bout ? "Resolver y rechazar el combate" : fighter ? "Resolver y ocultar la ficha" : "Resolver y retirar el comentario"}
                       </button>
-                      <button name="decision" value="dismiss" className="secondary">Cerrar: no hay error</button>
+                      <button name="decision" value="dismiss" className="secondary" aria-label={`Cerrar: no hay error (aviso de ${publicUserName(r.user.name)})`}>Cerrar: no hay error</button>
                     </form>
                   </td>
                 </tr>
@@ -183,7 +187,7 @@ export default async function Moderation() {
                 <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <input type="hidden" name="gymId" value={g.id} />
                   {!g.verifiedAt && <input name="note" aria-label={`Evidencia comprobada de ${g.name}`} placeholder="Evidencia comprobada (web, redes, llamada…)" maxLength={500} />}
-                  {g.verifiedAt ? <button name="decision" value="revoke" className="secondary">Retirar sello</button> : <button name="decision" value="verify">Verificar</button>}
+                  {g.verifiedAt ? <button name="decision" value="revoke" className="secondary" aria-label={`Retirar sello de ${g.name}`}>Retirar sello</button> : <button name="decision" value="verify" aria-label={`Verificar el gimnasio ${g.name}`}>Verificar</button>}
                 </form>
               </td>
             </tr>
@@ -196,8 +200,8 @@ export default async function Moderation() {
       <BoutTable rows={conSenales} vacio="No hay combates con señales." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
-          <button name="decision" value="verify">Verificar</button>
-          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare">Marcar como no correcto</button>
+          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
         </form>
       )} />
 
@@ -206,8 +210,8 @@ export default async function Moderation() {
       <BoutTable rows={sinSenales} vacio="No hay combates pendientes." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
-          <button name="decision" value="verify">Verificar</button>
-          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare">Marcar como no correcto</button>
+          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
         </form>
       )} />
 
@@ -216,8 +220,8 @@ export default async function Moderation() {
       <BoutTable rows={enRevision} vacio="No hay combates en revisión." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
-          <button name="decision" value="verify">Verificar</button>
-          <button name="decision" value="restore" className="secondary">Restaurar como pendiente</button>
+          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+          <button name="decision" value="restore" className="secondary" aria-label={`Restaurar como pendiente el combate: ${nombreCombate(b)}`}>Restaurar como pendiente</button>
         </form>
       )} />
     </>

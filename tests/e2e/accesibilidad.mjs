@@ -45,7 +45,7 @@ for (const [ruta, etiqueta] of [
 
 console.log("— Con sesión —");
 for (const [ruta, etiqueta] of [
-  ["/mi-ficha", "Mi ficha"], ["/mi-cuenta", "Mi cuenta"], ["/mi-cuenta/eliminar", "Eliminar mi cuenta"], ["/siguiendo", "Mis peleadores"], [fichaPeleador, "Ficha de peleador (con sesión)"],
+  ["/mi-ficha", "Mi ficha"], ["/mi-cuenta", "Mi cuenta"], ["/mi-cuenta/eliminar", "Eliminar mi cuenta"], ["/siguiendo", "Peleadores que sigo"], [fichaPeleador, "Ficha de peleador (con sesión)"],
 ]) await analizar(pepe.p, ruta, etiqueta);
 const sinFicha = await newUser("Sinficha", "FIGHTER");
 await analizar(sinFicha.p, "/mi-ficha", "Mi ficha (sin crear todavía)");

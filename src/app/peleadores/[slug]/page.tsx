@@ -75,7 +75,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             {REASONS_BY_ENTITY[entity].map((k) => <option key={k} value={k}>{REPORT_REASONS[k]}</option>)}
           </select>
           <input name="message" aria-label="Detalles (opcional)" placeholder="Detalles (opcional)" maxLength={500} />
-          <button className="secondary" aria-label={`Enviar el aviso sobre ${sobre}`}>Enviar aviso</button>
+          <button className="secondary" aria-label={`Enviar aviso sobre ${sobre}`}>Enviar aviso</button>
         </form>
       </details>
     ) : entity === "FIGHTER" ? (

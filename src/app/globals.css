@@ -16,7 +16,9 @@ header.top a,footer.foot a{display:inline-flex;align-items:center;min-height:44p
 .logo{font-weight:900;letter-spacing:.05em;font-size:1.2rem}.logo b{color:var(--red)}
 nav{display:flex;gap:4px 14px;flex-wrap:wrap;flex:1}
 header.top .cuenta{display:flex;gap:4px 14px;align-items:center;flex-wrap:wrap}
-header.top form.buscador{display:flex;gap:6px;align-items:center}
+header.top form.buscador{display:flex;gap:6px;align-items:center;flex:1 1 220px;max-width:100%}
+header.top form.buscador input{flex:1;min-width:0} /* A11Y: con zoom del 400 % (320 px) el buscador no ensancha la pantalla */
+::placeholder{color:#b4b4c0;opacity:1} /* A11Y: el texto de ejemplo llega al contraste AA */
 main{max-width:1000px;margin:auto;padding:24px 16px 64px}
 h1{margin:0 0 4px}h2{margin:32px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
 h1,h2,h3,caption{overflow-wrap:anywhere} /* un nombre largo sin espacios no debe ensanchar la pantalla */

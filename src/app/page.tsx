@@ -4,6 +4,7 @@ import { LEVEL_LABEL, fmtDate } from "../lib/common/labels";
 import { auraRanking } from "../lib/aura/ranking";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/common/disciplines";
 import { getUser } from "../lib/accounts/auth";
+import { plural } from "../lib/common/text";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function Home() {
             <Link href="/ayuda" className="btn secondary">Ver cómo funciona</Link>
           </p>
         )}
-        <form className="search" action="/buscar" role="search">
+        <form className="search" action="/buscar" role="search" aria-label="Buscar un peleador">
           <label className="field" style={{ flex: 1 }}><span>Busca un peleador, un gimnasio, un entrenador o una velada</span><input name="q" maxLength={80} /></label>
           <button className="secondary">Buscar</button>
         </form>
@@ -38,7 +39,7 @@ export default async function Home() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "0 0 8px" }}>
           {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "10px 14px", fontWeight: d === "BOXEO" ? 800 : 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
         </div>
-        <p className="mut">{counts[0]} peleadores amateur · {counts[1]} veladas · {counts[2]} gimnasios · {counts[3]} auras dadas. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
+        <p className="mut">{plural(counts[0], "peleador amateur", "peleadores amateur")} · {plural(counts[1], "velada", "veladas")} · {plural(counts[2], "gimnasio", "gimnasios")} · {plural(counts[3], "aura dada", "auras dadas")}. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
       </section>
       <h2>Más aura en boxeo</h2>
       <div className="grid">

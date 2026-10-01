@@ -19,7 +19,7 @@ export default async function Trainers({ searchParams }: { searchParams: Promise
   return (
     <>
       <h1>Entrenadores</h1>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Filtrar entrenadores">
         <CampoFiltro etiqueta="Nombre del entrenador"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <BotonesFiltro ruta="/entrenadores" />
       </form>

@@ -37,3 +37,9 @@ export function validateOutcome(input: { discipline: Discipline; outcome: string
 
 /** Clave canónica de un enfrentamiento: los dos ids ordenados, para que A-B y B-A sean el mismo combate. */
 export const pairKey = (a: string, b: string): string => [a, b].sort().join(":");
+
+/**
+ * Huella del resultado de un combate (resultado, forma de terminar y asalto). La confirmación del rival solo vale para el resultado que vio:
+ * si el autor lo corrige mientras el rival tiene la pantalla abierta, la confirmación se rechaza y debe revisarlo de nuevo.
+ */
+export const boutVersion = (b: { result: string | null; method: string | null; endRound: number | null }): string => `${b.result ?? ""}|${b.method ?? ""}|${b.endRound ?? ""}`;

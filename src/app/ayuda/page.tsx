@@ -31,7 +31,8 @@ export default function Help() {
       <p>Solicita el acceso de organizador en <Link href="/organizador">Organizadores</Link>. Un moderador revisa la solicitud. Después podrás crear tus veladas, montar el cartel y anotar los resultados, que quedan marcados como verificados.</p>
 
       <h2>Qué significan las etiquetas de un combate</h2>
-      <table>
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Qué significan las etiquetas de un combate">
+<table>
         <tbody>
           <tr><th scope="row">Pendiente de confirmar</th><td>Lo ha registrado uno de los peleadores y su rival todavía no lo ha confirmado. Cuenta en el récord, pero se indica que aún no está respaldado.</td></tr>
           <tr><th scope="row">Confirmado por el rival</th><td>Los dos peleadores están de acuerdo.</td></tr>
@@ -42,6 +43,7 @@ export default function Help() {
           <tr><th scope="row">✓ Verificado (gimnasios y organizadores)</th><td>Un moderador ha comprobado que existen y son quienes dicen ser.</td></tr>
         </tbody>
       </table>
+</div>
 
       <h2>Cómo cuidamos que los datos sean fiables</h2>
       <p>Mostramos siempre cuánto respaldo tiene cada dato. El aura está ligada a un combate concreto, se limitan por usuario y solo pueden hacerlas personas registradas con el correo confirmado. Todos los cambios importantes quedan registrados.</p>

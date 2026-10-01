@@ -30,7 +30,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
   return (
     <>
       <h1>Peleadores</h1>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Todos los niveles</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>

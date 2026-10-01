@@ -11,14 +11,15 @@ export default async function Unsubscribe({ searchParams }: { searchParams: Prom
     return (
       <>
         <h1>Avisos por correo electrónico</h1>
-        <p>Puedes activar o desactivar los avisos cuando quieras desde <Link href="/mi-cuenta">Mi cuenta</Link>.</p>
+        <p>Puedes activar o desactivar los avisos cuando quieras desde «Mi cuenta».</p>
+        <p className="acciones"><Link className="btn" href="/mi-cuenta">Ir a Mi cuenta</Link></p>
       </>
     );
   }
   return (
     <>
       <h1>Dejar de recibir avisos por correo</h1>
-      <p>Pulsa el botón y no te enviaremos más avisos de nuevos combates de los peleadores que sigues. Seguirás viéndolos en «Mis peleadores».</p>
+      <p>Pulsa el botón y no te enviaremos más avisos de nuevos combates de los peleadores que sigues. Seguirás viéndolos en «Peleadores que sigo», dentro de «Mi cuenta».</p>
       <form action={unsubscribeEmails}><input type="hidden" name="token" value={token} /><button>Dejar de recibir avisos</button></form>
     </>
   );

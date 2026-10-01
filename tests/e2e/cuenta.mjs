@@ -20,8 +20,8 @@ await ana.p.locator("summary", { hasText: "Corregir los datos de mi ficha" }).cl
 await ana.p.fill("details [name=alias]", "La Rápida"); await ana.p.fill("details [name=heightCm]", "999");
 await ana.p.click("details button:has-text('Guardar los datos de mi ficha')");
 check("una altura imposible se rechaza con un mensaje que explica cómo escribirla", await seen(malo(ana.p, "en centímetros")));
-await ana.p.locator("summary", { hasText: "Corregir los datos de mi ficha" }).click();
-await ana.p.fill("details [name=alias]", "La Rápida"); await ana.p.fill("details [name=heightCm]", "171"); await ana.p.fill("details [name=bio]", `Presentación de prueba ${rnd}`);
+check("tras el error el formulario vuelve abierto y con lo escrito: se ve dónde corregir", await seen(ana.p.locator("details[open] [name=alias]")) && await ana.p.waitForFunction(() => document.querySelector("details [name=alias]")?.value === "La Rápida", null, { timeout: 4000 }).then(() => true, () => false));
+await ana.p.fill("details [name=heightCm]", "171"); await ana.p.fill("details [name=bio]", `Presentación de prueba ${rnd}`);
 await ana.p.click("details button:has-text('Guardar los datos de mi ficha')");
 check("los datos de la ficha se guardan y se confirma", await seen(bueno(ana.p, "datos de tu ficha se han guardado")));
 const anon = await nueva();

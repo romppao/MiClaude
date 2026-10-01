@@ -54,6 +54,7 @@ import * as aura from "../../src/app/actions/aura";
 import * as veladas from "../../src/app/actions/events";
 import * as moderacion from "../../src/app/actions/moderation";
 import * as comunidad from "../../src/app/actions/community";
+import { hashPassword } from "../../src/lib/accounts/password";
 
 const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad };
 
@@ -173,6 +174,45 @@ describe("combates ajenos", () => {
   });
 });
 
+describe("resultado y confirmación de un combate", () => {
+  const dia = new Date("2026-01-01T12:00:00Z"); // ya celebrado
+  const combate = (extra: Record<string, unknown> = {}) => ({ id: "b1", eventId: "e1", fighterAId: "fa", fighterBId: "fb", createdById: "u-FIGHTER", verification: "SELF_REPORTED", result: "A_WIN", method: "UD", endRound: null, rounds: null, event: { organizerId: null, date: dia, discipline: "BOXEO" }, ...extra });
+  const version = "A_WIN|UD|";
+
+  it("el rival que confirma con un resultado distinto al que vio no confirma nada", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "u-rival", fighter: { id: "fb", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate({ result: "A_WIN", method: "KO", endRound: 2 }); // el autor lo corrigió después
+    expect(await destino(acciones.respondBout, { boutId: "b1", decision: "confirm", version })).toBe("/mi-ficha?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("si el combate cambia justo mientras se confirma, la escritura condicionada no encuentra nada y se avisa", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "u-rival", fighter: { id: "fb", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    mundo.estado.respuestas["bout.updateMany"] = { count: 0 };
+    expect(await destino(acciones.respondBout, { boutId: "b1", decision: "confirm", version })).toBe("/mi-ficha?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+  it("con la huella correcta el rival confirma y queda constancia en el historial", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "u-rival", fighter: { id: "fb", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    mundo.estado.respuestas["bout.updateMany"] = { count: 1 };
+    expect(await destino(acciones.respondBout, { boutId: "b1", decision: "confirm", version })).toBe("/mi-ficha?aviso=combate_confirmado");
+    expect(mundo.estado.escrituras).toContain("auditLog.create");
+  });
+  it("si el rival solo confirmó el combate cuando no tenía resultado, el autor puede añadirlo y vuelve a quedar pendiente de confirmar", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate({ verification: "CONFIRMED", result: null, method: null });
+    mundo.estado.respuestas["bout.updateMany"] = (args: { data: Record<string, unknown> }) => { expect(args.data.verification).toBe("SELF_REPORTED"); return { count: 1 }; };
+    expect(await destino(acciones.setMyBoutResult, { boutId: "b1", outcome: "WIN", method: "UD" })).toBe("/mi-ficha?aviso=resultado_guardado_confirmar");
+  });
+  it("un combate confirmado CON resultado ya no lo puede cambiar su autor", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate({ verification: "CONFIRMED" });
+    expect(await destino(acciones.setMyBoutResult, { boutId: "b1", outcome: "LOSS", method: "KO" })).toBe("/mi-ficha?problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+});
+
 describe("decisiones de moderación", () => {
   beforeEach(() => iniciarSesion(persona("ADMIN")));
   it("con una moderadora, una acción sobre algo que no existe responde «no existe» (la autorización no bloquea todo)", async () => {
@@ -196,6 +236,52 @@ describe("decisiones de moderación", () => {
   });
 });
 
+describe("decisiones concurrentes y ocultar fichas", () => {
+  beforeEach(() => iniciarSesion(persona("ADMIN")));
+  it("si otra persona de moderación decide a la vez sobre una reclamación, esta decisión se descarta con un aviso y no queda registrada", async () => {
+    mundo.estado.respuestas["claimRequest.findUnique"] = { id: "c1", userId: "u2", fighterId: "f1", status: "PENDING", fighter: { firstName: "A", lastName: "B" } };
+    mundo.estado.respuestas["fighter.updateMany"] = { count: 1 };
+    mundo.estado.respuestas["claimRequest.updateMany"] = { count: 0 }; // ya no estaba pendiente
+    expect(await destino(acciones.decideClaim, { claimId: "c1", decision: "approve" })).toBe("/moderacion?problema=solicitud_cambiada");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+  it("una solicitud de organizador que cambió mientras se revisaba no se aprueba", async () => {
+    mundo.estado.respuestas["organizerRequest.findUnique"] = { id: "o1", userId: "u2", orgName: "Club", message: "web", status: "PENDING", user: { role: "FAN" } };
+    mundo.estado.respuestas["organizerRequest.updateMany"] = (args: { where: { orgName: string; message: string } }) => { expect(args.where).toMatchObject({ status: "PENDING", orgName: "Club", message: "web" }); return { count: 0 }; };
+    expect(await destino(acciones.decideOrganizer, { requestId: "o1", decision: "approve", note: "Web comprobada" })).toBe("/moderacion?problema=solicitud_cambiada");
+    expect(mundo.estado.escrituras).not.toContain("user.update");
+  });
+  it("un combate que cambió de estado mientras se decidía no se pisa", async () => {
+    mundo.estado.respuestas["bout.findUnique"] = { id: "b1", fighterAId: "fa", fighterBId: "fb", verification: "SELF_REPORTED" };
+    mundo.estado.respuestas["bout.updateMany"] = (args: { where: { verification: string } }) => { expect(args.where.verification).toBe("SELF_REPORTED"); return { count: 0 }; };
+    expect(await destino(acciones.adminDecide, { boutId: "b1", decision: "verify" })).toBe("/moderacion?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+  const aviso = { id: "r1", entity: "FIGHTER", entityId: "f1", status: "OPEN", reason: "DATOS", userId: "u2" };
+  it("ocultar una ficha (borra sus datos personales para siempre) exige anotar el motivo", async () => {
+    mundo.estado.respuestas["report.findUnique"] = aviso;
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "hide" })).toBe("/moderacion?problema=ocultar_sin_nota");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("no se oculta desde un aviso una ficha que tiene titular (su titular la corrige o la elimina)", async () => {
+    mundo.estado.respuestas["report.findUnique"] = aviso;
+    mundo.estado.respuestas["fighter.findUnique"] = { userId: "u9" };
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "hide", note: "Piden retirarla" })).toBe("/moderacion?problema=ficha_con_titular");
+    expect(mundo.estado.escrituras).not.toContain("fighter.update");
+  });
+  it("ocultar una ficha que ya no existe da un aviso claro en lugar de un error", async () => {
+    mundo.estado.respuestas["report.findUnique"] = aviso;
+    mundo.estado.respuestas["fighter.findUnique"] = null;
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "hide", note: "Piden retirarla" })).toBe("/moderacion?problema=no_existe");
+  });
+  it("una ficha sin titular sí se oculta y su historial se vacía de datos personales", async () => {
+    mundo.estado.respuestas["report.findUnique"] = aviso;
+    mundo.estado.respuestas["fighter.findUnique"] = { userId: null };
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "hide", note: "Piden retirarla" })).toBe("/moderacion?aviso=aviso_resuelto_oculto");
+    expect(mundo.estado.escrituras.indexOf("auditLog.updateMany")).toBeGreaterThan(mundo.estado.escrituras.indexOf("fighter.update"));
+  });
+});
+
 describe("eliminar la cuenta", () => {
   it("la única moderadora no puede eliminar su cuenta (nadie quedaría a cargo)", async () => {
     iniciarSesion(persona("ADMIN"));
@@ -204,6 +290,15 @@ describe("eliminar la cuenta", () => {
     // la contraseña no es correcta en esta simulación: se comprueba que, sin ella, tampoco se borra nada
     expect(await destino(acciones.deleteAccount, { confirm: "on", current: "cualquiera" })).toMatch(/^\/mi-cuenta\/eliminar\?problema=/);
     expect(mundo.estado.escrituras).not.toContain("user.delete");
+  });
+  it("al eliminar la cuenta se vacían los datos personales del historial de cambios (nombre real antes y después) antes de dejar el apunte", async () => {
+    iniciarSesion(persona("FIGHTER", { passwordHash: await hashPassword("contraseña-buena-1") }));
+    mundo.estado.respuestas["rateHit.create"] = { id: "h1" }; // la reserva del intento de contraseña
+    mundo.estado.respuestas["fighter.findUnique"] = { id: "f1", _count: { boutsAsA: 0, boutsAsB: 0 } };
+    expect(await destino(acciones.deleteAccount, { confirm: "on", current: "contraseña-buena-1" })).toBe("/?aviso=cuenta_eliminada");
+    const e = mundo.estado.escrituras;
+    expect(e.filter((x) => x === "auditLog.updateMany")).toHaveLength(2); // el historial de la ficha y el de la cuenta
+    expect(e.lastIndexOf("auditLog.updateMany")).toBeLessThan(e.indexOf("auditLog.create"));
   });
   it("sin marcar la confirmación no se borra nada", async () => {
     iniciarSesion(persona("FAN"));

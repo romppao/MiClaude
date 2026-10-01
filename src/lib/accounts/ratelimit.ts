@@ -11,10 +11,14 @@ export const HORA = 60 * MINUTO;
 /**
  * Dirección IP de quien hace la petición, tal como la indica el servidor intermedio (proxy) que hay delante de la aplicación.
  * Devuelve null si no hay (desarrollo en local) o no tiene aspecto de dirección: entonces solo se aplican los límites por correo.
- * En producción la aplicación debe ir detrás de un proxy que sustituya la cabecera X-Forwarded-For; si no, la IP se podría falsear.
+ *
+ * X-Forwarded-For es una lista («cliente, proxy1, proxy2…») a la que cada proxy de confianza añade al final la dirección de quien le habló.
+ * Lo que escribe el propio cliente va al principio y se puede inventar, así que NO se lee el primer valor sino el que añadió nuestro
+ * proxy: el `saltos`-ésimo contando desde el final (1 = un solo proxy delante de la aplicación; `TRUSTED_PROXY_HOPS` lo cambia).
  */
-export function normalizeIp(raw: string | null | undefined): string | null {
-  const ip = (raw ?? "").split(",")[0].trim();
+export function normalizeIp(raw: string | null | undefined, saltos = 1): string | null {
+  const partes = (raw ?? "").split(",").map((p) => p.trim());
+  const ip = partes[Math.max(0, partes.length - Math.max(1, saltos))] ?? "";
   if (!ip || ip.length > 45 || !/^[0-9a-fA-F:.]+$/.test(ip)) return null;
   if (ip === "::1" || ip === "127.0.0.1" || ip === "::ffff:127.0.0.1") return null;
   return ip;
@@ -22,7 +26,8 @@ export function normalizeIp(raw: string | null | undefined): string | null {
 
 export async function clientIp(): Promise<string | null> {
   const h = await headers();
-  return normalizeIp(h.get("x-forwarded-for")) ?? normalizeIp(h.get("x-real-ip"));
+  const saltos = Number.parseInt(process.env.TRUSTED_PROXY_HOPS ?? "1", 10);
+  return normalizeIp(h.get("x-forwarded-for"), Number.isInteger(saltos) && saltos >= 1 && saltos <= 5 ? saltos : 1) ?? normalizeIp(h.get("x-real-ip"));
 }
 
 const since = (windowMs: number) => new Date(Date.now() - windowMs);
@@ -42,6 +47,17 @@ export async function isBlocked(key: string, max: number, windowMs: number): Pro
 export async function allow(key: string, max: number, windowMs: number): Promise<boolean> {
   await addHit(key);
   return (await countHits(key, windowMs)) <= max;
+}
+
+/**
+ * Reserva un intento ANTES de comprobar una contraseña (anota primero y cuenta después, como `allow`): así peticiones simultáneas no pueden
+ * ver todas «0 intentos» y probar cientos de contraseñas antes de que se anote el primer fallo. `devolver()` anula la reserva: se usa cuando
+ * la contraseña era correcta, porque entrar bien no debe gastar intentos.
+ */
+export async function reservar(key: string, max: number, windowMs: number): Promise<{ permitido: boolean; devolver: () => Promise<unknown> }> {
+  const hit = await db.rateHit.create({ data: { key }, select: { id: true } });
+  const permitido = (await countHits(key, windowMs)) <= max;
+  return { permitido, devolver: () => db.rateHit.deleteMany({ where: { id: hit.id } }) };
 }
 
 /** Borra los intentos de una clave (por ejemplo, tras iniciar sesión correctamente). */

@@ -22,7 +22,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
     <>
       <h1>Historial de cambios</h1>
       <p><Link href="/moderacion">← Volver a moderación</Link></p>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Filtrar el historial de cambios">
         <CampoFiltro etiqueta="Qué ha cambiado">
           <select name="entity" defaultValue={entidad ?? ""}><option value="">Todo</option>{Object.entries(AUDIT_ENTITY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
         </CampoFiltro>

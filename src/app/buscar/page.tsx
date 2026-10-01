@@ -40,7 +40,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Buscar</h1>
-      <form className="search" role="search">
+      <form className="search" role="search" aria-label="Buscar en Ring España">
         <label className="field" style={{ flex: 1 }}>
           <span>Busca peleadores, gimnasios, entrenadores o veladas</span>
           <input name="q" defaultValue={q} maxLength={LIMITS.name} placeholder="Por ejemplo: Ana Ruiz, Vallecas o Madrid" />
@@ -48,7 +48,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
         </label>
         <button>Buscar</button>
       </form>
-      {!q && <p className="mut">Escribe algo arriba y pulsa «Buscar».</p>}
+      {!q && <p className="mut">Escribe una palabra en el cuadro de búsqueda de esta página y pulsa «Buscar».</p>}
       {nada && <p>No hemos encontrado nada para «{q}». Prueba con menos palabras, o con solo el nombre o solo el apellido.</p>}
       {q && !nada && (
         <>

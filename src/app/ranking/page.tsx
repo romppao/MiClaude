@@ -31,7 +31,8 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
       {groups.map((g) => (
         <section key={g.weightClass ?? "sin"}>
           <h2>{DISCIPLINE_LABEL[discipline]} · {g.weightClass ?? NO_CATEGORY}</h2>
-          <table>
+          <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
+<table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th></tr></thead>
             <tbody>
               {g.entries.map((r) => (
@@ -43,6 +44,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
               ))}
             </tbody>
           </table>
+</div>
         </section>
       ))}
       {groups.length === 0 && <p className="mut">Todavía nadie ha recibido aura en esta disciplina y zona. Puedes darla desde la ficha de un peleador, en el combate que hayas visto.</p>}

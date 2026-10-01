@@ -4,66 +4,87 @@ import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const CLAVE = "ringespana:formulario-enviado";
-type Guardado = { ruta: string; indice: number; valores: Record<string, string> };
+/** `firma` identifica el formulario por los nombres de sus campos (no por su posición, que cambia si la pantalla cambia) y `orden` distingue a los que comparten firma. */
+type Guardado = { ruta: string; firma: string; orden: number; valores: Record<string, string> };
 type Campo = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 const esCampo = (el: Element): el is Campo => el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement;
 const formularios = () => Array.from(document.querySelectorAll<HTMLFormElement>("main form"));
+const firmaDe = (form: HTMLFormElement) => Array.from(form.elements).filter((el) => esCampo(el) && el.name && !el.name.startsWith("$ACTION")).map((el) => (el as Campo).name).sort().join(",");
+const hayProblema = () => !!new URLSearchParams(location.search).get("problema");
+
+function leer(): Guardado | null {
+  try { return JSON.parse(sessionStorage.getItem(CLAVE) ?? "null"); } catch { return null; }
+}
+function olvidar() {
+  try { sessionStorage.removeItem(CLAVE); } catch { /* ignorar */ }
+}
+
+/** Devuelve lo guardado a su formulario (sin pisar lo que la persona ya haya vuelto a escribir) y abre el desplegable que lo contiene. */
+function restaurar(g: Guardado) {
+  const candidatos = formularios().filter((f) => firmaDe(f) === g.firma);
+  const form = candidatos[g.orden] ?? candidatos[0];
+  if (!form) return;
+  // Un formulario dentro de un desplegable vuelve cerrado tras el error: se abre para que la persona vea dónde corregir.
+  for (let d = form.closest("details"); d; d = d.parentElement?.closest("details") ?? null) d.open = true;
+  for (const [nombre, valor] of Object.entries(g.valores)) {
+    const el = form.elements.namedItem(nombre);
+    if (!(el instanceof Element) || !esCampo(el)) continue;
+    if (el instanceof HTMLSelectElement) {
+      const inicial = Array.from(el.options).find((o) => o.defaultSelected)?.value ?? el.options[0]?.value;
+      if (el.value === inicial) el.value = valor;
+    } else if (el.value === el.defaultValue) el.value = valor;
+  }
+}
 
 /**
  * Para no perder lo escrito: al enviar un formulario se guardan sus campos de texto (en esta pestaña, sin contraseñas, campos ocultos ni casillas) y,
- * si la acción termina con un problema y la persona vuelve a la misma pantalla, se devuelven a su sitio. Con cualquier otro
- * resultado (éxito, otra pantalla) se descartan. Un campo que la persona ya ha vuelto a escribir no se pisa.
+ * si la acción termina con un problema y la persona vuelve a la misma pantalla, se devuelven a su sitio y se abre el desplegable que lo contiene
+ * (para que vea dónde corregir). Con cualquier otro resultado (éxito, otra pantalla) se descartan. Un campo que la persona ya ha vuelto a escribir no se pisa.
+ *
+ * Funciona aunque el mismo error se repita (la dirección no cambia): React vacía los campos cuando termina la acción y se vuelven a rellenar justo después.
  */
 export default function RecordarCampos() {
   const ruta = usePathname();
   const params = useSearchParams();
 
+  // Al enviar un formulario: se guarda y, durante unos segundos, cada vez que React lo vacíe al terminar su acción con un problema en esta misma pantalla, se rellena de nuevo.
   useEffect(() => {
+    let cierre: ReturnType<typeof setTimeout> | undefined;
+    const alReiniciar = () => queueMicrotask(() => {
+      const g = leer();
+      if (g && g.ruta === location.pathname && hayProblema()) restaurar(g);
+    });
     const guardar = (e: Event) => {
       const form = e.target;
       if (!(form instanceof HTMLFormElement)) return;
-      const indice = formularios().indexOf(form);
-      if (indice < 0) return;
+      const firma = firmaDe(form);
+      const orden = formularios().filter((f) => firmaDe(f) === firma).indexOf(form);
+      if (orden < 0) return;
       const valores: Record<string, string> = {};
       for (const el of Array.from(form.elements)) {
         if (!esCampo(el) || !el.name || el.name.startsWith("$ACTION")) continue;
-        if (el instanceof HTMLInputElement) {
-          // Las casillas no se recuerdan: casi todas son confirmaciones («entiendo que no se puede deshacer») y la persona debe volver a marcarlas a propósito.
-          if (["password", "hidden", "file", "submit", "button", "radio", "checkbox"].includes(el.type)) continue;
-          valores[el.name] = el.value;
-        } else valores[el.name] = el.value;
+        // Las casillas no se recuerdan: casi todas son confirmaciones («entiendo que no se puede deshacer») y la persona debe volver a marcarlas a propósito.
+        if (el instanceof HTMLInputElement && ["password", "hidden", "file", "submit", "button", "radio", "checkbox"].includes(el.type)) continue;
+        valores[el.name] = el.value;
       }
-      try { sessionStorage.setItem(CLAVE, JSON.stringify({ ruta: location.pathname, indice, valores } satisfies Guardado)); } catch { /* sin almacenamiento: simplemente no se recuerda */ }
+      try { sessionStorage.setItem(CLAVE, JSON.stringify({ ruta: location.pathname, firma, orden, valores } satisfies Guardado)); } catch { /* sin almacenamiento: simplemente no se recuerda */ }
+      clearTimeout(cierre);
+      document.addEventListener("reset", alReiniciar, true); // añadir dos veces el mismo escuchador no lo duplica
+      cierre = setTimeout(() => document.removeEventListener("reset", alReiniciar, true), 20000);
     };
     document.addEventListener("submit", guardar, true);
-    return () => document.removeEventListener("submit", guardar, true);
+    return () => { document.removeEventListener("submit", guardar, true); document.removeEventListener("reset", alReiniciar, true); clearTimeout(cierre); };
   }, []);
 
+  // Al llegar a una dirección nueva: si lo guardado es de esta pantalla y hay un problema, se restaura; en cualquier otro caso se descarta.
   useEffect(() => {
-    let guardado: Guardado | null = null;
-    try { guardado = JSON.parse(sessionStorage.getItem(CLAVE) ?? "null"); } catch { /* ignorar */ }
-    if (!guardado) return;
-    try { sessionStorage.removeItem(CLAVE); } catch { /* ignorar */ }
-    if (!params.get("problema") || guardado.ruta !== ruta) return;
-    const { indice, valores } = guardado;
-    const restaurar = () => {
-      const form = formularios()[indice];
-      if (!form) return;
-      for (const [nombre, valor] of Object.entries(valores)) {
-        const el = form.elements.namedItem(nombre);
-        if (!(el instanceof Element) || !esCampo(el)) continue;
-        if (el instanceof HTMLSelectElement) { const inicial = Array.from(el.options).find((o) => o.defaultSelected)?.value ?? el.options[0]?.value; if (el.value === inicial) el.value = valor; }
-        else if (el.value === el.defaultValue) el.value = valor;
-      }
-    };
-    // React vacía los campos de un formulario cuando termina su acción (emite «reset»): se vuelven a rellenar justo después.
-    const alReiniciar = () => queueMicrotask(restaurar);
-    document.addEventListener("reset", alReiniciar, true);
-    restaurar();
-    const t1 = setTimeout(restaurar, 150); // por si la pantalla nueva termina de pintarse un instante después
-    const t2 = setTimeout(() => document.removeEventListener("reset", alReiniciar, true), 2000);
-    return () => { clearTimeout(t1); clearTimeout(t2); document.removeEventListener("reset", alReiniciar, true); };
+    const g = leer();
+    if (!g) return;
+    if (!params.get("problema") || g.ruta !== ruta) { olvidar(); return; }
+    restaurar(g);
+    const t = setTimeout(() => restaurar(g), 150); // por si la pantalla nueva termina de pintarse un instante después
+    return () => clearTimeout(t);
   }, [ruta, params]);
 
   return null;

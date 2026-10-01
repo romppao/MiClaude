@@ -132,7 +132,8 @@ export async function resetPasswordWithToken(token: string, passwordHash: string
     if ((await tx.emailToken.deleteMany({ where: { id: row.id } })).count === 0) return null;
     const current = await tx.user.findUnique({ where: { id: row.userId }, select: { emailVerifiedAt: true } });
     const user = await tx.user.update({ where: { id: row.userId }, data: { passwordHash, emailVerifiedAt: current?.emailVerifiedAt ?? new Date() } });
-    await tx.emailToken.deleteMany({ where: { userId: row.userId } });
+    // Los enlaces de baja de los avisos ya enviados siguen valiendo: solo se anulan los de verificación y recuperación.
+    await tx.emailToken.deleteMany({ where: { userId: row.userId, kind: { in: ["VERIFY", "RESET"] } } });
     await tx.session.deleteMany({ where: { userId: row.userId } });
     return user;
   });

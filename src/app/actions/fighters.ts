@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
-import { slugify } from "../../lib/common/labels";
+import { slugName, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { parseBirthDate } from "../../lib/common/dates";
 import { parseDisciplineChoice } from "../../lib/common/disciplines";
@@ -39,7 +39,7 @@ export async function createMyFighter(f: FormData) {
   const created = await guard(back, async () => {
     let gymId: string | undefined;
     if (gymName) {
-      const gymSlug = slugify(`${gymName} ${city}`) || slugify(gymName) || "gimnasio";
+      const gymSlug = slugName(gymName, city);
       const gym = await db.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} });
       gymId = gym.id;
     }
@@ -86,7 +86,7 @@ export async function updateMyFighter(f: FormData) {
   await guard(back, () => db.$transaction(async (tx) => {
     let gymId: string | null = null;
     if (gymName) {
-      const gymSlug = slugify(`${gymName} ${city}`) || slugify(gymName) || "gimnasio";
+      const gymSlug = slugName(gymName, city);
       gymId = (await tx.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} })).id;
     }
     await tx.fighter.update({ where: { id: me.id }, data: { ...patch, gymId } });
