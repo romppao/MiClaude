@@ -70,6 +70,8 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | Campo opcional de nº de licencia (sin verificar hasta que haya acuerdo) | Estrategia de veracidad | ⚪ | |
 | API pública, app móvil, importación de datos federativos | Escala | ⚪ | |
 | SEO: mapa del sitio, `robots.txt`, títulos propios y comprobación de salud | Análisis de competencia / escala | 🟡 | Hecho; faltan favicon e imagen para compartir (son diseño) |
+| **Selector de tres opciones al registrarse y al entrar:** A) usuario normal (ver peleadores, cuándo se pelea), B) peleador (ficha, torneos…), C) organizador, promotora, federación. «No sé, eso ya lo veremos más tarde» (el detalle de B queda abierto) | Fundador, 1 de octubre de 2026 | 🔵 | En diseño (ver `docs/ORGANIZACIONES.md` cuando exista) |
+| **«Una especie de CRM» para federaciones y promotoras:** «si quiero que publiquen ahí cosas como veladas, administración de peleadores, todo ese tipo de cosas, debemos darle las facilidades para ello» | Fundador, 1 de octubre de 2026 | 🔵 | Hoy el organizador solo crea veladas, monta el cartel y pone resultados. Diseño con flujo de agentes (3 enfoques + jurado) en curso |
 
 ### Ideas surgidas en la auditoría del código (30 de septiembre de 2026)
 
