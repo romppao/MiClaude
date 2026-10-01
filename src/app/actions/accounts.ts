@@ -5,7 +5,7 @@
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
-import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
+import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../lib/accounts/password";
 import { HORA, MINUTO, addHit, allow, clearHits, clientIp, isBlocked } from "../../lib/accounts/ratelimit";
 import { maybePurge } from "../../lib/accounts/retention";
@@ -25,7 +25,8 @@ function checkNewPassword(password: string, back: string) {
 }
 
 export async function register(f: FormData) {
-  const back = "/registro";
+  const next = internalPath(str(f, "next"), "");
+  const back = `/registro${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   const email = str(f, "email").toLowerCase();
   const name = oneLine(str(f, "name"));
   const password = String(f.get("password") ?? "");
@@ -40,6 +41,7 @@ export async function register(f: FormData) {
   const user = await guard(back, () => db.user.create({ data: { email, name, role, passwordHash } }), "registro_email_existe");
   const enviado = await sendVerificationEmail(user);
   await createSession(user.id);
+  if (next) await rememberReturnPath(next); // al confirmar el correo se le ofrecerá volver a lo que estaba haciendo
   go("/verificar", enviado ? undefined : { problema: "correo_no_enviado" });
 }
 

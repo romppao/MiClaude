@@ -1,6 +1,6 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, link, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -102,6 +102,37 @@ await aprobarOrganizador(mod.p, nombreOrg);
 check("al aprobar, se avisa por correo de que ya puede publicar veladas", !!(await esperarCorreo(solicitante.email, "Ya puedes publicar veladas en Ring España")));
 await solicitante.p.goto(B + "/");
 check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(solicitante.p.locator("header a", { hasText: "Mis veladas" })));
+
+// 8) Volver a donde se estaba: sin sesión nunca hay redirecciones mudas, y quien se registra desde «Entra para…» vuelve a la ficha
+const nuevoVisitante = await nueva();
+await nuevoVisitante.goto(B + "/peleadores");
+const rutaFicha = await nuevoVisitante.locator("main a[href^='/peleadores/']").first().getAttribute("href");
+await nuevoVisitante.goto(B + rutaFicha);
+await nuevoVisitante.locator("a", { hasText: "Entra para seguir a este peleador" }).click();
+check("«Entra para seguir» lleva a «Entrar» explicando por qué y a dónde se volverá", await seen(nuevoVisitante.locator("[role=note]", { hasText: "Al terminar volverás a la página donde estabas" })));
+await nuevoVisitante.locator("main a.btn", { hasText: "Crear mi cuenta" }).click();
+check("junto al formulario de acceso hay un botón claro para crear la cuenta, y conserva el destino", await seen(nuevoVisitante.locator("[role=note]", { hasText: "podrás volver a la página donde estabas" })) && nuevoVisitante.url().includes("next="));
+const correoVolver = `volver${rnd}@test.es`;
+await nuevoVisitante.fill("[name=name]", "Persona Volver"); await nuevoVisitante.fill("[name=email]", correoVolver); await nuevoVisitante.fill("[name=password]", "contraseña123");
+await btn(nuevoVisitante, "Crear mi cuenta"); await nuevoVisitante.waitForURL("**/verificar");
+const enlaceVolver = link(correoVolver);
+const otroAparato = await nueva(); // el enlace se abre en otro aparato, sin sesión
+await otroAparato.goto(B + enlaceVolver); await btn(otroAparato, "Confirmar mi correo");
+check("quien confirma el correo en otro aparato (sin sesión) ve que está confirmado y se le invita a entrar, sin contradicciones", await seen(otroAparato.locator("h1", { hasText: "Tu correo electrónico está confirmado" })) && await otroAparato.locator("main button", { hasText: "Entrar en mi cuenta" }).count() === 1);
+await nuevoVisitante.goto(B + "/verificar");
+check("en el navegador donde se registró, al confirmarse se ofrece «Volver a lo que estabas haciendo»", await seen(nuevoVisitante.locator("main button", { hasText: "Volver a lo que estabas haciendo" })));
+await btn(nuevoVisitante, "Volver a lo que estabas haciendo");
+await nuevoVisitante.waitForURL("**" + rutaFicha);
+check("y ese botón lleva a la ficha del peleador", nuevoVisitante.url().endsWith(rutaFicha));
+const sinSesion = await nueva();
+for (const ruta of ["/mi-cuenta", "/mi-ficha", "/siguiendo", "/mi-cuenta/eliminar", "/moderacion", "/moderacion/historial"]) {
+  await sinSesion.goto(B + ruta);
+  check(`${ruta} sin sesión lleva a «Entrar» explicando qué ha pasado y recordando a dónde volver`, sinSesion.url().includes("/entrar") && sinSesion.url().includes("next=" + encodeURIComponent(ruta)) && await seen(sinSesion.locator("[role=status],[role=alert]", { hasText: "Entra en tu cuenta para continuar" })));
+}
+await sinSesion.goto(B + "/mi-cuenta");
+await sinSesion.fill("[name=email]", correoVolver); await sinSesion.fill("[name=password]", "contraseña123"); await btn(sinSesion, "Entrar en mi cuenta");
+await sinSesion.waitForURL("**/mi-cuenta");
+check("tras entrar se vuelve a la pantalla que se pedía", sinSesion.url().endsWith("/mi-cuenta"));
 
 // 8) Móvil: ninguna pantalla se sale del ancho a 360 px (WCAG 1.4.10, reflujo)
 const movil = await (await browser.newContext({ viewport: { width: 360, height: 740 } })).newPage();

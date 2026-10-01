@@ -9,7 +9,8 @@ import { PROVINCES } from "../../lib/common/labels";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../../lib/fighters/coherence";
 import { isTournamentStyle } from "../../lib/common/disciplines";
 
-export const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
+/** Texto de un campo de formulario, sin espacios en los extremos y sin caracteres nulos (PostgreSQL no los admite y darían un error 500). */
+export const str = (f: FormData, k: string) => String(f.get(k) ?? "").replace(/\u0000/g, "").trim();
 
 export const intOrNull = (f: FormData, k: string) => {
   const s = str(f, k);
