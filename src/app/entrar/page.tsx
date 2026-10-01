@@ -15,7 +15,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       <h1>Entrar en tu cuenta</h1>
       {/* Quien llega desde «Entra para dar aura» (o similar) debe saber por qué está aquí y a dónde volverá. El aviso de «sin sesión» ya lo explica. */}
       {next && !sp.problema && <p className="notice notice-info" role="note">Entra en tu cuenta para continuar. Al terminar volverás a la página donde estabas.</p>}
-      <form className="search" action={login} style={{ flexDirection: "column", maxWidth: 360 }}>
+      <form className="search" action={login} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 360 }}>
         {next && <input type="hidden" name="next" value={next} />}
         <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required maxLength={LIMITS.email} /></label>
         <label className="field"><span>Contraseña</span><input name="password" type="password" autoComplete="current-password" required maxLength={LIMITS.password} /></label>

@@ -30,7 +30,7 @@ export default async function Account() {
       </ul>
 
       <h2>Mis datos</h2>
-      <form className="search" action={updateAccount} style={{ flexDirection: "column", maxWidth: 420 }}>
+      <form className="search" action={updateAccount} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 420 }}>
         <label className="field"><span>Correo electrónico</span><input value={user.email} readOnly aria-readonly="true" /><span className="hint">{user.emailVerifiedAt ? "Verificado. " : ""}Para cambiar de correo electrónico, crea una cuenta nueva con el correo que quieras usar.</span></label>
         <label className="field"><span>Nombre</span><input name="name" defaultValue={user.name} required maxLength={LIMITS.name} autoComplete="name" /><span className="hint">Otras personas verán tu nombre de pila y la inicial del primer apellido junto a tus auras y tus avisos.</span></label>
         <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -41,7 +41,7 @@ export default async function Account() {
       </form>
 
       <h2>Cambiar mi contraseña</h2>
-      <form className="search" action={changePassword} style={{ flexDirection: "column", maxWidth: 420 }}>
+      <form className="search" action={changePassword} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 420 }}>
         <label className="field"><span>Contraseña actual</span><input name="current" type="password" autoComplete="current-password" required maxLength={LIMITS.password} /></label>
         <label className="field"><span>Contraseña nueva</span><input name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={LIMITS.password} /><span className="hint">Mínimo 8 caracteres. Al cambiarla, cerraremos las sesiones abiertas en otros dispositivos.</span></label>
         <label className="field"><span>Repite la contraseña nueva</span><input name="repeat" type="password" autoComplete="new-password" required minLength={8} maxLength={LIMITS.password} /></label>

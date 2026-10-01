@@ -15,6 +15,9 @@ import { LEVEL_LABEL, METHOD_LABEL, STANCE_LABEL, resultWord } from "../../../li
 import { publicFighterName, publicUserName } from "../../../lib/common/names";
 import { canGiveAura } from "../../../lib/aura/rules";
 import { plural } from "../../../lib/common/text";
+import { eventDayReached } from "../../../lib/common/dates";
+import { PROBLEMAS } from "../../../lib/common/messages";
+import { lookup } from "../../../lib/common/safe";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +78,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           <button className="secondary" aria-label={`Enviar el aviso sobre ${sobre}`}>Enviar aviso</button>
         </form>
       </details>
+    ) : entity === "FIGHTER" ? (
+      // Quien no puede avisar (sin cuenta o sin correo confirmado) debe saber por qué y qué hacer, no encontrarse con nada.
+      <p className="mut" style={{ marginTop: 6 }}>
+        {user ? <Link href="/verificar">¿Hay un error en esta ficha? Confirma tu correo electrónico para avisarnos</Link>
+          : <Link href={`/entrar?next=${encodeURIComponent(back)}`}>¿Hay un error en esta ficha? Entra en tu cuenta para avisarnos</Link>}
+      </p>
     ) : null;
   const age = publica && fighter.birthDate ? Math.floor((Date.now() - fighter.birthDate.getTime()) / 3.15576e10) : null;
 
@@ -126,7 +135,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
 
       <h2>Combates</h2>
       <div className="table-wrap" tabIndex={0} role="region" aria-label={`Combates de ${nombre}`}>
-      <table>
+      <table className="apilada">
         <caption className="mut" style={{ textAlign: "left" }}>Combates de {nombre}, del más reciente al más antiguo</caption>
         <thead><tr><th scope="col">Fecha</th><th scope="col">Rival</th><th scope="col">Resultado</th><th scope="col">Cómo terminó</th><th scope="col">Velada</th><th scope="col">Aura</th></tr></thead>
         <tbody>
@@ -134,26 +143,35 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             const isA = b.fighterAId === fighter.id;
             const opp = isA ? b.fighterB : b.fighterA;
             // Lo que declara un peleador sobre su rival no se muestra como hecho en la ficha del rival hasta que este lo confirme; lo rechazado tampoco.
-            const oculto = b.verification === "DISPUTED" || (b.verification === "SELF_REPORTED" && !isA);
+            const enRevision = b.verification === "DISPUTED";
+            const pendiente = b.verification === "SELF_REPORTED" && !isA;
+            const oculto = enRevision || pendiente;
             const r = resultWord(b.result, isA);
             const mine = myAuras.some((x) => x.boutId === b.id);
             const aura = canGiveAura({ bout: b, fighterId: fighter.id, viewerFighterId: user?.fighter?.id });
+            // Cuando no se puede dar aura, se dice por qué (en vez de dejar la celda vacía).
+            const notaAura = !aura.ok ? lookup(PROBLEMAS, aura.problema) : pendiente ? `Se podrá dar aura cuando ${nombre} confirme el combate.` : null;
             return (
               <tr key={b.id}>
-                <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
-                <td><Link href={`/peleadores/${opp.slug}`}>{publicFighterName(opp)}</Link></td>
-                <td>{oculto || !b.result ? <span className="mut">{oculto ? "Sin mostrar" : "Sin resultado"}</span> : <span className={r.cls}>{r.text}</span>}</td>
-                <td>{!oculto && b.method ? METHOD_LABEL[b.method] : ""}{!oculto && b.endRound ? ` (asalto ${b.endRound})` : ""}</td>
-                <td>
+                <td data-label="Fecha">{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
+                <td data-label="Rival"><Link href={`/peleadores/${opp.slug}`}>{publicFighterName(opp)}</Link></td>
+                <td data-label="Resultado">
+                  {enRevision ? <span className="mut">Resultado en revisión</span>
+                    : pendiente ? <span className="mut">Pendiente de confirmar por {nombre}</span>
+                    : !b.result ? <span className="mut">{eventDayReached(b.event.date) ? "Resultado por anotar" : "Próximo combate"}</span>
+                    : <span className={r.cls}>{r.text}</span>}
+                </td>
+                <td data-label="Cómo terminó">{!oculto && b.method ? METHOD_LABEL[b.method] : ""}{!oculto && b.endRound ? ` (asalto ${b.endRound})` : ""}</td>
+                <td data-label="Velada">
                   <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link>{" "}
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
                   <VerificationTag verification={b.verification} />
                   {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
                 </td>
-                <td>
+                <td data-label="Aura">
                   {reportForm("BOUT", b.id, undefined, `el combate contra ${publicFighterName(opp)}`)}
-                  {aura.ok && (user?.emailVerifiedAt ? (
+                  {aura.ok && !pendiente && (user?.emailVerifiedAt ? (
                     mine ? (
                       <form action={removeAura} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />
@@ -173,6 +191,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                     )
                   ) : user ? <Link href="/verificar">Confirma tu correo electrónico para dar aura</Link>
                     : <Link href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para dar aura</Link>)}
+                  {notaAura && <span className="mut">{notaAura}</span>}
                 </td>
               </tr>
             );

@@ -7,6 +7,7 @@ import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { publicFighterName } from "../../../lib/common/names";
 import VerificationTag from "../../components/VerificationTag";
+import { eventDayReached } from "../../../lib/common/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     <>
       <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       {e.status === "CANCELLED" && <span className="tag">velada cancelada</span>}
-      {!e.organizerId && <span className="tag" title="La ha declarado un peleador al registrar su combate">no oficial</span>}
+      {!e.organizerId && <span className="tag">no oficial</span>}
       <h1>{e.name}</h1>
+      {!e.organizerId && <p className="mut">Esta velada no la ha publicado un organizador: la indicó un peleador al registrar su combate. Los datos pueden estar incompletos.</p>}
       <p className="mut">
         {fmtDate(e.date)} · {e.venue}, {e.city} ({e.province})
         {oficial && <> · Publicada por <strong>{org?.orgName}</strong> <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span></>}
@@ -42,32 +44,38 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       </p>
       {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
       <h2>Cartel</h2>
-      <table>
+      <div className="table-wrap" tabIndex={0} role="region" aria-label={`Cartel de ${e.name}`}>
+      <table className="apilada">
         <caption className="mut" style={{ textAlign: "left" }}>Combates de la velada. La esquina roja aparece primero.</caption>
         <thead><tr><th scope="col">Esquina roja</th><th scope="col"><span className="sr-only">contra</span></th><th scope="col">Esquina azul</th><th scope="col">Categoría</th><th scope="col">Resultado</th><th scope="col">Respaldo</th></tr></thead>
         <tbody>
           {e.bouts.map((b) => {
-            const oculto = b.verification === "DISPUTED"; // un combate rechazado no se muestra como un hecho
+            const enRevision = b.verification === "DISPUTED"; // un combate rechazado no se muestra como un hecho
+            // Lo que declara un peleador sobre su rival no se da por hecho en ningún sitio hasta que el rival lo confirme (igual que en las fichas).
+            const pendiente = b.verification === "SELF_REPORTED";
+            const oculto = enRevision || pendiente;
             const ganador = oculto ? null : b.result === "A_WIN" ? publicFighterName(b.fighterA) : b.result === "B_WIN" ? publicFighterName(b.fighterB) : null;
             return (
               <tr key={b.id}>
-                <td className={!oculto && b.result === "A_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterA.slug}`}>{publicFighterName(b.fighterA)}</Link></td>
-                <td className="mut">contra</td>
-                <td className={!oculto && b.result === "B_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterB.slug}`}>{publicFighterName(b.fighterB)}</Link></td>
-                <td>{b.weightClass}{b.rounds ? ` · ${b.rounds} asaltos` : ""}</td>
-                <td>
-                  {oculto ? <span className="mut">Resultado en revisión</span>
-                    : !b.result ? "—"
+                <td data-label="Esquina roja" className={!oculto && b.result === "A_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterA.slug}`}>{publicFighterName(b.fighterA)}</Link></td>
+                <td className="mut solo-ancho">contra</td>
+                <td data-label="Esquina azul" className={!oculto && b.result === "B_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterB.slug}`}>{publicFighterName(b.fighterB)}</Link></td>
+                <td data-label="Categoría">{b.weightClass}{b.rounds ? ` · ${b.rounds} asaltos` : ""}</td>
+                <td data-label="Resultado">
+                  {enRevision ? <span className="mut">Resultado en revisión</span>
+                    : pendiente ? <span className="mut">Resultado pendiente de confirmar por el rival</span>
+                    : !b.result ? <span className="mut">{eventDayReached(e.date) ? "Resultado por anotar" : "Próximo combate"}</span>
                     : b.result === "DRAW" ? "Empate"
                     : b.result === "NO_CONTEST" ? "Sin decisión"
                     : <>Gana {ganador}{b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? `, asalto ${b.endRound}` : ""})` : ""}</>}
                 </td>
-                <td><VerificationTag verification={b.verification} /></td>
+                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag verification={b.verification} /> : <span className="mut">—</span>}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      </div>
       {e.bouts.length === 0 && <p className="mut">Cartel por anunciar.</p>}
     </>
   );

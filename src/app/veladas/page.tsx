@@ -18,7 +18,8 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   const ids = await searchIds("event", q);
   const now = new Date();
   const where: Prisma.EventWhereInput = {
-    date: past ? { lt: now } : { gte: new Date(now.getTime() - 864e5) },
+    // past: vacío = próximas · «1» = ya celebradas · «todas» = sin filtrar por fecha (lo usa «Ver todos» de la búsqueda, que encuentra veladas de cualquier fecha)
+    ...(past === "todas" ? {} : { date: past ? { lt: now } : { gte: new Date(now.getTime() - 864e5) } }),
     ...(level === "PRO" || level === "AMATEUR" ? { level } : {}),
     ...(province && { province }),
     ...(disciplina && isDiscipline(disciplina) ? { discipline: disciplina } : {}),
@@ -35,7 +36,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
-        <CampoFiltro etiqueta="Cuándo"><select name="past" defaultValue={past ?? ""}><option value="">Próximas</option><option value="1">Ya celebradas</option></select></CampoFiltro>
+        <CampoFiltro etiqueta="Cuándo"><select name="past" defaultValue={past ?? ""}><option value="">Próximas</option><option value="1">Ya celebradas</option><option value="todas">Todas</option></select></CampoFiltro>
         <BotonesFiltro ruta="/veladas" />
       </form>
       <div className="grid">

@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <>
       <h1>Privacidad y tus datos</h1>
-      <p className="mut">Explicado con palabras sencillas. Si algo no queda claro, escríbenos y te lo aclaramos.</p>
+      <p className="mut">Explicado con palabras sencillas. {contacto ? "Si algo no queda claro, escríbenos y te lo aclaramos." : "Si algo no queda claro, consulta «¿Cómo funciona?» o avísanos desde el botón «¿Hay un error? Avísanos» de cualquier ficha."}</p>
 
       {(responsable || contacto) && (
         <>

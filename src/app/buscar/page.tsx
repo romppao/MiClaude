@@ -55,7 +55,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
           <Grupo titulo="Peleadores" total={(fighterIds ?? []).length} verTodos={enlace("/peleadores")}>{fighters.map((b) => <li key={b.id}><Link href={`/peleadores/${b.slug}`}>{publicFighterName(b)}{b.alias ? ` “${b.alias}”` : ""}</Link></li>)}</Grupo>
           <Grupo titulo="Gimnasios" total={(gymIds ?? []).length} verTodos={enlace("/gimnasios")}>{gyms.map((g) => <li key={g.id}><Link href={`/gimnasios/${g.slug}`}>{g.name}</Link> <span className="mut">— {g.city}</span></li>)}</Grupo>
           <Grupo titulo="Entrenadores" total={(trainerIds ?? []).length} verTodos={enlace("/entrenadores")}>{trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</Grupo>
-          <Grupo titulo="Veladas" total={(eventIds ?? []).length} verTodos={enlace("/veladas")}>{events.map((e) => <li key={e.id}><Link href={`/veladas/${e.slug}`}>{e.name}</Link> <span className="mut">— {e.city}, {fmtDate(e.date)}</span></li>)}</Grupo>
+          <Grupo titulo="Veladas" total={(eventIds ?? []).length} verTodos={`${enlace("/veladas")}&past=todas`}>{events.map((e) => <li key={e.id}><Link href={`/veladas/${e.slug}`}>{e.name}</Link> <span className="mut">— {e.city}, {fmtDate(e.date)}</span></li>)}</Grupo>
         </>
       )}
     </>

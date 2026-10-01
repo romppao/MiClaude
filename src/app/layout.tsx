@@ -60,6 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Link href="/organizador">Organizar una velada</Link>
           {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
           <Link href="/privacidad">Privacidad</Link>
+          {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
       </body>
     </html>

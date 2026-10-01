@@ -28,7 +28,7 @@ export default async function DeleteAccount() {
         </>
       )}
       {user.role === "ORGANIZER" && <p>Las veladas que has publicado se conservan, pero dejarán de figurar a tu nombre.</p>}
-      <form className="search" action={deleteAccount} style={{ flexDirection: "column", maxWidth: 420 }}>
+      <form className="search" action={deleteAccount} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 420 }}>
         <label className="field"><span>Escribe tu contraseña para confirmar que eres tú</span><input name="current" type="password" autoComplete="current-password" required maxLength={LIMITS.password} /></label>
         <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <input type="checkbox" name="confirm" style={{ width: 24, height: 24 }} required />

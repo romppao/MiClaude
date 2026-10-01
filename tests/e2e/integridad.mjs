@@ -57,7 +57,7 @@ await anon.goto(B + `/peleadores/ana-integra${rnd}`);
 const rechazado = await cuerpo(anon);
 check("un combate rechazado no cuenta en el récord", !rechazado.includes("1-0-0"));
 check("ni suma aura", await anon.locator(".rec", { hasText: /^\s*0\s*$/ }).count() >= 1 && !rechazado.includes(`Gran pelea ${rnd}`));
-check("y no se muestra el resultado como un hecho", rechazado.includes("Sin mostrar"));
+check("y no se muestra el resultado como un hecho: se dice que está en revisión", rechazado.includes("Resultado en revisión"));
 await mod.goto(B + "/moderacion");
 check("los combates rechazados aparecen en la cola «en revisión» de moderación", await seen(filaCombate().locator("button:has-text('Restaurar')")));
 await filaCombate().locator("button:has-text('Restaurar')").click();

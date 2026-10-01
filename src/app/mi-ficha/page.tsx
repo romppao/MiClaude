@@ -60,7 +60,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           </>
         )}
         <h2>Si no apareces, crea tu ficha</h2>
-        <form className="search" action={createMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
+        <form className="search" action={createMyFighter} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
@@ -92,7 +92,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Mis datos</h2>
       <details className="card" style={{ marginBottom: 8 }}>
         <summary><strong>Corregir los datos de mi ficha</strong> <span className="mut">— nombre, alias, procedencia, gimnasio, medidas y presentación</span></summary>
-        <form className="search" action={updateMyFighter} style={{ flexDirection: "column", maxWidth: 560 }}>
+        <form className="search" action={updateMyFighter} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" defaultValue={me.firstName} required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" defaultValue={me.lastName} required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" defaultValue={me.alias ?? ""} maxLength={LIMITS.alias} /></label>

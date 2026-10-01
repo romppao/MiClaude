@@ -20,7 +20,7 @@ export default async function NewPassword({ searchParams }: { searchParams: Prom
   return (
     <>
       <h1>Elige tu contraseña nueva</h1>
-      <form className="search" action={resetPassword} style={{ flexDirection: "column", maxWidth: 360 }}>
+      <form className="search" action={resetPassword} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 360 }}>
         <input type="hidden" name="token" value={token} />
         <label className="field"><span>Contraseña nueva</span><input name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={LIMITS.password} /><span className="hint">Mínimo 8 caracteres.</span></label>
         <label className="field"><span>Repite la contraseña nueva</span><input name="repeat" type="password" autoComplete="new-password" required minLength={8} maxLength={LIMITS.password} /></label>

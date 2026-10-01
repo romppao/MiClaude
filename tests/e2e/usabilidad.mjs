@@ -1,6 +1,6 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, link, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -148,6 +148,25 @@ for (const [rol, rutas] of [["FIGHTER", ["/mi-ficha", "/mi-cuenta"]], ["ADMIN", 
   for (const ruta of rutas) { await p.goto(B + ruta); await p.waitForLoadState("load"); const d = await anchoDesbordado(p); if (d > 1) fuera.push(`${ruta} (+${d}px)`); }
 }
 check(`ninguna pantalla se sale del ancho en un móvil de 360 px${fuera.length ? ": " + fuera.join(", ") : ""}`, fuera.length === 0);
+
+// Fichas de peleador y de velada con combates (antes la tabla se salía de la pantalla y «Dar aura» quedaba fuera de la vista)
+const peleadorMovil = await newUser("Movilficha", "FIGHTER");
+await peleadorMovil.p.goto(B + "/mi-ficha");
+await peleadorMovil.p.fill("[name=firstName]", "Movil"); await peleadorMovil.p.fill("[name=lastName]", `Ficha${rnd}`);
+await btn(peleadorMovil.p, "Crear mi ficha");
+await peleadorMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+await registrar(peleadorMovil.p, { evento: `Velada Movil ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Movil${rnd}` });
+await peleadorMovil.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
+await movil.goto(B + `/peleadores/movil-ficha${rnd}`);
+const accionFicha = movil.locator("a", { hasText: "Entra para dar aura" }).first();
+check("en el móvil, la ficha de un peleador no se sale del ancho y «Entra para dar aura» queda a la vista", await seen(accionFicha) && await anchoDesbordado(movil) <= 1 && await accionFicha.evaluate((a) => { const r = a.getBoundingClientRect(); return r.left >= 0 && r.right <= window.innerWidth + 1 && r.width > 100; }));
+const rutaVelada = await movil.locator("a[href^='/veladas/']").first().getAttribute("href");
+await movil.goto(B + rutaVelada);
+check("en el móvil, la ficha de la velada tampoco se sale del ancho", await seen(movil.locator("h1")) && await anchoDesbordado(movil) <= 1);
+const textoVelada = await cuerpo(movil);
+check("en la velada, un resultado declarado por un peleador no se da por hecho: se dice que está pendiente de confirmar por el rival", textoVelada.includes("pendiente de confirmar por el rival") && !textoVelada.includes("Gana Movil"));
+check("y una velada que no ha publicado un organizador lo explica con texto visible (no solo en un aviso emergente)", textoVelada.includes("no la ha publicado un organizador"));
+
 
 await terminarDiagnosticos();
 await browser.close();

@@ -12,7 +12,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
     <>
       <h1>Crear cuenta</h1>
       {next && <p className="notice notice-info" role="note">Crea tu cuenta para continuar. Cuando confirmes tu correo electrónico podrás volver a la página donde estabas.</p>}
-      <form className="search" action={register} style={{ flexDirection: "column", maxWidth: 360 }}>
+      <form className="search" action={register} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 360 }}>
         {next && <input type="hidden" name="next" value={next} />}
         <label className="field"><span>Nombre</span><input name="name" autoComplete="name" required maxLength={LIMITS.name} /></label>
         <label className="field"><span>Correo electrónico</span><input name="email" type="email" autoComplete="email" required maxLength={LIMITS.email} /><span className="hint">Te enviaremos un enlace para confirmarlo.</span></label>

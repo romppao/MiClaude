@@ -33,6 +33,7 @@ export default function RecordCards({ records, disciplines }: { records: Records
           <div key={`${discipline}-${level}`} className="card">
             <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}{fd?.weightClass ? ` · ${fd.weightClass}` : ""}</div>
             <div className="rec">{formatRecord({ ...c, nc: tally.nc })}</div>
+            <div className="mut">victorias – derrotas – empates</div>
             <div className="mut">
               {tally.ko > 0 && `${tally.ko} por KO`}{tally.ko > 0 && tally.sub > 0 && " · "}{tally.sub > 0 && `${plural(tally.sub, "sumisión", "sumisiones")}`}
               {tally.unverified > 0 && `${tally.ko + tally.sub > 0 ? " · " : ""}${plural(tally.unverified, "pendiente de confirmar", "pendientes de confirmar")}`}
