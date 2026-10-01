@@ -48,13 +48,17 @@ export default function RecordarCampos() {
   const ruta = usePathname();
   const params = useSearchParams();
 
-  // Al enviar un formulario: se guarda y, durante unos segundos, cada vez que React lo vacíe al terminar su acción con un problema en esta misma pantalla, se rellena de nuevo.
+  // Al enviar un formulario: se guarda y, durante unos segundos, cada vez que la pantalla vacía o vuelve a crear el formulario al terminar su acción
+  // con un problema en esta misma pantalla (React lo vacía con un «reset» y, además, Next.js puede volver a montarlo con la respuesta del servidor), se rellena de nuevo.
   useEffect(() => {
     let cierre: ReturnType<typeof setTimeout> | undefined;
-    const alReiniciar = () => queueMicrotask(() => {
+    let observador: MutationObserver | undefined;
+    const restaurarSiProcede = () => {
       const g = leer();
       if (g && g.ruta === location.pathname && hayProblema()) restaurar(g);
-    });
+    };
+    const alReiniciar = () => queueMicrotask(restaurarSiProcede);
+    const dejarDeVigilar = () => { observador?.disconnect(); document.removeEventListener("reset", alReiniciar, true); clearTimeout(cierre); };
     const guardar = (e: Event) => {
       const form = e.target;
       if (!(form instanceof HTMLFormElement)) return;
@@ -69,12 +73,14 @@ export default function RecordarCampos() {
         valores[el.name] = el.value;
       }
       try { sessionStorage.setItem(CLAVE, JSON.stringify({ ruta: location.pathname, firma, orden, valores } satisfies Guardado)); } catch { /* sin almacenamiento: simplemente no se recuerda */ }
-      clearTimeout(cierre);
-      document.addEventListener("reset", alReiniciar, true); // añadir dos veces el mismo escuchador no lo duplica
-      cierre = setTimeout(() => document.removeEventListener("reset", alReiniciar, true), 20000);
+      dejarDeVigilar();
+      document.addEventListener("reset", alReiniciar, true);
+      observador = new MutationObserver(() => queueMicrotask(restaurarSiProcede)); // restaurar solo toca valores y desplegables, no los atributos que se observan: no hay bucle
+      observador.observe(document.body, { childList: true, subtree: true });
+      cierre = setTimeout(dejarDeVigilar, 8000);
     };
     document.addEventListener("submit", guardar, true);
-    return () => { document.removeEventListener("submit", guardar, true); document.removeEventListener("reset", alReiniciar, true); clearTimeout(cierre); };
+    return () => { document.removeEventListener("submit", guardar, true); dejarDeVigilar(); };
   }, []);
 
   // Al llegar a una dirección nueva: si lo guardado es de esta pantalla y hay un problema, se restaura; en cualquier otro caso se descarta.

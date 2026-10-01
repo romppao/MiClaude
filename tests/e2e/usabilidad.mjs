@@ -33,13 +33,19 @@ await visitante.evaluate(() => document.querySelectorAll("input[minlength]").for
 await visitante.fill("[name=name]", "Memoria Prueba"); await visitante.fill("[name=email]", `memoria${rnd}@test.es`); await visitante.fill("[name=password]", "corta");
 await btn(visitante, "Crear mi cuenta");
 check("el error de la contraseña corta se explica", await seen(malo(visitante, "8 caracteres")));
-check("y el nombre y el correo escritos siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]").value === v[0] && document.querySelector("[name=email]").value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
+check("y el nombre y el correo escritos siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]")?.value === v[0] && document.querySelector("[name=email]")?.value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
 check("pero la contraseña nunca se conserva", await visitante.inputValue("[name=password]") === "");
-// El mismo error dos veces seguidas (la dirección no cambia): lo escrito tampoco se pierde la segunda vez
-await visitante.fill("[name=password]", "otra");
-await btn(visitante, "Crear mi cuenta");
-await visitante.waitForFunction(() => document.querySelector("[name=password]").value === "", null, { timeout: 4000 }); // la acción terminó y React vació el formulario
-check("y si el mismo error se repite, el nombre y el correo siguen en su sitio", await visitante.waitForFunction((v) => document.querySelector("[name=name]").value === v[0] && document.querySelector("[name=email]").value === v[1], ["Memoria Prueba", `memoria${rnd}@test.es`], { timeout: 4000 }).then(() => true, () => false));
+// El mismo error dos veces seguidas (la dirección no cambia): lo escrito tampoco se pierde la segunda vez. En el acceso, React vacía el formulario
+// al terminar la acción y Next.js lo vuelve a montar con la respuesta, así que se espera a que todo haya terminado antes de mirar.
+const repetido = await nueva();
+await repetido.goto(B + "/entrar");
+await repetido.fill("[name=email]", `nadie${rnd}@test.es`); await repetido.fill("[name=password]", "incorrecta-1");
+await btn(repetido, "Entrar en mi cuenta");
+check("al equivocarse en el acceso, el correo escrito se conserva", await repetido.waitForFunction((v) => document.querySelector("[name=email]")?.value === v && location.search.includes("login_incorrecto"), `nadie${rnd}@test.es`, { timeout: 8000 }).then(() => true, () => false));
+await repetido.fill("[name=password]", "incorrecta-2");
+await btn(repetido, "Entrar en mi cuenta");
+await repetido.waitForTimeout(3000); // la acción termina, se vacía el formulario y Next.js lo vuelve a montar
+check("y si el mismo error se repite (la dirección no cambia), el correo sigue en su sitio", await repetido.inputValue("[name=email]") === `nadie${rnd}@test.es` && await repetido.inputValue("[name=password]") === "");
 await visitante.fill("[name=password]", "contraseña-larga-1");
 await btn(visitante, "Crear mi cuenta");
 await visitante.waitForURL("**/verificar");
