@@ -13,6 +13,17 @@ Todo el proceso se documenta para poder contarlo y retomarlo en el futuro. **Al 
 
 Recoger con las palabras del fundador las ideas y decisiones importantes. Ser honesto con lo que salió mal: el valor de estos documentos es que sean fiables.
 
+## Prioridad actual: funcionalidad completa y proyecto escalable (petición expresa del fundador, 1 de octubre de 2026)
+
+Palabras del fundador: «Ahora mismo lo que quiero es que te centres en la funcionalidad completa de la aplicación. No quiero fallas en el sistema, funcionalidades inservibles, botones que no funcionan. Que un usuario pueda entrar, entienda absolutamente todo, le funcione todo correctamente y esté todo organizado. **El diseño lo haremos más tarde.** Quiero que sea perfecta, cómoda de usar.» Y sobre la organización: «Como estamos haciendo vibe coding, es muy importante la organización y la estructura a la hora de planificar el proyecto, para que pueda ser escalable. Quiero que desde ahora cojas un buen hábito de desarrollo, documentando todo, esquematizando todas las cosas. Que haya una red clara de a dónde seguir, qué rutas tomar para hacer X cosas. En algún momento ampliaré el equipo y para eso las cosas tienen que estar muy bien organizadas: reglado, medido y estructurado.»
+
+Reglas que se derivan, para todo el trabajo:
+1. **Nada está «hecho» si no funciona de punta a punta** en un navegador real, con cada rol que pueda usarlo. Un botón, un enlace o un formulario que no hace lo que dice (o no responde con un mensaje claro) es un fallo de primera categoría.
+2. **Ningún trabajo de aspecto visual** (colores, tipografías, maquetación fina) hasta que el fundador lo pida. Solo funcionalidad, claridad de lenguaje y accesibilidad.
+3. **La estructura del código y de la documentación es parte del trabajo**, no un extra: cada cosa nueva va en su sitio según `docs/DESARROLLO.md` (estructura, recetas «cómo hago X», convenciones). Si no hay sitio claro para algo, se decide y se documenta antes de escribirlo.
+4. **Todo cambio deja rastro**: diario, ideas, lecciones, arquitectura y el mapa funcional (`docs/MAPA-FUNCIONAL.md`, que se genera con `npm run mapa` y el CI comprueba que está al día).
+5. **Antes de dar una funcionalidad por terminada se recorre como lo haría una persona real**, incluidas las que no saben de tecnología (guion en `docs/pruebas/personas.md`).
+
 ## Principio fundacional: intuitiva para todos, y profesional
 
 **Petición expresa del fundador, aplicable a esta y a cualquier aplicación que desarrollemos.** La app debe ser muy intuitiva para cualquier persona: niños, jóvenes, adultos y personas mayores, con cualquier nivel de conocimiento tecnológico. Cada usuario debe entender su funcionamiento a la perfección sin ayuda. Se mantiene siempre un tono **serio y profesional**: nada de lenguaje vulgar ni coloquial; la app debe transmitir que la lleva gente seria.
