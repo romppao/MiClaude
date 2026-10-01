@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { rankByCategory, type AuraEntry } from "../../src/lib/aura";
+import { rankByCategory, type AuraEntry } from "../../src/lib/aura/ranking";
 
 const e = (name: string, weightClass: string | null, aura: number): AuraEntry => ({ fighterId: name, slug: name.toLowerCase(), name, weightClass, aura });
 

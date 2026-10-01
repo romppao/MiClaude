@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateEnv } from "../../src/lib/env";
+import { validateEnv } from "../../src/lib/common/env";
 
 const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
 

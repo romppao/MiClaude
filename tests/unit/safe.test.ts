@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { hasOwn, lookup, oneParam } from "../../src/lib/safe";
-import { REPORT_REASONS } from "../../src/lib/reports";
-import { AVISOS, PROBLEMAS } from "../../src/lib/messages";
+import { hasOwn, lookup, oneParam } from "../../src/lib/common/safe";
+import { REPORT_REASONS } from "../../src/lib/community/reports";
+import { AVISOS, PROBLEMAS } from "../../src/lib/common/messages";
 
 const MALOS = ["__proto__", "constructor", "toString", "hasOwnProperty", "valueOf", "prototype", ""];
 

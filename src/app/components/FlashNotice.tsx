@@ -1,8 +1,8 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { AVISOS, PROBLEMAS } from "../lib/messages";
-import { lookup } from "../lib/safe";
+import { AVISOS, PROBLEMAS } from "../../lib/common/messages";
+import { lookup } from "../../lib/common/safe";
 
 /**
  * Muestra el resultado de la última acción (éxito o problema) arriba de la página, con texto claro.

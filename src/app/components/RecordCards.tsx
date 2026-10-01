@@ -1,7 +1,7 @@
 import type { Discipline, FighterDiscipline, Level } from "@prisma/client";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/disciplines";
-import { LEVEL_LABEL } from "../lib/labels";
-import { combinedRecord, emptyTally, formatRecord, type Records } from "../lib/record";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
+import { LEVEL_LABEL } from "../../lib/common/labels";
+import { combinedRecord, emptyTally, formatRecord, type Records } from "../../lib/fighters/record";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 

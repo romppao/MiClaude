@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash, randomBytes } from "node:crypto";
-import { db } from "./db";
+import { db } from "../common/db";
 export { hashPassword, verifyPassword } from "./password";
-import { APP_URL, sendMail } from "./mail";
-import { oneLine } from "./text";
+import { APP_URL, sendMail } from "../common/mail";
+import { oneLine } from "../common/text";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;

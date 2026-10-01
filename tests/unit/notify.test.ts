@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const db = vi.hoisted(() => ({ bout: { findUnique: vi.fn() }, follow: { findMany: vi.fn() } }));
 const mail = vi.hoisted(() => ({ APP_URL: "https://ring.test", sendMail: vi.fn() }));
 const auth = vi.hoisted(() => ({ unsubscribeLink: vi.fn(async (id: string) => `https://ring.test/baja?token=${id}`) }));
-vi.mock("../../src/lib/db", () => ({ db }));
-vi.mock("../../src/lib/mail", () => mail);
-vi.mock("../../src/lib/auth", () => auth);
+vi.mock("../../src/lib/common/db", () => ({ db }));
+vi.mock("../../src/lib/common/mail", () => mail);
+vi.mock("../../src/lib/accounts/auth", () => auth);
 
-import { notifyFollowersOfBout } from "../../src/lib/notify";
+import { notifyFollowersOfBout } from "../../src/lib/community/notify";
 
 const fighter = (id: string, first: string, last: string) => ({ id, firstName: first, lastName: last });
 const bout = (date: Date) => ({ id: "b1", fighterAId: "fa", fighterBId: "fb", fighterA: fighter("fa", "Ana", "Ruiz"), fighterB: fighter("fb", "Luis", "Gil"), event: { name: "Velada\nCentral", slug: "velada-central", date, venue: "Sala", city: "Madrid" } });

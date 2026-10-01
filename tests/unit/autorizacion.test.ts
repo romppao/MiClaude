@@ -35,7 +35,7 @@ const mundo = vi.hoisted(() => {
   return { estado, db, Redireccion };
 });
 
-vi.mock("../../src/lib/db", () => ({ db: mundo.db }));
+vi.mock("../../src/lib/common/db", () => ({ db: mundo.db }));
 vi.mock("next/navigation", () => ({
   redirect: (destino: string) => { throw new mundo.Redireccion(destino); },
   notFound: () => { throw new mundo.Redireccion("404"); },
@@ -47,7 +47,15 @@ vi.mock("next/headers", () => ({
   headers: async () => ({ get: () => null }),
 }));
 
-import * as acciones from "../../src/app/actions";
+import * as cuentas from "../../src/app/actions/accounts";
+import * as peleadores from "../../src/app/actions/fighters";
+import * as combates from "../../src/app/actions/bouts";
+import * as aura from "../../src/app/actions/aura";
+import * as veladas from "../../src/app/actions/events";
+import * as moderacion from "../../src/app/actions/moderation";
+import * as comunidad from "../../src/app/actions/community";
+
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -68,6 +76,17 @@ const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setG
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult"] as const;
 const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport"] as const;
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow"] as const;
+
+// Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
+const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
+
+describe("clasificación de las acciones", () => {
+  it("toda acción exportada está en una lista de autorización (si añades una, clasifícala arriba)", () => {
+    const clasificadas = new Set<string>([...SOLO_MODERADORES, ...SOLO_ORGANIZADORES, ...EXIGEN_CORREO_VERIFICADO, ...EXIGEN_SESION, ...PUBLICAS]);
+    expect(Object.keys(acciones).filter((n) => !clasificadas.has(n))).toEqual([]);
+    expect([...clasificadas].filter((n) => !(n in acciones))).toEqual([]);
+  });
+});
 
 describe("sin iniciar sesión", () => {
   for (const nombre of [...SOLO_MODERADORES]) {

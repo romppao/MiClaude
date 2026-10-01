@@ -1,5 +1,5 @@
-import { getUser, VERIFY_HOURS } from "../../lib/auth";
-import { resendVerification, verifyEmail } from "../actions";
+import { getUser, VERIFY_HOURS } from "../../lib/accounts/auth";
+import { resendVerification, verifyEmail } from "../actions/accounts";
 
 export const metadata = { title: "Verificar correo electrónico" };
 export const dynamic = "force-dynamic";

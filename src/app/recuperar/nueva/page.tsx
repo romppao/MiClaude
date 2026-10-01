@@ -1,6 +1,6 @@
-import { resetPassword } from "../../actions";
-import { isResetTokenUsable } from "../../../lib/auth";
-import { LIMITS } from "../../../lib/text";
+import { resetPassword } from "../../actions/accounts";
+import { isResetTokenUsable } from "../../../lib/accounts/auth";
+import { LIMITS } from "../../../lib/common/text";
 
 export const metadata = { title: "Elegir una contraseña nueva", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";

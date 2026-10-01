@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { requireUser } from "../../lib/auth";
-import { db } from "../../lib/db";
-import { REPORT_REASONS } from "../../lib/reports";
-import { lookup } from "../../lib/safe";
-import { changePassword, updateAccount } from "../actions";
-import { LIMITS } from "../../lib/text";
+import { requireUser } from "../../lib/accounts/auth";
+import { db } from "../../lib/common/db";
+import { REPORT_REASONS } from "../../lib/community/reports";
+import { lookup } from "../../lib/common/safe";
+import { changePassword, updateAccount } from "../actions/accounts";
+import { LIMITS } from "../../lib/common/text";
 
 export const metadata = { title: "Mi cuenta" };
 export const dynamic = "force-dynamic";

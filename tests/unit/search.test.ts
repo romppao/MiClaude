@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/lib/db", () => ({ db: {} }));
+vi.mock("../../src/lib/common/db", () => ({ db: {} }));
 
-import { ACCENT_FROM, ACCENT_TO, searchWords } from "../../src/lib/search";
-import { normalizeName } from "../../src/lib/names";
+import { ACCENT_FROM, ACCENT_TO, searchWords } from "../../src/lib/common/search";
+import { normalizeName } from "../../src/lib/common/names";
 
 describe("búsqueda sin tildes", () => {
   it("la tabla de tildes de la base de datos tiene el mismo largo por los dos lados", () => {

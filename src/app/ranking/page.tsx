@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { auraRanking, NO_CATEGORY } from "../../lib/aura";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disciplines";
-import { PROVINCES } from "../../lib/labels";
+import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/common/disciplines";
+import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Ránking de aura" };
 export const dynamic = "force-dynamic";

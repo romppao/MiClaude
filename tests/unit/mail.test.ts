@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { sendMail } from "../../src/lib/mail";
+import { sendMail } from "../../src/lib/common/mail";
 
 afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeIp } from "../../src/lib/ratelimit";
+import { normalizeIp } from "../../src/lib/accounts/ratelimit";
 
 describe("dirección IP del cliente", () => {
   it("toma la primera de la lista que añade el proxy", () => {

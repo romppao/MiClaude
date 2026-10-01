@@ -10,12 +10,12 @@ const db = vi.hoisted(() => {
   d.$transaction = vi.fn(async (a: unknown) => (typeof a === "function" ? (a as (tx: unknown) => unknown)(d) : Promise.all(a as unknown[])));
   return d;
 });
-vi.mock("../../src/lib/db", () => ({ db }));
+vi.mock("../../src/lib/common/db", () => ({ db }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined, set: vi.fn(), delete: vi.fn() }) }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
-vi.mock("../../src/lib/mail", () => ({ APP_URL: "https://ring.test", sendMail: vi.fn(async () => true) }));
+vi.mock("../../src/lib/common/mail", () => ({ APP_URL: "https://ring.test", sendMail: vi.fn(async () => true) }));
 
-import { consumeVerificationToken, isResetTokenUsable, resetPasswordWithToken, unsubscribeWithToken } from "../../src/lib/auth";
+import { consumeVerificationToken, isResetTokenUsable, resetPasswordWithToken, unsubscribeWithToken } from "../../src/lib/accounts/auth";
 
 const sha = (t: string) => createHash("sha256").update(t).digest("hex");
 const futuro = () => new Date(Date.now() + 36e5);

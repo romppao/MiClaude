@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pageNumber, pageWindow } from "../../src/lib/pagination";
+import { pageNumber, pageWindow } from "../../src/lib/common/pagination";
 
 describe("paginación", () => {
   it("interpreta el número de página con cuidado", () => {

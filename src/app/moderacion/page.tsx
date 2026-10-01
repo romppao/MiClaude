@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getUser } from "../../lib/auth";
-import { db } from "../../lib/db";
-import { FLAG_LABEL, type Flag } from "../../lib/coherence";
-import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions";
-import { REPORT_REASONS } from "../../lib/reports";
-import { lookup } from "../../lib/safe";
-import { METHOD_LABEL, VERIFICATION_LABEL, fmtDate } from "../../lib/labels";
-import { DISCIPLINE_LABEL } from "../../lib/disciplines";
-import { publicUserName } from "../../lib/names";
+import { getUser } from "../../lib/accounts/auth";
+import { db } from "../../lib/common/db";
+import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
+import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions/moderation";
+import { REPORT_REASONS } from "../../lib/community/reports";
+import { lookup } from "../../lib/common/safe";
+import { METHOD_LABEL, VERIFICATION_LABEL, fmtDate } from "../../lib/common/labels";
+import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
+import { publicUserName } from "../../lib/common/names";
 
 export const metadata = { title: "Moderación" };
 export const dynamic = "force-dynamic";

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { requireUser } from "../../../lib/auth";
-import { findNameCandidates } from "../../../lib/fighters";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/disciplines";
-import { publicFighterName } from "../../../lib/names";
-import { oneParam } from "../../../lib/safe";
-import { addBout } from "../../actions";
+import { requireUser } from "../../../lib/accounts/auth";
+import { findNameCandidates } from "../../../lib/fighters/fighters";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/common/disciplines";
+import { publicFighterName } from "../../../lib/common/names";
+import { oneParam } from "../../../lib/common/safe";
+import { addBout } from "../../actions/bouts";
 
 export const metadata = { title: "¿Quién es tu rival?", robots: { index: false } };
 export const dynamic = "force-dynamic";

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getUser } from "../../../lib/auth";
-import { db } from "../../../lib/db";
-import { METHOD_LABEL, fmtDate } from "../../../lib/labels";
-import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/disciplines";
-import { LIMITS } from "../../../lib/text";
-import { addCartelBout, setBoutEvidence, setBoutResult } from "../../actions";
+import { getUser } from "../../../lib/accounts/auth";
+import { db } from "../../../lib/common/db";
+import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
+import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/common/disciplines";
+import { LIMITS } from "../../../lib/common/text";
+import { setBoutEvidence } from "../../actions/bouts";
+import { addCartelBout, setBoutResult } from "../../actions/events";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";

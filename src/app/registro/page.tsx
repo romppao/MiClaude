@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { register } from "../actions";
-import { LIMITS } from "../../lib/text";
+import { register } from "../actions/accounts";
+import { LIMITS } from "../../lib/common/text";
 
 export const metadata = { title: "Crear cuenta" };
 

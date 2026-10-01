@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { db } from "../../../lib/db";
-import { getUser } from "../../../lib/auth";
-import { publicFighterName } from "../../../lib/names";
+import { db } from "../../../lib/common/db";
+import { getUser } from "../../../lib/accounts/auth";
+import { publicFighterName } from "../../../lib/common/names";
 
 export const dynamic = "force-dynamic";
 

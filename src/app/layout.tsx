@@ -2,11 +2,11 @@ import "./globals.css";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import FlashNotice from "./FlashNotice";
-import RecordarCampos from "./RecordarCampos";
-import { getUser } from "../lib/auth";
-import { logout } from "./actions";
-import { APP_URL } from "../lib/mail";
+import FlashNotice from "./components/FlashNotice";
+import RecordarCampos from "./components/RecordarCampos";
+import { getUser } from "../lib/accounts/auth";
+import { logout } from "./actions/accounts";
+import { APP_URL } from "../lib/common/mail";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),

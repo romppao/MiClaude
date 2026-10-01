@@ -47,6 +47,8 @@ jobs:
       - name: Comprobar que las migraciones reproducen exactamente el esquema
         run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - run: npm run typecheck
+      - name: Comprobar que el mapa funcional está al día (npm run mapa)
+        run: npm run mapa:comprobar
       - run: npm test
       - run: npm run build
       - name: Instalar Chromium

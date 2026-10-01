@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { proximityFlags } from "../../src/lib/coherence";
+import { proximityFlags } from "../../src/lib/fighters/coherence";
 
 const d = (s: string) => new Date(`${s}T12:00:00Z`);
 

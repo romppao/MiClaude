@@ -1,6 +1,6 @@
 import type { Discipline } from "@prisma/client";
-import { WEIGHT_CLASSES } from "./disciplines";
-import { db } from "./db";
+import { WEIGHT_CLASSES } from "../common/disciplines";
+import { db } from "../common/db";
 
 export type AuraEntry = { fighterId: string; name: string; slug: string; weightClass: string | null; aura: number };
 export type RankedEntry = AuraEntry & { position: number };

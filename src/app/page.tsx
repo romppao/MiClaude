@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { db } from "../lib/db";
-import { LEVEL_LABEL, fmtDate } from "../lib/labels";
-import { auraRanking } from "../lib/aura";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/disciplines";
-import { getUser } from "../lib/auth";
+import { db } from "../lib/common/db";
+import { LEVEL_LABEL, fmtDate } from "../lib/common/labels";
+import { auraRanking } from "../lib/aura/ranking";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/common/disciplines";
+import { getUser } from "../lib/accounts/auth";
 
 export const dynamic = "force-dynamic";
 

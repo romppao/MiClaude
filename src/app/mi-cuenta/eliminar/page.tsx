@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { requireUser } from "../../../lib/auth";
-import { db } from "../../../lib/db";
-import { deleteAccount } from "../../actions";
-import { LIMITS } from "../../../lib/text";
+import { requireUser } from "../../../lib/accounts/auth";
+import { db } from "../../../lib/common/db";
+import { deleteAccount } from "../../actions/accounts";
+import { LIMITS } from "../../../lib/common/text";
 
 export const metadata = { title: "Eliminar mi cuenta" };
 export const dynamic = "force-dynamic";

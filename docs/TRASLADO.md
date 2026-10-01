@@ -74,14 +74,14 @@ Verificación: **96 de los 99** pasaron una verificación adversarial con tres c
 ## 5. Reglas técnicas que conviene no olvidar
 
 - **TypeScript debe seguir en 5.x** (Next 15 no es compatible con la 7) y las importaciones son **relativas** (no hay alias `@/`).
-- **Todo lo que se exporta de `src/app/actions.ts` es un punto de entrada público (POST).** Los ayudantes van en `src/lib`, nunca exportados desde ese fichero.
-- Los mensajes al usuario viajan como **códigos en la URL** (`?aviso=…` / `?problema=…`) y se traducen en `src/lib/messages.ts`. Las acciones usan `go()`, `guard()` (traduce errores de Prisma), `withLock()` (bloqueo consultivo) y `audit()`.
-- **Nunca uses `in` ni `obj[clave]` con claves que vengan del usuario**: usa `hasOwn`/`lookup` de `src/lib/safe.ts`.
+- **Todo lo que se exporta de un módulo de `src/app/actions/` es un punto de entrada público (POST).** Los ayudantes van sin exportar o en `shared.ts`, y la lógica en `src/lib`. Un módulo de acciones no importa de otro (lo vigila `tests/unit/arquitectura.test.ts`).
+- Los mensajes al usuario viajan como **códigos en la URL** (`?aviso=…` / `?problema=…`) y se traducen en `src/lib/common/messages.ts`. Las acciones usan `go()`, `guard()` (traduce errores de Prisma), `withLock()` (bloqueo consultivo) y `audit()`.
+- **Nunca uses `in` ni `obj[clave]` con claves que vengan del usuario**: usa `hasOwn`/`lookup` de `src/lib/common/safe.ts`.
 - **No uses `cache()` de React en `getUser`:** con acciones que cierran la sesión y redirigen, devolvería una sesión obsoleta en la misma petición.
 - **Prisma se niega a ejecutar `db push --force-reset` cuando lo lanza una IA** (es una protección deliberada). No la sortees: ejecuta tú esos comandos destructivos. `--accept-data-loss` sin reinicio sí se usó, solo en la base local de pruebas.
 - **Pruebas de navegador:** espera siempre a un estado visible (`seen(locator)`), no leas nada justo después de una acción, no uses `networkidle`, usa datos únicos por ejecución y **acota las consultas por nombre** (los listados están paginados y la base de pruebas crece).
 - **Al reiniciar el servidor local**, comprueba que el arranque no termina en `EADDRINUSE`: un servidor antiguo sigue sirviendo la compilación vieja y las pruebas fallan de formas confusas. Mata el proceso `next-server`, no solo el envoltorio `npx`. Y no uses `pkill -f` con un patrón que aparezca en tu propia línea de comandos.
-- **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide con el día de Madrid (`lib/dates.ts`).
+- **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide con el día de Madrid (`lib/common/dates.ts`).
 - Todo lo que ve una persona va **en español** («correo electrónico», no «email»); los identificadores del código, en inglés.
 
 ## 6. Lo que queda por hacer, en orden

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PROVINCES, slugify } from "../../src/lib/labels";
+import { PROVINCES, slugify } from "../../src/lib/common/labels";
 
 describe("slugify", () => {
   it("quita tildes, eñes y símbolos", () => {

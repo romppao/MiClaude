@@ -17,11 +17,15 @@ Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibili
 
 ## Estructura del código
 
-- `src/app/` — rutas (todas en español: `/peleadores`, `/veladas`, `/mi-cuenta`, `/moderacion`…), `actions.ts` (todas las acciones del servidor) y componentes compartidos.
-- `src/lib/` — reglas y utilidades sin interfaz: `rules.ts` (aura y resultados), `record.ts` (récord), `aura.ts` (ránking), `dates.ts` (día de Madrid), `search.ts` (búsqueda sin tildes), `auth.ts`/`password.ts`/`ratelimit.ts`/`mail.ts`/`notify.ts`/`retention.ts`/`env.ts` (cuentas, correo y mantenimiento), `safe.ts` y `paths.ts` (entrada del usuario), `messages.ts` (textos de avisos y errores), `anonymize.ts`.
+El código se organiza **por dominios** y con reglas de dependencia que vigila una prueba. La guía completa (dónde está cada cosa, recetas para añadir pantallas o acciones, convenciones y definición de «terminado») es [`DESARROLLO.md`](DESARROLLO.md); el mapa de pantallas → acciones → permisos → tablas se genera solo en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
+
+- `src/app/` — la interfaz: una carpeta por pantalla, con direcciones en español (`/peleadores`, `/veladas`, `/mi-cuenta`, `/moderacion`…).
+  - `src/app/actions/` — las acciones del servidor, **un módulo por dominio** (`accounts`, `fighters`, `bouts`, `aura`, `events`, `moderation`, `community`) y `shared.ts` con los ayudantes comunes y las guardas de permisos (`requireAdmin`, `requireOrganizer`).
+  - `src/app/components/` — componentes compartidos entre pantallas (avisos, filtros, paginación, etiquetas de verificación…).
+- `src/lib/` — la lógica, sin interfaz y agrupada por dominio: `common` (base de datos, textos, fechas, disciplinas, mensajes, correo, búsqueda sin tildes, entrada del usuario), `accounts` (sesiones, contraseñas, enlaces de un solo uso, límites de intentos, retención), `fighters` (récord, declaración previa, coherencia, anonimización), `bouts` (reglas de resultados), `aura` (reglas y ránking) y `community` (avisos de error y notificaciones).
 - `src/instrumentation.ts` — comprueba la configuración al arrancar en producción (sin `APP_URL` el servidor no arranca).
-- `prisma/schema.prisma` y `prisma/seed.ts` (datos ficticios; se niega a borrar una base real).
-- Reglas de las acciones del servidor: todo lo exportado de `actions.ts` es un punto de entrada público; los ayudantes van en `src/lib`. Patrones: `go()` (redirigir con mensaje), `guard()` (traduce errores previsibles de Prisma), `withLock()` (bloqueo consultivo de PostgreSQL para límites diarios) y `audit()` (historial, dentro de la misma transacción).
+- `prisma/schema.prisma`, `prisma/migrations/` y `prisma/seed.ts` (datos ficticios; se niega a borrar una base real).
+- Reglas de las acciones del servidor: todo lo exportado de un módulo de `src/app/actions/` es un punto de entrada público (los ayudantes van sin exportar o en `shared.ts`); un módulo no importa de otro. Patrones: `go()` (redirigir con mensaje), `guard()` (traduce errores previsibles de Prisma), `withLock()` (bloqueo consultivo de PostgreSQL para límites diarios) y `audit()` (historial, dentro de la misma transacción).
 
 ## Actores y roles
 
@@ -39,17 +43,17 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 
 ## Cuentas, acceso y correo
 
-- **Contraseñas:** scrypt asíncrono (N=2^16, r=8, p=2, parámetros de OWASP) con los parámetros **guardados en el propio hash** (`scrypt$N$r$p$sal$hash`); los hashes del formato antiguo se verifican y se recalculan al entrar (`lib/password.ts`).
+- **Contraseñas:** scrypt asíncrono (N=2^16, r=8, p=2, parámetros de OWASP) con los parámetros **guardados en el propio hash** (`scrypt$N$r$p$sal$hash`); los hashes del formato antiguo se verifican y se recalculan al entrar (`lib/accounts/password.ts`).
 - **Sesión:** token aleatorio de 256 bits en cookie `httpOnly`/`sameSite=lax` (`secure` en producción); en la base solo el `sha256`. 30 días.
-- **Límites de intentos** (`lib/ratelimit.ts`, tabla `RateHit`): acceso (8 fallos/15 min por correo y 40 por IP), registro (10/hora por IP), recuperación (3/hora por correo) y reenvío de verificación (3/hora). La IP solo se usa si el proxy la facilita (`X-Forwarded-For`): **en producción la aplicación debe ir detrás de un proxy que sustituya esa cabecera**. El acceso tarda lo mismo exista o no el correo.
+- **Límites de intentos** (`lib/accounts/ratelimit.ts`, tabla `RateHit`): acceso (8 fallos/15 min por correo y 40 por IP), registro (10/hora por IP), recuperación (3/hora por correo) y reenvío de verificación (3/hora). La IP solo se usa si el proxy la facilita (`X-Forwarded-For`): **en producción la aplicación debe ir detrás de un proxy que sustituya esa cabecera**. El acceso tarda lo mismo exista o no el correo.
 - **Enlaces de un solo uso** (`EmailToken`, tipos `VERIFY` 48 h, `RESET` 1 h y `UNSUB` 1 año; se guarda el `sha256`; el consumo es atómico y solo se gasta con un `POST`, para que los escáneres de enlaces no lo consuman). Recuperar la contraseña cierra todas las sesiones y verifica el correo (así quien registró un correo ajeno no lo retiene).
-- **Correo** (`lib/mail.ts`): Resend por HTTP con `RESEND_API_KEY` y `MAIL_FROM`; `MAIL_TRANSPORT=log` escribe los mensajes en el log (desarrollo y pruebas); en producción sin proveedor no se envía nada y las pantallas lo dicen. Los textos de usuario que entran en un mensaje se reducen a una línea. Los avisos a seguidores se envían tras responder (`after()`), respetan la preferencia `notifyEmails` y llevan enlace de baja.
+- **Correo** (`lib/common/mail.ts`): Resend por HTTP con `RESEND_API_KEY` y `MAIL_FROM`; `MAIL_TRANSPORT=log` escribe los mensajes en el log (desarrollo y pruebas); en producción sin proveedor no se envía nada y las pantallas lo dicen. Los textos de usuario que entran en un mensaje se reducen a una línea. Los avisos a seguidores se envían tras responder (`after()`), respetan la preferencia `notifyEmails` y llevan enlace de baja.
 
 ## Privacidad y retención
 
 - `/mi-cuenta`: corregir datos, cambiar contraseña, avisos por correo, **descargar una copia de todos los datos** (`/mi-cuenta/datos`) y **eliminar la cuenta**. Al eliminarla se borran sesiones, auras dadas, seguimientos, solicitudes y avisos; la ficha de peleador **se borra si no tiene combates y se anonimiza si los tiene** (los combates forman parte del récord de los rivales). Queda un apunte en el historial sin datos personales. No se puede eliminar la única cuenta de moderador.
 - `/privacidad`: datos, destinatarios, plazos y derechos. **Texto redactado por la IA a partir del comportamiento real; requiere revisión jurídica.**
-- **Retención** (`lib/retention.ts`, se ejecuta como mucho cada 30 minutos por proceso): sesiones y enlaces caducados, intentos de acceso a los 2 días, cuentas sin verificar a los 30 días, solicitudes de reclamación decididas a los 90 días, avisos resueltos a los 12 meses, historial a los 3 años. El texto con el que alguien demuestra quién es se borra al decidir la solicitud.
+- **Retención** (`lib/accounts/retention.ts`, se ejecuta como mucho cada 30 minutos por proceso): sesiones y enlaces caducados, intentos de acceso a los 2 días, cuentas sin verificar a los 30 días, solicitudes de reclamación decididas a los 90 días, avisos resueltos a los 12 meses, historial a los 3 años. El texto con el que alguien demuestra quién es se borra al decidir la solicitud.
 
 ## Modelo de datos (`prisma/schema.prisma`)
 
@@ -57,16 +61,16 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 
 Decisiones clave:
 
-1. **El récord se calcula, no se guarda** (`lib/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
+1. **El récord se calcula, no se guarda** (`lib/fighters/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
 2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
 3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
-4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista.
+4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista.
 5. **Madrid como plaza inicial, no como límite:** todo se filtra por `province`.
-6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; todo lo específico de cada una (categorías, formas de terminar, si es de torneo) vive en `lib/disciplines.ts`. Una ficha por persona con varias disciplinas.
+6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; todo lo específico de cada una (categorías, formas de terminar, si es de torneo) vive en `lib/common/disciplines.ts`. Una ficha por persona con varias disciplinas.
 
 ## Aura y ránking
 
-El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura.ts`) suma en la base de datos por disciplina y categoría de peso, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
+El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/aura/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura/ranking.ts`) suma en la base de datos por disciplina y categoría de peso, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
 Decisión del fundador: **un clic por usuario y combate**; hasta tres clics será función premium más adelante. Pregunta abierta: ¿por persona y combate, o por persona, combate y peleador? (hallazgo 41).
 
 ## Seguridad
@@ -87,7 +91,7 @@ Estilo **provisional** (el diseño visual es al final, por petición del fundado
 
 ## Búsqueda y listados
 
-`lib/search.ts`: sin tildes ni mayúsculas y con varias palabras en cualquier orden (cada palabra debe aparecer en algún campo) sobre peleadores, gimnasios, entrenadores y veladas; los peleadores provisionales y ocultos no aparecen. Se hace con `translate`/`strpos` de PostgreSQL (recorrido completo de la tabla: suficiente para empezar; si crece, `pg_trgm`). Listados paginados de 24 en 24 que conservan los filtros.
+`lib/common/search.ts`: sin tildes ni mayúsculas y con varias palabras en cualquier orden (cada palabra debe aparecer en algún campo) sobre peleadores, gimnasios, entrenadores y veladas; los peleadores provisionales y ocultos no aparecen. Se hace con `translate`/`strpos` de PostgreSQL (recorrido completo de la tabla: suficiente para empezar; si crece, `pg_trgm`). Listados paginados de 24 en 24 que conservan los filtros.
 
 ## Despliegue y entorno
 

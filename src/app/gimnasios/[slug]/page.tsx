@@ -2,8 +2,8 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "../../../lib/db";
-import { LEVEL_LABEL } from "../../../lib/labels";
+import { db } from "../../../lib/common/db";
+import { LEVEL_LABEL } from "../../../lib/common/labels";
 
 export const dynamic = "force-dynamic";
 

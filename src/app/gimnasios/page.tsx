@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { db } from "../../lib/db";
-import { searchIds } from "../../lib/search";
-import { flatParams } from "../../lib/safe";
-import { pageNumber, pageWindow } from "../../lib/pagination";
-import Paginacion from "../Paginacion";
-import { BotonesFiltro, CampoFiltro } from "../Filtros";
-import { PROVINCES } from "../../lib/labels";
+import { db } from "../../lib/common/db";
+import { searchIds } from "../../lib/common/search";
+import { flatParams } from "../../lib/common/safe";
+import { pageNumber, pageWindow } from "../../lib/common/pagination";
+import Paginacion from "../components/Paginacion";
+import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
+import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Gimnasios" };
 export const dynamic = "force-dynamic";

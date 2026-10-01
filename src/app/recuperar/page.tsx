@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requestPasswordReset } from "../actions";
-import { LIMITS } from "../../lib/text";
+import { requestPasswordReset } from "../actions/accounts";
+import { LIMITS } from "../../lib/common/text";
 
 export const metadata = { title: "Elegir una contraseña nueva" };
 

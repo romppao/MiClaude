@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { safeHttpUrl } from "../../src/lib/url";
+import { safeHttpUrl } from "../../src/lib/common/url";
 
 describe("safeHttpUrl", () => {
   it("acepta http y https", () => {

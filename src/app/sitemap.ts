@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { db } from "../lib/db";
-import { APP_URL } from "../lib/mail";
+import { db } from "../lib/common/db";
+import { APP_URL } from "../lib/common/mail";
 
 export const dynamic = "force-dynamic";
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { scryptSync, randomBytes } from "node:crypto";
-import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../src/lib/password";
+import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../src/lib/accounts/password";
 
 describe("contraseñas", () => {
   it("verifica la contraseña correcta y rechaza otra", async () => {

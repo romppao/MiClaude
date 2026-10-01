@@ -1,5 +1,5 @@
 import type { Verification } from "@prisma/client";
-import { VERIFICATION_LABEL } from "../lib/labels";
+import { VERIFICATION_LABEL } from "../../lib/common/labels";
 
 /** Etiqueta con el nivel de respaldo de un combate, la misma en toda la aplicación. */
 export default function VerificationTag({ verification }: { verification: Verification }) {

@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { db } from "./db";
+import { db } from "../common/db";
 
 /**
  * Límite de frecuencia sobre la tabla RateHit: cada intento deja una fila con su clave («acción:correo» o «acción:IP»)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeRecords, formatRecord, type BoutForRecord } from "../../src/lib/record";
+import { computeRecords, formatRecord, type BoutForRecord } from "../../src/lib/fighters/record";
 
 const bout = (over: Partial<BoutForRecord> & { level?: "PRO" | "AMATEUR"; status?: string }): BoutForRecord => ({
   fighterAId: "me",

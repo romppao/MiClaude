@@ -2,11 +2,11 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "../../../lib/db";
-import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../../lib/labels";
-import { DISCIPLINE_LABEL } from "../../../lib/disciplines";
-import { publicFighterName } from "../../../lib/names";
-import VerificationTag from "../../VerificationTag";
+import { db } from "../../../lib/common/db";
+import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
+import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
+import { publicFighterName } from "../../../lib/common/names";
+import VerificationTag from "../../components/VerificationTag";
 
 export const dynamic = "force-dynamic";
 

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
-import { db } from "../../lib/db";
-import { searchIds } from "../../lib/search";
-import { flatParams } from "../../lib/safe";
-import { pageNumber, pageWindow } from "../../lib/pagination";
-import Paginacion from "../Paginacion";
-import { BotonesFiltro, CampoFiltro } from "../Filtros";
-import { plural } from "../../lib/text";
-import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/labels";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/disciplines";
+import { db } from "../../lib/common/db";
+import { searchIds } from "../../lib/common/search";
+import { flatParams } from "../../lib/common/safe";
+import { pageNumber, pageWindow } from "../../lib/common/pagination";
+import Paginacion from "../components/Paginacion";
+import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
+import { plural } from "../../lib/common/text";
+import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/common/labels";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/common/disciplines";
 
 export const metadata = { title: "Calendario de veladas" };
 export const dynamic = "force-dynamic";

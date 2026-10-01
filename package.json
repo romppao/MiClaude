@@ -8,6 +8,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "mapa": "node scripts/generar-mapa.mjs",
+    "mapa:comprobar": "node scripts/generar-mapa.mjs --comprobar",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",

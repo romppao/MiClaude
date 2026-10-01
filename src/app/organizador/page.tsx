@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { getUser } from "../../lib/auth";
-import { db } from "../../lib/db";
-import { PROVINCES, fmtDate } from "../../lib/labels";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/disciplines";
-import { LIMITS, plural } from "../../lib/text";
-import { createEvent, requestOrganizer } from "../actions";
+import { getUser } from "../../lib/accounts/auth";
+import { db } from "../../lib/common/db";
+import { PROVINCES, fmtDate } from "../../lib/common/labels";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
+import { LIMITS, plural } from "../../lib/common/text";
+import { createEvent, requestOrganizer } from "../actions/events";
 
 export const metadata = { title: "Organizadores" };
 export const dynamic = "force-dynamic";

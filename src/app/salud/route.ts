@@ -1,4 +1,4 @@
-import { db } from "../../lib/db";
+import { db } from "../../lib/common/db";
 
 export const dynamic = "force-dynamic";
 

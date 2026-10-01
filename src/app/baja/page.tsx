@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { unsubscribeEmails } from "../actions";
+import { unsubscribeEmails } from "../actions/accounts";
 
 export const metadata = { title: "Dejar de recibir avisos", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";

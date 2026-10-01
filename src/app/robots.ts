@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { APP_URL } from "../lib/mail";
+import { APP_URL } from "../lib/common/mail";
 
 export default function robots(): MetadataRoute.Robots {
   return {

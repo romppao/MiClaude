@@ -1,5 +1,5 @@
 import type { Discipline } from "@prisma/client";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES } from "../lib/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES } from "../../lib/common/disciplines";
 
 type Defaults = {
   discipline?: Discipline; weightClass?: string | null;

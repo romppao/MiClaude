@@ -3,7 +3,7 @@
  * un dato raro se guarda, pero queda marcado para revisarlo.
  */
 import type { Discipline } from "@prisma/client";
-import { isTournamentStyle } from "./disciplines";
+import { isTournamentStyle } from "../common/disciplines";
 
 export type Flag = "MISMO_DIA" | "MUY_SEGUIDOS";
 

@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { db } from "../../lib/db";
-import { flatParams } from "../../lib/safe";
-import { searchIds } from "../../lib/search";
-import { publicFighterName } from "../../lib/names";
-import { fmtDate } from "../../lib/labels";
-import { LIMITS } from "../../lib/text";
+import { db } from "../../lib/common/db";
+import { flatParams } from "../../lib/common/safe";
+import { searchIds } from "../../lib/common/search";
+import { publicFighterName } from "../../lib/common/names";
+import { fmtDate } from "../../lib/common/labels";
+import { LIMITS } from "../../lib/common/text";
 
 export const metadata = { title: "Buscar" };
 export const dynamic = "force-dynamic";

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { canGiveAura, pairKey, validateOutcome, type BoutForAura } from "../../src/lib/rules";
-import { publicFighterName, publicUserName, normalizeName } from "../../src/lib/names";
-import { firstTooLong, isEmail, oneLine } from "../../src/lib/text";
+import { pairKey, validateOutcome } from "../../src/lib/bouts/rules";
+import { canGiveAura, type BoutForAura } from "../../src/lib/aura/rules";
+import { publicFighterName, publicUserName, normalizeName } from "../../src/lib/common/names";
+import { firstTooLong, isEmail, oneLine } from "../../src/lib/common/text";
 
 const NOW = new Date("2026-09-30T10:00:00Z");
 const bout = (over: Partial<BoutForAura> = {}, event: Partial<BoutForAura["event"]> = {}): BoutForAura => ({

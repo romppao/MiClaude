@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import { db } from "./db";
-import { normalizeName } from "./names";
+import { db } from "../common/db";
+import { normalizeName } from "../common/names";
 
 type Client = Prisma.TransactionClient | typeof db;
 

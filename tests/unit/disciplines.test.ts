@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES, isTournamentStyle, parseDisciplineChoice } from "../../src/lib/disciplines";
-import { proximityAppliesTo } from "../../src/lib/coherence";
+import { DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES, isTournamentStyle, parseDisciplineChoice } from "../../src/lib/common/disciplines";
+import { proximityAppliesTo } from "../../src/lib/fighters/coherence";
 
 describe("disciplinas", () => {
   it("el boxeo va en cabeza y todas tienen categorías y formas de terminar", () => {

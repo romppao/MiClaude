@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { dayKey, eventDayReached, parseBirthDate, parseDay, todayMadrid } from "../../src/lib/dates";
+import { dayKey, eventDayReached, parseBirthDate, parseDay, todayMadrid } from "../../src/lib/common/dates";
 
 const at = (iso: string) => new Date(iso);
 

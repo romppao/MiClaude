@@ -1,6 +1,6 @@
 // DATOS FICTICIOS de demostración. No corresponden a personas, gimnasios ni veladas reales.
 import { PrismaClient, type Discipline, type Method, type Result } from "@prisma/client";
-import { slugify } from "../src/lib/labels";
+import { slugify } from "../src/lib/common/labels";
 
 const db = new PrismaClient();
 const day = 864e5;

@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { AVISOS, PROBLEMAS } from "../../src/lib/messages";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { AVISOS, PROBLEMAS } from "../../src/lib/common/messages";
 
 /** Todo código de aviso o de problema que usan las acciones del servidor debe tener su texto: si falta, la persona no ve ningún mensaje. */
 describe("mensajes al usuario", () => {
-  const fuentes = ["src/app/actions.ts", "src/lib/rules.ts", "src/lib/fighters.ts"].map((f) => readFileSync(f, "utf8")).join("\n");
+  // Todo el código fuente salvo el propio catálogo de textos: así un módulo nuevo queda cubierto sin tocar esta prueba.
+  const ficheros = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? ficheros(join(dir, e.name)) : /\.tsx?$/.test(e.name) ? [join(dir, e.name)] : []));
+  const fuentes = ficheros("src").filter((f) => !f.endsWith("common/messages.ts")).map((f) => readFileSync(f, "utf8")).join("\n");
   const problemas = new Set([...fuentes.matchAll(/problema: "([a-z_]+)"/g)].map((m) => m[1]));
   for (const m of fuentes.matchAll(/problema: [^,}]*\? "([a-z_]+)" : "([a-z_]+)"/g)) { problemas.add(m[1]); problemas.add(m[2]); }
   // Códigos que devuelven las reglas compartidas (rules.ts): pueden ser avisos o problemas, pero siempre tienen texto.

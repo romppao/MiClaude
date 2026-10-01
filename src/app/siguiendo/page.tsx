@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { requireUser } from "../../lib/auth";
-import { db } from "../../lib/db";
-import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../lib/labels";
-import { eventDayReached } from "../../lib/dates";
-import { publicFighterName } from "../../lib/names";
-import { plural } from "../../lib/text";
-import VerificationTag from "../VerificationTag";
-import { toggleFollow } from "../actions";
+import { requireUser } from "../../lib/accounts/auth";
+import { db } from "../../lib/common/db";
+import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../lib/common/labels";
+import { eventDayReached } from "../../lib/common/dates";
+import { publicFighterName } from "../../lib/common/names";
+import { plural } from "../../lib/common/text";
+import VerificationTag from "../components/VerificationTag";
+import { toggleFollow } from "../actions/community";
 
 export const metadata = { title: "Mis peleadores" };
 export const dynamic = "force-dynamic";

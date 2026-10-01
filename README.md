@@ -84,6 +84,9 @@ npm run test:e2e
 | Documento | Para qué |
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Reglas del fundador y del proyecto (las lee Claude Code al empezar) |
+| [`docs/README.md`](docs/README.md) | Índice de toda la documentación: qué abrir según lo que quieras hacer |
+| [`docs/DESARROLLO.md`](docs/DESARROLLO.md) | **Guía de desarrollo**: estructura, reglas de organización, recetas («cómo hago X»), convenciones y definición de «terminado» |
+| [`docs/MAPA-FUNCIONAL.md`](docs/MAPA-FUNCIONAL.md) | Pantallas → acciones → permisos → tablas (generado con `npm run mapa`) |
 | [`docs/TRASLADO.md`](docs/TRASLADO.md) | **Cómo retomar el proyecto**: puesta en marcha, estado, pendientes y decisiones |
 | [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) | Estado técnico, modelo de datos, seguridad, riesgos y hoja de ruta |
 | [`docs/AUDITORIA.md`](docs/AUDITORIA.md) | Los 99 hallazgos de la auditoría, con su estado |

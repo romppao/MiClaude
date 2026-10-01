@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { internalPath } from "../../src/lib/paths";
+import { internalPath } from "../../src/lib/common/paths";
 
 describe("internalPath (redirecciones seguras)", () => {
   it("acepta rutas internas con parámetros", () => {

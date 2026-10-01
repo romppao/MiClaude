@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser } from "../../../lib/auth";
-import { db } from "../../../lib/db";
-import { AUDIT_ACTION_LABEL, AUDIT_ENTITY_LABEL } from "../../../lib/labels";
-import { lookup, flatParams } from "../../../lib/safe";
-import { BotonesFiltro, CampoFiltro } from "../../Filtros";
+import { getUser } from "../../../lib/accounts/auth";
+import { db } from "../../../lib/common/db";
+import { AUDIT_ACTION_LABEL, AUDIT_ENTITY_LABEL } from "../../../lib/common/labels";
+import { lookup, flatParams } from "../../../lib/common/safe";
+import { BotonesFiltro, CampoFiltro } from "../../components/Filtros";
 
 export const metadata = { title: "Historial de cambios" };
 export const dynamic = "force-dynamic";

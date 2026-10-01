@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "../common/db";
 
 const DIA = 864e5;
 /** Cuentas cuyo correo nunca se verificó se borran a los 30 días: no han podido publicar nada y así nadie retiene un correo ajeno. */

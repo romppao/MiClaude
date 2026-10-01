@@ -1,8 +1,8 @@
-import { db } from "./db";
-import { APP_URL, sendMail } from "./mail";
-import { unsubscribeLink } from "./auth";
-import { fmtDate } from "./labels";
-import { oneLine } from "./text";
+import { db } from "../common/db";
+import { APP_URL, sendMail } from "../common/mail";
+import { unsubscribeLink } from "../accounts/auth";
+import { fmtDate } from "../common/labels";
+import { oneLine } from "../common/text";
 
 const fullName = (f: { firstName: string; lastName: string }) => oneLine(`${f.firstName} ${f.lastName}`);
 

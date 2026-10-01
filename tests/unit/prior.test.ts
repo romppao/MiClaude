@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parsePrior } from "../../src/lib/prior";
-import { combinedRecord, computeRecords, emptyTally, priorIsDetailed, type BoutForRecord } from "../../src/lib/record";
+import { parsePrior } from "../../src/lib/fighters/prior";
+import { combinedRecord, computeRecords, emptyTally, priorIsDetailed, type BoutForRecord } from "../../src/lib/fighters/record";
 
 describe("parsePrior (récord de partida declarado)", () => {
   it("sin nada rellenado no hay récord de partida", () => {
