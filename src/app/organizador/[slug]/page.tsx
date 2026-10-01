@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "../../../lib/accounts/auth";
+import { loginPath } from "../../../lib/common/paths";
 import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/common/disciplines";
@@ -15,7 +16,7 @@ const MAX_LISTA = 500;
 
 export default async function ManageEvent({ params }: { params: Promise<{ slug: string }> }) {
   const [{ slug }, user] = await Promise.all([params, getUser()]);
-  if (!user) redirect(`/entrar?next=${encodeURIComponent(`/organizador/${slug}`)}`);
+  if (!user) redirect(loginPath(`/organizador/${slug}`));
   const event = await db.event.findUnique({ where: { slug }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } });
   if (!event) notFound();
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");

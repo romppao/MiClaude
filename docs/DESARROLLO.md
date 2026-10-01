@@ -12,7 +12,7 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 |---|---|
 | Añadir o cambiar una **pantalla** | `src/app/<dirección>/page.tsx` (la carpeta es la dirección, en español). Receta 4.1 |
 | Añadir o cambiar lo que hace un **formulario o botón** | `src/app/actions/<módulo>.ts` (módulos de la tabla 2). Receta 4.2 |
-| Cambiar **quién puede hacer qué** | `src/app/actions/shared.ts` (`requireAdmin`, `requireOrganizer`…) y `src/lib/accounts/auth.ts` (`requireUser`, `requireVerifiedUser`) |
+| Cambiar **quién puede hacer qué** | `src/lib/accounts/permissions.ts` (`requireAdmin`, `requireOrganizer`) y `src/lib/accounts/auth.ts` (`requireUser`, `requireVerifiedUser`). Las usan por igual las acciones y las pantallas |
 | Cambiar un **texto que ve la persona** tras una acción | `src/lib/common/messages.ts` (los códigos `?aviso=` / `?problema=`). Receta 4.3 |
 | Cambiar una **regla de negocio** (aura, resultados, récord, fechas…) | `src/lib/<dominio>/…` con su prueba en `tests/unit/`. Receta 4.5 |
 | Cambiar el **modelo de datos** | `prisma/schema.prisma` + migración. Receta 4.4 |
@@ -34,6 +34,7 @@ tests/unit/               vitest: reglas, seguridad, autorización de las accion
 tests/e2e/                navegador real (playwright-core + axe): flujos, integridad, acceso, cuenta, búsqueda, usabilidad, accesibilidad
 src/
   instrumentation.ts      comprobaciones al arrancar (variables de entorno obligatorias en producción)
+  middleware.ts           limpia las direcciones antes de que lleguen a ninguna pantalla (parámetros repetidos, «constructor», caracteres nulos)
   app/                    LA INTERFAZ: una carpeta por pantalla; cada una con su page.tsx
     actions/              LAS ACCIONES DEL SERVIDOR, un módulo por dominio (tabla de abajo) + shared.ts
     components/           componentes compartidos entre pantallas (avisos, filtros, paginación, etiquetas…)
@@ -58,7 +59,7 @@ src/
 | `events.ts` | Pedir ser organizador, crear veladas, montar el cartel, poner resultados | Organizador |
 | `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos | Moderación |
 | `community.ts` | Avisos de error, seguir a un peleador | Cuenta con sesión |
-| `shared.ts` | Ayudantes comunes (`go`, `guard`, `withLock`, `str`…) y **las guardas de permisos** | Solo los módulos de arriba |
+| `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
 
 ### Quién puede depender de quién (lo vigila `tests/unit/arquitectura.test.ts`)
 
@@ -81,7 +82,8 @@ lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bou
 
 - **Idioma.** Todo lo que llega a una persona va en español («correo electrónico», «peleador»). Los identificadores del código van en inglés (convención técnica). El glosario de abajo traduce uno a otro. Pasar el código al español exigiría preguntárselo antes al fundador.
 - **Seguridad de las acciones.** Todo lo que un módulo de `actions/` exporta es un punto de entrada público (un POST que cualquiera puede lanzar): solo se exportan funciones `async` de verdad públicas; los ayudantes van sin exportar o en `shared.ts`. **Cada acción comprueba por sí misma quién la ejecuta** (nunca se fía de que la pantalla lo haya comprobado) y valida todo lo que recibe.
-- **Claves que vienen del usuario:** nunca `in` ni `obj[clave]`; se usa `hasOwn` / `lookup` de `lib/common/safe.ts`.
+- **Claves que vienen del usuario:** nunca `in` ni `obj[clave]`; se usa `hasOwn` / `lookup` de `lib/common/safe.ts`. Los parámetros de la dirección llegan ya limpios (`src/middleware.ts`: un solo valor por parámetro, sin `constructor` ni caracteres nulos); los campos de formulario se leen con `str()` de `actions/shared.ts`.
+- **Sin sesión nunca se redirige en silencio:** una pantalla privada usa `requireUser("/ruta")` / `requireAdmin("/ruta")` (llevan a «Entrar» con el motivo y vuelven a esa ruta tras entrar); fuera de eso, `loginPath(ruta)` de `lib/common/paths.ts`.
 - **Mensajes:** las acciones terminan siempre en `go(ruta, { aviso | problema })`; el texto está en `lib/common/messages.ts`. Nunca una pantalla vacía ni una redirección muda.
 - **Registro de cambios:** todo cambio que afecte a la fiabilidad (verificar, rechazar, aprobar, borrar…) llama a `audit()` dentro de la misma transacción.
 - **Reglas compartidas, en un solo sitio:** si el servidor y la interfaz necesitan la misma regla (por ejemplo «¿puede esta persona dar aura aquí?»), vive en `lib` y se usa desde los dos lados.

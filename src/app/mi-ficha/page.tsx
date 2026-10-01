@@ -20,7 +20,7 @@ export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
 
 export default async function MyProfile({ searchParams }: { searchParams: Promise<{ q?: string | string[] }> }) {
-  const user = await requireUser();
+  const user = await requireUser("/mi-ficha");
   if (!user.emailVerifiedAt) redirect("/verificar");
   const q = oneParam((await searchParams).q)?.slice(0, 100);
   const me = user.fighter;

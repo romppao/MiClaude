@@ -10,7 +10,7 @@ export const metadata = { title: "Mi cuenta" };
 export const dynamic = "force-dynamic";
 
 export default async function Account() {
-  const user = await requireUser();
+  const user = await requireUser("/mi-cuenta");
   const avisos = await db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 20 });
   const tieneFicha = !!user.fighter || user.role === "FIGHTER";
   const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario" } as const;

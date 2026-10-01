@@ -5,6 +5,7 @@ import { db } from "../common/db";
 export { hashPassword, verifyPassword } from "./password";
 import { APP_URL, sendMail } from "../common/mail";
 import { oneLine } from "../common/text";
+import { internalPath, loginPath } from "../common/paths";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
@@ -34,10 +35,25 @@ export async function getUser() {
   return s.user;
 }
 
-export async function requireUser() {
+/** Exige una sesión iniciada. Si falta, lleva a «Entrar» explicando por qué y, si se indica `next`, con la ruta a la que volver. */
+export async function requireUser(next?: string) {
   const u = await getUser();
-  if (!u) redirect("/entrar");
+  if (!u) redirect(loginPath(next));
   return u;
+}
+
+// ---------- A dónde volver tras registrarse y confirmar el correo ----------
+
+const RETURN_COOKIE = "volver";
+
+/** Recuerda a dónde quería ir la persona que se acaba de registrar, para devolverla allí cuando confirme su correo (2 horas). */
+export async function rememberReturnPath(path: string) {
+  (await cookies()).set(RETURN_COOKIE, path, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 2 * 3600 });
+}
+
+/** La ruta recordada por `rememberReturnPath` (siempre una ruta interna) o una cadena vacía. */
+export async function readReturnPath(): Promise<string> {
+  return internalPath((await cookies()).get(RETURN_COOKIE)?.value ?? "", "");
 }
 
 // ---------- Enlaces de un solo uso enviados por correo ----------

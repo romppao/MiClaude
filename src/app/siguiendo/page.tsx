@@ -12,7 +12,7 @@ export const metadata = { title: "Mis peleadores" };
 export const dynamic = "force-dynamic";
 
 export default async function Following() {
-  const user = await requireUser();
+  const user = await requireUser("/siguiendo");
   const follows = await db.follow.findMany({ where: { userId: user.id, fighter: { hiddenAt: null } }, include: { fighter: { include: { gym: true } } }, orderBy: { createdAt: "desc" } });
   const ids = follows.map((f) => f.fighterId);
   const bouts = ids.length

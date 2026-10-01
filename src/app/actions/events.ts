@@ -6,6 +6,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
+import { requireOrganizer } from "../../lib/accounts/permissions";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
@@ -15,7 +16,7 @@ import { isDiscipline, WEIGHT_CLASSES } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
-import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, ownEvent, readProvince, requireOrganizer, str, uniqueSlug } from "./shared";
+import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, ownEvent, readProvince, str, uniqueSlug } from "./shared";
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();

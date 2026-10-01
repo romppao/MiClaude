@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { getUser, requireVerifiedUser } from "../../lib/accounts/auth";
 import { audit } from "../../lib/common/audit";
-import { internalPath } from "../../lib/common/paths";
+import { internalPath, loginPath } from "../../lib/common/paths";
 import { MAX_REPORTS_PER_DAY, REASONS_BY_ENTITY, REPORT_ENTITIES, REPORT_REASONS, type ReportEntity } from "../../lib/community/reports";
 import { hasOwn } from "../../lib/common/safe";
 import { LIMITS } from "../../lib/common/text";
@@ -42,7 +42,7 @@ export async function createReport(f: FormData) {
 export async function toggleFollow(f: FormData) {
   const back = internalPath(str(f, "back"));
   const user = await getUser();
-  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
+  if (!user) redirect(loginPath(back));
   const fighter = await db.fighter.findFirst({ where: { id: str(f, "fighterId"), hiddenAt: null } });
   if (!fighter) go(back, { problema: "seguir_no_existe" });
   if (user.fighter?.id === fighter.id) go(back, { problema: "seguir_propio" });

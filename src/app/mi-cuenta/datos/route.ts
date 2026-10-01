@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "../../../lib/common/db";
 import { getUser } from "../../../lib/accounts/auth";
+import { loginPath } from "../../../lib/common/paths";
 import { publicFighterName } from "../../../lib/common/names";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 /** Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). */
 export async function GET(request: Request) {
   const user = await getUser();
-  if (!user) return NextResponse.redirect(new URL("/entrar?next=%2Fmi-cuenta&problema=sin_sesion", request.url));
+  if (!user) return NextResponse.redirect(new URL(loginPath("/mi-cuenta"), request.url));
 
   const fighter = user.fighter;
   const [bouts, auras, follows, claims, organizer, reports, history, events] = await Promise.all([

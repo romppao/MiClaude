@@ -1,11 +1,10 @@
 // Ayudantes comunes de las acciones del servidor. Este fichero NO lleva "use server": lo que se exporta aquí no es un punto de entrada público.
-// Las reglas de «quién puede hacer qué» (requireAdmin, requireOrganizer…) viven aquí para tenerlas juntas.
+// Las guardas de permisos («quién puede hacer qué») no están aquí sino en lib/accounts/permissions.ts, porque las usan también las pantallas.
 
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
-import { getUser, requireVerifiedUser } from "../../lib/accounts/auth";
 import { PROVINCES } from "../../lib/common/labels";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../../lib/fighters/coherence";
 import { isTournamentStyle } from "../../lib/common/disciplines";
@@ -71,13 +70,6 @@ export function readProvince(f: FormData, key: string, back: string, fallback?: 
   return v;
 }
 
-export async function requireAdmin() {
-  const u = await getUser();
-  if (!u) go("/entrar?next=%2Fmoderacion", { problema: "sin_sesion" });
-  if (u.role !== "ADMIN") go("/", { problema: "solo_moderadores" });
-  return u;
-}
-
 export type Client = Prisma.TransactionClient | typeof db;
 
 /** Señales de coherencia de un combate nuevo respecto a los demás combates de sus dos peleadores (incluidos los de la misma velada). */
@@ -100,12 +92,6 @@ export async function uniqueSlug(base: string, exists: (slug: string) => Promise
   let slug = root;
   for (let i = 2; await exists(slug); i++) slug = `${root}-${i}`;
   return slug;
-}
-
-export async function requireOrganizer() {
-  const user = await requireVerifiedUser();
-  if (user.role !== "ORGANIZER" && user.role !== "ADMIN") go("/organizador", { problema: "sin_permiso" });
-  return user;
 }
 
 export async function ownEvent(eventId: string, user: { id: string; role: string }) {

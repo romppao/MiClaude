@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { getUser } from "../../lib/accounts/auth";
-import { internalPath } from "../../lib/common/paths";
+import { internalPath, loginPath } from "../../lib/common/paths";
 import { AURA_COMMENT_MAX, AURA_PER_DAY, canGiveAura } from "../../lib/aura/rules";
 import { go, str, withLock } from "./shared";
 
@@ -19,7 +19,7 @@ import { go, str, withLock } from "./shared";
 export async function giveAura(f: FormData) {
   const user = await getUser();
   const back = internalPath(str(f, "back"));
-  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
+  if (!user) redirect(loginPath(back));
   if (!user.emailVerifiedAt) redirect("/verificar");
   if (str(f, "comment").length > AURA_COMMENT_MAX) go(back, { problema: "texto_largo" });
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") }, include: { event: true } });
@@ -48,7 +48,7 @@ export async function giveAura(f: FormData) {
 export async function removeAura(f: FormData) {
   const user = await getUser();
   const back = internalPath(str(f, "back"));
-  if (!user) redirect(`/entrar?next=${encodeURIComponent(back)}`);
+  if (!user) redirect(loginPath(back));
   await db.aura.deleteMany({ where: { userId: user.id, boutId: str(f, "boutId"), fighterId: str(f, "fighterId") } });
   revalidatePath("/", "layout");
   go(back, { aviso: "aura_quitada" });

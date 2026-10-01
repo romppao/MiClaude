@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getUser } from "../../lib/accounts/auth";
+import { requireAdmin } from "../../lib/accounts/permissions";
 import { db } from "../../lib/common/db";
 import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
 import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions/moderation";
@@ -58,9 +57,7 @@ function BoutTable({ rows, acciones, vacio }: { rows: BoutRow[]; acciones: (b: B
 }
 
 export default async function Moderation() {
-  const user = await getUser();
-  if (!user) redirect("/entrar?next=%2Fmoderacion&problema=sin_sesion");
-  if (user.role !== "ADMIN") redirect("/?problema=solo_moderadores");
+  const user = await requireAdmin("/moderacion");
 
   const porVerificar = { verification: { in: ["SELF_REPORTED", "CONFIRMED"] as ("SELF_REPORTED" | "CONFIRMED")[] } };
   const [conSenales, sinSenales, enRevision, totales] = await Promise.all([

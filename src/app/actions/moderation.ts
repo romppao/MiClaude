@@ -5,12 +5,13 @@
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
+import { requireAdmin } from "../../lib/accounts/permissions";
 import { APP_URL } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
 import { notifyDecision } from "../../lib/community/notify";
 import { anonymizeFighter } from "../../lib/fighters/anonymize";
 import { LIMITS, oneLine } from "../../lib/common/text";
-import { go, requireAdmin, str } from "./shared";
+import { go, str } from "./shared";
 
 /** Cola de moderación de combates: verificar, rechazar o restaurar uno rechazado. Solo moderadores. */
 export async function adminDecide(f: FormData) {

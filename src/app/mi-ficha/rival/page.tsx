@@ -17,7 +17,7 @@ const CAMPOS = ["discipline", "eventName", "date", "venue", "city", "province", 
  * (o que indique que es otra), en lugar de fusionar homónimos por el nombre.
  */
 export default async function ChooseRival({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireUser();
+  const user = await requireUser("/mi-ficha/rival");
   if (!user.emailVerifiedAt) redirect("/verificar");
   if (!user.fighter) redirect("/mi-ficha");
   const sp = await searchParams;

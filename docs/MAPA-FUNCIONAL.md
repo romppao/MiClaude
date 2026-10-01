@@ -22,10 +22,10 @@
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | — |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
-| `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
+| `/moderacion` | Moderación | Pública | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
+| `/moderacion/historial` | Historial de cambios | Pública | — | AuditLog |
 | `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
-| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Organizador de esa velada o moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.setBoutResult` | Event, Fighter |
+| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.setBoutResult` | Event, Fighter |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
 | `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, Follow |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
@@ -141,8 +141,9 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `isResetTokenUsable`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
+| `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
+| `permissions.ts` | `requireAdmin`, `requireOrganizer` |
 | `ratelimit.ts` | `HORA`, `MINUTO`, `addHit`, `allow`, `clearHits`, `clientIp`, `countHits`, `isBlocked`, `normalizeIp` |
 | `retention.ts` | `DIAS_CUENTA_SIN_VERIFICAR`, `maybePurge`, `purgeStale` |
 
@@ -173,7 +174,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
 | `names.ts` | `normalizeName`, `publicFighterName`, `publicUserName` |
 | `pagination.ts` | `PAGE_SIZE`, `pageNumber`, `pageWindow` |
-| `paths.ts` | `internalPath` |
+| `paths.ts` | `internalPath`, `loginPath` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |

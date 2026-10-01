@@ -70,6 +70,17 @@ check("la ficha de un gimnasio tiene su propio título", (await anon.title()).st
 await anon.goto(B + `/peleadores/alvaro-perez${rnd}-nunez`);
 check("la ficha de un peleador tiene su propio título", (await anon.title()).startsWith(`Álvaro Pérez${rnd} Núñez`));
 
+// 6) Direcciones con parámetros raros (los filtra src/middleware.ts): nunca provocan un error del servidor.
+//    Antes daban 500: «constructor» como nombre, un carácter nulo (%00) en un valor y parámetros repetidos en /ranking y /recuperar/nueva.
+const raras = ["constructor=y", "q=%00&entity=%00&id=%00", "q=a&q=b&token=a&token=b&provincia=a&provincia=b&next=a&next=b", "__proto__=x&then=x&pagina=abc"];
+const fallos = [];
+for (const ruta of ["/peleadores", "/veladas", "/gimnasios", "/entrenadores", "/ranking", "/buscar", "/entrar", "/recuperar/nueva", "/baja", "/verificar", "/moderacion/historial"]) {
+  for (const q of raras) { const r = await anon.request.get(B + `${ruta}?${q}`); if (r.status() >= 500) fallos.push(`${ruta}?${q} → ${r.status()}`); }
+}
+check(`ninguna dirección con parámetros raros provoca un error del servidor${fallos.length ? ": " + fallos.join(", ") : ""}`, fallos.length === 0);
+const conservada = await anon.request.get(B + `/peleadores?constructor=y&q=alvaro%20perez${rnd}`);
+check("y el resto de la dirección se conserva (la búsqueda sigue funcionando)", (await conservada.text()).includes(`Pérez${rnd}`) );
+
 await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nBúsqueda: hay comprobaciones fallidas");

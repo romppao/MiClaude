@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getUser } from "../../../lib/accounts/auth";
+import { requireAdmin } from "../../../lib/accounts/permissions";
 import { db } from "../../../lib/common/db";
 import { AUDIT_ACTION_LABEL, AUDIT_ENTITY_LABEL } from "../../../lib/common/labels";
 import { lookup, flatParams } from "../../../lib/common/safe";
@@ -12,8 +11,7 @@ export const dynamic = "force-dynamic";
 const LIMITE = 200;
 
 export default async function History({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await getUser();
-  if (user?.role !== "ADMIN") redirect("/");
+  await requireAdmin("/moderacion/historial");
   const { entity, id } = flatParams(await searchParams);
   const entidad = entity && lookup(AUDIT_ENTITY_LABEL, entity) ? entity : undefined;
   const logs = await db.auditLog.findMany({

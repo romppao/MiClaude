@@ -16,3 +16,6 @@ export function internalPath(raw: string, fallback = "/"): string {
     return fallback;
   }
 }
+
+/** Dirección de la pantalla de acceso con el motivo y, si se conoce, la página a la que volver después de entrar. */
+export const loginPath = (next?: string): string => `/entrar?${next ? `next=${encodeURIComponent(next)}&` : ""}problema=sin_sesion`;

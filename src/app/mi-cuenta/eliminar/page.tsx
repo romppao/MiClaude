@@ -8,7 +8,7 @@ export const metadata = { title: "Eliminar mi cuenta" };
 export const dynamic = "force-dynamic";
 
 export default async function DeleteAccount() {
-  const user = await requireUser();
+  const user = await requireUser("/mi-cuenta/eliminar");
   const fighter = user.fighter;
   const conCombates = fighter ? await db.bout.count({ where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] } }) : 0;
   return (
