@@ -1,6 +1,6 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -118,5 +118,6 @@ for (const [rol, rutas] of [["FIGHTER", ["/mi-ficha", "/mi-cuenta"]], ["ADMIN", 
 }
 check(`ninguna pantalla se sale del ancho en un móvil de 360 px${fuera.length ? ": " + fuera.join(", ") : ""}`, fuera.length === 0);
 
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nUsabilidad: hay comprobaciones fallidas");

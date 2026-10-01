@@ -4,16 +4,41 @@
 //   DATABASE_URL  para promover a un usuario a ADMIN (única acción que no se puede hacer desde la web)
 //   CHROMIUM_PATH ejecutable de Chromium (opcional)
 import { chromium } from "playwright-core";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 export const B = process.env.BASE_URL ?? "http://localhost:3111";
 export const rnd = Date.now();
 export const MAIL_LOG = process.env.MAIL_LOG ?? "/tmp/next.log";
 export const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--no-sandbox"] });
+
+// Diagnóstico al fallar: se guardan una captura y el HTML de todas las pantallas abiertas en test-results/ (el CI las sube como artefacto).
+const contextos = [];
+const crearContexto = browser.newContext.bind(browser);
+browser.newContext = async (...args) => { const c = await crearContexto(...args); contextos.push(c); return c; };
+const pendientes = [];
+const ficheroSeguro = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").slice(0, 60);
+async function volcarDiagnostico(motivo) {
+  try {
+    mkdirSync("test-results", { recursive: true });
+    let n = 0;
+    for (const c of contextos) for (const p of c.pages()) {
+      const base = `test-results/${rnd}-${ficheroSeguro(motivo)}-${n++}`;
+      await p.screenshot({ path: `${base}.png`, fullPage: true, timeout: 5000 }).catch(() => {});
+      writeFileSync(`${base}.html`, `<!-- ${p.url()} -->\n` + (await p.content().catch(() => "")));
+    }
+  } catch { /* el diagnóstico nunca debe tapar el fallo real */ }
+}
+process.on("uncaughtException", async (error) => { console.error(error); await volcarDiagnostico("excepcion"); process.exit(1); });
+
 /** Espera a que algo sea visible; devuelve true/false en vez de lanzar error. */
 export const seen = (locator, timeout = 8000) => locator.waitFor({ timeout }).then(() => true, () => false);
-export const check = (label, cond) => { console.log(cond ? "OK  " : "FAIL", label); if (!cond) process.exitCode = 1; };
+export const check = (label, cond) => {
+  console.log(cond ? "OK  " : "FAIL", label);
+  if (!cond) { process.exitCode = 1; pendientes.push(volcarDiagnostico(label)); }
+};
+/** Espera a que terminen de guardarse los diagnósticos pendientes (llamar antes de cerrar el navegador). */
+export const terminarDiagnosticos = () => Promise.all(pendientes);
 export const btn = (p, t) => p.click(`main button:has-text("${t}")`);
 export const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
 export const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });

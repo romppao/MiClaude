@@ -1,6 +1,6 @@
 // Pruebas de acceso y correo: límite de intentos, recuperación de contraseña, cuentas sin verificar,
 // enlaces de un solo uso y mensajes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, newUser, esperarEnlace, hayCorreoPara } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, newUser, esperarEnlace, hayCorreoPara, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -120,5 +120,6 @@ check("verificar el correo ofrece el siguiente paso con un botón", await seen(r
 await vieja.locator("header button:has-text('Salir')").click();
 check("al salir se confirma que la sesión está cerrada", await seen(avisoBueno(vieja, "Has cerrado la sesión")));
 
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nAcceso: hay comprobaciones fallidas");

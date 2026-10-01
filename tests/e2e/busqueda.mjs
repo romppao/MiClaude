@@ -1,6 +1,6 @@
 // Pruebas de búsqueda, paginación, cabeceras de seguridad y buscadores (robots, mapa del sitio, salud).
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const anon = await (await browser.newContext()).newPage();
@@ -70,5 +70,6 @@ check("la ficha de un gimnasio tiene su propio título", (await anon.title()).st
 await anon.goto(B + `/peleadores/alvaro-perez${rnd}-nunez`);
 check("la ficha de un peleador tiene su propio título", (await anon.title()).startsWith(`Álvaro Pérez${rnd} Núñez`));
 
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nBúsqueda: hay comprobaciones fallidas");

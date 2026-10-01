@@ -1,7 +1,7 @@
 // Pruebas de integridad de la verificación y del aura (lo que la auditoría marcó como fallos confirmados):
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -89,5 +89,6 @@ for (const ruta of ["/peleadores?disciplina=constructor&level=__proto__&province
   check(`la dirección ${ruta.slice(0, 40)}… no falla con claves heredadas`, r.status() < 500 && !texto.includes("function") && !texto.includes("Algo no ha salido como esperábamos"));
 }
 
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nIntegridad: hay comprobaciones fallidas");

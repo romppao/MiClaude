@@ -2,7 +2,7 @@
 // Recorre las pantallas públicas y las de usuario, moderador y organizador. Requiere el servidor en marcha (ver ayudas.mjs).
 // Sale con código 1 si hay incumplimientos de impacto «serious» o «critical».
 import AxeBuilder from "@axe-core/playwright";
-import { B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql } from "./ayudas.mjs";
+import { B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const problemas = [];
 async function analizar(page, ruta, etiqueta) {
@@ -56,6 +56,7 @@ console.log("— Moderación y organizador —");
 const admin = await newUser("Moderadora", "FAN"); hacerAdmin(admin.email);
 for (const [ruta, etiqueta] of [["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
 
+await terminarDiagnosticos();
 await browser.close();
 
 const graves = problemas.filter((p) => p.impacto === "serious" || p.impacto === "critical");

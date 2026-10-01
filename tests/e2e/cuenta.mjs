@@ -1,6 +1,6 @@
 // Pruebas de privacidad y cuenta: corregir datos, contraseña, descarga de datos, baja de avisos, eliminación de la cuenta.
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador } from "./ayudas.mjs";
+import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -150,5 +150,6 @@ check("está enlazada desde el pie de página", await anon.locator("footer a[hre
 await anon.goto(B + "/registro");
 check("y desde el formulario de registro", await anon.locator("main a[href='/privacidad']").count() === 1);
 
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nCuenta: hay comprobaciones fallidas");

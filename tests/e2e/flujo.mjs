@@ -1,4 +1,4 @@
-import { B, rnd, MAIL_LOG, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador } from "./ayudas.mjs";
+import { B, rnd, MAIL_LOG, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
@@ -203,5 +203,6 @@ await pepe.waitForSelector("[role=status]:has-text('Combate registrado')");
 await admin.p.goto(B + "/moderacion");
 const adminText = await admin.p.locator("body").innerText();
 check("la cola de moderación marca los combates muy seguidos", adminText.includes("Menos de 7 días"));
+await terminarDiagnosticos();
 await browser.close();
 if (process.exitCode) console.error("\nE2E: hay comprobaciones fallidas");
