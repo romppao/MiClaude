@@ -44,11 +44,13 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
           <Link key={e.id} href={`/veladas/${e.slug}`} className="card">
             <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
+            {!e.organizerId && <span className="tag">no oficial</span>}
             <strong>{e.name}</strong>
             <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
           </Link>
         ))}
       </div>
+      {events.some((e) => !e.organizerId) && <p className="mut">«No oficial»: la velada no la ha publicado un organizador, la indicó un peleador al registrar su combate y sus datos pueden estar incompletos.</p>}
       {events.length === 0 && <p className="mut">No hay veladas con esos filtros. Prueba a quitar alguno, o a mirar las pasadas.</p>}
       <Paginacion ruta="/veladas" params={{ q, disciplina, level, province, past }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["velada", "veladas"]} />
     </>

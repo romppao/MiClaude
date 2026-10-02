@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { db } from "../../../lib/common/db";
 import { requireUser } from "../../../lib/accounts/auth";
 import { findNameCandidates } from "../../../lib/fighters/fighters";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/common/disciplines";
@@ -27,6 +28,12 @@ export default async function ChooseRival({ searchParams }: { searchParams: Prom
   if (!valores.oppFirst || !valores.oppLast) redirect("/mi-ficha");
   const candidatos = (await findNameCandidates(valores.oppFirst, valores.oppLast)).filter((c) => c.id !== user.fighter!.id);
   if (candidatos.length === 0) redirect("/mi-ficha");
+  // Datos que ayudan a distinguir homónimos sin descubrir nada de terceros: cuántos combates tiene ya contigo y cuándo se creó la ficha.
+  const conmigo = await db.bout.findMany({
+    where: { OR: [{ fighterAId: user.fighter.id, fighterBId: { in: candidatos.map((c) => c.id) } }, { fighterBId: user.fighter.id, fighterAId: { in: candidatos.map((c) => c.id) } }] },
+    select: { fighterAId: true, fighterBId: true },
+  });
+  const combatesContigo = (id: string) => conmigo.filter((b) => b.fighterAId === id || b.fighterBId === id).length;
 
   const ocultos = (rivalId: string) => (
     <>
@@ -48,6 +55,10 @@ export default async function ChooseRival({ searchParams }: { searchParams: Prom
               {[...c.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => DISCIPLINE_LABEL[d.discipline]).join(", ")}
               {c.listed && c.city ? ` · ${c.city}` : ""}{c.listed && c.gym ? ` · ${c.gym.name}` : ""}
               {c.userId ? " · ficha con titular" : " · ficha sin reclamar"}
+            </div>
+            <div className="mut">
+              {combatesContigo(c.id) > 0 ? `Ya tienes ${combatesContigo(c.id) === 1 ? "un combate registrado" : `${combatesContigo(c.id)} combates registrados`} contra esta persona. ` : "Todavía no tienes combates registrados contra esta persona. "}
+              Ficha creada el {c.createdAt.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}.
             </div>
             <button style={{ marginTop: 8 }} aria-label={`Es esta persona: ${publicFighterName(c)}${c.userId ? " (ficha con titular)" : " (ficha sin reclamar)"}`}>Es esta persona</button>
           </form>

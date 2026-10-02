@@ -210,7 +210,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       </form>
       <h2>Mis combates</h2>
       <div className="table-wrap">
-        <table>
+        <table className="apilada">
           <caption className="sr-only">Tus combates con su estado, su resultado y su enlace de evidencia</caption>
           <thead><tr><th scope="col">Combate</th><th scope="col">Estado</th><th scope="col">Resultado</th><th scope="col">Enlace que lo demuestra</th></tr></thead>
           <tbody>
@@ -233,8 +233,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                       </details>
                     )}
                   </td>
-                  <td><span className="tag">{VERIFICATION_LABEL[b.verification]}</span></td>
-                  <td>
+                  <td data-label="Estado"><span className="tag">{VERIFICATION_LABEL[b.verification]}</span></td>
+                  <td data-label="Resultado">
                     {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
                     {puedeCorregir && (
                       <details style={{ marginTop: 6 }}>
@@ -257,7 +257,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                       </details>
                     )}
                   </td>
-                  <td>
+                  <td data-label="Enlace que lo demuestra">
                     {b.verification === "SELF_REPORTED" ? (
                       <form action={setBoutEvidence} style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} />

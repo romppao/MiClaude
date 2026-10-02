@@ -22,6 +22,7 @@ check("aviso claro tras registrar el combate", await pepe.locator("[role=status]
 // Coherencia: el mismo enfrentamiento no se puede registrar dos veces en la misma velada
 await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}` });
 check("si ya hay fichas con el nombre del rival se pide elegir cuál es", await seen(pepe.locator("h1", { hasText: "¿Quién es tu rival?" })));
+check("y cada candidata dice cuántos combates tienes contra ella y cuándo se creó su ficha", await seen(pepe.locator("main .card", { hasText: "Ficha creada el" }).first()) && (await pepe.locator("main").innerText()).includes("contra esta persona"));
 await btn(pepe, "Es esta persona");
 await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
 check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
@@ -247,6 +248,8 @@ await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor
 let mailed = false;
 for (let i = 0; i < 20 && !mailed; i++) { mailed = readFileSync(MAIL_LOG, "utf8").includes(`to=${fanAcc.email} subject="Pepe Uno${rnd} tiene un nuevo combate"`); if (!mailed) await new Promise((r) => setTimeout(r, 250)); }
 check("el seguidor recibe un aviso por correo del nuevo combate", mailed);
+await fan.goto(B + "/siguiendo");
+check("el calendario marca como «no oficial» la velada que indicó un peleador y lo explica", await (async () => { await fan.goto(B + `/veladas?past=todas&q=${encodeURIComponent(`Velada Nuria ${rnd}`)}`); const t = await fan.locator("main").innerText(); return t.includes("no oficial") && t.includes("la indicó un peleador"); })());
 await fan.goto(B + "/siguiendo");
 check("«Peleadores que sigo» muestra el próximo combate", await fan.locator("body").innerText().then((t) => t.includes(`Velada Futura ${rnd}`)));
 

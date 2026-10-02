@@ -87,7 +87,7 @@ export default async function Following() {
               </div>
             ))}
           </div>
-          <p className="mut">Sigues a {plural(follows.length, "peleador", "peleadores")}. Recibirás un correo cuando un organizador publique un nuevo combate de alguno de ellos.</p>
+          <p className="mut">Sigues a {plural(follows.length, "peleador", "peleadores")}. {user.notifyEmails ? "Recibirás un correo cuando un organizador publique un nuevo combate de alguno de ellos." : <>No recibirás correos con sus novedades porque tienes los avisos desactivados. Puedes activarlos en <Link href="/mi-cuenta">Mi cuenta</Link>.</>}</p>
         </>
       )}
     </>

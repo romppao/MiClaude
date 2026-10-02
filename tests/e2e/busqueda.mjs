@@ -80,6 +80,9 @@ for (const ruta of ["/peleadores", "/veladas", "/gimnasios", "/entrenadores", "/
 check(`ninguna dirección con parámetros raros provoca un error del servidor${fallos.length ? ": " + fallos.join(", ") : ""}`, fallos.length === 0);
 const conservada = await anon.request.get(B + `/peleadores?constructor=y&q=alvaro%20perez${rnd}`);
 check("y el resto de la dirección se conserva (la búsqueda sigue funcionando)", (await conservada.text()).includes(`Pérez${rnd}`) );
+const malCodificada = await anon.request.get(B + "/peleadores/%E0%A4%A");
+const textoMal = await malCodificada.text();
+check("una dirección mal codificada da una pantalla en español que explica qué hacer, no «Bad Request»", malCodificada.status() === 400 && textoMal.includes("No hemos podido abrir esta dirección") && textoMal.includes("Ir al inicio") && !textoMal.includes("Bad Request"));
 
 await terminarDiagnosticos();
 await browser.close();

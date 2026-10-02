@@ -104,5 +104,10 @@ Se lanzaron sobre la versión corregida. Terminaron las personas «aficionado»,
 | Peleador | Añadir una disciplina que ya se tenía daba un error técnico | corregido | `disciplina_ya_tienes` |
 | Organizador | No se podía corregir, cancelar ni quitar combates del cartel | corregido | `updateEvent`, `setEventStatus`, `removeCartelBout` (solo el organizador de esa velada) |
 | Privacidad | La ficha provisional del rival aparecía en la dirección con su apellido completo | corregido | Slug provisional sin apellido (`nombre-inicial`); al verificar o aprobar se pasa al nombre completo (`fullNameSlug`) |
-| Pendiente | Veladas de peleadores sin «no oficial» en el calendario; columna de evidencia en móvil; homónimos indistinguibles en el selector de rival; gimnasio duplicado por nombre en otra ciudad; nombre público con nombres compuestos; mensajes en la dirección; «Peleadores que sigo» promete correo con avisos desactivados; cabecera de cinco líneas; 400 en inglés con dirección mal codificada | pendiente | Siguiente bloque |
+| Calendario | Las veladas indicadas por un peleador no decían que no eran oficiales | corregido | Etiqueta «no oficial» en la tarjeta y una explicación bajo el listado. Prueba de navegador |
+| Móvil | «Mis combates» se salía de la pantalla (columna de evidencia) | corregido | Tabla apilada con etiquetas por celda |
+| Rival | Con homónimos no había forma de distinguirlos | corregido | Cada candidata dice cuántos combates tienes ya contra ella y cuándo se creó su ficha (sin descubrir datos de terceros) |
+| Avisos | «Peleadores que sigo» prometía correos con los avisos desactivados | corregido | El texto depende de la preferencia real y enlaza a «Mi cuenta» |
+| Dirección | Una dirección mal codificada (`%E0%A4%A`) daba «400: Bad Request» en inglés | corregido | `src/pages/_error.tsx`, pantalla en español independiente del resto. Efecto lateral: con ese fichero Next.js trata `useSearchParams` como anulable, y se ajustaron `FlashNotice` y `RecordarCampos` |
+| Pendiente | Gimnasio duplicado por nombre en otra ciudad; nombre público con nombres compuestos; mensajes en la dirección; cabecera de cinco líneas; favicon (diseño) | pendiente | Siguiente bloque |
 | Decisión del fundador | Aura a los dos peleadores de un combate frente a uno por combate (los textos se contradicen) | decisión | Ver `TRASLADO.md` §7 |

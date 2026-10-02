@@ -76,6 +76,10 @@ for (const [u, ficha] of [[seguidor, `ana-corregida${rnd}`], [apagado, `ana-corr
 await apagado.p.goto(B + "/mi-cuenta");
 await apagado.p.locator("main input[name=notifyEmails]").uncheck(); await apagado.p.click("main button:has-text('Guardar cambios')");
 await bueno(apagado.p, "cambios de tu cuenta").waitFor();
+await apagado.p.goto(B + "/siguiendo");
+check("con los avisos desactivados, «Peleadores que sigo» no promete correos y dice cómo activarlos", await seen(apagado.p.locator("main p", { hasText: "tienes los avisos desactivados" })) && !(await apagado.p.locator("main").innerText()).includes("Recibirás un correo"));
+await seguidor.p.goto(B + "/siguiendo");
+check("con los avisos activados sí lo dice", await seen(seguidor.p.locator("main p", { hasText: "Recibirás un correo" })));
 await orga.goto(B + "/organizador");
 await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await btn(orga, "Crear velada");
 await orga.waitForURL(`**/organizador/velada-avisos-${rnd}-*`);

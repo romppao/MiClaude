@@ -472,6 +472,10 @@ Ver la tabla de la segunda tanda en `docs/pruebas/hallazgos-2026-10-01.md`: prot
 - Tres fallos de **mis propias pruebas** (esperas a un aviso anterior, doble clic que seguía enviando dos veces, un selector de texto ambiguo): ver `docs/LECCIONES.md`. Dos de ellos mostraron que la primera versión de la protección de doble envío no bastaba.
 - La paridad con la base de datos vacía (la que usa el CI) volvió a ser la que lo descubrió.
 
+### Segunda ronda del mismo día (petición «haz lo recomendable»)
+
+Corregidos los hallazgos de la segunda tanda que no dependían de una decisión del fundador: «no oficial» en el calendario, «Mis combates» en móvil, homónimos distinguibles al elegir rival, texto de avisos según la preferencia real y la pantalla de dirección mal codificada en español. Detalle en la tabla de hallazgos. Se dejó fuera, a propósito, lo que necesita decisión suya (aura por combate o por peleador, menores, selector A/B/C y CRM).
+
 ### Estado y próximos pasos
 
 - Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.

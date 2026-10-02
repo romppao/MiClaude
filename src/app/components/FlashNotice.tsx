@@ -12,8 +12,8 @@ import { lookup } from "../../lib/common/safe";
  */
 export default function FlashNotice() {
   const params = useSearchParams();
-  const problema = lookup(PROBLEMAS, params.get("problema"));
-  const aviso = problema ? undefined : lookup(AVISOS, params.get("aviso"));
+  const problema = lookup(PROBLEMAS, params?.get("problema"));
+  const aviso = problema ? undefined : lookup(AVISOS, params?.get("aviso"));
   return (
     <>
       <div role="status" aria-live="polite" aria-atomic="true">

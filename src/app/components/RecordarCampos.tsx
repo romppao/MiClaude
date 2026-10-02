@@ -95,7 +95,7 @@ export default function RecordarCampos() {
   useEffect(() => {
     const g = leer();
     if (!g) return;
-    if (!params.get("problema") || g.ruta !== ruta) { olvidar(); return; }
+    if (!params?.get("problema") || g.ruta !== ruta) { olvidar(); return; }
     restaurar(g);
     const t = setTimeout(() => restaurar(g), 150); // por si la pantalla nueva termina de pintarse un instante después
     return () => clearTimeout(t);

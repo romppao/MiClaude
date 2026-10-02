@@ -90,6 +90,7 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | Mis pruebas de navegador fallaban de forma intermitente al registrar combates seguidos | Esperaba el aviso «Combate registrado», que seguía en pantalla del envío anterior, y rellenaba el formulario justo antes de que React lo vaciara al terminar la acción | **Regla:** tras una acción, esperar a lo que cambia de verdad (la fila nueva), no a un aviso que puede ser el anterior; y comprobar el recuento solo después de ver la fila |
 | El doble clic seguía enviando dos veces aunque desactivaba el botón | Desactivar el botón con `setTimeout(0)` llega tarde: el segundo clic ya había entrado | **Regla:** la protección de doble envío descarta el segundo `submit` de inmediato (`stopImmediatePropagation`) y solo después desactiva los botones para que se vea |
 | Una prueba con `text=El cartel está vacío` fallaba con el cartel vacío | `text=` busca de forma parcial y sin distinguir mayúsculas: coincidía con una ayuda que decía casi lo mismo y Playwright exige un único resultado | **Regla:** localizar por rol y texto más específico (`p` con el texto completo) |
+| Al añadir `src/pages/_error.tsx` la compilación falló en componentes que no tocaba | Con una carpeta `pages` presente, Next.js declara anulables `useSearchParams`/`usePathname`, y `tsc` suelto no lo ve: solo lo detecta `next build` | **Regla:** tras añadir cualquier fichero de infraestructura de Next.js, ejecutar `npm run build`, no solo `tsc` |
 
 ## Del proceso de trabajo
 
