@@ -1,5 +1,5 @@
 import type { Discipline } from "@prisma/client";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, weightClassLabel } from "../../lib/common/disciplines";
 
 type Defaults = {
   discipline?: Discipline; weightClass?: string | null;
@@ -18,10 +18,11 @@ export default function DisciplineFields({ defaults = {} }: { defaults?: Default
           {DISCIPLINE_ORDER.map((d) => (
             <optgroup key={d} label={DISCIPLINE_LABEL[d]}>
               <option value={`${d}:`}>{DISCIPLINE_LABEL[d]} · todavía no sé mi categoría</option>
-              {WEIGHT_CLASSES[d].map((w) => <option key={w} value={`${d}:${w}`}>{DISCIPLINE_LABEL[d]} · {w}</option>)}
+              {WEIGHT_CLASSES[d].map((w) => <option key={w} value={`${d}:${w}`}>{DISCIPLINE_LABEL[d]} · {weightClassLabel(d, w)}</option>)}
             </optgroup>
           ))}
         </select>
+        <span className="hint">Los kilos que se indican son el límite de cada categoría y son orientativos: cada velada puede aplicar los suyos. Si dudas, elige «todavía no sé mi categoría».</span>
       </label>
       <fieldset style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "8px 12px", flex: "1 1 100%" }}>
         <legend>Tus combates anteriores (opcional)</legend>

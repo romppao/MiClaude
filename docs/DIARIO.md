@@ -480,6 +480,10 @@ Corregidos los hallazgos de la segunda tanda que no dependían de una decisión 
 
 El entorno de desarrollo en la nube no admite visitas desde fuera, y el fundador trabaja desde el móvil, así que un script local no le servía. Se preparó una **demo alojada**: `render.yaml` (web + base de datos gratuitas en Render), `scripts/arranque-demo.sh`, y un **modo demostración** (`DEMO_MODE=si`) con un botón para confirmar el correo sin correos reales y otro para cambiar de papel (aficionado, peleador, organizador, moderador) con una sola cuenta. Las acciones se niegan si la variable no está; hay pruebas unitarias y una de navegador (`tests/e2e/demo.mjs`). Guía en `docs/DEMO.md`. **Limitación honesta:** el arranque se probó aquí en modo producción, pero el `render.yaml` no se ha podido probar en Render (hace falta la cuenta del fundador).
 
+### Pesos de las categorías (observación del fundador probando la demo)
+
+Palabras del fundador: «a la hora de filtrar por la categoría de peso, lo pones los nombres en inglés y tal […] en España la gente no tiene un buen nivel de inglés. Por lo que, aparte del nombre de la categoría, tienes que poner también el peso, en qué rango oscila». Los nombres ya estaban en español (Wélter, Ligero…), pero «wélter» sigue siendo opaco: ahora cada categoría lleva su límite en kilos («Wélter · hasta 66,7 kg») en los selectores de ficha, el filtro de peleadores (agrupado por disciplina, porque el mismo nombre pesa distinto en boxeo y en MMA), el ránking, la ficha y el cartel. **Solo se muestran pesos donde el estándar es conocido (boxeo profesional y MMA con reglas unificadas); en kickboxing, K-1 y jiu-jitsu no se afirma ninguno** hasta validarlos con las federaciones (decisión pendiente: facilitar los reglamentos o confirmar los pesos). Los pesos son orientativos y así se dice en pantalla. Código: `weightClassLabel` en `src/lib/common/disciplines.ts`.
+
 ### Estado y próximos pasos
 
 - Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.

@@ -10,7 +10,7 @@ import { oneParam } from "../../lib/common/safe";
 import { eventDayReached } from "../../lib/common/dates";
 import { OUTCOME_TO_RESULT, boutVersion } from "../../lib/bouts/rules";
 import { computeRecords } from "../../lib/fighters/record";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
 import RecordCards from "../components/RecordCards";
 import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
@@ -131,7 +131,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Mis disciplinas</h2>
       {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (
         <details key={d.discipline} className="card" style={{ marginBottom: 8 }}>
-          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${d.weightClass}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
+          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.weightClass)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
           <form className="search" action={saveDiscipline}>
             <DisciplineFields defaults={d} />
             <button>Guardar cambios</button>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Level, Prisma } from "@prisma/client";
+import type { Discipline, Level, Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
@@ -7,7 +7,7 @@ import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
 import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
 import { LEVEL_LABEL, PROVINCES } from "../../lib/common/labels";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, isDiscipline } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, isDiscipline, weightClassLabel } from "../../lib/common/disciplines";
 
 export const metadata = { title: "Peleadores" };
 export const dynamic = "force-dynamic";
@@ -15,14 +15,18 @@ export const dynamic = "force-dynamic";
 export default async function Fighters({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { q, level, province, disciplina, categoria, pagina } = flatParams(await searchParams);
   const ids = await searchIds("fighter", q);
-  const categorias = [...new Set(DISCIPLINE_ORDER.flatMap((d) => WEIGHT_CLASSES[d]))];
   const discipline = disciplina && isDiscipline(disciplina) ? disciplina : undefined;
+  // El filtro de categoría agrupa por disciplina (el mismo nombre pesa distinto en boxeo y en MMA): el valor es «DISCIPLINA:Categoría»; también se acepta solo el nombre.
+  const [catDisc, ...catResto] = (categoria ?? "").split(":");
+  const catConDisciplina = catResto.length > 0 && isDiscipline(catDisc);
+  const categoriaNombre = catConDisciplina ? catResto.join(":") : categoria;
+  const categoriaDisciplina = catConDisciplina ? (catDisc as Discipline) : undefined;
   const where: Prisma.FighterWhereInput = {
     listed: true, hiddenAt: null,
     ...(ids && { id: { in: ids } }),
     ...(level === "PRO" || level === "AMATEUR" ? { level: level as Level } : {}),
     ...(province && { province }),
-    ...((discipline || categoria) && { disciplines: { some: { ...(discipline && { discipline }), ...(categoria && { weightClass: categoria }) } } }),
+    ...((discipline || categoriaNombre) && { disciplines: { some: { ...((discipline ?? categoriaDisciplina) && { discipline: discipline ?? categoriaDisciplina }), ...(categoriaNombre && { weightClass: categoriaNombre }) } } }),
   };
   const total = await db.fighter.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
@@ -35,7 +39,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Todos los niveles</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
-        <CampoFiltro etiqueta="Categoría de peso"><select name="categoria" defaultValue={categoria ?? ""}><option value="">Todas las categorías</option>{categorias.map((c) => <option key={c}>{c}</option>)}</select></CampoFiltro>
+        <CampoFiltro etiqueta="Categoría de peso" ayuda="Los kilos son el límite de cada categoría y son orientativos."><select name="categoria" defaultValue={categoria ?? ""}><option value="">Todas las categorías</option>{DISCIPLINE_ORDER.filter((d) => !discipline || d === discipline).map((d) => <optgroup key={d} label={DISCIPLINE_LABEL[d]}>{WEIGHT_CLASSES[d].map((c) => <option key={c} value={`${d}:${c}`}>{weightClassLabel(d, c)}</option>)}</optgroup>)}</select></CampoFiltro>
         <BotonesFiltro ruta="/peleadores" />
       </form>
       <div className="grid">

@@ -5,7 +5,7 @@ import { loginPath } from "../../../lib/common/paths";
 import { eventDayReached } from "../../../lib/common/dates";
 import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
-import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES, weightClassLabel } from "../../../lib/common/disciplines";
 import { LIMITS } from "../../../lib/common/text";
 import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
@@ -73,7 +73,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
           <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{fighters.slice(0, MAX_LISTA).map((b) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>)}</select>
         </label>
         <label className="field"><span>Categoría de peso (opcional)</span>
-          <select name="weightClass" defaultValue=""><option value="">Sin indicar</option>{WEIGHT_CLASSES[event.discipline].map((w) => <option key={w}>{w}</option>)}</select>
+          <select name="weightClass" defaultValue=""><option value="">Sin indicar</option>{WEIGHT_CLASSES[event.discipline].map((w) => <option key={w} value={w}>{weightClassLabel(event.discipline, w)}</option>)}</select>
         </label>
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace del acta o del cartel (opcional)</span><input name="evidenceUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /></label>

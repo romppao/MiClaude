@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, weightClassLabel } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Ránking de aura" };
@@ -30,7 +30,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
       </form>
       {groups.map((g) => (
         <section key={g.weightClass ?? "sin"}>
-          <h2>{DISCIPLINE_LABEL[discipline]} · {g.weightClass ?? NO_CATEGORY}</h2>
+          <h2>{DISCIPLINE_LABEL[discipline]} · {g.weightClass ? weightClassLabel(discipline, g.weightClass) : NO_CATEGORY}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th></tr></thead>
