@@ -1,24 +1,39 @@
-# Demo local para probar la aplicación
+# Demo para probar la aplicación
 
-Una demo con **datos ficticios** (peleadores, gimnasios y veladas inventados) para recorrer la aplicación en el navegador como lo haría cualquier persona.
+Una copia con **datos ficticios** (peleadores, gimnasios y veladas inventados) para recorrer la aplicación en el navegador como lo haría cualquier persona. Hay dos formas de tenerla; **para probar desde el móvil, la A**.
 
-> **Importante:** la demo corre en *tu ordenador* (o en el equipo donde se ejecute). No hay una dirección pública: la sesión de desarrollo en la nube no admite visitas desde fuera. Para una dirección que se pueda compartir hay que alojar la aplicación en un servicio (ver «Para compartirla» al final).
+## A. Alojada en internet (funciona desde el móvil)
 
-## Arrancar
+La demo se publica en [Render](https://render.com) a partir del fichero `render.yaml` del repositorio: una web y una base de datos propias, sin tocar nada de producción. Se hace una sola vez, desde el navegador del móvil:
 
-Requisitos: Node 22 y PostgreSQL 16 (si tienes Docker, el script lo arranca solo).
+1. Entra en <https://render.com> y regístrate con tu cuenta de GitHub (autoriza el acceso al repositorio `romppao/MiClaude`).
+2. Pulsa **New** → **Blueprint**, elige el repositorio `MiClaude` y la rama `claude/ring-espana-mvp`, y pulsa **Apply**.
+3. Espera unos 5–10 minutos a que termine la primera construcción. Cuando el servicio `ring-espana-demo` aparezca como «Live», pulsa su dirección (algo como `https://ring-espana-demo.onrender.com`).
+
+Cosas que conviene saber:
+
+- Es un plan **gratuito**: tras un rato sin visitas la web se «duerme» y la primera carga tarda cerca de un minuto. Los planes gratuitos tienen límites de duración y de uso: compruébalos en Render antes de fiarte de la demo a largo plazo.
+- Cada vez que se sube código a la rama, Render vuelve a construir la demo. Los datos que se hayan probado se conservan (los datos de ejemplo solo se cargan cuando la base está vacía).
+- **No es producción**: la variable `DEMO_MODE=si` activa botones solo de demostración (ver abajo) y los correos no se envían, se escriben en el registro del servicio. En una instalación real esa variable no existe y esos botones no funcionan.
+
+### Cómo se prueba (modo demostración)
+
+1. Pulsa «Crear una cuenta» y regístrate con **cualquier correo** (no hace falta que exista).
+2. En la pantalla «Confirma tu correo electrónico» pulsa **«Confirmar mi correo ahora (solo demostración)»**.
+3. Entra en **Mi cuenta**: arriba hay un panel «Versión de demostración» con cuatro botones para **probar como otra persona** con la misma cuenta: aficionado, peleador, organizador o moderador.
+
+## B. En un ordenador
+
+Requisitos: Node 22 y PostgreSQL 16 (con Docker, el script lo arranca solo).
 
 ```bash
 git clone https://github.com/romppao/MiClaude && cd MiClaude
 git checkout claude/ring-espana-mvp
 scripts/demo.sh iniciar        # instala, compila, crea la base con datos de ejemplo y arranca en http://localhost:3000
+scripts/demo.sh correos        # enlaces de «confirmar correo» (esta forma no usa el modo demostración)
+scripts/demo.sh moderador su@correo.es   # da el papel de moderador a una cuenta ya registrada
+scripts/demo.sh parar          # detiene y borra la base de la demo
 ```
-
-## Probarla con tu propia cuenta
-
-1. Abre `http://localhost:3000/registro` y crea una cuenta (elige «peleador» para tener ficha).
-2. **Confirma el correo.** La demo no envía correos de verdad: ejecuta `scripts/demo.sh correos` y abre el enlace `/verificar?token=…` que aparece.
-3. Para probar la **moderación** y la aprobación de organizadores: crea otra cuenta y ejecuta `scripts/demo.sh moderador su@correo.es`; cierra sesión y vuelve a entrar.
 
 ## Qué conviene recorrer (guion corto)
 
@@ -27,17 +42,13 @@ scripts/demo.sh iniciar        # instala, compila, crea la base con datos de eje
 | Sin cuenta | Buscar un peleador, abrir su ficha, ver el calendario de veladas, entrar en «¿Cómo funciona?» |
 | Aficionado | Seguir a un peleador, dar aura a un combate, avisar de un error en una ficha |
 | Peleador | Crear la ficha, registrar un combate (con rival nuevo y con rival homónimo), quitar un combate registrado por error |
-| Organizador | Solicitar ser organizador, crear una velada, añadir combates al cartel, corregirla, cancelarla |
-| Moderación | Aprobar organizadores y reclamaciones, revisar avisos y combates en revisión |
+| Organizador | Crear una velada, añadir combates al cartel, corregirla, cancelarla |
+| Moderación | Revisar avisos y combates en revisión, aprobar solicitudes |
 
 Guion más detallado por personas: [`pruebas/personas.md`](pruebas/personas.md). Si algo no se entiende a la primera o un botón no hace lo que dice, anótalo: es un fallo de la aplicación, no tuyo.
 
-## Terminar
+## Detalles técnicos
 
-```bash
-scripts/demo.sh parar          # detiene el servidor y borra la base de la demo
-```
-
-## Para compartirla con otras personas
-
-Hace falta alojar la aplicación (servidor Node + PostgreSQL) en un servicio con una dirección pública y definir las variables de `.env.example` (`APP_URL`, `DATABASE_URL`, el correo, `TRUSTED_PROXY_HOPS`…). Es una decisión pendiente del fundador (alojamiento y proveedor de correo): ver `TRASLADO.md` §7.
+- `render.yaml`: servicio web + base de datos gratuitos (región Fráncfort). Arranca con `scripts/arranque-demo.sh` (migraciones, datos de ejemplo si la base está vacía, servidor).
+- Modo demostración: `src/lib/common/demo.ts` y `src/app/actions/demo.ts` (acciones que se niegan si `DEMO_MODE` no es `si`; probadas en `tests/unit/autorizacion.test.ts`). Prueba de navegador: `node tests/e2e/demo.mjs` contra un servidor con `DEMO_MODE=si` (el CI no la ejecuta porque su servidor no es de demostración).
+- Para una dirección pública **definitiva** (con correos reales) hay que alojar la aplicación de verdad: decisión pendiente del fundador, ver `TRASLADO.md` §7.

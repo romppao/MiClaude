@@ -8,6 +8,7 @@ import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
+import { demoActiva } from "../lib/common/demo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -52,6 +53,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </form>
           </div>
         </header>
+        {demoActiva() && (
+          <div className="barra-aviso"><div className="notice" style={{ margin: 0 }}><span aria-hidden="true">ℹ </span>Versión de demostración con datos ficticios: puedes probar con libertad, los datos pueden borrarse. {user ? <>Para probar como otra persona, entra en <Link href="/mi-cuenta">Mi cuenta</Link>.</> : <>Crea una cuenta con cualquier correo para empezar.</>}</div></div>
+        )}
         {user && !user.emailVerifiedAt && (
           <div className="barra-aviso"><div className="notice notice-bad" style={{ margin: 0 }}><span aria-hidden="true">⚠ </span>Falta confirmar tu correo electrónico para poder dar aura y registrar combates. <Link href="/verificar">Confirmarlo ahora</Link></div></div>
         )}

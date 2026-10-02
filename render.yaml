@@ -1,0 +1,33 @@
+# Despliegue de la DEMOSTRACIÓN en Render (render.com): una web con datos ficticios y su base de datos PostgreSQL.
+# Uso: en Render, «New» → «Blueprint» → elegir este repositorio. Detalle en docs/DEMO.md.
+# No es la configuración de producción: aquí DEMO_MODE=si y los correos se escriben en el registro en vez de enviarse.
+databases:
+  - name: ring-demo-db
+    databaseName: ring
+    user: ring
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: ring-espana-demo
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: claude/ring-espana-mvp
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: bash scripts/arranque-demo.sh
+    healthCheckPath: /salud
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ring-demo-db
+          property: connectionString
+      - key: DEMO_MODE
+        value: "si"
+      - key: MAIL_TRANSPORT
+        value: log
+      - key: TRUSTED_PROXY_HOPS
+        value: "1"

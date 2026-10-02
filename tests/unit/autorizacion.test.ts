@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
  * Autorización de las acciones del servidor: qué rol puede ejecutar qué. Cada acción se ejecuta con el verdadero `getUser` y las
@@ -54,9 +54,10 @@ import * as aura from "../../src/app/actions/aura";
 import * as veladas from "../../src/app/actions/events";
 import * as moderacion from "../../src/app/actions/moderation";
 import * as comunidad from "../../src/app/actions/community";
+import * as demo from "../../src/app/actions/demo";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -76,7 +77,7 @@ beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; i
 const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout"] as const;
 const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport"] as const;
-const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow"] as const;
+const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
 const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
@@ -102,6 +103,23 @@ describe("sin iniciar sesión", () => {
       expect(mundo.estado.escrituras).toEqual([]);
     });
   }
+});
+
+describe("acciones de la versión de demostración", () => {
+  afterEach(() => { delete process.env.DEMO_MODE; });
+  for (const nombre of ["demoConfirmarCorreo", "demoCambiarPapel"] as const) {
+    it(`${nombre} se niega y no escribe nada si no es una demostración`, async () => {
+      iniciarSesion(persona("FAN", { emailVerifiedAt: null }));
+      expect(await destino(() => acciones[nombre](fd({ papel: "ADMIN" })))).toBe("/?problema=demo_no_activa");
+      expect(mundo.estado.escrituras).toEqual([]);
+    });
+  }
+  it("con la demostración activa, un papel que no existe se rechaza sin escribir", async () => {
+    process.env.DEMO_MODE = "si";
+    iniciarSesion(persona("FAN"));
+    expect(await destino(() => acciones.demoCambiarPapel(fd({ papel: "constructor" })))).toBe("/mi-cuenta?problema=demo_papel_invalido");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
 });
 
 describe("con la cuenta sin verificar", () => {

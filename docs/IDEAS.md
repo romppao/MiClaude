@@ -137,3 +137,5 @@ Origen: el flujo de personas de prueba (ver [`pruebas/hallazgos-2026-10-01.md`](
 - ¿Cómo se trata a los peleadores menores de edad (privacidad, consentimiento parental, visibilidad de su ficha)?
 - ¿Modelo de sostenibilidad del proyecto (gratis, patrocinio de gimnasios y promotoras, entradas…)?
 - ¿Nombre definitivo y marca? («Ring España» es un nombre de trabajo.)
+
+- **Modo demostración con cambio de papel** (2 de octubre de 2026, surgió de «lánzame una demo» desde el móvil): botón para probar como aficionado / peleador / organizador / moderador con una sola cuenta. Es un andamio para probar, no una función de producto; pero anticipa el selector A/B/C que pidió el fundador (tarea 13).

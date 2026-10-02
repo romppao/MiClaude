@@ -5,6 +5,8 @@ import { REPORT_REASONS } from "../../lib/community/reports";
 import { lookup } from "../../lib/common/safe";
 import { changePassword, updateAccount } from "../actions/accounts";
 import { LIMITS } from "../../lib/common/text";
+import { DEMO_PAPELES, demoActiva } from "../../lib/common/demo";
+import { demoCambiarPapel } from "../actions/demo";
 
 export const metadata = { title: "Mi cuenta" };
 export const dynamic = "force-dynamic";
@@ -19,6 +21,19 @@ export default async function Account() {
     <>
       <h1>Mi cuenta</h1>
       <p className="mut">Aquí controlas tus datos, tu contraseña y los avisos que recibes.</p>
+
+      {demoActiva() && (
+        <section aria-labelledby="demo-papel" className="notice" style={{ marginTop: 16 }}>
+          <h2 id="demo-papel" style={{ marginTop: 0 }}>Versión de demostración: probar como otra persona</h2>
+          <p>Ahora usas la aplicación como <strong>{DEMO_PAPELES[user.role]}</strong>. Elige un papel para ver qué puede hacer cada tipo de persona; puedes cambiar las veces que quieras.</p>
+          <form action={demoCambiarPapel} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {(Object.entries(DEMO_PAPELES) as [keyof typeof DEMO_PAPELES, string][]).map(([clave, nombre]) => (
+              <button key={clave} name="papel" value={clave} className={clave === user.role ? undefined : "secondary"} aria-pressed={clave === user.role}>{clave === user.role ? `✓ ${nombre}` : `Probar como ${nombre.toLowerCase()}`}</button>
+            ))}
+          </form>
+          <p className="mut">Aficionado: ve y sigue peleadores y da aura. Peleador: crea su ficha y registra combates. Organizador: publica veladas. Moderador: revisa avisos y aprueba solicitudes.</p>
+        </section>
+      )}
 
       <h2>Accesos directos</h2>
       <ul>

@@ -1,5 +1,7 @@
 import { getUser, readReturnPath, VERIFY_HOURS } from "../../lib/accounts/auth";
 import { resendVerification, verifyEmail } from "../actions/accounts";
+import { demoConfirmarCorreo } from "../actions/demo";
+import { demoActiva } from "../../lib/common/demo";
 
 export const metadata = { title: "Verificar correo electrónico" };
 export const dynamic = "force-dynamic";
@@ -55,7 +57,13 @@ export default async function Verify({ searchParams }: { searchParams: Promise<{
       <h1>Confirma tu correo electrónico</h1>
       <p>Hemos enviado un enlace de confirmación a <strong>{user.email}</strong>. Ábrelo desde tu correo y pulsa el botón que verás. El enlace caduca en {VERIFY_HOURS} horas.</p>
       <p className="mut">Sin confirmarlo no puedes dar aura, registrar combates ni reclamar una ficha. Si no lo encuentras, mira en la carpeta de correo no deseado o pide uno nuevo.</p>
-      <form action={resendVerification}><button>Reenviar el enlace a {user.email}</button></form>
+      {demoActiva() && (
+        <div className="notice" style={{ marginBottom: 16 }}>
+          <p style={{ marginTop: 0 }}><strong>Versión de demostración:</strong> aquí no se envían correos de verdad. Pulsa el botón para dar por confirmado tu correo y seguir probando.</p>
+          <form action={demoConfirmarCorreo}><button>Confirmar mi correo ahora (solo demostración)</button></form>
+        </div>
+      )}
+      <form action={resendVerification}><button className={demoActiva() ? "secondary" : undefined}>Reenviar el enlace a {user.email}</button></form>
     </>
   );
 }

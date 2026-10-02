@@ -476,6 +476,10 @@ Ver la tabla de la segunda tanda en `docs/pruebas/hallazgos-2026-10-01.md`: prot
 
 Corregidos los hallazgos de la segunda tanda que no dependían de una decisión del fundador: «no oficial» en el calendario, «Mis combates» en móvil, homónimos distinguibles al elegir rival, texto de avisos según la preferencia real y la pantalla de dirección mal codificada en español. Detalle en la tabla de hallazgos. Se dejó fuera, a propósito, lo que necesita decisión suya (aura por combate o por peleador, menores, selector A/B/C y CRM).
 
+### Demostración alojada (petición del fundador: «Lánzame una demo»; «esta sesión la estoy haciendo en el móvil»)
+
+El entorno de desarrollo en la nube no admite visitas desde fuera, y el fundador trabaja desde el móvil, así que un script local no le servía. Se preparó una **demo alojada**: `render.yaml` (web + base de datos gratuitas en Render), `scripts/arranque-demo.sh`, y un **modo demostración** (`DEMO_MODE=si`) con un botón para confirmar el correo sin correos reales y otro para cambiar de papel (aficionado, peleador, organizador, moderador) con una sola cuenta. Las acciones se niegan si la variable no está; hay pruebas unitarias y una de navegador (`tests/e2e/demo.mjs`). Guía en `docs/DEMO.md`. **Limitación honesta:** el arranque se probó aquí en modo producción, pero el `render.yaml` no se ha podido probar en Render (hace falta la cuenta del fundador).
+
 ### Estado y próximos pasos
 
 - Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.
