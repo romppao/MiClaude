@@ -146,7 +146,7 @@ await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-bad", { hasText: "no coincide" }).waitFor();
 check("un récord de partida que no suma se rechaza con un mensaje claro", await vet.locator(".notice-bad", { hasText: "no coincide" }).count() === 1);
 await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Veterano${rnd}`);
-await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1");
+await vet.fill("[name=priorTotal]", "14"); await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1"); // tras el error el formulario conserva lo escrito: el total se corrige de forma explícita
 await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 check("el récord de partida detallado se muestra como declarado", await seen(vet.locator("text=10-3-1").first()) && await seen(vet.locator("text=Incluye 14 combates anteriores declarados por el propio deportista")));

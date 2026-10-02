@@ -42,6 +42,12 @@ await repetido.goto(B + "/entrar");
 await repetido.fill("[name=email]", `nadie${rnd}@test.es`); await repetido.fill("[name=password]", "incorrecta-1");
 await btn(repetido, "Entrar en mi cuenta");
 check("al equivocarse en el acceso, el correo escrito se conserva", await repetido.waitForFunction((v) => document.querySelector("[name=email]")?.value === v && location.search.includes("login_incorrecto"), `nadie${rnd}@test.es`, { timeout: 8000 }).then(() => true, () => false));
+// Lo que la persona borra a propósito después del error no se vuelve a rellenar aunque la pantalla cambie (restaurar solo devuelve lo que ella no ha tocado)
+await repetido.fill("[name=email]", "");
+await repetido.evaluate(() => document.body.appendChild(document.createElement("div")));
+await repetido.waitForTimeout(600);
+check("lo que se borra a propósito tras un error no se vuelve a rellenar", await repetido.inputValue("[name=email]") === "");
+await repetido.fill("[name=email]", `nadie${rnd}@test.es`);
 await repetido.fill("[name=password]", "incorrecta-2");
 await btn(repetido, "Entrar en mi cuenta");
 await repetido.waitForTimeout(3000); // la acción termina, se vacía el formulario y Next.js lo vuelve a montar

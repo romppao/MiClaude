@@ -12,6 +12,11 @@ const esCampo = (el: Element): el is Campo => el instanceof HTMLInputElement || 
 const formularios = () => Array.from(document.querySelectorAll<HTMLFormElement>("main form"));
 const firmaDe = (form: HTMLFormElement) => Array.from(form.elements).filter((el) => esCampo(el) && el.name && !el.name.startsWith("$ACTION")).map((el) => (el as Campo).name).sort().join(",");
 const hayProblema = () => !!new URLSearchParams(location.search).get("problema");
+/**
+ * Campos que la persona ha tocado (escrito, borrado o cambiado) DESPUÉS del último envío: restaurar nunca los pisa, ni siquiera si los ha dejado vacíos a propósito
+ * (por ejemplo, para quitar un enlace que dio error). Lo que escribió antes de enviar sí se devuelve: el envío empieza una lista nueva.
+ */
+let tocados = new WeakSet<Element>();
 
 function leer(): Guardado | null {
   try { return JSON.parse(sessionStorage.getItem(CLAVE) ?? "null"); } catch { return null; }
@@ -29,7 +34,7 @@ function restaurar(g: Guardado) {
   for (let d = form.closest("details"); d; d = d.parentElement?.closest("details") ?? null) d.open = true;
   for (const [nombre, valor] of Object.entries(g.valores)) {
     const el = form.elements.namedItem(nombre);
-    if (!(el instanceof Element) || !esCampo(el)) continue;
+    if (!(el instanceof Element) || !esCampo(el) || tocados.has(el)) continue;
     if (el instanceof HTMLSelectElement) {
       const inicial = Array.from(el.options).find((o) => o.defaultSelected)?.value ?? el.options[0]?.value;
       if (el.value === inicial) el.value = valor;
@@ -73,14 +78,17 @@ export default function RecordarCampos() {
         valores[el.name] = el.value;
       }
       try { sessionStorage.setItem(CLAVE, JSON.stringify({ ruta: location.pathname, firma, orden, valores } satisfies Guardado)); } catch { /* sin almacenamiento: simplemente no se recuerda */ }
+      tocados = new WeakSet();
       dejarDeVigilar();
       document.addEventListener("reset", alReiniciar, true);
       observador = new MutationObserver(() => queueMicrotask(restaurarSiProcede)); // restaurar solo toca valores y desplegables, no los atributos que se observan: no hay bucle
       observador.observe(document.body, { childList: true, subtree: true });
       cierre = setTimeout(dejarDeVigilar, 8000);
     };
+    const marcarTocado = (e: Event) => { if (e.target instanceof Element) tocados.add(e.target); };
+    document.addEventListener("input", marcarTocado, true);
     document.addEventListener("submit", guardar, true);
-    return () => { document.removeEventListener("submit", guardar, true); dejarDeVigilar(); };
+    return () => { document.removeEventListener("input", marcarTocado, true); document.removeEventListener("submit", guardar, true); dejarDeVigilar(); };
   }, []);
 
   // Al llegar a una dirección nueva: si lo guardado es de esta pantalla y hay un problema, se restaura; en cualquier otro caso se descarta.
