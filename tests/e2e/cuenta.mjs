@@ -1,6 +1,6 @@
 // Pruebas de privacidad y cuenta: corregir datos, contraseña, descarga de datos, baja de avisos, eliminación de la cuenta.
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -138,7 +138,7 @@ await btn(vet.p, "Eliminar mi cuenta definitivamente");
 await seen(bueno(vet.p, "se han eliminado"));
 const antigua = await anon.goto(B + `/peleadores/retirada-apellido${rnd}`);
 check("la dirección antigua de la ficha ya no existe", antigua.status() === 404);
-check("el rival conserva su combate en su ficha", await (async () => { await anon.goto(B + `/peleadores/rival-perdura${rnd}`); return seen(anon.locator("tbody tr").first()); })());
+check("el rival conserva su combate en su ficha", await (async () => { await anon.goto(B + `/peleadores/${slugDe(`Perdura${rnd}`)}`); return seen(anon.locator("tbody tr").first()); })());
 const t = await cuerpo(anon);
 check("y su rival figura como «Peleador anónimo», sin nombre, alias ni ciudad", t.includes("Peleador anónimo") && !t.includes(`Apellido${rnd}`) && !t.includes(`Alias secreto ${rnd}`) && !t.includes(`Ciudad secreta ${rnd}`));
 

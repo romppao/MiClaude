@@ -1,8 +1,7 @@
-import { execSync } from "node:child_process";
 // Pruebas de integridad de la verificación y del aura (lo que la auditoría marcó como fallos confirmados):
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
+import { slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -35,7 +34,7 @@ await anon.goto(B + `/peleadores?q=Tercero${rnd}`);
 check("la ficha creada por un tercero no sale en el listado", !(await cuerpo(anon)).includes(`Tercero${rnd}`));
 await anon.goto(B + `/buscar?q=Tercero${rnd}`);
 check("ni en la búsqueda", await anon.locator(`a:has-text("Tercero${rnd}")`).count() === 0); // la página repite lo buscado, así que se comprueba que no haya enlace a la ficha
-const slugRival = execSync(`psql "${process.env.DATABASE_URL}" -tAc "select slug from \\"Fighter\\" where \\"lastName\\"='Tercero${rnd}'"`).toString().trim();
+const slugRival = slugDe(`Tercero${rnd}`);
 check("la dirección de la ficha provisional no lleva el apellido", slugRival.startsWith("bruno-t") && !slugRival.includes("tercero"));
 await anon.goto(B + `/peleadores/${slugRival}`);
 const fichaRival = await cuerpo(anon);

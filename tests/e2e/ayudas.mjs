@@ -94,6 +94,8 @@ export async function newUser(name, role = "FAN", verify = true) {
 }
 
 /** Ejecuta SQL directamente en la base de pruebas (solo para preparar datos que la web no permite crear en bloque). */
+/** Dirección (slug) de la ficha cuyo apellido es `apellidos`: las fichas provisionales de rivales no llevan el apellido en la dirección, así que se lee de la base de datos. */
+export const slugDe = (apellidos) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "select slug from \\"Fighter\\" where \\"lastName\\"='${apellidos}'"`).toString().trim();
 export const sql = (sentencias) => execSync('psql "$DATABASE_URL" -v ON_ERROR_STOP=1', { input: sentencias, env: process.env, stdio: ["pipe", "ignore", "inherit"] });
 
 /** Convierte a un usuario en moderador (solo posible con acceso a la base de datos). */
