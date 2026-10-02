@@ -48,6 +48,7 @@ export const registrar = async (p, o) => {
   await p.fill("[name=eventName]", o.evento); await p.fill("[name=date]", o.fecha);
   await p.fill("[name=oppFirst]", o.rivalNombre); await p.fill("[name=oppLast]", o.rivalApellidos);
   if (o.disciplina) await p.selectOption("select[name=discipline]", o.disciplina);
+  if (o.resultado === null) { await p.selectOption("select[name=outcome]", ""); await p.selectOption("form select[name=method]", ""); } // tras un error el formulario conserva lo elegido: «sin resultado» se elige de forma explícita
   if (o.resultado !== null) { await p.selectOption("select[name=outcome]", o.resultado ?? "WIN"); if (o.metodo !== null) await p.selectOption("form select[name=method]", o.metodo ?? "UD"); }
   // Tras un error el formulario conserva lo escrito: el enlace se fija siempre de forma explícita (vacío si no se pide) para no heredar el de un intento anterior.
   await p.fill("[name=evidenceUrl]", o.evidencia ?? "");
