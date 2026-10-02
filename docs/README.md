@@ -8,6 +8,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 |---|---|
 | **Retomar el proyecto** en otro ordenador o con Claude Code: ponerlo en marcha y saber en qué punto está | [`TRASLADO.md`](TRASLADO.md) |
 | **Saber dónde está cada cosa en el código** y por qué ruta ir para hacer algo (añadir una pantalla, una acción, un mensaje, cambiar la base de datos…) | [`DESARROLLO.md`](DESARROLLO.md) |
+| **Probar la aplicación en el navegador** con datos ficticios | [`DEMO.md`](DEMO.md) |
 | **Ver qué pantalla lanza qué acción**, quién puede ejecutarla y en qué tablas escribe | [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md) (se genera solo con `npm run mapa`) |
 | **Entender las decisiones técnicas**: modelo de datos, roles, flujos, seguridad, riesgos y hoja de ruta | [`ARQUITECTURA.md`](ARQUITECTURA.md) |
 | **Saber qué se sabe roto** o mejorable (los 99 hallazgos de la auditoría y su estado) | [`AUDITORIA.md`](AUDITORIA.md) |
