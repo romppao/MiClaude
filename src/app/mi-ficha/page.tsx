@@ -13,7 +13,7 @@ import { computeRecords } from "../../lib/fighters/record";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
 import RecordCards from "../components/RecordCards";
-import { addBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
+import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
 import { createMyFighter, requestClaim, saveDiscipline, updateMyFighter } from "../actions/fighters";
 
 export const metadata = { title: "Mi ficha" };
@@ -34,12 +34,16 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       q ? db.fighter.findMany({ where: { id: { in: claimIds ?? [] } }, include: { gym: true, disciplines: true, _count: { select: { boutsAsA: true, boutsAsB: true } } }, take: 10 }) : Promise.resolve([]),
       db.claimRequest.findMany({ where: { userId: user.id }, include: { fighter: true }, orderBy: { createdAt: "desc" } }),
     ]);
+    const pendiente = myClaims.filter((c) => c.status === "PENDING");
+    const confirmarNueva = oneParam(sp.problema) === "ficha_con_tu_nombre"; // ya se le avisó de que existe una ficha con su nombre
     return (
       <>
         <h1>¿Ya apareces en Ring España?</h1>
         <p className="mut">Si alguien ya registró un combate tuyo, tu ficha existe. Búscala y reclámala; un moderador la revisará.</p>
         <form className="search" role="search" aria-label="Buscar mi ficha"><label className="field"><span>Tu nombre o apellidos</span><input name="q" defaultValue={q} maxLength={80} /></label><button>Buscar mi ficha</button></form>
-        {candidates.map((b) => (
+        {candidates.map((b) => pendiente.some((c) => c.fighterId === b.id) ? (
+          <p key={b.id} className="card" style={{ marginBottom: 8 }}><strong>{publicFighterName(b)}</strong> <span className="mut">· Ya has pedido reclamar esta ficha; está pendiente de revisión. No hace falta que hagas nada más.</span></p>
+        ) : (
           <form key={b.id} action={requestClaim} className="card" style={{ marginBottom: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <input type="hidden" name="fighterId" value={b.id} />
             <strong>{publicFighterName(b)}</strong><span className="mut">{b.disciplines.map((d) => DISCIPLINE_LABEL[d.discipline]).join(", ")} · {b._count.boutsAsA + b._count.boutsAsB} combates registrados{b.city ? ` · ${b.city}` : ""}{b.gym ? ` · ${b.gym.name}` : ""}</span>
@@ -62,6 +66,13 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             </ul>
           </>
         )}
+        {pendiente.length > 0 ? (
+          <>
+            <h2>Tu solicitud está pendiente</h2>
+            <p>Moderación está revisando tu solicitud para reclamar una ficha. <strong>No hace falta que hagas nada más</strong>: cuando la decida, vuelve a esta página para ver la respuesta. Hasta entonces no puedes crear otra ficha.</p>
+          </>
+        ) : (
+        <>
         <h2>Si no apareces, crea tu ficha</h2>
         <form className="search" action={createMyFighter} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
@@ -71,8 +82,11 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" maxLength={LIMITS.city} /></label>
           <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <DisciplineFields />
+          {confirmarNueva && <input type="hidden" name="confirmarNueva" value="1" />}
           <button>Crear mi ficha</button>
         </form>
+        </>
+        )}
       </>
     );
   }
@@ -127,6 +141,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <details className="card" style={{ marginBottom: 8 }}>
         <summary><strong>Añadir otra disciplina</strong> <span className="mut">— por ejemplo MMA, kickboxing, K-1 o jiu-jitsu</span></summary>
         <form className="search" action={saveDiscipline}>
+          <input type="hidden" name="modo" value="anadir" />
           <DisciplineFields defaults={{ discipline: DISCIPLINE_ORDER.find((d) => !me.disciplines.some((x) => x.discipline === d)) ?? "BOXEO" }} />
           <button>Añadir disciplina</button>
         </form>
@@ -147,6 +162,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                   <form action={respondBout} style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                     <input type="hidden" name="boutId" value={b.id} />
                     <input type="hidden" name="version" value={boutVersion(b)} />
+                    <label className="field" style={{ flexBasis: "100%" }}><span>Si no es correcto, ¿por qué? (obligatorio para rechazarlo)</span><input name="motivo" maxLength={LIMITS.note} /></label>
                     <button name="decision" value="confirm" aria-label={`Sí, es correcto: combate contra ${rival} en ${b.event.name}`}>Sí, es correcto</button>
                     <button name="decision" value="dispute" className="secondary" aria-label={`No es correcto: combate contra ${rival} en ${b.event.name}`}>No es correcto</button>
                   </form>
@@ -176,7 +192,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             <option value="">Elige el resultado…</option>
             <option value="WIN">Gané</option><option value="LOSS">Perdí</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>
           </select>
-          <span className="hint">Si el combate todavía no se ha celebrado, déjalo sin elegir: podrás añadirlo después.</span>
+          <span className="hint">Si el combate es hoy y todavía no se ha celebrado, o es futuro, déjalo sin elegir: podrás añadirlo después. Los combates de días anteriores necesitan resultado.</span>
         </label>
         <label className="field"><span>Cómo terminó</span>
           <select name="method" defaultValue={previo("method")}>
@@ -205,7 +221,18 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
               const puedeCorregir = soyAutor && (b.verification === "SELF_REPORTED" || (b.verification === "CONFIRMED" && !b.result)) && eventDayReached(b.event.date);
               return (
                 <tr key={b.id}>
-                  <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div></td>
+                  <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div>
+                    {soyAutor && b.verification === "SELF_REPORTED" && (
+                      <details style={{ marginTop: 6 }}>
+                        <summary className="mut" aria-label={`Quitar este combate: ${b.event.name}`}>Quitar este combate</summary>
+                        <form action={removeMyBout} style={{ marginTop: 6 }}>
+                          <input type="hidden" name="boutId" value={b.id} />
+                          <p className="mut">Úsalo si te equivocaste al registrarlo (rival, fecha o velada). Desaparece de tu ficha y de la de tu rival. No se puede deshacer, pero puedes volver a registrarlo bien.</p>
+                          <button className="secondary" aria-label={`Sí, quitar este combate: ${b.event.name}`}>Sí, quitar este combate</button>
+                        </form>
+                      </details>
+                    )}
+                  </td>
                   <td><span className="tag">{VERIFICATION_LABEL[b.verification]}</span></td>
                   <td>
                     {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
@@ -237,7 +264,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                         <input name="evidenceUrl" defaultValue={b.evidenceUrl ?? ""} maxLength={LIMITS.url} placeholder="Enlace que lo demuestre" aria-label={`Enlace que demuestra el combate ${b.event.name}`} />
                         <button className="secondary" aria-label={`Guardar enlace del combate ${b.event.name}`}>Guardar enlace</button>
                       </form>
-                    ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a> : <span className="mut">Combate ya confirmado o verificado</span>}
+                    ) : b.evidenceUrl ? <a href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a> : <span className="mut">{b.verification === "DISPUTED" ? "En revisión: moderación lo está aclarando" : "Combate ya confirmado o verificado: el enlace ya no se puede cambiar"}</span>}
                   </td>
                 </tr>
               );

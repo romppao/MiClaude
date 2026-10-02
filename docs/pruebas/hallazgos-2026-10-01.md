@@ -91,4 +91,18 @@ Tipos de hallazgo: ver [`personas.md`](personas.md). Estados: **corregido** (con
 
 ## Segunda tanda de personas (sobre la versión corregida)
 
-Ver la sección siguiente, que se completa cuando terminan.
+Se lanzaron sobre la versión corregida. Terminaron las personas «aficionado», «peleador», «rival» y «organizador» (con estados); la moderadora y las de seguridad, móvil, persona mayor y exploración destructiva **no se han ejecutado todavía**. Cada hallazgo se reprodujo a mano antes de corregirlo.
+
+| Tema | Hallazgo | Estado | Cómo se resolvió |
+|---|---|---|---|
+| Doble clic | Un doble clic en cualquier botón de envío enviaba dos veces (dos combates, un aviso de «duplicado») | corregido | `EvitarDobleEnvio`: el segundo envío del mismo formulario se descarta en el acto y los botones quedan desactivados hasta que la acción termina (o 3,5 s). Prueba de navegador con doble clic real |
+| Rival | El rival no sabía que alguien le había registrado un combate | corregido | Correo `notifyRivalOfBout` (después de responder, con `after()`) y correo de vuelta a quien lo registró con la respuesta |
+| Rival | «No es correcto» no pedía motivo y quien registró no sabía por qué | corregido | Motivo obligatorio (`rival_motivo_falta`), guardado en la auditoría y enviado por correo |
+| Peleador | Un combate registrado por error no se podía quitar | corregido | `removeMyBout` (solo el autor, mientras está sin confirmar), con confirmación y borrado de la velada y la ficha provisional que solo existían por él |
+| Peleador | Un combate de hoy no se podía registrar sin resultado | corregido | Se permite (queda «Resultado por anotar») |
+| Peleador | Crear una segunda ficha con el mismo nombre callejón sin salida (solicitud pendiente, ficha provisional existente) | corregido | Bloqueo claro con `ficha_reclamacion_pendiente`, aviso `ficha_con_tu_nombre` salvo `confirmarNueva=1`, y bloque «Tu solicitud está pendiente» |
+| Peleador | Añadir una disciplina que ya se tenía daba un error técnico | corregido | `disciplina_ya_tienes` |
+| Organizador | No se podía corregir, cancelar ni quitar combates del cartel | corregido | `updateEvent`, `setEventStatus`, `removeCartelBout` (solo el organizador de esa velada) |
+| Privacidad | La ficha provisional del rival aparecía en la dirección con su apellido completo | corregido | Slug provisional sin apellido (`nombre-inicial`); al verificar o aprobar se pasa al nombre completo (`fullNameSlug`) |
+| Pendiente | Veladas de peleadores sin «no oficial» en el calendario; columna de evidencia en móvil; homónimos indistinguibles en el selector de rival; gimnasio duplicado por nombre en otra ciudad; nombre público con nombres compuestos; mensajes en la dirección; «Peleadores que sigo» promete correo con avisos desactivados; cabecera de cinco líneas; 400 en inglés con dirección mal codificada | pendiente | Siguiente bloque |
+| Decisión del fundador | Aura a los dos peleadores de un combate frente a uno por combate (los textos se contradicen) | decisión | Ver `TRASLADO.md` §7 |

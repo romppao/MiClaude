@@ -70,6 +70,9 @@ export default async function Moderation() {
     cargarCombates({ verification: "DISPUTED" }),
     Promise.all([db.bout.count({ where: porVerificar }), db.bout.count({ where: { verification: "DISPUTED" } }), db.gym.count(), db.gym.count({ where: { verifiedAt: null } })]),
   ]);
+  // Por qué el rival dijo «no es correcto» (queda en el historial de cada combate rechazado)
+  const rechazos = await db.auditLog.findMany({ where: { entity: "BOUT", action: "RIVAL_DISPUTED", entityId: { in: enRevision.map((b) => b.id) } }, orderBy: { createdAt: "asc" }, select: { entityId: true, after: true } });
+  const motivoDe = new Map(rechazos.map((r) => [r.entityId, (r.after as { motivo?: string } | null)?.motivo ?? ""]));
   const reports = await db.report.findMany({ where: { status: "OPEN" }, include: { user: { select: { name: true, email: true } } }, orderBy: { createdAt: "asc" }, take: LIMITE });
   const ids = (e: string) => reports.filter((r) => r.entity === e).map((r) => r.entityId);
   const [reportedBouts, reportedFighters, reportedAuras] = await Promise.all([
@@ -220,6 +223,7 @@ export default async function Moderation() {
       <BoutTable rows={enRevision} vacio="No hay combates en revisión." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
+          {motivoDe.get(b.id) && <div className="mut" style={{ flexBasis: "100%" }}>Motivo del rival: {motivoDe.get(b.id)}</div>}
           <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
           <button name="decision" value="restore" className="secondary" aria-label={`Restaurar como pendiente el combate: ${nombreCombate(b)}`}>Restaurar como pendiente</button>
         </form>

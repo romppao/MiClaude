@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { slugName, slugify } from "../../lib/common/labels";
+import { findNameCandidates } from "../../lib/fighters/fighters";
 import { audit } from "../../lib/common/audit";
 import { parseBirthDate } from "../../lib/common/dates";
 import { parseDisciplineChoice } from "../../lib/common/disciplines";
@@ -35,6 +36,14 @@ export async function createMyFighter(f: FormData) {
   const province = readProvince(f, "province", back, "Madrid");
   const city = str(f, "city") || province;
   const gymName = str(f, "gym");
+
+  // Con una solicitud para reclamar una ficha pendiente no se crea otra: la moderación aprobaría la solicitud sobre una persona que ya tiene ficha y la rechazaría.
+  if (await db.claimRequest.findFirst({ where: { userId: user.id, status: "PENDING" }, select: { id: true } })) go(back, { problema: "ficha_reclamacion_pendiente" });
+  // Si ya hay una ficha sin titular con este nombre (la creó un rival al registrar un combate), se avisa antes de crear una segunda: lo normal es reclamarla.
+  if (str(f, "confirmarNueva") !== "1") {
+    const existentes = (await findNameCandidates(firstName, lastName)).filter((c) => !c.userId);
+    if (existentes.length > 0) go(`/mi-ficha?q=${encodeURIComponent(lastName)}`, { problema: "ficha_con_tu_nombre" });
+  }
 
   const created = await guard(back, async () => {
     let gymId: string | undefined;
@@ -105,6 +114,8 @@ export async function saveDiscipline(f: FormData) {
   if (!choice) go("/mi-ficha", { problema: "disciplina_no_valida" });
   if (!prior.ok) go("/mi-ficha", { problema: prior.error });
   const before = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } } });
+  // «Añadir otra disciplina» no sobrescribe una que ya tienes (borraría su récord declarado en silencio): para cambiarla se usa su propio formulario.
+  if (before && str(f, "modo") === "anadir") go("/mi-ficha", { problema: "disciplina_ya_tienes" });
   const data = { weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
   await db.$transaction([
     db.fighterDiscipline.upsert({

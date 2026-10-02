@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
-import { PROVINCES } from "../../lib/common/labels";
+import { PROVINCES, slugify } from "../../lib/common/labels";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../../lib/fighters/coherence";
 import { isTournamentStyle } from "../../lib/common/disciplines";
 
@@ -100,4 +100,24 @@ export async function ownEvent(eventId: string, user: { id: string; role: string
   if (!event) go("/organizador", { problema: "no_existe" });
   if (event.organizerId !== user.id && user.role !== "ADMIN") go("/organizador", { problema: "sin_permiso" });
   return event;
+}
+
+/**
+ * Una ficha creada por un tercero (provisional) lleva una dirección que NO revela el apellido (nombre e inicial): su nombre completo no es público.
+ * Cuando pasa a ser pública (el rival confirma, la verifica un organizador o moderación, o su titular la reclama) se le da la dirección con el nombre completo.
+ */
+export async function fullNameSlug(tx: Client, fighterId: string) {
+  const f = await tx.fighter.findUnique({ where: { id: fighterId }, select: { firstName: true, lastName: true } });
+  if (!f) return;
+  const slug = await uniqueSlug(slugify(`${f.firstName} ${f.lastName}`), async (s) => !!(await tx.fighter.findFirst({ where: { slug: s, id: { not: fighterId } }, select: { id: true } })), "peleador");
+  await tx.fighter.update({ where: { id: fighterId }, data: { slug } });
+}
+
+/** Hace públicas las fichas indicadas que aún eran provisionales (y les da su dirección con el nombre completo). */
+export async function listFighters(tx: Client, ids: string[]) {
+  const provisionales = await tx.fighter.findMany({ where: { id: { in: ids }, listed: false, hiddenAt: null }, select: { id: true } });
+  for (const { id } of provisionales) {
+    await tx.fighter.update({ where: { id }, data: { listed: true } });
+    await fullNameSlug(tx, id);
+  }
 }

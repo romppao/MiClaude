@@ -24,7 +24,7 @@ check("y con un apellido compuesto por la mitad (nombre y segundo apellido)", (a
 check("todas las palabras deben coincidir", !(await buscar(`alvaro zzzz${rnd}`)).includes(`Pérez${rnd}`));
 check("la búsqueda encuentra veladas y gimnasios sin tildes", (await buscar(`busqueda ${rnd}`)).includes(`Velada Búsqueda ${rnd}`) && (await buscar(`gimnasio meta ${rnd}`)).includes(`Gimnasio Meta ${rnd}`));
 await buscar(`oculto${rnd}`);
-check("una ficha creada por un tercero no aparece en la búsqueda", await anon.locator(`a[href*="rival-oculto${rnd}"]`).count() === 0);
+check("una ficha creada por un tercero no aparece en la búsqueda", await anon.locator(`a:has-text("Oculto${rnd}")`).count() === 0);
 const vacio = await buscar(`zzzz${rnd}`);
 check("sin resultados, se dice con claridad y se sugiere qué probar", vacio.includes("No hemos encontrado nada") && vacio.includes("Prueba con menos palabras"));
 check("el campo de búsqueda tiene su etiqueta visible con instrucciones", vacio.includes("Busca peleadores, gimnasios, entrenadores o veladas") && vacio.includes("No hace falta poner tildes"));
@@ -60,7 +60,7 @@ check("la política de contenido no bloquea nada de la propia web (scripts, esti
 const robots = await (await anon.request.get(B + "/robots.txt")).text();
 check("robots.txt indica el mapa del sitio y oculta las zonas privadas", /Sitemap: .*\/sitemap\.xml/.test(robots) && /Disallow: \/moderacion/.test(robots) && /Disallow: \/mi-cuenta/.test(robots));
 const mapa = await (await anon.request.get(B + "/sitemap.xml")).text();
-check("el mapa del sitio incluye las fichas públicas y no las provisionales", mapa.includes(`/peleadores/alvaro-perez${rnd}-nunez`) && !mapa.includes(`rival-oculto${rnd}`));
+check("el mapa del sitio incluye las fichas públicas y no las provisionales", mapa.includes(`/peleadores/alvaro-perez${rnd}-nunez`) && !mapa.includes(`oculto${rnd}`));
 const salud = await anon.request.get(B + "/salud");
 check("la comprobación de salud responde que todo funciona", salud.ok() && (await salud.json()).estado === "ok");
 

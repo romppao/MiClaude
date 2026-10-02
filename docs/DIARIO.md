@@ -452,6 +452,33 @@ Palabras del fundador: «No quiero que te centres ahora mismo en diseños, color
 
 ---
 
+## Sesión 1 (continuación) — 2 de octubre de 2026 — Segunda tanda de pruebas por personas: correcciones
+
+### Qué se pidió / qué idea surgió
+
+Seguir con la prioridad del fundador (funcionalidad completa, sin botones que no funcionen). Además, dos peticiones nuevas del 1–2 de octubre, **solo registradas, aún sin implementar**: (a) «una especie de CRM para las federaciones y promotoras» para que publiquen veladas y administren peleadores; (b) un selector de tres opciones al registrarse o entrar: A usuario normal, B peleador, C organizador/federación («eso ya lo veremos más tarde»). Están en `docs/IDEAS.md`.
+
+### Qué se decidió y por qué
+
+- Corregir primero lo que haría tropezar a una persona real: doble clic, combate registrado por error, rival sin aviso, ficha duplicada, organizador que no puede corregir.
+- La ficha provisional de un rival no lleva su apellido en la dirección pública hasta que se verifica: es un dato de un tercero.
+
+### Qué se hizo
+
+Ver la tabla de la segunda tanda en `docs/pruebas/hallazgos-2026-10-01.md`: protección contra doble envío en toda la aplicación, correos al rival y de vuelta al autor, motivo obligatorio al rechazar, quitar un combate propio, combate de hoy sin resultado, ficha sin callejones, disciplina duplicada, editar/cancelar/quitar del cartel para el organizador, y dirección provisional sin apellido.
+
+### Qué salió mal / qué se aprendió
+
+- Tres fallos de **mis propias pruebas** (esperas a un aviso anterior, doble clic que seguía enviando dos veces, un selector de texto ambiguo): ver `docs/LECCIONES.md`. Dos de ellos mostraron que la primera versión de la protección de doble envío no bastaba.
+- La paridad con la base de datos vacía (la que usa el CI) volvió a ser la que lo descubrió.
+
+### Estado y próximos pasos
+
+- Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.
+- Después: selector A/B/C y CRM (tareas 13 y 14), con las decisiones del fundador que siguen abiertas en `docs/TRASLADO.md` §7.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

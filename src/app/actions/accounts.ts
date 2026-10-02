@@ -6,7 +6,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
-import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, isResetTokenUsable, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
+import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, getUser, isResetTokenUsable, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../lib/accounts/password";
 import { HORA, MINUTO, allow, clearHits, clientIp, reservar } from "../../lib/accounts/ratelimit";
 import { maybePurge } from "../../lib/accounts/retention";
@@ -36,7 +36,11 @@ export async function register(f: FormData) {
   if (ip && !(await allow(`registro:ip:${ip}`, 10, HORA))) go(back, { problema: "demasiados_intentos" });
   if (!name || name.length > LIMITS.name || !isEmail(email)) go(back, { problema: "registro_datos" });
   checkNewPassword(password, back);
-  if (await db.user.findUnique({ where: { email }, select: { id: true } })) go(back, { problema: "registro_email_existe" });
+  if (await db.user.findUnique({ where: { email }, select: { id: true } })) {
+    // Un doble clic en «Crear mi cuenta» envía dos veces: la segunda ve la cuenta que acaba de crear la primera. Quien ya tiene esa sesión sigue a «Confirma tu correo».
+    if ((await getUser())?.email === email) go("/verificar");
+    go(back, { problema: "registro_email_existe" });
+  }
   await maybePurge();
   const passwordHash = await hashPassword(password);
   const user = await guard(back, () => db.user.create({ data: { email, name, role, passwordHash } }), "registro_email_existe");

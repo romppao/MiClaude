@@ -16,7 +16,7 @@ import { isDiscipline, WEIGHT_CLASSES } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
-import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, ownEvent, readProvince, str, uniqueSlug } from "./shared";
+import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();
@@ -87,7 +87,7 @@ export async function addCartelBout(f: FormData) {
   const created = await guard(back, () =>
     db.$transaction(async (tx) => {
       // Aparecer en un cartel oficial hace pública la ficha del peleador.
-      await tx.fighter.updateMany({ where: { id: { in: [a.id, b.id] } }, data: { listed: true } });
+      await listFighters(tx, [a.id, b.id]);
       await Promise.all([ensureDiscipline(tx, a.id, event.discipline), ensureDiscipline(tx, b.id, event.discipline)]);
       const flags = await coherenceFlagsFor(tx, event.date, event.discipline, [a.id, b.id]);
       const order = await tx.bout.count({ where: { eventId: event.id } });
@@ -122,9 +122,68 @@ export async function setBoutResult(f: FormData) {
   await db.$transaction(async (tx) => {
     await tx.bout.update({ where: { id: bout.id }, data: { result: v.result, method: v.method, endRound: v.endRound, verification } });
     await tx.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } });
-    if (verification === "VERIFIED") await tx.fighter.updateMany({ where: { id: { in: [bout.fighterAId, bout.fighterBId] } }, data: { listed: true } });
+    if (verification === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification } }, tx);
   });
   revalidatePath("/", "layout");
   go(back, { aviso: "resultado_guardado" });
+}
+
+/** Corrige los datos de una velada propia (nombre, fecha, lugar, promotor, entradas). La disciplina solo se cambia mientras el cartel está vacío. */
+export async function updateEvent(f: FormData) {
+  const user = await requireOrganizer();
+  const event = await ownEvent(str(f, "eventId"), user);
+  const back = `/organizador/${event.slug}`;
+  checkLengths(f, back, { name: LIMITS.eventName, venue: LIMITS.venue, city: LIMITS.city, promoter: LIMITS.promoter, ticketUrl: LIMITS.url });
+  const name = str(f, "name");
+  if (!name) go(back, { problema: "velada_datos" });
+  const date = parseDay(str(f, "date"));
+  if (!date) go(back, { problema: "fecha_invalida" });
+  const province = readProvince(f, "province", back, event.province);
+  const ticketRaw = str(f, "ticketUrl");
+  const ticketUrl = ticketRaw ? safeHttpUrl(ticketRaw) : null;
+  if (ticketRaw && !ticketUrl) go(back, { problema: "url_invalida" });
+  const disciplineRaw = str(f, "discipline");
+  const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
+  const data = { name, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl };
+  await guard(back, () => db.$transaction(async (tx) => {
+    // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
+    if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
+    await tx.event.update({ where: { id: event.id }, data });
+    await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, date, discipline, venue: data.venue, city: data.city, province } }, tx);
+  }));
+  revalidatePath("/", "layout");
+  go(back, { aviso: "velada_actualizada" });
+}
+
+/** Cancela una velada propia (sigue visible, marcada como cancelada, y sus combates dejan de contar) o la vuelve a abrir. */
+export async function setEventStatus(f: FormData) {
+  const user = await requireOrganizer();
+  const event = await ownEvent(str(f, "eventId"), user);
+  const back = `/organizador/${event.slug}`;
+  const cancelar = str(f, "decision") === "cancel";
+  const status = cancelar ? "CANCELLED" : eventDayReached(event.date) ? "COMPLETED" : "SCHEDULED";
+  if (status === event.status) go(back, { problema: "moderacion_estado" });
+  await db.$transaction([
+    db.event.update({ where: { id: event.id }, data: { status } }),
+    audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: cancelar ? "CANCELLED" : "REOPENED", before: { status: event.status }, after: { status } }, db),
+  ]);
+  revalidatePath("/", "layout");
+  go(back, { aviso: cancelar ? "velada_cancelada" : "velada_reabierta" });
+}
+
+/** Quita un combate del cartel de una velada propia. Si el público ya le ha dado aura no se quita (habría que borrar su apoyo): se cancela la velada o se corrige el resultado. */
+export async function removeCartelBout(f: FormData) {
+  const user = await requireOrganizer();
+  const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") } });
+  if (!bout) go("/organizador", { problema: "no_existe" });
+  const event = await ownEvent(bout.eventId, user);
+  const back = `/organizador/${event.slug}`;
+  await guard(back, () => db.$transaction(async (tx) => {
+    if ((await tx.aura.count({ where: { boutId: bout.id } })) > 0) throw new Rechazo("cartel_con_aura");
+    await tx.bout.delete({ where: { id: bout.id } });
+    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "REMOVED_FROM_CARTEL", before: { eventId: event.id, fighterAId: bout.fighterAId, fighterBId: bout.fighterBId, verification: bout.verification } }, tx);
+  }));
+  revalidatePath("/", "layout");
+  go(back, { aviso: "cartel_quitado" });
 }

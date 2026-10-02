@@ -52,7 +52,7 @@ export const registrar = async (p, o) => {
   if (o.resultado !== null) { await p.selectOption("select[name=outcome]", o.resultado ?? "WIN"); if (o.metodo !== null) await p.selectOption("form select[name=method]", o.metodo ?? "UD"); }
   // Tras un error el formulario conserva lo escrito: el enlace se fija siempre de forma explícita (vacío si no se pide) para no heredar el de un intento anterior.
   await p.fill("[name=evidenceUrl]", o.evidencia ?? "");
-  await btn(p, "Registrar este combate");
+  if (o.dobleClic) await p.dblclick('main button:has-text("Registrar este combate")'); else await btn(p, "Registrar este combate");
 };
 
 export const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };

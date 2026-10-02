@@ -27,6 +27,7 @@ form.search{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:flex-e
 input,select,textarea,button{background:var(--panel);color:var(--text);border:1px solid var(--field-border);border-radius:6px;padding:8px 10px;font:inherit}
 textarea{width:100%}
 input,select,textarea{max-width:100%;min-width:0} /* A11Y: ningún campo ensancha la pantalla en móvil */
+button:disabled{opacity:.6;cursor:progress}
 button{background:var(--red);border-color:var(--red);cursor:pointer;font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:block}

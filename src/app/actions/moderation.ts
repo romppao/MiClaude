@@ -11,7 +11,7 @@ import { audit } from "../../lib/common/audit";
 import { notifyDecision } from "../../lib/community/notify";
 import { anonymizeFighter } from "../../lib/fighters/anonymize";
 import { LIMITS, oneLine } from "../../lib/common/text";
-import { Rechazo, go, guard, str } from "./shared";
+import { Rechazo, fullNameSlug, go, guard, listFighters, str } from "./shared";
 
 /** Cola de moderación de combates: verificar, rechazar o restaurar uno rechazado. Solo moderadores. */
 export async function adminDecide(f: FormData) {
@@ -29,7 +29,7 @@ export async function adminDecide(f: FormData) {
   await guard(back, () => db.$transaction(async (tx) => {
     // Solo si el combate sigue en el estado que vio quien decide (el rival o otra persona de moderación pueden haberlo cambiado entretanto).
     if ((await tx.bout.updateMany({ where: { id: bout.id, verification: bout.verification }, data: { verification: plan.next } })).count === 0) throw new Rechazo("combate_cambiado");
-    if (plan.next === "VERIFIED") await tx.fighter.updateMany({ where: { id: { in: [bout.fighterAId, bout.fighterBId] } }, data: { listed: true } });
+    if (plan.next === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: admin.id, entity: "BOUT", entityId: bout.id, action: `ADMIN_${plan.next}`, before: { verification: bout.verification }, after: { verification: plan.next } }, tx);
   }));
   revalidatePath("/", "layout");
@@ -51,9 +51,13 @@ export async function decideClaim(f: FormData) {
       ok = (await tx.fighter.updateMany({ where: { id: claim.fighterId, userId: null, hiddenAt: null }, data: { userId: claim.userId, listed: true } })).count === 1;
     }
     // Se borra el texto con el que la persona justificó su identidad: ya no hace falta y no debe conservarse.
+    // Una aprobación imposible (la ficha ya tiene titular o la persona ya tiene otra ficha) no rechaza en silencio: la solicitud sigue pendiente y quien modera
+    // decide con la causa a la vista (puede rechazarla explicando el motivo, que se le envía por correo).
+    if (wantsApprove && !ok) throw new Rechazo("reclamacion_no_aprobable");
     // Solo si sigue pendiente: si otra persona de moderación decidió a la vez, esta decisión se descarta entera (no se pisa ni se envía un correo contradictorio).
     if ((await tx.claimRequest.updateMany({ where: { id: claim.id, status: "PENDING" }, data: { status: ok ? "APPROVED" : "REJECTED", message: null, reviewNote: note, reviewedAt: new Date() } })).count === 0) throw new Rechazo("solicitud_cambiada");
     if (ok) {
+      await fullNameSlug(tx, claim.fighterId);
       await tx.claimRequest.updateMany({ where: { fighterId: claim.fighterId, id: { not: claim.id }, status: "PENDING" }, data: { status: "REJECTED", message: null } });
       // Quien reclama una ficha no puede conservar el aura ni el seguimiento que dio a esa misma persona antes de ser ella.
       await tx.aura.deleteMany({ where: { userId: claim.userId, bout: { OR: [{ fighterAId: claim.fighterId }, { fighterBId: claim.fighterId }] } } });
@@ -69,7 +73,6 @@ export async function decideClaim(f: FormData) {
       approved ? `Un moderador ha aprobado tu solicitud: la ficha de ${nombreFicha} ya es tuya. Puedes verla y corregir sus datos aquí: ${APP_URL}/mi-ficha`
         : `Un moderador no ha podido aprobar tu solicitud para reclamar la ficha de ${nombreFicha}.${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nSi crees que es un error, puedes enviar otra solicitud con más información aquí: ${APP_URL}/mi-ficha`);
   });
-  if (wantsApprove && !approved) go(back, { problema: "reclamacion_no_aprobable" });
   go(back, { aviso: approved ? "reclamacion_aprobada" : "reclamacion_rechazada" });
 }
 

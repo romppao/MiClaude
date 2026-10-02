@@ -74,8 +74,8 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
 const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport"] as const;
-const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport"] as const;
+const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport"] as const;
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
@@ -144,6 +144,39 @@ describe("una persona que no es organizadora", () => {
     expect(await destino(acciones.setBoutResult, { boutId: "b1" })).toBe("/organizador?problema=sin_permiso");
     expect(mundo.estado.escrituras).toEqual([]);
   });
+  it("ni corregir, cancelar ni quitar combates de la velada de otro organizador", async () => {
+    iniciarSesion(persona("ORGANIZER"));
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada-ajena", organizerId: "otra-persona", date: new Date("2026-01-01T12:00:00Z"), discipline: "BOXEO", status: "SCHEDULED" };
+    mundo.estado.respuestas["bout.findUnique"] = { id: "b1", eventId: "e1", fighterAId: "fa", fighterBId: "fb", verification: "VERIFIED" };
+    expect(await destino(acciones.updateEvent, { eventId: "e1", name: "X", date: "2026-10-10" })).toBe("/organizador?problema=sin_permiso");
+    expect(await destino(acciones.setEventStatus, { eventId: "e1", decision: "cancel" })).toBe("/organizador?problema=sin_permiso");
+    expect(await destino(acciones.removeCartelBout, { boutId: "b1" })).toBe("/organizador?problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  describe("en su propia velada", () => {
+    const propia = { id: "e1", slug: "mi-velada", organizerId: "u-ORGANIZER", date: new Date("2026-12-01T12:00:00Z"), discipline: "BOXEO", status: "SCHEDULED", name: "Mi velada", venue: "v", city: "c", province: "Madrid" };
+    beforeEach(() => { iniciarSesion(persona("ORGANIZER")); mundo.estado.respuestas["event.findUnique"] = propia; });
+    it("cancelarla la marca como cancelada y deja constancia", async () => {
+      expect(await destino(acciones.setEventStatus, { eventId: "e1", decision: "cancel" })).toBe("/organizador/mi-velada?aviso=velada_cancelada");
+      expect(mundo.estado.escrituras).toEqual(expect.arrayContaining(["event.update", "auditLog.create"]));
+    });
+    it("no se cambia la disciplina de una velada con combates en el cartel", async () => {
+      mundo.estado.respuestas["bout.count"] = 2;
+      expect(await destino(acciones.updateEvent, { eventId: "e1", name: "Mi velada", date: "2026-12-01", discipline: "MMA", province: "Madrid" })).toBe("/organizador/mi-velada?problema=velada_disciplina_con_cartel");
+      expect(mundo.estado.escrituras).not.toContain("event.update");
+    });
+    it("un combate con aura del público no se quita del cartel", async () => {
+      mundo.estado.respuestas["bout.findUnique"] = { id: "b1", eventId: "e1", fighterAId: "fa", fighterBId: "fb", verification: "VERIFIED" };
+      mundo.estado.respuestas["aura.count"] = 3;
+      expect(await destino(acciones.removeCartelBout, { boutId: "b1" })).toBe("/organizador/mi-velada?problema=cartel_con_aura");
+      expect(mundo.estado.escrituras).not.toContain("bout.delete");
+    });
+    it("sin aura sí se quita y queda constancia", async () => {
+      mundo.estado.respuestas["bout.findUnique"] = { id: "b1", eventId: "e1", fighterAId: "fa", fighterBId: "fb", verification: "VERIFIED" };
+      expect(await destino(acciones.removeCartelBout, { boutId: "b1" })).toBe("/organizador/mi-velada?aviso=cartel_quitado");
+      expect(mundo.estado.escrituras).toEqual(expect.arrayContaining(["bout.delete", "auditLog.create"]));
+    });
+  });
 });
 
 describe("combates ajenos", () => {
@@ -198,6 +231,40 @@ describe("resultado y confirmación de un combate", () => {
     mundo.estado.respuestas["bout.updateMany"] = { count: 1 };
     expect(await destino(acciones.respondBout, { boutId: "b1", decision: "confirm", version })).toBe("/mi-ficha?aviso=combate_confirmado");
     expect(mundo.estado.escrituras).toContain("auditLog.create");
+  });
+  it("quien registró un combate pendiente puede quitarlo (y queda constancia)", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    mundo.estado.respuestas["bout.deleteMany"] = { count: 1 };
+    expect(await destino(acciones.removeMyBout, { boutId: "b1" })).toBe("/mi-ficha?aviso=combate_quitado");
+    expect(mundo.estado.escrituras).toEqual(expect.arrayContaining(["bout.deleteMany", "auditLog.create"]));
+  });
+  it("no se quita un combate ajeno, ni uno que el rival o moderación ya tocaron, ni uno con aura", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "otra", fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    expect(await destino(acciones.removeMyBout, { boutId: "b1" })).toBe("/mi-ficha?problema=sin_permiso");
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate({ verification: "CONFIRMED" });
+    expect(await destino(acciones.removeMyBout, { boutId: "b1" })).toBe("/mi-ficha?problema=combate_no_quitable");
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    mundo.estado.respuestas["aura.count"] = 2;
+    expect(await destino(acciones.removeMyBout, { boutId: "b1" })).toBe("/mi-ficha?problema=combate_no_quitable");
+    expect(mundo.estado.escrituras).not.toContain("bout.deleteMany");
+  });
+  it("el rival que dice «no es correcto» tiene que explicar por qué", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "u-rival", fighter: { id: "fb", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    expect(await destino(acciones.respondBout, { boutId: "b1", decision: "dispute" })).toBe("/mi-ficha?problema=rival_motivo_falta");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("con el motivo, el rechazo se guarda con él en el historial (lo ve moderación)", async () => {
+    iniciarSesion(persona("FIGHTER", { id: "u-rival", fighter: { id: "fb", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = combate();
+    mundo.estado.respuestas["bout.updateMany"] = { count: 1 };
+    let guardado: unknown;
+    mundo.estado.respuestas["auditLog.create"] = (a: { data: { after: unknown } }) => { guardado = a.data.after; return {}; };
+    expect(await destino(acciones.respondBout, { boutId: "b1", decision: "dispute", motivo: "No combatimos ese día" })).toBe("/mi-ficha?aviso=combate_rechazado");
+    expect(guardado).toMatchObject({ verification: "DISPUTED", motivo: "No combatimos ese día" });
   });
   it("si el rival solo confirmó el combate cuando no tenía resultado, el autor puede añadirlo y vuelve a quedar pendiente de confirmar", async () => {
     iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));

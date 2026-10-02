@@ -7,8 +7,10 @@ import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, WEIGHT_CLASSES } from "../../../lib/common/disciplines";
 import { LIMITS } from "../../../lib/common/text";
+import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
-import { addCartelBout, setBoutResult } from "../../actions/events";
+import { addCartelBout, removeCartelBout, setBoutResult, setEventStatus, updateEvent } from "../../actions/events";
+import { PROVINCES } from "../../../lib/common/labels";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -23,14 +25,43 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");
   const fighters = await db.fighter.findMany({ where: { hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }], take: MAX_LISTA + 1, include: { gym: true } });
   const past = eventDayReached(event.date);
-  const nombre = (b: { firstName: string; lastName: string }) => `${b.firstName} ${b.lastName}`;
+  const nombre = (b: { firstName: string; lastName: string; listed?: boolean; hiddenAt?: Date | null }) => publicFighterName(b); // como lo ve el público: una ficha provisional solo enseña la inicial del apellido
   // En la lista se distinguen los homónimos con el alias, la ciudad y el gimnasio.
   const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
   return (
     <>
       <h1>{event.name}</h1>
       <p className="mut"><span className="tag">{DISCIPLINE_LABEL[event.discipline]}</span> {fmtDate(event.date)} · {event.venue}, {event.city} · <Link href={`/veladas/${event.slug}`}>Ver la página pública</Link></p>
+      {event.status === "CANCELLED" && <p className="notice notice-bad" role="note">Esta velada está cancelada. Sigue visible con esa etiqueta y sus combates no cuentan. Puedes volver a activarla abajo.</p>}
       <p><Link href="/organizador">← Volver a mis veladas</Link></p>
+
+      <h2>Datos de la velada</h2>
+      <details>
+        <summary>Corregir los datos de la velada — nombre, fecha, lugar, promotor y entradas</summary>
+        <form className="search" action={updateEvent} style={{ marginTop: 8 }}>
+          <input type="hidden" name="eventId" value={event.id} />
+          <label className="field"><span>Nombre de la velada</span><input name="name" defaultValue={event.name} required maxLength={LIMITS.eventName} /></label>
+          <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={event.date.toISOString().slice(0, 10)} required min="1980-01-01" /></label>
+          <label className="field"><span>Disciplina</span>
+            <select name="discipline" defaultValue={event.discipline}>{Object.entries(DISCIPLINE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+            <span className="hint">Solo se puede cambiar mientras el cartel está vacío.</span>
+          </label>
+          <label className="field"><span>Recinto</span><input name="venue" defaultValue={event.venue} maxLength={LIMITS.venue} /></label>
+          <label className="field"><span>Ciudad</span><input name="city" defaultValue={event.city} maxLength={LIMITS.city} /></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue={event.province}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Promotor (opcional)</span><input name="promoter" defaultValue={event.promoter ?? ""} maxLength={LIMITS.promoter} /></label>
+          <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" defaultValue={event.ticketUrl ?? ""} maxLength={LIMITS.url} placeholder="https://…" /></label>
+          <button>Guardar los datos de la velada</button>
+        </form>
+      </details>
+      <details style={{ marginTop: 8 }}>
+        <summary>{event.status === "CANCELLED" ? "Volver a activar la velada" : "Cancelar la velada"}</summary>
+        <form action={setEventStatus} style={{ marginTop: 8 }}>
+          <input type="hidden" name="eventId" value={event.id} />
+          <p className="mut">{event.status === "CANCELLED" ? "La velada volverá a aparecer como activa y sus combates volverán a contar." : "La velada seguirá visible con la etiqueta «cancelada» y sus combates dejarán de contar. Podrás volver a activarla."}</p>
+          <button name="decision" value={event.status === "CANCELLED" ? "reopen" : "cancel"} className={event.status === "CANCELLED" ? undefined : "secondary"}>{event.status === "CANCELLED" ? "Volver a activar la velada" : "Sí, cancelar la velada"}</button>
+        </form>
+      </details>
 
       <h2>Añadir un combate al cartel</h2>
       <form className="search" action={addCartelBout}>
@@ -55,7 +86,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
         <div className="table-wrap">
           <table>
             <caption className="sr-only">Combates del cartel</caption>
-            <thead><tr><th scope="col">Combate</th><th scope="col">Categoría</th><th scope="col">Enlace del acta o del cartel</th><th scope="col">Resultado</th></tr></thead>
+            <thead><tr><th scope="col">Combate</th><th scope="col">Categoría</th><th scope="col">Enlace del acta o del cartel</th><th scope="col">Resultado</th><th scope="col">Quitar</th></tr></thead>
             <tbody>
               {event.bouts.map((b) => {
                 const cual = `${nombre(b.fighterA)} contra ${nombre(b.fighterB)}`;
@@ -74,14 +105,24 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
                       {past ? (
                         <form action={setBoutResult} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           <input type="hidden" name="boutId" value={b.id} />
-                          <select name="outcome" aria-label={`Resultado de ${cual}`} defaultValue={b.result === "A_WIN" ? "WIN" : b.result === "B_WIN" ? "LOSS" : b.result === "DRAW" ? "DRAW" : b.result === "NO_CONTEST" ? "NC" : "WIN"}>
-                            <option value="WIN">Gana {b.fighterA.firstName} (esquina roja)</option><option value="LOSS">Gana {b.fighterB.firstName} (esquina azul)</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>
+                          <select name="outcome" aria-label={`Resultado de ${cual}`} defaultValue={b.result === "A_WIN" ? "WIN" : b.result === "B_WIN" ? "LOSS" : b.result === "DRAW" ? "DRAW" : b.result === "NO_CONTEST" ? "NC" : ""}>
+                            <option value="">Elige el resultado…</option><option value="WIN">Gana {b.fighterA.firstName} (esquina roja)</option><option value="LOSS">Gana {b.fighterB.firstName} (esquina azul)</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>
                           </select>
-                          <select name="method" aria-label={`Cómo terminó ${cual}`} defaultValue={b.method ?? METHODS_BY_DISCIPLINE[event.discipline][0]}>{METHODS_BY_DISCIPLINE[event.discipline].filter((m) => m !== "DRAW" && m !== "NC").map((m) => <option key={m} value={m}>{METHOD_LABEL[m]}</option>)}</select>
+                          <select name="method" aria-label={`Cómo terminó ${cual}`} defaultValue={b.method ?? ""}><option value="">Cómo terminó…</option>{METHODS_BY_DISCIPLINE[event.discipline].filter((m) => m !== "DRAW" && m !== "NC").map((m) => <option key={m} value={m}>{METHOD_LABEL[m]}</option>)}</select>
                           <input name="endRound" type="number" min={1} max={12} aria-label={`Asalto en que terminó ${cual}`} placeholder="Asalto" defaultValue={b.endRound ?? ""} style={{ width: 96 }} />
                           <button aria-label={`${b.result ? "Actualizar" : "Guardar"} resultado de ${cual}`}>{b.result ? "Actualizar resultado" : "Guardar resultado"}</button>
                         </form>
                       ) : <span className="mut">Se podrá indicar cuando se celebre la velada.</span>}
+                    </td>
+                    <td>
+                      <details>
+                        <summary className="mut" aria-label={`Quitar del cartel: ${cual}`}>Quitar del cartel</summary>
+                        <form action={removeCartelBout} style={{ marginTop: 6 }}>
+                          <input type="hidden" name="boutId" value={b.id} />
+                          <p className="mut">El combate desaparece del cartel y de la página pública. Si ya tiene aura del público no se podrá quitar.</p>
+                          <button className="secondary" aria-label={`Sí, quitar del cartel: ${cual}`}>Sí, quitar del cartel</button>
+                        </form>
+                      </details>
                     </td>
                   </tr>
                 );

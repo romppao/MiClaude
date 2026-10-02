@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
+import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
@@ -54,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {user && !user.emailVerifiedAt && (
           <div className="barra-aviso"><div className="notice notice-bad" style={{ margin: 0 }}><span aria-hidden="true">⚠ </span>Falta confirmar tu correo electrónico para poder dar aura y registrar combates. <Link href="/verificar">Confirmarlo ahora</Link></div></div>
         )}
-        <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense>{children}</main>
+        <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense><EvitarDobleEnvio />{children}</main>
         <footer className="foot">
           <Link href="/ayuda">¿Cómo funciona?</Link>
           <Link href="/organizador">Organizar una velada</Link>

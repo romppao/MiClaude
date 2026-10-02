@@ -120,6 +120,20 @@ check("al aprobar, se avisa por correo de que ya puede publicar veladas", !!(awa
 await solicitante.p.goto(B + "/");
 check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(solicitante.p.locator("header a", { hasText: "Mis veladas" })));
 
+// 7b) Un doble clic no envía dos veces (dos combates, un error de «duplicado» tras haberlo hecho bien)
+const doble = await nueva();
+await doble.goto(B + "/registro");
+await doble.fill("[name=name]", "Doble Clic"); await doble.fill("[name=email]", `dobleclic${rnd}@test.es`); await doble.fill("[name=password]", "contraseña-larga-1");
+await doble.dblclick('main button:has-text("Crear mi cuenta")');
+check("un doble clic en «Crear mi cuenta» lleva a «Confirma tu correo», sin un error de «ya hay una cuenta»", await doble.waitForURL("**/verificar", { timeout: 8000 }).then(() => true, () => false));
+const peleadorDoble = await newUser("Dobleficha", "FIGHTER");
+await peleadorDoble.p.goto(B + "/mi-ficha");
+await peleadorDoble.p.fill("[name=firstName]", "Doble"); await peleadorDoble.p.fill("[name=lastName]", `Ficha${rnd}`);
+await btn(peleadorDoble.p, "Crear mi ficha");
+await peleadorDoble.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+await registrar(peleadorDoble.p, { evento: `Velada Doble ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Doble${rnd}`, dobleClic: true });
+check("un doble clic en «Registrar este combate» registra un solo combate y lo confirma (no pide elegir rival ni duplica)", await seen(peleadorDoble.p.locator("[role=status]", { hasText: "Combate registrado" })) && !peleadorDoble.p.url().includes("/mi-ficha/rival") && await seen(peleadorDoble.p.locator("main table tbody tr", { hasText: `Velada Doble ${rnd}` }).first()) && await peleadorDoble.p.locator("main table tbody tr", { hasText: `Velada Doble ${rnd}` }).count() === 1);
+
 // 8) Volver a donde se estaba: sin sesión nunca hay redirecciones mudas, y quien se registra desde «Entra para…» vuelve a la ficha
 const nuevoVisitante = await nueva();
 await nuevoVisitante.goto(B + "/peleadores");
