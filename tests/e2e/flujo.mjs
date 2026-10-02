@@ -225,7 +225,7 @@ await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).wait
 check("una sumisión no se acepta en boxeo", await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).count() === 1);
 const addDisc = vet.locator("details", { hasText: "Añadir otra disciplina" });
 await addDisc.locator("summary").click();
-await addDisc.locator("select[name=disciplineChoice]").selectOption("MMA:Ligero");
+await addDisc.locator("select[name=discipline]").selectOption("MMA"); await addDisc.locator("select[name=level]").selectOption("AMATEUR"); await addDisc.locator("select[name=weightClass]").selectOption("Ligero");
 await addDisc.locator("input[name=priorTotal]").fill("3");
 await addDisc.locator("button:has-text('Añadir disciplina')").click();
 await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor();

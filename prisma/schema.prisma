@@ -72,6 +72,7 @@ enum ReportStatus {
 enum Discipline {
   BOXEO
   MMA
+  MUAYTHAI
   KICKBOXING
   K1
   JIUJITSU

@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     fichaDePeleador: fighter && {
       nombre: fighter.firstName, apellidos: fighter.lastName, alias: fighter.alias, fechaDeNacimiento: fighter.birthDate, ciudad: fighter.city, provincia: fighter.province,
       guardia: fighter.stance, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,
-      disciplinas: fighter.disciplines.map((d) => ({ disciplina: d.discipline, categoria: d.weightClass, combatesAnterioresDeclarados: { total: d.priorTotal, victorias: d.priorWins, derrotas: d.priorLosses, empates: d.priorDraws } })),
+      disciplinas: fighter.disciplines.map((d) => ({ disciplina: d.discipline, nivel: d.level, categoria: d.weightClass, combatesAnterioresDeclarados: { total: d.priorTotal, victorias: d.priorWins, derrotas: d.priorLosses, empates: d.priorDraws } })),
     },
     combatesDeMiFicha: bouts.map((b) => ({ velada: b.event.name, fecha: b.event.date, disciplina: b.event.discipline, rival: publicFighterName(b.fighterAId === fighter?.id ? b.fighterB : b.fighterA), resultado: b.result, formaDeTerminar: b.method, estado: b.verification, enlaceDeEvidencia: b.evidenceUrl, loRegistreYo: b.createdById === user.id })),
     auraQueHeDado: auras.map((a) => ({ peleador: publicFighterName(a.fighter), velada: a.bout.event.name, comentario: a.comment, lovioEnDirecto: a.attended, fecha: a.createdAt })),

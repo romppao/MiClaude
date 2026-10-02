@@ -17,7 +17,7 @@ import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
 function readDisciplineForm(f: FormData) {
-  const choice = parseDisciplineChoice(str(f, "disciplineChoice"));
+  const choice = parseDisciplineChoice(str(f, "discipline"), str(f, "level"), str(f, "weightClass"));
   const prior = parsePrior({ total: str(f, "priorTotal"), wins: str(f, "priorWins"), losses: str(f, "priorLosses"), draws: str(f, "priorDraws") });
   return { choice, prior };
 }
@@ -55,12 +55,12 @@ export async function createMyFighter(f: FormData) {
     const slug = await uniqueSlug(slugify(`${firstName} ${lastName}`), async (s) => !!(await db.fighter.findUnique({ where: { slug: s } })), "peleador");
     return db.fighter.create({
       data: {
-        slug, firstName, lastName, alias: str(f, "alias") || null, city, province, level: "AMATEUR", gymId, userId: user.id,
-        disciplines: { create: { discipline: choice.discipline, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
+        slug, firstName, lastName, alias: str(f, "alias") || null, city, province, level: choice.level, gymId, userId: user.id,
+        disciplines: { create: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
       },
     });
   });
-  await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, weightClass: choice.weightClass, priorDeclared: prior.prior } });
+  await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, priorDeclared: prior.prior } });
   go(back, { aviso: "ficha_creada" });
 }
 
@@ -116,7 +116,7 @@ export async function saveDiscipline(f: FormData) {
   const before = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } } });
   // «Añadir otra disciplina» no sobrescribe una que ya tienes (borraría su récord declarado en silencio): para cambiarla se usa su propio formulario.
   if (before && str(f, "modo") === "anadir") go("/mi-ficha", { problema: "disciplina_ya_tienes" });
-  const data = { weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
+  const data = { level: choice.level, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
   await db.$transaction([
     db.fighterDiscipline.upsert({
       where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } },

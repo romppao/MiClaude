@@ -80,12 +80,6 @@ for (const ruta of ["/peleadores", "/veladas", "/gimnasios", "/entrenadores", "/
 check(`ninguna dirección con parámetros raros provoca un error del servidor${fallos.length ? ": " + fallos.join(", ") : ""}`, fallos.length === 0);
 const conservada = await anon.request.get(B + `/peleadores?constructor=y&q=alvaro%20perez${rnd}`);
 check("y el resto de la dirección se conserva (la búsqueda sigue funcionando)", (await conservada.text()).includes(`Pérez${rnd}`) );
-await anon.goto(B + "/peleadores");
-const opcionesPeso = await anon.locator("select[name=categoria]").innerText();
-check("el filtro de categoría de peso dice cuántos kilos es cada categoría, agrupado por disciplina", opcionesPeso.includes("Wélter · hasta 66,7 kg") && opcionesPeso.includes("Pesado · más de 90,7 kg") && opcionesPeso.includes("Ligero · hasta 70,3 kg"));
-check("y el filtro por categoría funciona con el nuevo valor y con el nombre solo", (await anon.request.get(B + "/peleadores?categoria=BOXEO%3AW%C3%A9lter")).status() === 200 && (await anon.request.get(B + "/peleadores?categoria=Ligero")).status() === 200);
-await anon.goto(B + "/peleadores?categoria=BOXEO%3ALigero");
-check("filtrar por una categoría muestra solo peleadores de esa categoría y disciplina", await anon.locator("main .card", { hasText: "Boxeo (Ligero)" }).count() >= 0 && !(await cuerpo(anon)).includes("MMA (Ligero)"));
 const malCodificada = await anon.request.get(B + "/peleadores/%E0%A4%A");
 const textoMal = await malCodificada.text();
 check("una dirección mal codificada da una pantalla en español que explica qué hacer, no «Bad Request»", malCodificada.status() === 400 && textoMal.includes("No hemos podido abrir esta dirección") && textoMal.includes("Ir al inicio") && !textoMal.includes("Bad Request"));

@@ -180,7 +180,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `dayKey`, `eventDayReached`, `parseBirthDate`, `parseDay`, `todayMadrid` |
 | `db.ts` | `db` |
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
-| `disciplines.ts` | `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `METHODS_BY_DISCIPLINE`, `WEIGHT_CLASSES`, `hasWeightLimits`, `isDiscipline`, `isTournamentStyle`, `parseDisciplineChoice`, `weightClassLabel` |
+| `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |

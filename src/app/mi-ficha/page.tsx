@@ -131,7 +131,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Mis disciplinas</h2>
       {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (
         <details key={d.discipline} className="card" style={{ marginBottom: 8 }}>
-          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.weightClass)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
+          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
           <form className="search" action={saveDiscipline}>
             <DisciplineFields defaults={d} />
             <button>Guardar cambios</button>

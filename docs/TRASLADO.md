@@ -116,7 +116,7 @@ Prioridad del fundador: **funcionalidad completa y sin fallos; el diseño, despu
 13. **Correo de contacto y responsable** (`CONTACT_EMAIL`, `RESPONSABLE_NOMBRE`): hoy, sin ellos, la privacidad no ofrece ningún medio de contacto a quien no tiene cuenta. Hay que decidir cuál es.
 14. **Carteles oficiales y fichas provisionales:** cuando un organizador añade a un cartel una ficha que creó otra persona al registrar un combate, esa ficha pasa a ser pública con nombre completo (hoy se acepta porque un cartel de una velada es público). Revisión pendiente: ¿debe confirmar antes la persona afectada?
 15. **Ocultar una ficha** (moderación) borra sus datos personales de forma irreversible: hoy exige anotar el motivo y solo vale para fichas sin titular. ¿Debe existir una forma de restaurarla durante unos días?
-16. **Pesos de kickboxing, K-1 y jiu-jitsu:** hoy solo se muestran los kilos de cada categoría en boxeo profesional y MMA (reglas unificadas); en las otras tres disciplinas no se afirma ningún peso. Hace falta el reglamento de la federación que se vaya a seguir en cada una (o confirmar los pesos) para añadirlos en `LIMITE_KG` de `src/lib/common/disciplines.ts`. El boxeo amateur puede usar límites distintos a los profesionales: también por confirmar.
+16. **Categorías de peso por disciplina y nivel** (petición del fundador, 2 de octubre): ya están separadas por disciplina y por profesional/amateur, con su fuente, en `docs/DISENO-PESOS.md`. Faltan datos que solo da la federación (Muay Thai amateur, kickboxing y K-1 profesional, femeninas, juveniles, cadete y júnior de boxeo) y decidir si la ficha guarda **sexo y edad**.
 
 ## 8. Pendiente que solo se puede hacer con acceso a internet
 

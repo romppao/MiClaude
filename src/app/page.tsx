@@ -2,7 +2,7 @@ import Link from "next/link";
 import { db } from "../lib/common/db";
 import { LEVEL_LABEL, fmtDate } from "../lib/common/labels";
 import { auraRanking } from "../lib/aura/ranking";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../lib/common/disciplines";
 import { getUser } from "../lib/accounts/auth";
 import { plural } from "../lib/common/text";
 
@@ -17,9 +17,9 @@ export default async function Home() {
     db.event.findMany({ where: { date: { gte: new Date() }, status: "SCHEDULED", level: "AMATEUR", province: HOME_PROVINCE }, orderBy: { date: "asc" }, take: 6 }),
     db.fighter.findMany({ where: { level: "AMATEUR", province: HOME_PROVINCE, listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
     Promise.all([db.fighter.count({ where: { level: "AMATEUR", listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
-    auraRanking({ discipline: "BOXEO", province: HOME_PROVINCE }), // el boxeo va en cabeza
+    auraRanking({ discipline: "BOXEO", level: "AMATEUR", province: HOME_PROVINCE }), // el boxeo va en cabeza
   ]);
-  const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, category: g.weightClass }))).sort((a, b) => b.aura - a.aura).slice(0, 5);
+  const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, category: g.weightClass ? weightClassLabel("BOXEO", g.level, g.weightClass) : null }))).sort((a, b) => b.aura - a.aura).slice(0, 5);
   return (
     <>
       <section className="hero">

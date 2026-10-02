@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Ránking de aura" };
 export const dynamic = "force-dynamic";
 
-export default async function Ranking({ searchParams }: { searchParams: Promise<{ disciplina?: string; provincia?: string; periodo?: string }> }) {
-  const { disciplina, provincia, periodo } = await searchParams;
+export default async function Ranking({ searchParams }: { searchParams: Promise<{ disciplina?: string; nivel?: string; provincia?: string; periodo?: string }> }) {
+  const { disciplina, nivel, provincia, periodo } = await searchParams;
   const discipline = disciplina && isDiscipline(disciplina) ? disciplina : "BOXEO"; // el boxeo va en cabeza
+  const level = nivel && isLevel(nivel) ? nivel : undefined; // sin nivel: se enseñan los dos, cada uno con sus categorías
   const province = provincia === undefined ? "Madrid" : provincia === "all" ? undefined : provincia;
   const recientes = periodo === "90";
-  const groups = await auraRanking({ discipline, province, sinceDays: recientes ? 90 : undefined });
+  const groups = await auraRanking({ discipline, level, province, sinceDays: recientes ? 90 : undefined });
   return (
     <>
       <h1>Ránking de aura</h1>
@@ -19,6 +20,9 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
       <form className="search">
         <label className="field"><span>Disciplina</span>
           <select name="disciplina" defaultValue={discipline}>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
+        </label>
+        <label className="field"><span>Nivel</span>
+          <select name="nivel" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{LEVEL_ORDER.map((n) => <option key={n} value={n}>{levelName(n)}</option>)}</select>
         </label>
         <label className="field"><span>Zona</span>
           <select name="provincia" defaultValue={province ?? "all"}><option value="all">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select>
@@ -29,8 +33,8 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <button>Ver ránking</button>
       </form>
       {groups.map((g) => (
-        <section key={g.weightClass ?? "sin"}>
-          <h2>{DISCIPLINE_LABEL[discipline]} · {g.weightClass ? weightClassLabel(discipline, g.weightClass) : NO_CATEGORY}</h2>
+        <section key={`${g.level}-${g.weightClass ?? "sin"}`}>
+          <h2>{DISCIPLINE_LABEL[discipline]} · {levelName(g.level)} · {g.weightClass ? weightClassLabel(discipline, g.level, g.weightClass) : NO_CATEGORY}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th></tr></thead>

@@ -47,9 +47,9 @@ async function main() {
   const names: [string, string, string | null, "PRO" | "AMATEUR", string, number, Discipline][] = [
     ["Álvaro", "Demo Ruiz", "El Toro", "PRO", "Ligero", 0, "BOXEO"],
     ["Iker", "Demo Etxeberria", null, "PRO", "Ligero", 0, "BOXEO"],
-    ["Sergio", "Demo Molina", "Puño de Hierro", "AMATEUR", "Wélter", 1, "BOXEO"],
-    ["Hugo", "Demo Santos", null, "AMATEUR", "Wélter", 1, "BOXEO"],
-    ["Marcos", "Demo Ortega", "Rayo", "AMATEUR", "Pluma", 2, "BOXEO"],
+    ["Sergio", "Demo Molina", "Puño de Hierro", "AMATEUR", "M65", 1, "BOXEO"],
+    ["Hugo", "Demo Santos", null, "AMATEUR", "M65", 1, "BOXEO"],
+    ["Marcos", "Demo Ortega", "Rayo", "AMATEUR", "M60", 2, "BOXEO"],
     ["Daniel", "Demo Vega", null, "PRO", "Pluma", 2, "BOXEO"],
     ["Nico", "Demo Bravo", null, "AMATEUR", "Ligero", 1, "MMA"],
     ["Ismael", "Demo Cano", "El Cerrojo", "AMATEUR", "Ligero", 1, "MMA"],
@@ -80,9 +80,9 @@ async function main() {
   const bout = (eventId: string, a: number, b: number, order: number, weightClass: string, result?: Result, method?: Method, endRound?: number) =>
     db.bout.create({ data: { eventId, fighterAId: fighters[a].id, fighterBId: fighters[b].id, order, weightClass, rounds: 6, result, method, endRound, verification: "VERIFIED" } });
   await bout(past1.id, 0, 1, 1, "Ligero", "A_WIN", "KO", 3);
-  await bout(past2.id, 2, 3, 1, "Wélter", "B_WIN", "UD");
+  await bout(past2.id, 2, 3, 1, "M65", "B_WIN", "UD");
   await bout(next1.id, 0, 5, 1, "Ligero");
-  await bout(next2.id, 2, 4, 1, "Wélter");
+  await bout(next2.id, 2, 4, 1, "M65");
   await bout(mma1.id, 6, 7, 1, "Ligero", "A_WIN", "SUBMISSION", 2);
 }
 

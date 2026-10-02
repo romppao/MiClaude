@@ -5,9 +5,11 @@ import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
-import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
-import { LEVEL_LABEL, PROVINCES } from "../../lib/common/labels";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, isDiscipline, weightClassLabel } from "../../lib/common/disciplines";
+import { BotonesFiltro, CampoFiltro, FiltrosActivos } from "../components/Filtros";
+import SelectorCategoria from "../components/SelectorCategoria";
+import { PROVINCES } from "../../lib/common/labels";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor } from "../../lib/common/disciplines";
+import { plural } from "../../lib/common/text";
 
 export const metadata = { title: "Peleadores" };
 export const dynamic = "force-dynamic";
@@ -15,43 +17,52 @@ export const dynamic = "force-dynamic";
 export default async function Fighters({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { q, level, province, disciplina, categoria, pagina } = flatParams(await searchParams);
   const ids = await searchIds("fighter", q);
-  const discipline = disciplina && isDiscipline(disciplina) ? disciplina : undefined;
-  // El filtro de categoría agrupa por disciplina (el mismo nombre pesa distinto en boxeo y en MMA): el valor es «DISCIPLINA:Categoría»; también se acepta solo el nombre.
-  const [catDisc, ...catResto] = (categoria ?? "").split(":");
-  const catConDisciplina = catResto.length > 0 && isDiscipline(catDisc);
-  const categoriaNombre = catConDisciplina ? catResto.join(":") : categoria;
-  const categoriaDisciplina = catConDisciplina ? (catDisc as Discipline) : undefined;
+  const discipline: Discipline | undefined = disciplina && isDiscipline(disciplina) ? disciplina : undefined;
+  const nivel: Level | undefined = level && isLevel(level) ? level : undefined;
+  // Disciplina, nivel y categoría se miran juntos sobre la misma disciplina de la ficha: «boxeo + profesional + wélter» es UNA disciplina con esas tres cosas, no tres cosas sueltas.
+  const porDisciplina = discipline || nivel || categoria;
   const where: Prisma.FighterWhereInput = {
     listed: true, hiddenAt: null,
     ...(ids && { id: { in: ids } }),
-    ...(level === "PRO" || level === "AMATEUR" ? { level: level as Level } : {}),
     ...(province && { province }),
-    ...((discipline || categoriaNombre) && { disciplines: { some: { ...((discipline ?? categoriaDisciplina) && { discipline: discipline ?? categoriaDisciplina }), ...(categoriaNombre && { weightClass: categoriaNombre }) } } }),
+    ...(porDisciplina && { disciplines: { some: { ...(discipline && { discipline }), ...(nivel && { level: nivel }), ...(categoria && { weightClass: categoria }) } } }),
   };
   const total = await db.fighter.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
   const fighters = await db.fighter.findMany({ where, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { gym: true, disciplines: true } });
+
+  // Texto de cada filtro aplicado (con «✕» para quitarlo) y qué parámetros de la dirección quita.
+  const etiquetaCategoria = categoria && discipline ? weightClassLabel(discipline, nivel ?? (weightClassesFor(discipline, "PRO").some((c) => c.valor === categoria) ? "PRO" : "AMATEUR"), categoria) : categoria;
+  const activos = [
+    ...(q ? [{ texto: `«${q}»`, claves: ["q"] }] : []),
+    ...(discipline ? [{ texto: DISCIPLINE_LABEL[discipline], claves: ["disciplina", "categoria"] }] : []),
+    ...(nivel ? [{ texto: levelName(nivel), claves: ["level", "categoria"] }] : []),
+    ...(categoria ? [{ texto: etiquetaCategoria ?? categoria, claves: ["categoria"] }] : []),
+    ...(province ? [{ texto: province, claves: ["province"] }] : []),
+  ];
   return (
     <>
       <h1>Peleadores</h1>
       <form className="search" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
-        <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Todos los niveles</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
+        <SelectorCategoria modo="filtro" nombres={{ discipline: "disciplina", level: "level", weightClass: "categoria" }} defaults={{ discipline: discipline ?? "", level: nivel ?? "", weightClass: categoria ?? "" }} />
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
-        <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
-        <CampoFiltro etiqueta="Categoría de peso" ayuda="Los kilos son el límite de cada categoría y son orientativos."><select name="categoria" defaultValue={categoria ?? ""}><option value="">Todas las categorías</option>{DISCIPLINE_ORDER.filter((d) => !discipline || d === discipline).map((d) => <optgroup key={d} label={DISCIPLINE_LABEL[d]}>{WEIGHT_CLASSES[d].map((c) => <option key={c} value={`${d}:${c}`}>{weightClassLabel(d, c)}</option>)}</optgroup>)}</select></CampoFiltro>
         <BotonesFiltro ruta="/peleadores" />
       </form>
+      <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria }} activos={activos} />
+      <p aria-live="polite" className="mut">{total === 0 ? "Ningún peleador coincide con estos filtros." : `${plural(total, "peleador encontrado", "peleadores encontrados")}.`}</p>
       <div className="grid">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
-            <span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span>
             <strong>{b.firstName} {b.lastName}</strong>
-            <div className="mut">{b.alias ? `“${b.alias}” · ` : ""}{[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => `${DISCIPLINE_LABEL[d.discipline]}${d.weightClass ? ` (${d.weightClass})` : ""}`).join(", ")} · {b.province ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</div>
+            <div className="mut">{b.alias ? `“${b.alias}”` : ""}{b.alias && (b.province || b.gym) ? " · " : ""}{[b.province, b.gym?.name].filter(Boolean).join(" · ")}</div>
+            {[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => (
+              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass)}` : ""}</div>
+            ))}
           </Link>
         ))}
       </div>
-      {fighters.length === 0 && <p className="mut">No hay peleadores con esos filtros. Prueba a quitar alguno o a escribir solo una parte del nombre.</p>}
+      {fighters.length === 0 && <p className="mut">Prueba a quitar algún filtro (pulsa sobre él, arriba) o a escribir solo una parte del nombre.</p>}
       <Paginacion ruta="/peleadores" params={{ q, level, province, disciplina, categoria }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["peleador", "peleadores"]} />
     </>
   );

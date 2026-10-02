@@ -12,7 +12,7 @@ import { slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
 import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
-import { isDiscipline, WEIGHT_CLASSES } from "../../lib/common/disciplines";
+import { isDiscipline, isWeightClass } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
@@ -79,7 +79,7 @@ export async function addCartelBout(f: FormData) {
   if (!a || !b || a.id === b.id) go(back, { problema: "cartel_boxeadores" });
   const rounds = intOrNull(f, "rounds");
   const weightClassRaw = str(f, "weightClass");
-  if (weightClassRaw && !WEIGHT_CLASSES[event.discipline].includes(weightClassRaw)) go(back, { problema: "cartel_categoria" });
+  if (weightClassRaw && !isWeightClass(event.discipline, event.level, weightClassRaw)) go(back, { problema: "cartel_categoria" });
   const evidenceRaw = str(f, "evidenceUrl");
   const evidenceUrl = evidenceRaw ? safeHttpUrl(evidenceRaw) : null;
   if (evidenceRaw && !evidenceUrl) go(back, { problema: "url_invalida" });

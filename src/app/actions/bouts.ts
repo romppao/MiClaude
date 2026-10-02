@@ -94,7 +94,7 @@ export async function addBout(f: FormData) {
         if (event.organizerId) throw new Rechazo("combate_velada_oficial"); // no se cuelgan combates propios en la velada oficial de otro
       } else {
         event = await tx.event.create({
-          data: { slug: slugBase, name: eventName, date, discipline, level: "AMATEUR", venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED", createdById: user.id },
+          data: { slug: slugBase, name: eventName, date, discipline, level: myDiscipline.level, venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED", createdById: user.id },
         });
       }
       const rival = rivalExisting

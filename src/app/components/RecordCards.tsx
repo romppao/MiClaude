@@ -31,7 +31,7 @@ export default function RecordCards({ records, disciplines }: { records: Records
         const c = combinedRecord(tally, prior);
         return (
           <div key={`${discipline}-${level}`} className="card">
-            <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}{fd?.weightClass ? ` · ${weightClassLabel(discipline, fd.weightClass)}` : ""}</div>
+            <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}{fd?.weightClass ? ` · ${weightClassLabel(discipline, fd.level, fd.weightClass)}` : ""}</div>
             <div className="rec">{formatRecord({ ...c, nc: tally.nc })}</div>
             <div className="mut">victorias – derrotas – empates</div>
             <div className="mut">

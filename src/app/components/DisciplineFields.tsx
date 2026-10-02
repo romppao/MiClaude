@@ -1,29 +1,17 @@
-import type { Discipline } from "@prisma/client";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, WEIGHT_CLASSES, weightClassLabel } from "../../lib/common/disciplines";
+import type { Discipline, Level } from "@prisma/client";
+import SelectorCategoria from "./SelectorCategoria";
 
 type Defaults = {
-  discipline?: Discipline; weightClass?: string | null;
+  discipline?: Discipline; level?: Level; weightClass?: string | null;
   priorTotal?: number | null; priorWins?: number | null; priorLosses?: number | null; priorDraws?: number | null;
 };
 
-/** Campos para elegir disciplina y categoría de peso y, opcionalmente, el récord de partida (declarado por el propio deportista). */
+/** Campos para elegir disciplina, nivel y categoría de peso y, opcionalmente, el récord de partida (declarado por el propio deportista). */
 export default function DisciplineFields({ defaults = {} }: { defaults?: Defaults }) {
-  const selected = defaults.discipline ? `${defaults.discipline}:${defaults.weightClass ?? ""}` : "BOXEO:";
   const num = (v: number | null | undefined) => (v ?? "") as number | "";
   return (
     <>
-      <label className="field" style={{ minWidth: 240 }}>
-        <span>Disciplina y categoría de peso</span>
-        <select name="disciplineChoice" defaultValue={selected}>
-          {DISCIPLINE_ORDER.map((d) => (
-            <optgroup key={d} label={DISCIPLINE_LABEL[d]}>
-              <option value={`${d}:`}>{DISCIPLINE_LABEL[d]} · todavía no sé mi categoría</option>
-              {WEIGHT_CLASSES[d].map((w) => <option key={w} value={`${d}:${w}`}>{DISCIPLINE_LABEL[d]} · {weightClassLabel(d, w)}</option>)}
-            </optgroup>
-          ))}
-        </select>
-        <span className="hint">Los kilos que se indican son el límite de cada categoría y son orientativos: cada velada puede aplicar los suyos. Si dudas, elige «todavía no sé mi categoría».</span>
-      </label>
+      <SelectorCategoria modo="ficha" defaults={{ discipline: defaults.discipline ?? "BOXEO", level: defaults.level ?? "AMATEUR", weightClass: defaults.weightClass }} />
       <fieldset style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "8px 12px", flex: "1 1 100%" }}>
         <legend>Tus combates anteriores (opcional)</legend>
         <p className="mut" style={{ margin: "0 0 8px" }}>
