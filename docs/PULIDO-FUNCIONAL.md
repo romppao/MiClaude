@@ -21,7 +21,7 @@ La composición actual es provisional. Este documento reúne los pendientes vige
 | Muchas solicitudes de un título podían ocultar la fuente de otros | Última solicitud por título, sin un límite global que mezcle sus historiales | 351 solicitudes de un título y una anterior de otro |
 | El relevo enumeraba problemas ya corregidos como pendientes | Estado actual con referencias a código y pruebas | Auditoría y traslado enlazan este documento |
 
-Integrado en [PR #15](https://github.com/romppao/MiClaude/pull/15): [CI #137](https://github.com/romppao/MiClaude/actions/runs/37158841984) aprueba 406 unitarias, 393 comprobaciones de navegador y axe en 37 pantallas sin incumplimientos, además de migraciones/paridad, tipos, mapa y build. La comprobación pública se registra en APORTACIONES-CODEX y DIARIO. No hay migración ni cambios de escala de aura, categorías o diseño.
+Integrado en [PR #15](https://github.com/romppao/MiClaude/pull/15) y [#16](https://github.com/romppao/MiClaude/pull/16): [CI final #142](https://github.com/romppao/MiClaude/actions/runs/37159831793) aprueba 406 unitarias, 395 comprobaciones de navegador y axe en 37 pantallas sin incumplimientos, además de migraciones/paridad, tipos, mapa y build. Demo final comprobada en Render: portada, ayuda y salud 200; el acceso a respaldos conserva la ruta. Evidencias y límites de la comprobación pública en APORTACIONES-CODEX y DIARIO. No hay migración ni cambios de escala de aura, categorías o diseño.
 
 ## Siguiente trabajo funcional, por impacto
 

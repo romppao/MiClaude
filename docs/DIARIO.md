@@ -893,3 +893,15 @@ Render sirve el pulido #15: portada, ayuda, ránking y `/salud` responden 200 po
 La comprobación de acceso privado descubrió un detalle adicional: `/respaldar` pedía sesión sin recordar la ruta de vuelta, al contrario de las páginas de moderación. Se transmite la ruta a través de las guardas de sesión verificada y respaldo, sin conceder permisos. Dos checks nuevos comprueban el mensaje/destino y el regreso real tras entrar con una cuenta autorizada; tipos, unitarias, build, navegador y CI se vuelven a comprobar por este cambio de código.
 
 Validación local del retorno: 406 unitarias, build de producción y 30 checks del guion de pulido aprobados; el guion también mide axe sobre las colas pobladas sin incumplimientos. CI comprobará el árbol completo con 395 comprobaciones de navegador antes de integrar esta continuación.
+
+
+### Validación e integración final del retorno
+
+[PR #16](https://github.com/romppao/MiClaude/pull/16) integrada con merge `d9fba959cfe79da379adab9f42237c7b2d73322c`. [CI #142](https://github.com/romppao/MiClaude/actions/runs/37159831793) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, **395 comprobaciones de navegador** y axe en **37 pantallas, 0 incumplimientos**. Árbol comprobado e integrado `ae120c766bfc5761298bd9fa835e62c93a31915c`. Antes de fusionar se verificaron el head `0e094d62c95ee6e320f30280cec49cb8731ff823` y la base `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. Las dos comprobaciones nuevas de acceso completan las 393 de #15; no se omiten ni sustituyen recorridos.
+
+
+### Demo final comprobada
+
+El 3 de octubre a las 23:03 UTC, Render sirve también #16: `/respaldar` sin sesión lleva a `/entrar?next=%2Frespaldar&problema=sin_sesion`; portada, ayuda y salud responden 200 por HTTPS con verificación TLS. El regreso autenticado se recorrió en navegador local y en CI; no se crearon cuentas ni fixtures en la demo para esta comprobación. Los datos existentes se conservan. Esta continuación de cierre modifica solo documentación.
+
+Siguiente trabajo: resolver solapamientos del historial/registro inicial y catálogos IMMAF/IBJJF; herramientas de entidades; errores y recorridos con personas; preparación de correo, copias y privacidad/menores. No se declaran cerrados por las pruebas automatizadas. Diseño provisional, a retomar al final mediante briefing con el fundador; #13 sigue abierta, sin sobrescribir el trabajo de Work.

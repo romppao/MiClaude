@@ -72,7 +72,7 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 
 **Auditoría histórica:** el cuadro de 99 hallazgos se ha revalidado donde existían estados obsoletos; los parciales y decisiones siguen abiertos. Consultar [AUDITORIA.md](AUDITORIA.md), no asumir que sus citas antiguas de fichero/línea siguen vigentes. Los defectos nuevos de este pulido están en PULIDO-FUNCIONAL.
 
-**Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. El pulido #15 pasa CI #137 con 406 unitarias, 393 comprobaciones de navegador (28 nuevas de volumen/integridad) y axe en 37 pantallas sin incumplimientos; publicación y referencias exactas en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
+**Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. El pulido #15 y el retorno a respaldos #16 pasan CI final #142 con 406 unitarias, 395 comprobaciones de navegador (30 del guion nuevo de volumen/integridad/acceso) y axe en 37 pantallas sin incumplimientos; publicación y referencias exactas en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
 
 **Organización del código (1 de octubre):** acciones en módulos por dominio, lógica en `src/lib/<dominio>`, reglas de dependencias comprobadas por prueba y un mapa funcional generado. Guía en [`DESARROLLO.md`](DESARROLLO.md); mapa en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
 
