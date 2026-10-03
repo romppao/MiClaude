@@ -154,5 +154,5 @@ Origen: petición del fundador de comparar Raunder y BoxRec; propuestas de Codex
 
 Origen: «continua el trabajo» del fundador y pendiente de validación de `APORTACIONES-CODEX.md`.
 
-- **Preparado para CI:** recorrido real de récord amateur y profesional en la misma disciplina, categorías correctas por nivel, resultados históricos, NC y enlace al respaldo. Se comprueba la ficha privada y la pública, con datos ficticios propios.
+- **Validado en CI (propuesta #9, ejecución `37110167176`):** recorrido real de récord amateur y profesional en la misma disciplina, categorías correctas por nivel, resultados históricos, NC y enlace al respaldo. Sus 17 comprobaciones pasan en las fichas privada y pública, con datos ficticios propios. Integración pendiente.
 - **Prioridad mantenida:** cerrar validación antes de ampliar funcionalidades. Las pruebas con personas reales, la paginación de moderación y las decisiones del fundador siguen pendientes.

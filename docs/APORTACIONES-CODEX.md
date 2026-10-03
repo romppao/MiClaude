@@ -4,13 +4,13 @@
 
 ## Leer primero al retomar
 
-**Continuación:** el recorrido pendiente de récords profesional/amateur se prepara en `codex/validacion-records-2026-10-03`, partiendo de `e049fe4`. Ver la sección final para distinguirlo de los cambios de calendario y sus ejecuciones de CI.
+**Continuación validada:** el recorrido de récords profesional/amateur está en [la propuesta #9](https://github.com/romppao/MiClaude/pull/9), rama `codex/validacion-records-2026-10-03`, partiendo de `e049fe4`. Ver la sección final para distinguirlo de los cambios de calendario y sus ejecuciones de CI.
 
 Este documento es el relevo solicitado expresamente por el fundador para que Claude entienda las aportaciones de Codex. Se complementa con `TRASLADO.md`, `DIARIO.md`, `COMPETENCIA.md` y el mapa funcional; no sustituye las reglas de `CLAUDE.md`.
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
 **Rama de aportaciones:** `codex/claridad-calendario-2026-10-03`.
-**Estado:** cambios preparados y comprobaciones locales aprobadas; integración y pruebas completas de navegador sujetas al CI de la propuesta. No confundir esta rama con la demo desplegada. La documentación de relevo se publica también en la rama principal para que sea fácil encontrarla.
+**Estado:** la continuación de #9 pasa CI completo (tipos, migraciones, mapa, 313 unitarias, compilación, E2E y axe). Integración pendiente: #9 está encadenada sobre la rama de #8. La demo sigue siendo una versión distinta hasta integrar y desplegar. El relevo inicial también está en la rama principal.
 
 ## Peticiones y decisiones del fundador
 
@@ -95,7 +95,11 @@ La categoría actual debe aparecer únicamente en su tarjeta; la histórica no h
 
 Se corrige también el bloqueo observado en la ejecución `37109729125`: la expresión `peleadores?` de `tests/e2e/filtros.mjs` no acepta «1 peleador encontrado». La comprobación ahora exige las frases españolas completas, singular o plural, conservando la comprobación de categoría y recuento. No cambia el producto ni se omite la prueba.
 
-Rama: `codex/validacion-records-2026-10-03`, base `e049fe4`. Sintaxis y diferencias comprobadas localmente. El proxy no responde y faltan dependencias, por lo que la validación completa se hace en CI y sigue pendiente hasta consultar el resultado. Este bloque no completa la auditoría por personas ni integra o despliega la demo.
+Rama: `codex/validacion-records-2026-10-03`, base `e049fe4`. Sintaxis y diferencias comprobadas localmente. El proxy no responde y faltan dependencias, por lo que la validación completa se hizo en GitHub Actions.
+
+**Resultado aprobado:** commit `233420c41702c159938fb1f2a3c402ddc555117d`, [ejecución de la propuesta #9 `37110167176`](https://github.com/romppao/MiClaude/actions/runs/37110167176): instalación, migraciones y paridad del esquema, tipos, mapa, 313 unitarias, compilación, conjunto E2E completo y axe correctos. El nuevo guion aprobó sus 17 comprobaciones; axe midió 0 incumplimientos, 0 graves o críticos. El código probado incluye también el calendario de #8. Esto no convierte las ejecuciones fallidas anteriores de #8 en aprobadas: consultar cada commit y su CI.
+
+Este bloque no completa la auditoría por personas ni integra o despliega la demo. Siguiente trabajo: revisión e integración de las propuestas, recorridos de seguridad/móvil/persona mayor y paginación real de moderación.
 
 
 ### Revisión de los guiones que siguen al primer flujo

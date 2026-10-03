@@ -615,7 +615,7 @@ El proxy local no acepta conexiones y no hay dependencias en caché: no se pudo 
 
 ### Estado y próximos pasos
 
-Recorrido preparado; validación completa pendiente del CI de esta rama. No se declara aprobada la accesibilidad ni el conjunto E2E hasta consultar esa ejecución. Integración y demo pendientes; siguen abiertos los recorridos por personas y los bloques de la auditoría indicados en `TRASLADO.md`.
+Validación completa aprobada en la ejecución `37110167176` de la propuesta #9, commit `233420c`: migraciones/paridad, tipos, mapa, 313 unitarias, compilación, todos los guiones E2E y axe (0 incumplimientos). El nuevo recorrido aprobó sus 17 comprobaciones. La propuesta #9 está encadenada sobre la rama de #8. Integración y demo pendientes; siguen abiertos los recorridos por personas y los bloques de la auditoría indicados en `TRASLADO.md`.
 
 ---
 
