@@ -521,6 +521,30 @@ TypeScript, 313 unitarias y compilación de producción aprobados. Integración 
 
 ---
 
+## Sesión 2 (continuación) — 3 de octubre — primera validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación de los cambios autorizados y mantener el relevo para Claude.
+
+### Qué se decidió y por qué
+
+No integrar con el CI fallando. Corregir la causa observada sin saltar pruebas.
+
+### Qué se hizo
+
+CI 77: migraciones, paridad, tipos, mapa, unitarias, compilación y arranque aprobados. La primera prueba E2E falló al buscar disciplina en un selector oculto de otro formulario. Se acota `registrar()` al formulario de su botón en `tests/e2e/ayudas.mjs`.
+
+### Qué salió mal / qué se aprendió
+
+El ayudante antiguo quedó desfasado al existir varios selectores de disciplina. El log demuestra la selección del primer elemento de cuatro, oculto; no es evidencia de fallo en la acción de registrar. Se documenta la regla de localización por formulario.
+
+### Estado y próximos pasos
+
+Subir la corrección y repetir CI completo. Calendario y axe todavía no se ejecutaron. Relevo detallado en `APORTACIONES-CODEX.md`.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

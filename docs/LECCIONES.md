@@ -118,3 +118,5 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | La ayuda afirmaba más respaldo del que proporciona un enlace | Equiparar evidencia aportada con verificación y omitir la diferencia autor/rival | Documentar la regla real y distinguir origen y estado del dato |
 | El análisis competitivo antiguo contenía supuestos hoy incorrectos | Conocimiento general y fuentes débiles sin verificar la oferta actual | Usar fuentes propias e inspección; separar observaciones, inferencias y límites |
 | PostgreSQL local no pudo instalarse | Permisos del entorno impidieron descargar/instalar paquetes del sistema | No declarar E2E aprobadas por compilar: usar el CI y dejar el bloqueo explícito |
+
+- **CI 77 (3 de octubre):** `registrar()` buscaba `select[name=discipline]` en toda la página; tras el selector por disciplina/nivel existen varios, algunos ocultos. Se elige el formulario por su botón de acción y se acota la disciplina a él. Regla: campos repetidos se localizan dentro del formulario correcto; no se arregla ampliando esperas ni forzando elementos ocultos.

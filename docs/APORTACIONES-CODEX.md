@@ -8,7 +8,6 @@ Este documento es el relevo solicitado expresamente por el fundador para que Cla
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
 **Rama de aportaciones:** `codex/claridad-calendario-2026-10-03`.
-**Propuesta:** [#8 — calendario y claridad funcional](https://github.com/romppao/MiClaude/pull/8), abierta en borrador para verificar CI.
 **Estado:** cambios preparados y comprobaciones locales aprobadas; integración y pruebas completas de navegador sujetas al CI de la propuesta. No confundir esta rama con la demo desplegada. La documentación de relevo se publica también en la rama principal para que sea fácil encontrarla.
 
 ## Peticiones y decisiones del fundador
@@ -73,3 +72,10 @@ El análisis actualizado en `COMPETENCIA.md` sustituye hipótesis antiguas: BoxR
 ## Comunicación y documentación
 
 Se actualizan `CLAUDE.md`, `TRASLADO.md`, el índice, `COMPETENCIA.md`, `DIARIO.md`, `IDEAS.md`, `LECCIONES.md` y `ARQUITECTURA.md`, además del mapa generado. Este documento sirve como comunicación persistente por GitHub; no se afirma haber enviado un mensaje a la sesión privada de Claude.
+
+
+## Validación en GitHub — primera ejecución
+
+El CI 77 de la propuesta #8 superó instalación, migraciones/paridad, TypeScript, mapa, unitarias, compilación y arranque. Falló en `flujo.mjs:232`: el ayudante `registrar()` usaba un selector global de disciplina y Playwright elegía el primero de cuatro, oculto dentro de otro formulario. El log muestra `element is not visible` en `ayudas.mjs:50`. No llegó a la nueva prueba de calendario ni a axe.
+
+Se corrige `tests/e2e/ayudas.mjs` acotando el selector al formulario que contiene el botón «Registrar este combate». Se conserva la misma acción y sus comprobaciones: no se salta la prueba ni se amplía el tiempo de espera. Siguiente ejecución pendiente; no integrar hasta comprobarla.
