@@ -72,7 +72,7 @@ await pepe.locator("li", { hasText: `Velada Rival Avisado ${rnd}` }).locator("bu
 check("«No es correcto» sin explicar el motivo no se admite y pide escribirlo", await seen(pepe.locator("[role=alert]", { hasText: "por qué no es correcto" })));
 await pepe.locator("li", { hasText: `Velada Rival Avisado ${rnd}` }).locator("[name=motivo]").fill("No combatimos ese día");
 await pepe.locator("li", { hasText: `Velada Rival Avisado ${rnd}` }).locator("button:has-text('No es correcto')").click();
-check("con el motivo, el combate se rechaza y se confirma", await seen(pepe.locator("[role=status]", { hasText: "Has indicado que el combate no es correcto" })) || await seen(pepe.locator(".notice-ok")));
+check("con el motivo, se solicita revisión sin suspender el resultado", await seen(pepe.locator("[role=status]", { hasText: "Has solicitado revisión a moderación" })) || await seen(pepe.locator(".notice-ok")));
 check("y quien lo registró recibe el motivo por correo", !!(await esperarCorreo(`luis${rnd}@test.es`, "No combatimos ese día")));
 
 // 3c) Quien ya tiene una ficha provisional con su nombre: se le avisa antes de crear otra, y con una solicitud pendiente no se le deja crearla
@@ -158,7 +158,7 @@ check("seguir a un peleador con aviso claro y contador", await fan.locator("text
 check("el propio peleador no ve el botón de seguirse", await (async () => { await pepe.goto(B + `/peleadores/pepe-uno${rnd}`); return pepe.locator("button:has-text('Seguir a este peleador')").count(); })() === 0);
 const anon = await (await browser.newContext()).newPage();
 await anon.goto(B + "/ayuda");
-check("la ayuda es pública y explica las etiquetas", await anon.locator("body").innerText().then((t) => t.includes("Qué significan las etiquetas") && t.includes("Pendiente de confirmar")));
+check("la ayuda es pública y explica las etiquetas", await anon.locator("body").innerText().then((t) => t.includes("Qué significan las etiquetas") && t.includes("Declarado · confirmación opcional") && t.includes("Cómo se calcula el aura")));
 
 // 4b) un visitante sin sesión que quiere dar aura vuelve a la misma ficha tras entrar
 const visitor = await (await browser.newContext()).newPage();

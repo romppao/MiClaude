@@ -15,6 +15,7 @@ import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
 import { divisionById, divisionEligible, knownBoxingAgeEligible } from "../../lib/common/competition";
 import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
+import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
 import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
@@ -129,7 +130,7 @@ export async function setBoutResult(f: FormData) {
   // Solo se eleva a «verificado» lo que ha creado el propio organizador (o un moderador): un combate ajeno conserva su estado.
   const verification = user.role === "ADMIN" || bout.createdById === user.id ? "VERIFIED" : bout.verification;
   await db.$transaction(async (tx) => {
-    await tx.bout.update({ where: { id: bout.id }, data: { result: v.result, method: v.method, endRound: v.endRound, verification } });
+    await tx.bout.update({ where: { id: bout.id }, data: { ...WITHOUT_BOUT_BACKING, result: v.result, method: v.method, endRound: v.endRound, verification } });
     await tx.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } });
     if (verification === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification } }, tx);
@@ -160,6 +161,7 @@ export async function updateEvent(f: FormData) {
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
     const bouts = await tx.bout.findMany({ where: { eventId: event.id }, include: { fighterA: true, fighterB: true } });
     if (bouts.some(b => !knownBoxingAgeEligible(event.discipline,event.level,b.fighterA.birthDate,date) || !knownBoxingAgeEligible(event.discipline,event.level,b.fighterB.birthDate,date) || (b.divisionId !== null && (!divisionEligible(b.divisionId, b.fighterA.birthDate, date) || !divisionEligible(b.divisionId, b.fighterB.birthDate, date))))) throw new Rechazo("categoria_edad_combate");
+    if (dayKey(date) !== dayKey(event.date) || name !== event.name) await tx.bout.updateMany({ where: { eventId: event.id }, data: WITHOUT_BOUT_BACKING });
     await tx.event.update({ where: { id: event.id }, data });
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));

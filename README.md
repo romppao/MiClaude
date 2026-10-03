@@ -2,9 +2,11 @@
 
 Comunidad y base de datos de los **deportes de contacto de toda España**: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai,
 amateur y profesional. Fichas de peleadores con su récord, calendario de veladas, gimnasios,
-entrenadores, búsqueda y **aura** (el reconocimiento del público, que sustituye a las estrellas).
+entrenadores, búsqueda y **aura** (trayectoria, respaldo opcional y reconocimiento de la comunidad).
 
 **[Abrir la demo actualizada](https://ring-espana-demo.onrender.com/)** — versión de prueba con datos ficticios.
+
+**Trayectoria y respaldo:** títulos anteriores declarados desde «Mi ficha → Mis títulos y mi aura», revisión opcional y bonificaciones por hechos comprobados. El rival puede pedir revisión sin vetar el resultado. Escala inicial y desglose en «¿Cómo funciona?». El menú reúne accesos para deportistas, clubes/entrenadores, promotores y cuenta.
 
 **Stack:** Next.js 15 (App Router, Server Actions, TypeScript 5) · PostgreSQL 16 · Prisma 6 · sin otras dependencias de ejecución.
 

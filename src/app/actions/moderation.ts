@@ -4,6 +4,7 @@
 
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { db } from "../../lib/common/db";
 import { requireAdmin } from "../../lib/accounts/permissions";
 import { APP_URL } from "../../lib/common/mail";
@@ -28,7 +29,7 @@ export async function adminDecide(f: FormData) {
   if (!plan) go(back, { problema: "moderacion_estado" });
   await guard(back, () => db.$transaction(async (tx) => {
     // Solo si el combate sigue en el estado que vio quien decide (el rival o otra persona de moderación pueden haberlo cambiado entretanto).
-    if ((await tx.bout.updateMany({ where: { id: bout.id, verification: bout.verification }, data: { verification: plan.next } })).count === 0) throw new Rechazo("combate_cambiado");
+    if ((await tx.bout.updateMany({ where: { id: bout.id, verification: bout.verification }, data: { ...WITHOUT_BOUT_BACKING, verification: plan.next } })).count === 0) throw new Rechazo("combate_cambiado");
     if (plan.next === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: admin.id, entity: "BOUT", entityId: bout.id, action: `ADMIN_${plan.next}`, before: { verification: bout.verification }, after: { verification: plan.next } }, tx);
   }));
@@ -132,7 +133,7 @@ export async function resolveReport(f: FormData) {
   if (hide && report.entity === "FIGHTER" && !note) go(back, { problema: "ocultar_sin_nota" });
   await guard(back, () => db.$transaction(async (tx) => {
     if (hide) {
-      if (report.entity === "BOUT") await tx.bout.updateMany({ where: { id: report.entityId }, data: { verification: "DISPUTED" } });
+      if (report.entity === "BOUT") await tx.bout.updateMany({ where: { id: report.entityId }, data: { ...WITHOUT_BOUT_BACKING, verification: "DISPUTED" } });
       else if (report.entity === "FIGHTER") {
         const ficha = await tx.fighter.findUnique({ where: { id: report.entityId }, select: { userId: true } });
         if (!ficha) throw new Rechazo("no_existe");

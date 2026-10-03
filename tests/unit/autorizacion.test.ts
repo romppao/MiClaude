@@ -54,10 +54,11 @@ import * as aura from "../../src/app/actions/aura";
 import * as veladas from "../../src/app/actions/events";
 import * as moderacion from "../../src/app/actions/moderation";
 import * as comunidad from "../../src/app/actions/community";
+import * as trayectoria from "../../src/app/actions/trajectory";
 import * as demo from "../../src/app/actions/demo";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -74,9 +75,9 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
-const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport"] as const;
+const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout"] as const;
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
@@ -282,7 +283,9 @@ describe("resultado y confirmación de un combate", () => {
     let guardado: unknown;
     mundo.estado.respuestas["auditLog.create"] = (a: { data: { after: unknown } }) => { guardado = a.data.after; return {}; };
     expect(await destino(acciones.respondBout, { boutId: "b1", decision: "dispute", motivo: "No combatimos ese día" })).toBe("/mi-ficha?aviso=combate_rechazado");
-    expect(guardado).toMatchObject({ verification: "DISPUTED", motivo: "No combatimos ese día" });
+    expect(guardado).toMatchObject({ motivo: "No combatimos ese día" });
+    expect(mundo.estado.escrituras).toContain("report.create");
+    expect(mundo.estado.escrituras).not.toContain("bout.updateMany");
   });
   it("si el rival solo confirmó el combate cuando no tenía resultado, el autor puede añadirlo y vuelve a quedar pendiente de confirmar", async () => {
     iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
@@ -382,12 +385,70 @@ describe("eliminar la cuenta", () => {
     mundo.estado.respuestas["fighter.findUnique"] = { id: "f1", _count: { boutsAsA: 0, boutsAsB: 0 } };
     expect(await destino(acciones.deleteAccount, { confirm: "on", current: "contraseña-buena-1" })).toBe("/?aviso=cuenta_eliminada");
     const e = mundo.estado.escrituras;
-    expect(e.filter((x) => x === "auditLog.updateMany")).toHaveLength(2); // el historial de la ficha y el de la cuenta
+    expect(e.filter((x) => x === "auditLog.updateMany")).toHaveLength(3); // ficha, cuenta y comprobaciones de trayectoria/acreditación
     expect(e.lastIndexOf("auditLog.updateMany")).toBeLessThan(e.indexOf("auditLog.create"));
   });
   it("sin marcar la confirmación no se borra nada", async () => {
     iniciarSesion(persona("FAN"));
     expect(await destino(acciones.deleteAccount, { current: "x" })).toBe("/mi-cuenta/eliminar?problema=eliminar_sin_confirmar");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+});
+
+describe("trayectoria: propiedad, acreditación y concurrencia", () => {
+  const updatedAt = new Date("2026-10-01T10:00:00Z");
+  const logro = { id: "t1", fighterId: "f-otro", withdrawnAt: null, rejectedAt: null, updatedAt, discipline: "BOXEO", supportKind: "DECLARED", fighter: { userId: "otro" } };
+  const accreditation = { id: "a1", userId: "u-FAN", active: true, kind: "TRAINER", disciplines: ["BOXEO"], name: "Entrenador acreditado", updatedAt };
+  for (const nombre of ["reviewAchievement", "endorseBout"] as const) {
+    it(`${nombre} exige acreditación aunque el usuario sea organizador`, async () => {
+      iniciarSesion(persona("ORGANIZER"));
+      expect(await destino(acciones[nombre])).toBe("/mi-cuenta?problema=respaldo_sin_permiso");
+      expect(mundo.estado.escrituras).toEqual([]);
+    });
+  }
+  for (const nombre of ["withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview"] as const) {
+    it(`${nombre} no permite gestionar un título ajeno`, async () => {
+      iniciarSesion(persona("FIGHTER", { fighter: { id: "f-mio", disciplines: [] } }));
+      mundo.estado.respuestas["fighterAchievement.findUnique"] = logro;
+      expect(await destino(acciones[nombre], { achievementId: "t1", version: updatedAt.toISOString() })).toBe("/mi-ficha/trayectoria?problema=sin_permiso");
+      expect(mundo.estado.escrituras).toEqual([]);
+    });
+  }
+  it("un entrenador no excluye títulos ni restaura los rechazados", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["supportAccreditation.findUnique"] = accreditation;
+    mundo.estado.respuestas["fighterAchievement.findUnique"] = logro;
+    expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "reject", note: "No me convence" })).toBe("/respaldar?problema=solo_moderadores");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un entrenador no respalda un título de otra disciplina aunque falsifique el formulario", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["supportAccreditation.findUnique"] = accreditation;
+    mundo.estado.respuestas["fighterAchievement.findUnique"] = { ...logro, discipline: "MMA" };
+    expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "endorse", supportKind: "FEDERATION", evidenceUrl: "https://example.com/acta", note: "Acta comprobada" })).toBe("/respaldar?problema=respaldo_sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un título cambiado entre lectura y decisión no se pisa", async () => {
+    iniciarSesion(persona("ADMIN"));
+    mundo.estado.respuestas["fighterAchievement.findUnique"] = logro;
+    mundo.estado.respuestas["fighterAchievement.updateMany"] = { count: 0 };
+    expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "reject", note: "Fuente no válida" })).toBe("/respaldar?problema=respaldo_cambiado");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+  it("una acreditación retirada durante la revisión no puede conceder nuevos puntos", async () => {
+    iniciarSesion(persona("FAN"));
+    let reads = 0;
+    mundo.estado.respuestas["supportAccreditation.findUnique"] = () => ++reads === 1 ? accreditation : { ...accreditation, active: false };
+    mundo.estado.respuestas["fighterAchievement.findUnique"] = logro;
+    expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "endorse", evidenceUrl: "https://example.com/acta", note: "Acta comprobada" })).toBe("/respaldar?problema=respaldo_sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+});
+
+describe("fechas de la trayectoria declarada", () => {
+  it("no permite declarar un título anterior al nacimiento conocido", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "f1", birthDate: new Date("1990-01-01"), disciplines: [] } }));
+    expect(await destino(acciones.saveAchievement, { championship: "Campeonato", organization: "Entidad", scope: "NATIONAL", awardedOn: "1975-06-01" })).toBe("/mi-ficha/trayectoria?problema=logro_fecha");
     expect(mundo.estado.escrituras).toEqual([]);
   });
 });

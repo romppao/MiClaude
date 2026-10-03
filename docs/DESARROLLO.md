@@ -202,3 +202,11 @@ Los documentos históricos (`DIARIO.md`, `AUDITORIA.md`) citan los ficheros con 
 Consultar la fuente primaria y su vigencia; documentar país/federación, modalidad, edición, edad, sexo, pesos y excepciones en `DISENO-PESOS.md`. Las divisiones se añaden en `lib/common/competition.ts` con identificadores nuevos por versión: nunca cambiar el significado de un id guardado. El texto puede mejorarse; el id se conserva aunque contenga el nombre original del grupo. No completar pesos ausentes por analogía con otra edad, sexo, federación o disciplina.
 
 Ficha y combate guardan divisiones independientes; usar `parseCompetitionChoice` en cada entrada de servidor y las guardas de edad en la fecha pertinente. Un catálogo deportivo no acredita licencia ni autorización de menores. Probar límites normativos en `competition.test.ts` y recorridos en `categorias.mjs`, incluida manipulación del formulario, ambos participantes y permanencia histórica. Ejecutar migraciones/paridad, tipos, mapa, unitarias, compilación, navegador y accesibilidad.
+
+## Cambiar trayectoria, respaldo o navegación
+
+- Puntos y etiquetas: `src/lib/aura/trajectory.ts`; agregación por categoría histórica: `ranking.ts`. Mantener política central, mayor título por categoría, respaldo no acumulable y retirada de bonus al revocar acreditación.
+- Permisos de quien respalda: `src/lib/accounts/backing.ts`, independientes del perfil visual y del rol del cartel. Acciones autenticadas: `src/app/actions/trajectory.ts`; no exportar ayudantes desde ese módulo.
+- Gestión propia `/mi-ficha/trayectoria`, revisión `/respaldar`, acreditaciones `/moderacion/acreditaciones`. Propiedad, disciplina, identidad, versiones, fuente y auditoría se verifican en el servidor. Cada cambio de hechos/fuentes debe invalidar su respaldo.
+- Navegación: `NavigationMenu.tsx` recibe sesión/permisos y el formulario de salir como propiedades; no importa acciones. `layout.tsx` obtiene permisos en el servidor. Usar diálogo nativo, foco/Escape y destinos existentes; mantener máximo cinco enlaces por grupo.
+- Pruebas: `trayectoria.test.ts`, `ranking-trayectoria.test.ts`, permisos en `autorizacion.test.ts`; navegador `trayectoria.mjs` y `menu.mjs`; además la regresión y axe completos. Regenerar mapa tras nuevas rutas/acciones/modelos.

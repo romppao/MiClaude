@@ -23,6 +23,7 @@ export default function Privacy() {
       <ul>
         <li><strong>Tu cuenta:</strong> tu nombre, tu correo electrónico y tu contraseña. La contraseña no se guarda: solo se conserva una huella cifrada que no permite conocerla.</li>
         <li><strong>Tu ficha de peleador</strong> (solo si la creas): nombre, apellidos, alias, ciudad, provincia, gimnasio, medidas, guardia, presentación, disciplinas, las divisiones deportivas y pesos que declaras (grupo de edad y categoría masculina o femenina), tu récord anterior declarado y, si quieres, tu fecha de nacimiento (en público solo se enseña la edad).</li>
+        <li><strong>Trayectoria y respaldos:</strong> los títulos que declaras, sus categorías históricas y fuentes, las solicitudes de revisión y, cuando corresponda, tu acreditación para respaldar hechos de otras personas.</li>
         <li><strong>Tu actividad:</strong> los combates que registras o confirmas, las auras y comentarios que das, los peleadores que sigues y los avisos que envías.</li>
         <li><strong>Datos técnicos mínimos:</strong> una cookie necesaria para mantener tu sesión iniciada y, durante 2 días como máximo, tu dirección de conexión, solo para frenar intentos repetidos de acceso. No usamos cookies de publicidad ni de medición.</li>
       </ul>
@@ -33,6 +34,7 @@ export default function Privacy() {
       <h2>Quién los ve</h2>
       <ul>
         <li><strong>Cualquier persona</strong> puede ver las fichas de peleadores, sus divisiones deportivas declaradas, los pesos y divisiones de sus combates, su récord y su aura, y los comentarios que dejas al dar aura junto a tu nombre de pila y la inicial de tu primer apellido.</li>
+        <li>Los títulos activos y su fuente se muestran en tu ficha pública. Las notas de revisión las ven moderación y las personas acreditadas para esa disciplina; tu correo electrónico sigue siendo privado. Al eliminar tu cuenta se retiran tus títulos y acreditación, y sus datos personales del historial.</li>
         <li><strong>Nunca se muestra</strong> tu correo electrónico ni tu contraseña.</li>
         <li><strong>Las personas moderadoras</strong> ven tu correo electrónico solo para revisar avisos y solicitudes.</li>
         <li><strong>El proveedor de envío de correo</strong> recibe tu dirección y el mensaje solo para poder entregártelo.</li>

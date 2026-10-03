@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 const getEvent = cache((slug: string) =>
   db.event.findUnique({
     where: { slug },
-    include: { organizer: { select: { organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { fighterA: true, fighterB: true } } },
+    include: { organizer: { select: { organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { fighterA: true, fighterB: true, supportAccreditation: true } } },
   }),
 );
 
@@ -52,9 +52,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <tbody>
           {e.bouts.map((b) => {
             const enRevision = b.verification === "DISPUTED"; // un combate rechazado no se muestra como un hecho
-            // Lo que declara un peleador sobre su rival no se da por hecho en ningún sitio hasta que el rival lo confirme (igual que en las fichas).
-            const pendiente = b.verification === "SELF_REPORTED";
-            const oculto = enRevision || pendiente;
+            // El resultado se presenta con su respaldo; confirmar es opcional.
+            const oculto = enRevision;
             const ganador = oculto ? null : b.result === "A_WIN" ? publicFighterName(b.fighterA) : b.result === "B_WIN" ? publicFighterName(b.fighterB) : null;
             return (
               <tr key={b.id}>
@@ -64,13 +63,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <td data-label="Categoría">{[divisionLabel(b.divisionId), b.weightClass ? weightClassLabel(e.discipline, e.level, b.weightClass, b.divisionId) : null, b.rounds ? `${b.rounds} asaltos` : null].filter(Boolean).join(" · ")}</td>
                 <td data-label="Resultado">
                   {enRevision ? <span className="mut">Resultado en revisión</span>
-                    : pendiente ? <span className="mut">Resultado pendiente de confirmar por el rival</span>
                     : !b.result ? <span className="mut">{eventDayReached(e.date) ? "Resultado por anotar" : "Próximo combate"}</span>
                     : b.result === "DRAW" ? "Empate"
                     : b.result === "NO_CONTEST" ? "Sin decisión"
                     : <>Gana {ganador}{b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? `, asalto ${b.endRound}` : ""})` : ""}</>}
                 </td>
-                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag verification={b.verification} /> : <span className="mut">—</span>}</td>
+                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag verification={b.verification} backing={b} /> : <span className="mut">—</span>}</td>
               </tr>
             );
           })}

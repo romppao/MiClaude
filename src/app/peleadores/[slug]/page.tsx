@@ -8,6 +8,9 @@ import { db } from "../../../lib/common/db";
 import { computeRecords } from "../../../lib/fighters/record";
 import { divisionLabel } from "../../../lib/common/competition";
 import { DISCIPLINE_LABEL, weightClassLabel } from "../../../lib/common/disciplines";
+import { auraRanking } from "../../../lib/aura/ranking";
+import TrajectoryList from "../../components/TrajectoryList";
+import AuraBreakdown from "../../components/AuraBreakdown";
 import RecordCards from "../../components/RecordCards";
 import VerificationTag from "../../components/VerificationTag";
 import { getUser } from "../../../lib/accounts/auth";
@@ -47,7 +50,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   if (!fighter) notFound();
   const bouts = await db.bout.findMany({
     where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] },
-    include: { event: true, fighterA: true, fighterB: true },
+    include: { event: true, fighterA: true, fighterB: true, supportAccreditation: true },
     orderBy: { event: { date: "desc" } },
   });
   const records = computeRecords(fighter.id, bouts);
@@ -62,6 +65,10 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
     user ? db.aura.findMany({ where: { fighterId: fighter.id, userId: user.id } }) : Promise.resolve([]),
   ]);
 
+  const [achievements, auraGroups] = fighter.listed && !fighter.hiddenAt ? await Promise.all([
+    db.fighterAchievement.findMany({ where: { fighterId: fighter.id, rejectedAt: null, withdrawnAt: null }, include: { supportAccreditation: true }, orderBy: { awardedOn: "desc" } }),
+    auraRanking({ fighterId: fighter.id }),
+  ]) : [[], []];
   const back = `/peleadores/${fighter.slug}`;
   const nombre = publicFighterName(fighter);
   const publica = fighter.listed && !fighter.hiddenAt; // sin reclamar u oculta: solo se muestran nombre abreviado, récord y combates
@@ -117,6 +124,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       </div>
 
       <RecordCards records={records} disciplines={fighter.disciplines} />
+      {publica&&<><h2>Aura por categoría</h2><AuraBreakdown groups={auraGroups}/><p><Link href="/ayuda#aura">Cómo se calcula el aura</Link></p><h2>Títulos y trayectoria</h2><TrajectoryList achievements={achievements}/><p className="mut">Cuenta el título con mayor aporte de cada categoría. Los títulos declarados son responsabilidad del deportista; puedes solicitar su revisión desde «¿Hay un error? Avísanos».</p></>}
       <div className="card" style={{ marginTop: 12 }}>
         <div className="mut">Aura del público</div>
         <div className="rec">{auraTotal}</div>
@@ -148,22 +156,20 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           {bouts.map((b) => {
             const isA = b.fighterAId === fighter.id;
             const opp = isA ? b.fighterB : b.fighterA;
-            // Lo que declara un peleador sobre su rival no se muestra como hecho en la ficha del rival hasta que este lo confirme; lo rechazado tampoco.
+            // Las declaraciones son visibles en ambas fichas; solo moderación puede suspenderlas.
             const enRevision = b.verification === "DISPUTED";
-            const pendiente = b.verification === "SELF_REPORTED" && !isA;
-            const oculto = enRevision || pendiente;
+            const oculto = enRevision;
             const r = resultWord(b.result, isA);
             const mine = myAuras.some((x) => x.boutId === b.id);
             const aura = canGiveAura({ bout: b, fighterId: fighter.id, viewerFighterId: user?.fighter?.id });
             // Cuando no se puede dar aura, se dice por qué (en vez de dejar la celda vacía).
-            const notaAura = !aura.ok ? lookup(PROBLEMAS, aura.problema) : pendiente ? `Se podrá dar aura cuando ${nombre} confirme el combate.` : null;
+            const notaAura = !aura.ok ? lookup(PROBLEMAS, aura.problema) : null;
             return (
               <tr key={b.id}>
                 <td data-label="Fecha">{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
                 <td data-label="Rival"><Link href={`/peleadores/${opp.slug}`}>{publicFighterName(opp)}</Link></td>
                 <td data-label="Resultado">
                   {enRevision ? <span className="mut">Resultado en revisión</span>
-                    : pendiente ? <span className="mut">Pendiente de confirmar por {nombre}</span>
                     : !b.result ? <span className="mut">{eventDayReached(b.event.date) ? "Resultado por anotar" : "Próximo combate"}</span>
                     : <span className={r.cls}>{r.text}</span>}
                 </td>
@@ -173,12 +179,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
                   <div className="mut">{divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(b.event.discipline, b.event.level, b.weightClass, b.divisionId)}` : ""}</div>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
-                  <VerificationTag verification={b.verification} />
+                  <VerificationTag verification={b.verification} backing={b} />
                   {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
                 </td>
                 <td data-label="Aura">
                   {reportForm("BOUT", b.id, undefined, `el combate contra ${publicFighterName(opp)}`)}
-                  {aura.ok && !pendiente && (user?.emailVerifiedAt ? (
+                  {aura.ok && (user?.emailVerifiedAt ? (
                     mine ? (
                       <form action={removeAura} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={fighter.id} />

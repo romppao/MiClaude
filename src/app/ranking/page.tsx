@@ -17,18 +17,18 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
   return (
     <>
       <h1>Ránking de aura</h1>
-      <p className="mut">El aura es el reconocimiento del público a una actuación. Este ránking mide el aura recibida, no las victorias ni una clasificación deportiva oficial. Puedes consultar el récord y el respaldo de los resultados en la ficha de cada peleador.</p>
+      <p className="mut">El aura combina trayectoria, respaldo opcional y reconocimiento de la comunidad. No es una clasificación deportiva oficial. Puedes consultar el récord y el respaldo de los resultados en la ficha de cada peleador.</p>
       <details>
         <summary>¿Cómo se calcula el ránking?</summary>
         <ul>
-          <li>Cada aura vale un punto. Se suman las recibidas en combates de cada disciplina; no se cuentan las de combates en revisión ni de veladas canceladas.</li>
-          <li>Se agrupa por el nivel, la división de edad y categoría y el peso guardados en cada combate. Cambiar la ficha no traslada el aura histórica. Las divisiones sin confirmar quedan separadas. Solo aparecen fichas públicas con aura.</li>
+          <li>Cada reconocimiento de la comunidad vale un punto. Se añade el título con mayor aporte de la categoría y los respaldos comprobados. La confirmación del rival es opcional; una revisión decidida por moderación o una cancelación excluye el combate.</li>
+          <li>Se agrupa por el nivel, la división de edad y categoría y el peso guardados en cada combate o título. Cambiar la ficha no traslada el aura histórica. Las divisiones sin confirmar quedan separadas. Solo aparecen fichas públicas con aura; los títulos sin respaldo se indican como declarados.</li>
           <li>La zona corresponde a la provincia de la ficha del peleador.</li>
-          <li>«Últimos 90 días» cuenta el aura dada en ese periodo, aunque el combate sea anterior.</li>
+          <li>«Últimos 90 días» limita los reconocimientos de la comunidad al periodo; la trayectoria y sus respaldos se mantienen.</li>
           <li>Con los mismos puntos se comparte puesto: 1, 1, 3. Los nombres empatados se muestran en orden alfabético.</li>
           <li>El total no se divide por el número de combates: más actividad o público puede dar lugar a más aura.</li>
         </ul>
-        <p><Link href="/ayuda#respaldo">Qué respaldo tienen los resultados</Link>.</p>
+        <p><Link href="/ayuda#aura">Escala de puntos y respaldos</Link>.</p>
       </details>
       <form className="search">
         <label className="field"><span>Disciplina</span>
@@ -50,13 +50,13 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
           <h2>{DISCIPLINE_LABEL[g.discipline]} · {levelName(g.level)} · {divisionLabel(g.divisionId)} · {g.weightClass ? weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId) : NO_CATEGORY}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
-            <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th></tr></thead>
+            <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th><th>Trayectoria</th><th>Respaldo</th><th>Comunidad</th></tr></thead>
             <tbody>
               {g.entries.map((r) => (
                 <tr key={r.fighterId}>
                   <td>{r.position}</td>
                   <td><Link href={`/peleadores/${r.slug}`}>{r.name}</Link></td>
-                  <td><strong>{r.aura}</strong></td>
+                  <td><strong>{r.aura}</strong></td><td>{r.trajectory??0}{r.declared&&<span className="mut"> · declarada</span>}</td><td>{r.backing??0}</td><td>{r.community??r.aura}</td>
                 </tr>
               ))}
             </tbody>

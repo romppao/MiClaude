@@ -38,7 +38,7 @@ export const slugName = (name: string, ...acompanantes: string[]): string =>
 
 /** Cómo se llama en pantalla cada nivel de respaldo de un combate. */
 export const VERIFICATION_LABEL = {
-  SELF_REPORTED: "pendiente de confirmar",
+  SELF_REPORTED: "declarado · confirmación opcional",
   CONFIRMED: "confirmado por el rival",
   VERIFIED: "verificado",
   DISPUTED: "en revisión",
@@ -54,12 +54,14 @@ export function resultWord(result: "A_WIN" | "B_WIN" | "DRAW" | "NO_CONTEST" | n
 
 /** Historial de cambios: nombres en español de lo que cambia y de la acción (lo desconocido se muestra en palabras sueltas). */
 export const AUDIT_ENTITY_LABEL: Record<string, string> = {
+  ACHIEVEMENT: "título", ACCREDITATION: "acreditación",
   BOUT: "Combate", EVENT: "Velada", FIGHTER: "Ficha de peleador", GYM: "Gimnasio", CLAIM: "Reclamación de ficha",
   ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta",
 };
 export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  UPDATED: "corregido", WITHDRAWN: "retirado", REVIEW_REQUESTED: "revisión solicitada", ENDORSE: "respaldado", REJECT: "excluido por moderación", RESTORE: "restaurado como declarado", GRANTED: "acreditación concedida", REVOKED: "acreditación retirada",
   CREATED: "creado", CREATED_BY_ORGANIZER: "añadido al cartel por el organizador", RESULT_SET: "resultado indicado", RESULT_SET_BY_AUTHOR: "resultado indicado por quien lo registró",
-  EVIDENCE_SET: "enlace de evidencia cambiado", RIVAL_CONFIRMED: "confirmado por el rival", RIVAL_DISPUTED: "rechazado por el rival", ADMIN_VERIFIED: "verificado por un moderador",
+  RIVAL_REVIEW_REQUESTED: "revisión solicitada por el rival", ENDORSED: "respaldo del hecho comprobado", WITHDRAWAL_UNDONE: "retirada del título deshecha", EVIDENCE_SET: "enlace de evidencia cambiado", RIVAL_CONFIRMED: "confirmado por el rival", RIVAL_DISPUTED: "rechazado por el rival", ADMIN_VERIFIED: "verificado por un moderador",
   ADMIN_DISPUTED: "marcado como no correcto por un moderador", ADMIN_SELF_REPORTED: "restaurado como pendiente por un moderador",
   APPROVED: "aprobada", REJECTED: "rechazada", VERIFIED: "sello de verificado concedido", VERIFICATION_REVOKED: "sello de verificado retirado",
   DISCIPLINE_ADDED: "disciplina añadida", DISCIPLINE_UPDATED: "disciplina modificada", PROFILE_UPDATED: "datos de la ficha modificados",

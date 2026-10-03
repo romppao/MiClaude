@@ -180,11 +180,23 @@ export async function deleteAccount(f: FormData) {
     const fighter = await tx.fighter.findUnique({ where: { userId: user.id }, include: { _count: { select: { boutsAsA: true, boutsAsB: true } } } });
     let ficha: "borrada" | "anonimizada" | null = null;
     if (fighter) {
-      if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await tx.fighter.delete({ where: { id: fighter.id } }); await scrubFighterHistory(tx, fighter.id); ficha = "borrada"; }
+      if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await scrubFighterHistory(tx, fighter.id); await tx.fighter.delete({ where: { id: fighter.id } }); ficha = "borrada"; }
       else { await anonymizeFighter(tx, fighter.id); ficha = "anonimizada"; }
     }
     // El historial guardaba su nombre real «antes» y «después» de cada cambio: se vacían esos datos (queda constancia de qué pasó y cuándo).
     await tx.auditLog.updateMany({ where: { entity: "USER", entityId: user.id }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
+    const accreditation = await tx.supportAccreditation.findUnique({ where: { userId: user.id } });
+    if (accreditation) {
+      await tx.supportAccreditation.update({ where: { id: accreditation.id }, data: { active: false, name: "Acreditación retirada", evidenceUrl: "", note: "" } });
+      await tx.auditLog.updateMany({ where: { entity: "ACCREDITATION", entityId: accreditation.id }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
+      await tx.fighterAchievement.updateMany({ where: { supportAccreditationId: accreditation.id }, data: { supportAuthority: null, supportNote: null } });
+      await tx.bout.updateMany({ where: { supportAccreditationId: accreditation.id }, data: { supportAuthority: null, supportNote: null } });
+    }
+    // Las comprobaciones nuevas también podían guardar el nombre o notas privadas de quien respaldó.
+    await tx.auditLog.updateMany({
+      where: { userId: user.id, OR: [{ entity: { in: ["ACHIEVEMENT", "ACCREDITATION"] } }, { entity: "BOUT", action: "ENDORSED" }] },
+      data: { before: Prisma.DbNull, after: Prisma.DbNull },
+    });
     await audit({ userId: null, entity: "USER", entityId: user.id, action: "ACCOUNT_DELETED", after: { role: user.role, ficha } }, tx);
     await tx.user.delete({ where: { id: user.id } });
   }));

@@ -44,7 +44,7 @@ function analizar(nombre) {
       if (ts.isCallExpression(x)) {
         const c = x.expression;
         if (ts.isIdentifier(c)) {
-          if (["requireUser", "requireVerifiedUser", "requireAdmin", "requireOrganizer"].includes(c.text)) r.guardas.add(c.text);
+          if (["requireUser", "requireVerifiedUser", "requireAdmin", "requireOrganizer", "requireSupportActor"].includes(c.text)) r.guardas.add(c.text);
           if (["sendMail", "sendVerificationEmail", "sendPasswordResetEmail", "notifyDecision", "notifyFollowersOfBout"].includes(c.text)) r.correo = true;
           if (c.text === "audit" && x.arguments[0] && ts.isObjectLiteralExpression(x.arguments[0])) {
             const props = Object.fromEntries(x.arguments[0].properties.filter(ts.isPropertyAssignment).map((p) => [p.name.getText(), ts.isStringLiteralLike(p.initializer) ? p.initializer.text : null]));
@@ -65,7 +65,7 @@ function analizar(nombre) {
 }
 // Tareas de mantenimiento que se disparan desde las acciones pero no son su propósito: no se siguen (ensuciarían el mapa).
 const NO_SEGUIR = new Set(["maybePurge", "notifyFollowersOfBout", "notifyDecision"]);
-const QUIEN = [["requireAdmin", "Moderación"], ["requireOrganizer", "Organizador (o moderación) con correo verificado"], ["requireVerifiedUser", "Cuenta con correo verificado"], ["requireUser", "Cuenta con sesión iniciada"]];
+const QUIEN = [["requireAdmin", "Moderación"], ["requireSupportActor", "Moderación o cuenta acreditada para la disciplina (correo verificado)"], ["requireOrganizer", "Organizador (o moderación) con correo verificado"], ["requireVerifiedUser", "Cuenta con correo verificado"], ["requireUser", "Cuenta con sesión iniciada"]];
 const quien = (g) => QUIEN.find(([k]) => g.has(k))?.[1] ?? "Cualquiera";
 const lista = (s) => (s.size ? [...s].sort(cmp).join(", ") : "—");
 
@@ -98,7 +98,8 @@ const pantallas = walk(path.join(RAIZ, "src/app")).filter((f) => /\/(page\.tsx|r
   // Heurística sobre el texto de la pantalla (las acciones, en cambio, se analizan siguiendo las llamadas).
   let acceso = "Pública";
   if (/sin_permiso/.test(texto) && /\/entrar/.test(texto)) acceso = "Organizador de esa velada o moderación";
-  else if (/role !== "ADMIN"\)\s*redirect|solo_moderadores/.test(texto)) acceso = "Moderación";
+  else if (/requireAdmin\s*\(|role !== "ADMIN"\)\s*redirect|solo_moderadores/.test(texto)) acceso = "Moderación";
+  else if (/requireSupportActor\s*\(/.test(texto)) acceso = "Moderación o cuenta acreditada para la disciplina (correo verificado)";
   else if (/requireVerifiedUser|redirect\("\/verificar"/.test(texto)) acceso = "Cuenta con correo verificado";
   else if (/requireUser\(|if \(!user\)[^\n]*redirect/.test(texto)) acceso = "Cuenta con sesión iniciada";
   else if (/\bgetUser\(/.test(texto)) acceso = "Pública (cambia lo que ve según la cuenta)";

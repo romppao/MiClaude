@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.redirect(new URL(loginPath("/mi-cuenta"), request.url));
 
   const fighter = user.fighter;
-  const [bouts, auras, follows, claims, organizer, reports, history, events] = await Promise.all([
+  const [bouts, auras, follows, claims, organizer, reports, history, events, achievements, accreditation] = await Promise.all([
     fighter ? db.bout.findMany({ where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] }, include: { event: true, fighterA: true, fighterB: true }, orderBy: { event: { date: "desc" } } }) : Promise.resolve([]),
     db.aura.findMany({ where: { userId: user.id }, include: { fighter: true, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" } }),
     db.follow.findMany({ where: { userId: user.id }, include: { fighter: true } }),
@@ -21,6 +21,8 @@ export async function GET(request: Request) {
     db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
     db.auditLog.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 1000 }),
     db.event.findMany({ where: { organizerId: user.id }, orderBy: { date: "desc" } }),
+    fighter ? db.fighterAchievement.findMany({ where: { fighterId: fighter.id } }) : Promise.resolve([]),
+    db.supportAccreditation.findUnique({ where: { userId: user.id } }),
   ]);
 
   const datos = {
@@ -33,6 +35,8 @@ export async function GET(request: Request) {
       guardia: fighter.stance, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,
       disciplinas: fighter.disciplines.map((d) => ({ disciplina: d.discipline, nivel: d.level, categoria: d.weightClass, divisionDeportiva: d.divisionId, cinturon: d.belt, grados: d.beltDegrees, combatesAnterioresDeclarados: { total: d.priorTotal, victorias: d.priorWins, derrotas: d.priorLosses, empates: d.priorDraws } })),
     },
+    titulosDeclarados: achievements.map(a=>({ campeonato:a.championship, entidad:a.organization, fecha:a.awardedOn, ambito:a.scope, disciplina:a.discipline, nivel:a.level, division:a.divisionId, peso:a.weightClass, respaldo:a.supportKind, autoridad:a.supportAuthority, fuente:a.evidenceUrl, comprobacion:a.supportNote, revisionSolicitadaEl:a.reviewRequestedAt, retiradoEl:a.withdrawnAt, excluidoEl:a.rejectedAt, motivo:a.rejectionReason })),
+    miAcreditacion: accreditation && { tipo:accreditation.kind, nombre:accreditation.name, disciplinas:accreditation.disciplines, activa:accreditation.active, fuente:accreditation.evidenceUrl, comprobacion:accreditation.note },
     combatesDeMiFicha: bouts.map((b) => ({ velada: b.event.name, fecha: b.event.date, disciplina: b.event.discipline, nivel: b.event.level, categoria: b.weightClass, divisionDeportiva: b.divisionId, rival: publicFighterName(b.fighterAId === fighter?.id ? b.fighterB : b.fighterA), resultado: b.result, formaDeTerminar: b.method, estado: b.verification, enlaceDeEvidencia: b.evidenceUrl, loRegistreYo: b.createdById === user.id })),
     auraQueHeDado: auras.map((a) => ({ peleador: publicFighterName(a.fighter), velada: a.bout.event.name, comentario: a.comment, lovioEnDirecto: a.attended, fecha: a.createdAt })),
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),

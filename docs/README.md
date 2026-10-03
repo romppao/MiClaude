@@ -1,6 +1,6 @@
 # Documentación de Ring España
 
-> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. Se han pedido propuestas visuales con colores opuestos a Raunder; la implementación de la identidad sigue pendiente de elección. Consulta [DISENO.md](DISENO.md).
+> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. El violeta y los perfiles aprobados están integrados en #12. La continuación incorpora trayectoria, respaldo opcional y navegación por actividades, conservando ese diseño. Consulta [DISENO.md](DISENO.md).
 
 Una página para saber **qué documento abrir según lo que quieras hacer**. Todo lo que está aquí se mantiene al día como parte del trabajo (regla del fundador: se documenta cada bloque de trabajo, para poder contarlo y retomarlo).
 
