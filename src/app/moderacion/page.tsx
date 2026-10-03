@@ -4,7 +4,10 @@ import { db } from "../../lib/common/db";
 import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
 import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions/moderation";
 import { REPORT_REASONS } from "../../lib/community/reports";
-import { lookup } from "../../lib/common/safe";
+import Paginacion from "../components/Paginacion";
+import { pageNumber, pageWindow } from "../../lib/common/pagination";
+import { boutVersion } from "../../lib/bouts/rules";
+import { lookup, flatParams } from "../../lib/common/safe";
 import { METHOD_LABEL, VERIFICATION_LABEL, fmtDate } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 import { publicUserName } from "../../lib/common/names";
@@ -12,13 +15,13 @@ import { publicUserName } from "../../lib/common/names";
 export const metadata = { title: "Moderación" };
 export const dynamic = "force-dynamic";
 
-const LIMITE = 100;
+const LIMITE = 50;
 
 type BoutRow = Awaited<ReturnType<typeof cargarCombates>>[number];
 
-function cargarCombates(where: object, take = LIMITE) {
+function cargarCombates(where: object, take = LIMITE, skip = 0) {
   return db.bout.findMany({
-    where, take, orderBy: { event: { date: "desc" } },
+    where, take, skip, orderBy: [{ event: { date: "desc" } }, { id: "asc" }],
     include: { event: true, fighterA: true, fighterB: true, createdBy: { select: { name: true, email: true } } },
   });
 }
@@ -60,40 +63,53 @@ function BoutTable({ rows, acciones, vacio }: { rows: BoutRow[]; acciones: (b: B
 const nombreCombate = (b: { fighterA: { firstName: string; lastName: string }; fighterB: { firstName: string; lastName: string }; event: { name: string } }) =>
   `${b.fighterA.firstName} ${b.fighterA.lastName} contra ${b.fighterB.firstName} ${b.fighterB.lastName} en ${b.event.name}`;
 
-export default async function Moderation() {
-  const user = await requireAdmin("/moderacion");
-
+export default async function Moderation({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  await requireAdmin("/moderacion");
+  const raw = flatParams(await searchParams);
+  const keys = ["avisos", "reclamaciones", "organizadores", "gimnasios", "senales", "combates", "revision"] as const;
   const porVerificar = { verification: { in: ["SELF_REPORTED", "CONFIRMED"] as ("SELF_REPORTED" | "CONFIRMED")[] } };
-  const [conSenales, sinSenales, enRevision, totales] = await Promise.all([
-    cargarCombates({ ...porVerificar, flags: { isEmpty: false } }),
-    cargarCombates({ ...porVerificar, flags: { isEmpty: true } }),
-    cargarCombates({ verification: "DISPUTED" }),
-    Promise.all([db.bout.count({ where: porVerificar }), db.bout.count({ where: { verification: "DISPUTED" } }), db.gym.count(), db.gym.count({ where: { verifiedAt: null } })]),
+  const flagged = { ...porVerificar, flags: { isEmpty: false } };
+  const unflagged = { ...porVerificar, flags: { isEmpty: true } };
+  const [nReports, nClaims, nOrganizers, nGimnasios, nFlags, nUnflagged, nRevision, nSinSello] = await Promise.all([
+    db.report.count({ where: { status: "OPEN" } }), db.claimRequest.count({ where: { status: "PENDING" } }),
+    db.organizerRequest.count({ where: { status: "PENDING" } }), db.gym.count(),
+    db.bout.count({ where: flagged }), db.bout.count({ where: unflagged }), db.bout.count({ where: { verification: "DISPUTED" } }),
+    db.gym.count({ where: { verifiedAt: null } }),
+  ]);
+  const counts = [nReports, nClaims, nOrganizers, nGimnasios, nFlags, nUnflagged, nRevision];
+  const windows = Object.fromEntries(keys.map((k,i) => [k, pageWindow(counts[i], pageNumber(raw[k]), LIMITE)]));
+  const pageParams = Object.fromEntries(keys.map(k => [k, windows[k].current > 1 ? String(windows[k].current) : undefined]));
+  const query = new URLSearchParams(Object.entries(pageParams).filter((v): v is [string,string] => !!v[1])).toString();
+  const back = (key: string) => `/moderacion${query ? `?${query}` : ""}#${key}`;
+  const paging = (key: string, unidad: [string,string], etiqueta: string) => {
+    const w = windows[key];
+    return <Paginacion ruta="/moderacion" params={pageParams} parametro={key} ancla={key} etiqueta={`Páginas de ${etiqueta}`} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={w.total} unidad={unidad} />;
+  };
+  const [conSenales, sinSenales, enRevision, reports, gyms, claims, organizers] = await Promise.all([
+    cargarCombates(flagged, windows.senales.take, windows.senales.skip),
+    cargarCombates(unflagged, windows.combates.take, windows.combates.skip),
+    cargarCombates({ verification: "DISPUTED" }, windows.revision.take, windows.revision.skip),
+    db.report.findMany({ where: { status: "OPEN" }, include: { user: { select: { name: true, email: true } } }, orderBy: [{ createdAt: "asc" }, { id: "asc" }], take: windows.avisos.take, skip: windows.avisos.skip }),
+    db.gym.findMany({ orderBy: [{ verifiedAt: { sort: "asc", nulls: "first" } }, { name: "asc" }, { id: "asc" }], take: windows.gimnasios.take, skip: windows.gimnasios.skip }),
+    db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, fighter: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }], take: windows.reclamaciones.take, skip: windows.reclamaciones.skip }),
+    db.organizerRequest.findMany({ where: { status: "PENDING" }, include: { user: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }], take: windows.organizadores.take, skip: windows.organizadores.skip }),
   ]);
   // Por qué el rival dijo «no es correcto» (queda en el historial de cada combate rechazado)
   const rechazos = await db.auditLog.findMany({ where: { entity: "BOUT", action: "RIVAL_DISPUTED", entityId: { in: enRevision.map((b) => b.id) } }, orderBy: { createdAt: "asc" }, select: { entityId: true, after: true } });
   const motivoDe = new Map(rechazos.map((r) => [r.entityId, (r.after as { motivo?: string } | null)?.motivo ?? ""]));
-  const reports = await db.report.findMany({ where: { status: "OPEN" }, include: { user: { select: { name: true, email: true } } }, orderBy: { createdAt: "asc" }, take: LIMITE });
   const ids = (e: string) => reports.filter((r) => r.entity === e).map((r) => r.entityId);
   const [reportedBouts, reportedFighters, reportedAuras] = await Promise.all([
     db.bout.findMany({ where: { id: { in: ids("BOUT") } }, include: { event: true, fighterA: true, fighterB: true } }),
     db.fighter.findMany({ where: { id: { in: ids("FIGHTER") } } }),
     db.aura.findMany({ where: { id: { in: ids("AURA") } }, include: { fighter: true, user: { select: { name: true } } } }),
   ]);
-  const [gyms, claims, organizers] = await Promise.all([
-    db.gym.findMany({ orderBy: [{ verifiedAt: { sort: "asc", nulls: "first" } }, { name: "asc" }], take: LIMITE }),
-    db.claimRequest.findMany({ where: { status: "PENDING" }, include: { user: true, fighter: true }, orderBy: { createdAt: "asc" } }),
-    db.organizerRequest.findMany({ where: { status: "PENDING" }, include: { user: true }, orderBy: { createdAt: "asc" } }),
-  ]);
-  const [nPorVerificar, nRevision, nGimnasios, nSinSello] = totales;
-
-  // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
   // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
   // En los organizadores, la nota es siempre obligatoria: al aprobar recoge la evidencia comprobada, que respalda el sello.
   const aprobarRechazar = (action: (f: FormData) => Promise<void>, name: string, id: string, quien: string, notaSiempre = false) => (
-    <form action={action} style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-end" }}>
+    <form action={action} noValidate={notaSiempre} style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-end" }}>
       <input type="hidden" name={name} value={id} />
-      <label className="field"><span>{notaSiempre ? "Evidencia comprobada, o motivo si rechazas (obligatorio)" : "Motivo (obligatorio si rechazas)"}</span><input name="note" maxLength={500} /></label>
+      <input type="hidden" name="back" value={back(name === "claimId" ? "reclamaciones" : "organizadores")} />
+      <label className="field"><span>{notaSiempre ? "Evidencia comprobada, o motivo si rechazas (obligatorio)" : "Motivo (obligatorio si rechazas)"}</span><input name="note" maxLength={500} required={notaSiempre} /></label>
       <button name="decision" value="approve" aria-label={`Aprobar la solicitud de ${quien}`}>Aprobar</button>
       <button name="decision" value="reject" className="secondary" aria-label={`Rechazar la solicitud de ${quien}`}>Rechazar</button>
     </form>
@@ -104,7 +120,8 @@ export default async function Moderation() {
       <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
       <p><Link href="/moderacion/historial">Ver el historial de cambios</Link></p>
 
-      <h2>Avisos de error de usuarios ({reports.length})</h2>
+      <h2 id="avisos">Avisos de error de usuarios ({nReports})</h2>
+      {paging("avisos", ["aviso", "avisos"], "avisos")}
       {reports.length === 0 ? <p className="mut">No hay avisos pendientes.</p> : (
         <div className="table-wrap"><table>
           <thead><tr><th scope="col">Motivo</th><th scope="col">Sobre qué</th><th scope="col">Acción</th></tr></thead>
@@ -129,6 +146,7 @@ export default async function Moderation() {
                   <td>
                     <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       <input type="hidden" name="reportId" value={r.id} />
+                      <input type="hidden" name="back" value={back("avisos")} />
                       <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar)" : "Nota (opcional)"} aria-label="Nota de resolución" maxLength={500} />
                       <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${publicUserName(r.user.name)})`}>Cerrar: ya está corregido</button>
                       <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : "Retira el comentario"}>
@@ -144,7 +162,8 @@ export default async function Moderation() {
         </table></div>
       )}
 
-      <h2>Reclamaciones de ficha ({claims.length})</h2>
+      <h2 id="reclamaciones">Reclamaciones de ficha ({nClaims})</h2>
+      {paging("reclamaciones", ["reclamación", "reclamaciones"], "reclamaciones")}
       {claims.length === 0 ? <p className="mut">No hay reclamaciones pendientes.</p> : (
         <div className="table-wrap"><table>
           <thead><tr><th scope="col">Quién reclama</th><th scope="col">Qué ficha</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
@@ -161,7 +180,8 @@ export default async function Moderation() {
         </table></div>
       )}
 
-      <h2>Solicitudes de organizador ({organizers.length})</h2>
+      <h2 id="organizadores">Solicitudes de organizador ({nOrganizers})</h2>
+      {paging("organizadores", ["solicitud", "solicitudes"], "solicitudes de organizador")}
       {organizers.length === 0 ? <p className="mut">No hay solicitudes pendientes.</p> : (
         <div className="table-wrap"><table>
           <thead><tr><th scope="col">Organización</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
@@ -177,8 +197,9 @@ export default async function Moderation() {
         </table></div>
       )}
 
-      <h2>Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
-      <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.{nGimnasios > LIMITE ? ` Se muestran los ${LIMITE} primeros.` : ""}</p>
+      <h2 id="gimnasios">Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
+      {paging("gimnasios", ["gimnasio", "gimnasios"], "gimnasios")}
+      <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.</p>
       <div className="table-wrap"><table>
         <thead><tr><th scope="col">Gimnasio</th><th scope="col">Evidencia anotada</th><th scope="col">Acción</th></tr></thead>
         <tbody>
@@ -189,6 +210,7 @@ export default async function Moderation() {
               <td>
                 <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <input type="hidden" name="gymId" value={g.id} />
+                  <input type="hidden" name="back" value={back("gimnasios")} />
                   {!g.verifiedAt && <input name="note" aria-label={`Evidencia comprobada de ${g.name}`} placeholder="Evidencia comprobada (web, redes, llamada…)" maxLength={500} />}
                   {g.verifiedAt ? <button name="decision" value="revoke" className="secondary" aria-label={`Retirar sello de ${g.name}`}>Retirar sello</button> : <button name="decision" value="verify" aria-label={`Verificar el gimnasio ${g.name}`}>Verificar</button>}
                 </form>
@@ -198,31 +220,39 @@ export default async function Moderation() {
         </tbody>
       </table></div>
 
-      <h2>Combates con señales de coherencia ({conSenales.length})</h2>
-      <p className="mut"><strong>Verificar</strong>: el combate cuenta como respaldado por un moderador. <strong>Marcar como no correcto</strong>: deja de contar en el récord y en el ránking y de mostrarse como hecho hasta que se aclare; puede restaurarse desde «Combates en revisión».</p>
+      <h2 id="senales">Combates con señales de coherencia ({nFlags})</h2>
+      {paging("senales", ["combate", "combates"], "combates con señales")}
+      <p className="mut"><strong>Verificar</strong>: moderación comprueba el registro; este paso no concede bonificación de respaldo. Para concederla, utiliza «Respaldar resultados y títulos». <strong>Marcar como no correcto</strong>: deja de contar en el récord y en el ránking y de mostrarse como hecho hasta que se aclare; puede restaurarse desde «Combates en revisión».</p>
       <BoutTable rows={conSenales} vacio="No hay combates con señales." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
+          <input type="hidden" name="back" value={back("senales")} />
+          <input type="hidden" name="version" value={boutVersion(b)} />
           <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
           <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
         </form>
       )} />
 
-      <h2>Combates por verificar ({nPorVerificar})</h2>
-      {nPorVerificar > sinSenales.length + conSenales.length && <p className="mut">Se muestran los {LIMITE} más recientes de cada lista; hay más pendientes.</p>}
+      <h2 id="combates">Combates por verificar sin señales ({nUnflagged})</h2>
+      {paging("combates", ["combate", "combates"], "combates sin señales")}
       <BoutTable rows={sinSenales} vacio="No hay combates pendientes." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
+          <input type="hidden" name="back" value={back("combates")} />
+          <input type="hidden" name="version" value={boutVersion(b)} />
           <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
           <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
         </form>
       )} />
 
-      <h2>Combates en revisión ({nRevision})</h2>
-      <p className="mut">Son los que el rival o un moderador ha rechazado. No cuentan en el récord ni en el ránking hasta que se aclaren.</p>
+      <h2 id="revision">Combates en revisión ({nRevision})</h2>
+      {paging("revision", ["combate", "combates"], "combates en revisión")}
+      <p className="mut">Son resultados suspendidos hasta aclararlos: no cuentan en el récord ni en el ránking. Un aviso del rival solicita revisión; por sí solo no suspende el resultado.</p>
       <BoutTable rows={enRevision} vacio="No hay combates en revisión." acciones={(b) => (
         <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <input type="hidden" name="boutId" value={b.id} />
+          <input type="hidden" name="back" value={back("revision")} />
+          <input type="hidden" name="version" value={boutVersion(b)} />
           {motivoDe.get(b.id) && <div className="mut" style={{ flexBasis: "100%" }}>Motivo del rival: {motivoDe.get(b.id)}</div>}
           <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
           <button name="decision" value="restore" className="secondary" aria-label={`Restaurar como pendiente el combate: ${nombreCombate(b)}`}>Restaurar como pendiente</button>

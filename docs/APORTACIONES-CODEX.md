@@ -201,3 +201,20 @@ Integrada [#14](https://github.com/romppao/MiClaude/pull/14) en `claude/ring-esp
 Render ya sirve portada con Menú, ayuda con fórmula/bonificaciones, ránking con la nueva explicación y salud 200. La comprobación pública usa HTTPS con confianza TLS del entorno. Los datos existentes se conservan. Se precisa una frase antigua de ayuda: es el reconocimiento de comunidad el que se liga a un combate; el aura total incluye títulos. Esta continuación de documentación y texto no modifica las reglas probadas.
 
 Relevo para Work: la propuesta móvil #13 sigue abierta y comparte layout/CSS con #14. Antes de integrarla, conciliar sus mejoras adaptables y MobileNav con NavigationMenu; evitar dos controles de menú o sustituir los grupos por actividades. No se ha integrado ni descartado el trabajo de esa rama.
+
+## Pulido funcional y diseño aplazado — 3 de octubre de 2026
+
+Base `dbecb53281f9c265081749acbbb71fd232c486df`, rama `codex/pulido-funcional-2026-10-03`. Petición: «Que más queda por hacer? pulamos la aplicación hasta el más mínimo detalle […] el [diseño] que está no me gusta […] desorganizado y saturado». La composición actual es provisional; no se ha rediseñado en este bloque. El relevo vigente está en PULIDO-FUNCIONAL y CLAUDE.
+
+Colas y seguimiento: paginación de avisos, reclamaciones, organizadores, gimnasios, señales, combates y suspensiones; títulos/resultados, acreditaciones e historial. Total real, 50 registros, desempate estable, parámetros independientes, búsqueda de acreditaciones y salidas vacías. Las decisiones conservan filtros/página y una sección validada por ruta; el aviso se enfoca y permite retomar la cola. Se corrigen etiquetas retiradas, categoría omitida y fuentes de solicitudes desplazadas por el límite global.
+
+Integridad: verificación condicionada al resultado leído, resolución de avisos reservada en transacción, edición de evidencia condicionada al respaldo/estado/hechos, opciones desconocidas rechazadas. Sin migración, cambios visuales ni cambios de aura. Auditoría y traslado ya no presentan como sin empezar varias tareas con código/pruebas existentes; los parciales permanecen abiertos.
+
+Validación local inicial: 405 unitarias, build y 26 nuevos checks E2E aprobados. La batería completa, axe, CI y demo se comprueban antes del cierre. Guion nuevo con más de 100 registros por cola, 351 solicitudes/cambios y pantallas antiguas; prefijos propios retirados al terminar. Base local de pruebas separada, sin borrar la anterior ni subir fixtures a Render.
+
+
+### Cierre de validación local
+
+El árbol final aprueba 406 unitarias y compilación de producción. Recorridos repetidos sobre el build final: 28 checks nuevos de volumen/integridad, 26 de trayectoria y 49 de usabilidad; axe en 37 pantallas, 0 incumplimientos. La regresión anterior pasó 389 de 391 y detectó dos mensajes de organizador bloqueados por validación nativa; los recorridos afectados pasan tras corregirlo. CI ejecutará la batería completa final (393 comprobaciones) antes de integrar. No se presenta la pasada anterior como completamente verde.
+
+También se protege la restauración de títulos: solo procede para uno excluido y no puede retirar el respaldo de uno activo. La prueba de volumen ahora consulta los totales y el orden reales antes de comprobar la tercera página: funciona también al reutilizar la base con datos de otros guiones. La publicación y su comprobación pública se registran después de CI.

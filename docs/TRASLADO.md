@@ -66,12 +66,13 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 
 ## 4. Estado del proyecto
 
-**Producto (todo implementado y probado):** cuentas con correo verificado y recuperación de contraseña; ficha de peleador con varias disciplinas y récord de partida; registro de combates con confirmación del rival; niveles de respaldo (autodeclarado → confirmado → verificado, y rechazado); aura (una por persona y combate) y ránking por disciplina y categoría; veladas, cartel y resultados por organizadores; moderación con cola de combates, avisos, reclamaciones y sello de gimnasios; historial de cambios; búsqueda sin tildes; listados paginados; cuenta con descarga y eliminación de datos; privacidad y baja de avisos.
+**Producto actual:** cuentas, recuperación, perfiles con foto/banner, carreras multidisciplina, categorías de edad/sexo versionadas, combates, veladas, búsqueda, comunidad, exportación/eliminación y moderación. #14 está integrada y visible en Render: trayectoria histórica, respaldos opcionales y acreditaciones separadas de perfiles. El rival pide revisión sin suspender automáticamente. Aura = trayectoria + respaldo + comunidad por categoría histórica; el récord permanece separado.
 
-**Auditoría de código** (`docs/AUDITORIA.md`): 99 hallazgos — **49 corregidos, 18 parciales, 27 pendientes, 2 a decidir por el fundador y 3 descartados con motivo**. Los bloques 1 a 4 están completos; el 5 está a medias.
-Verificación: **96 de los 99** pasaron una verificación adversarial con tres comprobadores. Se refutaron 5: el 81, el 83 y el 90 por ser falsos o exagerados, y el 91 y el 92 porque, al comprobarlos, ya estaban corregidos. Los **97, 98 y 99** no se pudieron verificar (se acabó el límite de uso de la sesión dos veces); comprueba que el problema existe antes de corregirlos. La pasada final de «huecos» tampoco llegó a ejecutarse. `AUDITORIA.md` indica el estado de esta verificación.
+**Pulido en esta continuación:** paginación de colas/historial, contexto tras acciones, categoría y respaldo efectivo en revisión, decisiones concurrentes y opciones desconocidas. No cambia diseño, escala o esquema. Estado y pendientes vigentes: [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md). La interfaz actual es provisional por la última petición expresa del fundador; no retomar ahora otro rediseño.
 
-**Pruebas (todas en el CI):** 266 unitarias (`tests/unit`: reglas, seguridad, autorización de cada acción, mensajes, dependencias entre carpetas…), 193 comprobaciones de navegador en seis guiones (`tests/e2e/flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`, `usabilidad`, con ayudas comunes en `ayudas.mjs`) y la medición de accesibilidad `test:a11y` (axe-core, WCAG 2.2 AA, 0 incumplimientos).
+**Auditoría histórica:** el cuadro de 99 hallazgos se ha revalidado donde existían estados obsoletos; los parciales y decisiones siguen abiertos. Consultar [AUDITORIA.md](AUDITORIA.md), no asumir que sus citas antiguas de fichero/línea siguen vigentes. Los defectos nuevos de este pulido están en PULIDO-FUNCIONAL.
+
+**Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. La continuación pasa 405 unitarias y 26 comprobaciones nuevas de volumen/decisiones; regresión, accesibilidad y publicación finales se registran en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
 
 **Organización del código (1 de octubre):** acciones en módulos por dominio, lógica en `src/lib/<dominio>`, reglas de dependencias comprobadas por prueba y un mapa funcional generado. Guía en [`DESARROLLO.md`](DESARROLLO.md); mapa en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
 
@@ -92,14 +93,9 @@ Verificación: **96 de los 99** pasaron una verificación adversarial con tres c
 
 ## 6. Lo que queda por hacer, en orden
 
-Prioridad del fundador: **funcionalidad completa y sin fallos; el diseño, después.**
+Prioridad actual del fundador: pulir funciones y claridad; el diseño publicado le parece desorganizado y saturado y se reconsiderará al final. El orden vigente está en [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md): carreras y catálogo deportivo; mantenimiento de entidades y carteles; errores/correos/conexiones/dispositivos reales; preparación del servicio real; integridad y rendimiento. Los guiones y pendientes de personas están en `pruebas/personas.md`.
 
-1. **Terminar las pruebas por personas** (guion en [`pruebas/personas.md`](pruebas/personas.md)): se ejecutó la persona «visitante» y se lanzó una segunda tanda (aficionado, peleador, rival, organizador, moderadora); faltan **seguridad, móvil y teclado, persona mayor y exploración destructiva**, y los revisores de código que no llegaron a ejecutarse (pruebas, documentos, datos y privacidad). Cada hallazgo se reproduce, se corrige con su prueba y se anota en [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md) (o en un fichero nuevo por fecha).
-2. **Mejoras ya identificadas y no hechas:** colas de moderación con paginación real (hallazgo 50); alinear `@types/node` con Node 22 y añadir *lint* al CI (hallazgo 82); comprobar los hallazgos 97, 98 y 99 de la auditoría, que no se verificaron, y la pasada de «huecos», que no llegó a ejecutarse.
-3. **Antes de publicar:** elegir alojamiento y desplegar (la base de datos gestionada y el proveedor de correo Resend necesitan cuentas del fundador); definir `APP_URL`, `CONTACT_EMAIL`, `RESPONSABLE_NOMBRE` y **`TRUSTED_PROXY_HOPS`** (cuántos proxies hay delante: si está mal, los límites por IP no protegen o bloquean a todos); revisión jurídica del texto de privacidad y política de menores (sección 7).
-4. **Probar con personas reales de distintas edades**, incluida gente mayor (regla 11 del principio fundacional): no lo puede hacer una IA.
-5. **Análisis de la competencia** (sección 8) cuando haya acceso a internet.
-6. **Después de la estructura básica (decisión del fundador):** funciones premium (hasta tres clics de aura, herramientas para organizadores…), **sin vender nunca verificación, sello ni posición en el ránking**; y la **fase de diseño visual**, que el fundador pide al final: empezar por un *briefing* con él (ver `CLAUDE.md`), varias direcciones distintas, diseñador humano para la marca y decisiones en `docs/DISENO.md` (se crea entonces). El favicon y la imagen para compartir son diseño y entran en esa fase.
+La demo de Render está publicada; eso no implica servicio real preparado. Mantener datos ficticios y correo de demostración hasta configurar proveedor/dominio, responsable/contacto, copias y recuperación, y resolver menores/privacidad. El análisis comprobado de competencia ya está en COMPETENCIA; no figura como tarea sin empezar. Premium y rediseño permanecen al final de la fase básica.
 
 ## 7. Decisiones que necesitan al fundador
 
@@ -118,11 +114,11 @@ Prioridad del fundador: **funcionalidad completa y sin fallos; el diseño, despu
 13. **Correo de contacto y responsable** (`CONTACT_EMAIL`, `RESPONSABLE_NOMBRE`): hoy, sin ellos, la privacidad no ofrece ningún medio de contacto a quien no tiene cuenta. Hay que decidir cuál es.
 14. **Carteles oficiales y fichas provisionales:** cuando un organizador añade a un cartel una ficha que creó otra persona al registrar un combate, esa ficha pasa a ser pública con nombre completo (hoy se acepta porque un cartel de una velada es público). Revisión pendiente: ¿debe confirmar antes la persona afectada?
 15. **Ocultar una ficha** (moderación) borra sus datos personales de forma irreversible: hoy exige anotar el motivo y solo vale para fichas sin titular. ¿Debe existir una forma de restaurarla durante unos días?
-16. **Categorías de peso por disciplina y nivel** (petición del fundador, 2 de octubre): ya están separadas por disciplina y por profesional/amateur, con su fuente, en `docs/DISENO-PESOS.md`. Faltan datos que solo da la federación (Muay Thai amateur, kickboxing y K-1 profesional, femeninas, juveniles, cadete y júnior de boxeo) y decidir si la ficha guarda **sexo y edad**.
+16. **Categorías deportivas:** la ficha ya guarda nacimiento y división versionada, separada de la del combate. Boxeo, IFMA y WAKO tienen sus categorías documentadas en `DISENO-PESOS.md`; siguen pendientes pesos IMMAF e IBJJF con cinturón/modalidad y reglas específicas. No volver a implementar categorías schoolboys como si no existieran.
 
-## 8. Pendiente que solo se puede hacer con acceso a internet
+## 8. Competencia
 
-**Análisis de la competencia** (Raunder, raunder.es, y BoxRec, boxrec.com): la sesión anterior no pudo abrir ninguna de las dos webs (política de red del entorno). `docs/COMPETENCIA.md` es honesto sobre ello y distingue «Comprobado» de «Sin comprobar». Con Claude Code en tu ordenador se puede hacer de verdad: ver en qué fallan, qué hacen bien y qué ideas nuevas salen, y pasarlas a `docs/IDEAS.md`. Regla del fundador: **no se afirma nada que no se haya podido comprobar.**
+El análisis revisado y sus fuentes comprobadas están en [COMPETENCIA.md](COMPETENCIA.md). Las limitaciones de sesiones anteriores no describen el estado actual. Las hipótesis de usabilidad se mantienen como hipótesis hasta probarlas con personas; no afirmar nada que no se haya comprobado.
 
 ## 9. Cómo se documenta (petición expresa del fundador)
 

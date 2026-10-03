@@ -4,6 +4,7 @@
 
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { boutVersion } from "../../lib/bouts/rules";
 import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { db } from "../../lib/common/db";
 import { requireAdmin } from "../../lib/accounts/permissions";
@@ -12,15 +13,16 @@ import { audit } from "../../lib/common/audit";
 import { notifyDecision } from "../../lib/community/notify";
 import { anonymizeFighter } from "../../lib/fighters/anonymize";
 import { LIMITS, oneLine } from "../../lib/common/text";
-import { Rechazo, fullNameSlug, go, guard, listFighters, str } from "./shared";
+import { Rechazo, fullNameSlug, go, guard, listFighters, returnTo, str } from "./shared";
 
 /** Cola de moderación de combates: verificar, rechazar o restaurar uno rechazado. Solo moderadores. */
 export async function adminDecide(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion";
+  const back = returnTo(f, "/moderacion");
   const bout = await db.bout.findUnique({ where: { id: str(f, "boutId") } });
   if (!bout) go(back, { problema: "no_existe" });
   const decision = str(f, "decision");
+  if (str(f, "version") !== boutVersion(bout)) go(back, { problema: "combate_cambiado" });
   const plan =
     decision === "verify" && bout.verification !== "VERIFIED" ? { next: "VERIFIED" as const, aviso: "moderacion_verificado" }
     : decision === "dispute" && bout.verification !== "DISPUTED" ? { next: "DISPUTED" as const, aviso: "moderacion_rechazado" }
@@ -29,7 +31,7 @@ export async function adminDecide(f: FormData) {
   if (!plan) go(back, { problema: "moderacion_estado" });
   await guard(back, () => db.$transaction(async (tx) => {
     // Solo si el combate sigue en el estado que vio quien decide (el rival o otra persona de moderación pueden haberlo cambiado entretanto).
-    if ((await tx.bout.updateMany({ where: { id: bout.id, verification: bout.verification }, data: { ...WITHOUT_BOUT_BACKING, verification: plan.next } })).count === 0) throw new Rechazo("combate_cambiado");
+    if ((await tx.bout.updateMany({ where: { id: bout.id, verification: bout.verification, result: bout.result, method: bout.method, endRound: bout.endRound }, data: { ...WITHOUT_BOUT_BACKING, verification: plan.next } })).count === 0) throw new Rechazo("combate_cambiado");
     if (plan.next === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: admin.id, entity: "BOUT", entityId: bout.id, action: `ADMIN_${plan.next}`, before: { verification: bout.verification }, after: { verification: plan.next } }, tx);
   }));
@@ -39,9 +41,10 @@ export async function adminDecide(f: FormData) {
 
 export async function decideClaim(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion";
+  const back = returnTo(f, "/moderacion");
   const claim = await db.claimRequest.findUnique({ where: { id: str(f, "claimId") }, include: { fighter: true } });
   if (!claim || claim.status !== "PENDING") go(back, { problema: "no_existe" });
+  if (!["approve", "reject"].includes(str(f, "decision"))) go(back, { problema: "decision_no_valida" });
   const wantsApprove = str(f, "decision") === "approve";
   const note = str(f, "note").slice(0, LIMITS.note) || null;
   if (!wantsApprove && !note) go(back, { problema: "motivo_falta" }); // quien recibe un «no» tiene derecho a saber por qué
@@ -79,9 +82,10 @@ export async function decideClaim(f: FormData) {
 
 export async function decideOrganizer(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion";
+  const back = returnTo(f, "/moderacion");
   const req = await db.organizerRequest.findUnique({ where: { id: str(f, "requestId") }, include: { user: true } });
   if (!req || req.status !== "PENDING") go(back, { problema: "no_existe" });
+  if (!["approve", "reject"].includes(str(f, "decision"))) go(back, { problema: "decision_no_valida" });
   const approve = str(f, "decision") === "approve";
   const note = str(f, "note").slice(0, LIMITS.note) || null;
   // El sello de organizador se apoya en una evidencia: se anota qué se ha comprobado al aprobar y el motivo al rechazar (quien recibe un «no» tiene derecho a saber por qué).
@@ -105,9 +109,10 @@ export async function decideOrganizer(f: FormData) {
 /** Un moderador concede o retira el sello de verificado a un gimnasio, anotando en qué evidencia se basa. */
 export async function setGymVerified(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion";
+  const back = returnTo(f, "/moderacion");
   const gym = await db.gym.findUnique({ where: { id: str(f, "gymId") } });
   if (!gym) go(back, { problema: "no_existe" });
+  if (!["verify", "revoke"].includes(str(f, "decision"))) go(back, { problema: "decision_no_valida" });
   const verify = str(f, "decision") === "verify";
   const note = str(f, "note").slice(0, LIMITS.note) || null;
   if (verify && !note) go(back, { problema: "sello_sin_nota" }); // el sello siempre lleva la evidencia que lo justifica
@@ -121,10 +126,11 @@ export async function setGymVerified(f: FormData) {
 
 export async function resolveReport(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion";
+  const back = returnTo(f, "/moderacion");
   const report = await db.report.findUnique({ where: { id: str(f, "reportId") } });
   if (!report || report.status !== "OPEN") go(back, { problema: "no_existe" });
   const decision = str(f, "decision");
+  if (!["resolve", "hide", "dismiss"].includes(decision)) go(back, { problema: "decision_no_valida" });
   const hide = decision === "hide"; // resolver actuando sobre el dato avisado: rechazar el combate, ocultar la ficha o retirar el comentario
   const status = decision === "dismiss" ? "DISMISSED" : "RESOLVED";
   const note = str(f, "note").slice(0, LIMITS.note) || null;
@@ -132,6 +138,7 @@ export async function resolveReport(f: FormData) {
   // (si tiene una cuenta, su titular puede corregirla o eliminarla; ocultarla lo dejaría atado a una ficha inservible).
   if (hide && report.entity === "FIGHTER" && !note) go(back, { problema: "ocultar_sin_nota" });
   await guard(back, () => db.$transaction(async (tx) => {
+    if (!(await tx.report.updateMany({ where: { id: report.id, status: "OPEN" }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } })).count) throw new Rechazo("solicitud_cambiada");
     if (hide) {
       if (report.entity === "BOUT") await tx.bout.updateMany({ where: { id: report.entityId }, data: { ...WITHOUT_BOUT_BACKING, verification: "DISPUTED" } });
       else if (report.entity === "FIGHTER") {
@@ -142,7 +149,6 @@ export async function resolveReport(f: FormData) {
       }
       else if (report.entity === "AURA") await tx.aura.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
     }
-    await tx.report.update({ where: { id: report.id }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } });
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);
   }));
   revalidatePath("/", "layout");

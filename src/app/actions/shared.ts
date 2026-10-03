@@ -8,6 +8,7 @@ import { db } from "../../lib/common/db";
 import { PROVINCES, slugify } from "../../lib/common/labels";
 import { proximityAppliesTo, proximityFlags, type Flag } from "../../lib/fighters/coherence";
 import { isTournamentStyle } from "../../lib/common/disciplines";
+import { internalPath } from "../../lib/common/paths";
 
 /** Texto de un campo de formulario, sin espacios en los extremos y sin caracteres nulos (PostgreSQL no los admite y darían un error 500). */
 export const str = (f: FormData, k: string) => String(f.get(k) ?? "").replace(/\u0000/g, "").trim();
@@ -20,11 +21,25 @@ export const intOrNull = (f: FormData, k: string) => {
 /** Redirige a `path` añadiendo un mensaje para el usuario (aviso de éxito o problema). */
 export function go(path: string, mensaje?: { aviso?: string; problema?: string }): never {
   if (!mensaje) redirect(path);
-  const [base, query = ""] = path.split("?");
+  const hashAt = path.indexOf("#");
+  const hash = hashAt < 0 ? "" : path.slice(hashAt);
+  const unhashed = hashAt < 0 ? path : path.slice(0, hashAt);
+  const queryAt = unhashed.indexOf("?");
+  const base = queryAt < 0 ? unhashed : unhashed.slice(0, queryAt);
+  const query = queryAt < 0 ? "" : unhashed.slice(queryAt + 1);
   const params = new URLSearchParams(query);
-  if (mensaje.aviso) params.set("aviso", mensaje.aviso);
-  if (mensaje.problema) params.set("problema", mensaje.problema);
+  // Las redirecciones de Server Actions pueden perder el fragmento. Conservamos la sección
+  // en la consulta y enseñamos el mensaje primero, con un enlace para retomar esa cola.
+  if (/^#[a-z][a-z0-9-]{0,39}$/.test(hash)) params.set("seccion", hash.slice(1));
+  if (mensaje.aviso) { params.delete("problema"); params.set("aviso", mensaje.aviso); }
+  if (mensaje.problema) { params.delete("aviso"); params.set("problema", mensaje.problema); }
   redirect(`${base}?${params.toString()}`);
+}
+
+/** Conserva filtros/página y sección de una cola, sin permitir cambiar el destino de la acción. */
+export function returnTo(f: FormData, page: string): string {
+  const path = internalPath(str(f, "back"), page);
+  return new URL(path, "http://interno.invalid").pathname === page ? path : page;
 }
 
 /** Un rechazo previsto dentro de una transacción: lleva el código del mensaje que se enseñará al usuario. */

@@ -7,7 +7,11 @@ Auditoría exhaustiva de solo lectura hecha con 9 revisores independientes (segu
 - Los hallazgos **97, 98, 99** **no se pudieron verificar** (el proceso agotó el límite de uso de la sesión). Son «hallazgos de un revisor»: comprueba que el problema existe antes de corregirlos.
 - La pasada de «huecos» (qué áreas no ha mirado nadie) **no llegó a ejecutarse**.
 
-**Estado a fecha del traslado (commit de este bloque 6).** Corregido: 71, Parcial: 16, Pendiente: 7, Decisión del fundador: 2, Descartado: 3.
+**Inventario histórico actualizado el 3 de octubre de 2026:** 99 hallazgos; 78 corregidos, 16 parciales, 0 pendientes sin empezar, 2 decisiones del fundador y 3 descartados. Los parciales siguen abiertos. Esta cuenta no incluye todos los defectos nuevos de la aplicación ni equivale a una certificación de calidad.
+
+**Revalidación de estados obsoletos:** 84 está cubierto por la clasificación/matriz de autorización en `tests/unit/autorizacion.test.ts`; 88 por `prior.test.ts` y el límite de la suma en `parsePrior`; 93 por la nota obligatoria de `decideOrganizer`; 94 por el modelo vigente de trayectoria/respaldo/comunidad y sus pruebas; 95 por el análisis de competencia revisado (no promete una ruta por combate); 96 por los metadatos nacionales/multidisciplina. El 50 se cierra con paginación real de todas las colas, respaldos, acreditaciones e historial y el recorrido de volumen `pulido.mjs`. El 97 queda parcial: normas y vocabulario actuales se corrigen, preservando citas históricas; falta revisar el corpus completo.
+
+Los detalles siguientes conservan el diagnóstico antiguo, incluidas referencias a `actions.ts` ya dividido. Para los pendientes vigentes, las nuevas carreras entre decisiones y las evidencias, leer [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md). No se afirma haber repetido la verificación adversarial histórica de los 99 hallazgos.
 
 Leyenda: **Corregido** (hecho y con prueba), **Parcial** (hecho en parte; la nota dice qué falta), **Pendiente** (sin hacer), **Decisión del fundador** (no se puede resolver sin su criterio), **Descartado** (con motivo: refutado por los comprobadores o rechazado a propósito).
 
@@ -64,7 +68,7 @@ Leyenda: **Corregido** (hecho y con prueba), **Parcial** (hecho en parte; la not
 | 47 | baja | Parcial | `src/app/layout.tsx:33` | Lenguaje: quedan textos con «email» en la interfaz y plurales sin resolver («1 combates», «1 peleadores», «1 auras dadas») y concordancias erróneas en la ayuda |
 | 48 | media | Descartado | `src/app/layout.tsx:15` | El layout raíz lee cookies: ninguna página pública se cachea, force-dynamic y revalidatePath no tienen efecto y getUser se ejecuta dos veces por petición |
 | 49 | media | Corregido | `src/lib/aura.ts:39` | auraRanking trae todas las auras a memoria y agrega en JavaScript en cada visita a la portada y al ránking |
-| 50 | media | Parcial | `src/app/peleadores/page.tsx:24` | Listados públicos y colas de moderación cortados a 100 (o 20) sin paginación ni aviso; la cola de combates se trunca antes de ordenar por señales y los gimnasios pendientes quedan al final |
+| 50 | media | Corregido | `src/app/peleadores/page.tsx:24` | Listados públicos y colas de moderación cortados a 100 (o 20) sin paginación ni aviso; la cola de combates se trunca antes de ordenar por señales y los gimnasios pendientes quedan al final |
 | 51 | media | Parcial | `src/app/peleadores/[slug]/page.tsx:14` | Las fichas de detalle no tienen título propio y faltan favicon, robots, sitemap, imagen para compartir y health check |
 | 52 | media | Corregido | `src/app/actions.ts:318` | Al pedir «Aprobar» una reclamación, decideClaim puede rechazarla en silencio |
 | 53 | media | Corregido | `src/app/organizador/page.tsx:28` | Los rechazos y resoluciones no dicen el motivo y se promete un «te avisaremos» que no existe |
@@ -98,24 +102,24 @@ Leyenda: **Corregido** (hecho y con prueba), **Parcial** (hecho en parte; la not
 | 81 | baja | Descartado | `prisma/schema.prisma:127` | Faltan índices en claves foráneas que las páginas consultan (Fighter.gymId y trainerId, Event.organizerId, Bout.createdById, Report.userId, ClaimRequest.fighterId) |
 | 82 | baja | Parcial | `.gitignore:1` | Higiene del repositorio y del CI: .gitignore solo ignora `.env`, sin engines, @types/node desalineado, workflow sin permisos, concurrencia ni lint, y sin dependabot |
 | 83 | baja | Corregido | `src/lib/password.ts:5` | Hash de contraseña con parámetros por defecto de scrypt y formato sin versión ni parámetros: no se puede reforzar sin invalidar todas las cuentas |
-| 84 | alta | Pendiente | `src/app/actions.ts:1` | Ninguna de las 24 Server Actions tiene pruebas de autorización ni de rama negativa; tres no se ejecutan nunca |
+| 84 | alta | Corregido | `src/app/actions.ts:1` | Ninguna de las 24 Server Actions tiene pruebas de autorización ni de rama negativa; tres no se ejecutan nunca |
 | 85 | media | Parcial | `tests/e2e/flujo.mjs:83` | El e2e es un único guion secuencial con estado compartido, clics no estrictos y sin diagnóstico al fallar |
 | 86 | media | Parcial | `tests/e2e/flujo.mjs:220` | Aserciones del e2e no acotadas a la ejecución (falsos verdes) y límites take:100 que las rompen con una base reutilizada |
 | 87 | media | Parcial | `src/lib/auth.ts:28` | auth.ts sin ninguna prueba: caducidad de sesión y tokens de verificación |
-| 88 | baja | Pendiente | `src/lib/prior.ts:30` | parsePrior: casos límite sin fijar y tope aplicado por campo, no a la suma |
+| 88 | baja | Corregido | `src/lib/prior.ts:30` | parsePrior: casos límite sin fijar y tope aplicado por campo, no a la suma |
 | 89 | media | Corregido | `tests/e2e/accesibilidad.mjs:36` | La medición de accesibilidad (test:a11y) no se ejecuta en el CI, no está documentada, da «OK» a pantallas a las que no llegó y no cubre los mensajes de error y confirmación |
 | 90 | baja | Descartado | `tests/e2e/flujo.mjs:197` | Datos de prueba que caducan o apuntan a terceros: velada «futura» fija en 2030 y dominio @test.es |
 | 91 | media | Corregido | `README.md:44` | README y ARQUITECTURA describen el proyecto anterior (Boxer, Rating, rateBoxer, ratings.ts, ránking bayesiano, solo boxeo) y una hoja de ruta desfasada, sin sección de variables ni despliegue |
 | 92 | media | Corregido | `src/app/actions.ts:132` | Ficha «gestionada por el peleador» en los documentos, pero solo se pueden editar disciplina, categoría y récord de partida |
-| 93 | media | Pendiente | `src/app/actions.ts:355` | El sello de organizador verificado no exige nota de evidencia, aunque IDEAS y ARQUITECTURA dicen que es obligatoria |
-| 94 | baja | Pendiente | `src/lib/aura.ts:40` | El documento dice que el ránking distingue siempre lo respaldado de lo autodeclarado, pero auraRanking no filtra ni etiqueta por verificación |
-| 95 | baja | Pendiente | `docs/COMPETENCIA.md:31` | COMPETENCIA.md da por hecho un enlace estable por combate que no existe y lista como pendiente lo que el ránking ya hace |
-| 96 | baja | Pendiente | `src/app/layout.tsx:11` | Textos públicos que no reflejan el alcance actual: descripción del sitio solo de boxeo y gimnasio de ejemplo con palabra inglesa |
-| 97 | baja | Pendiente | `CLAUDE.md:23` | Vocabulario residual en CLAUDE.md, IDEAS y ARQUITECTURA («boxeador», «valoración», «email») y fila mal formada en IDEAS |
+| 93 | media | Corregido | `src/app/actions.ts:355` | El sello de organizador verificado no exige nota de evidencia, aunque IDEAS y ARQUITECTURA dicen que es obligatoria |
+| 94 | baja | Corregido | `src/lib/aura.ts:40` | El documento dice que el ránking distingue siempre lo respaldado de lo autodeclarado, pero auraRanking no filtra ni etiqueta por verificación |
+| 95 | baja | Corregido | `docs/COMPETENCIA.md:31` | COMPETENCIA.md da por hecho un enlace estable por combate que no existe y lista como pendiente lo que el ránking ya hace |
+| 96 | baja | Corregido | `src/app/layout.tsx:11` | Textos públicos que no reflejan el alcance actual: descripción del sitio solo de boxeo y gimnasio de ejemplo con palabra inglesa |
+| 97 | baja | Parcial | `CLAUDE.md:23` | Vocabulario residual en CLAUDE.md, IDEAS y ARQUITECTURA («boxeador», «valoración», «email») y fila mal formada en IDEAS |
 | 98 | baja | Corregido | `src/app/actions.ts:449` | El enlace de evidencia de un combate ya verificado o confirmado puede cambiarlo o quitarlo el creador o el rival sin volver a revisarse |
 | 99 | baja | Parcial | `src/app/actions.ts:304` | Las solicitudes de reclamación y de organizador no tienen límite ni espera y pueden inundar la cola de moderación |
 
-## Detalle de lo que queda por hacer
+## Detalle del diagnóstico histórico
 
 Solo se detallan los hallazgos **Pendiente**, **Parcial** y **Decisión del fundador**. Los corregidos tienen su nota en el diario y en las pruebas.
 

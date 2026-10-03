@@ -214,10 +214,15 @@ export async function setBoutEvidence(f: FormData) {
   const raw = str(f, "evidenceUrl");
   const url = raw ? safeHttpUrl(raw) : null;
   if (raw && !url) go(back, { problema: "url_invalida" });
-  await db.$transaction([
-    db.bout.update({ where: { id: bout.id }, data: { evidenceUrl: url, ...(url !== bout.evidenceUrl ? WITHOUT_BOUT_BACKING : {}) } }),
-    audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "EVIDENCE_SET", before: { evidenceUrl: bout.evidenceUrl }, after: { evidenceUrl: url } }, db),
-  ]);
+  await guard(back, () => db.$transaction(async (tx) => {
+    // Conserva el permiso y el respaldo solo si los hechos siguen siendo los que se leyeron.
+    const changed = await tx.bout.updateMany({
+      where: { id: bout.id, evidenceUrl: bout.evidenceUrl, verification: bout.verification, result: bout.result, method: bout.method, endRound: bout.endRound, supportReviewedAt: bout.supportReviewedAt },
+      data: { evidenceUrl: url, ...(url !== bout.evidenceUrl ? WITHOUT_BOUT_BACKING : {}) },
+    });
+    if (!changed.count) throw new Rechazo("combate_cambiado");
+    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "EVIDENCE_SET", before: { evidenceUrl: bout.evidenceUrl }, after: { evidenceUrl: url } }, tx);
+  }));
   revalidatePath("/", "layout");
   go(back, { aviso: url ? "evidencia_guardada" : "evidencia_quitada" });
 }

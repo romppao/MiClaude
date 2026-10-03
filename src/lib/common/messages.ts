@@ -60,6 +60,7 @@ export const AVISOS: Record<string, string> = {
 
 export const PROBLEMAS: Record<string, string> = {
   logro_datos: "Indica el campeonato, la entidad organizadora y el ámbito del título.",
+  logro_no_excluido: "Este título no está excluido. No necesita restaurarse y conserva su respaldo actual.",
   logro_fecha: "Indica una fecha válida en la que ya hayas ganado el título, posterior a tu nacimiento si lo has indicado.",
   logro_duplicado: "Ya has declarado este campeonato, año y categoría. Corrige o restaura el título existente.",
   logro_limite: "Has alcanzado el límite de 30 títulos. Revisa tus declaraciones o pide ayuda a moderación.",
@@ -122,6 +123,7 @@ export const PROBLEMAS: Record<string, string> = {
   duplicado: "Eso ya estaba guardado.",
   no_existe: "No hemos encontrado lo que buscas.",
   moderacion_estado: "Ese combate ya no está en el estado esperado. Recarga la página y vuelve a intentarlo.",
+  decision_no_valida: "No se reconoce esa decisión. Recarga la página y elige una de las opciones disponibles.",
   reclamacion_no_aprobable: "No se ha podido aprobar: la ficha ya tiene titular o esa persona ya tiene otra ficha. La solicitud sigue pendiente: rechácela indicando el motivo, para que la persona sepa qué hacer.",
   resultado_disputado: "Este combate está en revisión: solo un moderador puede reabrirlo.",
   velada_duplicada: "Ya tienes una velada con ese nombre y esa fecha.",

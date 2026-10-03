@@ -325,7 +325,7 @@ describe("decisiones de moderación", () => {
 });
 
 describe("decisiones concurrentes y ocultar fichas", () => {
-  beforeEach(() => iniciarSesion(persona("ADMIN")));
+  beforeEach(() => { iniciarSesion(persona("ADMIN")); mundo.estado.respuestas["report.updateMany"] = { count: 1 }; });
   it("si otra persona de moderación decide a la vez sobre una reclamación, esta decisión se descarta con un aviso y no queda registrada", async () => {
     mundo.estado.respuestas["claimRequest.findUnique"] = { id: "c1", userId: "u2", fighterId: "f1", status: "PENDING", fighter: { firstName: "A", lastName: "B" } };
     mundo.estado.respuestas["fighter.updateMany"] = { count: 1 };
@@ -342,7 +342,7 @@ describe("decisiones concurrentes y ocultar fichas", () => {
   it("un combate que cambió de estado mientras se decidía no se pisa", async () => {
     mundo.estado.respuestas["bout.findUnique"] = { id: "b1", fighterAId: "fa", fighterBId: "fb", verification: "SELF_REPORTED" };
     mundo.estado.respuestas["bout.updateMany"] = (args: { where: { verification: string } }) => { expect(args.where.verification).toBe("SELF_REPORTED"); return { count: 0 }; };
-    expect(await destino(acciones.adminDecide, { boutId: "b1", decision: "verify" })).toBe("/moderacion?problema=combate_cambiado");
+    expect(await destino(acciones.adminDecide, { boutId: "b1", decision: "verify", version: "||" })).toBe("/moderacion?problema=combate_cambiado");
     expect(mundo.estado.escrituras).not.toContain("auditLog.create");
   });
   const aviso = { id: "r1", entity: "FIGHTER", entityId: "f1", status: "OPEN", reason: "DATOS", userId: "u2" };
@@ -435,6 +435,12 @@ describe("trayectoria: propiedad, acreditación y concurrencia", () => {
     expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "reject", note: "Fuente no válida" })).toBe("/respaldar?problema=respaldo_cambiado");
     expect(mundo.estado.escrituras).not.toContain("auditLog.create");
   });
+  it("restaurar un título activo no puede quitar su respaldo por accidente", async () => {
+    iniciarSesion(persona("ADMIN"));
+    mundo.estado.respuestas["fighterAchievement.findUnique"] = { ...logro, supportKind: "FEDERATION" };
+    expect(await destino(acciones.reviewAchievement, { achievementId: "t1", version: updatedAt.toISOString(), decision: "restore", note: "Intento de restauración" })).toBe("/respaldar?problema=logro_no_excluido");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
   it("una acreditación retirada durante la revisión no puede conceder nuevos puntos", async () => {
     iniciarSesion(persona("FAN"));
     let reads = 0;
@@ -450,5 +456,52 @@ describe("fechas de la trayectoria declarada", () => {
     iniciarSesion(persona("FIGHTER", { fighter: { id: "f1", birthDate: new Date("1990-01-01"), disciplines: [] } }));
     expect(await destino(acciones.saveAchievement, { championship: "Campeonato", organization: "Entidad", scope: "NATIONAL", awardedOn: "1975-06-01" })).toBe("/mi-ficha/trayectoria?problema=logro_fecha");
     expect(mundo.estado.escrituras).toEqual([]);
+  });
+});
+
+
+describe("pulido: decisiones explícitas, resultados leídos y respaldos concurrentes", () => {
+  beforeEach(() => iniciarSesion(persona("ADMIN")));
+  const bout = { id: "b1", fighterAId: "fa", fighterBId: "fb", verification: "SELF_REPORTED", result: "A_WIN", method: "UD", endRound: null, evidenceUrl: "https://example.com/acta", supportReviewedAt: null, event: { organizerId: "otro" } };
+  for (const [action, model, fields, record] of [
+    ["decideClaim", "claimRequest", { claimId: "c1" }, { id: "c1", status: "PENDING", fighter: {} }],
+    ["decideOrganizer", "organizerRequest", { requestId: "o1" }, { id: "o1", status: "PENDING", user: {} }],
+    ["setGymVerified", "gym", { gymId: "g1" }, { id: "g1" }],
+    ["resolveReport", "report", { reportId: "r1" }, { id: "r1", status: "OPEN" }],
+  ] as const) {
+    it(`${action} rechaza una decisión desconocida sin modificar ni rechazar por defecto`, async () => {
+      mundo.estado.respuestas[`${model}.findUnique`] = record;
+      expect(await destino(acciones[action], { ...fields, decision: "constructor", note: "Motivo" })).toBe("/moderacion?problema=decision_no_valida");
+      expect(mundo.estado.escrituras).toEqual([]);
+    });
+  }
+  it("moderación no verifica un resultado distinto del que muestra su formulario", async () => {
+    mundo.estado.respuestas["bout.findUnique"] = bout;
+    expect(await destino(acciones.adminDecide, { boutId: "b1", decision: "verify", version: "B_WIN|UD|" })).toBe("/moderacion?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("el resultado leído también se comprueba al escribir, no solo antes de la transacción", async () => {
+    mundo.estado.respuestas["bout.findUnique"] = bout;
+    mundo.estado.respuestas["bout.updateMany"] = (a: { where: unknown }) => { expect(a.where).toMatchObject({ result: "A_WIN", method: "UD", endRound: null }); return { count: 0 }; };
+    expect(await destino(acciones.adminDecide, { boutId: "b1", decision: "verify", version: "A_WIN|UD|" })).toBe("/moderacion?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+  it("un aviso resuelto entretanto no aplica otra acción sobre el dato ni escribe otra decisión", async () => {
+    mundo.estado.respuestas["report.findUnique"] = { id: "r1", status: "OPEN", entity: "BOUT", entityId: "b1" };
+    mundo.estado.respuestas["report.updateMany"] = { count: 0 };
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "hide", note: "Revisión" })).toBe("/moderacion?problema=solicitud_cambiada");
+    expect(mundo.estado.escrituras).toEqual(["report.updateMany"]);
+  });
+  it("resolver conserva página y sección sin permitir redirección externa", async () => {
+    mundo.estado.respuestas["report.findUnique"] = { id: "r1", status: "OPEN" };
+    mundo.estado.respuestas["report.updateMany"] = { count: 1 };
+    expect(await destino(acciones.resolveReport, { reportId: "r1", decision: "dismiss", back: "/moderacion?avisos=3#avisos" })).toBe("/moderacion?avisos=3&seccion=avisos&aviso=aviso_descartado");
+  });
+  it("editar evidencia no pisa un respaldo nuevo ni permite editar tras perder el permiso", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findUnique"] = bout;
+    mundo.estado.respuestas["bout.updateMany"] = (a: { where: unknown }) => { expect(a.where).toMatchObject({ verification: "SELF_REPORTED", evidenceUrl: bout.evidenceUrl, supportReviewedAt: null, result: "A_WIN" }); return { count: 0 }; };
+    expect(await destino(acciones.setBoutEvidence, { boutId: "b1", evidenceUrl: "https://example.com/otra" })).toBe("/mi-ficha?problema=combate_cambiado");
+    expect(mundo.estado.escrituras).not.toContain("auditLog.create");
   });
 });

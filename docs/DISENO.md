@@ -1,5 +1,7 @@
 # Dirección visual de Ring España
 
+> **Prioridad posterior del fundador — 3 de octubre de 2026:** el diseño publicado no le gusta: «se ve muy desorganizado y saturado». Pide pulir las funciones y volver al diseño al final. La composición actual queda provisional; las aprobaciones históricas no constituyen aceptación del resultado final. No implementar otra maqueta durante este bloque. Retomar con un briefing de jerarquía, recorridos y referencias cuando se cierre la fase funcional; [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md).
+
 > **DECISIÓN VIGENTE DEL FUNDADOR — 3 de octubre de 2026:** el color oficial es `#BE33F5`. Sustituye las paletas exploradas antes. La composición, tipografía y logotipo siguen pendientes de elección.
 
 ## Encargo y estado — 3 de octubre de 2026

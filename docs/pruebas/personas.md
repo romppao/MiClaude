@@ -132,3 +132,11 @@ Declarar un título antiguo con fecha y categoría propias, sin fuente ni entren
 ## 12. Menú por actividades
 
 Abrir desde móvil/escritorio como visitante, deportista, titular de entidad, promotor y moderador. Encontrar peleadores, veladas, gimnasio, ficha, perfiles y gestión de eventos sin ayuda. Tab y Mayús+Tab permanecen en el panel; Escape cierra y devuelve el foco. Seguir un enlace cierra el panel. Probar cerrar sesión. Confirmar que no aparecen enlaces a funciones inexistentes ni permisos de respaldo por haber creado un perfil visual.
+
+## 13. Moderación con muchos casos y una pantalla antigua
+
+Con datos ficticios de prueba: entrar en Moderación, recorrer varias páginas de avisos, solicitudes, gimnasios y combates; comprobar total, orden y acceso a los últimos. Cambiar una cola conservando las otras. Resolver desde la tercera página: respuesta visible, páginas conservadas y enlace para volver a la sección. Repetir desde una pestaña antigua: no se debe escribir otra resolución.
+
+En Respaldar, buscar títulos/veladas, recorrer ambas colas por separado, leer categoría y estado real del respaldo; una acreditación retirada no se presenta como vigente. Excluir un título con motivo y conservar consulta/páginas. En Acreditaciones, buscar por nombre/correo, retirar desde una página posterior, probar consulta vacía y quitar filtro. En Historial, llegar a cambios más antiguos que los primeros 200.
+
+Mientras moderación tiene abierto un resultado, corregirlo desde el otro recorrido: verificar la pantalla antigua debe avisar del cambio, sin aprobar el resultado nuevo. Guion automatizado de volumen: `tests/e2e/pulido.mjs`; no se trasladan sus registros a la demo pública.

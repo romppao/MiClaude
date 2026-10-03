@@ -40,13 +40,13 @@ Fuentes: [portada](https://boxrec.com/), [ayuda oficial](https://boxrec.com/en/s
 
 | Aprendizaje | Aportación de este bloque | Estado |
 |---|---|---|
-| Entrada por objetivo | Enlaces para descubrir peleadores, entrenar, consultar veladas, gestionar ficha y organizar | Código preparado |
-| Una clasificación debe explicar qué mide | Fórmula, periodo, provincia, empates y límites del aura | Código preparado, sin cambiar la regla de voto |
-| Respaldo entendible junto al dato | Enlace desde cada récord a ayuda precisa; evidencia no equivale a verificación | Código preparado |
-| Calendario útil y coherente | Hoy permanece durante todo el día de Madrid; filtros individuales y salida de resultados vacíos | Código preparado con regresiones |
+| Entrada por objetivo | Enlaces para descubrir peleadores, entrenar, consultar veladas, gestionar ficha y organizar | Publicado en #11; menú por actividades en #14 |
+| Una clasificación debe explicar qué mide | Fórmula, periodo, provincia, empates y límites del aura | Publicado; trayectoria y respaldo ampliados en #14 |
+| Respaldo entendible junto al dato | Enlace desde cada récord a ayuda precisa; evidencia no equivale a verificación | Publicado, con respaldo opcional y etiquetas en #14 |
+| Calendario útil y coherente | Hoy permanece durante todo el día peninsular; filtros individuales y salida de resultados vacíos | Publicado en #11, con regresiones |
 | Gimnasios con información práctica | Horarios, disciplinas, contacto y fecha de actualización | Propuesta pendiente, necesita modelo y responsable |
-| Trayectoria fácil de leer | Últimos resultados y estadísticas por disciplina/nivel, sin sumar datos declarados a estadísticas verificadas | Propuesta pendiente |
-| Herramientas profesionales | Gestión de una velada antes de ampliar a CRM | Hoja de ruta, no implementado |
+| Trayectoria fácil de leer | Récord por disciplina/nivel y títulos con desglose; las estadísticas adicionales necesitan datos suficientes | Récord y títulos publicados; racha/actividad y métricas nuevas, pendientes |
+| Herramientas profesionales | Gestión de una velada antes de ampliar a CRM | Gestión de veladas implementada; CRM pendiente |
 
 ## Prioridad siguiente
 

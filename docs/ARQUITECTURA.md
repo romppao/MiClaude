@@ -228,3 +228,11 @@ La escala es una configuración inicial, pendiente de calibración con uso real.
 ## Navegación por actividades — 3 de octubre de 2026
 
 Referencia: captura del menú de Raunder aportada por el fundador; no una comprobación de sus funciones. `NavigationMenu` conserva los cinco enlaces rápidos de escritorio y añade un panel lateral en móvil/escritorio: deportistas, clubes/entrenadores, promotores, cuenta/ayuda. Cada grupo tiene hasta cinco enlaces reales. Cuenta/moderación/respaldos dependen de sesión y permisos; cerrar sesión funciona dentro del panel. Escape, devolución del foco, bloqueo del fondo y cierre al navegar. Se preservan portada, fotos, banners y paleta de ChatGPT Work; no se añaden promesas de sparring, aprendizaje o reservas.
+
+## Pulido de colas y decisiones — 3 de octubre de 2026
+
+Colas de moderación, títulos/resultados, acreditaciones e historial usan ventanas de 50 con recuento total, desempate estable y parámetros independientes. Las búsquedas y páginas se conservan al decidir. `returnTo` solo admite la propia pantalla; `go` transporta sección en consulta, reemplaza mensajes antiguos y no mezcla un fragmento con la búsqueda. La respuesta se enfoca y permite retomar la sección validada por ruta.
+
+La verificación básica de moderación no concede bonus de respaldo. Su formulario lleva la huella del resultado, comprobada antes de escribir y en la condición de actualización. Resolver avisos reserva el estado OPEN dentro de la transacción antes de modificar el dato. Editar evidencia exige conservar estado, resultado, fuente y fecha de respaldo leídos. Opciones desconocidas se rechazan explícitamente. La cola de respaldo usa el grado efectivo y muestra categoría histórica; obtiene la última solicitud de cada título con SQL parametrizado, sin mezclar límites de otros historiales.
+
+No hay migración ni cambios de política de aura. Pendientes vigentes y diseño provisional: PULIDO-FUNCIONAL. Un diseño publicado no se considera definitivo cuando el fundador lo ha rechazado expresamente.
