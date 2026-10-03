@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { dayKey, eventDayReached, parseBirthDate, parseDay, todayMadrid } from "../../src/lib/common/dates";
+import { calendarDayStart, dayKey, eventDayReached, parseBirthDate, parseDay, todayMadrid } from "../../src/lib/common/dates";
 
 const at = (iso: string) => new Date(iso);
 
@@ -20,6 +20,24 @@ describe("fechas en Europe/Madrid", () => {
   });
   it("dayKey usa la parte de fecha guardada", () => {
     expect(dayKey(new Date("2026-06-13T12:00:00Z"))).toBe("2026-06-13");
+  });
+  it.each([
+    "2026-07-14T00:00:00Z", "2026-07-14T21:59:59Z",
+    "2026-12-14T00:00:00Z", "2026-12-14T22:59:59Z",
+  ])("las veladas de hoy siguen en próximas durante todo el día: %s", (iso) => {
+    const now = at(iso);
+    const boundary = calendarDayStart(now);
+    const today = at(`${todayMadrid(now)}T12:00:00Z`);
+    const yesterday = new Date(today.getTime() - 864e5);
+    const tomorrow = new Date(today.getTime() + 864e5);
+    expect(today.getTime()).toBeGreaterThanOrEqual(boundary.getTime());
+    expect(yesterday.getTime()).toBeLessThan(boundary.getTime());
+    expect(tomorrow.getTime()).toBeGreaterThanOrEqual(boundary.getTime());
+  });
+  it.each(["2026-07-14T22:00:00Z", "2026-12-14T23:00:00Z"])("a medianoche de Madrid la velada de ayer pasa a pasadas: %s", (iso) => {
+    expect(calendarDayStart(at(iso)).toISOString()).toBe(`${todayMadrid(at(iso))}T00:00:00.000Z`);
+    const yesterday = at(`${iso.slice(0, 10)}T12:00:00Z`);
+    expect(yesterday.getTime()).toBeLessThan(calendarDayStart(at(iso)).getTime());
   });
   it("parseDay acepta fechas reales dentro del rango", () => {
     const now = at("2026-09-30T10:00:00Z");

@@ -53,8 +53,8 @@ describe("categorías de peso por disciplina y nivel", () => {
     expect(weightClassLabel("BOXEO", "PRO", "Pesado")).toBe("Pesado · más de 90,7 kg");
     expect(weightClassLabel("JIUJITSU", "AMATEUR", "Medio")).toBe("Medio · hasta 82,3 kg");
   });
-  it("sin una lista fiable (Muay Thai amateur, kickboxing y K-1 profesional) la lista está vacía y no se inventa ningún peso", () => {
-    for (const [d, n] of [["MUAYTHAI", "AMATEUR"], ["KICKBOXING", "PRO"], ["K1", "PRO"]] as const) {
+  it("sin una lista profesional fiable (kickboxing y K-1) la lista está vacía y no se inventa ningún peso", () => {
+    for (const [d, n] of [["KICKBOXING", "PRO"], ["K1", "PRO"]] as const) {
       expect(weightClassesFor(d, n)).toEqual([]);
       expect(weightNote(d, n)).toContain("Todavía no tenemos confirmadas");
     }

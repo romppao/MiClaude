@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
+import { divisionLabel } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
 
@@ -16,7 +17,19 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
   return (
     <>
       <h1>Ránking de aura</h1>
-      <p className="mut">El aura es el reconocimiento del público. Cada persona puede dar aura a un peleador una vez por cada combate que ha visto. Aquí se ordenan los peleadores de cada categoría según el aura que han recibido.</p>
+      <p className="mut">El aura es el reconocimiento del público a una actuación. Este ránking mide el aura recibida, no las victorias ni una clasificación deportiva oficial. Puedes consultar el récord y el respaldo de los resultados en la ficha de cada peleador.</p>
+      <details>
+        <summary>¿Cómo se calcula el ránking?</summary>
+        <ul>
+          <li>Cada aura vale un punto. Se suman las recibidas en combates de la disciplina elegida; no se cuentan las de combates en revisión ni de veladas canceladas.</li>
+          <li>Se agrupa por el nivel, la división de edad y categoría y el peso guardados en cada combate. Cambiar la ficha no traslada el aura histórica. Las divisiones sin confirmar quedan separadas. Solo aparecen fichas públicas con aura.</li>
+          <li>La zona corresponde a la provincia de la ficha del peleador.</li>
+          <li>«Últimos 90 días» cuenta el aura dada en ese periodo, aunque el combate sea anterior.</li>
+          <li>Con los mismos puntos se comparte puesto: 1, 1, 3. Los nombres empatados se muestran en orden alfabético.</li>
+          <li>El total no se divide por el número de combates: más actividad o público puede dar lugar a más aura.</li>
+        </ul>
+        <p><Link href="/ayuda#respaldo">Qué respaldo tienen los resultados</Link>.</p>
+      </details>
       <form className="search">
         <label className="field"><span>Disciplina</span>
           <select name="disciplina" defaultValue={discipline}>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
@@ -33,8 +46,8 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <button>Ver ránking</button>
       </form>
       {groups.map((g) => (
-        <section key={`${g.level}-${g.weightClass ?? "sin"}`}>
-          <h2>{DISCIPLINE_LABEL[discipline]} · {levelName(g.level)} · {g.weightClass ? weightClassLabel(discipline, g.level, g.weightClass) : NO_CATEGORY}</h2>
+        <section key={`${g.level}-${g.divisionId ?? "sin-division"}-${g.weightClass ?? "sin"}`}>
+          <h2>{DISCIPLINE_LABEL[discipline]} · {levelName(g.level)} · {divisionLabel(g.divisionId)} · {g.weightClass ? weightClassLabel(discipline, g.level, g.weightClass, g.divisionId) : NO_CATEGORY}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th></tr></thead>
@@ -51,7 +64,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
 </div>
         </section>
       ))}
-      {groups.length === 0 && <p className="mut">Todavía nadie ha recibido aura en esta disciplina y zona. Puedes darla desde la ficha de un peleador, en el combate que hayas visto.</p>}
+      {groups.length === 0 && <p className="mut">No hay aura con esta disciplina, nivel, zona y periodo. Puedes <Link href={`/ranking?disciplina=${discipline}&provincia=all`}>ver esta disciplina en toda España y en todo el tiempo</Link> o <Link href={`/peleadores?disciplina=${discipline}`}>buscar un peleador</Link> para reconocer su actuación en un combate que hayas visto.</p>}
     </>
   );
 }

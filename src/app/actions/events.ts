@@ -12,7 +12,8 @@ import { slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
 import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
-import { isDiscipline, isWeightClass } from "../../lib/common/disciplines";
+import { divisionById, divisionEligible, knownBoxingAgeEligible } from "../../lib/common/competition";
+import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
@@ -73,13 +74,20 @@ export async function addCartelBout(f: FormData) {
   checkLengths(f, back, { evidenceUrl: LIMITS.url });
   // Cada esquina se elige de una lista que lleva el identificador de la ficha (no un texto que haya que escribir igual).
   const [a, b] = await Promise.all([
-    db.fighter.findFirst({ where: { id: str(f, "fighterA"), hiddenAt: null } }),
-    db.fighter.findFirst({ where: { id: str(f, "fighterB"), hiddenAt: null } }),
+    db.fighter.findFirst({ where: { id: str(f, "fighterA"), hiddenAt: null }, include: { disciplines: true } }),
+    db.fighter.findFirst({ where: { id: str(f, "fighterB"), hiddenAt: null }, include: { disciplines: true } }),
   ]);
   if (!a || !b || a.id === b.id) go(back, { problema: "cartel_boxeadores" });
   const rounds = intOrNull(f, "rounds");
   const weightClassRaw = str(f, "weightClass");
-  if (weightClassRaw && !isWeightClass(event.discipline, event.level, weightClassRaw)) go(back, { problema: "cartel_categoria" });
+  const category = parseCompetitionChoice(event.discipline, event.level, weightClassRaw, str(f, "divisionId"));
+  if (!category) go(back, { problema: "cartel_categoria" });
+  for (const fighter of [a,b]) {
+    if (!knownBoxingAgeEligible(event.discipline, event.level, fighter.birthDate, event.date)) go(back, { problema: "categoria_edad_combate" });
+    const current = divisionById(fighter.disciplines.find(d=>d.discipline===event.discipline)?.divisionId);
+    if (current && !current.combat && (!current.year || current.year===event.date.getUTCFullYear())) go(back, { problema: "categoria_sin_combate" });
+    if (category.divisionId && !divisionEligible(category.divisionId, fighter.birthDate, event.date)) go(back, { problema: "categoria_edad_combate" });
+  }
   const evidenceRaw = str(f, "evidenceUrl");
   const evidenceUrl = evidenceRaw ? safeHttpUrl(evidenceRaw) : null;
   if (evidenceRaw && !evidenceUrl) go(back, { problema: "url_invalida" });
@@ -92,9 +100,9 @@ export async function addCartelBout(f: FormData) {
       const flags = await coherenceFlagsFor(tx, event.date, event.discipline, [a.id, b.id]);
       const order = await tx.bout.count({ where: { eventId: event.id } });
       const bout = await tx.bout.create({
-        data: { flags, eventId: event.id, fighterAId: a.id, fighterBId: b.id, pairKey: pairKey(a.id, b.id), order: order + 1, weightClass: weightClassRaw || null, rounds: rounds && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl },
+        data: { flags, eventId: event.id, fighterAId: a.id, fighterBId: b.id, pairKey: pairKey(a.id, b.id), order: order + 1, weightClass: category.weightClass, divisionId: category.divisionId, rounds: rounds && rounds <= 12 ? rounds : null, verification: "VERIFIED", createdById: user.id, evidenceUrl },
       });
-      await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, fighterA: a.slug, fighterB: b.slug, evidenceUrl } }, tx);
+      await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "CREATED_BY_ORGANIZER", after: { eventId: event.id, fighterA: a.slug, fighterB: b.slug, divisionId: category.divisionId, weightClass: category.weightClass, evidenceUrl } }, tx);
       return bout;
     }),
     "cartel_duplicado",
@@ -149,6 +157,8 @@ export async function updateEvent(f: FormData) {
   await guard(back, () => db.$transaction(async (tx) => {
     // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
+    const bouts = await tx.bout.findMany({ where: { eventId: event.id }, include: { fighterA: true, fighterB: true } });
+    if (bouts.some(b => !knownBoxingAgeEligible(event.discipline,event.level,b.fighterA.birthDate,date) || !knownBoxingAgeEligible(event.discipline,event.level,b.fighterB.birthDate,date) || (b.divisionId !== null && (!divisionEligible(b.divisionId, b.fighterA.birthDate, date) || !divisionEligible(b.divisionId, b.fighterB.birthDate, date))))) throw new Rechazo("categoria_edad_combate");
     await tx.event.update({ where: { id: event.id }, data });
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));

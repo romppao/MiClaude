@@ -12,7 +12,8 @@ import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
 import { internalPath } from "../../lib/common/paths";
 import { dayKey, eventDayReached, parseDay, todayMadrid } from "../../lib/common/dates";
-import { isDiscipline } from "../../lib/common/disciplines";
+import { divisionById, divisionEligible, knownBoxingAgeEligible } from "../../lib/common/competition";
+import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { findNameCandidates } from "../../lib/fighters/fighters";
 import { boutVersion, pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { boutQuery } from "../../lib/bouts/form";
@@ -43,6 +44,12 @@ export async function addBout(f: FormData) {
   const myDiscipline = isDiscipline(disciplineRaw) ? me.disciplines.find((d) => d.discipline === disciplineRaw) : undefined;
   if (!myDiscipline) go(back, { problema: "combate_sin_disciplina" });
   const discipline = myDiscipline.discipline;
+  const category = parseCompetitionChoice(discipline, str(f, "level") || myDiscipline.level, str(f, "weightClass"), str(f, "divisionId"));
+  if (!category) go(back, { problema: "cartel_categoria" });
+  if (!knownBoxingAgeEligible(discipline, category.level, me.birthDate, date)) go(back, { problema: "categoria_edad_combate" });
+  const currentDivision = divisionById(myDiscipline.divisionId);
+  if (currentDivision && !currentDivision.combat && (!currentDivision.year || currentDivision.year === date.getUTCFullYear())) go(back, { problema: "categoria_sin_combate" });
+  if (category.divisionId && !divisionEligible(category.divisionId, me.birthDate, date)) go(back, { problema: "categoria_edad_combate" });
   const province = readProvince(f, "province", back, me.province);
   const city = str(f, "city") || me.city || province;
   const rounds = (() => { const n = intOrNull(f, "rounds"); return n && n <= 12 ? n : null; })();
@@ -67,9 +74,9 @@ export async function addBout(f: FormData) {
 
   // Rival: se elige por identificador. Si ya hay fichas con ese nombre, se le pide a la persona que elija cuál es (o que cree una nueva).
   const rivalId = str(f, "rivalId");
-  let rivalExisting: { id: string } | null = null;
+  let rivalExisting: { id: string; birthDate: Date | null; disciplines: { divisionId: string | null }[] } | null = null;
   if (rivalId && rivalId !== "nuevo") {
-    rivalExisting = await db.fighter.findFirst({ where: { id: rivalId, hiddenAt: null }, select: { id: true } });
+    rivalExisting = await db.fighter.findFirst({ where: { id: rivalId, hiddenAt: null }, select: { id: true, birthDate: true, disciplines: { where: { discipline }, select: { divisionId: true } } } });
     if (!rivalExisting) go(back, { problema: "no_existe" });
   } else if (!rivalId) {
     // Como en la pantalla de elección: la propia ficha del peleador no cuenta como candidata (si fuera la única, se perdería el combate en una redirección muda).
@@ -78,6 +85,11 @@ export async function addBout(f: FormData) {
     }
   }
   if (rivalExisting && rivalExisting.id === me.id) go(back, { problema: "combate_mismo" });
+  if (rivalExisting) {
+    const current = divisionById(rivalExisting.disciplines[0]?.divisionId);
+    if (current && !current.combat && (!current.year || current.year === date.getUTCFullYear())) go(back, { problema: "categoria_sin_combate" });
+    if (!knownBoxingAgeEligible(discipline,category.level,rivalExisting.birthDate,date) || (category.divisionId && !divisionEligible(category.divisionId,rivalExisting.birthDate,date))) go(back, { problema: "categoria_edad_combate" });
+  }
 
   const slugBase = slugName(eventName, dayKey(date));
 
@@ -90,11 +102,11 @@ export async function addBout(f: FormData) {
       if ((await tx.auditLog.count({ where: { userId: user.id, entity: "BOUT", action: "CREATED", createdAt: { gte: new Date(Date.now() - 864e5) } } })) >= MAX_BOUTS_PER_DAY) throw new Rechazo("combate_limite_dia");
       let event = await tx.event.findUnique({ where: { slug: slugBase } });
       if (event) {
-        if (event.discipline !== discipline) throw new Rechazo("combate_disciplina");
+        if (event.discipline !== discipline || event.level !== category.level) throw new Rechazo("combate_disciplina");
         if (event.organizerId) throw new Rechazo("combate_velada_oficial"); // no se cuelgan combates propios en la velada oficial de otro
       } else {
         event = await tx.event.create({
-          data: { slug: slugBase, name: eventName, date, discipline, level: myDiscipline.level, venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED", createdById: user.id },
+          data: { slug: slugBase, name: eventName, date, discipline, level: category.level, venue: str(f, "venue") || "Por confirmar", city, province, status: past ? "COMPLETED" : "SCHEDULED", createdById: user.id },
         });
       }
       const rival = rivalExisting
@@ -108,10 +120,10 @@ export async function addBout(f: FormData) {
         data: {
           flags, eventId: event.id, fighterAId: me.id, fighterBId: rival.id, pairKey: pairKey(me.id, rival.id),
           result: result?.result ?? null, method: result?.method ?? null, endRound: result?.endRound ?? null, rounds,
-          weightClass: myDiscipline.weightClass, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl,
+          weightClass: category.weightClass, divisionId: category.divisionId, verification: "SELF_REPORTED", createdById: user.id, evidenceUrl,
         },
       });
-      await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "CREATED", after: { result: bout.result, method: bout.method, verification: "SELF_REPORTED", evidenceUrl, flags } }, tx);
+      await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "CREATED", after: { divisionId: category.divisionId, weightClass: category.weightClass, result: bout.result, method: bout.method, verification: "SELF_REPORTED", evidenceUrl, flags } }, tx);
       return bout;
     }),
     "combate_duplicado",

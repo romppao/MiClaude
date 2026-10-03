@@ -1,4 +1,5 @@
 import type { Discipline, Level, Method } from "@prisma/client";
+import { divisionById } from "./competition";
 
 /** Orden de presentación: el boxeo va siempre en cabeza. Para añadir una disciplina: enum en Prisma (+ migración) y entradas aquí. */
 export const DISCIPLINE_ORDER: Discipline[] = ["BOXEO", "MMA", "MUAYTHAI", "KICKBOXING", "K1", "JIUJITSU"];
@@ -82,16 +83,16 @@ const PENDIENTE = (que: string): PesosDe => ({ categorias: [], nota: `Todavía n
 
 export const PESOS: Record<Discipline, Record<Level, PesosDe>> = {
   BOXEO: {
-    PRO: { categorias: BOXEO_PRO, nota: "Las 17 categorías del boxeo profesional (las que reconocen WBC, WBA, IBF y WBO). Son las mismas para hombres y mujeres." },
-    AMATEUR: { categorias: BOXEO_AMATEUR, nota: "Categorías de la Federación Española de Boxeo para competiciones nacionales (élite y joven), alineadas con World Boxing. Las de cadete y júnior son distintas y están pendientes de añadir." },
+    PRO: { categorias: BOXEO_PRO, nota: "Las 17 categorías del boxeo profesional (las que reconocen WBC, WBA, IBF y WBO). Consulta la organización y su reglamento; esta declaración no acredita la división femenina o masculina." },
+    AMATEUR: { categorias: BOXEO_AMATEUR, nota: "Categorías de la Federación Española de Boxeo para competiciones nacionales (élite y joven), alineadas con World Boxing. Para confirmar la categoría, elige el grupo de edad y sexo de la circular RFEBoxeo 2026. Sin división, este listado histórico no acredita edad ni sexo." },
   },
   MMA: {
     PRO: { categorias: MMA, nota: "Categorías de las reglas unificadas de MMA, en su versión masculina. Las categorías femeninas más ligeras están pendientes de confirmar." },
-    AMATEUR: { categorias: MMA, nota: "Categorías de la federación internacional IMMAF, en su versión masculina. Las categorías femeninas más ligeras y las de edades juveniles están pendientes de confirmar." },
+    AMATEUR: { categorias: MMA, nota: "Listado histórico masculino sin división de edad confirmada. Elige una división IMMAF 2026; sus pesos se mostrarán cuando se contrasten con la convocatoria vigente." },
   },
   MUAYTHAI: {
     PRO: { categorias: MUAYTHAI_PRO, nota: "Categorías del Consejo Mundial de Muay Thai (WMC). Cada promotora puede usar otras." },
-    AMATEUR: PENDIENTE("Muay Thai amateur"),
+    AMATEUR: { categorias: [], nota: "Elige una división de edad y sexo para consultar los pesos IFMA 2026 de Muay Thai amateur." },
   },
   KICKBOXING: {
     PRO: PENDIENTE("kickboxing profesional (cada promotora usa las suyas)"),
@@ -107,16 +108,20 @@ export const PESOS: Record<Discipline, Record<Level, PesosDe>> = {
   },
 };
 
-export const weightClassesFor = (discipline: Discipline, level: Level): CategoriaPeso[] => PESOS[discipline][level].categorias;
-export const weightNote = (discipline: Discipline, level: Level): string => PESOS[discipline][level].nota;
-export const isWeightClass = (discipline: Discipline, level: Level, valor: string): boolean => weightClassesFor(discipline, level).some((c) => c.valor === valor);
+export const weightClassesFor = (discipline: Discipline, level: Level, divisionId?: string | null): CategoriaPeso[] => {
+  if (!divisionId) return PESOS[discipline][level].categorias;
+  const division = divisionById(divisionId);
+  return division?.discipline === discipline && division.level === level ? division.weights : [];
+};
+export const weightNote = (discipline: Discipline, level: Level, divisionId?: string | null): string => divisionId ? divisionById(divisionId)?.note ?? "División no reconocida." : PESOS[discipline][level].nota;
+export const isWeightClass = (discipline: Discipline, level: Level, valor: string, divisionId?: string | null): boolean => weightClassesFor(discipline, level, divisionId).some((c) => c.valor === valor);
 
 /**
  * Texto de una categoría guardada, con su peso en kilos. Si el valor ya no está en la lista (datos antiguos o una lista que cambió), se enseña tal cual:
  * nunca se esconde lo que alguien declaró.
  */
-export function weightClassLabel(discipline: Discipline, level: Level, valor: string): string {
-  return weightClassesFor(discipline, level).find((c) => c.valor === valor)?.etiqueta ?? valor;
+export function weightClassLabel(discipline: Discipline, level: Level, valor: string, divisionId?: string | null): string {
+  return weightClassesFor(discipline, level, divisionId).find((c) => c.valor === valor)?.etiqueta ?? valor;
 }
 
 /** «Profesional» / «Amateur». */
@@ -147,4 +152,19 @@ export function parseDisciplineChoice(discipline: string, level: string, weightC
   const wc = weightClass.trim();
   if (!wc) return { discipline, level, weightClass: null };
   return isWeightClass(discipline, level, wc) ? { discipline, level, weightClass: wc } : null;
+}
+
+/** Recibe la división junto con el peso: nunca acepta un peso de élite como peso de un escolar. */
+export function parseCompetitionChoice(discipline: string, level: string, weightClass: string, divisionId: string) {
+  if (!isDiscipline(discipline) || !isLevel(level)) return null;
+  const id = divisionId.trim();
+  const wc = weightClass.trim();
+  if (!id) {
+    const legacy = parseDisciplineChoice(discipline, level, wc);
+    return legacy ? { ...legacy, divisionId: null } : null;
+  }
+  const division = divisionById(id);
+  if (!division || division.discipline !== discipline || division.level !== level) return null;
+  if (wc && !isWeightClass(discipline, level, wc, id)) return null;
+  return { discipline, level, divisionId: id, weightClass: wc || null };
 }

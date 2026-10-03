@@ -31,7 +31,7 @@ check("una fecha a más de un año vista se rechaza con un mensaje", await seen(
 
 // 2) La ficha que crea un tercero para su rival no se lista, no se indexa y solo enseña la inicial del apellido
 await anon.goto(B + `/peleadores?q=Tercero${rnd}`);
-check("la ficha creada por un tercero no sale en el listado", !(await cuerpo(anon)).includes(`Tercero${rnd}`));
+check("la ficha creada por un tercero no sale en el listado", await seen(anon.locator("main p", { hasText: "Ningún peleador coincide con estos filtros." })) && await anon.locator("main .card strong", { hasText: `Tercero${rnd}` }).count() === 0);
 await anon.goto(B + `/buscar?q=Tercero${rnd}`);
 check("ni en la búsqueda", await anon.locator(`a:has-text("Tercero${rnd}")`).count() === 0); // la página repite lo buscado, así que se comprueba que no haya enlace a la ficha
 const slugRival = slugDe(`Tercero${rnd}`);

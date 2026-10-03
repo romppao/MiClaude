@@ -45,14 +45,17 @@ export const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString
 
 /** Rellena y envía el formulario «Registrar un combate» con un resultado (por defecto, victoria por decisión unánime). */
 export const registrar = async (p, o) => {
-  await p.fill("[name=eventName]", o.evento); await p.fill("[name=date]", o.fecha);
-  await p.fill("[name=oppFirst]", o.rivalNombre); await p.fill("[name=oppLast]", o.rivalApellidos);
-  if (o.disciplina) await p.selectOption("select[name=discipline]", o.disciplina);
-  if (o.resultado === null) { await p.selectOption("select[name=outcome]", ""); await p.selectOption("form select[name=method]", ""); } // tras un error el formulario conserva lo elegido: «sin resultado» se elige de forma explícita
-  if (o.resultado !== null) { await p.selectOption("select[name=outcome]", o.resultado ?? "WIN"); if (o.metodo !== null) await p.selectOption("form select[name=method]", o.metodo ?? "UD"); }
+  // Disciplina, resultado, método y evidencia también existen en otros formularios de la ficha.
+  const form = p.locator("main form").filter({ has: p.getByRole("button", { name: "Registrar este combate", exact: true }) });
+  await form.locator("[name=eventName]").fill(o.evento); await form.locator("[name=date]").fill(o.fecha);
+  await form.locator("[name=oppFirst]").fill(o.rivalNombre); await form.locator("[name=oppLast]").fill(o.rivalApellidos);
+  if (o.disciplina) await form.locator("select[name=discipline]").selectOption(o.disciplina);
+  if (o.resultado === null) { await form.locator("select[name=outcome]").selectOption(""); await form.locator("select[name=method]").selectOption(""); } // tras un error el formulario conserva lo elegido: «sin resultado» se elige de forma explícita
+  if (o.resultado !== null) { await form.locator("select[name=outcome]").selectOption(o.resultado ?? "WIN"); if (o.metodo !== null) await form.locator("select[name=method]").selectOption(o.metodo ?? "UD"); }
   // Tras un error el formulario conserva lo escrito: el enlace se fija siempre de forma explícita (vacío si no se pide) para no heredar el de un intento anterior.
-  await p.fill("[name=evidenceUrl]", o.evidencia ?? "");
-  if (o.dobleClic) await p.dblclick('main button:has-text("Registrar este combate")'); else await btn(p, "Registrar este combate");
+  await form.locator("[name=evidenceUrl]").fill(o.evidencia ?? "");
+  const guardar = form.getByRole("button", { name: "Registrar este combate", exact: true });
+  if (o.dobleClic) await guardar.dblclick(); else await guardar.click();
 };
 
 export const link = (email) => { const log = readFileSync(MAIL_LOG, "utf8"); const i = log.lastIndexOf(`to=${email}`); return log.slice(i).match(/https?:\/\/[^\s/]+(\/verificar\?token=\w+)/)[1]; };

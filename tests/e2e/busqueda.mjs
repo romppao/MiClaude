@@ -34,6 +34,7 @@ check("el listado de peleadores también busca sin tildes", (await cuerpo(anon))
 
 // 2) Paginación de los listados. Se preparan 30 peleadores propios para no depender de cuántos haya en la base de datos.
 sql(`insert into "Fighter"(id, slug, "firstName", "lastName") select 'pag${rnd}-' || i, 'paginado-${rnd}-' || i, 'Pag', 'Paginado${rnd}' from generate_series(1, 30) i;`);
+sql(`insert into "FighterDiscipline"("fighterId", discipline, level) select 'pag${rnd}-' || i, 'BOXEO', 'AMATEUR' from generate_series(1, 30) i;`);
 await anon.goto(B + `/peleadores?q=Paginado${rnd}&level=AMATEUR`);
 const siguiente = anon.locator("a", { hasText: "Página siguiente" });
 check("los listados largos se paginan y dicen cuántos resultados hay", await seen(siguiente.first()) && (await cuerpo(anon)).includes("Mostrando del 1 al 24 de 30 peleadores · página 1 de 2"));

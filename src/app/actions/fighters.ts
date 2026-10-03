@@ -10,14 +10,15 @@ import { slugName, slugify } from "../../lib/common/labels";
 import { findNameCandidates } from "../../lib/fighters/fighters";
 import { audit } from "../../lib/common/audit";
 import { parseBirthDate } from "../../lib/common/dates";
-import { parseDisciplineChoice } from "../../lib/common/disciplines";
+import { divisionAgeEligible } from "../../lib/common/competition";
+import { parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parsePrior } from "../../lib/fighters/prior";
 import { LIMITS } from "../../lib/common/text";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
 function readDisciplineForm(f: FormData) {
-  const choice = parseDisciplineChoice(str(f, "discipline"), str(f, "level"), str(f, "weightClass"));
+  const choice = parseCompetitionChoice(str(f, "discipline"), str(f, "level"), str(f, "weightClass"), str(f, "divisionId"));
   const prior = parsePrior({ total: str(f, "priorTotal"), wins: str(f, "priorWins"), losses: str(f, "priorLosses"), draws: str(f, "priorDraws") });
   return { choice, prior };
 }
@@ -56,11 +57,11 @@ export async function createMyFighter(f: FormData) {
     return db.fighter.create({
       data: {
         slug, firstName, lastName, alias: str(f, "alias") || null, city, province, level: choice.level, gymId, userId: user.id,
-        disciplines: { create: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
+        disciplines: { create: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
       },
     });
   });
-  await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, priorDeclared: prior.prior } });
+  await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorDeclared: prior.prior } });
   go(back, { aviso: "ficha_creada" });
 }
 
@@ -81,6 +82,7 @@ export async function updateMyFighter(f: FormData) {
   const rawBirth = str(f, "birthDate");
   const birthDate = rawBirth ? parseBirthDate(rawBirth) : null;
   if (rawBirth && !birthDate) go(back, { problema: "nacimiento_invalido" });
+  if (birthDate && me.disciplines.some(d=>d.divisionId && !divisionAgeEligible(d.divisionId,birthDate,new Date()))) go(back, { problema: "categoria_edad_ficha" });
   const measure = (key: string, min: number, max: number) => {
     const raw = str(f, key);
     if (!raw) return null;
@@ -113,10 +115,11 @@ export async function saveDiscipline(f: FormData) {
   const { choice, prior } = readDisciplineForm(f);
   if (!choice) go("/mi-ficha", { problema: "disciplina_no_valida" });
   if (!prior.ok) go("/mi-ficha", { problema: prior.error });
+  if (choice.divisionId && me.birthDate && !divisionAgeEligible(choice.divisionId, me.birthDate, new Date())) go("/mi-ficha", { problema: "categoria_edad_ficha" });
   const before = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } } });
   // «Añadir otra disciplina» no sobrescribe una que ya tienes (borraría su récord declarado en silencio): para cambiarla se usa su propio formulario.
   if (before && str(f, "modo") === "anadir") go("/mi-ficha", { problema: "disciplina_ya_tienes" });
-  const data = { level: choice.level, weightClass: choice.weightClass, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
+  const data = { level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
   await db.$transaction([
     db.fighterDiscipline.upsert({
       where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } },

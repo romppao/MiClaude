@@ -186,6 +186,8 @@ model Bout {
   fighterBId   String
   fighterB     Fighter      @relation("FighterB", fields: [fighterBId], references: [id])
   weightClass  String?
+  // División federativa versionada (edad, sexo y modalidad); propia del combate, no de la ficha actual.
+  divisionId   String?
   rounds       Int?
   result       Result?
   method       Method?
@@ -360,6 +362,8 @@ model FighterDiscipline {
   discipline  Discipline
   level       Level      @default(AMATEUR)
   weightClass String?
+  // Null conserva las declaraciones anteriores sin asignarles una edad o un sexo por deducción.
+  divisionId  String?
   // Récord de partida: combates anteriores a usar la app. Datos declarados, no comprobables.
   priorTotal  Int?
   priorWins   Int?
@@ -369,6 +373,7 @@ model FighterDiscipline {
 
   @@id([fighterId, discipline])
   @@index([discipline, weightClass])
+  @@index([discipline, level, divisionId, weightClass])
 }
 
 // Registro de intentos para limitar la frecuencia (inicio de sesión, registro, reenvíos…). Clave = acción + correo o IP.

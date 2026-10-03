@@ -150,6 +150,22 @@ Origen: petición del fundador de comparar Raunder y BoxRec; propuestas de Codex
 - **No priorizado ahora:** reservas/pagos/sparrings y CRM amplio; primero validar recorridos básicos y la gestión de una velada. No se descartan definitivamente.
 - **Corregida la premisa competitiva:** no basar la diferenciación en que BoxRec sea exclusivamente boxeo/inglés/sin público, ni en que Raunder no cubra Madrid. Nuestra propuesta debe demostrarse por utilidad y fiabilidad.
 
+## Continuación — 3 de octubre de 2026
+
+Origen: «continua el trabajo» del fundador y pendiente de validación de `APORTACIONES-CODEX.md`.
+
+- **Validado en CI (propuesta #9, ejecución `37110167176`):** recorrido real de récord amateur y profesional en la misma disciplina, categorías correctas por nivel, resultados históricos, NC y enlace al respaldo. Sus 17 comprobaciones pasan en las fichas privada y pública, con datos ficticios propios. Integración pendiente.
+- **Prioridad mantenida:** cerrar validación antes de ampliar funcionalidades. Las pruebas con personas reales, la paginación de moderación y las decisiones del fundador siguen pendientes.
+
+
+## Categorías por edad y reglamento — 3 de octubre de 2026
+
+Origen: fundador, «hay infinidad de categorías desde schoolboys hasta élite […] informaros bien y aplicarlo correctamente».
+
+- **Implementado en rama de categorías:** divisiones versionadas de edad/sexo y pesos RFEBoxeo 2026, IFMA y WAKO ring/tatami; edades IMMAF 2026 e IBJJF. Ficha actual y categoría del combate independientes; búsqueda, ránking histórico, formación sin combate y guardas de edad. Validación final local aprobada (327 unitarias, 289 comprobaciones E2E, axe 0); integración pendiente. Detalle en `APORTACIONES-CODEX.md`.
+- **Pendientes explícitos:** tablas de peso IMMAF vigentes; IBJJF con cinturón y kimono/sin kimono; licencias, modalidades específicas, reglas de rounds y emparejamientos por edad y torneos de varios días. Un catálogo no resuelve por sí solo consentimiento/publicación de menores.
+- **Descartado:** asignar automáticamente élite/masculino a los datos anteriores, o compartir los pesos masculinos adultos con juveniles y mujeres. Daría una clasificación inventada.
+
 
 ## 3 de octubre de 2026 — identidad opuesta a Raunder
 

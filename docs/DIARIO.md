@@ -593,6 +593,30 @@ Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecuc
 
 ---
 
+## Sesión 3 — 3 de octubre de 2026 — Codex: recorrido de récords por nivel
+
+### Qué se pidió / qué idea surgió
+
+El fundador compartió el repositorio y pidió: «continua el trabajo».
+
+### Qué se decidió y por qué
+
+Continuar la validación pendiente del relevo, con prioridad funcional y diseño aplazado. La rama de la propuesta #8 recibió correcciones durante la revisión; se conservan y este bloque parte de `e049fe4` en una rama independiente (`codex/validacion-records-2026-10-03`).
+
+### Qué se hizo
+
+Se añadió `tests/e2e/respaldo.mjs` al conjunto de CI. Crea una cuenta y ficha ficticias desde la interfaz, registra un combate amateur, cambia a profesional, registra victoria y combate sin decisión, y vuelve a amateur. Comprueba en «Mi ficha» y como visitante que las tarjetas conservan los resultados históricos, muestran la categoría solo en el nivel actual, explican NC y enlazan a la ayuda pública. La ayuda de registro ahora acota todos los campos y el botón al formulario de combate; la corrección reciente de la rama anterior solo acotaba la disciplina.
+
+Se inspeccionó además la ejecución `37109729125`: el guion de filtros impedía llegar al calendario y al nuevo recorrido porque su expresión `peleadores?` no reconocía el singular «peleador». Se corrige la comprobación para aceptar las frases completas de singular y plural, sin modificar la pantalla.
+
+### Qué salió mal / qué se aprendió
+
+El proxy local no acepta conexiones y no hay dependencias en caché: no se pudo clonar ni instalar con `npm ci --offline`. Se recuperaron los ficheros mediante GitHub y se comprobaron sus SHA. Sintaxis de los guiones y diferencias comprobadas localmente; el CI debe validar dependencias, PostgreSQL y navegador. Se detectaron cambios concurrentes antes de publicar y se respetaron en una rama independiente.
+
+### Estado y próximos pasos
+
+Validación completa aprobada en la ejecución `37110167176` de la propuesta #9, commit `233420c`: migraciones/paridad, tipos, mapa, 313 unitarias, compilación, todos los guiones E2E y axe (0 incumplimientos). El nuevo recorrido aprobó sus 17 comprobaciones. La propuesta #9 está encadenada sobre la rama de #8. Integración y demo pendientes; siguen abiertos los recorridos por personas y los bloques de la auditoría indicados en `TRASLADO.md`.
+
 ## Sesión — 3 de octubre de 2026 — propuestas visuales diferenciadas
 
 ### Qué se pidió / qué idea surgió
@@ -684,3 +708,29 @@ Color aprobado, diseño sin elegir. No se modifica la demo. Contrastar futuras i
 
 ### Estado y próximos pasos
 ```
+
+## Sesión 4 — 3 de octubre de 2026 — Divisiones deportivas por edad y reglamento
+
+### Qué se pidió / qué idea surgió
+
+El fundador señaló: «dentro de la disciplina de boxeo, en especial en el campo amateur hay infinidad de categorías desde schoolboys hasta élite […] informaros bien y aplicarlo correctamente».
+
+### Qué se decidió y por qué
+
+Investigar reglamentos primarios antes de completar listas; almacenar una división federativa versionada que incluya edad, categoría masculina/femenina y modalidad cuando corresponda. Separar la división actual de la ficha y la propia de cada combate, sin reclasificar datos anteriores. Una división desconocida sigue siendo una declaración incompleta. No extrapolar los pesos adultos masculinos a menores o mujeres ni tratar todas las federaciones como si calculasen la edad igual.
+
+### Qué se hizo
+
+Se leyeron la circular RFEBoxeo 2026, IFMA v3.057, WAKO revisión 3, comunicación de edades IMMAF 2026 e IBJJF 6.1. Boxeo incorpora siete grupos, pesos específicos masculinos/femeninos, y benjamín/prebenjamín formativos sin combate. IFMA incorpora todos los grupos de su tabla; WAKO separa ring/tatami y K-1 recibe solo ring. IMMAF e IBJJF incorporan edades comprobadas; sus pesos quedan explícitamente pendientes del catálogo completo vigente.
+
+Se añadieron `divisionId` en ficha/combate, migración aditiva y catálogo con fuentes. Se aplican selección y validación conjunta, guardas de edad de ambos participantes, conservación histórica, filtro/paginación, ránking por categoría del combate y descarga de datos. La categoría actual del récord se etiqueta aparte del historial agregado. Se añadió un recorrido E2E y pruebas de límites normativos. Diseño visual sin cambios; documentación técnica, diario, ideas y lecciones actualizados.
+
+### Qué salió mal / qué se aprendió
+
+El PDF antiguo de IMMAF seguía enlazado pero el cálculo juvenil cambió para 2026: se encontraron y probaron los años de la comunicación posterior, con excepción Youth A. Un fragmento superpuesto de la circular de pesos RFE no se convirtió en una categoría extra. Las primeras pruebas nuevas esperaban textos y nombres accesibles incorrectos; se corrigieron contra la pantalla real. El primer recorrido completo detectó dos expectativas antiguas del filtro: ahora hay una división adicional y las tarjetas explican que la edad anterior está sin confirmar. Se conserva esa validación con sus nuevos datos.
+
+Esta vez se pudo instalar y ejecutar todo localmente usando el permiso de red explícito. PostgreSQL se extrajo en el área de trabajo, sin instalar paquetes del sistema ni modificar una base existente. Durante el bloque llegaron documentos nuevos a la rama de calendario y a la principal: se conservan al integrar el trabajo en la rama independiente.
+
+### Estado y próximos pasos
+
+Validación local final aprobada: migraciones desde base vacía y paridad, tipos, mapa, 327 unitarias, compilación, 289 comprobaciones E2E (18 del nuevo recorrido de categorías) y axe con 0 incumplimientos, 0 graves o críticos. Comprobada la ejecución real de los casos nuevos en el log. Propuesta preparada contra la rama principal, conservando #8/#9 y las actualizaciones de documentación; integración y demo pendientes. Pendientes explícitos: pesos IMMAF/IBJJF completos, modalidades/requisitos/licencias, política de menores y pruebas con personas. Detalle de fuentes y límites en `DISENO-PESOS.md`.

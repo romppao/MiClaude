@@ -123,9 +123,33 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 
 - **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.
 
+## Continuación — 3 de octubre de 2026: aislamiento y validación
+
+- El proxy configurado no acepta conexiones y el entorno no tiene dependencias en caché. Se recuperó el código con el conector de GitHub y se comprobaron los SHA; el CI valida las partes que no se pueden ejecutar localmente. Regla: la disponibilidad del conector no demuestra que funcione la red de la terminal; no presentar sintaxis como aprobación de E2E.
+- La rama remota cambió durante la revisión. Se incorporaron sus correcciones antes de crear una rama independiente. Regla: comprobar el SHA remoto antes de publicar y conservar el trabajo concurrente; nunca forzar una actualización para sobrescribirlo.
+- El mismo formulario de ficha repite también resultado, método y evidencia en otros apartados. La ayuda de registro debe acotar todos sus campos y su botón, no únicamente el campo que provocó el primer fallo.
+- La ejecución `37109729125` falló comprobando el recuento del filtro: `peleadores?` acepta «peleadore» o «peleadores», pero no «peleador». La pantalla mostraba correctamente el singular. Regla: probar explícitamente las frases de singular y plural; hacer opcional la última letra no siempre forma el singular español.
+- Una lectura conjunta de documentos para publicar excedió el límite de salida y truncó el JSON. Se abortó antes de crear objetos remotos y se leyeron los ficheros individualmente. Regla: comprobar el límite y la integridad de cada contenido antes de publicarlo.
+
 - Al cambiar un filtro de nivel desde `Fighter.level` a `FighterDiscipline.level`, los fixtures SQL que filtran por nivel deben crear la disciplina correspondiente. No basta con el valor por defecto de la ficha. Se corrige la preparación de las 30 fichas de paginación; el comportamiento del filtro se conserva.
 
+
+## Divisiones federativas — 3 de octubre de 2026
+
+- Disciplina/nivel/peso no describe una categoría deportiva completa. El catálogo original omitía edades escolares y júnior, y usaba tablas adultas masculinas en varias disciplinas. Regla: verificar edad, sexo, modalidad y edición antes de generalizar; no tomar un caso adulto por toda la disciplina.
+- La página de reglas IMMAF enlaza un PDF de edad anterior al cambio juvenil de 2026. Se encontró la comunicación oficial posterior y se aplicaron sus años de nacimiento expresos, incluida la excepción Youth A. Regla: que un PDF siga enlazado no demuestra que todas sus reglas sigan vigentes.
+- La categoría actual de una ficha no describe sus combates anteriores. Copiarla al registrar historial o trasladar su aura al cambiarla reescribe la trayectoria. Regla: guardar la división de cada combate y agrupar su aura por esa declaración histórica.
+- Las categorías infantiles de WAKO tatami no habilitan ring/K-1, y benjamín/prebenjamín RFE no permiten combate. Regla: distinguir modalidad y permisos deportivos, no limitarse a completar opciones de un desplegable.
+- La red de terminal funciona con el permiso de red explícito del entorno. El bloqueo anterior se debía a ejecutar sin ese permiso, no a la ausencia general de conexión. PostgreSQL se extrajo de paquetes Debian en el área de trabajo sin instalar en el sistema; se inició con permiso de red para validar localmente. Regla: diagnosticar la capa exacta antes de declarar imposible una comprobación.
+- Los primeros intentos del nuevo guion E2E esperaban un mensaje inexistente («actualizada») y un nombre de botón sin su etiqueta accesible contextual. Se corrigieron contra el texto real y el nombre accesible. Regla: leer las etiquetas antes de escribir selectores y esperar la respuesta visible de la acción.
+
+- El guion antiguo de filtros fijaba cinco etiquetas y una cadena contigua disciplina/nivel/peso. Al añadir división, esas expectativas dejan de describir la pantalla. Se actualiza a seis campos y a comprobar la tarjeta concreta con su declaración de división incompleta; no se elimina la comprobación de orden ni de peso.
 
 ## Maquetas visuales y semántica — 3 de octubre de 2026
 
 El generador añadió barras de aura y una insignia de confirmación para toda la ficha. No representan el modelo real: aura es una cantidad sin tope y la confirmación corresponde a combates. Se retiraron en la propuesta revisada. Regla: revisar cifras, insignias y promesas de cada maqueta contra las funciones existentes antes de implementarla.
+- Una edición por script reutilizó una variable de texto de otro fichero y sobrescribió el guion nuevo con el de filtros. Se detectó al cotejar el log con las comprobaciones previstas, se restauró el contenido y se repitió su ejecución. Regla: variables por fichero, inspección del diff y comprobar que el log contiene realmente los casos nuevos; que el comando termine bien no demuestra la cobertura anunciada.
+- Una búsqueda por botón accesible no encuentra el formulario dentro de un `details` cerrado. Se abre por su `summary` visible y después se busca el botón. Regla: no depender de controles ocultos para localizar la acción que debe hacerlos visibles.
+- Repetir el recorrido deja otras fichas con el mismo nombre de pila en el mismo grupo del ránking. Se busca el nombre completo con apellido único de esa ejecución. Regla: el dato único debe formar parte del selector, no solo del fixture creado.
+
+- WAKO permite participación sénior de júnior y, con autorización especial, de veteranos: validar únicamente 19–40 rechazaría algunos casos admitidos. Se distinguen edad por año y los 18 cumplidos de ring, y se explica que edad compatible no certifica autorización. Regla: leer y probar las excepciones junto a la tabla general.
