@@ -5,13 +5,18 @@ import {
   SUPPORT_LABEL,
   SUPPORT_OPTIONS,
   SCOPE_LABEL,
+  effectiveSupport,
 } from "../../lib/aura/trajectory";
-import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
+import Paginacion from "../components/Paginacion";
+import VerificationTag from "../components/VerificationTag";
+import { pageNumber, pageWindow } from "../../lib/common/pagination";
+import { divisionLabel } from "../../lib/common/competition";
+import { DISCIPLINE_LABEL, levelName, weightClassLabel } from "../../lib/common/disciplines";
 import { calendarDayStart } from "../../lib/common/dates";
 import { fmtDate } from "../../lib/common/labels";
 import { endorseBout, reviewAchievement } from "../actions/trajectory";
 import { safeHttpUrl } from "../../lib/common/url";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { oneParam, lookup } from "../../lib/common/safe";
 
 export const metadata = { title: "Respaldar resultados y títulos" };
@@ -23,61 +28,42 @@ export default async function Backing({
 }) {
   const actor = await requireSupportActor();
   const admin = actor.user.role === "ADMIN";
-  const q = oneParam((await searchParams).q)?.slice(0, 160) ?? "";
+  const raw = await searchParams;
+  const q = oneParam(raw.q)?.trim().slice(0, 160) ?? "";
   const ds = admin
     ? {}
     : { discipline: { in: actor.accreditation!.disciplines } };
-  const [achievements, bouts] = await Promise.all([
-    db.fighterAchievement.findMany({
-      where: {
-        ...ds,
-        withdrawnAt: null,
-        ...(!admin && { rejectedAt: null }),
-        ...(q && { championship: { contains: q, mode: "insensitive" } }),
-        fighter: {
-          listed: true,
-          hiddenAt: null,
-          NOT: { userId: actor.user.id },
-        },
-      },
-      include: { fighter: true },
-      take: 100,
-      orderBy: [
-        { reviewRequestedAt: { sort: "desc", nulls: "last" } },
-        { createdAt: "desc" },
-      ],
-    }),
-    db.bout.findMany({
-      where: {
-        result: { not: null },
-        verification: { not: "DISPUTED" },
-        event: {
-          ...ds,
-          date: { lt: new Date(calendarDayStart().getTime() + 864e5) },
-          status: { not: "CANCELLED" },
-          ...(q && { name: { contains: q, mode: "insensitive" } }),
-        },
-        fighterA: {
-          OR: [{ userId: null }, { userId: { not: actor.user.id } }],
-        },
-        fighterB: {
-          OR: [{ userId: null }, { userId: { not: actor.user.id } }],
-        },
-      },
-      include: { event: true, fighterA: true, fighterB: true },
-      take: 100,
-      orderBy: { event: { date: "desc" } },
-    }),
+  const achievementWhere: Prisma.FighterAchievementWhereInput = {
+    ...ds, withdrawnAt: null, ...(!admin && { rejectedAt: null }),
+    ...(q && { championship: { contains: q, mode: "insensitive" } }),
+    fighter: { listed: true, hiddenAt: null, NOT: { userId: actor.user.id } },
+  };
+  const boutWhere: Prisma.BoutWhereInput = {
+    result: { not: null }, verification: { not: "DISPUTED" },
+    event: { ...ds, date: { lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { not: "CANCELLED" }, ...(q && { name: { contains: q, mode: "insensitive" } }) },
+    fighterA: { hiddenAt: null, OR: [{ userId: null }, { userId: { not: actor.user.id } }] },
+    fighterB: { hiddenAt: null, OR: [{ userId: null }, { userId: { not: actor.user.id } }] },
+  };
+  const [titleCount, boutCount] = await Promise.all([
+    db.fighterAchievement.count({ where: achievementWhere }), db.bout.count({ where: boutWhere }),
   ]);
-  const requests = await db.auditLog.findMany({
-    where: {
-      entity: "ACHIEVEMENT",
-      entityId: { in: achievements.map((a) => a.id) },
-      action: "REVIEW_REQUESTED",
-    },
-    orderBy: { createdAt: "desc" },
-    take: 300,
-  });
+  const titlePage = pageWindow(titleCount, pageNumber(raw.titulos), 50);
+  const boutPage = pageWindow(boutCount, pageNumber(raw.combates), 50);
+  const params = { q: q || undefined, titulos: titlePage.current > 1 ? String(titlePage.current) : undefined, combates: boutPage.current > 1 ? String(boutPage.current) : undefined };
+  const query = new URLSearchParams(Object.entries(params).filter((v): v is [string,string] => !!v[1])).toString();
+  const back = `/respaldar${query ? `?${query}` : ""}`;
+  const [achievements, bouts] = await Promise.all([
+    db.fighterAchievement.findMany({ where: achievementWhere, include: { fighter: true, supportAccreditation: true }, take: titlePage.take, skip: titlePage.skip,
+      orderBy: [{ reviewRequestedAt: { sort: "desc", nulls: "last" } }, { createdAt: "desc" }, { id: "asc" }] }),
+    db.bout.findMany({ where: boutWhere, include: { event: true, fighterA: true, fighterB: true, supportAccreditation: true }, take: boutPage.take, skip: boutPage.skip,
+      orderBy: [{ event: { date: "desc" } }, { id: "asc" }] }),
+  ]);
+  // Una solicitud repetida no puede desplazar la fuente más reciente de otros títulos de esta página.
+  const requests = achievements.length ? await db.$queryRaw<{ entityId: string; after: Prisma.JsonValue | null }[]>(Prisma.sql`
+    SELECT DISTINCT ON ("entityId") "entityId", "after" FROM "AuditLog"
+    WHERE entity='ACHIEVEMENT' AND action='REVIEW_REQUESTED' AND "entityId" IN (${Prisma.join(achievements.map(a => a.id))})
+    ORDER BY "entityId", "createdAt" DESC, id DESC
+  `) : [];
   const latest = new Map<string, (typeof requests)[number]>();
   for (const r of requests)
     if (!latest.has(r.entityId)) latest.set(r.entityId, r);
@@ -170,12 +156,8 @@ export default async function Backing({
         </label>
         <button>Buscar hechos para respaldar</button>
       </form>
-      <h2>Títulos declarados</h2>
-      {achievements.length === 100 && (
-        <p>
-          Se muestran hasta 100 títulos. Usa la búsqueda para localizar otros.
-        </p>
-      )}
+      <h2 id="titulos">Títulos declarados ({titleCount})</h2>
+      <Paginacion ruta="/respaldar" params={params} parametro="titulos" ancla="titulos" etiqueta="Páginas de títulos para respaldar" actual={titlePage.current} paginas={titlePage.pages} desde={titlePage.from} hasta={titlePage.to} total={titlePage.total} unidad={["título", "títulos"]} />
       {!achievements.length && (
         <p>No hay títulos disponibles para respaldar.</p>
       )}
@@ -189,9 +171,10 @@ export default async function Backing({
             {DISCIPLINE_LABEL[a.discipline]} · {fmtDate(a.awardedOn)} ·{" "}
             {a.rejectedAt
               ? "Excluido por moderación"
-              : SUPPORT_LABEL[a.supportKind]}
+              : SUPPORT_LABEL[effectiveSupport(a)]}
           </p>
-          {latest.get(a.id) && (
+          <p>{levelName(a.level)} · {divisionLabel(a.divisionId)}{a.weightClass ? ` · ${weightClassLabel(a.discipline, a.level, a.weightClass, a.divisionId)}` : " · Peso sin confirmar"}</p>
+          {a.reviewRequestedAt && latest.get(a.id) && (
             <details>
               <summary>Fuente aportada en la solicitud de revisión</summary>
               {request(latest.get(a.id)!.after)}
@@ -199,6 +182,7 @@ export default async function Backing({
           )}
           <form action={reviewAchievement} className="search">
             <input type="hidden" name="achievementId" value={a.id} />
+            <input type="hidden" name="back" value={`${back}#titulos`} />
             <input
               type="hidden"
               name="version"
@@ -212,6 +196,7 @@ export default async function Backing({
           {admin && (
             <form action={reviewAchievement} className="search">
               <input type="hidden" name="achievementId" value={a.id} />
+              <input type="hidden" name="back" value={`${back}#titulos`} />
               <input
                 type="hidden"
                 name="version"
@@ -221,24 +206,18 @@ export default async function Backing({
                 <span>Motivo de la decisión de moderación</span>
                 <input name="note" required maxLength={500} />
               </label>
-              <button className="secondary" name="decision" value="reject">
+              {!a.rejectedAt ? <button className="secondary" name="decision" value="reject">
                 Excluir título indicando el motivo
-              </button>
-              <button className="secondary" name="decision" value="restore">
+              </button> : <button className="secondary" name="decision" value="restore">
                 Restaurar como declarado
-              </button>
+              </button>}
             </form>
           )}
         </section>
       ))}
-      <h2>Resultados de combates</h2>
+      <h2 id="combates">Resultados de combates ({boutCount})</h2>
+      <Paginacion ruta="/respaldar" params={params} parametro="combates" ancla="combates" etiqueta="Páginas de resultados para respaldar" actual={boutPage.current} paginas={boutPage.pages} desde={boutPage.from} hasta={boutPage.to} total={boutPage.total} unidad={["combate", "combates"]} />
       {!bouts.length && <p>No hay resultados disponibles para respaldar.</p>}
-      {bouts.length === 100 && (
-        <p>
-          Se muestran hasta 100 resultados. Busca por el nombre de la velada
-          para encontrar otros.
-        </p>
-      )}
       {bouts.map((b) => (
         <details key={b.id} className="card">
           <summary>
@@ -253,8 +232,11 @@ export default async function Backing({
                 ? "Sin decisión"
                 : `Gana ${b.result === "A_WIN" ? b.fighterA.firstName : b.fighterB.firstName}`}
           </p>
+          <p>{levelName(b.event.level)} · {divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(b.event.discipline, b.event.level, b.weightClass, b.divisionId)}` : " · Peso sin confirmar"}</p>
+          <VerificationTag verification={b.verification} backing={b} />
           <form action={endorseBout} className="search">
             <input type="hidden" name="boutId" value={b.id} />
+            <input type="hidden" name="back" value={`${back}#combates`} />
             <input
               type="hidden"
               name="version"

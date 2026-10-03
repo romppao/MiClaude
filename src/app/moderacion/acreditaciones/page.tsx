@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { requireAdmin } from "../../../lib/accounts/permissions";
 import { db } from "../../../lib/common/db";
+import Paginacion from "../../components/Paginacion";
+import { pageNumber, pageWindow } from "../../../lib/common/pagination";
+import { oneParam } from "../../../lib/common/safe";
 import { SUPPORT_LABEL } from "../../../lib/aura/trajectory";
 import {
   DISCIPLINE_ORDER,
@@ -9,12 +12,21 @@ import {
 import { setSupportAccreditation } from "../../actions/trajectory";
 export const metadata = { title: "Acreditaciones para respaldar" };
 export const dynamic = "force-dynamic";
-export default async function Accreditations() {
+export default async function Accreditations({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireAdmin("/moderacion/acreditaciones");
+  const raw = await searchParams;
+  const q = oneParam(raw.q)?.trim().slice(0, 160) ?? "";
+  const where = q ? { OR: [{ name: { contains: q, mode: "insensitive" as const } }, { user: { email: { contains: q, mode: "insensitive" as const } } }] } : {};
+  const total = await db.supportAccreditation.count({ where });
+  const page = pageWindow(total, pageNumber(raw.pagina), 50);
+  const params = { q: q || undefined, pagina: page.current > 1 ? String(page.current) : undefined };
+  const query = new URLSearchParams(Object.entries(params).filter((v): v is [string,string] => !!v[1])).toString();
+  const back = `/moderacion/acreditaciones${query ? `?${query}` : ""}#acreditaciones`;
   const values = await db.supportAccreditation.findMany({
+    where,
     include: { user: { select: { email: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 100,
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    take: page.take, skip: page.skip,
   });
   return (
     <>
@@ -68,7 +80,14 @@ export default async function Accreditations() {
         </label>
         <button>Conceder acreditación</button>
       </form>
-      <h2>Acreditaciones existentes</h2>
+      <h2 id="acreditaciones">Acreditaciones existentes ({total})</h2>
+      <form className="search" role="search" aria-label="Buscar acreditaciones">
+        <label className="field"><span>Nombre acreditado o correo electrónico</span><input name="q" defaultValue={q} maxLength={160} /></label>
+        <button>Buscar acreditaciones</button>
+        {q && <Link href="/moderacion/acreditaciones#acreditaciones">Quitar búsqueda</Link>}
+      </form>
+      <Paginacion ruta="/moderacion/acreditaciones" params={params} ancla="acreditaciones" actual={page.current} paginas={page.pages} desde={page.from} hasta={page.to} total={page.total} unidad={["acreditación", "acreditaciones"]} />
+      {!values.length && <p>No hay acreditaciones con esta búsqueda.</p>}
       {values.map((a) => (
         <div className="card" key={a.id}>
           <strong>{a.name}</strong> · {SUPPORT_LABEL[a.kind]} ·{" "}
@@ -80,6 +99,7 @@ export default async function Accreditations() {
           {a.user && (
             <form action={setSupportAccreditation}>
               <input type="hidden" name="email" value={a.user.email} />
+              <input type="hidden" name="back" value={back} />
               <input
                 type="hidden"
                 name="version"

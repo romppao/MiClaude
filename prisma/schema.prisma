@@ -49,7 +49,8 @@ enum Role {
 
 // Origen y fiabilidad de un combate registrado.
 // SELF_REPORTED: lo añadió un peleador; CONFIRMED: el rival lo confirmó;
-// VERIFIED: lo validó un administrador/organizador/federación; DISPUTED: el rival o un admin lo rechazó.
+// VERIFIED: registro validado; su respaldo específico es independiente. DISPUTED: resultado suspendido por moderación.
+// Una objeción nueva del rival crea un aviso y no cambia el estado; los DISPUTED antiguos se revisan manualmente.
 enum Verification {
   SELF_REPORTED
   CONFIRMED

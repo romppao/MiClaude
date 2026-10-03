@@ -98,7 +98,7 @@ lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bou
 |---|---|
 | `Fighter` | peleador (ficha pública con su récord) |
 | `Bout` | combate · `Event` velada · `Gym` gimnasio · `Trainer` entrenador |
-| `Verification`: `SELF_REPORTED` · `CONFIRMED` · `VERIFIED` · `DISPUTED` | «Pendiente de confirmar por tu rival» · «Confirmado por el rival» · «Verificado» · «En revisión» |
+| `Verification`: `SELF_REPORTED` · `CONFIRMED` · `VERIFIED` · `DISPUTED` | «Declarado · confirmación opcional» · «Confirmado por el rival» · «Verificado» · «En revisión» |
 | `Aura` | aura (el reconocimiento del público; un clic por persona y combate) |
 | `Role`: `FAN` · `FIGHTER` · `ORGANIZER` · `ADMIN` | aficionado · peleador · organizador · moderación |
 | `ClaimRequest` | reclamación de una ficha existente |
@@ -210,3 +210,11 @@ Ficha y combate guardan divisiones independientes; usar `parseCompetitionChoice`
 - Gestión propia `/mi-ficha/trayectoria`, revisión `/respaldar`, acreditaciones `/moderacion/acreditaciones`. Propiedad, disciplina, identidad, versiones, fuente y auditoría se verifican en el servidor. Cada cambio de hechos/fuentes debe invalidar su respaldo.
 - Navegación: `NavigationMenu.tsx` recibe sesión/permisos y el formulario de salir como propiedades; no importa acciones. `layout.tsx` obtiene permisos en el servidor. Usar diálogo nativo, foco/Escape y destinos existentes; mantener máximo cinco enlaces por grupo.
 - Pruebas: `trayectoria.test.ts`, `ranking-trayectoria.test.ts`, permisos en `autorizacion.test.ts`; navegador `trayectoria.mjs` y `menu.mjs`; además la regresión y axe completos. Regenerar mapa tras nuevas rutas/acciones/modelos.
+
+## Colas, decisiones y respuesta visible
+
+Contar antes de consultar una ventana con `pageNumber/pageWindow`; ordenar con una clave estable de desempate. No sustituir paginación por un corte fijo. `Paginacion` admite parámetro y etiqueta propios por cola; conserva filtros y las otras páginas. Se usan 50 filas por página en moderación, respaldos, acreditaciones e historial.
+
+Formularios pasan `back` con filtros, página y sección. `returnTo` solo admite la pantalla propia, además de `internalPath`; no ampliar los destinos arbitrariamente. `go` conserva consultas completas, sustituye el aviso anterior y guarda el fragmento como `seccion`: Next puede perder fragmentos en redirecciones de Server Actions. `FlashNotice` enfoca/desplaza al aviso y ofrece vuelta a secciones conocidas de la ruta; no se interpreta contenido arbitrario como un enlace.
+
+Decisiones deben validar su opción y escribir con el estado y los hechos leídos. Avisos se reservan con `updateMany` antes de actuar sobre el dato, dentro de la transacción. Evidencias incluyen estado, resultado y fecha de respaldo en la condición. La última solicitud de un título se consulta por título (DISTINCT ON parametrizado), sin un límite global que permita desplazar a otros. Recorrido de volumen y pantallas antiguas: `tests/e2e/pulido.mjs`.

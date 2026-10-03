@@ -3,20 +3,25 @@ import { requireAdmin } from "../../../lib/accounts/permissions";
 import { db } from "../../../lib/common/db";
 import { AUDIT_ACTION_LABEL, AUDIT_ENTITY_LABEL } from "../../../lib/common/labels";
 import { lookup, flatParams } from "../../../lib/common/safe";
+import Paginacion from "../../components/Paginacion";
+import { pageNumber, pageWindow } from "../../../lib/common/pagination";
 import { BotonesFiltro, CampoFiltro } from "../../components/Filtros";
 
 export const metadata = { title: "Historial de cambios" };
 export const dynamic = "force-dynamic";
 
-const LIMITE = 200;
+const LIMITE = 50;
 
 export default async function History({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireAdmin("/moderacion/historial");
-  const { entity, id } = flatParams(await searchParams);
+  const { entity, id, pagina } = flatParams(await searchParams);
   const entidad = entity && lookup(AUDIT_ENTITY_LABEL, entity) ? entity : undefined;
+  const where = { ...(entidad && { entity: entidad }), ...(id && { entityId: id.trim() }) };
+  const total = await db.auditLog.count({ where });
+  const page = pageWindow(total, pageNumber(pagina), LIMITE);
   const logs = await db.auditLog.findMany({
-    where: { ...(entidad && { entity: entidad }), ...(id && { entityId: id.trim() }) },
-    include: { user: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: LIMITE,
+    where,
+    include: { user: { select: { name: true } } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: page.take, skip: page.skip,
   });
   return (
     <>
@@ -31,7 +36,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
       </form>
       {logs.length === 0 ? <p className="mut">No hay registros con esos filtros.</p> : (
         <>
-          <p className="mut">{logs.length === LIMITE ? `Se muestran los ${LIMITE} cambios más recientes.` : `${logs.length} cambios.`}</p>
+          <Paginacion ruta="/moderacion/historial" params={{ entity: entidad, id }} actual={page.current} paginas={page.pages} desde={page.from} hasta={page.to} total={page.total} unidad={["cambio", "cambios"]} />
           <div className="table-wrap">
             <table>
               <caption className="sr-only">Cambios registrados, del más reciente al más antiguo</caption>

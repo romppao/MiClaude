@@ -9,7 +9,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 
 | # | Idea | Origen | Estado |
 |---|---|---|---|
-| F1 | Hacer crecer la comunidad boxística española y dar visibilidad a sus boxeadores | Visión inicial del fundador | 🟡 |
+| F1 | Dar visibilidad a la comunidad española de deportes de contacto | Visión inicial ampliada por el fundador a varias disciplinas; comunicación inclusiva del 3 de octubre | 🟡 |
 | F2 | **Amateur primero**: hoy son aficionados, mañana la cara del boxeo español en el mundo | Giro tras ver el primer MVP | 🟡 |
 | F3 | **El público valora**: un aficionado puede reconocer a un peleador después de verlo pelear (idea original: puntuarlo con estrellas; hoy es el aura) | Giro tras ver el primer MVP | 🟢 |
 | F4 | **Madrid primero**, luego España; adelantarse a la competencia de Barcelona | Visión inicial del fundador | ⚪ Prioridad operativa histórica; no comunicarla al público ni usarla como filtro inicial (petición del 3 de octubre de 2026, F16) |
@@ -209,3 +209,9 @@ Origen: fundador. «Va a ser complicado que entre rivales se acepten los resulta
 Menú: «Me gusta como tiene distribuido el menú raunder lo debemos coger y mejorarlo», con captura. **Implementado en rama:** cuatro grupos por actividades, panel accesible y accesos según permisos. La captura aporta distribución, no aprobación de otras funciones. Sparring, formación y reservas siguen siendo ideas futuras; no se muestran como servicios implementados. Se conserva el diseño trabajado con ChatGPT Work.
 
 Estado final de este bloque: #14 integrada y comprobada en Render, CI #131 aprobado. Los estados «en rama» de los párrafos anteriores quedan superados; los pendientes de calibración y funciones futuras se mantienen.
+
+## Pulido funcional y diseño aplazado — 3 de octubre de 2026
+
+Origen: fundador. «Que más queda por hacer? pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El diseño actual es provisional. No rehacer ahora paleta, tipografía o composición; retomar con un briefing al final.
+
+Implementado en esta rama: colas e historial paginados, continuación tras decidir, avisos visibles, categoría/respaldo efectivo en revisión, control de resultados/respaldos concurrentes y decisiones desconocidas. La búsqueda de acreditaciones dispone de respuesta vacía y limpieza de filtros. Se actualiza el relevo: varias tareas estaban resueltas pero seguían descritas como pendientes. La hoja vigente está en PULIDO-FUNCIONAL; los catálogos deportivos incompletos, herramientas de entidades, servicio real y pruebas con personas siguen abiertos.

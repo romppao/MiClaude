@@ -848,3 +848,34 @@ Implementación terminada en rama; tipos, migraciones/paridad, mapa, compilació
 ### Resultado publicado
 
 CI #131 aprobado con 393 unitarias, 365 comprobaciones E2E, migraciones/paridad, tipos, mapa, build y 37 pantallas axe sin incumplimientos. Integrada #14 en `0c3fde6`, con el mismo árbol probado. Render muestra el nuevo acceso Menú y la fórmula y explicación de aura; portada, ranking, ayuda y salud responden 200. Se conserva la base y el diseño publicado de Work. Se documenta el solapamiento con la propuesta móvil #13, que sigue abierta. Una frase de ayuda se precisa para distinguir el voto por combate del aura total con títulos.
+
+## 3 de octubre de 2026 — Pulido funcional antes del rediseño
+
+### Qué se pidió / qué idea surgió
+
+El fundador preguntó qué queda y pidió «pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El aspecto actual deja de considerarse definitivo; este bloque se centra en funciones, errores, claridad y el relevo entre entornos.
+
+### Qué se decidió y por qué
+
+Revalidar pendientes con el código actual antes de repetir tareas resueltas. Cerrar cortes de registros, decisiones que pisan datos cambiados y etiquetas que no reflejan el respaldo efectivo. Conservar el diseño provisional y los datos de la demo. Las categorías deportivas incompletas, herramientas de entidades, servicio real, menores/privacidad y pruebas con personas se mantienen en una hoja vigente, sin declararlos resueltos por una batería verde.
+
+### Qué se hizo
+
+Paginación de todas las colas de moderación, respaldos, acreditaciones e historial: ventanas de 50, totales reales, orden estable y páginas independientes. Búsqueda de acreditaciones, estado vacío y limpieza del filtro. Las acciones conservan consulta/página y respuesta visible con enlace a su sección; `returnTo` limita el destino. La revisión muestra categoría y grado efectivo. La última fuente de cada título se obtiene sin que las solicitudes de otro la desplacen.
+
+Huella del resultado al verificar y condición sobre los hechos leídos; reserva de un aviso pendiente antes de actuar sobre el dato; edición de evidencia condicionada a estado/resultado/fuente/respaldo. Opciones desconocidas dejan de interpretarse como decisiones destructivas. Se actualizan auditoría, traslado y mapa; PULIDO-FUNCIONAL reúne lo que queda. No hay migración ni cambio de escala de aura.
+
+### Qué salió mal / qué se aprendió
+
+El primer usuario sintético generó un correo con tilde y la validación nativa impidió enviar. Unos checks leían una fila antes de completar su actualización; se esperan los controles finales. Next perdió el fragmento de las redirecciones: se conserva como sección validada en consulta y enlace tras el mensaje. TypeScript detectó un diccionario opcional pasado a lookup; se añade el caso vacío. Los datos históricos de volumen usan fechas relativas para no depender de evitar la limpieza. Las reglas concretas se registran en LECCIONES.
+
+### Estado y próximos pasos
+
+405 unitarias, compilación y 26 comprobaciones nuevas de volumen/decisiones aprobadas. La regresión completa, axe y CI se comprueban antes de integrar; publicación efectiva se anota al final de este bloque. El rediseño sigue aplazado y se retomará con un briefing al final de la fase funcional. La propuesta móvil #13 sigue abierta: conciliar layout/menú antes de incorporarla.
+
+
+### Cierre de validación local
+
+El árbol final aprueba 406 unitarias y compilación de producción. Recorridos repetidos sobre el build final: 28 checks nuevos de volumen/integridad, 26 de trayectoria y 49 de usabilidad; axe en 37 pantallas, 0 incumplimientos. La regresión anterior pasó 389 de 391 y detectó dos mensajes de organizador bloqueados por validación nativa; los recorridos afectados pasan tras corregirlo. CI ejecutará la batería completa final (393 comprobaciones) antes de integrar. No se presenta la pasada anterior como completamente verde.
+
+También se protege la restauración de títulos: solo procede para uno excluido y no puede retirar el respaldo de uno activo. La prueba de volumen ahora consulta los totales y el orden reales antes de comprobar la tercera página: funciona también al reutilizar la base con datos de otros guiones. La publicación y su comprobación pública se registran después de CI.

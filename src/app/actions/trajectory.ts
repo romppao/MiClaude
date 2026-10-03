@@ -22,7 +22,7 @@ import {
   effectiveSupport,
   supportRank,
 } from "../../lib/aura/trajectory";
-import { Rechazo, checkLengths, go, guard, str } from "./shared";
+import { Rechazo, checkLengths, go, guard, returnTo, str } from "./shared";
 
 const ownBack = "/mi-ficha/trayectoria";
 const reviewBack = "/respaldar";
@@ -322,6 +322,7 @@ export async function requestAchievementReview(f: FormData) {
 }
 
 export async function reviewAchievement(f: FormData) {
+  const reviewBack = returnTo(f, "/respaldar");
   const actor = await requireSupportActor();
   const a = await db.fighterAchievement.findUnique({
     where: { id: str(f, "achievementId") },
@@ -360,6 +361,8 @@ export async function reviewAchievement(f: FormData) {
       go(reviewBack, { problema: "respaldo_sin_permiso" });
   } else if (actor.user.role !== "ADMIN")
     go(reviewBack, { problema: "solo_moderadores" });
+  if (decision === "restore" && !a.rejectedAt)
+    go(reviewBack, { problema: "logro_no_excluido" });
   const data =
     decision === "endorse"
       ? {
@@ -422,6 +425,7 @@ export async function reviewAchievement(f: FormData) {
 }
 
 export async function endorseBout(f: FormData) {
+  const reviewBack = returnTo(f, "/respaldar");
   const actor = await requireSupportActor();
   const b = await db.bout.findUnique({
     where: { id: str(f, "boutId") },
@@ -528,7 +532,7 @@ export async function endorseBout(f: FormData) {
 
 export async function setSupportAccreditation(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion/acreditaciones";
+  const back = returnTo(f, "/moderacion/acreditaciones");
   checkLengths(f, back, { email: 254, authority: 160 });
   const target = await db.user.findUnique({
     where: { email: str(f, "email").toLowerCase() },
