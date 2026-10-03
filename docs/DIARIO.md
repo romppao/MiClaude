@@ -840,3 +840,7 @@ TypeScript detectó que usePathname puede devolver null: se trata explícitament
 ### Estado y próximos pasos
 
 339 unitarias correctas. Validación de tipos/compilación en curso y pruebas de navegador completas pendientes en CI antes de integrar y comprobar Render. Las pruebas con usuarios en teléfonos físicos siguen pendientes.
+
+### Continuación de la validación móvil
+
+CI #125 detectó un fallo del editor de datos a 320 px. Se separaron las comprobaciones de ancho y fuente y se abrieron los datos de la ficha, añadiendo además el editor real de foto/banner. CI #127 identificó 15 px extra en Mi ficha: la regla de tablas apiladas sobrescribía el ancho de un caption sr-only destinado al lector de pantalla. Se restaura su caja de 1×1 px sin retirar el texto accesible ni ocultar el desbordamiento general. El editor de foto/banner, controles de 16 px, navegación, perfiles públicos y axe móvil pasaron. Se revalida la corrección antes de integrar.

@@ -48,3 +48,5 @@ header.top nav{flex:1 1 430px;min-width:0}header.top form.buscador{flex-basis:10
   header.top .cuenta a{min-width:44px;padding:8px}
   .mobile-nav a{font-size:1rem}
 }
+/* El título accesible no debe heredar el ancho completo de la tabla apilada. */
+@media(max-width:720px){table.apilada caption.sr-only{width:1px;height:1px}}
