@@ -10,6 +10,7 @@ import { slugName, slugify } from "../../lib/common/labels";
 import { findNameCandidates } from "../../lib/fighters/fighters";
 import { audit } from "../../lib/common/audit";
 import { parseBirthDate } from "../../lib/common/dates";
+import { parseGraduation } from "../../lib/fighters/graduation";
 import { divisionAgeEligible } from "../../lib/common/competition";
 import { parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parsePrior } from "../../lib/fighters/prior";
@@ -20,7 +21,8 @@ import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared
 function readDisciplineForm(f: FormData) {
   const choice = parseCompetitionChoice(str(f, "discipline"), str(f, "level"), str(f, "weightClass"), str(f, "divisionId"));
   const prior = parsePrior({ total: str(f, "priorTotal"), wins: str(f, "priorWins"), losses: str(f, "priorLosses"), draws: str(f, "priorDraws") });
-  return { choice, prior };
+  const graduation = parseGraduation(str(f, "discipline"), str(f, "belt"), str(f, "beltDegrees"));
+  return { choice, prior, graduation };
 }
 
 export async function createMyFighter(f: FormData) {
@@ -31,7 +33,8 @@ export async function createMyFighter(f: FormData) {
   const firstName = str(f, "firstName");
   const lastName = str(f, "lastName");
   if (!firstName || !lastName) go(back, { problema: "nombre_ficha" });
-  const { choice, prior } = readDisciplineForm(f);
+  const { choice, prior, graduation } = readDisciplineForm(f);
+  if (!graduation) go("/mi-ficha", { problema: "cinturon_invalido" });
   if (!choice) go(back, { problema: "disciplina_no_valida" });
   if (!prior.ok) go(back, { problema: prior.error });
   const province = readProvince(f, "province", back);
@@ -57,7 +60,7 @@ export async function createMyFighter(f: FormData) {
     return db.fighter.create({
       data: {
         slug, firstName, lastName, alias: str(f, "alias") || null, city, province, level: choice.level, gymId, userId: user.id,
-        disciplines: { create: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
+        disciplines: { create: { ...graduation, discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws } },
       },
     });
   });
@@ -112,14 +115,15 @@ export async function saveDiscipline(f: FormData) {
   const user = await requireVerifiedUser();
   const me = user.fighter;
   if (!me) redirect("/mi-ficha");
-  const { choice, prior } = readDisciplineForm(f);
+  const { choice, prior, graduation } = readDisciplineForm(f);
+  if (!graduation) go("/mi-ficha", { problema: "cinturon_invalido" });
   if (!choice) go("/mi-ficha", { problema: "disciplina_no_valida" });
   if (!prior.ok) go("/mi-ficha", { problema: prior.error });
   if (choice.divisionId && me.birthDate && !divisionAgeEligible(choice.divisionId, me.birthDate, new Date())) go("/mi-ficha", { problema: "categoria_edad_ficha" });
   const before = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } } });
   // «Añadir otra disciplina» no sobrescribe una que ya tienes (borraría su récord declarado en silencio): para cambiarla se usa su propio formulario.
   if (before && str(f, "modo") === "anadir") go("/mi-ficha", { problema: "disciplina_ya_tienes" });
-  const data = { level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
+  const data = { ...graduation, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorTotal: prior.prior.total, priorWins: prior.prior.wins, priorLosses: prior.prior.losses, priorDraws: prior.prior.draws };
   await db.$transaction([
     db.fighterDiscipline.upsert({
       where: { fighterId_discipline: { fighterId: me.id, discipline: choice.discipline } },

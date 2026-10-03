@@ -17,8 +17,12 @@ export default async function Account() {
   const tieneFicha = !!user.fighter || user.role === "FIGHTER";
   const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario" } as const;
   const estado = { OPEN: "En revisión", RESOLVED: "Cerrado: ya está corregido", DISMISSED: "Cerrado: no se ha encontrado ningún error" } as const;
+  const managedProfiles = await db.profile.findMany({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } }, select: { id: true, kind: true, entityId: true, name: true } });
   return (
     <>
+      {user.role === "ORGANIZER" && <p><Link className="btn" href={`/promotores/${user.id}`}>Mi perfil de promotor</Link></p>}
+      {managedProfiles.length > 0 && <section><h2>Perfiles que gestionas</h2>{managedProfiles.map(p => <p key={p.id}><Link href={`/perfiles/${p.kind}/${p.entityId}/editar`}>Personalizar {p.name ?? p.kind}</Link></p>)}</section>}
+
       <h1>Mi cuenta</h1>
       <p className="mut">Aquí controlas tus datos, tu contraseña y los avisos que recibes.</p>
 

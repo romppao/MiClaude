@@ -3,6 +3,7 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  perfil_guardado: "Tu perfil se ha guardado. Ya puedes ver los cambios en tu página pública.",
   combate_registrado_futuro: "Combate registrado. Como todavía no se ha celebrado, podrás añadir el resultado cuando ocurra.",
   moderacion_verificado: "Combate verificado. Ya cuenta como respaldado.",
   moderacion_rechazado: "Combate marcado en revisión. Deja de contar en el récord y en el ránking.",
@@ -52,6 +53,10 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  enlace_invalido: "Indica un enlace que empiece por https:// o http://.",
+  imagen_invalida: "No se ha guardado nada. Elige imágenes JPG, PNG o WebP de hasta 4 MB y 25 megapíxeles, sin animación, y un encuadre entre 0 y 100.",
+  titular_invalido: "El titular debe tener una cuenta con ese correo electrónico confirmado.",
+  cinturon_invalido: "Elige un cinturón de la lista y un número de grados entre 0 y 10. Para indicar grados debes elegir el cinturón.",
   login_incorrecto: "El correo electrónico o la contraseña no son correctos. Revísalos e inténtalo de nuevo, o elige una contraseña nueva si la has olvidado.",
   demasiados_intentos: "Has hecho demasiados intentos seguidos. Espera unos minutos y vuelve a probar.",
   registro_datos: "Revisa tu nombre y tu correo electrónico: el nombre es obligatorio y el correo debe ser una dirección completa, como nombre@ejemplo.es.",

@@ -23,5 +23,7 @@ export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: 
       listed: false, hiddenAt: new Date(),
     },
   });
+  await tx.profile.deleteMany({ where: { kind: "peleador", entityId: fighterId } });
+  await tx.fighterDiscipline.updateMany({ where: { fighterId }, data: { belt: null, beltDegrees: null } });
   await scrubFighterHistory(tx, fighterId);
 }

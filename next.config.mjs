@@ -19,6 +19,7 @@ const csp = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  experimental: { serverActions: { bodySizeLimit: "9mb" } },
   async headers() {
     return [
       {

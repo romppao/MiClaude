@@ -104,7 +104,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <h1>{me.firstName} {me.lastName}</h1>
+      <h1>{me.firstName} {me.lastName}</h1><p><Link className="btn" href={`/perfiles/peleador/${me.id}/editar`}>Editar foto y banner</Link></p>
       <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
       <RecordCards records={records} disciplines={me.disciplines} />
 

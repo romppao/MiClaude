@@ -1,12 +1,13 @@
 "use client";
 
+import { BELTS } from "../../lib/fighters/graduation";
 import { useId, useState } from "react";
 import type { Discipline, Level } from "@prisma/client";
 import { lookup } from "../../lib/common/safe";
 import { divisionById, divisionsFor } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, LEVEL_ORDER, levelName, weightClassesFor, weightNote, type CategoriaPeso } from "../../lib/common/disciplines";
 
-type Valores = { discipline?: Discipline | ""; level?: Level | ""; weightClass?: string | null; divisionId?: string | null };
+type Valores = { belt?: string | null; beltDegrees?: number | null; discipline?: Discipline | ""; level?: Level | ""; weightClass?: string | null; divisionId?: string | null };
 
 type Props = {
   /** «ficha»: elegir la propia disciplina, nivel y categoría (todo obligatorio salvo la categoría). «filtro»: buscar (todo opcional). */
@@ -98,6 +99,12 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
           {sinLista ? nota : nota ? `${nota} Los kilos son los límites del reglamento indicado. Confirma la convocatoria con la organización.` : esFiltro ? "Elige una disciplina para ver sus categorías, con su peso en kilos." : ""}
         </span>
       </label>
+      {!esFiltro && disciplina === "JIUJITSU" && <fieldset className="graduation-fields">
+        <legend>Graduación de BJJ (opcional)</legend>
+        <label className="field"><span>Cinturón</span><select name="belt" defaultValue={defaults.belt ?? ""}><option value="">Sin indicar</option>{Object.entries(BELTS).map(([k,v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+        <label className="field"><span>Grados</span><input name="beltDegrees" type="number" min={0} max={10} defaultValue={defaults.beltDegrees ?? ""} /></label>
+        <p className="mut">Indica tu graduación real. Es información declarada por ti, no una acreditación verificada por Ring España. Las reglas de graduación dependen de la edad y de la organización.</p>
+      </fieldset>}
     </>
   );
 }

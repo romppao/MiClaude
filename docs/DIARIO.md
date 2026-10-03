@@ -689,6 +689,25 @@ Color aprobado, diseño sin elegir. No se modifica la demo. Contrastar futuras i
 
 ---
 
+## Sesión — 3 de octubre de 2026 — identidad y personalización
+
+### Qué se pidió / qué idea surgió
+Aplicar a GitHub y a la demo los diseños aprobados y documentarlos para Claude.
+
+### Qué se decidió y por qué
+Violeta oficial #BE33F5, glow y bordes redondeados; foto y banner elegidos por sus titulares para todos los tipos de perfil. Nivel y graduación por disciplina para representar al deportista sin confundir declaración con verificación.
+
+### Qué se hizo
+CSS adaptable, portada de comunidad, editor e imágenes persistentes en PostgreSQL, directorios de promotores/federaciones y permisos de titular/moderación; migración aditiva, privacidad y exportación. 339 pruebas unitarias y build de producción correctos; prueba E2E nueva incorporada al CI.
+
+### Qué salió mal / qué se aprendió
+No se pudo instalar PostgreSQL por las restricciones del entorno; la validación completa se realiza en CI con PostgreSQL 16. Se corrigió la conversión de Buffer a Uint8Array para Prisma y la ausencia de un mensaje de error detectada por los tests.
+
+### Estado y próximos pasos
+Implementación preparada; comprobar CI, integrar y observar el despliegue real antes de afirmar que la demo está actualizada. Ver el PR para el resultado final.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

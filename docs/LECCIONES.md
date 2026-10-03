@@ -148,6 +148,10 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 ## Maquetas visuales y semántica — 3 de octubre de 2026
 
 El generador añadió barras de aura y una insignia de confirmación para toda la ficha. No representan el modelo real: aura es una cantidad sin tope y la confirmación corresponde a combates. Se retiraron en la propuesta revisada. Regla: revisar cifras, insignias y promesas de cada maqueta contra las funciones existentes antes de implementarla.
+
+- Personalización en Render: el disco local es efímero; guardar imágenes optimizadas en un almacenamiento persistente. En este MVP se usan bytes en PostgreSQL con límites estrictos y sin metadatos.
+- Buffer con los tipos recientes de Node no coincide siempre con Bytes de Prisma; entregar Uint8Array respaldado por ArrayBuffer y comprobar con el build.
+- Los tests negativos de búsqueda deben mirar tarjetas de resultados, no el texto completo que también repite la consulta. Los datos de paginación deben incluir las disciplinas por las que se filtran.
 - Una edición por script reutilizó una variable de texto de otro fichero y sobrescribió el guion nuevo con el de filtros. Se detectó al cotejar el log con las comprobaciones previstas, se restauró el contenido y se repitió su ejecución. Regla: variables por fichero, inspección del diff y comprobar que el log contiene realmente los casos nuevos; que el comando termine bien no demuestra la cobertura anunciada.
 - Una búsqueda por botón accesible no encuentra el formulario dentro de un `details` cerrado. Se abre por su `summary` visible y después se busca el botón. Regla: no depender de controles ocultos para localizar la acción que debe hacerlos visibles.
 - Repetir el recorrido deja otras fichas con el mismo nombre de pila en el mismo grupo del ránking. Se busca el nombre completo con apellido único de esa ejecución. Regla: el dato único debe formar parte del selector, no solo del fixture creado.
@@ -163,3 +167,7 @@ El recorrido de una ficha provisional mostró otra dependencia del antiguo valor
 ## 3 de octubre de 2026 — Integrar y publicar son comprobaciones distintas
 
 Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Render: primero se construye la nueva versión. Confirmar contenido y salud en la dirección pública antes de comunicar que la demo está actualizada. Si el navegador del entorno no confía en la CA del proxy, conservar TLS y usar una comprobación HTTPS con la confianza configurada, sin desactivar la validación de certificados.
+
+- CI #107 validó la personalización de los cinco tipos. La comprobación del sello del gimnasio falló porque buscaba dentro de h1; el componente nuevo coloca el sello junto al título. Comprobar el sello con su texto y título explicativo dentro de la cabecera, preservando la verificación real y la privacidad de su nota.
+
+- CI #109: la comprobación de reclamación pasó en #107 y falló en #109. Esperaba el aviso, pero contaba el botón sin esperar a que apareciera; ahora ambos elementos se esperan con el mismo límite de tiempo. El diagnóstico asincrónico podía capturar la segunda creación en lugar del estado fallido: se espera su finalización antes de continuar. Esto corrige la sincronización y conserva las dos exigencias, sin afirmar que la captura anterior demostrara una duplicación de fichas.

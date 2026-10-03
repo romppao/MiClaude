@@ -1,3 +1,4 @@
+import ProfileThumbnail from "./components/ProfileThumbnail";
 import Link from "next/link";
 import { db } from "../lib/common/db";
 import { LEVEL_LABEL, fmtDate } from "../lib/common/labels";
@@ -14,15 +15,22 @@ export default async function Home() {
   const user = await getUser();
   const [events, fighters, counts, topGroups] = await Promise.all([
     db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 6 }),
-    db.fighter.findMany({ where: { listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
+    db.fighter.findMany({ where: { listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true, disciplines: true } }),
     Promise.all([db.fighter.count({ where: { listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
     auraRanking(),
   ]);
   const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, discipline: g.discipline, category: `${divisionLabel(g.divisionId)}${g.weightClass ? ` · ${weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId)}` : ""}` }))).sort((a, b) => b.aura - a.aura || a.name.localeCompare(b.name, "es")).slice(0, 5);
   return (
     <>
-      <section className="hero">
-        <h1>Tu comunidad de deportes de contacto en toda España</h1>
+      <section className="home-hero">
+        <h1>Tu deporte.<br />Tu gente.</h1>
+        <p>Tu comunidad de deportes de contacto en toda España</p>
+        <Link href="/peleadores" className="btn">Explorar peleadores</Link>
+        <p className="sr-only">Imagen ilustrativa con personas ficticias.</p>
+      </section>
+      <div className="discipline-strip">{DISCIPLINE_ORDER.map(d => <Link key={d} href={`/peleadores?disciplina=${d}`}>{DISCIPLINE_LABEL[d]}</Link>)}</div>
+      <section className="community-discovery">
+        <h2>Descubre tu comunidad</h2>
         <p className="mut">Encuentra peleadores, gimnasios y veladas de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Comparte tu trayectoria y reconoce las actuaciones que has visto, tanto en el deporte amateur como en el profesional.</p>
         <p className="mut">Puedes consultar las fichas, las veladas y los gimnasios sin crear una cuenta.</p>
         {!user && (
@@ -73,7 +81,7 @@ export default async function Home() {
       <div className="grid">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
-            <strong>{b.firstName} {b.lastName}</strong>
+            <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong><div>{b.disciplines.map(d => <span key={d.discipline} className={`tag ${d.level}`}>{DISCIPLINE_LABEL[d.discipline]} · {LEVEL_LABEL[d.level]}</span>)}</div>
             <div className="mut">{b.alias ? `“${b.alias}” · ` : ""}{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</div>
           </Link>
         ))}
