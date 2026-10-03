@@ -818,3 +818,29 @@ La primera consulta seguía mostrando la versión antigua mientras Render constr
 ### Estado y próximos pasos
 
 Los cambios funcionales y de comunicación están integrados y visibles en <https://ring-espana-demo.onrender.com/>. CI de propuesta e integración aprobado. Se conserva la base de la demo: el arranque solo añade migraciones y carga ejemplos si está vacía. Pendientes anteriores fuera de este bloque: catálogo completo de pesos IMMAF/IBJJF, decisiones sobre menores, pruebas con personas y aplicación del diseño visual elegido.
+
+## 3 de octubre de 2026 — Trayectoria, respaldo opcional, aura y menú por actividades
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió configurar el modelo aceptado de verificación y aura. Precisó que el rival puede negarse por un pique, que un campeón autonómico o nacional debe poder reconocer su trayectoria anterior y que entrenadores/federaciones son opcionales al iniciar la aplicación. Reiteró que una federación aporta más aura. Después pidió usar como referencia la distribución del menú de Raunder, con una captura, y continuar. Pidió conservar el trabajo de diseño de ChatGPT Work.
+
+### Qué se decidió y por qué
+
+Permitir declaraciones honestas desde el primer día, identificadas por su respaldo. Rival solicita revisión motivada sin veto automático; solo moderación suspende. Separar el récord de los puntos de reputación. Aura = trayectoria + respaldo opcional + comunidad, por categoría histórica; no inferir títulos ni avales de una biografía o un perfil visual. Un título por categoría aporta el mayor valor; mejorar su respaldo sustituye el anterior. Escala inicial de Codex 20/50/80, bonificaciones 25/50/100 %, centralizada y revisable con datos reales: el fundador aprobó el modelo, no confirmó expresamente esas cifras. Se conserva el clic y no se adelanta premium ni una clasificación deportiva tipo Elo.
+
+Menú por actividades con cuatro grupos, permisos reales y hasta cinco enlaces por grupo; diálogo nativo accesible. Las funciones de sparring, formación o reservas de la captura no se anuncian como implementadas. Se conserva el violeta, portada y personalización de perfiles.
+
+### Qué se hizo
+
+Se partió de #12 y se incorporó sin sobrescribir la documentación posterior de Work (`6670b35`). Migración aditiva con títulos, acreditaciones y metadatos de respaldo. Gestión de trayectoria, correcciones, retirada reversible y revisión; cola de hechos y acreditaciones concedidas por moderación. Versiones y bloqueos para duplicados, límites y concurrencia; fuente/nota para respaldos, sin autoaval ni permisos fuera de disciplina. Ranking y fichas con desglose y etiquetas; cancelaciones/suspensiones excluidas. Cambios de datos/fuentes invalidan respaldos. Exportación, eliminación y anonimización incluyen los nuevos datos y sus copias en el historial.
+
+El menú funciona en móvil/escritorio, con Escape, foco, cierre al navegar/salir y accesos de cuenta, perfiles asignados y moderación. Se actualizan ayuda, mensajes, correos, privacidad, arquitectura, desarrollo, ideas, diseño y guiones. El mapa ahora identifica la nueva guarda y las llamadas de moderación con ruta.
+
+### Qué salió mal / qué se aprendió
+
+TypeScript detectó una comparación ya inalcanzable y campos no anulables al limpiar una acreditación; se corrigieron. Los guiones nuevos tenían selectores relativos anidados, un desplegable ya abierto, una velada que no era enlace en Mi ficha y frases de confirmación incorrectas. Otro guion sumaba categorías diferentes: se declaró el peso del combate. La regresión conservaba expectativas de la confirmación obligatoria; se actualizaron exigiendo las nuevas reglas. Un aviso JSX necesitó permanecer dentro del formulario. La revisión de privacidad encontró copias de datos de quien respalda en auditorías y su prueba exigió limpiar antes del apunte de eliminación; ambas cosas se corrigieron. Los detalles y reglas quedan en LECCIONES.
+
+### Estado y próximos pasos
+
+Implementación terminada en rama; tipos, migraciones/paridad, mapa, compilación y 393 unitarias aprobados. La batería local completa pasó 364 comprobaciones de navegador; se repitieron las 26 de trayectoria tras añadir una de privacidad (365 en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. Se comprobará CI del árbol final antes de integrar/publicar la demo. Los cambios normativos, menores y pruebas con personas que estaban pendientes siguen en sus documentos.

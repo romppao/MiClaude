@@ -14,6 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function Account() {
   const user = await requireUser("/mi-cuenta");
   const avisos = await db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 20 });
+  const accreditation = await db.supportAccreditation.findUnique({where:{userId:user.id}});
   const tieneFicha = !!user.fighter || user.role === "FIGHTER";
   const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario" } as const;
   const estado = { OPEN: "En revisión", RESOLVED: "Cerrado: ya está corregido", DISMISSED: "Cerrado: no se ha encontrado ningún error" } as const;
@@ -48,6 +49,8 @@ export default async function Account() {
         {user.role === "ADMIN" && <li><Link href="/moderacion">Moderación</Link></li>}
       </ul>
 
+      {user.fighter&&<p><Link href="/mi-ficha/trayectoria">Mis títulos y mi aura</Link></p>}
+      {(user.role==="ADMIN"||accreditation?.active)&&<p><Link href="/respaldar">Respaldar resultados y títulos</Link></p>}
       <h2>Mis datos</h2>
       <form className="search" action={updateAccount} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 420 }}>
         <label className="field"><span>Correo electrónico</span><input value={user.email} readOnly aria-readonly="true" /><span className="hint">{user.emailVerifiedAt ? "Verificado. " : ""}Para cambiar de correo electrónico, crea una cuenta nueva con el correo que quieras usar.</span></label>

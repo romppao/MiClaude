@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
+import NavigationMenu from "./components/NavigationMenu";
+import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
@@ -18,6 +20,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
+  const [accreditation, managedProfileCount] = await Promise.all([
+    user && user.role !== "ADMIN" ? db.supportAccreditation.findUnique({ where: { userId: user.id } }) : Promise.resolve(null),
+    user ? db.profile.count({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } } }) : Promise.resolve(0),
+  ]);
   const tieneFicha = !!user && (!!user.fighter || user.role === "FIGHTER");
   return (
     <html lang="es">
@@ -33,6 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/gimnasios">Gimnasios</Link>
               <Link href="/entrenadores">Entrenadores</Link>
             </nav>
+            <NavigationMenu signedIn={!!user} hasFighter={tieneFicha} hasManagedProfiles={managedProfileCount > 0} admin={user?.role === "ADMIN"} canSupport={!!user?.emailVerifiedAt && (user.role === "ADMIN" || !!accreditation?.active)} logoutForm={user ? <form action={logout}><button className="secondary">Salir</button></form> : undefined} />
             <div className="cuenta">
               <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
               {user ? (

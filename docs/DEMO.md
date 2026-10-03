@@ -65,3 +65,14 @@ PR #12, commit 8a861e7. La demo ya muestra el violeta oficial #BE33F5 con glow, 
 - Federación: moderación crea el perfil desde Federaciones. El directorio no acredita reconocimiento oficial.
 
 Las imágenes se guardan optimizadas en PostgreSQL. Sin imagen se conservan iniciales y fondo violeta; no es un error de carga. La portada usa personas ficticias con fin ilustrativo.
+
+## Trayectoria, respaldos y menú — guion de la nueva versión
+
+El menú agrupa deportistas, clubes/entrenadores, promotores y cuenta/ayuda. Los accesos privados dependen de los permisos; conserva el diseño violeta de Work.
+
+1. Como peleador, crea tu ficha y entra en Mi ficha → Mi trayectoria. Declara un campeonato con fecha y categoría histórica. Un título nacional declarado aporta 50 puntos y muestra su condición de declaración.
+2. Como moderación, entra en Respaldar resultados y títulos. Comprueba una fuente y registra el respaldo: ese mismo título aporta 62 con documentación, 75 con entrenador/organizador o 100 con federación. Se sustituye la bonificación anterior, sin acumular escalones.
+3. Moderación → Acreditaciones permite habilitar una cuenta confirmada de entrenador, organizador o federación con fuente, motivo y disciplinas. Un perfil de entidad por sí solo no concede este permiso. Retirar la acreditación elimina sus bonificaciones.
+4. Comprueba el desglose en la ficha pública y el ránking. El rival puede solicitar revisión motivada, sin suspender el resultado. Corregir los hechos o la fuente exige comprobar el respaldo de nuevo.
+
+La escala inicial está centralizada para ajustarla con datos reales. El aura mide trayectoria, respaldo y comunidad; el récord sigue separado. Publicación y CI de este bloque se anotarán después de comprobar la demo.

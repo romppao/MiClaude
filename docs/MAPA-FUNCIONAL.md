@@ -20,17 +20,19 @@
 | `/gimnasios` | Gimnasios | Pública | — | Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Gym |
 | `/imagenes/:kind/:id/:slot` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | — | Profile |
-| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report |
-| `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, Follow, OrganizerRequest, Profile, Report |
+| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
+| `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, FighterAchievement, Follow, OrganizerRequest, Profile, Report, SupportAccreditation |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
-| `/moderacion` | Moderación | Pública | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
-| `/moderacion/historial` | Historial de cambios | Pública | — | AuditLog |
+| `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
+| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
+| `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
+| `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
 | `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
 | `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent` | Event, Fighter |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
-| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, Follow |
+| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, FighterAchievement, Follow |
 | `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | User |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
 | `/promotores` | Promotores | Pública | — | User |
@@ -39,6 +41,7 @@
 | `/recuperar` | ¿Has olvidado tu contraseña? | Pública | `accounts.requestPasswordReset` | — |
 | `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
 | `/registro` | Crear cuenta | Pública | `accounts.register` | — |
+| `/respaldar` | Respaldar resultados y títulos | Moderación o cuenta acreditada para la disciplina (correo verificado) | `trajectory.endorseBout`, `trajectory.reviewAchievement` | AuditLog, Bout, FighterAchievement |
 | `/salud` | Comprobación de salud para el alojamiento: responde 200 si la aplicación y la base de datos funcionan, y 503 si no. | Pública | — | — |
 | `/siguiendo` | Peleadores que sigo | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
@@ -56,7 +59,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `changePassword` | Cuenta con sesión iniciada | RateHit, Session, User | — | Sí | contrasena_guardada |
-| `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Fighter, FighterDiscipline, Profile, RateHit, Session, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
+| `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Profile, RateHit, Session, SupportAccreditation, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | RateHit, Session, User | — | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
 | `register` | Cualquiera | EmailToken, RateHit, Session, User | — | Sí | — |
@@ -80,7 +83,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 |---|---|---|---|---|---|
 | `addBout` | Cuenta con correo verificado | AuditLog, Bout, Event, Fighter, FighterDiscipline | BOUT: CREATED | Sí | — |
 | `removeMyBout` | Cuenta con correo verificado | AuditLog, Bout, Event, Fighter | BOUT: REMOVED_BY_AUTHOR | — | combate_quitado |
-| `respondBout` | Cuenta con correo verificado | AuditLog, Bout, Fighter | BOUT: (varias) | Sí | — |
+| `respondBout` | Cuenta con correo verificado | AuditLog, Bout, Fighter, Report | BOUT: (varias), BOUT: RIVAL_REVIEW_REQUESTED | Sí | — |
 | `setBoutEvidence` | Cuenta con correo verificado | AuditLog, Bout | BOUT: EVIDENCE_SET | — | — |
 | `setMyBoutResult` | Cuenta con correo verificado | AuditLog, Bout | BOUT: RESULT_SET_BY_AUTHOR | — | — |
 
@@ -108,7 +111,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `requestOrganizer` | Cuenta con correo verificado | OrganizerRequest | — | — | solicitud_enviada |
 | `setBoutResult` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event, Fighter | BOUT: RESULT_SET | — | resultado_guardado |
 | `setEventStatus` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
-| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: UPDATED | — | velada_actualizada |
+| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event | EVENT: UPDATED | — | velada_actualizada |
 
 ### `fighters`
 
@@ -126,7 +129,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `adminDecide` | Moderación | AuditLog, Bout, Fighter | BOUT: (varias) | — | moderacion_rechazado, moderacion_restaurado, moderacion_verificado |
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, User | ORGANIZER: (varias) | Sí | — |
-| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterDiscipline, Profile, Report | REPORT: (varias) | — | — |
+| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Profile, Report | REPORT: (varias) | — | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
 
 ### `profiles`
@@ -136,6 +139,18 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `createFederation` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: FEDERATION_CREATED | — | — |
 | `saveProfile` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: PROFILE_UPDATED | — | perfil_guardado |
 
+### `trajectory`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `endorseBout` | Moderación o cuenta acreditada para la disciplina (correo verificado) | AuditLog, Bout | BOUT: ENDORSED | — | respaldo_guardado |
+| `requestAchievementReview` | Cuenta con correo verificado | AuditLog, FighterAchievement | ACHIEVEMENT: REVIEW_REQUESTED | — | respaldo_solicitado |
+| `restoreOwnAchievement` | Cuenta con correo verificado | AuditLog, FighterAchievement | ACHIEVEMENT: WITHDRAWAL_UNDONE | — | logro_restaurado |
+| `reviewAchievement` | Moderación o cuenta acreditada para la disciplina (correo verificado) | AuditLog, FighterAchievement | ACHIEVEMENT: (varias) | — | respaldo_guardado |
+| `saveAchievement` | Cuenta con correo verificado | AuditLog, FighterAchievement | ACHIEVEMENT: (varias) | — | logro_guardado |
+| `setSupportAccreditation` | Moderación | AuditLog, SupportAccreditation | ACCREDITATION: GRANTED, ACCREDITATION: REVOKED | — | acreditacion_guardada |
+| `withdrawAchievement` | Cuenta con correo verificado | AuditLog, FighterAchievement | ACHIEVEMENT: WITHDRAWN | — | logro_retirado |
+
 ## Tablas y quién escribe en ellas
 
 | Tabla | Acciones que escriben |
@@ -144,19 +159,21 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Trainer | ninguna acción (solo la retención, la semilla o la baja de cuenta) |
 | Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport` |
 | Event | `bouts.addBout`, `bouts.removeMyBout`, `events.createEvent`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus` |
-| Bout | `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `events.removeCartelBout`, `moderation.adminDecide`, `moderation.resolveReport` |
+| Bout | `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.removeCartelBout`, `moderation.adminDecide`, `moderation.resolveReport`, `trajectory.endorseBout` |
 | User | `accounts.register`, `accounts.login`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.unsubscribeEmails`, `accounts.deleteAccount`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `moderation.decideOrganizer` |
 | Session | `accounts.register`, `accounts.login`, `accounts.logout`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount` |
 | Aura | `aura.giveAura`, `aura.removeAura`, `moderation.decideClaim`, `moderation.resolveReport` |
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
-| Report | `community.createReport`, `moderation.resolveReport` |
+| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| Report | `bouts.respondBout`, `community.createReport`, `moderation.resolveReport` |
 | Follow | `community.toggleFollow`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `moderation.resolveReport` |
 | RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification` |
 | Profile | `accounts.deleteAccount`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
+| SupportAccreditation | `accounts.deleteAccount`, `trajectory.setSupportAccreditation` |
+| FighterAchievement | `accounts.deleteAccount`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -167,6 +184,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | Fichero | Exporta |
 |---|---|
 | `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
+| `backing.ts` | `canEndorse`, `requireSupportActor` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
 | `permissions.ts` | `requireAdmin`, `requireOrganizer` |
 | `ratelimit.ts` | `HORA`, `MINUTO`, `addHit`, `allow`, `clearHits`, `clientIp`, `countHits`, `isBlocked`, `normalizeIp`, `reservar` |
@@ -178,6 +196,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `ranking.ts` | `AuraEntry`, `CategoryRanking`, `NO_CATEGORY`, `RankedEntry`, `auraRanking`, `rankByCategory` |
 | `rules.ts` | `AURA_COMMENT_MAX`, `AURA_PER_DAY`, `AuraProblema`, `BoutForAura`, `canGiveAura` |
+| `trajectory.ts` | `AURA_POLICY`, `CategoryChoice`, `SCOPE_LABEL`, `SUPPORT_LABEL`, `SUPPORT_OPTIONS`, `SUPPORT_ORDER`, `SupportedAchievement`, `WITHOUT_BOUT_BACKING`, `achievementPoints`, `auraCategoryKey`, `boutBackingPoints`, `effectiveSupport`, `supportRank`, `trajectoryByCategory` |
 
 ### `lib/bouts`
 

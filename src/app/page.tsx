@@ -47,7 +47,7 @@ export default async function Home() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "0 0 8px" }}>
           {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "10px 14px", fontWeight: 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
         </div>
-        <p className="mut">{plural(counts[0], "peleador", "peleadores")} · {plural(counts[1], "velada", "veladas")} · {plural(counts[2], "gimnasio", "gimnasios")} · {plural(counts[3], "aura dada", "auras dadas")}. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
+        <p className="mut">{plural(counts[0], "peleador", "peleadores")} · {plural(counts[1], "velada", "veladas")} · {plural(counts[2], "gimnasio", "gimnasios")} · {plural(counts[3], "aura dada", "auras dadas")}. El aura combina trayectoria, respaldo opcional y reconocimiento de la comunidad: <Link href="/ayuda">cómo funciona</Link>.</p>
       </section>
       <section aria-labelledby="empezar">
         <h2 id="empezar">¿Qué quieres hacer?</h2>
@@ -59,10 +59,10 @@ export default async function Home() {
           <li><Link href="/organizador">Organizar una velada</Link>: solicita acceso para gestionar el cartel y los resultados.</li>
         </ul>
       </section>
-      <h2>Actuaciones reconocidas por la comunidad</h2>
+      <h2>Peleadores con aura</h2>
       <div className="grid">
-        {top.map((t) => <Link key={`${t.fighterId}-${t.discipline}-${t.level}-${t.divisionId ?? ""}-${t.weightClass ?? ""}`} href={`/peleadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{DISCIPLINE_LABEL[t.discipline]} · {LEVEL_LABEL[t.level]} · {t.aura} de aura{t.category ? ` · ${t.category}` : ""}</div></Link>)}
-        {top.length === 0 && <p className="mut">Todavía no hay actuaciones con aura. Sé la primera persona en darla a un peleador tras verlo competir.</p>}
+        {top.map((t) => <Link key={`${t.fighterId}-${t.discipline}-${t.level}-${t.divisionId ?? ""}-${t.weightClass ?? ""}`} href={`/peleadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{DISCIPLINE_LABEL[t.discipline]} · {LEVEL_LABEL[t.level]} · {t.aura} de aura{t.category ? ` · ${t.category}` : ""}{t.declared ? " · trayectoria declarada" : ""}</div></Link>)}
+        {top.length === 0 && <p className="mut">Todavía no hay aura. Puedes declarar tu trayectoria o reconocer la actuación de un peleador tras verlo competir.</p>}
       </div>
       <p><Link href="/ranking">Ver el ránking completo</Link></p>
       <h2>Veladas de hoy y próximas</h2>

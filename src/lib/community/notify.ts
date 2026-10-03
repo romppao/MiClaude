@@ -68,7 +68,7 @@ export async function notifyRivalOfBout(boutId: string): Promise<boolean> {
     const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
     if (!bout || bout.verification !== "SELF_REPORTED" || !bout.fighterB.userId) return false;
     return await notifyDecision(bout.fighterB.userId, `${fullName(bout.fighterA)} ha registrado un combate contra ti`,
-      `${fullName(bout.fighterA)} ha registrado en Ring España un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nHasta que lo respondas, el combate aparece como «pendiente de confirmar» y no cuenta en tu récord.`);
+      `${fullName(bout.fighterA)} ha registrado en Ring España un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
   } catch (e) {
     console.error(`[avisos] no se pudo avisar al rival: ${e instanceof Error ? e.message : String(e)}`);
     return false;
@@ -84,7 +84,7 @@ export async function notifyAuthorOfAnswer(boutId: string, confirmed: boolean, m
     return await notifyDecision(bout.createdById, confirmed ? `${rival} ha confirmado tu combate` : `${rival} dice que tu combate no es correcto`,
       confirmed
         ? `${rival} ha confirmado el combate «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}). Ya figura como confirmado por el rival.\n\nPuedes verlo en ${APP_URL}/mi-ficha`
-        : `${rival} ha indicado que el combate «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}) no es correcto${motivo ? `. Motivo: ${oneLine(motivo)}` : ""}.\n\nEl combate deja de contar hasta que moderación lo aclare. Si ha sido un error al registrarlo, avisa desde tu ficha pública. ${APP_URL}/mi-ficha`);
+        : `${rival} ha indicado que el combate «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}) no es correcto${motivo ? `. Motivo: ${oneLine(motivo)}` : ""}.\n\nSe ha solicitado una revisión. El aviso del rival no elimina automáticamente el resultado ni su aura. Si ha sido un error al registrarlo, avisa desde tu ficha pública. ${APP_URL}/mi-ficha`);
   } catch (e) {
     console.error(`[avisos] no se pudo avisar al autor: ${e instanceof Error ? e.message : String(e)}`);
     return false;

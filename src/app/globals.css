@@ -4,3 +4,20 @@
 @media(max-width:720px){header.top .in{padding:12px 16px;gap:8px 16px}header.top nav{flex-basis:100%;gap:8px 18px}header.top .cuenta{flex:1;justify-content:flex-end}header.top .buscador{display:none}main{padding:20px 16px 100px}.home-hero{padding:26px 22px 230px;min-height:610px;background-position:65% bottom;background-size:auto 420px;background-color:#180924;background-repeat:no-repeat}.home-hero::before{background:linear-gradient(180deg,#100717 0%,#210b2bdd 43%,#14051c00 75%)}.home-hero h1{font-size:4.8rem;max-width:100%}.home-hero p{font-size:1rem;max-width:100%}.home-hero .btn{width:100%}.discipline-strip{gap:4px 14px;padding:10px 14px;justify-content:center}.discipline-strip a{font-size:.9rem}.profile-hero{padding:24px 20px}.profile-identity{align-items:flex-start;gap:16px}.profile-avatar{width:90px;height:110px;border-radius:18px;font-size:2rem}.profile-heading h1{font-size:2.5rem}.profile-heading p{font-size:1rem}.discipline-badge{font-size:.95rem}.profile-edit{width:100%}.editor-columns{grid-template-columns:1fr}.grid{gap:14px}.card{padding:16px}.event-card{gap:16px}.section-top h2{margin-bottom:12px}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:5;background:#fffffffa;border:1px solid var(--line);border-radius:18px 18px 0 0;justify-content:space-around;padding:8px 6px max(10px,env(safe-area-inset-bottom));box-shadow:0 -5px 22px #1809240a}.mobile-nav a{display:flex;align-items:center;justify-content:center;min-height:44px;font-size:.9rem;font-weight:700;color:#40134f;padding:8px}.field{min-width:0}form.search>.field{flex:1 1 100%}form.search>button{flex:1}footer.foot{padding-bottom:105px}.barra-aviso{padding:0 16px}table.apilada,table.apilada caption,table.apilada tbody,table.apilada tr,table.apilada td{display:block;width:100%}table.apilada thead{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0)}table.apilada tr{border:1px solid var(--line);background:white;border-radius:16px;padding:8px 14px;margin:0 0 14px}table.apilada td{border:0;padding:8px 0}table.apilada td[data-label]::before{content:attr(data-label);display:block;font-size:.95rem;color:var(--mut)}table.apilada td.solo-ancho{display:none}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .card-avatar{position:relative;display:inline-grid;place-items:center;vertical-align:middle;margin:0 12px 12px 0;background:#f1dafa;color:#481258;width:64px;height:64px;border-radius:16px;overflow:hidden;font-weight:800}.card-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* Menú por actividades: conserva la identidad violeta y usa un diálogo accesible. */
+.menu-open{display:inline-flex;gap:8px;align-items:center;min-height:44px}
+.menu-dialog{position:fixed;inset:0 0 0 auto;margin:0;width:min(100%,440px);height:100dvh;max-height:100dvh;max-width:100%;padding:0;border:0;border-left:1px solid var(--line);background:white;color:var(--text)}
+.menu-dialog::backdrop{background:#14051c80}
+.menu-panel{padding:20px 24px max(24px,env(safe-area-inset-bottom));min-height:100%;overflow-wrap:anywhere}
+.menu-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.menu-heading strong{font-size:1.15rem}
+.menu-navigation{display:block;flex:none}
+.menu-navigation section{padding:24px 0;border-bottom:1px solid var(--line)}
+.menu-navigation section:last-child{border-bottom:0}
+.menu-navigation h2{font-family:Arial,Helvetica,sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin:0 0 10px;padding:0}
+.menu-navigation ul{list-style:none;margin:0;padding:0}
+.menu-navigation a{display:flex;align-items:center;min-height:48px;padding:10px 12px;border-radius:12px;font-weight:700}
+.menu-navigation a:hover{background:#f1dafa;color:#481258}
+.menu-navigation form{margin-top:16px}
+@media(max-width:650px){header.top nav[aria-label=Principal],header.top .cuenta{display:none}header.top .menu-open{margin-left:auto}.menu-panel{padding-left:20px;padding-right:20px}}

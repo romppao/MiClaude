@@ -8,6 +8,12 @@ Aplicación web para la comunidad de deportes de contacto de toda España: boxeo
 
 La comunicación pública no debe presentar Madrid ni el boxeo como prioridad, aunque existan prioridades operativas internas. Hablar a personas de todas las ciudades y disciplinas admitidas, con el mismo trato. Portada y ránking empiezan sin filtros de provincia, disciplina o nivel; las altas piden elegir provincia y disciplina. Los listados siguen criterios de fecha, aura u orden alfabético, sin énfasis especial en boxeo. Conservar ubicaciones reales, reglamentos específicos y zona horaria técnica. No prometer cobertura ni datos que aún no existan. Esta instrucción prevalece sobre formulaciones anteriores de «Madrid primero» o «boxeo en cabeza».
 
+## Trayectoria, verificación y aura — decisión vigente del fundador, 3 de octubre de 2026
+
+La verificación del rival, entrenadores y federaciones es **opcional**. El rival puede solicitar revisión motivada, pero no suspende el resultado ni su aura por sí solo; esa decisión corresponde a moderación. Se admiten títulos anteriores declarados honestamente, identificados como tales. Aura = trayectoria + respaldo opcional + comunidad; una federación acreditada aporta mayor bonificación. La escala inicial está centralizada en `src/lib/aura/trajectory.ts` y explicada en `/ayuda#aura`; no constituye una clasificación deportiva oficial. La acreditación para respaldar es independiente del perfil visual y del rol de organizador. No sumar varios respaldos del mismo hecho ni atribuir un aval a toda la carrera.
+
+El fundador también pidió tomar como referencia la distribución del menú de Raunder, mostrando una captura. El menú se organiza por actividades: deportistas, clubes y entrenadores, promotores, cuenta y ayuda. Mantener el violeta aprobado, permisos reales y destinos funcionales. No presentar sparring, formación o reservas como funciones disponibles mientras no estén implementadas. El trabajo visual realizado en ChatGPT Work debe conservarse.
+
 ## Documentación obligatoria (petición expresa del fundador)
 
 Todo el proceso se documenta para poder contarlo y retomarlo en el futuro. **Al terminar cada bloque de trabajo, antes de dar la sesión por cerrada:**

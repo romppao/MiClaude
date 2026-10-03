@@ -8,7 +8,7 @@ Fomentar la afición a los deportes de contacto de toda España: boxeo, jiu-jits
 El peleador amateur gestiona su ficha y su récord; el público da aura a lo que ve; el calendario descubre veladas.
 Cada decisión técnica se toma para que esto escale a otras provincias sin rehacer nada.
 
-Diseño gráfico: aplazado a propósito, por petición del fundador. La UI actual (fondo oscuro, rojo y dorado) es funcional y provisional.
+Identidad visual vigente: violeta #BE33F5 y perfiles personalizables, integrados en #12. El menú se organiza por actividades por petición del fundador; se conserva el diseño aprobado.
 
 ## Stack
 
@@ -20,7 +20,7 @@ Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibili
 El código se organiza **por dominios** y con reglas de dependencia que vigila una prueba. La guía completa (dónde está cada cosa, recetas para añadir pantallas o acciones, convenciones y definición de «terminado») es [`DESARROLLO.md`](DESARROLLO.md); el mapa de pantallas → acciones → permisos → tablas se genera solo en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
 
 - `src/app/` — la interfaz: una carpeta por pantalla, con direcciones en español (`/peleadores`, `/veladas`, `/mi-cuenta`, `/moderacion`…).
-  - `src/app/actions/` — las acciones del servidor, **un módulo por dominio** (`accounts`, `fighters`, `bouts`, `aura`, `events`, `moderation`, `community`) y `shared.ts` con los ayudantes comunes y las guardas de permisos (`requireAdmin`, `requireOrganizer`).
+  - `src/app/actions/` — las acciones del servidor, **un módulo por dominio** (`accounts`, `fighters`, `bouts`, `aura`, `events`, `moderation`, `community`, `trajectory`) y `shared.ts` con los ayudantes comunes y las guardas de permisos (`requireAdmin`, `requireOrganizer`).
   - `src/app/components/` — componentes compartidos entre pantallas (avisos, filtros, paginación, etiquetas de verificación…).
 - `src/lib/` — la lógica, sin interfaz y agrupada por dominio: `common` (base de datos, textos, fechas, disciplinas, mensajes, correo, búsqueda sin tildes, entrada del usuario), `accounts` (sesiones, contraseñas, enlaces de un solo uso, límites de intentos, retención), `fighters` (récord, declaración previa, coherencia, anonimización), `bouts` (reglas de resultados), `aura` (reglas y ránking) y `community` (avisos de error y notificaciones).
 - `src/instrumentation.ts` — comprueba la configuración al arrancar en producción (sin `APP_URL` el servidor no arranca).
@@ -31,7 +31,7 @@ El código se organiza **por dominios** y con reglas de dependencia que vigila u
 
 | Rol | Puede |
 |---|---|
-| Visitante | Navegar, buscar, ver fichas, veladas y ránking (solo lo respaldado se muestra como hecho) |
+| Visitante | Navegar, buscar, ver fichas, veladas y ránking (las declaraciones se muestran identificadas por su respaldo) |
 | `FAN` | Lo anterior + dar aura a peleadores (con el correo verificado) y seguirlos |
 | `FIGHTER` | Lo anterior + una ficha propia (una o varias disciplinas) y registrar sus combates |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita (con una comprobación obligatoria); lo aprueba un `ADMIN` anotando la evidencia comprobada. Puede ascender cualquier usuario que no sea administrador |
@@ -61,8 +61,8 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 
 Decisiones clave:
 
-1. **El récord se calcula, no se guarda** (`lib/fighters/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
-2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
+1. **El récord se calcula, no se guarda** (`lib/fighters/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Los resultados declarados se muestran en ambas esquinas, etiquetados como no confirmados. Solo una decisión de moderación los suspende; el aviso del rival solicita revisión.
+2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (suspendido por moderación: no cuenta y tiene cola para restaurarlo; no lo impone el rival). Ver la sección de confianza más abajo.
 3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
 4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista. Portada y calendario comparten `calendarDayStart()`: hoy y próximas incluye todo el día de Madrid; pasadas contiene únicamente fechas anteriores a hoy. No cambia cuándo se permite registrar un resultado (`eventDayReached`).
 5. **Ámbito nacional y filtros voluntarios:** portada y ránking consultan todas las provincias, disciplinas y niveles al entrar. Las altas no suponen Madrid ni boxeo: se eligen provincia y disciplina, validadas en servidor. La edición conserva datos guardados. Los nombres de disciplinas se presentan alfabéticamente y con el mismo énfasis. La portada ordena veladas por fecha/identificador, fichas por alta y actuaciones por aura/nombre; no aplica cuotas ni selección por prioridad interna.
@@ -70,8 +70,11 @@ Decisiones clave:
 
 ## Aura y ránking
 
-El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/aura/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura/ranking.ts`) suma por actuaciones y agrupa por disciplina, nivel, división deportiva y peso del combate, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
-Decisión del fundador: **un clic por usuario y combate**; hasta tres clics será función premium más adelante. Pregunta abierta: ¿por persona y combate, o por persona, combate y peleador? (hallazgo 41).
+El aura total combina **trayectoria + respaldo opcional + comunidad**. La política v1 vive en `lib/aura/trajectory.ts` y el cálculo en `lib/aura/ranking.ts`. El desglose se muestra en ficha y ránking. Los votos mantienen sus reglas (`lib/aura/rules.ts`): combate celebrado con resultado, sin suspensión ni cancelación; cuenta con correo confirmado; no participantes; una aura por persona, combate y peleador, reversible; máximo 20 al día; comentario denunciable hasta 500 caracteres. Se conserva la decisión de un clic y no se adelanta premium.
+
+Títulos: autonómico 20, nacional 50, internacional 80 puntos declarados. Se toma el mayor aporte de **un único título** en cada disciplina/nivel/división/peso históricos. Documentación comprobada añade 25 % (redondeo hacia abajo), entrenador u organizador acreditado 50 %, federación acreditada 100 %. El respaldo superior sustituye el anterior. Por resultado de combate respaldado: documento 1, entrenador/organizador 2, federación 3; máximo 40 puntos de respaldos de combates por categoría. La comunidad suma un punto por voto elegible. No hay puntuación deportiva tipo Elo en esta fase; se requiere estudiar datos suficientes antes de presentarla.
+
+El filtro de 90 días afecta a los votos recibidos, manteniendo trayectoria y respaldos históricos; las categorías históricas no cambian al editar la ficha. Cancelaciones, suspensiones y eventos futuros se excluyen de las consultas. Fichas provisionales/ocultas no entran. Las verificaciones antiguas y la confirmación del rival no reciben automáticamente nuevas bonificaciones: no se inventa un documento ni un aval federativo.
 
 ## Seguridad
 
@@ -84,7 +87,7 @@ Decisión del fundador: **un clic por usuario y combate**; hasta tres clics ser�
 
 ## Interfaz y accesibilidad
 
-Estilo **provisional** (el diseño visual es al final, por petición del fundador); aquí solo hay accesibilidad y claridad, en `globals.css` (los ajustes de accesibilidad llevan la marca «A11Y»).
+El estilo aprobado y la accesibilidad se conservan en `globals.css`. El nuevo menú usa `dialog.showModal()`, foco nativo, Escape y enlaces agrupados; las acciones se pasan como propiedades al componente compartido.
 - **Medición automática:** `npm run test:a11y` pasa axe-core (WCAG 2.2 AA) por unas 40 pantallas (públicas, con sesión, moderación y organizador) y debe dar **0 incumplimientos graves**; se ejecuta también en el CI. Axe no mide todo: `tests/e2e/usabilidad.mjs` comprueba además navegación corta, tamaños de 16 px y 44 px, contraste calculado de los controles, enlaces subrayados, lo escrito que se conserva, avisos para lectores de pantalla y que ninguna pantalla se salga del ancho a 360 px.
 - **Avisos** (`FlashNotice`): regiones permanentes (`role=status` educada para éxitos y `role=alert` asertiva para problemas) que se rellenan con el código de la dirección (`?aviso=` / `?problema=`) traducido por `lookup` (nunca claves heredadas).
 - **Lo escrito no se pierde** (`RecordarCampos`): al enviar un formulario se guardan sus campos de texto en `sessionStorage` (sin contraseñas, ocultos ni casillas) y, si la acción vuelve a la misma pantalla con un problema, se devuelven a su sitio, también cuando el mismo error se repite (la dirección no cambia: se escucha el evento `reset` que lanza React al terminar la acción). El formulario se identifica por los nombres de sus campos y se abre el desplegable que lo contiene para que se vea dónde corregir.
@@ -123,17 +126,17 @@ Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comp
 
 Principio: **no se intenta demostrar que un dato es verdad, sino acumular evidencia independiente y mostrar siempre cuánta hay.** Nadie ve un récord como «verdadero/falso», sino con su nivel de respaldo. Las federaciones serán el nivel más alto cuando colaboren, pero el sistema funciona sin ellas.
 
-### Niveles de respaldo de un combate
+### Niveles de respaldo de un combate — vigente desde el 3 de octubre de 2026
 
-| Nivel | Fuente | Estado hoy |
+| Respaldo | Cómo se concede | Participación |
 |---|---|---|
-| 0 | Lo declara el propio peleador | hecho (`SELF_REPORTED`) |
-| 1 | Lo confirma el rival (cuenta verificada) | hecho (`CONFIRMED`) |
-| 2 | Lo publica o confirma el organizador de la velada, que estuvo allí | hecho (`VERIFIED` si lo introduce el organizador) |
-| 3 | Corroborado por terceros: enlace de evidencia (acta, cartel, redes, vídeo) y gimnasio/organizador con sello | **parcial**: enlace de evidencia y sellos hechos; falta que el sistema pondere el nivel automáticamente |
-| 4 | Federación (licencia, actas oficiales) | futuro |
+| Declarado | El deportista cuenta el hecho; no puede autoasignarse una verificación | Válida desde el primer día, identificada como declaración |
+| Confirmado por rival | Confirmación voluntaria; su discrepancia solo abre un aviso | Opcional, sin bonus nuevo |
+| Documentación comprobada | Moderación anota fuente y qué demuestra | Opcional |
+| Entrenador/organizador acreditado | Cuenta acreditada para esa disciplina revisa el hecho concreto | Opcional |
+| Federación acreditada | Igual comprobación concreta, con mayor bonus | Opcional |
 
-Regla de producto: **la ficha distingue siempre lo respaldado de lo autodeclarado** (etiqueta de respaldo en cada combate y récord de partida aparte). **El ránking de aura aún no lo distingue**: cuenta el aura de todo combate que no esté rechazado ni cancelado, sea cual sea su nivel de respaldo. Pendiente de decidir si el ránking exige un mínimo de combates confirmados (pregunta abierta en `IDEAS.md`).
+El rol de organizador conserva sus permisos del cartel; no equivale a una acreditación para conceder bonus. Los avales externos pueden revisarse manualmente por moderación aunque sus representantes no tengan cuenta. No se concede respaldo propio, fuera de disciplina ni con acreditación retirada. Un perfil visual de federación tampoco concede permisos.
 
 ### Verificar también a quien verifica (gimnasios, promotoras, organizadores)
 
@@ -155,7 +158,7 @@ Un organizador o gimnasio que «verifica» solo vale lo que valga su propia cred
 - **Historial de cambios (audit log)** de cada dato: quién, cuándo, qué cambió. Nada se edita en silencio.
 - **Botón «reportar dato»** en fichas, combates y veladas, con seguimiento del caso.
 - **Evidencia adjunta** opcional en cada combate (enlace a acta, cartel, publicación, vídeo).
-- Los datos disputados dejan de contar en el récord hasta resolverse (ya ocurre con `DISPUTED`).
+- Los datos suspendidos por moderación dejan de contar hasta resolverse (`DISPUTED`). Una reclamación del rival no impone esa suspensión.
 
 ### Moderación humana con ventaja local
 
@@ -208,3 +211,20 @@ Petición del fundador de incluir las edades de boxeo y estudiar las demás disc
 Guardas compartidas de edad y combinaciones en el servidor: formación sin combate, incompatibilidad de peso/sexo/grupo, edad en la fecha, año de reglamento y ambas esquinas del cartel. Al cambiar fecha de evento se vuelven a comprobar sus combates. Una fecha de nacimiento conocida se comprueba también al corregir la ficha o su división; una división sin nacimiento es autodeclarada, no verificada. La política de menores y consentimiento sigue siendo un bloque propio pendiente, no una consecuencia automática de la edad deportiva.
 
 Fuentes, cobertura, excepciones y límites: `DISENO-PESOS.md`. MMA conserva vacíos los pesos de sus nuevas divisiones hasta contrastar una tabla vigente; IBJJF requiere catálogo conjunto por cinturón y kimono/sin kimono, todavía pendiente. Las divisiones WAKO distinguen ring/tatami, pero la modalidad concreta y las reglas de rounds/empate/emparejamiento por edad no se certifican con este catálogo. Licencias, requisitos médicos y selección federativa no se deducen de la ficha. El evento actual solo tiene una fecha; torneos de varios días necesitarán fecha final para las reglas que exigen conservar edad durante toda la competición.
+
+## Trayectoria y acreditación opcional — implementación del 3 de octubre de 2026
+
+Migración aditiva `20261003160000_trayectoria_respaldo_aura`: `FighterAchievement`, `SupportAccreditation`, enums de ámbito y respaldo, y metadatos de respaldo en `Bout`. Se conservan perfiles, votos, resultados y categorías existentes. Los antiguos `DISPUTED` se mantienen para revisión: no hay información suficiente para restaurar indiscriminadamente todas las suspensiones históricas.
+
+- `/mi-ficha/trayectoria`: declarar/corregir/retirar y deshacer retirada, fuente opcional, solicitar revisión. Máximo 30 declaraciones; unicidad por peleador/campeonato/entidad/año/categoría normalizados. El ámbito no elude la unicidad. Retirados/excluidos no cuentan ni se recrean como duplicados. Títulos desde 1920 hasta el día actual; el reglamento de la división debe ser válido en la fecha histórica o quedar sin confirmar.
+- `/respaldar`: moderación o cuentas acreditadas; fuentes/notas obligatorias para el respaldo y motivo para excluir/restaurar. Búsqueda por campeonato o velada, 100 resultados por consulta, solicitudes primero. El entrenador no excluye ni restaura declaraciones rechazadas, no rebaja un respaldo superior y solo verifica sus disciplinas. Moderación puede revisar fuentes externas y decisiones motivadas.
+- `/moderacion/acreditaciones`: comprobar identidad/representación y disciplinas, conceder, retirar y reactivar. Una acreditación usada conserva su identidad. La retirada o eliminación de su cuenta elimina sus bonus, sin borrar la trayectoria declarada.
+- Versiones comparadas al escribir, bloqueo de la ficha para límites y duplicados y bloqueo de la acreditación durante revisión. Un cambio simultáneo no sobreescribe datos ni permite respaldar después de una retirada.
+- Corregir un título, cambiar el resultado/fuente de un combate o nombre/fecha de la velada invalida el respaldo anterior. Nueva solicitud de fuente conserva el respaldo previo hasta la decisión. Fuente y alcance son públicos; notas y motivos son privados para revisión.
+- Exportación incluye trayectoria/acreditación propias. Eliminación/anonimización retira los títulos y sus datos personales del historial; revoca y limpia la acreditación. No se exponen correos o notas de comprobación en fichas públicas.
+
+La escala es una configuración inicial, pendiente de calibración con uso real. La honestidad declarada es una decisión expresa del fundador; no se presenta como verificación oficial. La política de menores y las pruebas con personas siguen siendo los pendientes anteriores.
+
+## Navegación por actividades — 3 de octubre de 2026
+
+Referencia: captura del menú de Raunder aportada por el fundador; no una comprobación de sus funciones. `NavigationMenu` conserva los cinco enlaces rápidos de escritorio y añade un panel lateral en móvil/escritorio: deportistas, clubes/entrenadores, promotores, cuenta/ayuda. Cada grupo tiene hasta cinco enlaces reales. Cuenta/moderación/respaldos dependen de sesión y permisos; cerrar sesión funciona dentro del panel. Escape, devolución del foco, bloqueo del fondo y cierre al navegar. Se preservan portada, fotos, banners y paleta de ChatGPT Work; no se añaden promesas de sparring, aprendizaje o reservas.

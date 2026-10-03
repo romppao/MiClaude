@@ -181,3 +181,15 @@ Comprobación pública después del despliegue: portada `https://ring-espana-dem
 Para personalizar: peleador → Mi ficha → Editar foto y banner; promotor o titular de una entidad → Mi cuenta → su perfil. Moderación puede asignar titulares con correo confirmado desde el editor y crear federaciones desde su directorio. Sin foto aparece una identidad con iniciales; sin banner, el fondo violeta. La demo no atribuye fotografías ficticias a los peleadores.
 
 Este resultado sustituye los estados «pendiente de elección», «sin modificar la demo» y «pendiente de comprobar CI» de las entradas históricas de diseño. Las categorías por edad y la comunicación nacional incorporadas previamente se mantienen.
+
+## Continuación — Trayectoria, respaldo opcional y menú, 3 de octubre de 2026
+
+Base: `6670b357cf4125dcec8179e397a120b04b68e588`, posterior a #12 y su documentación de despliegue. Rama `codex/trayectoria-respaldo-aura-2026-10-03`. Se conservan la identidad violeta, perfiles, fotos, banners, categorías deportivas, calendario e inclusión nacional.
+
+El fundador autoriza configurar trayectoria y aura con honestidad declarada, sin verificación obligatoria de rivales/entrenadores/federaciones. Rival pide revisión; no suspende ni elimina puntos. Nuevas rutas `/mi-ficha/trayectoria`, `/respaldar`, `/moderacion/acreditaciones`. Acreditación separada de perfiles y rol de cartel, fuente/nota de hechos, límites de disciplina y prohibición de autoaval, versiones concurrentes, retirada/reactivación. Migración aditiva `20261003160000_trayectoria_respaldo_aura`, sin reset ni avales ficticios de datos anteriores.
+
+Política v1 en `lib/aura/trajectory.ts`: título regional/nacional/internacional 20/50/80; documento +25 %, entrenador/organizador +50 %, federación +100 %. Mayor aporte de un título por categoría; niveles sustituidos, no acumulados. Bonus por combate 1/2/3 con máximo 40 por categoría; voto elegible +1. La categoría es histórica, no la actual de la ficha. 90 días limita los votos, manteniendo trayectoria. Los títulos retirados/excluidos no cuentan; retirar acreditación elimina bonus. Cambios de hechos/fuentes retiran el respaldo; una solicitud no reemplaza la fuente ya comprobada. La puntuación deportiva estadística y la calibración de escala quedan para datos reales.
+
+Exportación y eliminación contemplan títulos, acreditación y copias en auditorías. El menú toma la distribución de la captura del fundador: deportistas, clubes/entrenadores, promotores, cuenta/ayuda. Usa diálogo nativo con foco/Escape, cierre al navegar o salir y permisos reales. Compartidos sin importaciones de acciones; el formulario de salir se pasa desde layout.
+
+Validación local: migraciones/paridad, tipos, mapa y compilación aprobados; 393 pruebas unitarias. Batería completa de 364 comprobaciones E2E aprobada y repetición final de las 26 de trayectoria, incluida una adicional de privacidad (365 comprobaciones en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. CI comprobará el árbol final completo antes de integrar. El resultado público se registrará tras el despliegue.

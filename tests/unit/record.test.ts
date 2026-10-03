@@ -61,3 +61,11 @@ describe("formatRecord", () => {
     expect(formatRecord({ w: 5, l: 2, d: 1, nc: 2 })).toBe("5-2-1 (2 NC)");
   });
 });
+
+describe("la confirmación del rival es opcional", () => {
+  it("muestra declaraciones en ambas esquinas, identificadas como sin confirmar", () => {
+    const declared = bout({ verification: "SELF_REPORTED", fighterAId: "otro", result: "A_WIN" });
+    expect(computeRecords("me", [declared]).BOXEO!.AMATEUR).toMatchObject({ w: 0, l: 1, unverified: 1 });
+    expect(computeRecords("otro", [declared]).BOXEO!.AMATEUR).toMatchObject({ w: 1, l: 0, unverified: 1 });
+  });
+});

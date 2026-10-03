@@ -17,6 +17,7 @@ import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplin
 import { findNameCandidates } from "../../lib/fighters/fighters";
 import { boutVersion, pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { boutQuery } from "../../lib/bouts/form";
+import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { notifyAuthorOfAnswer, notifyRivalOfBout } from "../../lib/community/notify";
 import { LIMITS } from "../../lib/common/text";
 import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, readProvince, Rechazo, str, uniqueSlug } from "./shared";
@@ -153,7 +154,7 @@ export async function setMyBoutResult(f: FormData) {
     const r = await tx.bout.updateMany({
       where: { id: bout.id, verification: bout.verification, result: bout.result },
       // El rival solo había confirmado el combate, no este resultado: vuelve a «pendiente de confirmar» para que lo confirme.
-      data: { result: v.result, method: v.method, endRound: v.endRound, ...(soloEmparejamientoConfirmado ? { verification: "SELF_REPORTED" as const } : {}) },
+      data: { ...WITHOUT_BOUT_BACKING, result: v.result, method: v.method, endRound: v.endRound, ...(soloEmparejamientoConfirmado ? { verification: "SELF_REPORTED" as const } : {}) },
     });
     if (r.count === 0) throw new Rechazo("combate_cambiado");
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET_BY_AUTHOR", before: { result: bout.result, method: bout.method, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification: soloEmparejamientoConfirmado ? "SELF_REPORTED" : bout.verification } }, tx);
@@ -178,10 +179,16 @@ export async function respondBout(f: FormData) {
   // La confirmación solo vale para el resultado que el rival tenía delante: si el autor lo corrigió entretanto, debe revisarlo de nuevo.
   if (next === "CONFIRMED" && str(f, "version") !== boutVersion(bout)) go(back, { problema: "combate_cambiado" });
   await guard(back, () => db.$transaction(async (tx) => {
+    if (next === "DISPUTED") {
+      await tx.$queryRaw`SELECT id FROM "Bout" WHERE id=${bout.id} FOR UPDATE`;
+      if (!await tx.report.findFirst({ where: { userId: user.id, entity: "BOUT", entityId: bout.id, status: "OPEN" } })) await tx.report.create({ data: { userId: user.id, entity: "BOUT", entityId: bout.id, reason: "RESULTADO", message: motivo } });
+      await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RIVAL_REVIEW_REQUESTED", after: { motivo } }, tx);
+      return;
+    }
     const r = await tx.bout.updateMany({ where: { id: bout.id, verification: "SELF_REPORTED", result: bout.result, method: bout.method, endRound: bout.endRound }, data: { verification: next } });
     if (r.count === 0) throw new Rechazo("combate_cambiado");
     if (next === "CONFIRMED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
-    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: `RIVAL_${next}`, before: { verification: bout.verification }, after: { verification: next, ...(next === "DISPUTED" ? { motivo } : {}) } }, tx);
+    await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: `RIVAL_${next}`, before: { verification: bout.verification }, after: { verification: next } }, tx);
   }));
   revalidatePath("/", "layout");
   after(() => notifyAuthorOfAnswer(bout.id, next === "CONFIRMED", motivo));
@@ -208,7 +215,7 @@ export async function setBoutEvidence(f: FormData) {
   const url = raw ? safeHttpUrl(raw) : null;
   if (raw && !url) go(back, { problema: "url_invalida" });
   await db.$transaction([
-    db.bout.update({ where: { id: bout.id }, data: { evidenceUrl: url } }),
+    db.bout.update({ where: { id: bout.id }, data: { evidenceUrl: url, ...(url !== bout.evidenceUrl ? WITHOUT_BOUT_BACKING : {}) } }),
     audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "EVIDENCE_SET", before: { evidenceUrl: bout.evidenceUrl }, after: { evidenceUrl: url } }, db),
   ]);
   revalidatePath("/", "layout");

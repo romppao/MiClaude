@@ -1,9 +1,11 @@
 import type { Discipline, Level } from "@prisma/client";
 import { divisionsFor } from "../common/competition";
 import { DISCIPLINE_ORDER, LEVEL_ORDER, weightClassesFor } from "../common/disciplines";
+import { AURA_POLICY, auraCategoryKey, boutBackingPoints, trajectoryByCategory } from "./trajectory";
+import { calendarDayStart } from "../common/dates";
 import { db } from "../common/db";
 
-export type AuraEntry = { fighterId: string; name: string; slug: string; level: Level; weightClass: string | null; divisionId?: string | null; aura: number };
+export type AuraEntry = { fighterId: string; name: string; slug: string; level: Level; weightClass: string | null; divisionId?: string | null; aura: number; trajectory?: number; backing?: number; community?: number; declared?: boolean };
 export type RankedEntry = AuraEntry & { position: number };
 export type CategoryRanking = { level: Level; weightClass: string | null; divisionId: string | null; entries: RankedEntry[] };
 
@@ -41,37 +43,48 @@ export function rankByCategory(entries: AuraEntry[], discipline: Discipline): Ca
   });
 }
 
-/**
- * Aura recibida por cada peleador, con filtro opcional de disciplina (según el combate en el que se dio),
- * por la división guardada en cada combate (sin trasladar aura entre edades), opcionalmente solo de una provincia y de los últimos `sinceDays` días. Devuelve el ránking ya agrupado por categoría.
+/** Aura total = trayectoria declarada + respaldo opcional + reconocimiento de la comunidad.
+ * Cada categoría conserva su historia. El periodo limita el reconocimiento de la comunidad, no borra la carrera previa.
  */
-export async function auraRanking(opts: { discipline?: Discipline; level?: Level; province?: string; sinceDays?: number } = {}): Promise<(CategoryRanking & { discipline: Discipline })[]> {
-  // Agrupa por actuación: la categoría del combate no cambia al actualizar la ficha ni al cumplir años.
-  const totals = await db.aura.groupBy({
-    by: ["fighterId", "boutId"],
-    where: {
-      bout: { verification: { not: "DISPUTED" }, event: { discipline: opts.discipline, status: { not: "CANCELLED" }, ...(opts.level && { level: opts.level }) } },
+export async function auraRanking(opts: { discipline?: Discipline; level?: Level; province?: string; sinceDays?: number; fighterId?: string } = {}): Promise<(CategoryRanking & { discipline: Discipline })[]> {
+  const fighterWhere = { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }), ...(opts.fighterId && { id: opts.fighterId }) };
+  const eventWhere = { discipline: opts.discipline, level: opts.level, date: { lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { not: "CANCELLED" as const } };
+  const [totals, achievements, supportedBouts] = await Promise.all([
+    db.aura.groupBy({ by: ["fighterId", "boutId"], where: {
+      bout: { verification: { not: "DISPUTED" }, event: eventWhere }, fighter: fighterWhere,
       ...(opts.sinceDays && { createdAt: { gte: new Date(Date.now() - opts.sinceDays * 864e5) } }),
-      fighter: { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }) },
-    },
-    _count: { _all: true },
-  });
-  if (totals.length === 0) return [];
-  const [fighters, bouts] = await Promise.all([
-    db.fighter.findMany({ where: { id: { in: [...new Set(totals.map(t=>t.fighterId))] } }, select: { id: true, firstName: true, lastName: true, slug: true } }),
-    db.bout.findMany({ where: { id: { in: [...new Set(totals.map(t=>t.boutId))] } }, select: { id: true, weightClass: true, divisionId: true, event: { select: { level: true, discipline: true } } } }),
+    }, _count: { _all: true } }),
+    db.fighterAchievement.findMany({ where: { fighter: fighterWhere, discipline: opts.discipline, level: opts.level, withdrawnAt: null, rejectedAt: null }, include: { supportAccreditation: true } }),
+    db.bout.findMany({ where: { supportKind: { not: null }, verification: "VERIFIED", result: { not: null }, event: eventWhere, OR: [{ fighterA: fighterWhere }, { fighterB: fighterWhere }] }, include: { event: { select: { discipline: true, level: true } }, supportAccreditation: true } }),
   ]);
-  const byId = new Map(fighters.map(f=>[f.id,f]));
-  const byBout = new Map(bouts.map(b=>[b.id,b]));
-  const entries = new Map<string,AuraEntry & { discipline: Discipline }>();
-  for (const t of totals) {
-    const f = byId.get(t.fighterId), b = byBout.get(t.boutId);
-    if (!f || !b) continue;
-    const key = `${f.id}|${b.event.discipline}|${b.event.level}|${b.divisionId ?? ""}|${b.weightClass ?? ""}`;
-    const e = entries.get(key) ?? { fighterId: f.id, slug: f.slug, name: `${f.firstName} ${f.lastName}`, discipline: b.event.discipline, level: b.event.level, weightClass: b.weightClass, divisionId: b.divisionId, aura: 0 };
-    e.aura += t._count._all;
-    entries.set(key,e);
+  const ids = [...new Set([...totals.map(t=>t.fighterId), ...achievements.map(a=>a.fighterId), ...supportedBouts.flatMap(b=>[b.fighterAId,b.fighterBId])])];
+  if (!ids.length) return [];
+  const [fighters, bouts] = await Promise.all([
+    db.fighter.findMany({ where: { ...fighterWhere, id: opts.fighterId ?? { in: ids } }, select: { id: true, firstName: true, lastName: true, slug: true } }),
+    totals.length ? db.bout.findMany({ where: { id: { in: [...new Set(totals.map(t=>t.boutId))] } }, select: { id: true, weightClass: true, divisionId: true, event: { select: { level: true, discipline: true } } } }) : Promise.resolve([]),
+  ]);
+  const byId = new Map(fighters.map(f=>[f.id,f])), byBout = new Map(bouts.map(b=>[b.id,b]));
+  type Entry = AuraEntry & { discipline: Discipline; trajectory: number; backing: number; community: number; declared: boolean; titleBacking: number; boutBacking: number };
+  const entries = new Map<string,Entry>();
+  function entry(fighterId: string, g: { discipline: Discipline; level: Level; divisionId: string | null; weightClass: string | null }) {
+    const f=byId.get(fighterId); if (!f) return null;
+    const key = `${fighterId}|${auraCategoryKey(g)}`;
+    let e=entries.get(key);
+    if (!e) { e={ fighterId, slug:f.slug, name:`${f.firstName} ${f.lastName}`, ...g, aura:0, trajectory:0, backing:0, community:0, declared:false, titleBacking:0, boutBacking:0 }; entries.set(key,e); }
+    return e;
   }
-  // Cada disciplina conserva sus categorías y posiciones, incluso al consultar todas.
-  return DISCIPLINE_ORDER.flatMap(discipline => rankByCategory([...entries.values()].filter(e => e.discipline === discipline), discipline).map(g => ({ ...g, discipline })));
+  for (const t of totals) {
+    const b=byBout.get(t.boutId); if (!b) continue;
+    const e=entry(t.fighterId,{...b.event, divisionId:b.divisionId, weightClass:b.weightClass}); if (e) e.community+=t._count._all;
+  }
+  for (const f of fighters) {
+    for (const {achievement,trajectory,backing,declared} of trajectoryByCategory(achievements.filter(a=>a.fighterId===f.id)).values()) {
+      const e=entry(f.id,achievement); if (e) { e.trajectory=trajectory; e.titleBacking=backing; e.declared=declared; }
+    }
+  }
+  for (const b of supportedBouts) for (const fighterId of [b.fighterAId,b.fighterBId]) {
+    const e=entry(fighterId,{...b.event,divisionId:b.divisionId,weightClass:b.weightClass}); if (e) e.boutBacking+=boutBackingPoints(b);
+  }
+  for (const e of entries.values()) { e.backing=e.titleBacking+Math.min(AURA_POLICY.maxBoutSupportPerCategory,e.boutBacking); e.aura=e.trajectory+e.backing+e.community; }
+  return DISCIPLINE_ORDER.flatMap(discipline=>rankByCategory([...entries.values()].filter(e=>e.discipline===discipline && e.aura>0),discipline).map(g=>({...g,discipline})));
 }

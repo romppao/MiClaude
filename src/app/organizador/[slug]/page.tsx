@@ -53,7 +53,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
           <label className="field"><span>Provincia</span><select name="province" defaultValue={event.province}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <label className="field"><span>Promotor (opcional)</span><input name="promoter" defaultValue={event.promoter ?? ""} maxLength={LIMITS.promoter} /></label>
           <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" defaultValue={event.ticketUrl ?? ""} maxLength={LIMITS.url} placeholder="https://…" /></label>
-          <button>Guardar los datos de la velada</button>
+          <p className="hint">Cambiar el nombre o la fecha retira los respaldos específicos de sus resultados; deberán comprobarse de nuevo.</p><button>Guardar los datos de la velada</button>
         </form>
       </details>
       <details style={{ marginTop: 8 }}>
@@ -104,6 +104,8 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
                     <td>
                       {past ? (
                         <form action={setBoutResult} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        <p className="hint">Cambiar el resultado retira su bonificación de respaldo hasta que se compruebe de nuevo.</p>
+
                           <input type="hidden" name="boutId" value={b.id} />
                           <select name="outcome" aria-label={`Resultado de ${cual}`} defaultValue={b.result === "A_WIN" ? "WIN" : b.result === "B_WIN" ? "LOSS" : b.result === "DRAW" ? "DRAW" : b.result === "NO_CONTEST" ? "NC" : ""}>
                             <option value="">Elige el resultado…</option><option value="WIN">Gana {b.fighterA.firstName} (esquina roja)</option><option value="LOSS">Gana {b.fighterB.firstName} (esquina azul)</option><option value="DRAW">Empate</option><option value="NC">Sin decisión</option>

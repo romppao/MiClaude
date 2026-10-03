@@ -195,7 +195,7 @@ const rutaVelada = await movil.locator("a[href^='/veladas/']").first().getAttrib
 await movil.goto(B + rutaVelada);
 check("en el móvil, la ficha de la velada tampoco se sale del ancho", await seen(movil.locator("h1")) && await anchoDesbordado(movil) <= 1);
 const textoVelada = await cuerpo(movil);
-check("en la velada, un resultado declarado por un peleador no se da por hecho: se dice que está pendiente de confirmar por el rival", textoVelada.includes("pendiente de confirmar por el rival") && !textoVelada.includes("Gana Movil"));
+check("en la velada, un resultado declarado se muestra identificado y no exige confirmación", textoVelada.includes("declarado · confirmación opcional") && textoVelada.includes("Gana Movil"));
 check("y una velada que no ha publicado un organizador lo explica con texto visible (no solo en un aviso emergente)", textoVelada.includes("no la ha publicado un organizador"));
 
 

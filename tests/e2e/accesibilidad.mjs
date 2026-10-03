@@ -45,7 +45,7 @@ for (const [ruta, etiqueta] of [
 
 console.log("— Con sesión —");
 for (const [ruta, etiqueta] of [
-  ["/mi-ficha", "Mi ficha"], ["/mi-cuenta", "Mi cuenta"], ["/mi-cuenta/eliminar", "Eliminar mi cuenta"], ["/siguiendo", "Peleadores que sigo"], [fichaPeleador, "Ficha de peleador (con sesión)"],
+  ["/mi-ficha", "Mi ficha"], ["/mi-ficha/trayectoria", "Mi trayectoria"], ["/mi-cuenta", "Mi cuenta"], ["/mi-cuenta/eliminar", "Eliminar mi cuenta"], ["/siguiendo", "Peleadores que sigo"], [fichaPeleador, "Ficha de peleador (con sesión)"],
 ]) await analizar(pepe.p, ruta, etiqueta);
 const sinFicha = await newUser("Sinficha", "FIGHTER");
 await analizar(sinFicha.p, "/mi-ficha", "Mi ficha (sin crear todavía)");
@@ -54,7 +54,7 @@ await analizar(sinVerificar.p, "/verificar", "Verificar correo (con sesión)");
 
 console.log("— Moderación y organizador —");
 const admin = await newUser("Moderadora", "FAN"); hacerAdmin(admin.email);
-for (const [ruta, etiqueta] of [["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
+for (const [ruta, etiqueta] of [["/respaldar", "Respaldar hechos"], ["/moderacion/acreditaciones", "Acreditaciones"], ["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
 
 await terminarDiagnosticos();
 await browser.close();

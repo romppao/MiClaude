@@ -23,8 +23,7 @@ export function computeRecords(fighterId: string, bouts: BoutForRecord[]): Recor
   const records: Records = {};
   for (const b of bouts) {
     if (!b.result || b.event.status === "CANCELLED" || b.verification === "DISPUTED") continue;
-    // Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirme o un moderador lo verifique.
-    if (b.verification === "SELF_REPORTED" && b.fighterAId !== fighterId) continue;
+    // La declaración cuenta con su etiqueta en ambas esquinas; el rival puede pedir una revisión independiente.
     const perLevel = (records[b.event.discipline] ??= { PRO: empty(), AMATEUR: empty() });
     const r = perLevel[b.event.level];
     if (b.verification === "SELF_REPORTED") r.unverified++;

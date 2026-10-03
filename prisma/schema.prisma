@@ -136,6 +136,7 @@ model Fighter {
   trainer       Trainer?            @relation(fields: [trainerId], references: [id])
   userId        String?             @unique
   user          User?               @relation(fields: [userId], references: [id])
+  achievements FighterAchievement[]
   disciplines   FighterDiscipline[]
   auras         Aura[]
   followers     Follow[]
@@ -197,6 +198,14 @@ model Bout {
   createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
   auras        Aura[]
   flags        String[]     @default([])
+  supportKind            SupportKind?
+  supportAuthority       String?
+  supportNote            String?
+  supportReviewedAt      DateTime?
+  supportReviewedById    String?
+  supportReviewedBy      User?                 @relation("BoutReviewer", fields: [supportReviewedById], references: [id], onDelete: SetNull)
+  supportAccreditationId String?
+  supportAccreditation   SupportAccreditation? @relation(fields: [supportAccreditationId], references: [id], onDelete: SetNull)
   evidenceUrl  String?
   // Pareja canónica (ids ordenados): impide registrar dos veces el mismo enfrentamiento en una velada, en cualquier esquina.
   pairKey      String?
@@ -217,6 +226,10 @@ model User {
   notifyEmails     Boolean           @default(true)
   emailVerifiedAt  DateTime?
   createdAt        DateTime          @default(now())
+  accreditation         SupportAccreditation?  @relation("AccreditedUser")
+  grantedAccreditations SupportAccreditation[] @relation("AccreditationGrantor")
+  reviewedAchievements  FighterAchievement[]   @relation("AchievementReviewer")
+  endorsedBouts         Bout[]                 @relation("BoutReviewer")
   profiles         Profile[]
   sessions         Session[]
   fighter          Fighter?
@@ -411,4 +424,71 @@ model Profile {
   updatedAt   DateTime @updatedAt
   @@unique([kind, entityId])
   @@index([ownerId])
+}
+
+// El respaldo es opcional: no otorga permisos por tener un perfil de entrenador o federación.
+enum SupportKind {
+  DECLARED
+  DOCUMENT
+  TRAINER
+  ORGANIZER
+  FEDERATION
+}
+
+enum AchievementScope {
+  REGIONAL
+  NATIONAL
+  INTERNATIONAL
+}
+
+model SupportAccreditation {
+  id           String               @id @default(cuid())
+  userId       String?              @unique
+  user         User?                @relation("AccreditedUser", fields: [userId], references: [id], onDelete: SetNull)
+  kind         SupportKind
+  name         String
+  disciplines  Discipline[]
+  evidenceUrl  String
+  note         String
+  active       Boolean              @default(true)
+  grantedById  String?
+  grantedBy    User?                @relation("AccreditationGrantor", fields: [grantedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  achievements FighterAchievement[]
+  bouts        Bout[]
+}
+
+model FighterAchievement {
+  id                     String                @id @default(cuid())
+  fighterId              String
+  fighter                Fighter               @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  championship           String
+  organization           String
+  awardedOn              DateTime
+  scope                  AchievementScope
+  discipline             Discipline
+  level                  Level
+  divisionId             String?
+  weightClass            String?
+  declarationKey         String
+  evidenceUrl            String?
+  supportKind            SupportKind           @default(DECLARED)
+  supportAuthority       String?
+  supportNote            String?
+  supportReviewedAt      DateTime?
+  supportReviewedById    String?
+  supportReviewedBy      User?                 @relation("AchievementReviewer", fields: [supportReviewedById], references: [id], onDelete: SetNull)
+  supportAccreditationId String?
+  supportAccreditation   SupportAccreditation? @relation(fields: [supportAccreditationId], references: [id], onDelete: SetNull)
+  reviewRequestedAt      DateTime?
+  rejectedAt             DateTime?
+  rejectionReason        String?
+  withdrawnAt            DateTime?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@unique([fighterId, declarationKey])
+  @@index([discipline, level, divisionId, weightClass])
+  @@index([reviewRequestedAt])
 }

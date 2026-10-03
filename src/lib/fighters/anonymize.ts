@@ -5,6 +5,11 @@ import { Prisma } from "@prisma/client";
  * que guardan nombre, apellidos, alias, ciudad y provincia tal como estaban.
  */
 export async function scrubFighterHistory(tx: Prisma.TransactionClient, fighterId: string) {
+  const achievements = await tx.fighterAchievement.findMany({ where: { fighterId }, select: { id: true } });
+  if (achievements.length) {
+    await tx.auditLog.updateMany({ where: { entity: "ACHIEVEMENT", entityId: { in: achievements.map(a=>a.id) } }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
+    await tx.fighterAchievement.deleteMany({ where: { fighterId } });
+  }
   await tx.auditLog.updateMany({ where: { entity: "FIGHTER", entityId: fighterId }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
 }
 

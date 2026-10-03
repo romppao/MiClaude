@@ -124,3 +124,11 @@ Una pantalla que funciona pero hace dudar a una persona **también es un fallo**
 4. Abrir en dos pestañas la misma pantalla y actuar en las dos (por ejemplo, confirmar y rechazar el mismo combate).
 5. Direcciones manipuladas: `?pagina=-1`, `?pagina=abc`, parámetros repetidos, identificadores que no existen, `/peleadores/` + algo raro.
 6. Entrar en pantallas de otro rol (moderación, organizador) y de otras personas (la gestión de la velada de otro organizador).
+
+## 11. Campeón con historia previa y acreditación opcional
+
+Declarar un título antiguo con fecha y categoría propias, sin fuente ni entrenador en la aplicación. Comprobar sus puntos y etiqueta pública; pedir respaldo después. Revisar como moderación, entrenador de disciplina diferente y federación acreditada; intentar respaldar un hecho propio. Mejorar el respaldo sin sumar niveles, retirarlo y recalcular. Corregir datos, retirar/deshacer retirada y revisar un título excluido. Cambiar categoría actual sin mover sus puntos históricos. Rival solicita revisión: el resultado sigue contado hasta una decisión de moderación. Descargar datos y eliminar la cuenta; revisar títulos y notas personales restantes.
+
+## 12. Menú por actividades
+
+Abrir desde móvil/escritorio como visitante, deportista, titular de entidad, promotor y moderador. Encontrar peleadores, veladas, gimnasio, ficha, perfiles y gestión de eventos sin ayuda. Tab y Mayús+Tab permanecen en el panel; Escape cierra y devuelve el foco. Seguir un enlace cierra el panel. Probar cerrar sesión. Confirmar que no aparecen enlaces a funciones inexistentes ni permisos de respaldo por haber creado un perfil visual.

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "../../lib/accounts/auth";
 import { db } from "../../lib/common/db";
-import { PROVINCES, VERIFICATION_LABEL } from "../../lib/common/labels";
+import VerificationTag from "../components/VerificationTag";
+import { PROVINCES } from "../../lib/common/labels";
 import { LIMITS } from "../../lib/common/text";
 import { publicFighterName } from "../../lib/common/names";
 import { searchIds } from "../../lib/common/search";
@@ -95,7 +96,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
   const bouts = await db.bout.findMany({
     where: { OR: [{ fighterAId: me.id }, { fighterBId: me.id }] },
-    include: { event: true, fighterA: true, fighterB: true },
+    include: { event: true, fighterA: true, fighterB: true, supportAccreditation: true },
     orderBy: { event: { date: "desc" } },
   });
   const records = computeRecords(me.id, bouts);
@@ -106,6 +107,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     <>
       <h1>{me.firstName} {me.lastName}</h1><p><Link className="btn" href={`/perfiles/peleador/${me.id}/editar`}>Editar foto y banner</Link></p>
       <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
+      <p><Link className="btn" href="/mi-ficha/trayectoria">Gestionar mis títulos y mi aura</Link></p>
       <RecordCards records={records} disciplines={me.disciplines} />
 
       <h2>Mis datos</h2>
@@ -151,8 +153,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
       {toConfirm.length > 0 && (
         <>
-          <h2>Combates que tu rival ha registrado y necesitan tu respuesta</h2>
-          <p className="mut">Tu rival dice que combatisteis y que el resultado fue el que ves aquí. Si es correcto, confírmalo; si no, indícalo.</p>
+          <h2>Combates que puedes confirmar o pedir que se revisen</h2>
+          <p className="mut">Tu rival ha declarado estos resultados. Confirmarlos es opcional. Si hay un error, explica el motivo para que moderación lo revise; el aviso no suspende el resultado automáticamente.</p>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {toConfirm.map((b) => {
               const rival = `${b.fighterA.firstName} ${b.fighterA.lastName}`;
@@ -204,7 +206,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         </label>
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" defaultValue={previo("rounds")} type="number" min={1} max={12} /></label>
         <label className="field"><span>Asalto en que terminó (opcional)</span><input name="endRound" defaultValue={previo("endRound")} type="number" min={1} max={12} /><span className="hint">Solo si acabó por KO, TKO, abandono, sumisión o descalificación.</span></label>
-        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" defaultValue={previo("evidenceUrl")} maxLength={LIMITS.url} placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace ayuda a que tu combate se confirme antes.</span></label>
+        <label className="field" style={{ flex: 1, minWidth: 260 }}><span>Enlace que lo demuestre (opcional)</span><input name="evidenceUrl" defaultValue={previo("evidenceUrl")} maxLength={LIMITS.url} placeholder="Acta, cartel, vídeo o publicación" /><span className="hint">Un enlace permite comprobar el hecho; no verifica el resultado automáticamente.</span></label>
         <button>Registrar este combate</button>
       </form>
       <h2>Mis combates</h2>
@@ -232,7 +234,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                       </details>
                     )}
                   </td>
-                  <td data-label="Estado"><span className="tag">{VERIFICATION_LABEL[b.verification]}</span></td>
+                  <td data-label="Estado"><VerificationTag verification={b.verification} backing={b} /></td>
                   <td data-label="Resultado">
                     {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
                     {puedeCorregir && (
@@ -271,7 +273,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           </tbody>
         </table>
       </div>
-      <p className="mut">Tus combates aparecen como «pendiente de confirmar» hasta que tu rival (si tiene cuenta) o un moderador los verifique. Lo que declaras sobre tu rival no cuenta en su récord hasta que él lo confirme.</p>
+      <p className="mut">Los resultados declarados se muestran en ambas fichas con su etiqueta. La confirmación del rival y los respaldos son opcionales. Moderación puede suspender un resultado incorrecto tras revisar un aviso.</p>
     </>
   );
 }

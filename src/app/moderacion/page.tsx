@@ -101,7 +101,7 @@ export default async function Moderation() {
 
   return (
     <>
-      <h1>Moderación</h1>
+      <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
       <p><Link href="/moderacion/historial">Ver el historial de cambios</Link></p>
 
       <h2>Avisos de error de usuarios ({reports.length})</h2>
