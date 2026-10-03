@@ -75,7 +75,7 @@ await anon.selectOption("main form select[name=level]", "PRO");
 await anon.selectOption("main form select[name=categoria]", "Wélter");
 await btn(anon, "Aplicar filtros");
 await anon.waitForURL("**categoria=W*");
-check("el resumen enseña lo aplicado y cuántos resultados hay", await seen(anon.locator("[role=group][aria-label='Filtros aplicados']", { hasText: "Wélter · hasta 66,7 kg" })) && await seen(anon.locator("main p", { hasText: /\d+ peleadores? encontrados?\./ })));
+check("el resumen enseña lo aplicado y cuántos resultados hay", await seen(anon.locator("[role=group][aria-label='Filtros aplicados']", { hasText: "Wélter · hasta 66,7 kg" })) && await seen(anon.locator("main p", { hasText: /^\d+ (?:peleador encontrado|peleadores encontrados)\.$/ })));
 await anon.click("[role=group][aria-label='Filtros aplicados'] a:has-text('Profesional')");
 await anon.waitForURL((u) => !u.search.includes("level="));
 check("cada filtro se quita por separado desde el resumen", !(await anon.url()).includes("level=") && (await anon.url()).includes("disciplina=BOXEO"));

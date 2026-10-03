@@ -607,6 +607,8 @@ Continuar la validación pendiente del relevo, con prioridad funcional y diseño
 
 Se añadió `tests/e2e/respaldo.mjs` al conjunto de CI. Crea una cuenta y ficha ficticias desde la interfaz, registra un combate amateur, cambia a profesional, registra victoria y combate sin decisión, y vuelve a amateur. Comprueba en «Mi ficha» y como visitante que las tarjetas conservan los resultados históricos, muestran la categoría solo en el nivel actual, explican NC y enlazan a la ayuda pública. La ayuda de registro ahora acota todos los campos y el botón al formulario de combate; la corrección reciente de la rama anterior solo acotaba la disciplina.
 
+Se inspeccionó además la ejecución `37109729125`: el guion de filtros impedía llegar al calendario y al nuevo recorrido porque su expresión `peleadores?` no reconocía el singular «peleador». Se corrige la comprobación para aceptar las frases completas de singular y plural, sin modificar la pantalla.
+
 ### Qué salió mal / qué se aprendió
 
 El proxy local no acepta conexiones y no hay dependencias en caché: no se pudo clonar ni instalar con `npm ci --offline`. Se recuperaron los ficheros mediante GitHub y se comprobaron sus SHA. Sintaxis de los guiones y diferencias comprobadas localmente; el CI debe validar dependencias, PostgreSQL y navegador. Se detectaron cambios concurrentes antes de publicar y se respetaron en una rama independiente.

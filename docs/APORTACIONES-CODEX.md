@@ -93,6 +93,8 @@ Petición del fundador: «continua el trabajo». Este bloque conserva las correc
 
 La categoría actual debe aparecer únicamente en su tarjeta; la histórica no hereda una categoría de otro nivel. El récord profesional queda `1-0-0 (1 NC)` y el amateur `1-0-0` tras ambos cambios. Todos los campos de `registrar()` quedan acotados a su formulario, conservando doble clic y caminos de error.
 
+Se corrige también el bloqueo observado en la ejecución `37109729125`: la expresión `peleadores?` de `tests/e2e/filtros.mjs` no acepta «1 peleador encontrado». La comprobación ahora exige las frases españolas completas, singular o plural, conservando la comprobación de categoría y recuento. No cambia el producto ni se omite la prueba.
+
 Rama: `codex/validacion-records-2026-10-03`, base `e049fe4`. Sintaxis y diferencias comprobadas localmente. El proxy no responde y faltan dependencias, por lo que la validación completa se hace en CI y sigue pendiente hasta consultar el resultado. Este bloque no completa la auditoría por personas ni integra o despliega la demo.
 
 
