@@ -99,6 +99,8 @@ Estilo **provisional** (el diseño visual es al final, por petición del fundado
 
 ## Despliegue y entorno
 
+La demo pública vive en <https://ring-espana-demo.onrender.com/>, servicio Render enlazado a `claude/ring-espana-mvp` según `render.yaml`. El 3 de octubre se integró #11 (commit funcional `7580902d63f4deec42c41f1cb29c5b913e009451`), con el mismo árbol que la propuesta validada. El arranque aplica migraciones aditivas y conserva los datos de una base existente; los datos ficticios solo se cargan en una base vacía. Se comprobaron públicamente portada/ránking/ayuda y `/salud` tras la actualización.
+
 Variables en [`.env.example`](../.env.example) y en el README. `GET /salud` comprueba la aplicación y la base de datos; `robots.txt` y `sitemap.xml` se generan dinámicamente. **Migraciones:** `prisma/migrations` (la inicial reproduce el esquema; el CI las aplica sobre una base vacía y falla si difieren de `schema.prisma`); `db push` queda para pruebas desechables. **Falta:** alojamiento y proveedor de correo reales.
 
 ## Idioma y modelo de negocio (decisiones del fundador)

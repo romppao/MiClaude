@@ -23,7 +23,7 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F13 | **Monetizar la aplicación** con funciones premium, **después** de terminar la estructura básica. Sin vender verificación ni posiciones de ránking | Fundador | ⚪ (aplazado a propósito) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 | F14 | **Funcionalidad completa y sin fallos antes que diseño; organización clara para poder ampliar el equipo.** «Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo»; «no puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado» | Fundador, 1 de octubre de 2026 | 🟡 (código por dominios, guía `DESARROLLO.md`, mapa funcional generado y pruebas por personas en marcha) |
-| F16 | **Ninguna ciudad ni disciplina debe sentirse excluida**: no presentar Madrid o boxeo como prioridad pública; filtros iniciales nacionales y multidisciplina, altas sin suposiciones | Fundador, petición urgente del 3 de octubre de 2026 | 🟢 Aplicado en la propuesta de comunicación inclusiva; integración y despliegue pendientes |
+| F16 | **Ninguna ciudad ni disciplina debe sentirse excluida**: no presentar Madrid o boxeo como prioridad pública; filtros iniciales nacionales y multidisciplina, altas sin suposiciones | Fundador, petición urgente del 3 de octubre de 2026 | 🟢 Integrado con #11 y comprobado en la demo pública el 3 de octubre de 2026 |
 
 ## Ideas de producto
 
@@ -178,3 +178,7 @@ Ajuste en la misma sesión: el fundador no se mostró convencido con petróleo/m
 ## Decisión del fundador — 3 de octubre de 2026 — color oficial
 
 «He decidido que el color oficial de la aplicación será este #be33f5». Estado: **color decidido**, sustituye las paletas anteriores. Diseño todavía abierto: busca más energía juvenil y comunidad. Fuentes aportadas en una imagen de quince recursos, revisadas con límites en DISENO.md. No interpretar como aprobación de la última maqueta ni como autorización para desplegarla ya.
+
+## Integración y publicación de la demo — 3 de octubre de 2026
+
+Petición expresa del fundador: «Actualiza ya la página en GitHub para que pueda ver la demo actualizada con todos estos cambios». La propuesta #11 integra el trabajo funcional de #8/#9/#10 y la comunicación inclusiva en la rama de la demo. Comprobación pública: portada nacional, ránking sin filtros de disciplina/nivel/provincia, ayuda con división por edad y salud de aplicación/base, todas 200. Los pendientes normativos y de diseño anotados anteriormente siguen abiertos.

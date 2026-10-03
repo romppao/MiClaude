@@ -758,3 +758,25 @@ La primera batería completa detectó que el guion de una ficha provisional sin 
 ### Estado y próximos pasos
 
 Validación local final aprobada: tipos, mapa actualizado y comprobado, 327 unitarias, compilación de producción, 307 comprobaciones E2E (18 nuevas) y axe con 0 incumplimientos, 0 graves o críticos. Propuesta contra la rama principal que conserva #10 y sus antecedentes; integración y despliegue pendientes. Se comprueba además el CI de la propuesta antes de cerrar la sesión.
+
+## Sesión 6 — 3 de octubre de 2026 — Publicación efectiva de la demo
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió: «Actualiza ya la página en GitHub para que pueda ver la demo actualizada con todos estos cambios».
+
+### Qué se decidió y por qué
+
+Integrar la propuesta #11, ya validada, en la rama que usa Render. Incluye el trabajo de las propuestas anteriores, por lo que no se requiere integrarlas una a una. Comprobar la dirección pública después de la actualización automática; no dar por publicado un cambio solo por haber fusionado el código.
+
+### Qué se hizo
+
+Se comprobó CI aprobado y cabeza exacta antes de integrar #11 mediante un merge normal, commit `7580902d63f4deec42c41f1cb29c5b913e009451`. La rama principal conserva el árbol probado y los documentos anteriores. Render sirve la demo actualizada. Peticiones HTTPS verificadas a portada, ránking, ayuda y salud devuelven 200: título nacional, disciplinas/niveles/provincias sin filtro inicial, ayuda inclusiva con divisiones por edad y base conectada. También pasa el CI de integración, ejecución `37127024537`. Se añade el enlace directo a la demo al README y se actualizan demo, arquitectura, ideas y relevo.
+
+### Qué salió mal / qué se aprendió
+
+La primera consulta seguía mostrando la versión antigua mientras Render construía la nueva. Se esperó y se confirmó el contenido público real. Chromium no confiaba en la CA del proxy del entorno; no se desactivó la comprobación TLS. La comprobación pública se realizó mediante HTTPS con la confianza del entorno, conservando las pruebas de navegador ya aprobadas en CI.
+
+### Estado y próximos pasos
+
+Los cambios funcionales y de comunicación están integrados y visibles en <https://ring-espana-demo.onrender.com/>. CI de propuesta e integración aprobado. Se conserva la base de la demo: el arranque solo añade migraciones y carga ejemplos si está vacía. Pendientes anteriores fuera de este bloque: catálogo completo de pesos IMMAF/IBJJF, decisiones sobre menores, pruebas con personas y aplicación del diseño visual elegido.

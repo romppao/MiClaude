@@ -2,6 +2,8 @@
 
 Una copia con **datos ficticios** (peleadores, gimnasios y veladas inventados) para recorrer la aplicación en el navegador como lo haría cualquier persona. Hay dos formas de tenerla; **para probar desde el móvil, la A**.
 
+**Demo activa:** <https://ring-espana-demo.onrender.com/>. El 3 de octubre de 2026 se integró la propuesta #11 en `claude/ring-espana-mvp`: incluye categorías por edad, correcciones de calendario/récords y comunicación inclusiva. Comprobados públicamente portada, ránking, ayuda y salud, todos con respuesta 200 y los contenidos nuevos.
+
 ## A. Alojada en internet (funciona desde el móvil)
 
 La demo se publica en [Render](https://render.com) a partir del fichero `render.yaml` del repositorio: una web y una base de datos propias, sin tocar nada de producción. Se hace una sola vez, desde el navegador del móvil:

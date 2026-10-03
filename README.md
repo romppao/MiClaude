@@ -4,6 +4,8 @@ Comunidad y base de datos de los **deportes de contacto de toda España**: boxeo
 amateur y profesional. Fichas de peleadores con su récord, calendario de veladas, gimnasios,
 entrenadores, búsqueda y **aura** (el reconocimiento del público, que sustituye a las estrellas).
 
+**[Abrir la demo actualizada](https://ring-espana-demo.onrender.com/)** — versión de prueba con datos ficticios.
+
 **Stack:** Next.js 15 (App Router, Server Actions, TypeScript 5) · PostgreSQL 16 · Prisma 6 · sin otras dependencias de ejecución.
 
 > **¿Retomas el proyecto en otro ordenador o con Claude Code?** Empieza por [`docs/TRASLADO.md`](docs/TRASLADO.md): puesta en marcha paso a paso, estado, lo que falta y las decisiones pendientes.

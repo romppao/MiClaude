@@ -159,3 +159,7 @@ El generador añadió barras de aura y una insignia de confirmación para toda l
 La portada decía Madrid y amateur, la ayuda «boxeo en cabeza», los botones destacaban boxeo y ránking/altas elegían Madrid y boxeo por defecto. Cambiar solo los párrafos habría conservado el sesgo en los datos visibles. Regla: revisar también consultas, filtros, vacíos, metadatos y valores de formulario; conservar ubicaciones reales y reglamentos específicos. Las pruebas deben elegir explícitamente sus datos ficticios y comprobar por separado que una alta real empieza sin provincia ni disciplina.
 
 El recorrido de una ficha provisional mostró otra dependencia del antiguo valor inicial: registrar un combate también exige elegir provincia si la ficha carece de ella. Se corrigió el guion para aportar un dato ficticio explícito; la aplicación conserva la elección neutral.
+
+## 3 de octubre de 2026 — Integrar y publicar son comprobaciones distintas
+
+Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Render: primero se construye la nueva versión. Confirmar contenido y salud en la dirección pública antes de comunicar que la demo está actualizada. Si el navegador del entorno no confía en la CA del proxy, conservar TLS y usar una comprobación HTTPS con la confianza configurada, sin desactivar la validación de certificados.
