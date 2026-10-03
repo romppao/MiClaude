@@ -10,7 +10,7 @@ export default function HeaderMenu({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   useEffect(() => { setOpen(false); }, [pathname]);
   return <>
-    <button ref={trigger} type="button" className="header-menu-toggle secondary" aria-expanded={open} aria-controls="header-menu" onClick={() => setOpen(!open)}>
+    <button ref={trigger} type="button" className="header-menu-toggle secondary" aria-expanded={open} aria-controls="header-menu" onClick={() => setOpen(!open)} onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }}>
       <span aria-hidden="true">{open ? "×" : "☰"}</span> {open ? "Cerrar" : "Menú"}
     </button>
     <div id="header-menu" className={`header-menu${open ? " is-open" : ""}`}

@@ -2,6 +2,7 @@
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
 import { datosDeAlta, B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 import AxeBuilder from "@axe-core/playwright";
+import { mkdirSync } from "node:fs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -205,6 +206,10 @@ for (const width of [320, 390, 430]) {
   await movil.goto(B + "/");
   const menu = movil.getByRole("button", { name: "Menú", exact: true });
   check(`${width}px: cabecera compacta y menú cerrado al entrar`, await seen(menu) && await movil.locator("header").evaluate((el) => el.getBoundingClientRect().height < 100) && await menu.getAttribute("aria-expanded") === "false");
+  if (width === 390) { mkdirSync("test-results/movil", { recursive: true }); await movil.screenshot({ path: "test-results/movil/inicio-390.png", fullPage: true }); }
+  await menu.click();
+  await movil.keyboard.press("Escape");
+  check(`${width}px: Escape también cierra desde el propio botón`, await menu.getAttribute("aria-expanded") === "false");
   await menu.click();
   check(`${width}px: el menú muestra entrenadores, acceso y búsqueda sin desbordamiento`, await seen(movil.getByRole("navigation", { name: "Principal", exact: true }).getByRole("link", { name: "Entrenadores" })) && await seen(movil.locator("header .cuenta a[href='/entrar']")) && await seen(movil.locator("header form[role=search] input")) && await anchoDesbordado(movil) <= 1);
   await movil.locator("#header-search").focus();
@@ -219,6 +224,7 @@ for (const width of [320, 390, 430]) {
     check(`${width}px: ${ruta} cabe en la pantalla`, await anchoDesbordado(movil) <= 1);
   }
   await movil.goto(B + `/peleadores/movil-ficha${rnd}`);
+  if (width === 390) await movil.screenshot({ path: "test-results/movil/perfil-390.png", fullPage: true });
   const active = movil.locator(".mobile-nav a[aria-current=page]");
   check(`${width}px: el perfil mantiene Peleadores como sección activa`, await active.count() === 1 && await active.getAttribute("href") === "/peleadores");
   check(`${width}px: los cuatro accesos inferiores tienen al menos 44×44 px`, await movil.locator(".mobile-nav a").evaluateAll((els) => els.length === 4 && els.every((el) => { const r = el.getBoundingClientRect(); return r.width >= 44 && r.height >= 44; })));
@@ -227,6 +233,7 @@ for (const width of [320, 390, 430]) {
 }
 await movil.getByRole("button", { name: "Menú", exact: true }).click();
 const axeMovil = await new AxeBuilder({ page: movil }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+await movil.screenshot({ path: "test-results/movil/menu-430.png", fullPage: true });
 check("el perfil y el menú móvil abierto pasan axe WCAG 2.2 AA", axeMovil.violations.length === 0);
 await peleadorMovil.p.setViewportSize({ width: 320, height: 740 });
 await peleadorMovil.p.goto(B + "/mi-ficha");
