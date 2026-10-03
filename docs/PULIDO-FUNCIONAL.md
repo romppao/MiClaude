@@ -9,6 +9,7 @@ La composición actual es provisional. Este documento reúne los pendientes vige
 | Problema comprobado | Corrección | Cómo se comprueba |
 |---|---|---|
 | Las colas dejaban registros fuera después de 100; el historial, después de 200 | Páginas de 50, total real, orden estable y páginas independientes por cola | Navegador con 105 avisos, reclamaciones, solicitudes, gimnasios, títulos y acreditaciones; tres grupos de 104 combates y 351 cambios |
+| El acceso a respaldos perdía la ruta después de entrar | Destino explícito por las guardas de sesión y acreditación | Acceso sin sesión y regreso real con una cuenta autorizada |
 | Resolver obligaba a empezar la lista de nuevo | Se conservan filtros y páginas; el aviso permite volver a la sección | Acciones reales desde la tercera página y con filtros |
 | Una pantalla larga podía esconder la respuesta | Foco y desplazamiento al aviso; enlace de vuelta a la cola | Comprobación de foco, posición y accesibilidad |
 | Moderación podía aprobar un resultado corregido mientras leía | Huella del resultado en formulario y escritura condicionada a los datos leídos | Pantalla antigua, cambio del resultado y rechazo de la decisión |
@@ -20,7 +21,7 @@ La composición actual es provisional. Este documento reúne los pendientes vige
 | Muchas solicitudes de un título podían ocultar la fuente de otros | Última solicitud por título, sin un límite global que mezcle sus historiales | 351 solicitudes de un título y una anterior de otro |
 | El relevo enumeraba problemas ya corregidos como pendientes | Estado actual con referencias a código y pruebas | Auditoría y traslado enlazan este documento |
 
-Validación y publicación de este bloque se anotan en APORTACIONES-CODEX y DIARIO una vez comprobadas. No hay migración ni cambios de escala de aura, categorías o diseño.
+Integrado en [PR #15](https://github.com/romppao/MiClaude/pull/15): [CI #137](https://github.com/romppao/MiClaude/actions/runs/37158841984) aprueba 406 unitarias, 393 comprobaciones de navegador y axe en 37 pantallas sin incumplimientos, además de migraciones/paridad, tipos, mapa y build. La comprobación pública se registra en APORTACIONES-CODEX y DIARIO. No hay migración ni cambios de escala de aura, categorías o diseño.
 
 ## Siguiente trabajo funcional, por impacto
 

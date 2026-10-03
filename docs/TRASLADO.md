@@ -1,15 +1,15 @@
 # Traslado del proyecto a Claude Code (en tu ordenador)
 
-> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. Se han pedido propuestas visuales con colores opuestos a Raunder; la implementación de la identidad sigue pendiente de elección. Consulta [DISENO.md](DISENO.md).
+> **Relevo vigente (3 de octubre de 2026):** empezar por [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md) y el cierre de [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md). El fundador considera la composición actual desorganizada y saturada; el diseño es provisional y se retoma al final. No iniciar otro rediseño ni integrar automáticamente la propuesta móvil #13.
 
 Guía para retomar Ring España fuera de la sesión de la aplicación móvil, con Claude Code instalado en tu ordenador.
 Está escrita para que la pueda seguir una persona y también para que la lea Claude Code al empezar.
-Se redactó el **30 de septiembre de 2026**, con el último commit de código `5303086` (después vienen los de documentación de este traslado).
+Redacción original: **30 de septiembre de 2026**. El estado se actualiza con los bloques posteriores; el cierre de APORTACIONES-CODEX identifica los commits y las comprobaciones vigentes.
 
 ## 1. Dónde está todo
 
 - **Repositorio:** <https://github.com/romppao/MiClaude>
-- **Rama de trabajo:** `claude/ring-espana-mvp` (no hay otra; **nunca se ha abierto una *pull request*** porque no se pidió). Todo el trabajo está subido a esa rama.
+- **Rama de trabajo:** `claude/ring-espana-mvp`, fuente del despliegue de Render. Los cambios se comprueban en ramas aisladas y pull requests antes de integrar; #13 sigue abierta.
 - **Integración continua:** GitHub Actions (`.github/workflows/ci.yml`): tipos, pruebas unitarias, compilación y pruebas de navegador con un PostgreSQL de servicio. En el momento del traslado, los últimos commits verificados estaban en verde.
 - **Lo que NO viaja con el repositorio:** la base de datos de pruebas del entorno anterior (era desechable; el `seed` crea datos ficticios de demostración), el fichero `.env` (se crea de nuevo) y la transcripción de la conversación. Lo importante de esa conversación está en `docs/DIARIO.md`, `docs/LECCIONES.md` y en este documento.
 
@@ -23,14 +23,14 @@ cd MiClaude
 git checkout claude/ring-espana-mvp
 npm ci
 cp .env.example .env            # edita DATABASE_URL (y deja APP_URL y MAIL_TRANSPORT=log para trabajar en local)
-npx prisma db push              # crea las tablas
+npx prisma migrate deploy       # aplica las migraciones existentes
 npm run db:seed                 # datos FICTICIOS (solo si la base está vacía)
 npm run dev                     # http://localhost:3000
 ```
 
 Sin PostgreSQL instalado: `docker run --name ring-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16`.
 
-Comprobar que todo está sano (debe dar 0 errores, 103 pruebas unitarias y 146 comprobaciones de navegador):
+Comprobar tipos, unitarias, build y recorridos con base de pruebas. Las cifras actuales y la medición de accesibilidad están en el cierre de APORTACIONES-CODEX:
 
 ```bash
 npm run typecheck && npm test
@@ -72,7 +72,7 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 
 **Auditoría histórica:** el cuadro de 99 hallazgos se ha revalidado donde existían estados obsoletos; los parciales y decisiones siguen abiertos. Consultar [AUDITORIA.md](AUDITORIA.md), no asumir que sus citas antiguas de fichero/línea siguen vigentes. Los defectos nuevos de este pulido están en PULIDO-FUNCIONAL.
 
-**Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. La continuación pasa 405 unitarias y 26 comprobaciones nuevas de volumen/decisiones; regresión, accesibilidad y publicación finales se registran en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
+**Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. El pulido #15 pasa CI #137 con 406 unitarias, 393 comprobaciones de navegador (28 nuevas de volumen/integridad) y axe en 37 pantallas sin incumplimientos; publicación y referencias exactas en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
 
 **Organización del código (1 de octubre):** acciones en módulos por dominio, lógica en `src/lib/<dominio>`, reglas de dependencias comprobadas por prueba y un mapa funcional generado. Guía en [`DESARROLLO.md`](DESARROLLO.md); mapa en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
 

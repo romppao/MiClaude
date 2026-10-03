@@ -140,8 +140,8 @@ export async function resetPasswordWithToken(token: string, passwordHash: string
 }
 
 /** Igual que requireUser, pero exige el correo electrónico verificado. Lo usan las acciones que publican contenido. */
-export async function requireVerifiedUser() {
-  const u = await requireUser();
+export async function requireVerifiedUser(next?: string) {
+  const u = await requireUser(next);
   if (!u.emailVerifiedAt) redirect("/verificar");
   return u;
 }

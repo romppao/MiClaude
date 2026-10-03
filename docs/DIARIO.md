@@ -879,3 +879,17 @@ El primer usuario sintético generó un correo con tilde y la validación nativa
 El árbol final aprueba 406 unitarias y compilación de producción. Recorridos repetidos sobre el build final: 28 checks nuevos de volumen/integridad, 26 de trayectoria y 49 de usabilidad; axe en 37 pantallas, 0 incumplimientos. La regresión anterior pasó 389 de 391 y detectó dos mensajes de organizador bloqueados por validación nativa; los recorridos afectados pasan tras corregirlo. CI ejecutará la batería completa final (393 comprobaciones) antes de integrar. No se presenta la pasada anterior como completamente verde.
 
 También se protege la restauración de títulos: solo procede para uno excluido y no puede retirar el respaldo de uno activo. La prueba de volumen ahora consulta los totales y el orden reales antes de comprobar la tercera página: funciona también al reutilizar la base con datos de otros guiones. La publicación y su comprobación pública se registran después de CI.
+
+
+### Integración comprobada
+
+Integrada [PR #15](https://github.com/romppao/MiClaude/pull/15) en `claude/ring-espana-mvp`, merge `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. [CI #137](https://github.com/romppao/MiClaude/actions/runs/37158841984) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, 393 comprobaciones de navegador y axe en 37 pantallas: 0 incumplimientos, 0 graves o críticos. Árbol probado e integrado idéntico: `812da937097a5362123cbb3bd8b73c9b3008f0b7`; head revisado `cc2e17987f56037f88b574f1b8740ab16c4fd247`, base `dbecb53281f9c265081749acbbb71fd232c486df`, ambos comprobados antes de fusionar. La prueba completa final supera también los dos recorridos que habían fallado en la regresión local anterior.
+
+
+### Comprobación pública del primer despliegue
+
+Render sirve el pulido #15: portada, ayuda, ránking y `/salud` responden 200 por HTTPS con verificación TLS. El bundle compartido cambia de `layout-c9e2e3184aacfcf6.js` a `layout-febc489e998a92be.js` y contiene sección, foco y enlace de vuelta; SHA-256 `ba2162b7780bac81eed6ff191289b1e7a6acc11b5fb2ac6d8a2a47ab60f1c473`. Es una comprobación de despliegue, no una prueba autenticada de las colas públicas; esas acciones se recorrieron en local/CI. Los datos de volumen no se subieron a Render.
+
+La comprobación de acceso privado descubrió un detalle adicional: `/respaldar` pedía sesión sin recordar la ruta de vuelta, al contrario de las páginas de moderación. Se transmite la ruta a través de las guardas de sesión verificada y respaldo, sin conceder permisos. Dos checks nuevos comprueban el mensaje/destino y el regreso real tras entrar con una cuenta autorizada; tipos, unitarias, build, navegador y CI se vuelven a comprobar por este cambio de código.
+
+Validación local del retorno: 406 unitarias, build de producción y 30 checks del guion de pulido aprobados; el guion también mide axe sobre las colas pobladas sin incumplimientos. CI comprobará el árbol completo con 395 comprobaciones de navegador antes de integrar esta continuación.

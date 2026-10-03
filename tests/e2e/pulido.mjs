@@ -19,6 +19,18 @@ const rows = name => p.locator(`input[name=${name}]`);
 const card = (name, value) => p.locator("section.card, div.card").filter({ has: p.locator(`input[name=${name}][value="${value}"]`) });
 
 try {
+  const visitorContext = await browser.newContext();
+  const visitor = await visitorContext.newPage();
+  await visitor.goto(B + "/respaldar");
+  await visitor.getByRole("heading", { name: "Entrar en tu cuenta", exact: true }).waitFor();
+  check("respaldar sin sesión explica el acceso y conserva la pantalla a la que volver", new URL(visitor.url()).searchParams.get("next") === "/respaldar" && new URL(visitor.url()).searchParams.get("problema") === "sin_sesion" && await visitor.locator("input[name=next]").inputValue() === "/respaldar");
+  await visitor.locator("input[name=email]").fill(admin.email);
+  await visitor.locator("input[name=password]").fill("contraseña123");
+  await visitor.getByRole("button", { name: "Entrar en mi cuenta", exact: true }).click();
+  await visitor.waitForURL("**/respaldar");
+  await visitor.getByRole("heading", { name: "Respaldar resultados y títulos", exact: true }).waitFor();
+  check("quien puede respaldar vuelve a esa pantalla después de entrar", new URL(visitor.url()).pathname === "/respaldar");
+  await visitorContext.close();
   await db.user.createMany({ data: indexes.map(i => ({ id: id("u", i), email: `${id("u", i)}@example.test`, name: `Persona ficticia ${i}`, passwordHash: "cuenta-ficticia-sin-acceso", role: "FIGHTER", emailVerifiedAt: at(i) })) });
   await db.fighter.createMany({ data: indexes.map(i => ({ id: id("f", i), slug: id("f", i), firstName: "Deportista", lastName: `Ficticio ${i}`, userId: id("u", i), province: "Valencia", createdAt: at(i) })) });
   await db.fighterDiscipline.createMany({ data: indexes.map(i => ({ fighterId: id("f", i), discipline: "BOXEO", level: "AMATEUR", weightClass: "M70" })) });
