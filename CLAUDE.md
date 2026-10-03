@@ -1,5 +1,7 @@
 # Ring España — instrucciones para Claude
 
+> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. El diseño gráfico sigue aplazado.
+
 Aplicación web para la comunidad española de deportes de contacto — boxeo en cabeza, más MMA, kickboxing, K-1 y jiu-jitsu (amateur primero, Madrid como plaza inicial). El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
 
 ## Documentación obligatoria (petición expresa del fundador)

@@ -1,5 +1,7 @@
 # Traslado del proyecto a Claude Code (en tu ordenador)
 
+> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. El diseño gráfico sigue aplazado.
+
 Guía para retomar Ring España fuera de la sesión de la aplicación móvil, con Claude Code instalado en tu ordenador.
 Está escrita para que la pueda seguir una persona y también para que la lea Claude Code al empezar.
 Se redactó el **30 de septiembre de 2026**, con el último commit de código `5303086` (después vienen los de documentación de este traslado).
