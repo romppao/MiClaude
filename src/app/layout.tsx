@@ -13,7 +13,7 @@ import { demoActiva } from "../lib/common/demo";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: { default: "Ring España", template: "%s · Ring España" },
-  description: "Los deportes de contacto en España: peleadores, récords, aura del público, veladas, gimnasios y entrenadores de boxeo, MMA, kickboxing, K-1 y jiu-jitsu.",
+  description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

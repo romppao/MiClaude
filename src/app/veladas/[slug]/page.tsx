@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
 import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
+import { divisionLabel } from "../../../lib/common/competition";
 import { DISCIPLINE_LABEL, weightClassLabel } from "../../../lib/common/disciplines";
 import { publicFighterName } from "../../../lib/common/names";
 import VerificationTag from "../../components/VerificationTag";
@@ -60,7 +61,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <td data-label="Esquina roja" className={!oculto && b.result === "A_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterA.slug}`}>{publicFighterName(b.fighterA)}</Link></td>
                 <td className="mut solo-ancho">contra</td>
                 <td data-label="Esquina azul" className={!oculto && b.result === "B_WIN" ? "W" : ""}><Link href={`/peleadores/${b.fighterB.slug}`}>{publicFighterName(b.fighterB)}</Link></td>
-                <td data-label="Categoría">{[b.weightClass ? weightClassLabel(e.discipline, e.level, b.weightClass) : null, b.rounds ? `${b.rounds} asaltos` : null].filter(Boolean).join(" · ")}</td>
+                <td data-label="Categoría">{[divisionLabel(b.divisionId), b.weightClass ? weightClassLabel(e.discipline, e.level, b.weightClass, b.divisionId) : null, b.rounds ? `${b.rounds} asaltos` : null].filter(Boolean).join(" · ")}</td>
                 <td data-label="Resultado">
                   {enRevision ? <span className="mut">Resultado en revisión</span>
                     : pendiente ? <span className="mut">Resultado pendiente de confirmar por el rival</span>

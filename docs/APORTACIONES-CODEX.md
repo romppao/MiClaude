@@ -4,11 +4,13 @@
 
 ## Leer primero al retomar
 
+**Continuación validada:** el recorrido de récords profesional/amateur está en [la propuesta #9](https://github.com/romppao/MiClaude/pull/9), rama `codex/validacion-records-2026-10-03`, partiendo de `e049fe4`. Ver la sección final para distinguirlo de los cambios de calendario y sus ejecuciones de CI.
+
 Este documento es el relevo solicitado expresamente por el fundador para que Claude entienda las aportaciones de Codex. Se complementa con `TRASLADO.md`, `DIARIO.md`, `COMPETENCIA.md` y el mapa funcional; no sustituye las reglas de `CLAUDE.md`.
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
 **Rama de aportaciones:** `codex/claridad-calendario-2026-10-03`.
-**Estado:** cambios preparados y comprobaciones locales aprobadas; integración y pruebas completas de navegador sujetas al CI de la propuesta. No confundir esta rama con la demo desplegada. La documentación de relevo se publica también en la rama principal para que sea fácil encontrarla.
+**Estado:** la continuación de #9 pasa CI completo (tipos, migraciones, mapa, 313 unitarias, compilación, E2E y axe). Integración pendiente: #9 está encadenada sobre la rama de #8. La demo sigue siendo una versión distinta hasta integrar y desplegar. El relevo inicial también está en la rama principal.
 
 ## Peticiones y decisiones del fundador
 
@@ -85,10 +87,32 @@ Se corrige `tests/e2e/ayudas.mjs` acotando el selector al formulario que contien
 
 CI 79: se completó el recorrido de `flujo.mjs`, incluido el registro de MMA. Quedó una comprobación negativa incorrecta: «y excluye a quien no» buscaba el nombre en todo `body`, donde también aparece en el resumen del filtro `q`. Se cambia a comprobar la tarjeta de resultado y, para la exclusión, el mensaje visible de cero resultados más ausencia de esa tarjeta. La inclusión ahora también exige tarjeta visible, evitando que el propio filtro la haga pasar. No se modifica el filtro de producto. Se repite CI; aún no se declara E2E/axe aprobado.
 
+## Continuación: récords profesional y amateur
+
+Petición del fundador: «continua el trabajo». Este bloque conserva las correcciones recientes de #8 y añade `tests/e2e/respaldo.mjs` al conjunto de CI. Mediante la web crea su propio peleador ficticio, registra resultados amateur y profesionales (incluido NC), cambia la categoría en ambos sentidos y comprueba ficha privada, ficha pública y ayuda.
+
+La categoría actual debe aparecer únicamente en su tarjeta; la histórica no hereda una categoría de otro nivel. El récord profesional queda `1-0-0 (1 NC)` y el amateur `1-0-0` tras ambos cambios. Todos los campos de `registrar()` quedan acotados a su formulario, conservando doble clic y caminos de error.
+
+Se corrige también el bloqueo observado en la ejecución `37109729125`: la expresión `peleadores?` de `tests/e2e/filtros.mjs` no acepta «1 peleador encontrado». La comprobación ahora exige las frases españolas completas, singular o plural, conservando la comprobación de categoría y recuento. No cambia el producto ni se omite la prueba.
+
+Rama: `codex/validacion-records-2026-10-03`, base `e049fe4`. Sintaxis y diferencias comprobadas localmente. El proxy no responde y faltan dependencias, por lo que la validación completa se hizo en GitHub Actions.
+
+**Resultado aprobado:** commit `233420c41702c159938fb1f2a3c402ddc555117d`, [ejecución de la propuesta #9 `37110167176`](https://github.com/romppao/MiClaude/actions/runs/37110167176): instalación, migraciones y paridad del esquema, tipos, mapa, 313 unitarias, compilación, conjunto E2E completo y axe correctos. El nuevo guion aprobó sus 17 comprobaciones; axe midió 0 incumplimientos, 0 graves o críticos. El código probado incluye también el calendario de #8. Esto no convierte las ejecuciones fallidas anteriores de #8 en aprobadas: consultar cada commit y su CI.
+
+Este bloque no completa la auditoría por personas ni integra o despliega la demo. Siguiente trabajo: revisión e integración de las propuestas, recorridos de seguridad/móvil/persona mayor y paginación real de moderación.
+
 
 ### Revisión de los guiones que siguen al primer flujo
 
 La inspección encontró el mismo `body.includes(q)` en `integridad.mjs`, para una ficha provisional; se aplica la misma comprobación de listado vacío y ausencia de tarjeta. Además, la prueba de paginación en `busqueda.mjs` creaba 30 fichas sin `FighterDiscipline` pero filtraba por amateur; desde el último cambio de Claude, el nivel se filtra en la disciplina. Se crean también sus disciplinas amateur en los datos de prueba. Se mantienen las 30 fichas, la paginación y el filtro: no se relaja la prueba ni se cambia el producto.
+
+## Divisiones deportivas por edad — 3 de octubre de 2026
+
+Rama `codex/categorias-edad-reglamentos-2026-10-03`, partiendo de la continuación de #9. Petición del fundador: incluir las categorías de boxeo desde escolares hasta élite y comprobar las otras disciplinas. Fuentes primarias, tablas, cobertura y límites en `DISENO-PESOS.md`.
+
+Incluye todas las edades y pesos de boxeo amateur RFEBoxeo 2026; tablas IFMA y WAKO ring/tatami; edades IMMAF 2026 e IBJJF con sus pesos aún pendientes de contraste completo. Añade división versionada en ficha y combate, guardas de edad y combinación en servidor, selección histórica independiente, búsqueda y ránking por división del combate. Benjamín/prebenjamín permiten ficha formativa, pero no combates. Los registros anteriores no se convierten automáticamente en élite ni masculino. Se actualiza la ayuda y el texto de privacidad para explicar la información deportiva declarada.
+
+La propuesta incluye los cambios funcionales anteriores de #8/#9 y conserva la documentación posterior de ambas ramas y de la principal (color oficial #BE33F5 y referencias). No altera el diseño ni publica la demo. Validación local final aprobada: migraciones desde base vacía/paridad, tipos, mapa, 327 unitarias, compilación y 289 comprobaciones E2E, incluidas las 18 del nuevo recorrido de categorías. Axe: 0 incumplimientos, 0 graves o críticos. La propuesta apunta directamente a `claude/ring-espana-mvp`; permite revisar e integrar el conjunto sin depender de resolver primero las propuestas encadenadas. La integración y el despliegue siguen pendientes.
 
 
 ## Estado del CI 83 y relevo honesto
@@ -113,3 +137,9 @@ El fundador valora mejor azul noche/amarillo oro, pero considera la composición
 ## Decisión vigente de color y recursos de diseño
 
 El fundador ha elegido `#BE33F5` como color oficial. Se mantiene su petición de una aplicación más juvenil y llamativa que las propuestas anteriores. Se consultaron los quince recursos de su imagen, con límites de acceso documentados, y se revisaron visualmente ejemplos deportivos de Landbook. Se mostró una nueva portada violeta de comunidad. Solo el color está aprobado; diseño, logotipo y tipografía siguen abiertos. No hay cambios gráficos aplicados a la demo. Fuentes y decisiones en DISENO.md y aviso explícito en CLAUDE.md.
+
+## Continuación urgente — Comunicación inclusiva, 3 de octubre de 2026
+
+Petición del fundador: no dar a entender que Madrid y boxeo son la prioridad pública, para que otras ciudades y disciplinas no se sientan excluidas. Portada nacional sin filtro de nivel o disciplina, consultas y contadores acordes, disciplinas alfabéticas con igual énfasis. Ránking inicial nacional con todas las disciplinas, agrupadas por sus propias categorías y posiciones. Altas de fichas/veladas sin ciudad, provincia ni disciplina asumidas, con selección y validación explícitas; edición conserva lo guardado. Ayuda, metadatos, búsqueda y README coherentes. «Hora de Madrid» se explica como hora peninsular del calendario, sin cambiar la zona técnica ni las ubicaciones reales. La norma editorial está en `CLAUDE.md`; las entradas históricas del diario se conservan. Se añaden comprobaciones de datos de varias disciplinas y provincias y se actualizan los datos explícitos de los guiones anteriores. Esta continuación conserva las categorías por edad y todo el trabajo de #10. Integración y despliegue pendientes.
+
+Validación local de esta continuación: tipos, mapa, 327 unitarias, compilación, 307 comprobaciones E2E y axe con 0 incumplimientos (0 graves o críticos). Los 18 casos nuevos se ejecutaron también dentro de la batería completa.

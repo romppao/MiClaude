@@ -43,7 +43,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
       <form className="search" role="search" aria-label="Buscar en Ring España">
         <label className="field" style={{ flex: 1 }}>
           <span>Busca peleadores, gimnasios, entrenadores o veladas</span>
-          <input name="q" defaultValue={q} maxLength={LIMITS.name} placeholder="Por ejemplo: Ana Ruiz, Vallecas o Madrid" />
+          <input name="q" defaultValue={q} maxLength={LIMITS.name} placeholder="Nombre de un peleador, gimnasio, entrenador o velada" />
           <span className="hint">Escribe una o varias palabras. No hace falta poner tildes.</span>
         </label>
         <button>Buscar</button>

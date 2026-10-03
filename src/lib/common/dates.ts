@@ -8,6 +8,9 @@ export function todayMadrid(now: Date = new Date()): string {
 /** Las veladas se guardan a las 12:00 UTC del día elegido: su «día» es la parte de fecha en UTC (mismo día en Madrid en cualquier época del año). */
 export const dayKey = (d: Date): string => d.toISOString().slice(0, 10);
 
+/** Límite para consultar veladas por día: las de hoy permanecen en el calendario todo el día de Madrid. */
+export const calendarDayStart = (now: Date = new Date()): Date => new Date(`${todayMadrid(now)}T00:00:00Z`);
+
 /** ¿Ya ha llegado el día de la velada (hoy o antes, según la fecha de Madrid)? Es la única definición de «ya celebrada» de la aplicación. */
 export const eventDayReached = (eventDate: Date, now: Date = new Date()): boolean => dayKey(eventDate) <= todayMadrid(now);
 

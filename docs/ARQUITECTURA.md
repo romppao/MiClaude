@@ -4,7 +4,7 @@ Estado técnico vigente. La historia de cómo se llegó hasta aquí está en [`D
 
 ## Propósito y enfoque
 
-Fomentar la afición a los deportes de contacto en España (boxeo en cabeza; también MMA, kickboxing, K-1 y jiu-jitsu) **empezando por el amateur** y por **Madrid**.
+Fomentar la afición a los deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. La comunicación y los valores iniciales no presentan una ciudad o disciplina como prioridad (petición urgente del fundador, 3 de octubre de 2026); las prioridades operativas internas no son mensajes públicos.
 El peleador amateur gestiona su ficha y su récord; el público da aura a lo que ve; el calendario descubre veladas.
 Cada decisión técnica se toma para que esto escale a otras provincias sin rehacer nada.
 
@@ -57,20 +57,20 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 
 ## Modelo de datos (`prisma/schema.prisma`)
 
-`User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con categoría de peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`.
+`User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con división deportiva versionada, peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`.
 
 Decisiones clave:
 
 1. **El récord se calcula, no se guarda** (`lib/fighters/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
 2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
 3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
-4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista.
-5. **Madrid como plaza inicial, no como límite:** todo se filtra por `province`.
-6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; todo lo específico de cada una (categorías, formas de terminar, si es de torneo) vive en `lib/common/disciplines.ts`. Una ficha por persona con varias disciplinas.
+4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista. Portada y calendario comparten `calendarDayStart()`: hoy y próximas incluye todo el día de Madrid; pasadas contiene únicamente fechas anteriores a hoy. No cambia cuándo se permite registrar un resultado (`eventDayReached`).
+5. **Ámbito nacional y filtros voluntarios:** portada y ránking consultan todas las provincias, disciplinas y niveles al entrar. Las altas no suponen Madrid ni boxeo: se eligen provincia y disciplina, validadas en servidor. La edición conserva datos guardados. Los nombres de disciplinas se presentan alfabéticamente y con el mismo énfasis. La portada ordena veladas por fecha/identificador, fichas por alta y actuaciones por aura/nombre; no aplica cuotas ni selección por prioridad interna.
+6. **Disciplinas:** `BOXEO`, `MMA`, `MUAYTHAI`, `KICKBOXING`, `K1`, `JIUJITSU`; los métodos y las categorías heredadas viven en `lib/common/disciplines.ts`; las divisiones federativas por edad, sexo y modalidad, fuentes y reglas de edad viven en `lib/common/competition.ts`. Una ficha por persona con varias disciplinas.
 
 ## Aura y ránking
 
-El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/aura/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura/ranking.ts`) suma en la base de datos por disciplina y categoría de peso, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
+El **aura** sustituye a las estrellas: reconocimiento del público a un peleador **por su actuación en un combate**. Reglas (`lib/aura/rules.ts`, compartidas por el servidor y la interfaz): el combate debe haberse celebrado, tener resultado, no estar rechazado ni cancelado, y quien la da no puede ser uno de los participantes; correo verificado; una por persona, combate y peleador (se puede quitar); 20 al día; comentario de hasta 500 caracteres, **denunciable y retirable por moderación**; se muestra el nombre de pila y la inicial del primer apellido. El ránking (`lib/aura/ranking.ts`) suma por actuaciones y agrupa por disciplina, nivel, división deportiva y peso del combate, con zona y periodo, y los empates comparten posición. Las fichas provisionales y las ocultas no entran.
 Decisión del fundador: **un clic por usuario y combate**; hasta tres clics será función premium más adelante. Pregunta abierta: ¿por persona y combate, o por persona, combate y peleador? (hallazgo 41).
 
 ## Seguridad
@@ -180,3 +180,12 @@ En Madrid, al principio, la moderación manual es viable y es una ventaja: se pu
 2. **Siguiente (ver `TRASLADO.md`, sección 6):** migraciones y despliegue; accesibilidad y usabilidad (Bloque 6, incluida la prueba con personas reales); pruebas de autorización y documentación (Bloque 7); decisiones del fundador (sección 7 de `TRASLADO.md`).
 3. **Después:** funciones premium (sin vender verificación ni ránking); fase de diseño visual con *briefing* del fundador; fotos y vídeo; perfiles de gimnasio gestionados por su responsable; mapa de gimnasios de Madrid.
 4. **Escala:** API pública, app móvil, importación de datos federativos (Federación Madrileña / FEB), otras provincias.
+
+
+## Divisiones deportivas — 3 de octubre de 2026
+
+Petición del fundador de incluir las edades de boxeo y estudiar las demás disciplinas. `divisionId` nullable en `FighterDiscipline` (actual) y `Bout` (histórico) referencia un catálogo federativo versionado. Migración aditiva, sin clasificar retrospectivamente edades o sexos. El formulario de combate declara su categoría y nivel propios: ya no copia el peso actual de la ficha al registrar historial. Los cambios de ficha no mueven aura entre categorías; un peleador puede figurar en varios grupos históricos. El récord agregado sigue por disciplina/nivel y separa su etiqueta de categoría actual.
+
+Guardas compartidas de edad y combinaciones en el servidor: formación sin combate, incompatibilidad de peso/sexo/grupo, edad en la fecha, año de reglamento y ambas esquinas del cartel. Al cambiar fecha de evento se vuelven a comprobar sus combates. Una fecha de nacimiento conocida se comprueba también al corregir la ficha o su división; una división sin nacimiento es autodeclarada, no verificada. La política de menores y consentimiento sigue siendo un bloque propio pendiente, no una consecuencia automática de la edad deportiva.
+
+Fuentes, cobertura, excepciones y límites: `DISENO-PESOS.md`. MMA conserva vacíos los pesos de sus nuevas divisiones hasta contrastar una tabla vigente; IBJJF requiere catálogo conjunto por cinturón y kimono/sin kimono, todavía pendiente. Las divisiones WAKO distinguen ring/tatami, pero la modalidad concreta y las reglas de rounds/empate/emparejamiento por edad no se certifican con este catálogo. Licencias, requisitos médicos y selección federativa no se deducen de la ficha. El evento actual solo tiene una fecha; torneos de varios días necesitarán fecha final para las reglas que exigen conservar edad durante toda la competición.

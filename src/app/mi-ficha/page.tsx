@@ -10,6 +10,8 @@ import { oneParam } from "../../lib/common/safe";
 import { eventDayReached } from "../../lib/common/dates";
 import { OUTCOME_TO_RESULT, boutVersion } from "../../lib/bouts/rules";
 import { computeRecords } from "../../lib/fighters/record";
+import SelectorCategoria from "../components/SelectorCategoria";
+import { divisionLabel } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
 import RecordCards from "../components/RecordCards";
@@ -79,8 +81,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" maxLength={LIMITS.gym} /></label>
-          <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" maxLength={LIMITS.city} /></label>
-          <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Ciudad</span><input name="city" maxLength={LIMITS.city} /></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <DisciplineFields />
           {confirmarNueva && <input type="hidden" name="confirmarNueva" value="1" />}
           <button>Crear mi ficha</button>
@@ -115,7 +117,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <label className="field"><span>Alias (opcional)</span><input name="alias" defaultValue={me.alias ?? ""} maxLength={LIMITS.alias} /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" defaultValue={gym?.name ?? ""} maxLength={LIMITS.gym} /></label>
           <label className="field"><span>Ciudad</span><input name="city" defaultValue={me.city ?? ""} maxLength={LIMITS.city} /></label>
-          <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? "Madrid"}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <label className="field"><span>Fecha de nacimiento (opcional)</span><input name="birthDate" type="date" defaultValue={me.birthDate ? me.birthDate.toISOString().slice(0, 10) : ""} min="1920-01-01" /><span className="hint">En público solo se muestra tu edad.</span></label>
           <label className="field"><span>Guardia (opcional)</span>
             <select name="stance" defaultValue={me.stance ?? ""}><option value="">Sin indicar</option><option value="ORTODOXO">Ortodoxo</option><option value="ZURDO">Zurdo</option><option value="AMBIDIESTRO">Ambidiestro</option></select>
@@ -131,7 +133,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Mis disciplinas</h2>
       {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (
         <details key={d.discipline} className="card" style={{ marginBottom: 8 }}>
-          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
+          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong> · {divisionLabel(d.divisionId)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
           <form className="search" action={saveDiscipline}>
             <DisciplineFields defaults={d} />
             <button>Guardar cambios</button>
@@ -139,10 +141,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         </details>
       ))}
       <details className="card" style={{ marginBottom: 8 }}>
-        <summary><strong>Añadir otra disciplina</strong> <span className="mut">— por ejemplo MMA, kickboxing, K-1 o jiu-jitsu</span></summary>
+        <summary><strong>Añadir otra disciplina</strong> <span className="mut">— elige otra disciplina que practiques</span></summary>
         <form className="search" action={saveDiscipline}>
           <input type="hidden" name="modo" value="anadir" />
-          <DisciplineFields defaults={{ discipline: DISCIPLINE_ORDER.find((d) => !me.disciplines.some((x) => x.discipline === d)) ?? "BOXEO" }} />
+          <DisciplineFields />
           <button>Añadir disciplina</button>
         </form>
       </details>
@@ -175,16 +177,13 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
       <h2>Registrar un combate</h2>
       <form className="search" action={addBout}>
-        <label className="field"><span>Disciplina</span>
-          <select name="discipline" defaultValue={previo("discipline") || me.disciplines[0]?.discipline}>
-            {me.disciplines.map((d) => <option key={d.discipline} value={d.discipline}>{DISCIPLINE_LABEL[d.discipline]}</option>)}
-          </select>
-        </label>
+        <SelectorCategoria modo="combate" nivelesPorDisciplina={Object.fromEntries(me.disciplines.map(d=>[d.discipline,d.level]))} disciplinas={me.disciplines.map(d=>d.discipline)} defaults={{ discipline: (previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"], level: (previo("level") || me.disciplines[0]?.level) as typeof me.disciplines[0]["level"], divisionId: previo("divisionId"), weightClass: previo("weightClass") }} />
+        <p className="hint">Indica la división y el peso de este combate, aunque hoy compitas en otra categoría. Si no los recuerdas, déjalos sin confirmar.</p>
         <label className="field"><span>Nombre de la velada</span><input name="eventName" defaultValue={previo("eventName")} required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={previo("date")} required min="1980-01-01" /></label>
         <label className="field"><span>Recinto (opcional)</span><input name="venue" defaultValue={previo("venue")} maxLength={LIMITS.venue} /></label>
-        <label className="field"><span>Ciudad</span><input name="city" defaultValue={previo("city") || (me.city ?? "Madrid")} maxLength={LIMITS.city} /></label>
-        <label className="field"><span>Provincia</span><select name="province" defaultValue={previo("province") || (me.province ?? "Madrid")}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+        <label className="field"><span>Ciudad</span><input name="city" defaultValue={previo("city") || (me.city ?? "")} maxLength={LIMITS.city} /></label>
+        <label className="field"><span>Provincia</span><select name="province" defaultValue={previo("province") || (me.province ?? "")} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" defaultValue={previo("oppFirst")} required maxLength={LIMITS.firstName} /></label>
         <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" defaultValue={previo("oppLast")} required maxLength={LIMITS.lastName} /></label>
         <label className="field"><span>Resultado</span>
@@ -211,7 +210,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2>Mis combates</h2>
       <div className="table-wrap">
         <table className="apilada">
-          <caption className="sr-only">Tus combates con su estado, su resultado y su enlace de evidencia</caption>
+          <caption className="sr-only">Tus combates con su división deportiva, estado, resultado y enlace de evidencia</caption>
           <thead><tr><th scope="col">Combate</th><th scope="col">Estado</th><th scope="col">Resultado</th><th scope="col">Enlace que lo demuestra</th></tr></thead>
           <tbody>
             {bouts.map((b) => {

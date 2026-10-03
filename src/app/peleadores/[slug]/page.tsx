@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
 import { computeRecords } from "../../../lib/fighters/record";
-import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
+import { divisionLabel } from "../../../lib/common/competition";
+import { DISCIPLINE_LABEL, weightClassLabel } from "../../../lib/common/disciplines";
 import RecordCards from "../../components/RecordCards";
 import VerificationTag from "../../components/VerificationTag";
 import { getUser } from "../../../lib/accounts/auth";
@@ -165,6 +166,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                 <td data-label="Velada">
                   <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link>{" "}
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
+                  <div className="mut">{divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(b.event.discipline, b.event.level, b.weightClass, b.divisionId)}` : ""}</div>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
                   <VerificationTag verification={b.verification} />
                   {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}

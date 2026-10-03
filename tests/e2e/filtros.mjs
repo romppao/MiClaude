@@ -1,6 +1,6 @@
 // Categorías de peso por disciplina y nivel, y el panel de filtros de /peleadores: cada disciplina y cada nivel tienen sus propias categorías,
 // la lista cambia al elegir disciplina y nivel, y el filtro combina las tres cosas sobre la misma disciplina de la ficha.
-import { B, rnd, browser, seen, check, btn, newUser, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, btn, newUser, terminarDiagnosticos } from "./ayudas.mjs";
 
 /** Crea una ficha eligiendo disciplina, nivel y (opcional) categoría con el selector de tres pasos. */
 async function crearFicha(usuario, nombre, apellidos, { disciplina, nivel, categoria }) {
@@ -10,7 +10,7 @@ async function crearFicha(usuario, nombre, apellidos, { disciplina, nivel, categ
   await u.p.selectOption("main form select[name=discipline]", disciplina);
   await u.p.selectOption("main form select[name=level]", nivel);
   if (categoria) await u.p.selectOption("main form select[name=weightClass]", categoria);
-  await btn(u.p, "Crear mi ficha");
+  await datosDeAlta(u.p); await btn(u.p, "Crear mi ficha");
   await u.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
   return u.p;
 }
@@ -34,7 +34,7 @@ check("MMA tiene sus propias categorías, distintas de las del boxeo", cat.inclu
 await p.selectOption("main form select[name=discipline]", "MUAYTHAI"); await p.selectOption("main form select[name=level]", "PRO");
 check("el Muay Thai existe como disciplina y sus categorías profesionales salen con su peso", (await etiquetas(p, sel)).some((t) => t.includes("hasta 50,8 kg")));
 await p.selectOption("main form select[name=level]", "AMATEUR");
-check("sin una lista confirmada (Muay Thai amateur) no se inventan pesos y se explica qué hacer", (await etiquetas(p, sel)).length === 1 && await seen(p.locator("main form .hint", { hasText: "Todavía no tenemos confirmadas" })));
+check("Muay Thai amateur pide la división antes de ofrecer pesos", (await etiquetas(p, sel)).length === 1 && await seen(p.locator("main form .hint", { hasText: "Elige una división de edad y sexo" })));
 await p.selectOption("main form select[name=discipline]", "BOXEO"); await p.selectOption("main form select[name=level]", "PRO"); await p.selectOption(sel, "Wélter");
 await p.selectOption("main form select[name=level]", "AMATEUR");
 check("al cambiar de nivel, una categoría que no existe en el nuevo nivel se vacía y no se queda una incorrecta", await p.inputValue(sel) === "");
@@ -67,7 +67,7 @@ check("una combinación que no existe (boxeo profesional con una categoría amat
 // 3) El panel: orden, dependencia y resumen de filtros aplicados
 await anon.goto(B + "/peleadores?q=Filtro");
 const etiquetasPanel = (await anon.locator("main form.search label > span:first-child").allInnerTexts()).map((t) => t.trim());
-check("el panel sigue un orden lógico: nombre, disciplina, nivel, categoría de peso, provincia", ["Nombre o alias", "Disciplina", "Nivel", "Categoría de peso", "Provincia"].every((t, i) => etiquetasPanel[i] === t));
+check("el panel sigue un orden lógico: nombre, disciplina, nivel, división, peso, provincia", ["Nombre o alias", "Disciplina", "Nivel", "División deportiva (edad y categoría)", "Categoría de peso", "Provincia"].every((t, i) => etiquetasPanel[i] === t));
 check("sin disciplina elegida, la categoría está desactivada y dice qué hacer", await anon.locator("main form select[name=categoria]").isDisabled() && (await etiquetas(anon, "main form select[name=categoria]"))[0].includes("Primero elige una disciplina"));
 await anon.selectOption("main form select[name=disciplina]", "BOXEO");
 check("al elegir disciplina se activa y ofrece las categorías separadas por nivel", await anon.locator("main form select[name=categoria]").isEnabled() && await anon.locator("main form select[name=categoria] optgroup").count() === 2);
@@ -75,11 +75,12 @@ await anon.selectOption("main form select[name=level]", "PRO");
 await anon.selectOption("main form select[name=categoria]", "Wélter");
 await btn(anon, "Aplicar filtros");
 await anon.waitForURL("**categoria=W*");
-check("el resumen enseña lo aplicado y cuántos resultados hay", await seen(anon.locator("[role=group][aria-label='Filtros aplicados']", { hasText: "Wélter · hasta 66,7 kg" })) && await seen(anon.locator("main p", { hasText: /\d+ peleadores? encontrados?\./ })));
+check("el resumen enseña lo aplicado y cuántos resultados hay", await seen(anon.locator("[role=group][aria-label='Filtros aplicados']", { hasText: "Wélter · hasta 66,7 kg" })) && await seen(anon.locator("main p", { hasText: /^\d+ (?:peleador encontrado|peleadores encontrados)\.$/ })));
 await anon.click("[role=group][aria-label='Filtros aplicados'] a:has-text('Profesional')");
 await anon.waitForURL((u) => !u.search.includes("level="));
 check("cada filtro se quita por separado desde el resumen", !(await anon.url()).includes("level=") && (await anon.url()).includes("disciplina=BOXEO"));
-check("las fichas muestran su disciplina, nivel y categoría con kilos", (await anon.locator("main").innerText()).includes("Boxeo · Profesional · Wélter · hasta 66,7 kg"));
+const tarjeta = anon.locator('main .grid > a.card').filter({hasText:nombreA});
+check("las fichas muestran disciplina, nivel, división sin confirmar y peso sin inventar una edad", await seen(tarjeta) && (await tarjeta.innerText()).includes("Boxeo · Profesional") && (await tarjeta.innerText()).includes("Grupo de edad y categoría sin confirmar") && (await tarjeta.innerText()).includes("Wélter · hasta 66,7 kg"));
 
 // 4) Direcciones raras no rompen el filtro
 const raras = ["level=SEMIPRO", "disciplina=NATACION&categoria=x", "categoria=%00", "level=PRO&level=AMATEUR", "disciplina=constructor&level=__proto__&categoria=toString"];

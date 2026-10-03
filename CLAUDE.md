@@ -2,7 +2,11 @@
 
 > **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. Se han pedido propuestas visuales con colores opuestos a Raunder; la implementación de la identidad sigue pendiente de elección. Consulta [docs/DISENO.md](docs/DISENO.md).
 
-Aplicación web para la comunidad española de deportes de contacto — boxeo en cabeza, más MMA, kickboxing, K-1 y jiu-jitsu (amateur primero, Madrid como plaza inicial). El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
+Aplicación web para la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
+
+## Comunicación inclusiva — petición urgente del fundador, 3 de octubre de 2026
+
+La comunicación pública no debe presentar Madrid ni el boxeo como prioridad, aunque existan prioridades operativas internas. Hablar a personas de todas las ciudades y disciplinas admitidas, con el mismo trato. Portada y ránking empiezan sin filtros de provincia, disciplina o nivel; las altas piden elegir provincia y disciplina. Los listados siguen criterios de fecha, aura u orden alfabético, sin énfasis especial en boxeo. Conservar ubicaciones reales, reglamentos específicos y zona horaria técnica. No prometer cobertura ni datos que aún no existan. Esta instrucción prevalece sobre formulaciones anteriores de «Madrid primero» o «boxeo en cabeza».
 
 ## Documentación obligatoria (petición expresa del fundador)
 

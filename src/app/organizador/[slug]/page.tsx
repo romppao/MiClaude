@@ -5,7 +5,9 @@ import { loginPath } from "../../../lib/common/paths";
 import { eventDayReached } from "../../../lib/common/dates";
 import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
-import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, weightClassesFor, weightClassLabel, weightNote } from "../../../lib/common/disciplines";
+import SelectorCategoria from "../../components/SelectorCategoria";
+import { divisionLabel } from "../../../lib/common/competition";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, weightClassLabel } from "../../../lib/common/disciplines";
 import { LIMITS } from "../../../lib/common/text";
 import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
@@ -43,7 +45,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
           <label className="field"><span>Nombre de la velada</span><input name="name" defaultValue={event.name} required maxLength={LIMITS.eventName} /></label>
           <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={event.date.toISOString().slice(0, 10)} required min="1980-01-01" /></label>
           <label className="field"><span>Disciplina</span>
-            <select name="discipline" defaultValue={event.discipline}>{Object.entries(DISCIPLINE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+            <select name="discipline" defaultValue={event.discipline}>{DISCIPLINE_ORDER.map(d => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
             <span className="hint">Solo se puede cambiar mientras el cartel está vacío.</span>
           </label>
           <label className="field"><span>Recinto</span><input name="venue" defaultValue={event.venue} maxLength={LIMITS.venue} /></label>
@@ -72,10 +74,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Esquina azul</span>
           <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{fighters.slice(0, MAX_LISTA).map((b) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>)}</select>
         </label>
-        <label className="field"><span>Categoría de peso (opcional)</span>
-          <select name="weightClass" defaultValue=""><option value="">Sin indicar</option>{weightClassesFor(event.discipline, event.level).map((w) => <option key={w.valor} value={w.valor}>{w.etiqueta}</option>)}</select>
-          <span className="hint">{weightNote(event.discipline, event.level)}</span>
-        </label>
+        <SelectorCategoria modo="combate" fijas={{ discipline: event.discipline, level: event.level }} />
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace del acta o del cartel (opcional)</span><input name="evidenceUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /></label>
         <button>Añadir al cartel</button>
@@ -94,7 +93,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
                 return (
                   <tr key={b.id}>
                     <th scope="row" style={{ color: "var(--text)" }}>{nombre(b.fighterA)} <span className="mut">contra</span> {nombre(b.fighterB)}</th>
-                    <td className="mut">{b.weightClass ? weightClassLabel(event.discipline, event.level, b.weightClass) : "—"}</td>
+                    <td className="mut">{divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(event.discipline, event.level, b.weightClass, b.divisionId)}` : ""}</td>
                     <td>
                       <form action={setBoutEvidence} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="back" value={`/organizador/${event.slug}`} />

@@ -31,7 +31,7 @@ docs/                     toda la documentación (índice en docs/README.md)
 prisma/                   schema.prisma, migrations/ (la verdad del esquema) y seed.ts (datos ficticios)
 scripts/                  entorno-aislado.sh (base y servidor propios) y generar-mapa.mjs (docs/MAPA-FUNCIONAL.md)
 tests/unit/               vitest: reglas, seguridad, autorización de las acciones, organización del código
-tests/e2e/                navegador real (playwright-core + axe): flujos, integridad, acceso, cuenta, búsqueda, usabilidad, accesibilidad
+tests/e2e/                navegador real (playwright-core + axe): flujos, integridad, acceso, cuenta, búsqueda, filtros, calendario, respaldo del récord, usabilidad, accesibilidad
 src/
   instrumentation.ts      comprobaciones al arrancar (variables de entorno obligatorias en producción)
   middleware.ts           limpia las direcciones antes de que lleguen a ninguna pantalla (parámetros repetidos, «constructor», caracteres nulos)
@@ -195,3 +195,10 @@ Los documentos históricos (`DIARIO.md`, `AUDITORIA.md`) citan los ficheros con 
 | `src/lib/rules.ts` (reglas del aura) | `src/lib/aura/rules.ts` |
 | `src/lib/aura.ts` (ránking) | `src/lib/aura/ranking.ts` |
 | `src/lib/{reports,notify}.ts` | `src/lib/community/` |
+
+
+## Añadir o actualizar un reglamento de categorías
+
+Consultar la fuente primaria y su vigencia; documentar país/federación, modalidad, edición, edad, sexo, pesos y excepciones en `DISENO-PESOS.md`. Las divisiones se añaden en `lib/common/competition.ts` con identificadores nuevos por versión: nunca cambiar el significado de un id guardado. El texto puede mejorarse; el id se conserva aunque contenga el nombre original del grupo. No completar pesos ausentes por analogía con otra edad, sexo, federación o disciplina.
+
+Ficha y combate guardan divisiones independientes; usar `parseCompetitionChoice` en cada entrada de servidor y las guardas de edad en la fecha pertinente. Un catálogo deportivo no acredita licencia ni autorización de menores. Probar límites normativos en `competition.test.ts` y recorridos en `categorias.mjs`, incluida manipulación del formulario, ambos participantes y permanencia histórica. Ejecutar migraciones/paridad, tipos, mapa, unitarias, compilación, navegador y accesibilidad.

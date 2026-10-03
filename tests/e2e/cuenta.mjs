@@ -1,6 +1,6 @@
 // Pruebas de privacidad y cuenta: corregir datos, contraseña, descarga de datos, baja de avisos, eliminación de la cuenta.
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -9,7 +9,7 @@ const bueno = (p, texto) => p.locator("[role=status]", { hasText: texto });
 async function crearFicha(p, nombre, apellidos) {
   await p.goto(B + "/mi-ficha");
   await p.fill("[name=firstName]", nombre); await p.fill("[name=lastName]", apellidos);
-  await btn(p, "Crear mi ficha");
+  await datosDeAlta(p); await btn(p, "Crear mi ficha");
   await bueno(p, "ficha de peleador se ha creado").waitFor();
 }
 
@@ -81,7 +81,7 @@ check("con los avisos desactivados, «Peleadores que sigo» no promete correos y
 await seguidor.p.goto(B + "/siguiendo");
 check("con los avisos activados sí lo dice", await seen(seguidor.p.locator("main p", { hasText: "Recibirás un correo" })));
 await orga.goto(B + "/organizador");
-await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await btn(orga, "Crear velada");
+await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await datosDeAlta(orga); await btn(orga, "Crear velada");
 await orga.waitForURL(`**/organizador/velada-avisos-${rnd}-*`);
 await anadirAlCartel(orga, `Ana Corregida${rnd}`, `Rival Aviso${rnd}`);
 await bueno(orga, "se ha añadido al cartel").waitFor();
