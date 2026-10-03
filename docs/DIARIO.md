@@ -641,6 +641,30 @@ Pendiente de elección. Extender y probar el sistema en pantallas funcionales, c
 
 ---
 
+## Sesión — 3 de octubre de 2026 — referencias y color oficial
+
+### Qué se pidió / qué idea surgió
+
+El fundador considera Raunder más llamativa y juvenil, aporta quince sitios de referencia y decide: «He decidido que el color oficial de la aplicación será este #be33f5».
+
+### Qué se decidió y por qué
+
+Registrar #BE33F5 como decisión vigente. Sustituye azul/amarillo y petróleo/marfil. Mantener personalidad joven y de comunidad con legibilidad para todos.
+
+### Qué se hizo
+
+Se consultaron páginas públicas de los recursos, con límites documentados; se observaron ejemplos deportivos en Landbook, incluida la captura de Off-Field. Se mostró una portada conceptual violeta de comunidad en móvil y escritorio. CLAUDE.md, DISENO.md, IDEAS.md y APORTACIONES-CODEX.md registran la elección y sus límites.
+
+### Qué salió mal / qué se aprendió
+
+No todas las bibliotecas son accesibles sin cuenta o desde el lector; no declarar revisión profunda donde solo se obtuvo el índice. El blanco sobre el violeta elegido da aproximadamente 4,22:1: para textos pequeños de botones se propone casi negro.
+
+### Estado y próximos pasos
+
+Color aprobado, diseño sin elegir. No se modifica la demo. Contrastar futuras interacciones de maquetas con funcionalidades reales y comprobar accesibilidad en CSS.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

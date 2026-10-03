@@ -59,6 +59,10 @@ Motivo: al fundador **no le gustan los diseños que genera Claude**. Siempre sal
 5. **Documentar cada decisión de diseño** (qué se eligió, qué se descartó y por qué) en `docs/DISENO.md`, que se crea al empezar esta fase.
 6. Mientras tanto se mantiene **todo lo que no es estilo**: claridad, lenguaje, flujos, accesibilidad (principio de usabilidad).
 
+## Decisión visual vigente — 3 de octubre de 2026
+
+El fundador ha elegido **`#BE33F5` como color oficial de la aplicación**. Sustituye las propuestas azul/amarillo y petróleo/marfil. Quiere un aspecto juvenil, con garra y comunidad, diferenciable de Raunder. Solo el color está decidido: no considerar aprobado el logotipo, composición ni tipografía de ninguna maqueta. Propuestas y fuentes en [docs/DISENO.md](docs/DISENO.md). La implementación visual sigue pendiente. Esta elección expresa prevalece sobre recomendaciones anteriores de paleta.
+
 ## Idioma: todo en español (petición expresa del fundador)
 
 Todo lo que llegue a una persona va en **español**: la interfaz (textos, botones, avisos, errores, títulos, pantallas de «no encontrada» y de error), los correos, la documentación y los mensajes de commit. También las direcciones visibles (`/peleadores`, `/moderacion`…). Se usa «correo electrónico» y no «email» en los textos. Los identificadores internos del código (`Fighter`, `Bout`…) están en inglés por convención técnica; **si el fundador quiere también el código en español, hay que preguntárselo y planificarlo, porque supone un renombrado grande.**

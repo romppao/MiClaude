@@ -156,3 +156,8 @@ Origen: petición del fundador de comparar Raunder y BoxRec; propuestas de Codex
 Origen: petición expresa del fundador de propuestas visuales y de una gama opuesta a Raunder. Estado: exploración; petróleo/marfil recomendado por Codex, pendiente de elección del fundador. Se descartan rojo óxido y naranja como marca. Referencia completa en [DISENO.md](DISENO.md). No cambia la prioridad funcional ni aplica colores a la demo.
 
 Ajuste en la misma sesión: el fundador no se mostró convencido con petróleo/marfil y pidió más garra y valentía. Recomendación actual: azul noche, amarillo oro y blanco cálido; propuesta mostrada, todavía no elegida. Véase DISENO.md.
+
+
+## Decisión del fundador — 3 de octubre de 2026 — color oficial
+
+«He decidido que el color oficial de la aplicación será este #be33f5». Estado: **color decidido**, sustituye las paletas anteriores. Diseño todavía abierto: busca más energía juvenil y comunidad. Fuentes aportadas en una imagen de quince recursos, revisadas con límites en DISENO.md. No interpretar como aprobación de la última maqueta ni como autorización para desplegarla ya.

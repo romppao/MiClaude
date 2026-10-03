@@ -1,5 +1,7 @@
 # Dirección visual de Ring España
 
+> **DECISIÓN VIGENTE DEL FUNDADOR — 3 de octubre de 2026:** el color oficial es `#BE33F5`. Sustituye las paletas exploradas antes. La composición, tipografía y logotipo siguen pendientes de elección.
+
 ## Encargo y estado — 3 de octubre de 2026
 
 El fundador ha pedido propuestas visuales mientras continúa el desarrollo funcional: «Mientras códex se encarga de el desarrollo de la aplicación entonces tú encárgate de darme las propuestas visuales para que la aplicación tenga un buen aspecto».
@@ -65,3 +67,53 @@ El fundador: «Me convence más el tema de los colores escogidos […] en cuanto
 Codex muestra otra exploración de la pantalla de veladas, con título conceptual «A pie de ring», listados separados por líneas, fecha/lugar/disciplina comparables, cuerdas del ring como motivo gráfico y carteles de eventos ficticios. Se sustituye la composición genérica de atleta y tarjeta de perfil por una dirección de cartelería local y publicación deportiva. El amarillo se usa con más medida.
 
 Pendiente de elección y desarrollo: extender la identidad a formularios y perfiles, probar legibilidad y navegación, y representar también MMA, Muay Thai, K-1 y jiu-jitsu para no reducir la comunidad al boxeo. Los carteles de ejemplo no deben sustituir ni alterar los carteles reales de organizadores. Titulares de campaña, fotografías, wordmark y texturas son exploraciones, no recursos definitivos ni funcionalidades aplicadas.
+
+
+## Color oficial y exploración juvenil — decisión posterior
+
+El fundador: **«He decidido que el color oficial de la aplicación será este #be33f5»**. Registrar como decisión, no como recomendación de Codex. Los códigos hexadecimales no distinguen mayúsculas: `#BE33F5` es el mismo color.
+
+Antes de esta decisión indicó que Raunder llama más la atención y resulta más juvenil. Se mantiene como objetivo una identidad joven, energética y de comunidad, junto con claridad para personas de todas las edades. La representación española se expresa con personas, gimnasios y contexto local; no obliga a usar rojo/amarillo.
+
+### Aplicación propuesta del color
+
+- Violeta oficial `#BE33F5`: grandes superficies de marca, acciones y acentos.
+- Casi negro `#08090B`: texto sobre violeta, navegación y contraste.
+- Blanco `#FAFAFA`: listados, perfiles y formularios. Estos neutros son propuestas, no colores oficiales decididos por el fundador.
+- Sin degradados ni efectos de brillo como sustituto de una identidad cuidada.
+
+Comprobación de contraste con la fórmula de luminancia sRGB: blanco puro sobre el violeta da aproximadamente 4,22:1, por debajo de 4,5:1 para texto normal. Por ello se propone texto casi negro para los botones violetas. Verificar siempre los valores finales, estados, tamaños y foco en CSS real; no medir el color exacto de una imagen generada.
+
+### Referencias aportadas por el fundador
+
+El fundador adjuntó una imagen con quince recursos. Se consultaron sus páginas y resultados públicos; no equivale a haber navegado todas sus bibliotecas ni probado cada interfaz. No se compraron suscripciones ni se accedió a cuentas.
+
+| Recursos | Revisión y utilidad para Ring España |
+|---|---|
+| https://curated.design/ | Índice público de estilos y sitios; útil para seleccionar referencias de composición |
+| https://land-book.com/ | Revisión visual de la categoría Sport y de Off-Field; fotografía deportiva, tipografía y marca |
+| https://www.landing.love/ | Página pública y explicación de grabaciones completas; recurso para estudiar movimiento, no vídeo reproducido en este bloque |
+| https://onepagelove.com/ | Índice público de páginas y secciones; apoyo para portada |
+| https://www.awwwards.com/ | Resultados de fichas deportivas; la portada no fue accesible por el lector. No se afirma una revisión visual profunda |
+| https://saaspo.com/ | Portada devolvió 403 al lector; resultado público de una categoría. Menor prioridad frente a interfaces deportivas |
+| https://www.navbar.gallery/ | Tipos de navegación y búsqueda; apoyo para menús cortos |
+| https://www.cta.gallery/ | Índice de acciones; apoyo para botones claros |
+| https://www.footer.design/ | Página pública; apoyo para ayuda y enlaces al pie |
+| https://component.gallery/ | Catálogo público de componentes; referencia para coherencia de controles |
+| https://hugeicons.com/ | Catálogo público; explorar una familia coherente de iconos, pendiente de elección y licencia |
+| https://mobbin.com/ | Página pública de biblioteca de interfaces; no se revisó un flujo privado ni la app Strava |
+| https://refero.design/ | Página respondió sin contenido legible; revisión limitada |
+| https://www.rebrand.gallery/ | Página pública de identidades y aplicaciones de marca |
+| https://recent.design/ | Índice público de diseño, interfaces, branding y motion; revisión de categorías |
+
+Ejemplos observados en Landbook:
+
+- https://land-book.com/websites/83291-off-field-untold-and-unsung — captura de Off-Field: titular de gran presencia, fotografía documental y color sólido. Se toma el criterio, sin copiar marca, fotografía ni diseño.
+- Lobb’s Padel, observado en la galería deportiva: combinación de fotografías de personas e ilustraciones para expresar pertenencia. No se recorrió su web completa.
+- Hyperice, observado en la misma galería: fotografía deportiva con bloques de información más contenidos. No se afirma una prueba de su tienda.
+
+### Nueva muestra
+
+Se mostró portada conceptual en escritorio y móvil con `#BE33F5`, titular «Tu deporte. Tu gente.», fotografía de grupo y de entrenamiento, disciplinas visibles, buscador y veladas. Datos, fotografías, carteles y símbolo del logotipo son ficticios y exploratorios. El fundador solo ha elegido el color; no ha aprobado esta maqueta ni ese símbolo.
+
+El buscador y cualquier otra interacción de la maqueta deben contrastarse con las rutas y capacidades reales antes de implementar. No se han aplicado colores ni cambios gráficos a la demo en este bloque.

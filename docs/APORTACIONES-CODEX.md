@@ -108,3 +108,8 @@ El fundador no se mostró convencido con petróleo/marfil y pidió que la marca 
 ### Valoración posterior del diseño
 
 El fundador valora mejor azul noche/amarillo oro, pero considera la composición pobre y con aspecto de IA. Se conserva la paleta como base de exploración y se rehace la propuesta visual de veladas con referencias de cartelería deportiva, cuerdas del ring, listados editoriales y amarillo más contenido. Diseño sin aprobar ni implementar. Detalle del comentario y pendientes en DISENO.md.
+
+
+## Decisión vigente de color y recursos de diseño
+
+El fundador ha elegido `#BE33F5` como color oficial. Se mantiene su petición de una aplicación más juvenil y llamativa que las propuestas anteriores. Se consultaron los quince recursos de su imagen, con límites de acceso documentados, y se revisaron visualmente ejemplos deportivos de Landbook. Se mostró una nueva portada violeta de comunidad. Solo el color está aprobado; diseño, logotipo y tipografía siguen abiertos. No hay cambios gráficos aplicados a la demo. Fuentes y decisiones en DISENO.md y aviso explícito en CLAUDE.md.
