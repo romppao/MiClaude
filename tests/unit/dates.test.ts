@@ -36,7 +36,7 @@ describe("fechas en Europe/Madrid", () => {
   });
   it.each(["2026-07-14T22:00:00Z", "2026-12-14T23:00:00Z"])("a medianoche de Madrid la velada de ayer pasa a pasadas: %s", (iso) => {
     expect(calendarDayStart(at(iso)).toISOString()).toBe(`${todayMadrid(at(iso))}T00:00:00.000Z`);
-    const yesterday = new Date(calendarDayStart(at(iso)).getTime() - 12 * 36e5);
+    const yesterday = at(`${iso.slice(0, 10)}T12:00:00Z`);
     expect(yesterday.getTime()).toBeLessThan(calendarDayStart(at(iso)).getTime());
   });
   it("parseDay acepta fechas reales dentro del rango", () => {

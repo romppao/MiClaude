@@ -8,6 +8,7 @@ Este documento es el relevo solicitado expresamente por el fundador para que Cla
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
 **Rama de aportaciones:** `codex/claridad-calendario-2026-10-03`.
+**Propuesta:** [#8 — calendario y claridad funcional](https://github.com/romppao/MiClaude/pull/8), abierta en borrador para verificar CI.
 **Estado:** cambios preparados y comprobaciones locales aprobadas; integración y pruebas completas de navegador sujetas al CI de la propuesta. No confundir esta rama con la demo desplegada. La documentación de relevo se publica también en la rama principal para que sea fácil encontrarla.
 
 ## Peticiones y decisiones del fundador
