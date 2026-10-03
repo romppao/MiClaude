@@ -47,7 +47,7 @@ export default function Help() {
 </div>
 
       <h2>Cómo cuidamos que los datos sean fiables</h2>
-      <p>Mostramos cuánto respaldo tiene cada combate. Los resultados sin confirmar y el récord anterior declarado se identifican como tales. El aura está ligada a un combate concreto, se limita por usuario y solo pueden darla personas registradas con el correo confirmado. Los cambios importantes quedan registrados.</p>
+      <p>Mostramos cuánto respaldo tiene cada combate. Los resultados sin confirmar y el récord anterior declarado se identifican como tales. El reconocimiento de la comunidad está ligado a un combate concreto, se limita por usuario y solo pueden darlo personas registradas con el correo confirmado. Los cambios importantes quedan registrados.</p>
       <p>El <Link href="/ranking">ránking de aura</Link> combina trayectoria, respaldo y reconocimiento de la comunidad. No es una clasificación deportiva oficial ni cambia el resultado de un combate.</p>
 
       <h2 id="aura">Cómo se calcula el aura</h2>

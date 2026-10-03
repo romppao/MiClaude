@@ -193,3 +193,11 @@ Política v1 en `lib/aura/trajectory.ts`: título regional/nacional/internaciona
 Exportación y eliminación contemplan títulos, acreditación y copias en auditorías. El menú toma la distribución de la captura del fundador: deportistas, clubes/entrenadores, promotores, cuenta/ayuda. Usa diálogo nativo con foco/Escape, cierre al navegar o salir y permisos reales. Compartidos sin importaciones de acciones; el formulario de salir se pasa desde layout.
 
 Validación local: migraciones/paridad, tipos, mapa y compilación aprobados; 393 pruebas unitarias. Batería completa de 364 comprobaciones E2E aprobada y repetición final de las 26 de trayectoria, incluida una adicional de privacidad (365 comprobaciones en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. CI comprobará el árbol final completo antes de integrar. El resultado público se registrará tras el despliegue.
+
+### Publicación comprobada
+
+Integrada [#14](https://github.com/romppao/MiClaude/pull/14) en `claude/ring-espana-mvp`, commit `0c3fde6c2f0ebb68bdbc0b2b8778a9c3d6765d5b`. [CI #131](https://github.com/romppao/MiClaude/actions/runs/37147966389) aprobó migraciones/paridad, tipos, mapa, 393 unitarias, build, 365 comprobaciones E2E y axe sobre 37 pantallas con 0 incumplimientos. Árbol integrado idéntico al comprobado: `3aa7058c31d970231577a075e55e5bcd414bc664`.
+
+Render ya sirve portada con Menú, ayuda con fórmula/bonificaciones, ránking con la nueva explicación y salud 200. La comprobación pública usa HTTPS con confianza TLS del entorno. Los datos existentes se conservan. Se precisa una frase antigua de ayuda: es el reconocimiento de comunidad el que se liga a un combate; el aura total incluye títulos. Esta continuación de documentación y texto no modifica las reglas probadas.
+
+Relevo para Work: la propuesta móvil #13 sigue abierta y comparte layout/CSS con #14. Antes de integrarla, conciliar sus mejoras adaptables y MobileNav con NavigationMenu; evitar dos controles de menú o sustituir los grupos por actividades. No se ha integrado ni descartado el trabajo de esa rama.

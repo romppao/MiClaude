@@ -844,3 +844,7 @@ TypeScript detectó una comparación ya inalcanzable y campos no anulables al li
 ### Estado y próximos pasos
 
 Implementación terminada en rama; tipos, migraciones/paridad, mapa, compilación y 393 unitarias aprobados. La batería local completa pasó 364 comprobaciones de navegador; se repitieron las 26 de trayectoria tras añadir una de privacidad (365 en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. Se comprobará CI del árbol final antes de integrar/publicar la demo. Los cambios normativos, menores y pruebas con personas que estaban pendientes siguen en sus documentos.
+
+### Resultado publicado
+
+CI #131 aprobado con 393 unitarias, 365 comprobaciones E2E, migraciones/paridad, tipos, mapa, build y 37 pantallas axe sin incumplimientos. Integrada #14 en `0c3fde6`, con el mismo árbol probado. Render muestra el nuevo acceso Menú y la fórmula y explicación de aura; portada, ranking, ayuda y salud responden 200. Se conserva la base y el diseño publicado de Work. Se documenta el solapamiento con la propuesta móvil #13, que sigue abierta. Una frase de ayuda se precisa para distinguir el voto por combate del aura total con títulos.

@@ -75,4 +75,4 @@ El menú agrupa deportistas, clubes/entrenadores, promotores y cuenta/ayuda. Los
 3. Moderación → Acreditaciones permite habilitar una cuenta confirmada de entrenador, organizador o federación con fuente, motivo y disciplinas. Un perfil de entidad por sí solo no concede este permiso. Retirar la acreditación elimina sus bonificaciones.
 4. Comprueba el desglose en la ficha pública y el ránking. El rival puede solicitar revisión motivada, sin suspender el resultado. Corregir los hechos o la fuente exige comprobar el respaldo de nuevo.
 
-La escala inicial está centralizada para ajustarla con datos reales. El aura mide trayectoria, respaldo y comunidad; el récord sigue separado. Publicación y CI de este bloque se anotarán después de comprobar la demo.
+La escala inicial está centralizada para ajustarla con datos reales. El aura mide trayectoria, respaldo y comunidad; el récord sigue separado. Publicado mediante #14 (`0c3fde6`), con CI #131 aprobado: 393 unitarias, 365 comprobaciones E2E y axe sin incumplimientos. Comprobados públicamente Menú, fórmula, explicación del ránking y salud con respuesta 200.
