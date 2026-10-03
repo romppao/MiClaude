@@ -569,6 +569,30 @@ Repetir CI completo. No se modificó el filtro de producto ni se omitieron compr
 
 ---
 
+## Sesión 2 (continuación) — 3 de octubre — revisión de pruebas dependientes
+
+### Qué se pidió / qué idea surgió
+
+Completar la misma validación, revisando los guiones posteriores tras la causa encontrada en CI 79.
+
+### Qué se decidió y por qué
+
+Aplicar la corrección de localización también a la exclusión de fichas provisionales y adaptar datos de prueba al modelo actual de disciplinas.
+
+### Qué se hizo
+
+`integridad.mjs` comprueba cero resultados y ausencia de tarjeta, evitando el texto repetido del filtro. `busqueda.mjs` crea una disciplina de boxeo amateur para cada una de sus 30 fichas, ya que el filtro de nivel consulta `FighterDiscipline`. No cambia código de producto.
+
+### Qué salió mal / qué se aprendió
+
+La prueba de paginación aún preparaba el modelo anterior de nivel. Regla: las fixtures deben representar los datos que realmente consulta el filtro.
+
+### Estado y próximos pasos
+
+Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecución de navegador completa en CI.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

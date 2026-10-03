@@ -122,3 +122,5 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 - **CI 77 (3 de octubre):** `registrar()` buscaba `select[name=discipline]` en toda la página; tras el selector por disciplina/nivel existen varios, algunos ocultos. Se elige el formulario por su botón de acción y se acota la disciplina a él. Regla: campos repetidos se localizan dentro del formulario correcto; no se arregla ampliando esperas ni forzando elementos ocultos.
 
 - **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.
+
+- Al cambiar un filtro de nivel desde `Fighter.level` a `FighterDiscipline.level`, los fixtures SQL que filtran por nivel deben crear la disciplina correspondiente. No basta con el valor por defecto de la ficha. Se corrige la preparación de las 30 fichas de paginación; el comportamiento del filtro se conserva.
