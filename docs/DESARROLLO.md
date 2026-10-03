@@ -31,7 +31,7 @@ docs/                     toda la documentación (índice en docs/README.md)
 prisma/                   schema.prisma, migrations/ (la verdad del esquema) y seed.ts (datos ficticios)
 scripts/                  entorno-aislado.sh (base y servidor propios) y generar-mapa.mjs (docs/MAPA-FUNCIONAL.md)
 tests/unit/               vitest: reglas, seguridad, autorización de las acciones, organización del código
-tests/e2e/                navegador real (playwright-core + axe): flujos, integridad, acceso, cuenta, búsqueda, usabilidad, accesibilidad
+tests/e2e/                navegador real (playwright-core + axe): flujos, integridad, acceso, cuenta, búsqueda, filtros, calendario, respaldo del récord, usabilidad, accesibilidad
 src/
   instrumentation.ts      comprobaciones al arrancar (variables de entorno obligatorias en producción)
   middleware.ts           limpia las direcciones antes de que lleguen a ninguna pantalla (parámetros repetidos, «constructor», caracteres nulos)

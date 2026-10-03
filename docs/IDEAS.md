@@ -149,3 +149,10 @@ Origen: petición del fundador de comparar Raunder y BoxRec; propuestas de Codex
 - **Propuesto, no implementado:** información práctica de gimnasios (horarios, disciplinas, contacto y fecha de actualización) con responsable de mantenimiento; trayectoria con últimos resultados y estadísticas separadas por disciplina/nivel/respaldo.
 - **No priorizado ahora:** reservas/pagos/sparrings y CRM amplio; primero validar recorridos básicos y la gestión de una velada. No se descartan definitivamente.
 - **Corregida la premisa competitiva:** no basar la diferenciación en que BoxRec sea exclusivamente boxeo/inglés/sin público, ni en que Raunder no cubra Madrid. Nuestra propuesta debe demostrarse por utilidad y fiabilidad.
+
+## Continuación — 3 de octubre de 2026
+
+Origen: «continua el trabajo» del fundador y pendiente de validación de `APORTACIONES-CODEX.md`.
+
+- **Preparado para CI:** recorrido real de récord amateur y profesional en la misma disciplina, categorías correctas por nivel, resultados históricos, NC y enlace al respaldo. Se comprueba la ficha privada y la pública, con datos ficticios propios.
+- **Prioridad mantenida:** cerrar validación antes de ampliar funcionalidades. Las pruebas con personas reales, la paginación de moderación y las decisiones del fundador siguen pendientes.

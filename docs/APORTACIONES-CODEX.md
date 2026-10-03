@@ -4,6 +4,8 @@
 
 ## Leer primero al retomar
 
+**Continuación:** el recorrido pendiente de récords profesional/amateur se prepara en `codex/validacion-records-2026-10-03`, partiendo de `e049fe4`. Ver la sección final para distinguirlo de los cambios de calendario y sus ejecuciones de CI.
+
 Este documento es el relevo solicitado expresamente por el fundador para que Claude entienda las aportaciones de Codex. Se complementa con `TRASLADO.md`, `DIARIO.md`, `COMPETENCIA.md` y el mapa funcional; no sustituye las reglas de `CLAUDE.md`.
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
@@ -84,6 +86,14 @@ Se corrige `tests/e2e/ayudas.mjs` acotando el selector al formulario que contien
 ## Segunda ejecución del CI
 
 CI 79: se completó el recorrido de `flujo.mjs`, incluido el registro de MMA. Quedó una comprobación negativa incorrecta: «y excluye a quien no» buscaba el nombre en todo `body`, donde también aparece en el resumen del filtro `q`. Se cambia a comprobar la tarjeta de resultado y, para la exclusión, el mensaje visible de cero resultados más ausencia de esa tarjeta. La inclusión ahora también exige tarjeta visible, evitando que el propio filtro la haga pasar. No se modifica el filtro de producto. Se repite CI; aún no se declara E2E/axe aprobado.
+
+## Continuación: récords profesional y amateur
+
+Petición del fundador: «continua el trabajo». Este bloque conserva las correcciones recientes de #8 y añade `tests/e2e/respaldo.mjs` al conjunto de CI. Mediante la web crea su propio peleador ficticio, registra resultados amateur y profesionales (incluido NC), cambia la categoría en ambos sentidos y comprueba ficha privada, ficha pública y ayuda.
+
+La categoría actual debe aparecer únicamente en su tarjeta; la histórica no hereda una categoría de otro nivel. El récord profesional queda `1-0-0 (1 NC)` y el amateur `1-0-0` tras ambos cambios. Todos los campos de `registrar()` quedan acotados a su formulario, conservando doble clic y caminos de error.
+
+Rama: `codex/validacion-records-2026-10-03`, base `e049fe4`. Sintaxis y diferencias comprobadas localmente. El proxy no responde y faltan dependencias, por lo que la validación completa se hace en CI y sigue pendiente hasta consultar el resultado. Este bloque no completa la auditoría por personas ni integra o despliega la demo.
 
 
 ### Revisión de los guiones que siguen al primer flujo
