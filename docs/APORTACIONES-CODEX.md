@@ -103,3 +103,8 @@ El fundador pidió propuestas de aspecto en paralelo al desarrollo y añadió: �
 ### Ajuste tras el comentario sobre garra y valentía
 
 El fundador no se mostró convencido con petróleo/marfil y pidió que la marca represente a la comunidad española de deportes de contacto con más garra. Se mostró una segunda revisión con azul noche `#0B1F3A`, amarillo oro `#F3C316` y blanco cálido `#F5F4EE`, títulos deportivos contundentes y fotografía de mujeres y hombres entrenando. Esta es la recomendación actual de Codex, pendiente de elección; la anterior no estaba aprobada. No se ha implementado ni desplegado ninguna de las dos.
+
+
+### Valoración posterior del diseño
+
+El fundador valora mejor azul noche/amarillo oro, pero considera la composición pobre y con aspecto de IA. Se conserva la paleta como base de exploración y se rehace la propuesta visual de veladas con referencias de cartelería deportiva, cuerdas del ring, listados editoriales y amarillo más contenido. Diseño sin aprobar ni implementar. Detalle del comentario y pendientes en DISENO.md.

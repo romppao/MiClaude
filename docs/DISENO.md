@@ -56,3 +56,12 @@ La maqueta generada incluye detalles no definitivos (fecha ficticia, pestañas c
 ## Pendiente
 
 El fundador debe elegir la dirección final antes de modificar notablemente el aspecto de la aplicación. No se han cambiado CSS, logotipo, tipografías ni recursos de la demo en este bloque. En siguientes propuestas se conserva el requisito de diferenciación cromática de Raunder.
+
+
+## Tercera revisión: conservar colores, rehacer el lenguaje visual
+
+El fundador: «Me convence más el tema de los colores escogidos […] en cuanto a diseño, se ve muy pobre y hecho por IA». La paleta azul noche/amarillo oro recibe una valoración más favorable; el diseño anterior no está elegido. No confundir aceptar mejor los colores con aprobar composición, tipografía o logotipo.
+
+Codex muestra otra exploración de la pantalla de veladas, con título conceptual «A pie de ring», listados separados por líneas, fecha/lugar/disciplina comparables, cuerdas del ring como motivo gráfico y carteles de eventos ficticios. Se sustituye la composición genérica de atleta y tarjeta de perfil por una dirección de cartelería local y publicación deportiva. El amarillo se usa con más medida.
+
+Pendiente de elección y desarrollo: extender la identidad a formularios y perfiles, probar legibilidad y navegación, y representar también MMA, Muay Thai, K-1 y jiu-jitsu para no reducir la comunidad al boxeo. Los carteles de ejemplo no deben sustituir ni alterar los carteles reales de organizadores. Titulares de campaña, fotografías, wordmark y texturas son exploraciones, no recursos definitivos ni funcionalidades aplicadas.

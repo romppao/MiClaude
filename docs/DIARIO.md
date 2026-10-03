@@ -617,6 +617,30 @@ El fundador no se mostró convencido con petróleo/marfil y pidió más garra. S
 
 ---
 
+## Sesión — 3 de octubre de 2026 — revisión del lenguaje visual
+
+### Qué se pidió / qué idea surgió
+
+El fundador valora mejor los colores, pero el diseño le parece «muy pobre y hecho por IA».
+
+### Qué se decidió y por qué
+
+Conservar azul noche/amarillo oro como base y explorar otra composición inspirada en carteles de veladas. No interpretar el comentario como aprobación del diseño.
+
+### Qué se hizo
+
+Se mostró una pantalla conceptual de veladas en escritorio y móvil, con listados editoriales, fechas visibles y motivos de cuerdas del ring. Se documentó en DISENO.md y APORTACIONES-CODEX.md.
+
+### Qué salió mal / qué se aprendió
+
+La composición anterior se percibió genérica pese al cambio de paleta. Los colores solos no dan identidad: tipografía, composición y detalles necesitan un criterio coherente.
+
+### Estado y próximos pasos
+
+Pendiente de elección. Extender y probar el sistema en pantallas funcionales, con representación de todas las disciplinas. Sin cambios visuales desplegados.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```
