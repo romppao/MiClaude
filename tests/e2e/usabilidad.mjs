@@ -237,7 +237,18 @@ await movil.screenshot({ path: "test-results/movil/menu-430.png", fullPage: true
 check("el perfil y el menú móvil abierto pasan axe WCAG 2.2 AA", axeMovil.violations.length === 0);
 await peleadorMovil.p.setViewportSize({ width: 320, height: 740 });
 await peleadorMovil.p.goto(B + "/mi-ficha");
-check("el editor propio cabe a 320px y los campos evitan el zoom automático de iOS", await anchoDesbordado(peleadorMovil.p) <= 1 && await peleadorMovil.p.locator("main input:not([type=checkbox]):not([type=hidden]), main select, main textarea").evaluateAll((els) => els.every((el) => parseFloat(getComputedStyle(el).fontSize) >= 16)));
+await peleadorMovil.p.getByText("Corregir los datos de mi ficha", { exact: true }).click();
+const revisarEditor = async (p, nombre) => {
+  const extra = await anchoDesbordado(p);
+  const pequenos = await p.locator("main input:not([type=checkbox]):not([type=hidden]), main select, main textarea").evaluateAll((els) => els.filter(el => el.getClientRects().length && parseFloat(getComputedStyle(el).fontSize) < 16).map(el => ({ nombre: el.getAttribute("name"), fuente: getComputedStyle(el).fontSize })));
+  const fuera = await p.locator("main *").evaluateAll((els) => els.filter(el => el.getClientRects().length && el.getBoundingClientRect().right > window.innerWidth + 1).slice(0,8).map(el => ({ tag: el.tagName, nombre: el.getAttribute("name"), clase: el.className, ancho: el.getBoundingClientRect().width })));
+  check(`${nombre}: cabe a 320px (desborde ${extra}px; ${JSON.stringify(fuera)})`, extra <= 1);
+  check(`${nombre}: controles visibles de al menos 16px (${JSON.stringify(pequenos)})`, pequenos.length === 0);
+};
+await revisarEditor(peleadorMovil.p, "Editor de datos");
+await peleadorMovil.p.getByRole("link", { name: "Editar foto y banner", exact: true }).click();
+await peleadorMovil.p.waitForURL("**/perfiles/peleador/*/editar");
+await revisarEditor(peleadorMovil.p, "Editor de foto y banner");
 await peleadorMovil.p.getByRole("button", { name: "Menú", exact: true }).click();
 check("el menú móvil conserva Mi ficha, Mi cuenta y Salir para el titular", await seen(peleadorMovil.p.locator("header a[href='/mi-ficha']")) && await seen(peleadorMovil.p.locator("header a[href='/mi-cuenta']")) && await seen(peleadorMovil.p.locator("header button", { hasText: "Salir" })));
 

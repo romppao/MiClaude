@@ -43,3 +43,8 @@ header.top nav{flex:1 1 430px;min-width:0}header.top form.buscador{flex-basis:10
   .profile-heading h1{font-size:clamp(2.2rem,10vw,3rem)}
 }
 .mobile-nav-icon{width:22px;height:22px;flex:none}
+@media(max-width:720px){
+  main button{max-width:100%;overflow-wrap:anywhere}
+  header.top .cuenta a{min-width:44px;padding:8px}
+  .mobile-nav a{font-size:1rem}
+}
