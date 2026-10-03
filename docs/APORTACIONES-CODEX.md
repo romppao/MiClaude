@@ -169,3 +169,5 @@ Por autorización expresa del fundador, se integró [#11](https://github.com/rom
 
 ### Resultado de CI #107
 Migraciones y equivalencia de esquema, tipos, 339 tests y build correctos. Pasaron todas las comprobaciones de personalización de los cinco tipos. Se actualiza el selector del sello de gimnasio al cambiar su ubicación en la cabecera; la prueba sigue verificando la marca y que su nota interna no se publica. Se amplía la medición de accesibilidad a los editores de entidades. El siguiente CI debe completar todos los guiones antes de desplegar.
+
+CI #109 confirmó la accesibilidad de los editores de gimnasio, entrenador y federación. La prueba intermitente de reclamación ahora espera tanto el aviso como el botón y finaliza el diagnóstico antes de continuar, para no confundir la segunda creación con el estado comprobado. Las exigencias funcionales no se reducen.

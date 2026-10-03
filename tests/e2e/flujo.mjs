@@ -94,7 +94,8 @@ const nuria = (await newUser("Nuria", "FIGHTER")).p;
 await nuria.goto(B + "/mi-ficha");
 await nuria.fill("[name=firstName]", "Nuria"); await nuria.fill("[name=lastName]", `Provisional${rnd}`);
 await datosDeAlta(nuria); await btn(nuria, "Crear mi ficha");
-check("si ya hay una ficha sin titular con tu nombre, se avisa antes de crear otra y se ofrece reclamarla", await seen(nuria.locator("[role=alert]", { hasText: "ficha sin titular con tu nombre" })) && await nuria.locator("main button", { hasText: "Reclamar esta ficha" }).count() >= 1);
+check("si ya hay una ficha sin titular con tu nombre, se avisa antes de crear otra y se ofrece reclamarla", await seen(nuria.locator("[role=alert]", { hasText: "ficha sin titular con tu nombre" })) && await seen(nuria.getByRole("button", { name: /Reclamar esta ficha/ }).first()));
+await terminarDiagnosticos(); // Capturar el estado comprobado antes de la siguiente creación, si falla.
 await nuria.fill("[name=firstName]", "Nuria"); await nuria.fill("[name=lastName]", `Provisional${rnd}`);
 await datosDeAlta(nuria); await btn(nuria, "Crear mi ficha");
 check("y quien confirma que no es esa persona puede crear su ficha", await seen(nuria.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" })));
