@@ -545,6 +545,30 @@ Subir la corrección y repetir CI completo. Calendario y axe todavía no se ejec
 
 ---
 
+## Sesión 2 (continuación) — 3 de octubre — segunda validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación autorizada tras corregir el selector de disciplina.
+
+### Qué se decidió y por qué
+
+Comprobar resultados del filtro, no coincidencias del texto buscado en toda la pantalla.
+
+### Qué se hizo
+
+CI 79 completó el flujo de registro de MMA. La comprobación de exclusión falló porque el nombre seguía visible en el resumen del filtro, aunque no hubiera tarjeta. Se cambia `tests/e2e/flujo.mjs` a exigir tarjeta visible para inclusión y mensaje de cero resultados más ausencia de tarjeta para exclusión.
+
+### Qué salió mal / qué se aprendió
+
+El test antiguo podía dar falsa inclusión por el texto de búsqueda. Se acotan las comprobaciones al listado y se espera su estado visible.
+
+### Estado y próximos pasos
+
+Repetir CI completo. No se modificó el filtro de producto ni se omitieron comprobaciones. Axe y los guiones siguientes continúan pendientes.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

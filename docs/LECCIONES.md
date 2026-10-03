@@ -120,3 +120,5 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 | PostgreSQL local no pudo instalarse | Permisos del entorno impidieron descargar/instalar paquetes del sistema | No declarar E2E aprobadas por compilar: usar el CI y dejar el bloqueo explícito |
 
 - **CI 77 (3 de octubre):** `registrar()` buscaba `select[name=discipline]` en toda la página; tras el selector por disciplina/nivel existen varios, algunos ocultos. Se elige el formulario por su botón de acción y se acota la disciplina a él. Regla: campos repetidos se localizan dentro del formulario correcto; no se arregla ampliando esperas ni forzando elementos ocultos.
+
+- **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.

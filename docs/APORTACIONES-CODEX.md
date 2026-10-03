@@ -79,3 +79,8 @@ Se actualizan `CLAUDE.md`, `TRASLADO.md`, el índice, `COMPETENCIA.md`, `DIARIO.
 El CI 77 de la propuesta #8 superó instalación, migraciones/paridad, TypeScript, mapa, unitarias, compilación y arranque. Falló en `flujo.mjs:232`: el ayudante `registrar()` usaba un selector global de disciplina y Playwright elegía el primero de cuatro, oculto dentro de otro formulario. El log muestra `element is not visible` en `ayudas.mjs:50`. No llegó a la nueva prueba de calendario ni a axe.
 
 Se corrige `tests/e2e/ayudas.mjs` acotando el selector al formulario que contiene el botón «Registrar este combate». Se conserva la misma acción y sus comprobaciones: no se salta la prueba ni se amplía el tiempo de espera. Siguiente ejecución pendiente; no integrar hasta comprobarla.
+
+
+## Segunda ejecución del CI
+
+CI 79: se completó el recorrido de `flujo.mjs`, incluido el registro de MMA. Quedó una comprobación negativa incorrecta: «y excluye a quien no» buscaba el nombre en todo `body`, donde también aparece en el resumen del filtro `q`. Se cambia a comprobar la tarjeta de resultado y, para la exclusión, el mensaje visible de cero resultados más ausencia de esa tarjeta. La inclusión ahora también exige tarjeta visible, evitando que el propio filtro la haga pasar. No se modifica el filtro de producto. Se repite CI; aún no se declara E2E/axe aprobado.
