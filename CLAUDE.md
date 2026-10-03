@@ -1,6 +1,6 @@
 # Ring España — instrucciones para Claude
 
-> **Relevo de Codex (3 de octubre de 2026):** el fundador autorizó aplicar el diseño aprobado a la demo. Color oficial #BE33F5, glow, bordes redondeados y perfiles con foto y banner propios. Lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) y [docs/DISENO.md](docs/DISENO.md) antes de continuar. Se han conservado los cambios recientes de categorías por edad, comunicación inclusiva y calendario de la rama de la demo.
+> **Relevo de Codex (3 de octubre de 2026):** el diseño aprobado está integrado en PR #12 y comprobado públicamente en Render; CI #111 correcto. Color oficial #BE33F5, glow, bordes redondeados y perfiles con foto y banner propios. Lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) y [docs/DISENO.md](docs/DISENO.md) antes de continuar. Se han conservado los cambios recientes de categorías por edad, comunicación inclusiva y calendario de la rama de la demo.
 
 Aplicación web para la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
 

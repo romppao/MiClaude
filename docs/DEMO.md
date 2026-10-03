@@ -54,3 +54,14 @@ Guion más detallado por personas: [`pruebas/personas.md`](pruebas/personas.md).
 - `render.yaml`: servicio web + base de datos gratuitos (región Fráncfort). Arranca con `scripts/arranque-demo.sh` (migraciones, datos de ejemplo si la base está vacía, servidor).
 - Modo demostración: `src/lib/common/demo.ts` y `src/app/actions/demo.ts` (acciones que se niegan si `DEMO_MODE` no es `si`; probadas en `tests/unit/autorizacion.test.ts`). Prueba de navegador: `node tests/e2e/demo.mjs` contra un servidor con `DEMO_MODE=si` (el CI no la ejecuta porque su servidor no es de demostración).
 - Para una dirección pública **definitiva** (con correos reales) hay que alojar la aplicación de verdad: decisión pendiente del fundador, ver `TRASLADO.md` §7.
+
+## Diseño y personalización publicados — 3 de octubre de 2026
+
+PR #12, commit 8a861e7. La demo ya muestra el violeta oficial #BE33F5 con glow, bordes redondeados y cabeceras comunes. Validada por CI #111 y comprobada públicamente tras el despliegue.
+
+- Peleador: Mi ficha → Editar foto y banner. Ajusta el encuadre, guarda o retira imágenes. En la disciplina jiu-jitsu puedes indicar cinturón y grados declarados.
+- Promotor: Mi cuenta → su perfil público o su editor.
+- Gimnasio, entrenador o federación: moderación asigna una cuenta con correo confirmado desde el editor; esa cuenta ve sus perfiles gestionados en Mi cuenta.
+- Federación: moderación crea el perfil desde Federaciones. El directorio no acredita reconocimiento oficial.
+
+Las imágenes se guardan optimizadas en PostgreSQL. Sin imagen se conservan iniciales y fondo violeta; no es un error de carga. La portada usa personas ficticias con fin ilustrativo.

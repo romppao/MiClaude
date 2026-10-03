@@ -708,6 +708,25 @@ Implementación preparada; comprobar CI, integrar y observar el despliegue real 
 
 ---
 
+## Sesión — 3 de octubre de 2026 — publicación del diseño aprobado
+
+### Qué se pidió / qué idea surgió
+El fundador indicó que todavía no veía los cambios en Render.
+
+### Qué se decidió y por qué
+Completar la validación y desplegar en la rama real de Render, conservando los cambios simultáneos de categorías, calendario y comunicación inclusiva.
+
+### Qué se hizo
+PR #12 integrada (8a861e7), CI #111 correcto: migraciones, esquema, tipos, mapa, 339 pruebas unitarias, build, flujos completos y accesibilidad. Se comprobó en el navegador público la portada nueva, el listado exacto del fundador y la ficha de Sergio Demo Molina. Se documentaron rutas de edición y permisos en APORTACIONES-CODEX.md.
+
+### Qué salió mal / qué se aprendió
+Hubo conflictos con commits simultáneos, que se combinaron preservando ambos trabajos. Se ajustó la prueba del sello de gimnasio a su ubicación nueva y se corrigió la espera del botón de reclamación. La petición de integración agotó su tiempo de respuesta, pero GitHub la completó; se verificó su estado antes de actuar de nuevo. La imagen de portada tardó en cargar inicialmente, pero se comprobó su archivo y su aparición final.
+
+### Estado y próximos pasos
+Diseño y perfiles publicados y observados en Render. Los titulares pueden subir sus propias fotos y banners. No se borraron los datos existentes.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

@@ -171,3 +171,13 @@ Por autorización expresa del fundador, se integró [#11](https://github.com/rom
 Migraciones y equivalencia de esquema, tipos, 339 tests y build correctos. Pasaron todas las comprobaciones de personalización de los cinco tipos. Se actualiza el selector del sello de gimnasio al cambiar su ubicación en la cabecera; la prueba sigue verificando la marca y que su nota interna no se publica. Se amplía la medición de accesibilidad a los editores de entidades. El siguiente CI debe completar todos los guiones antes de desplegar.
 
 CI #109 confirmó la accesibilidad de los editores de gimnasio, entrenador y federación. La prueba intermitente de reclamación ahora espera tanto el aviso como el botón y finaliza el diagnóstico antes de continuar, para no confundir la segunda creación con el estado comprobado. Las exigencias funcionales no se reducen.
+
+## Resultado final: publicado y comprobado en Render
+
+3 de octubre de 2026. PR #12 integrada mediante el commit `8a861e7ba90b45e2417e6c8c77c696934b20f770` en `claude/ring-espana-mvp`. CI #111 completamente correcto: https://github.com/romppao/MiClaude/actions/runs/37128631610 (migraciones y equivalencia de esquema, tipos, mapa funcional, 339 pruebas unitarias, build, todos los guiones de navegador y accesibilidad WCAG 2.2 AA).
+
+Comprobación pública después del despliegue: portada `https://ring-espana-demo.onrender.com/`, listado de boxeo amateur enviado por el fundador y ficha `/peleadores/sergio-demo-molina`. Se observaron el violeta, el glow, las esquinas redondeadas, la fotografía ilustrativa de portada, las tarjetas y la cabecera de perfil. El archivo de portada también se sirve correctamente; puede tardar en cargar la primera visita. No se resetearon los datos de la demo ni se trasladaron los usuarios ficticios del CI.
+
+Para personalizar: peleador → Mi ficha → Editar foto y banner; promotor o titular de una entidad → Mi cuenta → su perfil. Moderación puede asignar titulares con correo confirmado desde el editor y crear federaciones desde su directorio. Sin foto aparece una identidad con iniciales; sin banner, el fondo violeta. La demo no atribuye fotografías ficticias a los peleadores.
+
+Este resultado sustituye los estados «pendiente de elección», «sin modificar la demo» y «pendiente de comprobar CI» de las entradas históricas de diseño. Las categorías por edad y la comunicación nacional incorporadas previamente se mantienen.
