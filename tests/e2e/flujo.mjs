@@ -262,7 +262,7 @@ await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, 
 await gymRow().locator("button:has-text('Verificar')").click();
 await gymRow().locator("button:has-text('Retirar sello')").waitFor(); // la acción ha terminado
 await pepe.goto(B + `/gimnasios/gym-test-${rnd}-madrid`);
-check("gimnasio muestra el sello de verificado", await pepe.locator("h1 .tag", { hasText: "verificado" }).count() === 1);
+check("gimnasio muestra el sello de verificado", await pepe.locator('.profile-heading .tag[title="Verificado por un moderador"]', { hasText: "verificado" }).count() === 1);
 check("la nota interna no se expone públicamente", !(await pepe.locator("body").innerText()).includes("Google Maps"));
 await admin.p.goto(B + "/moderacion/historial?entity=BOUT");
 const hist = await admin.p.locator("body").innerText();

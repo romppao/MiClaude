@@ -1,6 +1,7 @@
 // Personalización persistente, permisos y graduación, con imágenes reales y PostgreSQL.
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
+import AxeBuilder from '@axe-core/playwright';
 import { B, rnd, browser, newUser, btn, check, seen, terminarDiagnosticos } from './ayudas.mjs';
 const db = new PrismaClient();
 const own = await newUser('Perfil', 'FIGHTER');
@@ -59,6 +60,8 @@ for (const [kind,id,publicPath] of [['gimnasio',gym.id,`/gimnasios/${gym.slug}`]
   await admin.p.fill('[name=ownerEmail]', other.email);
   await btn(admin.p, 'Guardar perfil'); await admin.p.locator('.notice-ok').waitFor();
   await other.p.goto(B + path);
+  const axe = await new AxeBuilder({page:other.p}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
+  check(`El editor de ${kind} no tiene fallos graves de accesibilidad`, !axe.violations.some(v => v.impact === 'serious' || v.impact === 'critical'));
   await other.p.fill('[name=bio]', `Presentación de ${kind}`);
   await other.p.setInputFiles('[name=avatar]', {name:'logo.png',mimeType:'image/png',buffer:image});
   await other.p.setInputFiles('[name=banner]', {name:'portada.png',mimeType:'image/png',buffer:image});

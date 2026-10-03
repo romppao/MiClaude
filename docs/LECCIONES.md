@@ -167,3 +167,5 @@ El recorrido de una ficha provisional mostró otra dependencia del antiguo valor
 ## 3 de octubre de 2026 — Integrar y publicar son comprobaciones distintas
 
 Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Render: primero se construye la nueva versión. Confirmar contenido y salud en la dirección pública antes de comunicar que la demo está actualizada. Si el navegador del entorno no confía en la CA del proxy, conservar TLS y usar una comprobación HTTPS con la confianza configurada, sin desactivar la validación de certificados.
+
+- CI #107 validó la personalización de los cinco tipos. La comprobación del sello del gimnasio falló porque buscaba dentro de h1; el componente nuevo coloca el sello junto al título. Comprobar el sello con su texto y título explicativo dentro de la cabecera, preservando la verificación real y la privacidad de su nota.

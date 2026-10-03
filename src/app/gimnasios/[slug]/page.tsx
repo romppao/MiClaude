@@ -6,11 +6,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
+import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { LEVEL_LABEL } from "../../../lib/common/labels";
 
 export const dynamic = "force-dynamic";
 
-const getGym = cache((slug: string) => db.gym.findUnique({ where: { slug }, include: { fighters: { where: { listed: true, hiddenAt: null }, orderBy: { lastName: "asc" } }, trainers: true } }));
+const getGym = cache((slug: string) => db.gym.findUnique({ where: { slug }, include: { fighters: { where: { listed: true, hiddenAt: null }, orderBy: { lastName: "asc" }, include: { disciplines: true } }, trainers: true } }));
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const gym = await getGym((await params).slug);
@@ -32,7 +33,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       <h2>Peleadores</h2>
       {gym.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este gimnasio en Ring España.</p>}
       <div className="grid">
-        {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
+        {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">{b.disciplines.map(d => <span key={d.discipline} className={`tag ${d.level}`}>{DISCIPLINE_LABEL[d.discipline]} · {LEVEL_LABEL[d.level]}</span>)}<ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>
     </>
   );
