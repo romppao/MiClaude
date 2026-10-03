@@ -123,4 +123,12 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 
 - **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.
 
+## Continuación — 3 de octubre de 2026: aislamiento y validación
+
+- El proxy configurado no acepta conexiones y el entorno no tiene dependencias en caché. Se recuperó el código con el conector de GitHub y se comprobaron los SHA; el CI valida las partes que no se pueden ejecutar localmente. Regla: la disponibilidad del conector no demuestra que funcione la red de la terminal; no presentar sintaxis como aprobación de E2E.
+- La rama remota cambió durante la revisión. Se incorporaron sus correcciones antes de crear una rama independiente. Regla: comprobar el SHA remoto antes de publicar y conservar el trabajo concurrente; nunca forzar una actualización para sobrescribirlo.
+- El mismo formulario de ficha repite también resultado, método y evidencia en otros apartados. La ayuda de registro debe acotar todos sus campos y su botón, no únicamente el campo que provocó el primer fallo.
+- La ejecución `37109729125` falló comprobando el recuento del filtro: `peleadores?` acepta «peleadore» o «peleadores», pero no «peleador». La pantalla mostraba correctamente el singular. Regla: probar explícitamente las frases de singular y plural; hacer opcional la última letra no siempre forma el singular español.
+- Una lectura conjunta de documentos para publicar excedió el límite de salida y truncó el JSON. Se abortó antes de crear objetos remotos y se leyeron los ficheros individualmente. Regla: comprobar el límite y la integridad de cada contenido antes de publicarlo.
+
 - Al cambiar un filtro de nivel desde `Fighter.level` a `FighterDiscipline.level`, los fixtures SQL que filtran por nivel deben crear la disciplina correspondiente. No basta con el valor por defecto de la ficha. Se corrige la preparación de las 30 fichas de paginación; el comportamiento del filtro se conserva.

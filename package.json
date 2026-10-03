@@ -14,7 +14,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs && node tests/e2e/filtros.mjs && node tests/e2e/calendario.mjs && node tests/e2e/usabilidad.mjs",
+    "test:e2e": "node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs && node tests/e2e/filtros.mjs && node tests/e2e/calendario.mjs && node tests/e2e/respaldo.mjs && node tests/e2e/usabilidad.mjs",
     "test:a11y": "node tests/e2e/accesibilidad.mjs"
   },
   "prisma": {
