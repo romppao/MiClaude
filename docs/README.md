@@ -1,6 +1,6 @@
 # Documentación de Ring España
 
-> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. El diseño gráfico sigue aplazado.
+> **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. Se han pedido propuestas visuales con colores opuestos a Raunder; la implementación de la identidad sigue pendiente de elección. Consulta [DISENO.md](DISENO.md).
 
 Una página para saber **qué documento abrir según lo que quieras hacer**. Todo lo que está aquí se mantiene al día como parte del trabajo (regla del fundador: se documenta cada bloque de trabajo, para poder contarlo y retomarlo).
 
@@ -17,9 +17,10 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Probar la aplicación como lo haría una persona real** (guiones por perfil: visitante, peleador, organizador, moderación, móvil, persona mayor…) | [`pruebas/personas.md`](pruebas/personas.md) |
 | **Ver qué han encontrado las pruebas por personas y qué se hizo con cada cosa** | [`pruebas/hallazgos-2026-10-01.md`](pruebas/hallazgos-2026-10-01.md) |
 | **Saber cómo hemos llegado hasta aquí**, sesión a sesión | [`DIARIO.md`](DIARIO.md) |
+| **Conocer las propuestas visuales y el requisito de colores opuestos a Raunder** | [`DISENO.md`](DISENO.md) |
 | **Ver las ideas** (y las descartadas, con su porqué) | [`IDEAS.md`](IDEAS.md) |
 | **Evitar repetir un error** ya cometido | [`LECCIONES.md`](LECCIONES.md) |
-| **Conocer a la competencia** (incompleto: falta acceso a internet para comprobarlo) | [`COMPETENCIA.md`](COMPETENCIA.md) |
+| **Conocer la competencia** (fuentes contrastadas y límites de la revisión) | [`COMPETENCIA.md`](COMPETENCIA.md) |
 | **Saber las reglas del fundador** (usabilidad para todos, idioma, diseño al final, aura, monetización) | [`../CLAUDE.md`](../CLAUDE.md) |
 | **Poner en marcha, probar y desplegar** (comandos, variables de entorno) | [`../README.md`](../README.md) |
 

@@ -107,3 +107,25 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 3. Comprobar que todo está sano: `npm run typecheck && npm test`; para el flujo completo, `npm run test:e2e` (ver README).
 4. Consultar [`IDEAS.md`](IDEAS.md) para elegir el siguiente paso (empezar por lo marcado 🔵).
 5. Al terminar, añadir la entrada al diario y actualizar ideas y lecciones.
+
+
+## 3 de octubre de 2026 — revisión de Codex
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Una velada de hoy desaparecía de portada por la tarde y el calendario solapaba próximas/pasadas | Comparar días guardados a las 12:00 UTC con el instante actual o una ventana de 24 h | Consultar por día de Madrid con un límite compartido; probar verano, invierno y medianoche |
+| Una tarjeta de récord de otro nivel heredaba la categoría actual | Reutilizar la disciplina sin comprobar el nivel de la tarjeta | Mostrar categoría solo en el nivel al que pertenece |
+| La ayuda afirmaba más respaldo del que proporciona un enlace | Equiparar evidencia aportada con verificación y omitir la diferencia autor/rival | Documentar la regla real y distinguir origen y estado del dato |
+| El análisis competitivo antiguo contenía supuestos hoy incorrectos | Conocimiento general y fuentes débiles sin verificar la oferta actual | Usar fuentes propias e inspección; separar observaciones, inferencias y límites |
+| PostgreSQL local no pudo instalarse | Permisos del entorno impidieron descargar/instalar paquetes del sistema | No declarar E2E aprobadas por compilar: usar el CI y dejar el bloqueo explícito |
+
+- **CI 77 (3 de octubre):** `registrar()` buscaba `select[name=discipline]` en toda la página; tras el selector por disciplina/nivel existen varios, algunos ocultos. Se elige el formulario por su botón de acción y se acota la disciplina a él. Regla: campos repetidos se localizan dentro del formulario correcto; no se arregla ampliando esperas ni forzando elementos ocultos.
+
+- **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.
+
+- Al cambiar un filtro de nivel desde `Fighter.level` a `FighterDiscipline.level`, los fixtures SQL que filtran por nivel deben crear la disciplina correspondiente. No basta con el valor por defecto de la ficha. Se corrige la preparación de las 30 fichas de paginación; el comportamiento del filtro se conserva.
+
+
+## Maquetas visuales y semántica — 3 de octubre de 2026
+
+El generador añadió barras de aura y una insignia de confirmación para toda la ficha. No representan el modelo real: aura es una cantidad sin tope y la confirmación corresponde a combates. Se retiraron en la propuesta revisada. Regla: revisar cifras, insignias y promesas de cada maqueta contra las funciones existentes antes de implementarla.

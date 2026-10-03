@@ -8,7 +8,6 @@ Este documento es el relevo solicitado expresamente por el fundador para que Cla
 
 **Base examinada:** `f86e3347d0efadffa940f5cc91987c7abbdfa41c`, rama principal `claude/ring-espana-mvp`.
 **Rama de aportaciones:** `codex/claridad-calendario-2026-10-03`.
-**Propuesta:** [#8 — calendario y claridad funcional](https://github.com/romppao/MiClaude/pull/8), abierta en borrador para verificar CI.
 **Estado:** cambios preparados y comprobaciones locales aprobadas; integración y pruebas completas de navegador sujetas al CI de la propuesta. No confundir esta rama con la demo desplegada. La documentación de relevo se publica también en la rama principal para que sea fácil encontrarla.
 
 ## Peticiones y decisiones del fundador
@@ -73,3 +72,34 @@ El análisis actualizado en `COMPETENCIA.md` sustituye hipótesis antiguas: BoxR
 ## Comunicación y documentación
 
 Se actualizan `CLAUDE.md`, `TRASLADO.md`, el índice, `COMPETENCIA.md`, `DIARIO.md`, `IDEAS.md`, `LECCIONES.md` y `ARQUITECTURA.md`, además del mapa generado. Este documento sirve como comunicación persistente por GitHub; no se afirma haber enviado un mensaje a la sesión privada de Claude.
+
+
+## Validación en GitHub — primera ejecución
+
+El CI 77 de la propuesta #8 superó instalación, migraciones/paridad, TypeScript, mapa, unitarias, compilación y arranque. Falló en `flujo.mjs:232`: el ayudante `registrar()` usaba un selector global de disciplina y Playwright elegía el primero de cuatro, oculto dentro de otro formulario. El log muestra `element is not visible` en `ayudas.mjs:50`. No llegó a la nueva prueba de calendario ni a axe.
+
+Se corrige `tests/e2e/ayudas.mjs` acotando el selector al formulario que contiene el botón «Registrar este combate». Se conserva la misma acción y sus comprobaciones: no se salta la prueba ni se amplía el tiempo de espera. Siguiente ejecución pendiente; no integrar hasta comprobarla.
+
+
+## Segunda ejecución del CI
+
+CI 79: se completó el recorrido de `flujo.mjs`, incluido el registro de MMA. Quedó una comprobación negativa incorrecta: «y excluye a quien no» buscaba el nombre en todo `body`, donde también aparece en el resumen del filtro `q`. Se cambia a comprobar la tarjeta de resultado y, para la exclusión, el mensaje visible de cero resultados más ausencia de esa tarjeta. La inclusión ahora también exige tarjeta visible, evitando que el propio filtro la haga pasar. No se modifica el filtro de producto. Se repite CI; aún no se declara E2E/axe aprobado.
+
+
+### Revisión de los guiones que siguen al primer flujo
+
+La inspección encontró el mismo `body.includes(q)` en `integridad.mjs`, para una ficha provisional; se aplica la misma comprobación de listado vacío y ausencia de tarjeta. Además, la prueba de paginación en `busqueda.mjs` creaba 30 fichas sin `FighterDiscipline` pero filtraba por amateur; desde el último cambio de Claude, el nivel se filtra en la disciplina. Se crean también sus disciplinas amateur en los datos de prueba. Se mantienen las 30 fichas, la paginación y el filtro: no se relaja la prueba ni se cambia el producto.
+
+
+## Estado del CI 83 y relevo honesto
+
+La ejecución 83 (run `37109604469`, commit `e049fe4f83bcf63a2fe1dd7772f5b5147f893c5f`) vuelve a fallar en la comprobación del aviso de ficha sin titular con el mismo nombre, un fallo intermitente previamente documentado. Se descargó e inspeccionó el artefacto `11269835165`: la captura de Nuria muestra ya la ficha creada. Esa captura posterior no permite demostrar qué estado exacto había al comprobar el aviso; no se atribuye sin evidencia a un problema de espera ni se modifica el producto a ciegas. Sigue pendiente reproducir esa comprobación y completar los guiones posteriores, la nueva prueba de calendario y axe. La propuesta #8 sigue en borrador y no se ha integrado ni desplegado.
+
+## Propuestas visuales solicitadas después
+
+El fundador pidió propuestas de aspecto en paralelo al desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder». Se mostraron tres direcciones iniciales y se revisó la segunda para recomendar petróleo `#083D3B`, marfil `#F2EFE7`, pizarra `#152526` y menta `#BFE6D8`, tras observar los rojos de Raunder. Se descartaron rojo y naranja como propuestas de marca. También se corrigió la maqueta para no inventar porcentajes de aura ni una confirmación de toda la ficha. Detalles y estado de elección en [DISENO.md](DISENO.md). Son propuestas, sin cambios visuales aplicados a la demo.
+
+
+### Ajuste tras el comentario sobre garra y valentía
+
+El fundador no se mostró convencido con petróleo/marfil y pidió que la marca represente a la comunidad española de deportes de contacto con más garra. Se mostró una segunda revisión con azul noche `#0B1F3A`, amarillo oro `#F3C316` y blanco cálido `#F5F4EE`, títulos deportivos contundentes y fotografía de mujeres y hombres entrenando. Esta es la recomendación actual de Codex, pendiente de elección; la anterior no estaba aprobada. No se ha implementado ni desplegado ninguna de las dos.

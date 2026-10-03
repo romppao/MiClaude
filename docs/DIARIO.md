@@ -497,6 +497,126 @@ Palabras del fundador: «las categorías de peso las estás englobando todas en 
 
 ---
 
+## Sesión 2 — 3 de octubre de 2026 — Codex: comparación y claridad funcional
+
+### Qué se pidió / qué idea surgió
+
+El fundador autorizó mejoras y pidió estudiar Raunder y BoxRec. Reiteró: «El diseño gráfico de la aplicación lo dejaremos para lo último» y pidió subir un Markdown para que Claude conozca todas las aportaciones.
+
+### Qué se decidió y por qué
+
+Actuar sobre recorridos existentes, exactitud y transparencia. La comparación pública permite mejorar orientación y explicación sin ampliar permisos ni adelantar el CRM, el premium o decisiones sobre menores/aura. Los cambios van en una rama y propuesta de integración para validación completa.
+
+### Qué se hizo
+
+Calendario por día de Madrid, entrada por objetivos, filtros individuales de veladas, ránking explicado, ayuda ajustada a las reglas reales, categoría correcta por nivel en tarjetas de récord y explicación de NC. Comparación competitiva revisada con fuentes propias. Relevo detallado: `APORTACIONES-CODEX.md`, enlazado desde instrucciones e índice. Nueva regresión de calendario en unitarias y guion E2E incluido en CI; mapa regenerado.
+
+### Qué salió mal / qué se aprendió
+
+BoxRec impidió la inspección normal en este navegador con verificación contra bots; se usaron páginas recuperadas y ayuda oficial, sin afirmar haber probado sus flujos. PostgreSQL no estaba instalado y el intento de instalación falló por permisos. No se ejecutó E2E/axe local ni una auditoría completa.
+
+### Estado y próximos pasos
+
+TypeScript, 313 unitarias y compilación de producción aprobados. Integración y E2E/axe pendientes de CI. Rama: `codex/claridad-calendario-2026-10-03`. El Markdown de relevo se publica también en la rama principal para Claude. La demo sigue siendo la versión previa hasta integración/despliegue. Completar las personas pendientes y verificar categorías históricas por nivel. No se han resuelto decisiones del fundador ni trabajado diseño gráfico.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — primera validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación de los cambios autorizados y mantener el relevo para Claude.
+
+### Qué se decidió y por qué
+
+No integrar con el CI fallando. Corregir la causa observada sin saltar pruebas.
+
+### Qué se hizo
+
+CI 77: migraciones, paridad, tipos, mapa, unitarias, compilación y arranque aprobados. La primera prueba E2E falló al buscar disciplina en un selector oculto de otro formulario. Se acota `registrar()` al formulario de su botón en `tests/e2e/ayudas.mjs`.
+
+### Qué salió mal / qué se aprendió
+
+El ayudante antiguo quedó desfasado al existir varios selectores de disciplina. El log demuestra la selección del primer elemento de cuatro, oculto; no es evidencia de fallo en la acción de registrar. Se documenta la regla de localización por formulario.
+
+### Estado y próximos pasos
+
+Subir la corrección y repetir CI completo. Calendario y axe todavía no se ejecutaron. Relevo detallado en `APORTACIONES-CODEX.md`.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — segunda validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación autorizada tras corregir el selector de disciplina.
+
+### Qué se decidió y por qué
+
+Comprobar resultados del filtro, no coincidencias del texto buscado en toda la pantalla.
+
+### Qué se hizo
+
+CI 79 completó el flujo de registro de MMA. La comprobación de exclusión falló porque el nombre seguía visible en el resumen del filtro, aunque no hubiera tarjeta. Se cambia `tests/e2e/flujo.mjs` a exigir tarjeta visible para inclusión y mensaje de cero resultados más ausencia de tarjeta para exclusión.
+
+### Qué salió mal / qué se aprendió
+
+El test antiguo podía dar falsa inclusión por el texto de búsqueda. Se acotan las comprobaciones al listado y se espera su estado visible.
+
+### Estado y próximos pasos
+
+Repetir CI completo. No se modificó el filtro de producto ni se omitieron comprobaciones. Axe y los guiones siguientes continúan pendientes.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — revisión de pruebas dependientes
+
+### Qué se pidió / qué idea surgió
+
+Completar la misma validación, revisando los guiones posteriores tras la causa encontrada en CI 79.
+
+### Qué se decidió y por qué
+
+Aplicar la corrección de localización también a la exclusión de fichas provisionales y adaptar datos de prueba al modelo actual de disciplinas.
+
+### Qué se hizo
+
+`integridad.mjs` comprueba cero resultados y ausencia de tarjeta, evitando el texto repetido del filtro. `busqueda.mjs` crea una disciplina de boxeo amateur para cada una de sus 30 fichas, ya que el filtro de nivel consulta `FighterDiscipline`. No cambia código de producto.
+
+### Qué salió mal / qué se aprendió
+
+La prueba de paginación aún preparaba el modelo anterior de nivel. Regla: las fixtures deben representar los datos que realmente consulta el filtro.
+
+### Estado y próximos pasos
+
+Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecución de navegador completa en CI.
+
+---
+
+## Sesión — 3 de octubre de 2026 — propuestas visuales diferenciadas
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió propuestas visuales mientras sigue el desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder».
+
+### Qué se decidió y por qué
+
+Se observó su identidad roja/blanca y se recomendó verde petróleo, marfil, pizarra y menta. Se descartaron las direcciones roja y naranja propuestas inicialmente. La elección final queda abierta.
+
+### Qué se hizo
+
+Se mostraron tres maquetas conceptuales y se ajustó la editorial a petróleo/marfil en móvil y escritorio. Se creó DISENO.md y se actualizaron los puntos de entrada para Claude. Se documentó también el fallo pendiente del CI 83 tras inspeccionar su artefacto.
+
+### Qué salió mal / qué se aprendió
+
+Las primeras maquetas añadían barras de aura y una confirmación global de ficha que no corresponden al modelo. Se corrigieron en la propuesta revisada. Las imágenes deben revisarse contra la funcionalidad real antes de convertirlas en código.
+
+### Estado y próximos pasos
+
+El fundador no se mostró convencido con petróleo/marfil y pidió más garra. Se mostró después azul noche/amarillo oro con tipografía deportiva y fotografía de entrenamientos; es la recomendación actual, pendiente de elección. Ningún cambio gráfico desplegado. Desarrollo en propuesta #8 pendiente de E2E/axe completo; no se declara terminado.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```
