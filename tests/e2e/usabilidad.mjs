@@ -1,6 +1,6 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -129,7 +129,7 @@ check("un doble clic en «Crear mi cuenta» lleva a «Confirma tu correo», sin 
 const peleadorDoble = await newUser("Dobleficha", "FIGHTER");
 await peleadorDoble.p.goto(B + "/mi-ficha");
 await peleadorDoble.p.fill("[name=firstName]", "Doble"); await peleadorDoble.p.fill("[name=lastName]", `Ficha${rnd}`);
-await btn(peleadorDoble.p, "Crear mi ficha");
+await datosDeAlta(peleadorDoble.p); await btn(peleadorDoble.p, "Crear mi ficha");
 await peleadorDoble.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 await registrar(peleadorDoble.p, { evento: `Velada Doble ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Doble${rnd}`, dobleClic: true });
 check("un doble clic en «Registrar este combate» registra un solo combate y lo confirma (no pide elegir rival ni duplica)", await seen(peleadorDoble.p.locator("[role=status]", { hasText: "Combate registrado" })) && !peleadorDoble.p.url().includes("/mi-ficha/rival") && await seen(peleadorDoble.p.locator("main table tbody tr", { hasText: `Velada Doble ${rnd}` }).first()) && await peleadorDoble.p.locator("main table tbody tr", { hasText: `Velada Doble ${rnd}` }).count() === 1);
@@ -184,7 +184,7 @@ check(`ninguna pantalla se sale del ancho en un móvil de 360 px${fuera.length ?
 const peleadorMovil = await newUser("Movilficha", "FIGHTER");
 await peleadorMovil.p.goto(B + "/mi-ficha");
 await peleadorMovil.p.fill("[name=firstName]", "Movil"); await peleadorMovil.p.fill("[name=lastName]", `Ficha${rnd}`);
-await btn(peleadorMovil.p, "Crear mi ficha");
+await datosDeAlta(peleadorMovil.p); await btn(peleadorMovil.p, "Crear mi ficha");
 await peleadorMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 await registrar(peleadorMovil.p, { evento: `Velada Movil ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Movil${rnd}` });
 await peleadorMovil.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();

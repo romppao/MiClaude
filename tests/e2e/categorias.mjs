@@ -1,11 +1,12 @@
 // Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
-import { B, rnd, browser, seen, check, newUser, registrar, sql, enDias, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, sql, enDias, terminarDiagnosticos } from "./ayudas.mjs";
 const junior="RFE2026:Júnior:M", cadete="RFE2026:Cadete / Schoolboys–Schoolgirls:M", benjamin="RFE2026:Benjamín:M";
 const formButton=(p,name)=>p.locator("main form").filter({has:p.getByRole("button",{name,exact:true})});
 const disciplina=(p)=>p.locator('main details').filter({has:p.locator('summary strong',{hasText:/^Boxeo$/})});
 async function create(name,division,peso) {
   const u=await newUser(name,"FIGHTER");
   await u.p.goto(B+"/mi-ficha");
+  await datosDeAlta(u.p);
   const f=formButton(u.p,"Crear mi ficha");
   await f.locator("[name=firstName]").fill(name); await f.locator("[name=lastName]").fill(`Divisiones${rnd}`);
   if (division) await f.locator("[name=divisionId]").selectOption(division);
@@ -47,6 +48,7 @@ const org=await newUser("OrganizadorCategorias");
 sql(`UPDATE "User" SET role='ORGANIZER' WHERE email='${org.email}';`);
 await org.p.goto(B+"/organizador");
 await org.p.locator('[name=name]').fill(`Divisiones cartel ${rnd}`); await org.p.locator('[name=date]').fill(enDias(-1));
+await datosDeAlta(org.p);
 await org.p.getByRole("button",{name:"Crear velada",exact:true}).click(); await org.p.waitForURL('**/organizador/*');
 const cartel=formButton(org.p,"Añadir al cartel");
 const valor=async (name,text)=>cartel.locator(`[name=${name}]`).evaluate((el,text)=>[...el.options].find(o=>o.textContent.includes(text))?.value,text);

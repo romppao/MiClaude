@@ -1,7 +1,7 @@
 // Pruebas de integridad de la verificación y del aura (lo que la auditoría marcó como fallos confirmados):
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
-import { slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -15,7 +15,7 @@ const mod = moderadora.p;
 
 await ana.goto(B + "/mi-ficha");
 await ana.fill("[name=firstName]", "Ana"); await ana.fill("[name=lastName]", `Integra${rnd}`);
-await btn(ana, "Crear mi ficha");
+await datosDeAlta(ana); await btn(ana, "Crear mi ficha");
 await ana.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 
 // 1) Un combate celebrado hoy conserva su resultado; uno futuro no admite resultado

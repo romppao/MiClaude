@@ -40,6 +40,17 @@ export const check = (label, cond) => {
 /** Espera a que terminen de guardarse los diagnósticos pendientes (llamar antes de cerrar el navegador). */
 export const terminarDiagnosticos = () => Promise.all(pendientes);
 export const btn = (p, t) => p.click(`main button:has-text("${t}")`);
+/** Elige explícitamente los datos ficticios de las altas antiguas; la aplicación ya no presupone Madrid ni boxeo. */
+export async function datosDeAlta(p) {
+  const form = p.locator("main form").filter({ has: p.getByRole("button", { name: /^(Crear mi ficha|Crear velada)$/ }) });
+  for (const [name, value] of [["discipline", "BOXEO"], ["province", "Madrid"]]) {
+    const campo = form.locator(`select[name=${name}]`);
+    if (!(await campo.inputValue())) await campo.selectOption(value);
+  }
+  const ciudad = form.locator("input[name=city]");
+  if (!(await ciudad.inputValue())) await ciudad.fill("Madrid");
+}
+
 export const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
 export const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
 
@@ -49,6 +60,8 @@ export const registrar = async (p, o) => {
   const form = p.locator("main form").filter({ has: p.getByRole("button", { name: "Registrar este combate", exact: true }) });
   await form.locator("[name=eventName]").fill(o.evento); await form.locator("[name=date]").fill(o.fecha);
   await form.locator("[name=oppFirst]").fill(o.rivalNombre); await form.locator("[name=oppLast]").fill(o.rivalApellidos);
+  // Una ficha provisional no tiene procedencia: el guion debe elegirla, igual que la persona.
+  if (!(await form.locator("select[name=province]").inputValue())) await form.locator("select[name=province]").selectOption(o.provincia ?? "Madrid");
   if (o.disciplina) await form.locator("select[name=discipline]").selectOption(o.disciplina);
   if (o.resultado === null) { await form.locator("select[name=outcome]").selectOption(""); await form.locator("select[name=method]").selectOption(""); } // tras un error el formulario conserva lo elegido: «sin resultado» se elige de forma explícita
   if (o.resultado !== null) { await form.locator("select[name=outcome]").selectOption(o.resultado ?? "WIN"); if (o.metodo !== null) await form.locator("select[name=method]").selectOption(o.metodo ?? "UD"); }

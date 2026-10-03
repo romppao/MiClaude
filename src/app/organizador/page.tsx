@@ -53,11 +53,11 @@ export default async function Organizer() {
       <form className="search" action={createEvent}>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre de la velada</span><input name="name" required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>
-        <label className="field"><span>Disciplina</span><select name="discipline" defaultValue="BOXEO">{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></label>
+        <label className="field"><span>Disciplina</span><select name="discipline" defaultValue="" required><option value="">Elige una disciplina</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></label>
         <label className="field"><span>Nivel</span><select name="level" defaultValue="AMATEUR"><option value="AMATEUR">Amateur</option><option value="PRO">Profesional</option></select></label>
         <label className="field"><span>Recinto (opcional)</span><input name="venue" maxLength={LIMITS.venue} /><span className="hint">Si aún no lo sabes, déjalo vacío: aparecerá «Por confirmar».</span></label>
-        <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" maxLength={LIMITS.city} /></label>
-        <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+        <label className="field"><span>Ciudad</span><input name="city" maxLength={LIMITS.city} /></label>
+        <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Organiza (opcional)</span><input name="promoter" maxLength={LIMITS.promoter} /><span className="hint">El nombre que verá el público.</span></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /><span className="hint">Debe empezar por https://</span></label>
         <button>Crear velada</button>

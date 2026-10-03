@@ -6,7 +6,7 @@ export default function Help() {
   return (
     <>
       <h1>¿Cómo funciona Ring España?</h1>
-      <p>Ring España reúne los deportes de contacto de España en un solo lugar, con el boxeo en cabeza: boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu. Aquí encontrarás a los peleadores, sus récords, las veladas, los gimnasios y los entrenadores. Damos especial importancia al deporte amateur, que es donde nacen los campeones del futuro.</p>
+      <p>Ring España reúne a la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Puedes consultar y compartir trayectorias amateur y profesionales, encontrar veladas, gimnasios y entrenadores, y reconocer las actuaciones que has visto. Elige tu disciplina y tu provincia para encontrar lo que te interesa.</p>
       <p className="mut">No necesitas una cuenta para consultar veladas, fichas y el ránking. Para dar aura, registrar combates o publicar sí es necesario registrarse.</p>
 
       <h2>Si eres aficionado</h2>

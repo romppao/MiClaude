@@ -10,23 +10,20 @@ import { calendarDayStart } from "../lib/common/dates";
 
 export const dynamic = "force-dynamic";
 
-// Plaza inicial de lanzamiento. Cambiar aquí (o parametrizar) al expandirse a otras provincias.
-const HOME_PROVINCE = "Madrid";
-
 export default async function Home() {
   const user = await getUser();
   const [events, fighters, counts, topGroups] = await Promise.all([
-    db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED", level: "AMATEUR", province: HOME_PROVINCE }, orderBy: { date: "asc" }, take: 6 }),
-    db.fighter.findMany({ where: { level: "AMATEUR", province: HOME_PROVINCE, listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
-    Promise.all([db.fighter.count({ where: { level: "AMATEUR", listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
-    auraRanking({ discipline: "BOXEO", level: "AMATEUR", province: HOME_PROVINCE }), // el boxeo va en cabeza
+    db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 6 }),
+    db.fighter.findMany({ where: { listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true } }),
+    Promise.all([db.fighter.count({ where: { listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
+    auraRanking(),
   ]);
-  const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, category: `${divisionLabel(g.divisionId)}${g.weightClass ? ` · ${weightClassLabel("BOXEO", g.level, g.weightClass, g.divisionId)}` : ""}` }))).sort((a, b) => b.aura - a.aura).slice(0, 5);
+  const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, discipline: g.discipline, category: `${divisionLabel(g.divisionId)}${g.weightClass ? ` · ${weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId)}` : ""}` }))).sort((a, b) => b.aura - a.aura || a.name.localeCompare(b.name, "es")).slice(0, 5);
   return (
     <>
       <section className="hero">
-        <h1>Descubre los deportes de contacto amateur de {HOME_PROVINCE}</h1>
-        <p className="mut">Boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu en un mismo lugar. Registra tu récord, da aura a quien has visto pelear y encuentra las próximas veladas. Los campeones del futuro empiezan aquí.</p>
+        <h1>Tu comunidad de deportes de contacto en toda España</h1>
+        <p className="mut">Encuentra peleadores, gimnasios y veladas de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Comparte tu trayectoria y reconoce las actuaciones que has visto, tanto en el deporte amateur como en el profesional.</p>
         <p className="mut">Puedes consultar las fichas, las veladas y los gimnasios sin crear una cuenta.</p>
         {!user && (
           <p className="acciones">
@@ -40,9 +37,9 @@ export default async function Home() {
         </form>
         <p style={{ margin: "8px 0 4px", fontWeight: 700 }}>O elige una disciplina</p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "0 0 8px" }}>
-          {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "10px 14px", fontWeight: d === "BOXEO" ? 800 : 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
+          {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/peleadores?disciplina=${d}`} className="card" style={{ padding: "10px 14px", fontWeight: 500 }}>{DISCIPLINE_LABEL[d]}</Link>)}
         </div>
-        <p className="mut">{plural(counts[0], "peleador amateur", "peleadores amateur")} · {plural(counts[1], "velada", "veladas")} · {plural(counts[2], "gimnasio", "gimnasios")} · {plural(counts[3], "aura dada", "auras dadas")}. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
+        <p className="mut">{plural(counts[0], "peleador", "peleadores")} · {plural(counts[1], "velada", "veladas")} · {plural(counts[2], "gimnasio", "gimnasios")} · {plural(counts[3], "aura dada", "auras dadas")}. El aura es el reconocimiento del público a un peleador por su actuación en un combate: <Link href="/ayuda">cómo funciona</Link>.</p>
       </section>
       <section aria-labelledby="empezar">
         <h2 id="empezar">¿Qué quieres hacer?</h2>
@@ -54,25 +51,25 @@ export default async function Home() {
           <li><Link href="/organizador">Organizar una velada</Link>: solicita acceso para gestionar el cartel y los resultados.</li>
         </ul>
       </section>
-      <h2>Más aura en boxeo</h2>
+      <h2>Actuaciones reconocidas por la comunidad</h2>
       <div className="grid">
-        {top.map((t) => <Link key={`${t.fighterId}-${t.divisionId ?? ""}-${t.weightClass ?? ""}`} href={`/peleadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{t.aura} de aura{t.category ? ` · ${t.category}` : ""}</div></Link>)}
-        {top.length === 0 && <p className="mut">Todavía no hay aura en {HOME_PROVINCE}. Sé la primera persona en darla a un peleador tras verlo competir.</p>}
+        {top.map((t) => <Link key={`${t.fighterId}-${t.discipline}-${t.level}-${t.divisionId ?? ""}-${t.weightClass ?? ""}`} href={`/peleadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{DISCIPLINE_LABEL[t.discipline]} · {LEVEL_LABEL[t.level]} · {t.aura} de aura{t.category ? ` · ${t.category}` : ""}</div></Link>)}
+        {top.length === 0 && <p className="mut">Todavía no hay actuaciones con aura. Sé la primera persona en darla a un peleador tras verlo competir.</p>}
       </div>
       <p><Link href="/ranking">Ver el ránking completo</Link></p>
-      <h2>Veladas amateur de hoy y próximas</h2>
-      <p className="mut">En {HOME_PROVINCE}. Las veladas de hoy permanecen aquí durante todo el día.</p>
+      <h2>Veladas de hoy y próximas</h2>
+      <p className="mut">Consulta eventos de todas las disciplinas y provincias. Las veladas de hoy permanecen aquí durante todo el día.</p>
       <div className="grid">
         {events.map((e) => (
           <Link key={e.id} href={`/veladas/${e.slug}`} className="card">
-            <span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
+            <span className={`tag ${e.level}`}>{DISCIPLINE_LABEL[e.discipline]} · {LEVEL_LABEL[e.level]}</span>
             <strong>{e.name}</strong>
             <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city}</div>
           </Link>
         ))}
-        {events.length === 0 && <p className="mut">No hay veladas amateur programadas. <Link href="/veladas">Ver todo el calendario</Link></p>}
+        {events.length === 0 && <p className="mut">No hay veladas programadas. <Link href="/veladas">Ver todo el calendario</Link></p>}
       </div>
-      <h2>Peleadores amateur recientes</h2>
+      <h2>Peleadores recientes</h2>
       <div className="grid">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
@@ -80,7 +77,7 @@ export default async function Home() {
             <div className="mut">{b.alias ? `“${b.alias}” · ` : ""}{b.city ?? ""}{b.gym ? ` · ${b.gym.name}` : ""}</div>
           </Link>
         ))}
-        {fighters.length === 0 && <p className="mut">Todavía no hay peleadores amateur en {HOME_PROVINCE}. <Link href="/registro">Crea tu cuenta</Link> y sé el primero.</p>}
+        {fighters.length === 0 && <p className="mut">Todavía no hay fichas públicas de peleadores. <Link href="/registro">Crea tu cuenta</Link> para compartir tu trayectoria.</p>}
       </div>
     </>
   );

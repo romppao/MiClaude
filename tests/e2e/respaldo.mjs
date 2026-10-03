@@ -1,9 +1,10 @@
 // Recorrido de una ficha con historial amateur y profesional: categoría por nivel y explicación del récord.
 // Solo contra el servidor y la base de pruebas; datos ficticios únicos creados mediante la interfaz.
-import { B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos } from "./ayudas.mjs";
 
 const { p } = await newUser("Trayectoria", "FIGHTER");
 await p.goto(B + "/mi-ficha");
+await datosDeAlta(p);
 const crear = p.locator("main form").filter({ has: p.getByRole("button", { name: "Crear mi ficha", exact: true }) });
 await crear.locator("[name=firstName]").fill("Trayectoria");
 await crear.locator("[name=lastName]").fill(`Niveles${rnd}`);

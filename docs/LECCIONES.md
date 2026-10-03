@@ -153,3 +153,9 @@ El generador añadió barras de aura y una insignia de confirmación para toda l
 - Repetir el recorrido deja otras fichas con el mismo nombre de pila en el mismo grupo del ránking. Se busca el nombre completo con apellido único de esa ejecución. Regla: el dato único debe formar parte del selector, no solo del fixture creado.
 
 - WAKO permite participación sénior de júnior y, con autorización especial, de veteranos: validar únicamente 19–40 rechazaría algunos casos admitidos. Se distinguen edad por año y los 18 cumplidos de ring, y se explica que edad compatible no certifica autorización. Regla: leer y probar las excepciones junto a la tabla general.
+
+## 3 de octubre de 2026 — Las prioridades internas se filtraban a la experiencia pública
+
+La portada decía Madrid y amateur, la ayuda «boxeo en cabeza», los botones destacaban boxeo y ránking/altas elegían Madrid y boxeo por defecto. Cambiar solo los párrafos habría conservado el sesgo en los datos visibles. Regla: revisar también consultas, filtros, vacíos, metadatos y valores de formulario; conservar ubicaciones reales y reglamentos específicos. Las pruebas deben elegir explícitamente sus datos ficticios y comprobar por separado que una alta real empieza sin provincia ni disciplina.
+
+El recorrido de una ficha provisional mostró otra dependencia del antiguo valor inicial: registrar un combate también exige elegir provincia si la ficha carece de ella. Se corrigió el guion para aportar un dato ficticio explícito; la aplicación conserva la elección neutral.

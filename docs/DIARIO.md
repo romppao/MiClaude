@@ -734,3 +734,27 @@ Esta vez se pudo instalar y ejecutar todo localmente usando el permiso de red ex
 ### Estado y próximos pasos
 
 Validación local final aprobada: migraciones desde base vacía y paridad, tipos, mapa, 327 unitarias, compilación, 289 comprobaciones E2E (18 del nuevo recorrido de categorías) y axe con 0 incumplimientos, 0 graves o críticos. Comprobada la ejecución real de los casos nuevos en el log. Propuesta preparada contra la rama principal, conservando #8/#9 y las actualizaciones de documentación; integración y demo pendientes. Pendientes explícitos: pesos IMMAF/IBJJF completos, modalidades/requisitos/licencias, política de menores y pruebas con personas. Detalle de fuentes y límites en `DISENO-PESOS.md`.
+
+## Sesión 5 — 3 de octubre de 2026 — Comunicación inclusiva y ámbito nacional
+
+### Qué se pidió / qué idea surgió
+
+Petición urgente del fundador: «hay varios textos en la aplicación que hacen saber que estamos más centrados en Madrid y que nuestra prioridad es el boxeo. Aunque esto sea así, no podemos dar a entender tal cosa porque gente de otras ciudades y de otras disciplinas se pueden sentir excluidas». Pidió continuar el trabajo.
+
+### Qué se decidió y por qué
+
+Las prioridades operativas internas no se trasladan a mensajes públicos ni a filtros iniciales. Revisar los datos visibles además del texto: una portada que diga toda España pero solo consulte Madrid conservaría el problema. Mostrar las seis disciplinas admitidas con igual énfasis y orden alfabético, niveles amateur/profesional y provincias elegidas por la persona. Conservar ubicaciones reales, normas deportivas y zona horaria técnica; no afirmar una cobertura de datos inexistente.
+
+### Qué se hizo
+
+Se eliminaron las referencias de prioridad de portada, ayuda y README; se completaron metadatos y se neutralizó el ejemplo del buscador. Portada y contadores consultan todas las provincias y niveles. El ránking empieza con todas las disciplinas, conserva categorías/posiciones independientes e incluye disciplina en las claves de agregación y de pantalla. La portada identifica disciplina/nivel de cada actuación y evento. Las altas de fichas y veladas parten sin provincia, ciudad o disciplina supuestas y el servidor rechaza elecciones ausentes o inválidas. La edición conserva los datos propios. El calendario explica la hora peninsular sin cambiar su comportamiento.
+
+Se documentó la norma vigente en CLAUDE, arquitectura, ideas, lecciones y relevo, conservando las entradas históricas. Los guiones anteriores eligen sus datos ficticios explícitamente. Se añadieron 18 comprobaciones E2E con seis disciplinas, provincias distintas, amateur/profesional, una persona con aura en dos disciplinas, filtros y altas fuera de Madrid. Se mantiene el trabajo de categorías por edad de la propuesta #10.
+
+### Qué salió mal / qué se aprendió
+
+La primera batería completa detectó que el guion de una ficha provisional sin provincia dependía del antiguo valor Madrid al registrar su combate. Ahora el guion elige la provincia explícitamente. La comprobación de tipos detectó una importación aún necesaria para editar eventos; se conservó. La inspección de los guiones detectó dos importaciones faltantes del nuevo ayudante y se corrigieron antes de continuar. No se sustituyeron los valores neutrales de la aplicación para acomodar las pruebas.
+
+### Estado y próximos pasos
+
+Validación local final aprobada: tipos, mapa actualizado y comprobado, 327 unitarias, compilación de producción, 307 comprobaciones E2E (18 nuevas) y axe con 0 incumplimientos, 0 graves o críticos. Propuesta contra la rama principal que conserva #10 y sus antecedentes; integración y despliegue pendientes. Se comprueba además el CI de la propuesta antes de cerrar la sesión.

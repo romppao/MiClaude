@@ -1,6 +1,6 @@
 // Pruebas de búsqueda, paginación, cabeceras de seguridad y buscadores (robots, mapa del sitio, salud).
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const anon = await (await browser.newContext()).newPage();
@@ -11,7 +11,7 @@ anon.on("console", (m) => { if (/Content Security Policy|Refused to/i.test(m.tex
 const alvaro = await newUser("Alvaro", "FIGHTER");
 await alvaro.p.goto(B + "/mi-ficha");
 await alvaro.p.fill("[name=firstName]", "Álvaro"); await alvaro.p.fill("[name=lastName]", `Pérez${rnd} Núñez`); await alvaro.p.fill("[name=gym]", `Gimnasio Meta ${rnd}`);
-await btn(alvaro.p, "Crear mi ficha");
+await datosDeAlta(alvaro.p); await btn(alvaro.p, "Crear mi ficha");
 await alvaro.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 await registrar(alvaro.p, { evento: `Velada Búsqueda ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Oculto${rnd}` });
 await alvaro.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();

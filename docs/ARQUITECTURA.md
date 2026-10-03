@@ -4,7 +4,7 @@ Estado técnico vigente. La historia de cómo se llegó hasta aquí está en [`D
 
 ## Propósito y enfoque
 
-Fomentar la afición a los deportes de contacto en España (boxeo en cabeza; también MMA, kickboxing, K-1 y jiu-jitsu) **empezando por el amateur** y por **Madrid**.
+Fomentar la afición a los deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. La comunicación y los valores iniciales no presentan una ciudad o disciplina como prioridad (petición urgente del fundador, 3 de octubre de 2026); las prioridades operativas internas no son mensajes públicos.
 El peleador amateur gestiona su ficha y su récord; el público da aura a lo que ve; el calendario descubre veladas.
 Cada decisión técnica se toma para que esto escale a otras provincias sin rehacer nada.
 
@@ -65,8 +65,8 @@ Decisiones clave:
 2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
 3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
 4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista. Portada y calendario comparten `calendarDayStart()`: hoy y próximas incluye todo el día de Madrid; pasadas contiene únicamente fechas anteriores a hoy. No cambia cuándo se permite registrar un resultado (`eventDayReached`).
-5. **Madrid como plaza inicial, no como límite:** todo se filtra por `province`.
-6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; los métodos y las categorías heredadas viven en `lib/common/disciplines.ts`; las divisiones federativas por edad, sexo y modalidad, fuentes y reglas de edad viven en `lib/common/competition.ts`. Una ficha por persona con varias disciplinas.
+5. **Ámbito nacional y filtros voluntarios:** portada y ránking consultan todas las provincias, disciplinas y niveles al entrar. Las altas no suponen Madrid ni boxeo: se eligen provincia y disciplina, validadas en servidor. La edición conserva datos guardados. Los nombres de disciplinas se presentan alfabéticamente y con el mismo énfasis. La portada ordena veladas por fecha/identificador, fichas por alta y actuaciones por aura/nombre; no aplica cuotas ni selección por prioridad interna.
+6. **Disciplinas:** `BOXEO`, `MMA`, `MUAYTHAI`, `KICKBOXING`, `K1`, `JIUJITSU`; los métodos y las categorías heredadas viven en `lib/common/disciplines.ts`; las divisiones federativas por edad, sexo y modalidad, fuentes y reglas de edad viven en `lib/common/competition.ts`. Una ficha por persona con varias disciplinas.
 
 ## Aura y ránking
 

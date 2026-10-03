@@ -12,17 +12,18 @@ Estados: 🟢 hecho · 🟡 en marcha / parcial · 🔵 planificado · ⚪ aparc
 | F1 | Hacer crecer la comunidad boxística española y dar visibilidad a sus boxeadores | Visión inicial del fundador | 🟡 |
 | F2 | **Amateur primero**: hoy son aficionados, mañana la cara del boxeo español en el mundo | Giro tras ver el primer MVP | 🟡 |
 | F3 | **El público valora**: un aficionado puede reconocer a un peleador después de verlo pelear (idea original: puntuarlo con estrellas; hoy es el aura) | Giro tras ver el primer MVP | 🟢 |
-| F4 | **Madrid primero**, luego España; adelantarse a la competencia de Barcelona | Fundador | 🟡 |
+| F4 | **Madrid primero**, luego España; adelantarse a la competencia de Barcelona | Visión inicial del fundador | ⚪ Prioridad operativa histórica; no comunicarla al público ni usarla como filtro inicial (petición del 3 de octubre de 2026, F16) |
 | F5 | **Arquitectura y estructura antes que diseño gráfico** | Fundador | 🟢 (se aplaza el diseño) |
 | F6 | Ver es público; **votar, registrar y publicar exige registro** | Fundador | 🟢 |
 | F7 | **Veracidad de los datos** sin depender de trámites federativos al principio; colaborar con las federaciones a medio plazo | Fundador | 🟡 (estrategia escrita) |
 | F8 | Documentar todo el proceso para poder contarlo y retomarlo | Fundador | 🟢 (estos documentos) |
 | F10 | **El diseño visual se deja para el final** y debe tener **identidad propia**, sin el aspecto genérico que suele producir Claude, para que la app no se asocie con una IA. Se trabajará con briefing, varias direcciones y, a ser posible, un diseñador humano | Fundador (reiterado) | ⚪ (aplazado a propósito; principio documentado en `CLAUDE.md`) |
-| F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🟡 (cinco disciplinas implementadas; falta validar categorías con federaciones y ampliar) |
+| F11 | **Ecosistema de todos los deportes de contacto en España** (MMA, kickboxing, K-1, jiu-jitsu…) con **el boxeo en cabeza**. Ser pioneros | Fundador | 🟡 Seis disciplinas implementadas, con categorías por reglamento; «boxeo en cabeza» queda como antecedente interno y se sustituye en comunicación pública por F16 |
 | F12 | **Todo en español** (interfaz, correos, documentación, commits y direcciones visibles) | Fundador | 🟢 (aplicado a lo visible; el código interno sigue en inglés: preguntar si también debe cambiar) |
 | F13 | **Monetizar la aplicación** con funciones premium, **después** de terminar la estructura básica. Sin vender verificación ni posiciones de ránking | Fundador | ⚪ (aplazado a propósito) |
 | F9 | **Muy intuitiva para todo el mundo** (niños, jóvenes, adultos y mayores, con cualquier nivel tecnológico), siempre con tono serio y profesional. Aplica a esta y a toda aplicación futura | Fundador | 🟡 (aplicado a los flujos principales; falta organizador, moderación, medición de accesibilidad y pruebas con personas reales) |
 | F14 | **Funcionalidad completa y sin fallos antes que diseño; organización clara para poder ampliar el equipo.** «Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo»; «no puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado» | Fundador, 1 de octubre de 2026 | 🟡 (código por dominios, guía `DESARROLLO.md`, mapa funcional generado y pruebas por personas en marcha) |
+| F16 | **Ninguna ciudad ni disciplina debe sentirse excluida**: no presentar Madrid o boxeo como prioridad pública; filtros iniciales nacionales y multidisciplina, altas sin suposiciones | Fundador, petición urgente del 3 de octubre de 2026 | 🟢 Aplicado en la propuesta de comunicación inclusiva; integración y despliegue pendientes |
 
 ## Ideas de producto
 

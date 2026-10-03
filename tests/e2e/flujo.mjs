@@ -1,4 +1,4 @@
-import { B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
@@ -11,7 +11,7 @@ await unv.p.goto(B + "/mi-ficha"); check("sin verificar → redirige a /verifica
 // 2) Pepe crea ficha y registra combate contra un rival aún sin cuenta
 const pepe = (await newUser("Pepe", "FIGHTER")).p;
 await pepe.goto(B + "/mi-ficha");
-await pepe.fill("[name=firstName]", "Pepe"); await pepe.fill("[name=lastName]", `Uno${rnd}`); await pepe.fill("[name=gym]", `Gym Test ${rnd}`); await btn(pepe, "Crear mi ficha");
+await pepe.fill("[name=firstName]", "Pepe"); await pepe.fill("[name=lastName]", `Uno${rnd}`); await pepe.fill("[name=gym]", `Gym Test ${rnd}`); await datosDeAlta(pepe); await btn(pepe, "Crear mi ficha");
 await pepe.waitForSelector("text=Registrar un combate");
 await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}`, evidencia: "javascript:alert(1)" });
 check("un enlace peligroso se rechaza con un mensaje claro y no se guarda nada", await seen(pepe.locator(".notice-bad", { hasText: "El enlace no es válido" })));
@@ -93,10 +93,10 @@ await pepe.goto(B + "/mi-ficha");
 const nuria = (await newUser("Nuria", "FIGHTER")).p;
 await nuria.goto(B + "/mi-ficha");
 await nuria.fill("[name=firstName]", "Nuria"); await nuria.fill("[name=lastName]", `Provisional${rnd}`);
-await btn(nuria, "Crear mi ficha");
+await datosDeAlta(nuria); await btn(nuria, "Crear mi ficha");
 check("si ya hay una ficha sin titular con tu nombre, se avisa antes de crear otra y se ofrece reclamarla", await seen(nuria.locator("[role=alert]", { hasText: "ficha sin titular con tu nombre" })) && await nuria.locator("main button", { hasText: "Reclamar esta ficha" }).count() >= 1);
 await nuria.fill("[name=firstName]", "Nuria"); await nuria.fill("[name=lastName]", `Provisional${rnd}`);
-await btn(nuria, "Crear mi ficha");
+await datosDeAlta(nuria); await btn(nuria, "Crear mi ficha");
 check("y quien confirma que no es esa persona puede crear su ficha", await seen(nuria.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" })));
 const olga = (await newUser("Olga", "FIGHTER")).p;
 await olga.goto(B + `/mi-ficha?q=Provisional${rnd}`);
@@ -172,7 +172,7 @@ const org = (await newUser("Orga")).p;
 await solicitarOrganizador(org, `Club Demo Madrid ${rnd}`);
 await aprobarOrganizador(admin.p, `Club Demo Madrid ${rnd}`);
 await org.goto(B + "/organizador");
-await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await btn(org, "Crear velada");
+await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await datosDeAlta(org); await btn(org, "Crear velada");
 await org.waitForURL(`**/organizador/gran-velada-org-${rnd}-2026-07-20?*`);
 await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator("[role=status]", { hasText: "se ha añadido al cartel" }).waitFor();
@@ -209,12 +209,12 @@ const vet = (await newUser("Vet", "FIGHTER")).p;
 await vet.goto(B + "/mi-ficha");
 await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Veterano${rnd}`);
 await vet.fill("[name=priorTotal]", "20"); await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1");
-await btn(vet, "Crear mi ficha");
+await datosDeAlta(vet); await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-bad", { hasText: "no coincide" }).waitFor();
 check("un récord de partida que no suma se rechaza con un mensaje claro", await vet.locator(".notice-bad", { hasText: "no coincide" }).count() === 1);
 await vet.fill("[name=firstName]", "Vet"); await vet.fill("[name=lastName]", `Veterano${rnd}`);
 await vet.fill("[name=priorTotal]", "14"); await vet.fill("[name=priorWins]", "10"); await vet.fill("[name=priorLosses]", "3"); await vet.fill("[name=priorDraws]", "1"); // tras el error el formulario conserva lo escrito: el total se corrige de forma explícita
-await btn(vet, "Crear mi ficha");
+await datosDeAlta(vet); await btn(vet, "Crear mi ficha");
 await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 check("el récord de partida detallado se muestra como declarado", await seen(vet.locator("text=10-3-1").first()) && await seen(vet.locator("text=Incluye 14 combates anteriores declarados por el propio deportista")));
 await registrar(vet, { evento: `Velada Vet ${rnd}`, fecha: "2026-06-01", rivalNombre: "Vet", rivalApellidos: `Rival${rnd}` });
@@ -241,7 +241,7 @@ check("y excluye a quien no", await seen(anon.locator("main p", { hasText: "Ning
 
 // Avisos a seguidores: un organizador publica un combate futuro de un peleador seguido
 await org.goto(B + "/organizador");
-await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await btn(org, "Crear velada");
+await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await datosDeAlta(org); await btn(org, "Crear velada");
 await org.waitForURL(`**/organizador/velada-futura-${rnd}-${futura}?*`);
 await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor();

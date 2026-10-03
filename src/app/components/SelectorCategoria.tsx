@@ -29,7 +29,7 @@ const mismasListas = (a: CategoriaPeso[], b: CategoriaPeso[]) => a.length === b.
 export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, disciplinas = DISCIPLINE_ORDER, defaults = {}, nombres = { discipline: "discipline", level: "level", weightClass: "weightClass" } }: Props) {
   const id = useId();
   const esFiltro = modo === "filtro";
-  const [disciplina, setDisciplina] = useState<Discipline | "">(fijas?.discipline ?? defaults.discipline ?? (esFiltro ? "" : "BOXEO"));
+  const [disciplina, setDisciplina] = useState<Discipline | "">(fijas?.discipline ?? defaults.discipline ?? (modo === "combate" ? disciplinas[0] ?? "" : ""));
   const [nivel, setNivel] = useState<Level | "">(fijas?.level ?? defaults.level ?? (esFiltro ? "" : "AMATEUR"));
   const [divisionId, setDivisionId] = useState(defaults.divisionId ?? "");
   const division = divisionById(divisionId);
@@ -61,7 +61,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
       {!fijas ? <><label className="field">
         <span>Disciplina</span>
         <select name={nombres.discipline} value={disciplina} onChange={(e) => cambiar(e.target.value as Discipline | "", nivel)} required={!esFiltro}>
-          {esFiltro && <option value="">Todas las disciplinas</option>}
+          <option value="">{esFiltro ? "Todas las disciplinas" : "Elige una disciplina"}</option>
           {disciplinas.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}
         </select>
       </label>
@@ -86,7 +86,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
       </label>
       <label className="field" style={{ minWidth: 240 }}>
         <span>Categoría de peso</span>
-        <select name={nombres.weightClass} value={categoria} onChange={(e) => setCategoria(e.target.value)} disabled={esFiltro && !disciplina} aria-describedby={`${id}-nota`}>
+        <select name={nombres.weightClass} value={categoria} onChange={(e) => setCategoria(e.target.value)} disabled={!disciplina} aria-describedby={`${id}-nota`}>
           <option value="">{vacioCategoria}</option>
           {/* Un valor guardado que ya no está en la lista (datos antiguos) se conserva para no esconder lo que se declaró. */}
           {categoria && !disponibles.has(categoria) && <option value={categoria}>{categoria}</option>}

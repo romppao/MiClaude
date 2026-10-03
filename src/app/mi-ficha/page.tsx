@@ -81,8 +81,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" maxLength={LIMITS.gym} /></label>
-          <label className="field"><span>Ciudad</span><input name="city" defaultValue="Madrid" maxLength={LIMITS.city} /></label>
-          <label className="field"><span>Provincia</span><select name="province" defaultValue="Madrid">{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Ciudad</span><input name="city" maxLength={LIMITS.city} /></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <DisciplineFields />
           {confirmarNueva && <input type="hidden" name="confirmarNueva" value="1" />}
           <button>Crear mi ficha</button>
@@ -117,7 +117,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <label className="field"><span>Alias (opcional)</span><input name="alias" defaultValue={me.alias ?? ""} maxLength={LIMITS.alias} /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" defaultValue={gym?.name ?? ""} maxLength={LIMITS.gym} /></label>
           <label className="field"><span>Ciudad</span><input name="city" defaultValue={me.city ?? ""} maxLength={LIMITS.city} /></label>
-          <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? "Madrid"}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label className="field"><span>Provincia</span><select name="province" defaultValue={me.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
           <label className="field"><span>Fecha de nacimiento (opcional)</span><input name="birthDate" type="date" defaultValue={me.birthDate ? me.birthDate.toISOString().slice(0, 10) : ""} min="1920-01-01" /><span className="hint">En público solo se muestra tu edad.</span></label>
           <label className="field"><span>Guardia (opcional)</span>
             <select name="stance" defaultValue={me.stance ?? ""}><option value="">Sin indicar</option><option value="ORTODOXO">Ortodoxo</option><option value="ZURDO">Zurdo</option><option value="AMBIDIESTRO">Ambidiestro</option></select>
@@ -141,10 +141,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         </details>
       ))}
       <details className="card" style={{ marginBottom: 8 }}>
-        <summary><strong>Añadir otra disciplina</strong> <span className="mut">— por ejemplo MMA, kickboxing, K-1 o jiu-jitsu</span></summary>
+        <summary><strong>Añadir otra disciplina</strong> <span className="mut">— elige otra disciplina que practiques</span></summary>
         <form className="search" action={saveDiscipline}>
           <input type="hidden" name="modo" value="anadir" />
-          <DisciplineFields defaults={{ discipline: DISCIPLINE_ORDER.find((d) => !me.disciplines.some((x) => x.discipline === d)) ?? "BOXEO" }} />
+          <DisciplineFields />
           <button>Añadir disciplina</button>
         </form>
       </details>
@@ -182,8 +182,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         <label className="field"><span>Nombre de la velada</span><input name="eventName" defaultValue={previo("eventName")} required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={previo("date")} required min="1980-01-01" /></label>
         <label className="field"><span>Recinto (opcional)</span><input name="venue" defaultValue={previo("venue")} maxLength={LIMITS.venue} /></label>
-        <label className="field"><span>Ciudad</span><input name="city" defaultValue={previo("city") || (me.city ?? "Madrid")} maxLength={LIMITS.city} /></label>
-        <label className="field"><span>Provincia</span><select name="province" defaultValue={previo("province") || (me.province ?? "Madrid")}>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+        <label className="field"><span>Ciudad</span><input name="city" defaultValue={previo("city") || (me.city ?? "")} maxLength={LIMITS.city} /></label>
+        <label className="field"><span>Provincia</span><select name="province" defaultValue={previo("province") || (me.province ?? "")} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Nombre de tu rival</span><input name="oppFirst" defaultValue={previo("oppFirst")} required maxLength={LIMITS.firstName} /></label>
         <label className="field"><span>Apellidos de tu rival</span><input name="oppLast" defaultValue={previo("oppLast")} required maxLength={LIMITS.lastName} /></label>
         <label className="field"><span>Resultado</span>

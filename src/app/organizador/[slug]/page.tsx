@@ -7,7 +7,7 @@ import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import SelectorCategoria from "../../components/SelectorCategoria";
 import { divisionLabel } from "../../../lib/common/competition";
-import { DISCIPLINE_LABEL, METHODS_BY_DISCIPLINE, weightClassLabel } from "../../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, weightClassLabel } from "../../../lib/common/disciplines";
 import { LIMITS } from "../../../lib/common/text";
 import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
@@ -45,7 +45,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
           <label className="field"><span>Nombre de la velada</span><input name="name" defaultValue={event.name} required maxLength={LIMITS.eventName} /></label>
           <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={event.date.toISOString().slice(0, 10)} required min="1980-01-01" /></label>
           <label className="field"><span>Disciplina</span>
-            <select name="discipline" defaultValue={event.discipline}>{Object.entries(DISCIPLINE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+            <select name="discipline" defaultValue={event.discipline}>{DISCIPLINE_ORDER.map(d => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
             <span className="hint">Solo se puede cambiar mientras el cartel está vacío.</span>
           </label>
           <label className="field"><span>Recinto</span><input name="venue" defaultValue={event.venue} maxLength={LIMITS.venue} /></label>

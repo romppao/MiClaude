@@ -45,8 +45,9 @@ export async function createEvent(f: FormData) {
   if (!date) go(back, { problema: "fecha_invalida" });
   const level = str(f, "level") === "PRO" ? "PRO" : "AMATEUR";
   const disciplineRaw = str(f, "discipline");
-  const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : "BOXEO";
-  const province = readProvince(f, "province", back, "Madrid");
+  if (!isDiscipline(disciplineRaw)) go(back, { problema: "disciplina_no_valida" });
+  const discipline = disciplineRaw;
+  const province = readProvince(f, "province", back);
   const ticketRaw = str(f, "ticketUrl");
   const ticketUrl = ticketRaw ? safeHttpUrl(ticketRaw) : null;
   if (ticketRaw && !ticketUrl) go(back, { problema: "url_invalida" });

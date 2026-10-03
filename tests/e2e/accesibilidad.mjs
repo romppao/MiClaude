@@ -2,7 +2,7 @@
 // Recorre las pantallas públicas y las de usuario, moderador y organizador. Requiere el servidor en marcha (ver ayudas.mjs).
 // Sale con código 1 si hay incumplimientos de impacto «serious» o «critical».
 import AxeBuilder from "@axe-core/playwright";
-import { B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const problemas = [];
 async function analizar(page, ruta, etiqueta) {
@@ -16,7 +16,7 @@ async function analizar(page, ruta, etiqueta) {
 const pepe = await newUser("Accesible", "FIGHTER");
 await pepe.p.goto(B + "/mi-ficha");
 await pepe.p.fill("[name=firstName]", "Accesible"); await pepe.p.fill("[name=lastName]", `Prueba${rnd}`); await pepe.p.fill("[name=gym]", `Gimnasio Accesible ${rnd}`);
-await btn(pepe.p, "Crear mi ficha");
+await datosDeAlta(pepe.p); await btn(pepe.p, "Crear mi ficha");
 await pepe.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 await registrar(pepe.p, { evento: `Velada Accesible ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Accesible${rnd}` });
 await pepe.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();

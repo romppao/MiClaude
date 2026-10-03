@@ -1,8 +1,8 @@
 import type { Discipline, Level, Method } from "@prisma/client";
 import { divisionById } from "./competition";
 
-/** Orden de presentación: el boxeo va siempre en cabeza. Para añadir una disciplina: enum en Prisma (+ migración) y entradas aquí. */
-export const DISCIPLINE_ORDER: Discipline[] = ["BOXEO", "MMA", "MUAYTHAI", "KICKBOXING", "K1", "JIUJITSU"];
+/** Orden alfabético de los nombres visibles, sin prioridad editorial. Para añadir una disciplina: enum en Prisma (+ migración) y entradas aquí. */
+export const DISCIPLINE_ORDER: Discipline[] = ["BOXEO", "JIUJITSU", "K1", "KICKBOXING", "MMA", "MUAYTHAI"];
 
 export const DISCIPLINE_LABEL: Record<Discipline, string> = {
   BOXEO: "Boxeo",

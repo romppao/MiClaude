@@ -1,6 +1,6 @@
 // Categorías de peso por disciplina y nivel, y el panel de filtros de /peleadores: cada disciplina y cada nivel tienen sus propias categorías,
 // la lista cambia al elegir disciplina y nivel, y el filtro combina las tres cosas sobre la misma disciplina de la ficha.
-import { B, rnd, browser, seen, check, btn, newUser, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, btn, newUser, terminarDiagnosticos } from "./ayudas.mjs";
 
 /** Crea una ficha eligiendo disciplina, nivel y (opcional) categoría con el selector de tres pasos. */
 async function crearFicha(usuario, nombre, apellidos, { disciplina, nivel, categoria }) {
@@ -10,7 +10,7 @@ async function crearFicha(usuario, nombre, apellidos, { disciplina, nivel, categ
   await u.p.selectOption("main form select[name=discipline]", disciplina);
   await u.p.selectOption("main form select[name=level]", nivel);
   if (categoria) await u.p.selectOption("main form select[name=weightClass]", categoria);
-  await btn(u.p, "Crear mi ficha");
+  await datosDeAlta(u.p); await btn(u.p, "Crear mi ficha");
   await u.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
   return u.p;
 }

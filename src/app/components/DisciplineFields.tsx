@@ -11,7 +11,7 @@ export default function DisciplineFields({ defaults = {} }: { defaults?: Default
   const num = (v: number | null | undefined) => (v ?? "") as number | "";
   return (
     <>
-      <SelectorCategoria modo="ficha" defaults={{ discipline: defaults.discipline ?? "BOXEO", level: defaults.level ?? "AMATEUR", divisionId: defaults.divisionId, weightClass: defaults.weightClass }} />
+      <SelectorCategoria modo="ficha" defaults={{ discipline: defaults.discipline ?? "", level: defaults.level ?? "AMATEUR", divisionId: defaults.divisionId, weightClass: defaults.weightClass }} />
       <fieldset style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "8px 12px", flex: "1 1 100%" }}>
         <legend>Tus combates anteriores (opcional)</legend>
         <p className="mut" style={{ margin: "0 0 8px" }}>

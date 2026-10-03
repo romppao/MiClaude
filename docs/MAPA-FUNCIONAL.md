@@ -8,7 +8,7 @@
 
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
-| `/` | Descubre los deportes de contacto amateur de | Pública (cambia lo que ve según la cuenta) | — | Aura, Event, Fighter, Gym |
+| `/` | Tu comunidad de deportes de contacto en toda España | Pública (cambia lo que ve según la cuenta) | — | Aura, Event, Fighter, Gym |
 | `/ayuda` | ¿Cómo funciona Ring España? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/buscar` | Buscar | Pública | — | Event, Fighter, Gym, Trainer |

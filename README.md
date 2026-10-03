@@ -1,7 +1,7 @@
 # Ring España
 
-Comunidad y base de datos de los **deportes de contacto en España** — boxeo en cabeza, más MMA, kickboxing, K-1 y jiu-jitsu —,
-con el amateur primero y Madrid como plaza inicial: fichas de peleadores con su récord, calendario de veladas, gimnasios,
+Comunidad y base de datos de los **deportes de contacto de toda España**: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai,
+amateur y profesional. Fichas de peleadores con su récord, calendario de veladas, gimnasios,
 entrenadores, búsqueda y **aura** (el reconocimiento del público, que sustituye a las estrellas).
 
 **Stack:** Next.js 15 (App Router, Server Actions, TypeScript 5) · PostgreSQL 16 · Prisma 6 · sin otras dependencias de ejecución.

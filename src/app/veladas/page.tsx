@@ -33,7 +33,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Calendario de veladas</h1>
-      <p className="mut">Consulta el cartel y los resultados desde cada velada. «Hoy y próximas» incluye todo el día de hoy según la hora de Madrid; «Ya celebradas» muestra las fechas anteriores a hoy. Las canceladas llevan un aviso.</p>
+      <p className="mut">Consulta el cartel y los resultados desde cada velada. «Hoy y próximas» incluye todo el día de hoy según la hora peninsular (también usada para ordenar eventos de Canarias); «Ya celebradas» muestra las fechas anteriores a hoy. Las canceladas llevan un aviso.</p>
       <form className="search" role="search" aria-label="Filtrar veladas">
         <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>

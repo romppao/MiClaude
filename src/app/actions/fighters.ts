@@ -34,7 +34,7 @@ export async function createMyFighter(f: FormData) {
   const { choice, prior } = readDisciplineForm(f);
   if (!choice) go(back, { problema: "disciplina_no_valida" });
   if (!prior.ok) go(back, { problema: prior.error });
-  const province = readProvince(f, "province", back, "Madrid");
+  const province = readProvince(f, "province", back);
   const city = str(f, "city") || province;
   const gymName = str(f, "gym");
 
