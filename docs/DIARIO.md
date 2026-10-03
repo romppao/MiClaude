@@ -593,6 +593,30 @@ Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecuc
 
 ---
 
+## Sesión — 3 de octubre de 2026 — propuestas visuales diferenciadas
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió propuestas visuales mientras sigue el desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder».
+
+### Qué se decidió y por qué
+
+Se observó su identidad roja/blanca y se recomendó verde petróleo, marfil, pizarra y menta. Se descartaron las direcciones roja y naranja propuestas inicialmente. La elección final queda abierta.
+
+### Qué se hizo
+
+Se mostraron tres maquetas conceptuales y se ajustó la editorial a petróleo/marfil en móvil y escritorio. Se creó DISENO.md y se actualizaron los puntos de entrada para Claude. Se documentó también el fallo pendiente del CI 83 tras inspeccionar su artefacto.
+
+### Qué salió mal / qué se aprendió
+
+Las primeras maquetas añadían barras de aura y una confirmación global de ficha que no corresponden al modelo. Se corrigieron en la propuesta revisada. Las imágenes deben revisarse contra la funcionalidad real antes de convertirlas en código.
+
+### Estado y próximos pasos
+
+El fundador no se mostró convencido con petróleo/marfil y pidió más garra. Se mostró después azul noche/amarillo oro con tipografía deportiva y fotografía de entrenamientos; es la recomendación actual, pendiente de elección. Ningún cambio gráfico desplegado. Desarrollo en propuesta #8 pendiente de E2E/axe completo; no se declara terminado.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

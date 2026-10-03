@@ -124,3 +124,8 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 - **CI 79:** comprobar un resultado con `body.includes(nombre)` deja de ser válido cuando el nombre buscado aparece en el resumen de filtros; produce tanto falsos positivos como falsos negativos. Regla: esperar el estado visible del listado y comprobar las tarjetas de resultado, no el texto de toda la página.
 
 - Al cambiar un filtro de nivel desde `Fighter.level` a `FighterDiscipline.level`, los fixtures SQL que filtran por nivel deben crear la disciplina correspondiente. No basta con el valor por defecto de la ficha. Se corrige la preparación de las 30 fichas de paginación; el comportamiento del filtro se conserva.
+
+
+## Maquetas visuales y semántica — 3 de octubre de 2026
+
+El generador añadió barras de aura y una insignia de confirmación para toda la ficha. No representan el modelo real: aura es una cantidad sin tope y la confirmación corresponde a combates. Se retiraron en la propuesta revisada. Regla: revisar cifras, insignias y promesas de cada maqueta contra las funciones existentes antes de implementarla.

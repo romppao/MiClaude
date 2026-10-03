@@ -89,3 +89,17 @@ CI 79: se completó el recorrido de `flujo.mjs`, incluido el registro de MMA. Qu
 ### Revisión de los guiones que siguen al primer flujo
 
 La inspección encontró el mismo `body.includes(q)` en `integridad.mjs`, para una ficha provisional; se aplica la misma comprobación de listado vacío y ausencia de tarjeta. Además, la prueba de paginación en `busqueda.mjs` creaba 30 fichas sin `FighterDiscipline` pero filtraba por amateur; desde el último cambio de Claude, el nivel se filtra en la disciplina. Se crean también sus disciplinas amateur en los datos de prueba. Se mantienen las 30 fichas, la paginación y el filtro: no se relaja la prueba ni se cambia el producto.
+
+
+## Estado del CI 83 y relevo honesto
+
+La ejecución 83 (run `37109604469`, commit `e049fe4f83bcf63a2fe1dd7772f5b5147f893c5f`) vuelve a fallar en la comprobación del aviso de ficha sin titular con el mismo nombre, un fallo intermitente previamente documentado. Se descargó e inspeccionó el artefacto `11269835165`: la captura de Nuria muestra ya la ficha creada. Esa captura posterior no permite demostrar qué estado exacto había al comprobar el aviso; no se atribuye sin evidencia a un problema de espera ni se modifica el producto a ciegas. Sigue pendiente reproducir esa comprobación y completar los guiones posteriores, la nueva prueba de calendario y axe. La propuesta #8 sigue en borrador y no se ha integrado ni desplegado.
+
+## Propuestas visuales solicitadas después
+
+El fundador pidió propuestas de aspecto en paralelo al desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder». Se mostraron tres direcciones iniciales y se revisó la segunda para recomendar petróleo `#083D3B`, marfil `#F2EFE7`, pizarra `#152526` y menta `#BFE6D8`, tras observar los rojos de Raunder. Se descartaron rojo y naranja como propuestas de marca. También se corrigió la maqueta para no inventar porcentajes de aura ni una confirmación de toda la ficha. Detalles y estado de elección en [DISENO.md](DISENO.md). Son propuestas, sin cambios visuales aplicados a la demo.
+
+
+### Ajuste tras el comentario sobre garra y valentía
+
+El fundador no se mostró convencido con petróleo/marfil y pidió que la marca represente a la comunidad española de deportes de contacto con más garra. Se mostró una segunda revisión con azul noche `#0B1F3A`, amarillo oro `#F3C316` y blanco cálido `#F5F4EE`, títulos deportivos contundentes y fotografía de mujeres y hombres entrenando. Esta es la recomendación actual de Codex, pendiente de elección; la anterior no estaba aprobada. No se ha implementado ni desplegado ninguna de las dos.
