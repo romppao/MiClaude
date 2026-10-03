@@ -4,6 +4,10 @@
 
 Aplicación web para la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
 
+## Prioridad móvil — petición del fundador, 3 de octubre de 2026
+
+El móvil es la referencia principal del diseño y las interacciones, porque concentrará el uso. Conservar cabecera compacta con menú accesible, accesos inferiores con sección activa, texto de controles de 16 px y zonas táctiles de al menos 44 px. Validar reflujo a 320, 390 y 430 px, perfiles, menús y editor; no dar por suficiente una captura de escritorio. Véase el relevo y `tests/e2e/usabilidad.mjs`.
+
 ## Comunicación inclusiva — petición urgente del fundador, 3 de octubre de 2026
 
 La comunicación pública no debe presentar Madrid ni el boxeo como prioridad, aunque existan prioridades operativas internas. Hablar a personas de todas las ciudades y disciplinas admitidas, con el mismo trato. Portada y ránking empiezan sin filtros de provincia, disciplina o nivel; las altas piden elegir provincia y disciplina. Los listados siguen criterios de fecha, aura u orden alfabético, sin énfasis especial en boxeo. Conservar ubicaciones reales, reglamentos específicos y zona horaria técnica. No prometer cobertura ni datos que aún no existan. Esta instrucción prevalece sobre formulaciones anteriores de «Madrid primero» o «boxeo en cabeza».

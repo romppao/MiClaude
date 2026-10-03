@@ -68,6 +68,13 @@ jobs:
           name: diagnostico-pruebas
           path: test-results/
           if-no-files-found: ignore
+      - name: Capturas de móvil para revisión visual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: revision-movil
+          path: test-results/movil/
+          if-no-files-found: ignore
       - name: Log del servidor si algo falla
         if: failure()
         run: tail -n 100 "$MAIL_LOG" || true

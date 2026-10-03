@@ -199,3 +199,15 @@ La migración `20261003140000_identidad_perfiles` añade Profile y cinturón/gra
 339 pruebas unitarias pasan y la compilación de producción pasa. Nueva prueba de navegador `tests/e2e/perfiles.mjs`: subida real, persistencia, encuadre, cinturón visible, otra cuenta rechazada, eliminación e imágenes ocultas. La validación completa de PostgreSQL, migraciones, navegador y accesibilidad se ejecuta en CI antes de integrar. No hay PostgreSQL disponible en este entorno local. Se incorporan correcciones verificadas de los selectores y datos de las pruebas antiguas; no se desactiva ninguna prueba. El estado final de CI y publicación se registrará en el PR.
 
 Render está configurado en `render.yaml` para la rama `claude/ring-espana-mvp`; `scripts/arranque-demo.sh` aplica migraciones. La actualización se ha combinado con la rama vigente de la demo (7580902), preservando las categorías por edad, la comunicación inclusiva y el calendario incorporados durante el trabajo.
+
+## 3 de octubre de 2026 — el móvil es la referencia principal
+
+Petición del fundador: «Es muy importante que la aplicación esté muy bien diseñada para dispositivos móviles ya que es lo que más usarán los usuarios».
+
+Se sustituye la cabecera móvil extensa por un botón Menú: conserva navegación, ayuda, acciones de cuenta y búsqueda en un único panel, sin duplicar permisos ni formularios. Escape cierra el panel y devuelve el foco; cambiar de ruta lo cierra. La barra inferior incluye iconos acompañados de texto y marca la sección actual, también dentro de los perfiles. El panel se usa hasta 1000 px para admitir tabletas y evitar columnas de enlaces comprimidas.
+
+La portada usa tipografía proporcional al ancho; los perfiles apilan foto y nombre en móviles estrechos. Los controles mantienen texto de 16 px, las acciones y enlaces de navegación tienen zonas táctiles de al menos 44 px y el pie reserva espacio para la barra y el área segura inferior. Se conserva el violeta #BE33F5, brillo y esquinas redondeadas. Los filtros continúan visibles, con sus etiquetas y ayudas deportivas.
+
+Pruebas nuevas en `tests/e2e/usabilidad.mjs`: 320, 390 y 430 px; menú, Escape/foco, navegación, sección activa, áreas táctiles, ausencia de desbordamiento en nueve pantallas, pie libre de solapamiento, editor propio y acciones de cuenta. Axe mide el perfil con el menú móvil abierto. Los recorridos privados anteriores y las pruebas de perfiles siguen siendo obligatorios. No sustituye pruebas con personas ni una revisión en teléfonos físicos.
+
+Estado de este bloque: implementado; validación completa de navegador en CI e integración pendientes. No cambia el esquema de datos ni requiere migraciones.

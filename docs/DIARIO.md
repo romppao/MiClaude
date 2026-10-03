@@ -818,3 +818,29 @@ La primera consulta seguía mostrando la versión antigua mientras Render constr
 ### Estado y próximos pasos
 
 Los cambios funcionales y de comunicación están integrados y visibles en <https://ring-espana-demo.onrender.com/>. CI de propuesta e integración aprobado. Se conserva la base de la demo: el arranque solo añade migraciones y carga ejemplos si está vacía. Pendientes anteriores fuera de este bloque: catálogo completo de pesos IMMAF/IBJJF, decisiones sobre menores, pruebas con personas y aplicación del diseño visual elegido.
+
+## Sesión — 3 de octubre de 2026 — prioridad móvil
+
+### Qué se pidió / qué idea surgió
+
+El fundador indicó que el móvil concentrará el uso y pidió un diseño especialmente cuidado para estos dispositivos.
+
+### Qué se decidió y por qué
+
+Usar el móvil como referencia, reducir la altura de la cabecera sin perder opciones y adaptar los perfiles en pantallas estrechas. Conservar filtros visibles y permisos existentes.
+
+### Qué se hizo
+
+Menú de cabecera compartido con búsqueda y acciones de cuenta, cierre por navegación/Escape, barra inferior con iconos y sección activa, perfiles apilados a 480 px, portada proporcional y controles táctiles. Se añaden recorridos reales a 320/390/430 px, comprobación de solapamientos y axe con menú abierto.
+
+### Qué salió mal / qué se aprendió
+
+TypeScript detectó que usePathname puede devolver null: se trata explícitamente antes de calcular la sección activa. No se cambian los datos ni las autorizaciones.
+
+### Estado y próximos pasos
+
+339 unitarias correctas. Validación de tipos/compilación en curso y pruebas de navegador completas pendientes en CI antes de integrar y comprobar Render. Las pruebas con usuarios en teléfonos físicos siguen pendientes.
+
+### Continuación de la validación móvil
+
+CI #125 detectó un fallo del editor de datos a 320 px. Se separaron las comprobaciones de ancho y fuente y se abrieron los datos de la ficha, añadiendo además el editor real de foto/banner. CI #127 identificó 15 px extra en Mi ficha: la regla de tablas apiladas sobrescribía el ancho de un caption sr-only destinado al lector de pantalla. Se restaura su caja de 1×1 px sin retirar el texto accesible ni ocultar el desbordamiento general. El editor de foto/banner, controles de 16 px, navegación, perfiles públicos y axe móvil pasaron. Se revalida la corrección antes de integrar.

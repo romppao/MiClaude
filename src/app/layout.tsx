@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
+import HeaderMenu from "./components/HeaderMenu";
+import MobileNav from "./components/MobileNav";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
@@ -26,6 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="top">
           <div className="in">
             <Link href="/" className="logo"><svg className="brand-mark" viewBox="0 0 64 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="18" ry="12" transform="rotate(-35 24 24)" fill="none" stroke="currentColor" strokeWidth="7"/><ellipse cx="42" cy="24" rx="18" ry="12" transform="rotate(-35 42 24)" fill="none" stroke="currentColor" strokeWidth="7"/></svg>RING <b>ESPAÑA</b></Link>
+            <HeaderMenu>
             <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>
@@ -48,9 +51,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               )}
             </div>
             <form action="/buscar" role="search" aria-label="Búsqueda rápida" className="buscador">
-              <input name="q" aria-label="Buscar peleadores, gimnasios, entrenadores o veladas" placeholder="Buscar…" maxLength={80} />
+              <label className="header-search-label" htmlFor="header-search">Buscar en Ring España</label>
+              <input id="header-search" name="q" aria-label="Buscar peleadores, gimnasios, entrenadores o veladas" placeholder="Buscar…" maxLength={80} />
               <button className="secondary">Buscar</button>
             </form>
+            </HeaderMenu>
           </div>
         </header>
         {demoActiva() && (
@@ -68,7 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Link href="/privacidad">Privacidad</Link>
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
-        <nav className="mobile-nav" aria-label="Navegación móvil"><Link href="/">Inicio</Link><Link href="/peleadores">Peleadores</Link><Link href="/veladas">Veladas</Link><Link href="/gimnasios">Gimnasios</Link></nav>
+        <MobileNav />
       </body>
     </html>
   );

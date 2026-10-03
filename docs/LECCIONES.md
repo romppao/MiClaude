@@ -171,3 +171,11 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 - CI #107 validó la personalización de los cinco tipos. La comprobación del sello del gimnasio falló porque buscaba dentro de h1; el componente nuevo coloca el sello junto al título. Comprobar el sello con su texto y título explicativo dentro de la cabecera, preservando la verificación real y la privacidad de su nota.
 
 - CI #109: la comprobación de reclamación pasó en #107 y falló en #109. Esperaba el aviso, pero contaba el botón sin esperar a que apareciera; ahora ambos elementos se esperan con el mismo límite de tiempo. El diagnóstico asincrónico podía capturar la segunda creación en lugar del estado fallido: se espera su finalización antes de continuar. Esto corrige la sincronización y conserva las dos exigencias, sin afirmar que la captura anterior demostrara una duplicación de fichas.
+
+## 3 de octubre de 2026 — rutas y navegación adaptable
+
+usePathname puede ser null según los tipos de compatibilidad de Next. La comprobación de tipos encontró una llamada a startsWith sin tratar ese caso. Calcular el estado activo con una cadena segura y comprobar tipos antes de publicar. La cabecera no debe repartir navegación, cuenta y buscador en columnas comprimidas: en tabletas y móviles se usa un panel único, manteniendo los permisos calculados en el servidor.
+
+### Validación móvil: títulos accesibles y desbordamiento
+
+CI #125 detectó un fallo a 320 px en Mi ficha. La aserción inicial mezclaba ancho y tamaño de texto; #127 los separó y mostró desborde de 15 px, con controles de 16 px correctos. La regla `table.apilada caption { width:100% }` prevalecía sobre `sr-only`: un título absoluto oculto para lectores de pantalla medía 320 px desde el margen de la tabla, creando 15 px extra. Se conserva el título accesible y se restaura su caja de 1×1 px en móvil. No ocultar el desbordamiento general con overflow-x:hidden: medir el elemento que lo causa y corregir su geometría.

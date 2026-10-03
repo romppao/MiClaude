@@ -181,3 +181,15 @@ Comprobación pública después del despliegue: portada `https://ring-espana-dem
 Para personalizar: peleador → Mi ficha → Editar foto y banner; promotor o titular de una entidad → Mi cuenta → su perfil. Moderación puede asignar titulares con correo confirmado desde el editor y crear federaciones desde su directorio. Sin foto aparece una identidad con iniciales; sin banner, el fondo violeta. La demo no atribuye fotografías ficticias a los peleadores.
 
 Este resultado sustituye los estados «pendiente de elección», «sin modificar la demo» y «pendiente de comprobar CI» de las entradas históricas de diseño. Las categorías por edad y la comunicación nacional incorporadas previamente se mantienen.
+
+## 3 de octubre de 2026 — el móvil es la referencia principal
+
+Petición del fundador: «Es muy importante que la aplicación esté muy bien diseñada para dispositivos móviles ya que es lo que más usarán los usuarios».
+
+Se sustituye la cabecera móvil extensa por un botón Menú: conserva navegación, ayuda, acciones de cuenta y búsqueda en un único panel, sin duplicar permisos ni formularios. Escape cierra el panel y devuelve el foco; cambiar de ruta lo cierra. La barra inferior incluye iconos acompañados de texto y marca la sección actual, también dentro de los perfiles. El panel se usa hasta 1000 px para admitir tabletas y evitar columnas de enlaces comprimidas.
+
+La portada usa tipografía proporcional al ancho; los perfiles apilan foto y nombre en móviles estrechos. Los controles mantienen texto de 16 px, las acciones y enlaces de navegación tienen zonas táctiles de al menos 44 px y el pie reserva espacio para la barra y el área segura inferior. Se conserva el violeta #BE33F5, brillo y esquinas redondeadas. Los filtros continúan visibles, con sus etiquetas y ayudas deportivas.
+
+Pruebas nuevas en `tests/e2e/usabilidad.mjs`: 320, 390 y 430 px; menú, Escape/foco, navegación, sección activa, áreas táctiles, ausencia de desbordamiento en nueve pantallas, pie libre de solapamiento, editor propio y acciones de cuenta. Axe mide el perfil con el menú móvil abierto. Los recorridos privados anteriores y las pruebas de perfiles siguen siendo obligatorios. No sustituye pruebas con personas ni una revisión en teléfonos físicos.
+
+Estado de este bloque: implementado; validación completa de navegador en CI e integración pendientes. No cambia el esquema de datos ni requiere migraciones.
