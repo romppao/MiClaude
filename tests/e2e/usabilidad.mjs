@@ -1,6 +1,7 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
 import { datosDeAlta, B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import AxeBuilder from "@axe-core/playwright";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -197,6 +198,41 @@ check("en el móvil, la ficha de la velada tampoco se sale del ancho", await see
 const textoVelada = await cuerpo(movil);
 check("en la velada, un resultado declarado por un peleador no se da por hecho: se dice que está pendiente de confirmar por el rival", textoVelada.includes("pendiente de confirmar por el rival") && !textoVelada.includes("Gana Movil"));
 check("y una velada que no ha publicado un organizador lo explica con texto visible (no solo en un aviso emergente)", textoVelada.includes("no la ha publicado un organizador"));
+
+// 9) Móvil como referencia: navegación, teclado, formularios y perfiles en tres anchos reales.
+for (const width of [320, 390, 430]) {
+  await movil.setViewportSize({ width, height: 844 });
+  await movil.goto(B + "/");
+  const menu = movil.getByRole("button", { name: "Menú", exact: true });
+  check(`${width}px: cabecera compacta y menú cerrado al entrar`, await seen(menu) && await movil.locator("header").evaluate((el) => el.getBoundingClientRect().height < 100) && await menu.getAttribute("aria-expanded") === "false");
+  await menu.click();
+  check(`${width}px: el menú muestra entrenadores, acceso y búsqueda sin desbordamiento`, await seen(movil.getByRole("navigation", { name: "Principal", exact: true }).getByRole("link", { name: "Entrenadores" })) && await seen(movil.locator("header .cuenta a[href='/entrar']")) && await seen(movil.locator("header form[role=search] input")) && await anchoDesbordado(movil) <= 1);
+  await movil.locator("#header-search").focus();
+  await movil.keyboard.press("Escape");
+  check(`${width}px: Escape cierra el menú y devuelve el foco al botón`, await menu.getAttribute("aria-expanded") === "false" && await menu.evaluate((el) => el === document.activeElement));
+  await menu.click();
+  await movil.getByRole("navigation", { name: "Principal", exact: true }).getByRole("link", { name: "Entrenadores" }).click();
+  await movil.waitForURL("**/entrenadores");
+  check(`${width}px: navegar cierra el menú`, await menu.getAttribute("aria-expanded") === "false");
+  for (const ruta of ["/", "/peleadores?disciplina=BOXEO&level=AMATEUR", `/peleadores/movil-ficha${rnd}`, rutaVelada, "/gimnasios", "/entrenadores", "/promotores", "/federaciones", "/registro"]) {
+    await movil.goto(B + ruta);
+    check(`${width}px: ${ruta} cabe en la pantalla`, await anchoDesbordado(movil) <= 1);
+  }
+  await movil.goto(B + `/peleadores/movil-ficha${rnd}`);
+  const active = movil.locator(".mobile-nav a[aria-current=page]");
+  check(`${width}px: el perfil mantiene Peleadores como sección activa`, await active.count() === 1 && await active.getAttribute("href") === "/peleadores");
+  check(`${width}px: los cuatro accesos inferiores tienen al menos 44×44 px`, await movil.locator(".mobile-nav a").evaluateAll((els) => els.length === 4 && els.every((el) => { const r = el.getBoundingClientRect(); return r.width >= 44 && r.height >= 44; })));
+  await movil.locator("footer").scrollIntoViewIfNeeded();
+  check(`${width}px: la barra inferior no tapa el último enlace del pie`, await movil.evaluate(() => { const links = document.querySelectorAll("footer a"); return links[links.length - 1].getBoundingClientRect().bottom <= document.querySelector(".mobile-nav").getBoundingClientRect().top; }));
+}
+await movil.getByRole("button", { name: "Menú", exact: true }).click();
+const axeMovil = await new AxeBuilder({ page: movil }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+check("el perfil y el menú móvil abierto pasan axe WCAG 2.2 AA", axeMovil.violations.length === 0);
+await peleadorMovil.p.setViewportSize({ width: 320, height: 740 });
+await peleadorMovil.p.goto(B + "/mi-ficha");
+check("el editor propio cabe a 320px y los campos evitan el zoom automático de iOS", await anchoDesbordado(peleadorMovil.p) <= 1 && await peleadorMovil.p.locator("main input:not([type=checkbox]):not([type=hidden]), main select, main textarea").evaluateAll((els) => els.every((el) => parseFloat(getComputedStyle(el).fontSize) >= 16)));
+await peleadorMovil.p.getByRole("button", { name: "Menú", exact: true }).click();
+check("el menú móvil conserva Mi ficha, Mi cuenta y Salir para el titular", await seen(peleadorMovil.p.locator("header a[href='/mi-ficha']")) && await seen(peleadorMovil.p.locator("header a[href='/mi-cuenta']")) && await seen(peleadorMovil.p.locator("header button", { hasText: "Salir" })));
 
 
 await terminarDiagnosticos();
