@@ -20,8 +20,8 @@ sql(`insert into "Bout" (id,"eventId","fighterAId","fighterBId",result,verificat
   insert into "Aura" (id,"userId","fighterId","boutId","updatedAt") values ('${prefix}Mixto','${prefix}Fan','${prefix}MMA','${prefix}Mixto',now());`);
 const p = await (await browser.newContext()).newPage();
 await p.goto(B);
-check("la portada se presenta como comunidad de toda España", await seen(p.getByRole("heading", { name: "Tu comunidad de deportes de contacto en toda España", exact: true })));
-const enlaces = p.locator(".hero a.card");
+check("la portada se presenta como comunidad de toda España", await seen(p.getByRole("heading", { name: /Tu deporte\.\s*Tu gente\./ })) && (await p.locator("main").innerText()).includes("Tu comunidad de deportes de contacto en toda España"));
+const enlaces = p.locator(".community-discovery a.card");
 check("las seis disciplinas tienen igual énfasis y orden alfabético", JSON.stringify(await enlaces.allInnerTexts()) === JSON.stringify(disciplinas.map(d => d[1])) && (await enlaces.evaluateAll(xs => xs.map(x => getComputedStyle(x).fontWeight))).every(x => x === "500"));
 const eventos = await p.locator("main .grid").nth(1).innerText();
 check("la portada incluye veladas de seis disciplinas, varias provincias y ambos niveles", disciplinas.every(([,label]) => eventos.includes(`${prefix} ${label}`)) && eventos.includes("Valencia") && eventos.includes("Profesional") && eventos.includes("Amateur"));

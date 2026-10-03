@@ -138,6 +138,23 @@ El fundador valora mejor azul noche/amarillo oro, pero considera la composición
 
 El fundador ha elegido `#BE33F5` como color oficial. Se mantiene su petición de una aplicación más juvenil y llamativa que las propuestas anteriores. Se consultaron los quince recursos de su imagen, con límites de acceso documentados, y se revisaron visualmente ejemplos deportivos de Landbook. Se mostró una nueva portada violeta de comunidad. Solo el color está aprobado; diseño, logotipo y tipografía siguen abiertos. No hay cambios gráficos aplicados a la demo. Fuentes y decisiones en DISENO.md y aviso explícito en CLAUDE.md.
 
+## Aplicación de los diseños aprobados — 3 de octubre de 2026
+
+Origen: el fundador pidió «ya puedes aplicar todo esto a la aplicación en GitHub» para verlo en Render. Se implementa #BE33F5 con brillo, esquinas redondeadas, portada de comunidad adaptable y la misma cabecera para peleadores, gimnasios, entrenadores, promotores y federaciones. Las fotos y banners son independientes, con encuadre horizontal/vertical y eliminación. La imagen de portada es ilustrativa y sus personas ficticias.
+
+Los peleadores conservan nivel amateur/profesional y categoría por disciplina. Jiu-jitsu incorpora cinturón y grados opcionales, marcados como declaración del deportista; no son una acreditación federativa. Se conservan récords por disciplina y aura por combate.
+
+### Implementación y permisos
+
+Nuevo módulo `src/lib/profiles`, componentes ProfileHeader/ProfileEditor y editor `/perfiles/[kind]/[id]/editar`. Peleadores y promotores editan su propio perfil; moderación puede editar todos. Moderación asigna gimnasios, entrenadores y federaciones a cuentas con correo confirmado; el titular encuentra sus perfiles en Mi cuenta. Las federaciones se crean desde el directorio por moderación y no llevan acreditación automática. No se inventan perfiles de entidades ni se asigna su control automáticamente.
+
+La migración `20261003140000_identidad_perfiles` añade Profile y cinturón/grados; no borra registros existentes. Fotos WebP en PostgreSQL para persistir entre despliegues de Render sin disco persistente. Sharp comprueba formato real, tamaño máximo 4 MB por imagen, máximo 25 millones de píxeles, descarta animaciones, retira metadatos y reduce dimensiones. La ruta de imágenes verifica visibilidad y permisos; no publica imágenes de fichas ocultas. La exportación de cuenta incluye las imágenes; anonimizar un peleador retira su personalización y graduación.
+
+### Validación y despliegue
+
+339 pruebas unitarias pasan y la compilación de producción pasa. Nueva prueba de navegador `tests/e2e/perfiles.mjs`: subida real, persistencia, encuadre, cinturón visible, otra cuenta rechazada, eliminación e imágenes ocultas. La validación completa de PostgreSQL, migraciones, navegador y accesibilidad se ejecuta en CI antes de integrar. No hay PostgreSQL disponible en este entorno local. Se incorporan correcciones verificadas de los selectores y datos de las pruebas antiguas; no se desactiva ninguna prueba. El estado final de CI y publicación se registrará en el PR.
+
+Render está configurado en `render.yaml` para la rama `claude/ring-espana-mvp`; `scripts/arranque-demo.sh` aplica migraciones. La actualización se ha combinado con la rama vigente de la demo (7580902), preservando las categorías por edad, la comunicación inclusiva y el calendario incorporados durante el trabajo.
 ## Continuación urgente — Comunicación inclusiva, 3 de octubre de 2026
 
 Petición del fundador: no dar a entender que Madrid y boxeo son la prioridad pública, para que otras ciudades y disciplinas no se sientan excluidas. Portada nacional sin filtro de nivel o disciplina, consultas y contadores acordes, disciplinas alfabéticas con igual énfasis. Ránking inicial nacional con todas las disciplinas, agrupadas por sus propias categorías y posiciones. Altas de fichas/veladas sin ciudad, provincia ni disciplina asumidas, con selección y validación explícitas; edición conserva lo guardado. Ayuda, metadatos, búsqueda y README coherentes. «Hora de Madrid» se explica como hora peninsular del calendario, sin cambiar la zona técnica ni las ubicaciones reales. La norma editorial está en `CLAUDE.md`; las entradas históricas del diario se conservan. Se añaden comprobaciones de datos de varias disciplinas y provincias y se actualizan los datos explícitos de los guiones anteriores. Esta continuación conserva las categorías por edad y todo el trabajo de #10. Integración y despliegue pendientes.

@@ -217,6 +217,7 @@ model User {
   notifyEmails     Boolean           @default(true)
   emailVerifiedAt  DateTime?
   createdAt        DateTime          @default(now())
+  profiles         Profile[]
   sessions         Session[]
   fighter          Fighter?
   boutsCreated     Bout[]            @relation("BoutCreator")
@@ -357,6 +358,8 @@ model Follow {
 // Disciplinas que practica un peleador: categoría de peso y récord de partida (declarado por él) en cada una.
 // Una sola ficha por persona; el récord registrado en la app se calcula aparte, a partir de los combates.
 model FighterDiscipline {
+  belt String?
+  beltDegrees Int?
   fighterId   String
   fighter     Fighter    @relation(fields: [fighterId], references: [id], onDelete: Cascade)
   discipline  Discipline
@@ -384,4 +387,28 @@ model RateHit {
 
   @@index([key, createdAt])
   @@index([createdAt])
+}
+
+// Identidad visual común. Las imágenes viven en PostgreSQL, no en el disco efímero de Render.
+model Profile {
+  id          String @id @default(cuid())
+  kind        String
+  entityId    String
+  ownerId     String?
+  owner       User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String?
+  bio         String?
+  city        String?
+  website     String?
+  hasAvatar   Boolean @default(false)
+  hasBanner   Boolean @default(false)
+  avatar      Bytes?
+  banner      Bytes?
+  avatarX     Int @default(50)
+  avatarY     Int @default(50)
+  bannerX     Int @default(50)
+  bannerY     Int @default(50)
+  updatedAt   DateTime @updatedAt
+  @@unique([kind, entityId])
+  @@index([ownerId])
 }

@@ -1,3 +1,5 @@
+import ProfileThumbnail from "../components/ProfileThumbnail";
+import { graduationLabel } from "../../lib/fighters/graduation";
 import Link from "next/link";
 import type { Discipline, Level, Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
@@ -57,7 +59,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       <div className="grid">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
-            <strong>{b.firstName} {b.lastName}</strong>
+            <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong>
             <div className="mut">{b.alias ? `“${b.alias}”` : ""}{b.alias && (b.province || b.gym) ? " · " : ""}{[b.province, b.gym?.name].filter(Boolean).join(" · ")}</div>
             {[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => (
               <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {divisionLabel(d.divisionId)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""}</div>

@@ -1,3 +1,5 @@
+import ProfileHeader from "../../components/ProfileHeader";
+import { graduationLabel } from "../../../lib/fighters/graduation";
 import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -90,9 +92,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <span className={`tag ${fighter.level}`}>{LEVEL_LABEL[fighter.level]}</span>
+      <ProfileHeader kind="peleador" id={fighter.id} name={nombre} visible={publica} subtitle={publica ? fighter.alias ?? fighter.city ?? undefined : undefined}>
+        <div className="discipline-tags">{fighter.disciplines.map(d => <div key={d.discipline} className="discipline-badge"><span className={`tag ${d.level}`}>{LEVEL_LABEL[d.level]}</span><strong>{DISCIPLINE_LABEL[d.discipline]}</strong>{d.weightClass && <span>{weightClassLabel(d.discipline,d.level,d.weightClass,d.divisionId)}</span>}{publica && graduationLabel(d.belt,d.beltDegrees) && <span>{graduationLabel(d.belt,d.beltDegrees)} · Declarado por el deportista</span>}</div>)}</div>
+        <a className="btn" href="#combates">Ver combates</a>
+      </ProfileHeader>
       {!fighter.listed && !fighter.hiddenAt && <span className="tag">ficha sin reclamar</span>}
-      <h1>{nombre}</h1>
+
       {publica && fighter.alias && <p className="mut">“{fighter.alias}”</p>}
       {!publica && (
         <p className="mut">
@@ -134,7 +139,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       )}
       {reportForm("FIGHTER", fighter.id, undefined, `la ficha de ${nombre}`)}
 
-      <h2>Combates</h2>
+      <h2 id="combates">Combates</h2>
       <div className="table-wrap" tabIndex={0} role="region" aria-label={`Combates de ${nombre}`}>
       <table className="apilada">
         <caption className="mut" style={{ textAlign: "left" }}>Combates de {nombre}, del más reciente al más antiguo</caption>

@@ -8,17 +8,20 @@
 
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
-| `/` | Tu comunidad de deportes de contacto en toda España | Pública (cambia lo que ve según la cuenta) | — | Aura, Event, Fighter, Gym |
+| `/` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | Aura, Event, Fighter, Gym |
 | `/ayuda` | ¿Cómo funciona Ring España? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/buscar` | Buscar | Pública | — | Event, Fighter, Gym, Trainer |
 | `/entrar` | Entrar en tu cuenta | Pública | `accounts.login` | — |
 | `/entrenadores` | Entrenadores | Pública | — | Trainer |
 | `/entrenadores/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Trainer |
+| `/federaciones` | Federaciones | Pública (cambia lo que ve según la cuenta) | `profiles.createFederation` | Profile |
+| `/federaciones/:id` | (ficha individual: el título depende del elemento) | Pública | — | Profile |
 | `/gimnasios` | Gimnasios | Pública | — | Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Gym |
-| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Report |
-| `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, Follow, OrganizerRequest, Report |
+| `/imagenes/:kind/:id/:slot` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | — | Profile |
+| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report |
+| `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, Follow, OrganizerRequest, Profile, Report |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
@@ -28,7 +31,10 @@
 | `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent` | Event, Fighter |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
 | `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, Follow |
+| `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | User |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
+| `/promotores` | Promotores | Pública | — | User |
+| `/promotores/:id` | (ficha individual: el título depende del elemento) | Pública | — | Event, User |
 | `/ranking` | Ránking de aura | Pública | — | — |
 | `/recuperar` | ¿Has olvidado tu contraseña? | Pública | `accounts.requestPasswordReset` | — |
 | `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
@@ -50,7 +56,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `changePassword` | Cuenta con sesión iniciada | RateHit, Session, User | — | Sí | contrasena_guardada |
-| `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Fighter, RateHit, Session, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
+| `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Fighter, FighterDiscipline, Profile, RateHit, Session, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | RateHit, Session, User | — | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
 | `register` | Cualquiera | EmailToken, RateHit, Session, User | — | Sí | — |
@@ -120,8 +126,15 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `adminDecide` | Moderación | AuditLog, Bout, Fighter | BOUT: (varias) | — | moderacion_rechazado, moderacion_restaurado, moderacion_verificado |
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, User | ORGANIZER: (varias) | Sí | — |
-| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, Report | REPORT: (varias) | — | — |
+| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterDiscipline, Profile, Report | REPORT: (varias) | — | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
+
+### `profiles`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `createFederation` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: FEDERATION_CREATED | — | — |
+| `saveProfile` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: PROFILE_UPDATED | — | perfil_guardado |
 
 ## Tablas y quién escribe en ellas
 
@@ -138,11 +151,12 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport` |
+| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 | Report | `community.createReport`, `moderation.resolveReport` |
 | Follow | `community.toggleFollow`, `moderation.decideClaim` |
-| FighterDiscipline | `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline` |
+| FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `moderation.resolveReport` |
 | RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification` |
+| Profile | `accounts.deleteAccount`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -208,5 +222,13 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `anonymize.ts` | `anonymizeFighter`, `scrubFighterHistory` |
 | `coherence.ts` | `FLAG_LABEL`, `Flag`, `MIN_DAYS_BETWEEN_BOUTS`, `proximityAppliesTo`, `proximityFlags` |
 | `fighters.ts` | `findNameCandidates` |
+| `graduation.ts` | `BELTS`, `graduationLabel`, `parseGraduation` |
 | `prior.ts` | `PriorError`, `PriorParse`, `parsePrior` |
 | `record.ts` | `BoutForRecord`, `Prior`, `Records`, `Tally`, `combinedRecord`, `computeRecords`, `emptyTally`, `formatRecord`, `priorIsDetailed` |
+
+### `lib/profiles`
+
+| Fichero | Exporta |
+|---|---|
+| `images.ts` | `MAX_IMAGE_BYTES`, `imagePosition`, `normalizeImage` |
+| `profiles.ts` | `PROFILE_KINDS`, `ProfileKind`, `canEditProfile`, `profileAccess`, `profileKind`, `profileSelect`, `profileSource` |

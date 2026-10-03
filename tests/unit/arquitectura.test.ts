@@ -23,6 +23,7 @@ const PERMITIDAS: Record<string, string[]> = {
   bouts: ["common"],
   aura: ["common"],
   community: ["common", "accounts"],
+  profiles: ["common"],
 };
 
 const ficheros = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? ficheros(join(dir, e.name)) : /\.tsx?$/.test(e.name) ? [join(dir, e.name)] : []));

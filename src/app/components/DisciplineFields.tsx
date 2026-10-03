@@ -2,6 +2,7 @@ import type { Discipline, Level } from "@prisma/client";
 import SelectorCategoria from "./SelectorCategoria";
 
 type Defaults = {
+  belt?: string | null; beltDegrees?: number | null;
   discipline?: Discipline; level?: Level; weightClass?: string | null; divisionId?: string | null;
   priorTotal?: number | null; priorWins?: number | null; priorLosses?: number | null; priorDraws?: number | null;
 };
@@ -11,7 +12,7 @@ export default function DisciplineFields({ defaults = {} }: { defaults?: Default
   const num = (v: number | null | undefined) => (v ?? "") as number | "";
   return (
     <>
-      <SelectorCategoria modo="ficha" defaults={{ discipline: defaults.discipline ?? "", level: defaults.level ?? "AMATEUR", divisionId: defaults.divisionId, weightClass: defaults.weightClass }} />
+      <SelectorCategoria modo="ficha" defaults={{ discipline: defaults.discipline ?? "", level: defaults.level ?? "AMATEUR", belt: defaults.belt, beltDegrees: defaults.beltDegrees, divisionId: defaults.divisionId, weightClass: defaults.weightClass }} />
       <fieldset style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "8px 12px", flex: "1 1 100%" }}>
         <legend>Tus combates anteriores (opcional)</legend>
         <p className="mut" style={{ margin: "0 0 8px" }}>

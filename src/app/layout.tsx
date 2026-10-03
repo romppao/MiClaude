@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
-            <Link href="/" className="logo">RING <b>ESPAÑA</b></Link>
+            <Link href="/" className="logo"><svg className="brand-mark" viewBox="0 0 64 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="18" ry="12" transform="rotate(-35 24 24)" fill="none" stroke="currentColor" strokeWidth="7"/><ellipse cx="42" cy="24" rx="18" ry="12" transform="rotate(-35 42 24)" fill="none" stroke="currentColor" strokeWidth="7"/></svg>RING <b>ESPAÑA</b></Link>
             <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>
@@ -64,9 +64,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Link href="/ayuda">¿Cómo funciona?</Link>
           <Link href="/organizador">Organizar una velada</Link>
           {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
+          <Link href="/federaciones">Federaciones</Link><Link href="/promotores">Promotores</Link>
           <Link href="/privacidad">Privacidad</Link>
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
+        <nav className="mobile-nav" aria-label="Navegación móvil"><Link href="/">Inicio</Link><Link href="/peleadores">Peleadores</Link><Link href="/veladas">Veladas</Link><Link href="/gimnasios">Gimnasios</Link></nav>
       </body>
     </html>
   );

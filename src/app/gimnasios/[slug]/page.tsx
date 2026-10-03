@@ -1,3 +1,6 @@
+import ProfileThumbnail from "../../components/ProfileThumbnail";
+import ProfileHeader from "../../components/ProfileHeader";
+import ProfileDetails from "../../components/ProfileDetails";
 import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -21,7 +24,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
   if (!gym) notFound();
   return (
     <>
-      <h1>{gym.name} {gym.verifiedAt && <span className="tag PRO" title="Verificado por un moderador">✓ verificado</span>}</h1>
+      <ProfileHeader kind="gimnasio" id={gym.id} name={gym.name} subtitle={[gym.city,gym.province].join(" · ")}>{gym.verifiedAt && <span className="tag" title="Verificado por un moderador">✓ verificado</span>}</ProfileHeader><ProfileDetails kind="gimnasio" id={gym.id}/>
       <p className="mut">{[gym.address, gym.city, gym.province].filter(Boolean).join(", ")}</p>
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       <h2>Entrenadores</h2>
@@ -29,7 +32,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       <h2>Peleadores</h2>
       {gym.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este gimnasio en Ring España.</p>}
       <div className="grid">
-        {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><strong>{b.firstName} {b.lastName}</strong></Link>)}
+        {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card"><span className={`tag ${b.level}`}>{LEVEL_LABEL[b.level]}</span><ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>
     </>
   );
