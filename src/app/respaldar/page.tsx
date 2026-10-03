@@ -26,7 +26,7 @@ export default async function Backing({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const actor = await requireSupportActor();
+  const actor = await requireSupportActor("/respaldar");
   const admin = actor.user.role === "ADMIN";
   const raw = await searchParams;
   const q = oneParam(raw.q)?.trim().slice(0, 160) ?? "";

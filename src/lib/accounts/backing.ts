@@ -3,8 +3,8 @@ import type { Discipline, SupportKind } from "@prisma/client";
 import { requireVerifiedUser } from "./auth";
 import { db } from "../common/db";
 
-export async function requireSupportActor() {
-  const user = await requireVerifiedUser();
+export async function requireSupportActor(next?: string) {
+  const user = await requireVerifiedUser(next);
   const accreditation = await db.supportAccreditation.findUnique({
     where: { userId: user.id },
   });
