@@ -27,7 +27,7 @@ const primer = async (ruta, patron) => {
   return anon.locator(`a[href^="${patron}"]`).first().getAttribute("href");
 };
 const fichaPeleador = `/peleadores/accesible-prueba${rnd}`;
-const fichaVelada = await primer("/veladas?past=1", "/veladas/");
+const fichaVelada = await primer("/veladas?past=todas", "/veladas/");
 const fichaGimnasio = await primer("/gimnasios", "/gimnasios/");
 sql(`insert into "Trainer"(id, slug, name) values ('ent${rnd}', 'entrenador-accesible-${rnd}', 'Entrenador Accesible ${rnd}');`); // los entrenadores no se crean desde la web
 const fichaEntrenador = `/entrenadores/entrenador-accesible-${rnd}`;

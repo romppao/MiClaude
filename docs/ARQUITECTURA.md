@@ -64,7 +64,7 @@ Decisiones clave:
 1. **El récord se calcula, no se guarda** (`lib/fighters/record.ts`), por disciplina y nivel. No puede quedar desincronizado. Lo que declara un peleador sobre su rival no cuenta en el récord del rival hasta que este lo confirma; lo rechazado no cuenta en ninguna parte.
 2. **Fiabilidad del dato (`Bout.verification`):** `SELF_REPORTED` → `CONFIRMED` (lo confirma el rival) → `VERIFIED` (organizador o moderador) · `DISPUTED` (rechazado: no cuenta ni se muestra como hecho, y tiene cola de moderación para restaurarlo). Ver la sección de confianza más abajo.
 3. **Un combate = una pareja por velada** (`Bout.pairKey`, única con la velada): se impide registrarlo dos veces en cualquier esquina. La doble pulsación y las carreras se traducen en mensajes, no en errores.
-4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista.
+4. **Fechas:** las veladas se guardan a las 12:00 UTC del día elegido; «ya celebrada» se decide por el día de Madrid (`lib/common/dates.ts`). No se admiten fechas anteriores a 1980 ni a más de un año vista. Portada y calendario comparten `calendarDayStart()`: hoy y próximas incluye todo el día de Madrid; pasadas contiene únicamente fechas anteriores a hoy. No cambia cuándo se permite registrar un resultado (`eventDayReached`).
 5. **Madrid como plaza inicial, no como límite:** todo se filtra por `province`.
 6. **Disciplinas:** `BOXEO`, `MMA`, `KICKBOXING`, `K1`, `JIUJITSU`; todo lo específico de cada una (categorías, formas de terminar, si es de torneo) vive en `lib/common/disciplines.ts`. Una ficha por persona con varias disciplinas.
 

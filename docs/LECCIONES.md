@@ -107,3 +107,14 @@ Se completa en cada sesión (ver [`DIARIO.md`](DIARIO.md)). Formato: **qué pas�
 3. Comprobar que todo está sano: `npm run typecheck && npm test`; para el flujo completo, `npm run test:e2e` (ver README).
 4. Consultar [`IDEAS.md`](IDEAS.md) para elegir el siguiente paso (empezar por lo marcado 🔵).
 5. Al terminar, añadir la entrada al diario y actualizar ideas y lecciones.
+
+
+## 3 de octubre de 2026 — revisión de Codex
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Una velada de hoy desaparecía de portada por la tarde y el calendario solapaba próximas/pasadas | Comparar días guardados a las 12:00 UTC con el instante actual o una ventana de 24 h | Consultar por día de Madrid con un límite compartido; probar verano, invierno y medianoche |
+| Una tarjeta de récord de otro nivel heredaba la categoría actual | Reutilizar la disciplina sin comprobar el nivel de la tarjeta | Mostrar categoría solo en el nivel al que pertenece |
+| La ayuda afirmaba más respaldo del que proporciona un enlace | Equiparar evidencia aportada con verificación y omitir la diferencia autor/rival | Documentar la regla real y distinguir origen y estado del dato |
+| El análisis competitivo antiguo contenía supuestos hoy incorrectos | Conocimiento general y fuentes débiles sin verificar la oferta actual | Usar fuentes propias e inspección; separar observaciones, inferencias y límites |
+| PostgreSQL local no pudo instalarse | Permisos del entorno impidieron descargar/instalar paquetes del sistema | No declarar E2E aprobadas por compilar: usar el CI y dejar el bloqueo explícito |

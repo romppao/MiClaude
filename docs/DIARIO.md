@@ -497,6 +497,30 @@ Palabras del fundador: «las categorías de peso las estás englobando todas en 
 
 ---
 
+## Sesión 2 — 3 de octubre de 2026 — Codex: comparación y claridad funcional
+
+### Qué se pidió / qué idea surgió
+
+El fundador autorizó mejoras y pidió estudiar Raunder y BoxRec. Reiteró: «El diseño gráfico de la aplicación lo dejaremos para lo último» y pidió subir un Markdown para que Claude conozca todas las aportaciones.
+
+### Qué se decidió y por qué
+
+Actuar sobre recorridos existentes, exactitud y transparencia. La comparación pública permite mejorar orientación y explicación sin ampliar permisos ni adelantar el CRM, el premium o decisiones sobre menores/aura. Los cambios van en una rama y propuesta de integración para validación completa.
+
+### Qué se hizo
+
+Calendario por día de Madrid, entrada por objetivos, filtros individuales de veladas, ránking explicado, ayuda ajustada a las reglas reales, categoría correcta por nivel en tarjetas de récord y explicación de NC. Comparación competitiva revisada con fuentes propias. Relevo detallado: `APORTACIONES-CODEX.md`, enlazado desde instrucciones e índice. Nueva regresión de calendario en unitarias y guion E2E incluido en CI; mapa regenerado.
+
+### Qué salió mal / qué se aprendió
+
+BoxRec impidió la inspección normal en este navegador con verificación contra bots; se usaron páginas recuperadas y ayuda oficial, sin afirmar haber probado sus flujos. PostgreSQL no estaba instalado y el intento de instalación falló por permisos. No se ejecutó E2E/axe local ni una auditoría completa.
+
+### Estado y próximos pasos
+
+TypeScript, 313 unitarias y compilación de producción aprobados. Integración y E2E/axe pendientes de CI. Rama: `codex/claridad-calendario-2026-10-03`. El Markdown de relevo se publica también en la rama principal para Claude. La demo sigue siendo la versión previa hasta integración/despliegue. Completar las personas pendientes y verificar categorías históricas por nivel. No se han resuelto decisiones del fundador ni trabajado diseño gráfico.
+
+---
+
 ## Plantilla para nuevas entradas
 
 ```

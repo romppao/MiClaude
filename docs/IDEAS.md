@@ -139,3 +139,13 @@ Origen: el flujo de personas de prueba (ver [`pruebas/hallazgos-2026-10-01.md`](
 - ¿Nombre definitivo y marca? («Ring España» es un nombre de trabajo.)
 
 - **Modo demostración con cambio de papel** (2 de octubre de 2026, surgió de «lánzame una demo» desde el móvil): botón para probar como aficionado / peleador / organizador / moderador con una sola cuenta. Es un andamio para probar, no una función de producto; pero anticipa el selector A/B/C que pidió el fundador (tarea 13).
+
+
+## Aportaciones de la comparación — 3 de octubre de 2026
+
+Origen: petición del fundador de comparar Raunder y BoxRec; propuestas de Codex tras inspección pública. Detalle y límites en `COMPETENCIA.md`.
+
+- **Preparado en rama de aportaciones:** entrada por objetivos usando rutas existentes, ránking explicado, ayuda sobre respaldo, filtros individuales de veladas y calendario coherente. Integración pendiente de CI; no es rediseño gráfico.
+- **Propuesto, no implementado:** información práctica de gimnasios (horarios, disciplinas, contacto y fecha de actualización) con responsable de mantenimiento; trayectoria con últimos resultados y estadísticas separadas por disciplina/nivel/respaldo.
+- **No priorizado ahora:** reservas/pagos/sparrings y CRM amplio; primero validar recorridos básicos y la gestión de una velada. No se descartan definitivamente.
+- **Corregida la premisa competitiva:** no basar la diferenciación en que BoxRec sea exclusivamente boxeo/inglés/sin público, ni en que Raunder no cubra Madrid. Nuestra propuesta debe demostrarse por utilidad y fiabilidad.

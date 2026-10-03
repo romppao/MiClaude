@@ -177,7 +177,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | Fichero | Exporta |
 |---|---|
 | `audit.ts` | `audit` |
-| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `dayKey`, `eventDayReached`, `parseBirthDate`, `parseDay`, `todayMadrid` |
+| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayKey`, `eventDayReached`, `parseBirthDate`, `parseDay`, `todayMadrid` |
 | `db.ts` | `db` |
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
