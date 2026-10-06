@@ -5,7 +5,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Los saltos de versión mayor (Next, Prisma, TypeScript…) cambian el funcionamiento y requieren una tarea propia (docs/tareas/):
+    # solo se proponen actualizaciones menores y de seguridad.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

@@ -6,7 +6,7 @@
 
 > **Última prioridad del fundador — 3 de octubre de 2026:** «pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El aspecto actual es provisional, aunque se publicaran decisiones anteriores. No hacer ahora otro rediseño. Corregir funciones, datos, errores y claridad; retomar composición e identidad con el fundador al final. Pendientes vigentes y evidencias: [docs/PULIDO-FUNCIONAL.md](docs/PULIDO-FUNCIONAL.md).
 
-> **Relevo de Codex (3 de octubre de 2026):** el diseño aprobado está integrado en PR #12 y comprobado públicamente en Render; CI #111 correcto. Color oficial #BE33F5, glow, bordes redondeados y perfiles con foto y banner propios. Lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) y [docs/DISENO.md](docs/DISENO.md) antes de continuar. Se han conservado los cambios recientes de categorías por edad, comunicación inclusiva y calendario de la rama de la demo.
+> **Relevo de Codex (3 de octubre de 2026):** la primera aplicación visual (color oficial #BE33F5, brillo, bordes redondeados y perfiles con foto y banner propios) está integrada en el PR #12 y comprobada en Render; **sigue siendo provisional** hasta la fase final de diseño (ver más abajo). Lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) y [docs/DISENO.md](docs/DISENO.md) antes de continuar. Se han conservado los cambios recientes de categorías por edad, comunicación inclusiva y calendario de la rama de la demo.
 
 Aplicación web para la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional. El vocabulario es «peleador», no «boxeador». Stack: Next.js 15, TypeScript 5, PostgreSQL, Prisma. Contexto y decisiones en `docs/ARQUITECTURA.md`.
 
@@ -77,7 +77,7 @@ Motivo: al fundador **no le gustan los diseños que genera Claude**. Siempre sal
 
 ## Decisión visual vigente — 3 de octubre de 2026
 
-El fundador ha elegido **`#BE33F5` como color oficial de la aplicación**. Sustituye las propuestas azul/amarillo y petróleo/marfil. Quiere un aspecto juvenil, con garra y comunidad, diferenciable de Raunder. Solo el color está decidido: no considerar aprobado el logotipo, composición ni tipografía de ninguna maqueta. Propuestas y fuentes en [docs/DISENO.md](docs/DISENO.md). La implementación visual sigue pendiente. Esta elección expresa prevalece sobre recomendaciones anteriores de paleta.
+El fundador ha elegido **`#BE33F5` como color oficial de la aplicación**. Sustituye las propuestas azul/amarillo y petróleo/marfil. Quiere un aspecto juvenil, con garra y comunidad, diferenciable de Raunder. Solo el color está decidido (y ya aplicado en la interfaz): no considerar aprobado el logotipo, la composición ni la tipografía de ninguna maqueta. El aspecto actual (color, brillo, bordes, perfiles con foto) es **provisional**: el rediseño completo, con briefing e identidad propia, queda para el final. Propuestas y fuentes en [docs/DISENO.md](docs/DISENO.md). Esta elección expresa prevalece sobre recomendaciones anteriores de paleta.
 
 ## Idioma: todo en español (petición expresa del fundador)
 

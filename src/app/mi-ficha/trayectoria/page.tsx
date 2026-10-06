@@ -58,8 +58,8 @@ export default async function Trajectory() {
           defaultValue={a?.awardedOn.toISOString().slice(0, 10)}
         />
         <span className="hint">
-          Para títulos de otros años cuyo reglamento no esté disponible, deja la
-          división sin confirmar. No se asignan a tu categoría actual.
+          Para títulos de otros años cuyo reglamento no tengas a mano, elige «Prefiero
+          indicarlo más tarde» en la división. No se asignan a tu categoría actual.
         </span>
       </label>
       <label className="field">

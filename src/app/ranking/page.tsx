@@ -22,7 +22,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <summary>¿Cómo se calcula el ránking?</summary>
         <ul>
           <li>Cada reconocimiento de la comunidad vale un punto. Se añade el título con mayor aporte de la categoría y los respaldos comprobados. La confirmación del rival es opcional; una revisión decidida por moderación o una cancelación excluye el combate.</li>
-          <li>Se agrupa por el nivel, la división de edad y categoría y el peso guardados en cada combate o título. Cambiar la ficha no traslada el aura histórica. Las divisiones sin confirmar quedan separadas. Solo aparecen fichas públicas con aura; los títulos sin respaldo se indican como declarados.</li>
+          <li>Se agrupa por el nivel, la división de edad y categoría y el peso guardados en cada combate o título. Cambiar la ficha no traslada el aura histórica. Quienes no han indicado su edad y categoría aparecen en un grupo aparte. Solo aparecen fichas públicas con aura; los títulos sin respaldo se indican como declarados.</li>
           <li>La zona corresponde a la provincia de la ficha del peleador.</li>
           <li>«Últimos 90 días» limita los reconocimientos de la comunidad al periodo; la trayectoria y sus respaldos se mantienen.</li>
           <li>Con los mismos puntos se comparte puesto: 1, 1, 3. Los nombres empatados se muestran en orden alfabético.</li>

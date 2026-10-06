@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
+import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
@@ -75,7 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Link href="/privacidad">Privacidad</Link>
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
-        <nav className="mobile-nav" aria-label="Navegación móvil"><Link href="/">Inicio</Link><Link href="/peleadores">Peleadores</Link><Link href="/veladas">Veladas</Link><Link href="/gimnasios">Gimnasios</Link></nav>
+        <MobileNav />
       </body>
     </html>
   );
