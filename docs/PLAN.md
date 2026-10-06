@@ -39,7 +39,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | N2 | Antigravity (prueba de ingreso 2) o Codex | — |
 | [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | N3 | Codex | proveedor y credenciales (fundador) para la parte S3 |
 | [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | N3 | Codex | — |
-| [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | N3 | Codex si dispone de PostgreSQL local; si no, Claude | necesita PostgreSQL local |
+| [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | N3 | Claude (6 oct, en revisión) | necesita PostgreSQL local |
 | [T-007](tareas/T-007-prueba-de-carga.md) | Prueba de carga (k6) y presupuesto | F2 | N2 | Antigravity (puede ejecutar el servidor) o Copilot | necesita ejecutar el servidor |
 | [T-008](tareas/T-008-cola-de-correos.md) | Cola de correos | F2 | N3 | Codex | proveedor de correo (fundador) para el envío real |
 | [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | N2 | Antigravity o Copilot (prueba de ingreso 2) | — |
