@@ -10,6 +10,11 @@ const DIR = process.env.ESC_DIR ?? "/tmp/escenarios";
 mkdirSync(DIR, { recursive: true });
 const SOLO = process.argv.slice(2);
 const informe = [];
+// Los escenarios necesitan los datos de ejemplo (peleadores, veladas, combates): se arranca con `scripts/entorno-aislado.sh iniciar <nombre> <puerto> --semilla`.
+{
+  const r = await fetch(B + "/peleadores"); const t = await r.text();
+  if (!/href="\/peleadores\/[^"]+"/.test(t)) { console.error("Los escenarios necesitan datos de ejemplo y esta base está vacía. Arranca el entorno con --semilla (scripts/entorno-aislado.sh iniciar <nombre> <puerto> --semilla)."); process.exit(2); }
+}
 let numPaso = 0;
 
 async function persona(nombre, descripcion, guion) {
