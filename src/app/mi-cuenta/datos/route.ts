@@ -3,6 +3,8 @@ import { db } from "../../../lib/common/db";
 import { getUser } from "../../../lib/accounts/auth";
 import { loginPath } from "../../../lib/common/paths";
 import { publicFighterName } from "../../../lib/common/names";
+import { getImageStore } from "../../../lib/common/imageStore";
+import { imageKey } from "../../../lib/common/imageKeys";
 
 export const dynamic = "force-dynamic";
 
@@ -25,11 +27,16 @@ export async function GET(request: Request) {
     db.supportAccreditation.findUnique({ where: { userId: user.id } }),
   ]);
 
+  const almacen = getImageStore();
+  const imagen = async (kind: string, id: string, slot: "avatar" | "banner", hay: boolean) => (hay ? (await almacen.get(imageKey(kind, id, slot)))?.bytes.toString("base64") ?? null : null);
+  const perfiles = await db.profile.findMany({ where: { ownerId: user.id }, select: { kind: true, entityId: true, name: true, bio: true, city: true, website: true, hasAvatar: true, hasBanner: true, avatarX: true, avatarY: true, bannerX: true, bannerY: true } });
+  const perfilesPersonalizados = await Promise.all(perfiles.map(async (p) => ({ tipo: p.kind, nombre: p.name, presentacion: p.bio, zona: p.city, web: p.website, foto: await imagen(p.kind, p.entityId, "avatar", p.hasAvatar), banner: await imagen(p.kind, p.entityId, "banner", p.hasBanner), formatoImagen: "image/webp", encuadre: { fotoX: p.avatarX, fotoY: p.avatarY, bannerX: p.bannerX, bannerY: p.bannerY } })));
+
   const datos = {
     generadoEl: new Date().toISOString(),
     nota: "Estos son los datos personales que Ring España guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
     cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails },
-    perfilesPersonalizados: (await db.profile.findMany({where:{ownerId:user.id}})).map(p => ({ tipo:p.kind, nombre:p.name, presentacion:p.bio, zona:p.city, web:p.website, foto:p.avatar ? Buffer.from(p.avatar).toString("base64") : null, banner:p.banner ? Buffer.from(p.banner).toString("base64") : null, formatoImagen:"image/webp", encuadre:{fotoX:p.avatarX,fotoY:p.avatarY,bannerX:p.bannerX,bannerY:p.bannerY} })),
+    perfilesPersonalizados,
     fichaDePeleador: fighter && {
       nombre: fighter.firstName, apellidos: fighter.lastName, alias: fighter.alias, fechaDeNacimiento: fighter.birthDate, ciudad: fighter.city, provincia: fighter.province,
       guardia: fighter.stance, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,

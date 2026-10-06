@@ -37,7 +37,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | N3 | ✔ hecha (Claude, 6 oct) | — |
 | [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | N1 | ✔ hecha (Claude, 6 oct) | — |
 | [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | N2 | Antigravity (prueba de ingreso 2) o Codex | — |
-| [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | N3 | Codex | proveedor y credenciales (fundador) para la parte S3 |
+| [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | N3 | Claude (parte 1 en revisión, 6 oct) · parte 2 pendiente de proveedor | proveedor y credenciales (fundador) para la parte S3 |
 | [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | N3 | Codex | — |
 | [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | N3 | Codex si dispone de PostgreSQL local; si no, Claude | necesita PostgreSQL local |
 | [T-007](tareas/T-007-prueba-de-carga.md) | Prueba de carga (k6) y presupuesto | F2 | N2 | Antigravity (puede ejecutar el servidor) o Copilot | necesita ejecutar el servidor |

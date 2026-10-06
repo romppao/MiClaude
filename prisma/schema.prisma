@@ -420,6 +420,9 @@ model Profile {
   hasBanner   Boolean @default(false)
   avatar      Bytes?
   banner      Bytes?
+  // Clave de la imagen en el almacén de objetos (T-004, parte 2); nula mientras las imágenes estén en la base de datos.
+  avatarKey   String?
+  bannerKey   String?
   avatarX     Int @default(50)
   avatarY     Int @default(50)
   bannerX     Int @default(50)

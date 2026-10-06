@@ -5,6 +5,8 @@ import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { profileKind, profileAccess } from "../../lib/profiles/profiles";
 import { imagePosition, normalizeImage } from "../../lib/profiles/images";
+import { getImageStore } from "../../lib/common/imageStore";
+import { imageKey } from "../../lib/common/imageKeys";
 import { safeHttpUrl } from "../../lib/common/url";
 import { audit } from "../../lib/common/audit";
 import { str, go, checkLengths } from "./shared";
@@ -37,9 +39,13 @@ export async function saveProfile(f: FormData) {
     if (email && !owner?.emailVerifiedAt) go(back, { problema: "titular_invalido" });
     ownerId = owner?.id ?? null;
   }
-  const data = { bio: str(f, "bio") || null, website, city: str(f, "city") || null, name: kind === "federacion" ? str(f, "name") || source.name : undefined, ownerId, avatar, banner, hasAvatar: avatar === undefined ? undefined : avatar !== null, hasBanner: banner === undefined ? undefined : banner !== null, avatarX: avatarX!, avatarY: avatarY!, bannerX: bannerX!, bannerY: bannerY! };
+  const data = { bio: str(f, "bio") || null, website, city: str(f, "city") || null, name: kind === "federacion" ? str(f, "name") || source.name : undefined, ownerId, hasAvatar: avatar === undefined ? undefined : avatar !== null, hasBanner: banner === undefined ? undefined : banner !== null, avatarX: avatarX!, avatarY: avatarY!, bannerX: bannerX!, bannerY: bannerY! };
   await db.$transaction(async tx => {
     await tx.profile.upsert({ where: { kind_entityId: { kind, entityId: id } }, create: { kind, entityId: id, ...data }, update: data });
+    // Los bytes pasan por el almacén de imágenes (hoy la propia base de datos, dentro de la misma transacción).
+    const store = getImageStore();
+    if (avatar) await store.put(imageKey(kind, id, "avatar"), avatar, "image/webp", tx); else if (avatar === null) await store.delete(imageKey(kind, id, "avatar"), tx);
+    if (banner) await store.put(imageKey(kind, id, "banner"), banner, "image/webp", tx); else if (banner === null) await store.delete(imageKey(kind, id, "banner"), tx);
     await audit({ userId: user.id, entity: "PROFILE", entityId: id, action: "PROFILE_UPDATED", after: { kind, imagesUpdated: avatar !== undefined || banner !== undefined } }, tx);
   });
   revalidatePath("/", "layout"); go(back, { aviso: "perfil_guardado" });
