@@ -2,9 +2,9 @@
 
 ## Resultado honesto
 
-La ficha T-005 **no está completada**. He implementado y validado cuatro porciones acotadas: el cálculo del ránking público de aura y los listados públicos paginados de peleadores, gimnasios y entrenadores se sirven mediante `unstable_cache`, con claves que incluyen sus filtros normalizados, una caducidad de 60 segundos y etiquetas explícitas. Dar o retirar aura invalida `ranking`; crear o actualizar una ficha invalida `fichas` y, si procede, `gimnasios`; moderación invalida `gimnasios` al cambiar un sello.
+La ficha T-005 **no está completada**. He implementado y validado cinco porciones acotadas: el cálculo del ránking público de aura y los listados públicos paginados de peleadores, gimnasios, entrenadores y veladas se sirven mediante `unstable_cache`, con claves que incluyen sus filtros normalizados, una caducidad de 60 segundos y etiquetas explícitas. Dar o retirar aura invalida `ranking`; crear o actualizar una ficha invalida `fichas` y, si procede, `gimnasios`; moderación invalida `gimnasios` al cambiar un sello; las escrituras de veladas invalidan `veladas`.
 
-No afirmo que esto cubra todos los criterios de T-005 ni que el proyecto entero esté libre de datos desactualizados: aún faltan la ficha individual, portada y veladas, sus etiquetas de escritura completas, la medición de consultas y las pruebas de navegador con base vacía.
+No afirmo que esto cubra todos los criterios de T-005 ni que el proyecto entero esté libre de datos desactualizados: aún faltan la ficha individual y portada, etiquetas de escritura completas, la medición de consultas y las pruebas de navegador con base vacía.
 
 ## Qué hice
 
@@ -13,6 +13,7 @@ No afirmo que esto cubra todos los criterios de T-005 ni que el proyecto entero 
 - La clave incluye `discipline`, `level`, `province`, `sinceDays` y `fighterId`, incluidos como `null` cuando no se usan, para que dos combinaciones no compartan resultado.
 - Cacheé también la cuenta y página de `/peleadores`, con una selección Prisma explícita que no contiene fechas y una clave que incluye búsqueda, ids filtrados, disciplina, nivel, provincia, categoría, división y página.
 - Cacheé los directorios paginados de gimnasios y entrenadores. El sello de gimnasio se transforma a booleano antes de almacenarlo, por lo que ninguna fecha se recupera de caché como texto.
+- Cacheé el calendario público de veladas. Las fechas se guardan como ISO y se reconstruyen como `Date` justo antes de `fmtDate`, para no tratar texto serializado como fecha.
 - Crear ficha ya invalida `fichas` y `gimnasios`; actualizar datos de ficha invalida ambas, y guardar disciplina invalida `fichas`.
 - Elegí este cálculo porque devuelve únicamente datos JSON seguros (texto, números, booleanos y nulos); no hay fechas que rehidratar. No he aplicado el ayudante aún a consultas Prisma que devuelven fechas, porque hacerlo sin una conversión explícita incumpliría la advertencia de la ficha.
 - Añadí `invalidar(...etiquetas)` al módulo compartido de acciones y lo llamé desde `giveAura()` y `removeAura()`.
@@ -37,7 +38,7 @@ No afirmo que esto cubra todos los criterios de T-005 ni que el proyecto entero 
 
 | Criterio | Estado |
 | --- | --- |
-| Lectura pública cacheada | Parcial: ránking de aura y listados paginados de peleadores, gimnasios y entrenadores. |
+| Lectura pública cacheada | Parcial: ránking de aura y listados paginados de peleadores, gimnasios, entrenadores y veladas. |
 | Cambio visible tras cualquier escritura afectada | Parcial: aura y principales escrituras de ficha invalidadas; el resto aún no. |
 | Ninguna página privada o dato oculto cacheado | Cumplido para estas porciones: `auraRanking()` y el listado mantienen `listed: true` y `hiddenAt: null`, no reciben sesión ni cookies, y la selección del listado no contiene fechas. |
 | Mejora medida | Pendiente. |

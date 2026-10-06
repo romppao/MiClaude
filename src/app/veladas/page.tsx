@@ -10,6 +10,7 @@ import { calendarDayStart } from "../../lib/common/dates";
 import { plural } from "../../lib/common/text";
 import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/common/disciplines";
+import { leerCacheado } from "../../lib/common/cache";
 
 export const metadata = { title: "Calendario de veladas" };
 export const dynamic = "force-dynamic";
@@ -27,9 +28,14 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
     ...(disciplina && isDiscipline(disciplina) ? { discipline: disciplina } : {}),
     ...(ids && { id: { in: ids } }),
   };
-  const total = await db.event.count({ where });
+  const consulta = await leerCacheado(`veladas:listado:${JSON.stringify({ q: q ?? null, ids: ids ?? null, level: level ?? null, province: province ?? null, discipline: disciplina ?? null, period, pagina: pagina ?? null })}`, ["veladas"], 60, async () => {
+    const total = await db.event.count({ where });
+    const ventana = pageWindow(total, pageNumber(pagina));
+    const events = await db.event.findMany({ where, orderBy: [{ date: period === "1" ? "desc" : "asc" }, { id: "asc" }], skip: ventana.skip, take: ventana.take, select: { id: true, slug: true, discipline: true, level: true, status: true, organizerId: true, name: true, date: true, venue: true, city: true, province: true, _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
+    return { total, events: events.map(({ date, ...event }) => ({ ...event, date: date.toISOString() })) };
+  });
+  const { total, events } = consulta;
   const w = pageWindow(total, pageNumber(pagina));
-  const events = await db.event.findMany({ where, orderBy: [{ date: period === "1" ? "desc" : "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
   return (
     <>
       <h1>Calendario de veladas</h1>
@@ -56,7 +62,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
             {!e.organizerId && <span className="tag">no oficial</span>}
             <strong>{e.name}</strong>
-            <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
+            <div className="mut">{fmtDate(new Date(e.date))}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
           </Link>
         ))}
       </div>

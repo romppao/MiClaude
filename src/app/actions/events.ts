@@ -19,7 +19,7 @@ import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
 import { parseTipoDeEntidad } from "../../lib/accounts/landing";
-import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
+import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, invalidar, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();
@@ -69,6 +69,7 @@ export async function createEvent(f: FormData) {
     });
   });
   await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level, discipline } });
+  invalidar("veladas");
   revalidatePath("/", "layout");
   go(`/organizador/${created.slug}`, { aviso: "velada_creada" });
 }
@@ -114,6 +115,7 @@ export async function addCartelBout(f: FormData) {
     }),
     "cartel_duplicado",
   );
+  invalidar("veladas");
   revalidatePath("/", "layout");
   // Solo combates de organizador y futuros. Se avisa después de responder: un fallo del correo no debe afectar a un combate ya guardado.
   after(async () => {
@@ -140,6 +142,7 @@ export async function setBoutResult(f: FormData) {
     if (verification === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification } }, tx);
   });
+  invalidar("veladas");
   revalidatePath("/", "layout");
   go(back, { aviso: "resultado_guardado" });
 }
@@ -170,6 +173,7 @@ export async function updateEvent(f: FormData) {
     await tx.event.update({ where: { id: event.id }, data });
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));
+  invalidar("veladas");
   revalidatePath("/", "layout");
   go(back, { aviso: "velada_actualizada" });
 }
@@ -186,6 +190,7 @@ export async function setEventStatus(f: FormData) {
     db.event.update({ where: { id: event.id }, data: { status } }),
     audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: cancelar ? "CANCELLED" : "REOPENED", before: { status: event.status }, after: { status } }, db),
   ]);
+  invalidar("veladas");
   revalidatePath("/", "layout");
   go(back, { aviso: cancelar ? "velada_cancelada" : "velada_reabierta" });
 }
@@ -202,6 +207,7 @@ export async function removeCartelBout(f: FormData) {
     await tx.bout.delete({ where: { id: bout.id } });
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "REMOVED_FROM_CARTEL", before: { eventId: event.id, fighterAId: bout.fighterAId, fighterBId: bout.fighterBId, verification: bout.verification } }, tx);
   }));
+  invalidar("veladas");
   revalidatePath("/", "layout");
   go(back, { aviso: "cartel_quitado" });
 }
