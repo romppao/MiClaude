@@ -961,3 +961,9 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Pendiente del fundador:** decir qué modelo ejecuta cada herramienta y si Codex tiene PostgreSQL y navegador locales; el orden de 3–5 puede cambiar mucho con eso.
 
 **Corrección posterior (mismo día):** el fundador aclaró que el orden de los puestos 3–5 debe decidirlo Claude **cuando tenga pruebas** del trabajo de las otras herramientas: «ahora todavía no hace falta». Se retira el orden a priori de `RANGOS.md` y `ADR-002`; solo quedan Claude (1) y Codex (2, con evidencia); Antigravity, Copilot y Open Code, sin ordenar y en periodo de prueba.
+
+
+## 6 de octubre de 2026 (noche) — Prueba de ingreso de los asistentes
+
+**Pedido por el fundador:** un documento que **exija a cada herramienta una aportación a máximo nivel y también a nivel medio** (bajo consumo de tokens), que les **pregunte primero qué es lo que mejor se les da** y después les ponga una **prueba común de exigencia máxima**; el fundador vio resultados buenos de diseño frontend de Antigravity con *skills* instaladas y quiere comparar «de verdad».
+**Qué se hizo:** `docs/PRUEBA-DE-INGRESO.md` (protocolo y reglas; Parte 0 autodeclaración, Parte 1 especialidad a elección —con propuesta de diseño aislada para quien la elija—, Parte 2 prueba común máxima = T-011, Parte 3 prueba común media = T-003, Parte 4 revisión a ciegas de un PR con 12 defectos plantados; puntuación de 100 puntos con calibración y eficiencia), plantilla de autodeclaración, tabla `docs/ingreso/RESULTADOS.md`, `revision-ciega/CAMBIO.md` y su clave. **Límite honesto:** la clave de la revisión a ciegas está en el repositorio (no hay forma de ocultarla en un repositorio compartido); se apoya en la norma de no leerla, y el fundador o Claude pueden contrastar con el historial de acceso si hay dudas. Las pruebas comunes generan trabajo duplicado a propósito; solo se integra lo mejor.

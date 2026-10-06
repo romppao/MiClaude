@@ -37,7 +37,7 @@ Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen p
 4. Claude revisa el PR (lista de `REVISION.md`) y lo aprueba, lo devuelve con comentarios o abre una propuesta si el cambio revela un problema de plan.
 5. El fundador integra (o autoriza a integrar).
 
-**Primera vez de un asistente nuevo:** antes de tomar nada, crea su `docs/APORTACIONES-<NOMBRE>.md` indicando qué **puede y qué no puede ejecutar** (¿tiene PostgreSQL y navegador?, ¿solo el CI?). Claude le asignará tareas acordes: empezar por una pequeña y bien acotada (por ejemplo T-002) sirve para calibrar.
+**Primera vez de un asistente nuevo: hace la [prueba de ingreso](PRUEBA-DE-INGRESO.md).** Antes: antes de tomar nada, crea su `docs/APORTACIONES-<NOMBRE>.md` indicando qué **puede y qué no puede ejecutar** (¿tiene PostgreSQL y navegador?, ¿solo el CI?). Claude le asignará tareas acordes: empezar por una pequeña y bien acotada (por ejemplo T-002) sirve para calibrar.
 
 ## Reglas comunes (obligatorias para todos)
 

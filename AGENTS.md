@@ -6,4 +6,6 @@ Antes de cambiar nada, lee **[`docs/EQUIPO.md`](docs/EQUIPO.md)** (protocolo de 
 
 **Reparto (decisión del fundador, 6 de octubre de 2026):** Claude es el líder técnico: define el plan ([`docs/PLAN.md`](docs/PLAN.md)) y escribe las fichas de tarea ([`docs/tareas/`](docs/tareas/)). **Tú ejecutas la ficha que te den, al pie de la letra**, en tu rama y con tu PR (Claude lo revisa con [`docs/REVISION.md`](docs/REVISION.md)). Si crees que hay una forma mejor, **no la improvises**: abre una propuesta con evidencia en [`docs/decisiones/`](docs/decisiones/README.md). Si la ficha no se puede cumplir, para y avisa en el PR.
 
+**Si es tu primera vez en este proyecto, haz primero la prueba de ingreso: [`docs/PRUEBA-DE-INGRESO.md`](docs/PRUEBA-DE-INGRESO.md)** (es la primera toma de contacto con el líder técnico).
+
 Prioridad vigente: **móvil primero** (iOS y Android; objetivo: App Store y Google Play) — ver [`docs/MOVIL.md`](docs/MOVIL.md). Todo en español. Nada de enlaces o botones muertos.
