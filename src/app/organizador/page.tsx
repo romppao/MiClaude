@@ -5,6 +5,7 @@ import { PROVINCES, fmtDate } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { LIMITS, plural } from "../../lib/common/text";
 import { createEvent, requestOrganizer } from "../actions/events";
+import { TIPOS_DE_ENTIDAD, TIPO_DE_ENTIDAD_ETIQUETA } from "../../lib/accounts/landing";
 
 export const metadata = { title: "Organizadores" };
 export const dynamic = "force-dynamic";
@@ -35,7 +36,13 @@ export default async function Organizer() {
                 <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Tu solicitud anterior fue rechazada{req.reviewNote ? <>. Motivo: {req.reviewNote}</> : ""}. Puedes enviar otra con más información.</div>
               )}
               <form className="search" action={requestOrganizer} style={{ flexDirection: "column", maxWidth: 480, alignItems: "stretch" }}>
-                <label className="field"><span>Nombre de tu organización, club o promotora</span><input name="orgName" required defaultValue={req?.orgName} maxLength={LIMITS.orgName} /></label>
+                <label className="field"><span>Nombre de tu entidad</span><input name="orgName" required defaultValue={req?.orgName} maxLength={LIMITS.orgName} /></label>
+                <label className="field"><span>Tipo de entidad</span>
+                  <select name="entityKind" defaultValue={req?.kind ?? "PROMOTORA"} required>
+                    {TIPOS_DE_ENTIDAD.map((k) => <option key={k} value={k}>{TIPO_DE_ENTIDAD_ETIQUETA[k]}</option>)}
+                  </select>
+                </label>
+                <label className="field"><span>Web o red social (opcional)</span><input name="website" type="url" inputMode="url" defaultValue={req?.website ?? ""} maxLength={LIMITS.url} /><span className="hint">Empieza por https://</span></label>
                 <label className="field"><span>¿Cómo podemos comprobarlo?</span><input name="message" required maxLength={LIMITS.message} /><span className="hint">Una web, una red social o una velada anterior. No escribas números de documento.</span></label>
                 <button>Solicitar acceso de organizador</button>
               </form>

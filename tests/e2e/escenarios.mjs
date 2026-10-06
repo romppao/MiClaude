@@ -52,9 +52,9 @@ const aviso = (p, t) => p.locator("[role=status], [role=alert]", { hasText: t })
 async function registrarse(p, nombre, rol = "FAN") {
   const email = `${nombre.toLowerCase().replace(/[^a-z]/g, "")}${rnd}@test.es`;
   await p.goto(B + "/registro");
+  await p.locator("a.panel-registro", { hasText: rol === "FIGHTER" ? "Peleador" : "Usuario" }).click(); // la persona elige su panel
   await p.fill("[name=name]", nombre); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
-  await p.selectOption("[name=role]", rol);
-  await p.getByRole("button", { name: "Crear mi cuenta" }).click();
+  await p.getByRole("button", { name: /^Crear mi cuenta/ }).click();
   await p.waitForURL("**/verificar");
   return email;
 }

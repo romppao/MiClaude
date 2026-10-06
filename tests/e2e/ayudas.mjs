@@ -105,8 +105,8 @@ export async function hayCorreoPara(email, espera = 1500) {
 export async function newUser(name, role = "FAN", verify = true) {
   const email = `${name.toLowerCase()}${rnd}@test.es`;
   const p = await (await browser.newContext()).newPage();
-  await p.goto(B + "/registro");
-  await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123"); await p.selectOption("[name=role]", role);
+  await p.goto(B + `/registro?tipo=${role === "FIGHTER" ? "peleador" : "usuario"}`);
+  await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
   await btn(p, "Crear mi cuenta"); await p.waitForURL("**/verificar");
   if (verify) { await p.goto(B + link(email)); await btn(p, "Confirmar"); await p.waitForSelector("text=Correo electrónico verificado"); }
   return { p, email };

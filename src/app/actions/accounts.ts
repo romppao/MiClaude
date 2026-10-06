@@ -15,7 +15,9 @@ import { audit } from "../../lib/common/audit";
 import { internalPath } from "../../lib/common/paths";
 import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
-import { go, guard, Rechazo, str } from "./shared";
+import { landingFor, parseTipoDeCuenta, parseTipoDeEntidad } from "../../lib/accounts/landing";
+import { safeHttpUrl } from "../../lib/common/url";
+import { checkLengths, go, guard, Rechazo, str } from "./shared";
 
 const MIN_PASSWORD = 8;
 
@@ -25,17 +27,33 @@ function checkNewPassword(password: string, back: string) {
   if (password.length > LIMITS.password) go(back, { problema: "contrasena_larga" });
 }
 
+/** Alta de cuenta desde uno de los tres paneles del registro: «usuario», «peleador» o «entidad» (promotora o federación, con su solicitud). */
 export async function register(f: FormData) {
   const next = internalPath(str(f, "next"), "");
-  const back = `/registro${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+  const tipo = parseTipoDeCuenta(str(f, "tipo"), str(f, "role")); // un formulario antiguo con «role» sigue funcionando
+  const back = `/registro?tipo=${tipo}${next ? `&next=${encodeURIComponent(next)}` : ""}`;
   const email = str(f, "email").toLowerCase();
   const name = oneLine(str(f, "name"));
   const password = String(f.get("password") ?? "");
-  const role = str(f, "role") === "FIGHTER" ? "FIGHTER" : "FAN";
+  const role = tipo === "peleador" ? "FIGHTER" : "FAN"; // la entidad empieza como persona normal: el permiso de organizadora lo concede un moderador
   const ip = await clientIp();
   if (ip && !(await allow(`registro:ip:${ip}`, 10, HORA))) go(back, { problema: "demasiados_intentos" });
   if (!name || name.length > LIMITS.name || !isEmail(email)) go(back, { problema: "registro_datos" });
   checkNewPassword(password, back);
+  // Panel C: los datos de la entidad se comprueban ANTES de crear nada, para no dejar una cuenta sin su solicitud.
+  let entidad: { orgName: string; kind: "PROMOTORA" | "FEDERACION"; website: string | null; message: string } | null = null;
+  if (tipo === "entidad") {
+    checkLengths(f, back, { orgName: LIMITS.orgName, message: LIMITS.message, website: LIMITS.url });
+    const orgName = oneLine(str(f, "orgName"));
+    const kind = parseTipoDeEntidad(str(f, "entityKind"));
+    const website = str(f, "website") ? safeHttpUrl(str(f, "website")) : null;
+    const message = str(f, "message");
+    if (!orgName) go(back, { problema: "nombre_organizacion" });
+    if (!kind) go(back, { problema: "entidad_tipo" });
+    if (str(f, "website") && !website) go(back, { problema: "enlace_invalido" });
+    if (!message) go(back, { problema: "organizador_sin_datos" });
+    entidad = { orgName, kind, website, message };
+  }
   if (await db.user.findUnique({ where: { email }, select: { id: true } })) {
     // Un doble clic en «Crear mi cuenta» envía dos veces: la segunda ve la cuenta que acaba de crear la primera. Quien ya tiene esa sesión sigue a «Confirma tu correo».
     if ((await getUser())?.email === email) go("/verificar");
@@ -43,11 +61,16 @@ export async function register(f: FormData) {
   }
   await maybePurge();
   const passwordHash = await hashPassword(password);
-  const user = await guard(back, () => db.user.create({ data: { email, name, role, passwordHash } }), "registro_email_existe");
+  // La cuenta y, en su caso, la solicitud de la entidad se crean juntas: o se guardan las dos o ninguna.
+  const user = await guard(back, () => db.$transaction(async (tx) => {
+    const creada = await tx.user.create({ data: { email, name, role, passwordHash } });
+    if (entidad) await tx.organizerRequest.create({ data: { userId: creada.id, ...entidad } });
+    return creada;
+  }), "registro_email_existe");
   const enviado = await sendVerificationEmail(user);
   await createSession(user.id);
   if (next) await rememberReturnPath(next); // al confirmar el correo se le ofrecerá volver a lo que estaba haciendo
-  go("/verificar", enviado ? undefined : { problema: "correo_no_enviado" });
+  go("/verificar", enviado ? (entidad ? { aviso: "registro_entidad" } : undefined) : { problema: "correo_no_enviado" });
 }
 
 // Límites del inicio de sesión: intentos fallidos en 15 minutos por correo y por dirección IP (si el proxy la facilita).
@@ -75,7 +98,7 @@ export async function login(f: FormData) {
   await clearHits(`acceso:correo:${email}`);
   if (needsRehash(user.passwordHash)) await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
   await createSession(user.id);
-  go(next || (user.role === "FIGHTER" ? "/mi-ficha" : "/"));
+  go(next || landingFor(user.role));
 }
 
 export async function logout() {

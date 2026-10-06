@@ -87,7 +87,7 @@ async function recorrer(papel, p, semillas) {
   console.log(`   ${papel}: ${n} pantallas recorridas`);
 }
 
-const SEMILLAS = ["/", "/peleadores", "/veladas", "/veladas?past=1", "/ranking", "/gimnasios", "/entrenadores", "/buscar?q=a", "/ayuda", "/privacidad", "/registro", "/entrar", "/recuperar", "/pagina-que-no-existe"];
+const SEMILLAS = ["/", "/peleadores", "/veladas", "/veladas?past=1", "/ranking", "/gimnasios", "/entrenadores", "/buscar?q=a", "/ayuda", "/privacidad", "/registro", "/registro?tipo=usuario", "/registro?tipo=peleador", "/registro?tipo=entidad", "/entrar", "/recuperar", "/pagina-que-no-existe"];
 
 // Sin cuenta
 const anon = await (await browser.newContext()).newPage();

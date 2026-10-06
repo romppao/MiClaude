@@ -77,7 +77,7 @@ async function auditar(p, perfil, papel, ruta) {
   return p.evaluate(() => [...document.querySelectorAll("a[href]")].filter((a) => a.target !== "_blank").map((a) => a.href));
 }
 
-const SEMILLAS = ["/", "/peleadores", "/veladas", "/ranking", "/gimnasios", "/entrenadores", "/ayuda", "/privacidad", "/registro", "/entrar", "/recuperar", "/buscar?q=a", "/pagina-que-no-existe"];
+const SEMILLAS = ["/", "/peleadores", "/veladas", "/ranking", "/gimnasios", "/entrenadores", "/ayuda", "/privacidad", "/registro", "/registro?tipo=entidad", "/entrar", "/recuperar", "/buscar?q=a", "/pagina-que-no-existe"];
 const SEGUIR = [/^\/peleadores\/[^/?]+$/, /^\/veladas\/[^/?]+$/, /^\/gimnasios\/[^/?]+$/, /^\/entrenadores\/[^/?]+$/];
 
 async function recorrer(perfil, opciones, papel, cuenta, privadas) {

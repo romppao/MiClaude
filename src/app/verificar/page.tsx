@@ -1,3 +1,4 @@
+import { db } from "../../lib/common/db";
 import { getUser, readReturnPath, VERIFY_HOURS } from "../../lib/accounts/auth";
 import { resendVerification, verifyEmail } from "../actions/accounts";
 import { demoConfirmarCorreo } from "../actions/demo";
@@ -14,6 +15,7 @@ const Ir = ({ a, children, secundario }: { a: string; children: React.ReactNode;
 export default async function Verify({ searchParams }: { searchParams: Promise<{ token?: string; aviso?: string }> }) {
   const { token, aviso } = await searchParams;
   const user = await getUser();
+  const solicitud = user ? await db.organizerRequest.findFirst({ where: { userId: user.id, status: "PENDING" }, select: { id: true } }) : null;
   const volver = await readReturnPath(); // a dónde quería ir quien se registró desde «Entra para…» (solo en el mismo navegador)
 
   // El enlace del correo solo muestra un botón: verificar exige un POST, así los escáneres de enlaces no consumen el token.
@@ -46,7 +48,7 @@ export default async function Verify({ searchParams }: { searchParams: Promise<{
         <h1>Tu correo electrónico está verificado</h1>
         <p>El correo <strong>{user.email}</strong> ya está confirmado. Ya puedes dar aura, registrar combates y reclamar tu ficha.</p>
         {volver && <Ir a={volver}>Volver a lo que estabas haciendo</Ir>}
-        {user.role === "FIGHTER" || user.fighter ? <Ir a="/mi-ficha" secundario={!!volver}>Ir a mi ficha de peleador</Ir> : <Ir a="/peleadores" secundario={!!volver}>Ver los peleadores</Ir>}
+        {solicitud ? <Ir a="/organizador" secundario={!!volver}>Ver el estado de mi solicitud</Ir> : user.role === "FIGHTER" || user.fighter ? <Ir a="/mi-ficha" secundario={!!volver}>Ir a mi ficha de peleador</Ir> : <Ir a="/peleadores" secundario={!!volver}>Ver los peleadores</Ir>}
         <Ir a="/" secundario>Ir al inicio</Ir>
       </>
     );

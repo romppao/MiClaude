@@ -34,6 +34,7 @@ El código se organiza **por dominios** y con reglas de dependencia que vigila u
 | Visitante | Navegar, buscar, ver fichas, veladas y ránking (las declaraciones se muestran identificadas por su respaldo) |
 | `FAN` | Lo anterior + dar aura a peleadores (con el correo verificado) y seguirlos |
 | `FIGHTER` | Lo anterior + una ficha propia (una o varias disciplinas) y registrar sus combates |
+| *Alta por paneles* | **6 oct 2026:** `/registro` ofrece tres paneles (usuario, peleador, promotora o federación); el tercero crea la cuenta (rol `FAN`) y una `OrganizerRequest` con `kind` (`PROMOTORA`\|`FEDERACION`) y `website` en la misma transacción. Al aprobar una federación se crea su `Profile kind="federacion"` con la solicitante como `ownerId`. El aterrizaje tras entrar sale de `src/lib/accounts/landing.ts`. |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita (con una comprobación obligatoria); lo aprueba un `ADMIN` anotando la evidencia comprobada. Puede ascender cualquier usuario que no sea administrador |
 | `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Se asigna a mano en la base de datos |
 

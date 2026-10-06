@@ -18,20 +18,25 @@ import { notifyFollowersOfBout } from "../../lib/community/notify";
 import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
+import { parseTipoDeEntidad } from "../../lib/accounts/landing";
 import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();
   const back = "/organizador";
-  checkLengths(f, back, { orgName: LIMITS.orgName, message: LIMITS.message });
+  checkLengths(f, back, { orgName: LIMITS.orgName, message: LIMITS.message, website: LIMITS.url });
   const orgName = str(f, "orgName");
   if (!orgName) go(back, { problema: "nombre_organizacion" });
+  const kind = parseTipoDeEntidad(str(f, "entityKind"));
+  if (!kind) go(back, { problema: "entidad_tipo" });
+  const website = str(f, "website") ? safeHttpUrl(str(f, "website")) : null;
+  if (str(f, "website") && !website) go(back, { problema: "enlace_invalido" });
   const message = str(f, "message") || null;
   if (!message) go(back, { problema: "organizador_sin_datos" });
   await db.organizerRequest.upsert({
     where: { userId: user.id },
-    create: { userId: user.id, orgName, message },
-    update: { orgName, message, status: "PENDING" },
+    create: { userId: user.id, orgName, kind, website, message },
+    update: { orgName, kind, website, message, status: "PENDING" },
   });
   go(back, { aviso: "solicitud_enviada" });
 }

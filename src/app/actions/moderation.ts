@@ -2,6 +2,7 @@
 // Todo lo que se exporta aquí es un punto de entrada público del servidor (POST): los ayudantes van sin exportar o en ./shared.
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { boutVersion } from "../../lib/bouts/rules";
@@ -95,12 +96,18 @@ export async function decideOrganizer(f: FormData) {
     if ((await tx.organizerRequest.updateMany({ where: { id: req.id, status: "PENDING", orgName: req.orgName, message: req.message }, data: { status: approve ? "APPROVED" : "REJECTED", reviewNote: note, reviewedAt: new Date(), message: null } })).count === 0) throw new Rechazo("solicitud_cambiada");
     // Los permisos de organizador salen del rol: se concede a cualquier persona que no sea ya moderadora (un peleador también puede organizar).
     if (approve && req.user.role !== "ADMIN") await tx.user.update({ where: { id: req.userId }, data: { role: "ORGANIZER" } });
+    // Una federación aprobada tiene desde ese momento su perfil en el directorio y a su solicitante como titular (puede editarlo sin más pasos).
+    if (approve && req.kind === "FEDERACION") {
+      const profileId = randomUUID();
+      await tx.profile.create({ data: { kind: "federacion", entityId: profileId, name: req.orgName, website: req.website, ownerId: req.userId } });
+      await audit({ userId: admin.id, entity: "PROFILE", entityId: profileId, action: "FEDERATION_CREATED", after: { name: req.orgName, ownerId: req.userId, fromRequest: req.id } }, tx);
+    }
     await audit({ userId: admin.id, entity: "ORGANIZER", entityId: req.id, action: approve ? "APPROVED" : "REJECTED", after: { userId: req.userId, orgName: req.orgName, note } }, tx);
   }));
   revalidatePath("/", "layout");
   after(async () => {
     await notifyDecision(req.userId, approve ? "Ya puedes publicar veladas en Ring España" : "Tu solicitud de organizador en Ring España no se ha aprobado",
-      approve ? `Un moderador ha aprobado tu solicitud como organizador de «${oneLine(req.orgName)}». Ya puedes crear veladas y montar sus carteles aquí: ${APP_URL}/organizador`
+      approve ? `Un moderador ha aprobado tu solicitud como organizador de «${oneLine(req.orgName)}». Ya puedes crear veladas y montar sus carteles aquí: ${APP_URL}/organizador${req.kind === "FEDERACION" ? `\n\nTu federación ya tiene su perfil en el directorio: puedes completarlo desde Mi cuenta o en ${APP_URL}/federaciones` : ""}`
         : `Un moderador no ha podido aprobar tu solicitud como organizador de «${oneLine(req.orgName)}».${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nPuedes enviar otra solicitud con más información aquí: ${APP_URL}/organizador`);
   });
   go(back, { aviso: approve ? "organizador_aprobado" : "organizador_rechazado" });

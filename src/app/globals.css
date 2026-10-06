@@ -66,3 +66,8 @@ nav.indice-pagina a{display:inline-flex;align-items:center;min-height:44px;paddi
   .profile-identity{flex-direction:column;gap:16px}.profile-hero{padding:24px 18px}.profile-heading{width:100%}
   .profile-heading h1{font-size:clamp(2.2rem,10vw,3rem)}
 }
+
+/* Registro: tres paneles, uno por tipo de cuenta (estructura y tamaño táctil; el aspecto lo definirá la fase de diseño). */
+.paneles-registro{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin:16px 0 24px}
+a.panel-registro{display:flex;flex-direction:column;gap:6px;min-height:96px;justify-content:center;text-decoration:none}
+a.panel-registro strong{font-size:1.2rem}

@@ -15,7 +15,7 @@ async function entrar(p, email, password) {
 // 1) Registro: datos incorrectos y correo ya usado, con mensajes que explican qué hacer
 const rep = await newUser("Repetida", "FAN");
 const anon = await nueva();
-await anon.goto(B + "/registro");
+await anon.goto(B + "/registro?tipo=usuario");
 await anon.fill("[name=name]", "Otra persona"); await anon.fill("[name=email]", `repetida${rnd}@test.es`); await anon.fill("[name=password]", "contraseña123");
 await btn(anon, "Crear mi cuenta");
 check("un correo ya registrado se explica y ofrece entrar o recuperar la contraseña", await seen(avisoMalo(anon, "Ya hay una cuenta con ese correo")) && await seen(anon.locator("main a:has-text('Elige una nueva')")));

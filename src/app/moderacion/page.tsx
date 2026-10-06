@@ -5,6 +5,7 @@ import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
 import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions/moderation";
 import { REPORT_REASONS } from "../../lib/community/reports";
 import Paginacion from "../components/Paginacion";
+import { TIPO_DE_ENTIDAD_ETIQUETA, parseTipoDeEntidad } from "../../lib/accounts/landing";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import { boutVersion } from "../../lib/bouts/rules";
 import { lookup, flatParams } from "../../lib/common/safe";
@@ -188,8 +189,8 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
           <tbody>
             {organizers.map((o) => (
               <tr key={o.id}>
-                <th scope="row" className="celda-fila"><strong>{o.orgName}</strong> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></th>
-                <td className="mut">{o.message}</td>
+                <th scope="row" className="celda-fila"><strong>{o.orgName}</strong> <span className="tag">{TIPO_DE_ENTIDAD_ETIQUETA[parseTipoDeEntidad(o.kind) ?? "PROMOTORA"]}</span> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></th>
+                <td className="mut">{o.message}{o.website && <> · <a href={o.website} target="_blank" rel="noopener noreferrer nofollow ugc">web o redes<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a></>}</td>
                 <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, `${o.orgName}`, true)}</td>
               </tr>
             ))}

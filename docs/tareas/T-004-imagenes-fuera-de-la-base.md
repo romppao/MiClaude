@@ -14,7 +14,7 @@ Hoy `Profile.avatar` y `Profile.banner` son `Bytes` en PostgreSQL (`prisma/schem
 3. `dbImageStore.ts`: implementa la interfaz con las columnas actuales (comportamiento idéntico al de hoy).
 4. Refactoriza `actions/profiles.ts`, la ruta de `imagenes`, `mi-cuenta/datos/route.ts` y `anonymize.ts` para usar la interfaz, **sin cambiar comportamiento**.
 5. Migración **aditiva** `prisma/migrations/<fecha>_imagenes_clave`: añade `avatarKey String?` y `bannerKey String?` a `Profile`. No borres columnas.
-6. Ruta de imágenes: respuestas con `Cache-Control: public, max-age=31536000, immutable` cuando la URL lleve un parámetro de versión (`?v=<updatedAt en ms>`), y `ETag`; mantener la comprobación de visibilidad (no servir imágenes de fichas ocultas: en ese caso `private, no-store`). Actualiza donde se construye la URL para añadir `?v=`.
+6. *(Medio hecho el 6 oct 2026 por Claude: `ETag` y 304 sin leer bytes, caché `private, no-cache`; falta la caché larga con versión en la URL y la interfaz `ImageStore`.)* Ruta de imágenes: respuestas con `Cache-Control: public, max-age=31536000, immutable` cuando la URL lleve un parámetro de versión (`?v=<updatedAt en ms>`), y `ETag`; mantener la comprobación de visibilidad (no servir imágenes de fichas ocultas: en ese caso `private, no-store`). Actualiza donde se construye la URL para añadir `?v=`.
 7. Pruebas unitarias con un `ImageStore` falso (put/get/delete, borrado al anonimizar, exportación). `tests/e2e/perfiles.mjs` sigue en verde.
 
 ## Pasos — parte 2 (bloqueada hasta que el fundador elija proveedor): almacenamiento de objetos

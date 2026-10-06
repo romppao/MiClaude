@@ -44,6 +44,7 @@ export const AVISOS: Record<string, string> = {
   siguiendo: "Ahora sigues a este peleador. Verás sus próximas veladas en «Peleadores que sigo» (dentro de «Mi cuenta»).",
   siguiendo_quitado: "Has dejado de seguir a este peleador.",
   disciplina_guardada: "Se ha guardado la disciplina en tu ficha.",
+  registro_entidad: "Hemos recibido tu solicitud. Confirma tu correo electrónico con el enlace que te enviamos; después un moderador la revisará y te responderá por correo electrónico.",
   solicitud_enviada: "Solicitud enviada. Un moderador la revisará y te responderá por correo electrónico; también podrás ver la respuesta en esta página.",
   demo_papel_cambiado: "Listo: has cambiado tu papel en la demostración. El menú ya muestra lo que puede hacer ahora tu cuenta.",
   correo_verificado: "Correo electrónico verificado. Ya puedes dar aura, registrar combates y reclamar tu ficha.",
@@ -163,5 +164,6 @@ export const PROBLEMAS: Record<string, string> = {
   cartel_peleadores: "Elige dos peleadores distintos de la lista.",
   resultado_futuro: "Solo puedes poner resultados cuando la velada ya se ha celebrado.",
   velada_datos: "Revisa el nombre y la fecha de la velada.",
+  entidad_tipo: "Elige si tu entidad es una promotora o una federación.",
   nombre_organizacion: "Indica el nombre de tu organización.",
 };

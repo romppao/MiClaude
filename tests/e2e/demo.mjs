@@ -2,7 +2,7 @@
 import { B, rnd, browser, seen, check, btn, terminarDiagnosticos } from "./ayudas.mjs";
 
 const p = await (await browser.newContext()).newPage();
-await p.goto(B + "/registro");
+await p.goto(B + "/registro?tipo=usuario");
 check("la demostración avisa con un mensaje visible de que los datos son ficticios", await seen(p.locator(".barra-aviso", { hasText: "Versión de demostración" })));
 await p.fill("[name=name]", "Persona Demo"); await p.fill("[name=email]", `demo${rnd}@test.es`); await p.fill("[name=password]", "contraseña-larga-1");
 await btn(p, "Crear mi cuenta");

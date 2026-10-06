@@ -12,7 +12,7 @@ export default function Help() {
 
       <h2>Si eres aficionado</h2>
       <ol>
-        <li><Link href="/registro">Crea tu cuenta</Link> y confirma tu correo electrónico.</li>
+        <li><Link href="/registro">Crea tu cuenta</Link> eligiendo «Usuario» y confirma tu correo electrónico.</li>
         <li>Busca a un peleador en <Link href="/peleadores">Peleadores</Link> o mira quién compite en <Link href="/veladas">Veladas</Link>.</li>
         <li>En la ficha del peleador, elige el combate que viste y pulsa <strong>«Dar aura»</strong>. El aura es tu forma de reconocer a un peleador que te ha impresionado. Puedes añadir un comentario e indicar si lo viste en directo.</li>
         <li>Los peleadores con más aura aparecen en el <Link href="/ranking">Ránking</Link>, ordenados dentro de la disciplina, nivel, división deportiva y peso del combate. Cambiar la categoría actual no mueve el aura recibida en combates anteriores.</li>
@@ -21,7 +21,7 @@ export default function Help() {
 
       <h2>Si eres peleador</h2>
       <ol>
-        <li><Link href="/registro">Crea tu cuenta</Link> eligiendo «Tener mi ficha de peleador» y confirma tu correo electrónico.</li>
+        <li><Link href="/registro">Crea tu cuenta</Link> eligiendo «Peleador» y confirma tu correo electrónico.</li>
         <li>Si alguien ya registró un combate tuyo, busca tu ficha y pide que pase a ser tuya. Si no aparece, crea una nueva.</li>
         <li>Elige tu disciplina, nivel, división deportiva (grupo de edad y categoría masculina o femenina) y peso. Cada reglamento tiene sus propias edades y pesos; puedes consultarlo junto al selector. Si no conoces la división, déjala sin confirmar. Si ya habías competido antes, indica cuántos combates llevas; si recuerdas tu récord, añádelo, y si no, con el número de combates basta. Puedes añadir más disciplinas cuando quieras.</li>
         <li>En <Link href="/mi-ficha">Mi ficha</Link>, registra tus combates. Añadir un acta, vídeo o publicación con el resultado ayuda a comprobarlo. Un cartel solo anuncia el combate.</li>

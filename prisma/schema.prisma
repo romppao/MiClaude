@@ -313,6 +313,8 @@ model OrganizerRequest {
   userId     String        @unique
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   orgName    String
+  kind       String        @default("PROMOTORA") // PROMOTORA | FEDERACION
+  website    String?
   message    String?
   status     RequestStatus @default(PENDING)
   reviewNote String?

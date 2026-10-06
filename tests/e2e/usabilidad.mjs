@@ -28,7 +28,7 @@ await aficionada.p.goto(B + "/mi-cuenta");
 check("«Mi cuenta» reúne los accesos directos (peleadores que sigo, organizar veladas) y los avisos enviados", await seen(aficionada.p.locator("main a", { hasText: "Peleadores que sigo" })) && await aficionada.p.locator("main a", { hasText: "Organizar veladas" }).count() === 1 && (await cuerpo(aficionada.p)).includes("Avisos de error que he enviado"));
 
 // 2) Lo escrito no se pierde tras un error (nunca la contraseña)
-await visitante.goto(B + "/registro");
+await visitante.goto(B + "/registro?tipo=usuario");
 await visitante.evaluate(() => document.querySelectorAll("input[minlength]").forEach((i) => i.removeAttribute("minlength")));
 await visitante.fill("[name=name]", "Memoria Prueba"); await visitante.fill("[name=email]", `memoria${rnd}@test.es`); await visitante.fill("[name=password]", "corta");
 await btn(visitante, "Crear mi cuenta");
@@ -55,7 +55,7 @@ check("y si el mismo error se repite (la dirección no cambia), el correo sigue 
 await visitante.fill("[name=password]", "contraseña-larga-1");
 await btn(visitante, "Crear mi cuenta");
 await visitante.waitForURL("**/verificar");
-await visitante.goto(B + "/registro");
+await visitante.goto(B + "/registro?tipo=usuario");
 check("una pantalla nueva no hereda lo escrito de otro envío", await visitante.inputValue("[name=name]") === "");
 
 // 3) Los avisos están en regiones permanentes para lectores de pantalla
@@ -63,7 +63,7 @@ await visitante.goto(B + "/entrar");
 check("existen las regiones permanentes de aviso (educada para éxitos, asertiva para errores)", await visitante.locator("[role=status][aria-live=polite]").count() >= 1 && await visitante.locator("[role=alert][aria-live=assertive]").count() >= 1);
 
 // 4) Tamaños, enlaces y contraste de los controles
-await visitante.goto(B + "/registro");
+await visitante.goto(B + "/registro?tipo=usuario");
 const medidas = await visitante.evaluate(() => {
   const alto = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null).map((e) => Math.round(e.getBoundingClientRect().height));
   const px = (sel) => [...document.querySelectorAll(sel)].map((e) => parseFloat(getComputedStyle(e).fontSize));
@@ -124,7 +124,7 @@ check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(soli
 
 // 7b) Un doble clic no envía dos veces (dos combates, un error de «duplicado» tras haberlo hecho bien)
 const doble = await nueva();
-await doble.goto(B + "/registro");
+await doble.goto(B + "/registro?tipo=usuario");
 await doble.fill("[name=name]", "Doble Clic"); await doble.fill("[name=email]", `dobleclic${rnd}@test.es`); await doble.fill("[name=password]", "contraseña-larga-1");
 await doble.dblclick('main button:has-text("Crear mi cuenta")');
 check("un doble clic en «Crear mi cuenta» lleva a «Confirma tu correo», sin un error de «ya hay una cuenta»", await doble.waitForURL("**/verificar", { timeout: 8000 }).then(() => true, () => false));
@@ -145,6 +145,9 @@ await nuevoVisitante.locator("a", { hasText: "Entra para seguir a este peleador"
 check("«Entra para seguir» lleva a «Entrar» explicando por qué y a dónde se volverá", await seen(nuevoVisitante.locator("[role=note]", { hasText: "Al terminar volverás a la página donde estabas" })));
 await nuevoVisitante.locator("main a.btn", { hasText: "Crear mi cuenta" }).click();
 check("junto al formulario de acceso hay un botón claro para crear la cuenta, y conserva el destino", await seen(nuevoVisitante.locator("[role=note]", { hasText: "podrás volver a la página donde estabas" })) && nuevoVisitante.url().includes("next="));
+check("el registro ofrece tres paneles claros, sin el desplegable antiguo", await nuevoVisitante.locator("a.panel-registro").count() === 3 && await nuevoVisitante.locator("select[name=role]").count() === 0);
+await nuevoVisitante.locator("a.panel-registro", { hasText: "Usuario" }).click();
+check("el panel «Usuario» conserva el destino y pide solo nombre, correo y contraseña", await seen(nuevoVisitante.locator("[name=password]")) && nuevoVisitante.url().includes("next=") && await nuevoVisitante.locator("main form input:not([type=hidden])").count() === 3);
 const correoVolver = `volver${rnd}@test.es`;
 await nuevoVisitante.fill("[name=name]", "Persona Volver"); await nuevoVisitante.fill("[name=email]", correoVolver); await nuevoVisitante.fill("[name=password]", "contraseña123");
 await btn(nuevoVisitante, "Crear mi cuenta"); await nuevoVisitante.waitForURL("**/verificar");

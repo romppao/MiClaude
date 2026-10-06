@@ -1,6 +1,6 @@
 # T-011 — Registro por tres paneles (usuario · peleador · promotora o federación)
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F1 · **Estado:** lista · **Sugerida a:** Codex · **Depende de:** —
+**Fase:** F1 · **Estado:** hecha por Claude el 6 de octubre de 2026 (petición expresa del fundador: «corrige todo lo que dijiste…») · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo
 Sustituir el desplegable «¿Qué quieres hacer en Ring España?» del registro por **tres paneles claros** y profesionales, uno por tipo de persona, y llevar a cada una al sitio adecuado al terminar.

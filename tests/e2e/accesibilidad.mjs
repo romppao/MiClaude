@@ -38,7 +38,7 @@ for (const [ruta, etiqueta] of [
   ...(fichaVelada ? [[fichaVelada, "Ficha de velada"]] : []), ["/gimnasios", "Gimnasios"],
   ...(fichaGimnasio ? [[fichaGimnasio, "Ficha de gimnasio"]] : []), ["/entrenadores", "Entrenadores"], [fichaEntrenador, "Ficha de entrenador"],
   ["/ranking", "Ránking"], ["/ayuda", "Ayuda"], ["/buscar", "Búsqueda (vacía)"], ["/buscar?q=accesible", "Búsqueda (con resultados)"], ["/buscar?q=zzzzqq", "Búsqueda (sin resultados)"],
-  ["/registro", "Registro"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
+  ["/registro", "Registro"], ["/registro?tipo=usuario", "Registro de usuario"], ["/registro?tipo=peleador", "Registro de peleador"], ["/registro?tipo=entidad", "Registro de promotora o federación"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
   ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/organizador", "Organizadores (sin sesión)"],
   ["/pagina-que-no-existe", "Página no encontrada"],
 ]) await analizar(anon, ruta, etiqueta);

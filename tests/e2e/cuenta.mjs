@@ -151,7 +151,7 @@ await anon.goto(B + "/privacidad");
 const priv = await cuerpo(anon);
 check("la página de privacidad explica datos, plazos y derechos", priv.includes("Qué datos guardamos") && priv.includes("Cuánto tiempo los conservamos") && priv.includes("Tus derechos"));
 check("está enlazada desde el pie de página", await anon.locator("footer a[href='/privacidad']").count() === 1);
-await anon.goto(B + "/registro");
+await anon.goto(B + "/registro?tipo=usuario");
 check("y desde el formulario de registro", await anon.locator("main a[href='/privacidad']").count() === 1);
 
 await terminarDiagnosticos();
