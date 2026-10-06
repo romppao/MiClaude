@@ -64,7 +64,14 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
 </div>
         </section>
       ))}
-      {groups.length === 0 && <p className="mut">No hay aura con esta disciplina, nivel, zona y periodo. Puedes <Link href={discipline ? `/ranking?disciplina=${discipline}&provincia=all` : "/ranking"}>ampliar la consulta a toda España y a todo el tiempo</Link> o <Link href={discipline ? `/peleadores?disciplina=${discipline}` : "/peleadores"}>buscar un peleador</Link> para reconocer su actuación en un combate que hayas visto.</p>}
+      {groups.length === 0 && (
+        <p className="mut">
+          Todavía no hay aura con estos criterios.{" "}
+          {/* Solo se ofrece ampliar si la consulta es más estrecha que la general: un enlace a la misma pantalla no hace nada. */}
+          {(level || province || recientes) && <><Link href={discipline ? `/ranking?disciplina=${discipline}` : "/ranking"}>Quitar el nivel, la zona y el periodo</Link> para ver más resultados, o </>}
+          <Link href={discipline ? `/peleadores?disciplina=${discipline}` : "/peleadores"}>{level || province || recientes ? "busca" : "Busca"} un peleador</Link> para reconocer su actuación en un combate que hayas visto.
+        </p>
+      )}
     </>
   );
 }

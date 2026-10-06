@@ -6,7 +6,7 @@
 //  - ningún enlace lleva a la misma pantalla en la que ya estás (salvo el logotipo, el inicio y el menú de la propia sección);
 //  - todo botón está dentro de un formulario que se envía a algún sitio (un botón suelto no hace nada);
 //  - no hay elementos con aspecto de enlace (cursor de mano) que no sean ni enlaces ni botones.
-import { B, rnd, browser, check, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
+import { B, rnd, browser, check, newUser, hacerAdmin, sql, datosDeAlta, terminarDiagnosticos } from "./ayudas.mjs";
 
 const MAX_PAGINAS = Number(process.env.ENLACES_MAX ?? 90);
 const origen = new URL(B).origin;
@@ -38,7 +38,9 @@ async function auditarPagina(p, papel, ruta) {
     for (const b of document.querySelectorAll("button, input[type=submit], input[type=button]")) {
       const n = nombre(b) || b.getAttribute("value") || "";
       const f = b.closest("form") || (b.getAttribute("form") && document.getElementById(b.getAttribute("form")));
-      if (!f && b.type !== "reset") out.push(`botón suelto, sin formulario (no hace nada): «${n}»`);
+      // Un botón que abre o cierra un diálogo (menú) lleva su propia función: se reconoce por aria-controls / aria-haspopup o por estar dentro del diálogo.
+      const abreDialogo = b.hasAttribute("aria-controls") || b.hasAttribute("aria-haspopup") || !!b.closest("dialog");
+      if (!f && b.type !== "reset" && !abreDialogo) out.push(`botón suelto, sin formulario (no hace nada): «${n}»`);
       else if (f && !f.getAttribute("action") && !f.action) out.push(`formulario sin acción: «${n}»`);
       if (!n) out.push("botón sin texto ni nombre accesible");
     }
@@ -105,13 +107,15 @@ for (const [papel, rol, nombre] of cuentas) {
   if (papel === "peleador") {
     await u.p.goto(B + "/mi-ficha");
     await u.p.fill("[name=firstName]", "Enlaces"); await u.p.fill("[name=lastName]", `Prueba${rnd}`);
+    await datosDeAlta(u.p);
     await u.p.click("main button:has-text('Crear mi ficha')");
     await u.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
   }
   await recorrer(papel, u.p, [...SEMILLAS.filter((r) => !r.includes("no-existe")), "/mi-cuenta", "/siguiendo", "/mi-ficha", "/organizador", "/moderacion", "/moderacion/historial"]);
 }
 
-const unicos = [...new Set(problemas)];
+// Las direcciones con identificadores (perfiles, veladas…) se agrupan para contar cada defecto una sola vez por tipo de pantalla.
+const unicos = [...new Set(problemas.map((t) => t.replace(/\/[a-z0-9]{20,}\b/g, "/:id")))];
 console.log(unicos.length ? "\nPROBLEMAS ENCONTRADOS:\n" + unicos.map((t) => "  - " + t).join("\n") : "");
 check(`ninguna pantalla tiene enlaces ni botones que no lleven a ningún sitio (${unicos.length} problemas)`, unicos.length === 0);
 await terminarDiagnosticos();

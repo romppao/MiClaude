@@ -21,7 +21,7 @@ export default async function Trainers({ searchParams }: { searchParams: Promise
       <h1>Entrenadores</h1>
       <form className="search" role="search" aria-label="Filtrar entrenadores">
         <CampoFiltro etiqueta="Nombre del entrenador"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
-        <BotonesFiltro ruta="/entrenadores" />
+        <BotonesFiltro ruta="/entrenadores" hayFiltros={!!q} />
       </form>
       <div className="grid">
         {trainers.map((t) => <Link key={t.id} href={`/entrenadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{t.gym?.name ?? "Independiente"} · {t._count.fighters} peleadores</div></Link>)}

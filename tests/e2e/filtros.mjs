@@ -80,7 +80,7 @@ await anon.click("[role=group][aria-label='Filtros aplicados'] a:has-text('Profe
 await anon.waitForURL((u) => !u.search.includes("level="));
 check("cada filtro se quita por separado desde el resumen", !(await anon.url()).includes("level=") && (await anon.url()).includes("disciplina=BOXEO"));
 const tarjeta = anon.locator('main .grid > a.card').filter({hasText:nombreA});
-check("las fichas muestran disciplina, nivel, división sin confirmar y peso sin inventar una edad", await seen(tarjeta) && (await tarjeta.innerText()).includes("Boxeo · Profesional") && (await tarjeta.innerText()).includes("Grupo de edad y categoría sin confirmar") && (await tarjeta.innerText()).includes("Wélter · hasta 66,7 kg"));
+check("las fichas muestran disciplina, nivel, división sin confirmar y peso sin inventar una edad", await seen(tarjeta) && (await tarjeta.innerText()).includes("Boxeo · Profesional") && (await tarjeta.innerText()).includes("Edad y categoría sin indicar") && (await tarjeta.innerText()).includes("Wélter · hasta 66,7 kg"));
 
 // 4) Direcciones raras no rompen el filtro
 const raras = ["level=SEMIPRO", "disciplina=NATACION&categoria=x", "categoria=%00", "level=PRO&level=AMATEUR", "disciplina=constructor&level=__proto__&categoria=toString"];

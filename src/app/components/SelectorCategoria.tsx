@@ -78,7 +78,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
       <label className="field">
         <span>División deportiva (edad y categoría)</span>
         <select name={nombres.divisionId ?? "divisionId"} value={divisionId} disabled={!disciplina} onChange={(e) => { setDivisionId(e.target.value); setCategoria(""); }} aria-describedby={`${id}-division`}>
-          <option value="">{esFiltro ? "Todas las divisiones" : "Grupo de edad y categoría sin confirmar"}</option>
+          <option value="">{esFiltro ? "Todas las divisiones" : "Prefiero indicarlo más tarde"}</option>
           {disciplina && niveles.flatMap(n => divisionsFor(disciplina, n)).map(d => <option key={d.id} value={d.id}>{d.label}{!nivel ? ` · ${levelName(d.level)}` : ""}</option>)}
         </select>
         <span className="hint" id={`${id}-division`} aria-live="polite">

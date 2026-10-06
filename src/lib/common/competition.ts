@@ -88,7 +88,7 @@ for (const d of divisions.filter(d=>d.discipline==="JIUJITSU")) divisions.push({
 export const COMPETITION_DIVISIONS: readonly CompetitionDivision[] = divisions;
 export const divisionById = (id?: string | null) => divisions.find(d=>d.id===id);
 export const divisionsFor = (discipline: Discipline, level: Level) => divisions.filter(d=>d.discipline===discipline && d.level===level);
-export const divisionLabel = (id?: string | null) => divisionById(id)?.label ?? (id || "Grupo de edad y categoría sin confirmar");
+export const divisionLabel = (id?: string | null) => divisionById(id)?.label ?? (id || "Edad y categoría sin indicar");
 
 /** Comprobación deportiva, no licencia médica/federativa. Sin nacimiento la edad queda declarada, sin afirmar que se haya verificado. */
 export function divisionAgeEligible(id: string, birth: Date | null, start: Date, end = start): boolean {

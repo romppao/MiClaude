@@ -905,3 +905,24 @@ Validación local del retorno: 406 unitarias, build de producción y 30 checks d
 El 3 de octubre a las 23:03 UTC, Render sirve también #16: `/respaldar` sin sesión lleva a `/entrar?next=%2Frespaldar&problema=sin_sesion`; portada, ayuda y salud responden 200 por HTTPS con verificación TLS. El regreso autenticado se recorrió en navegador local y en CI; no se crearon cuentas ni fixtures en la demo para esta comprobación. Los datos existentes se conservan. Esta continuación de cierre modifica solo documentación.
 
 Siguiente trabajo: resolver solapamientos del historial/registro inicial y catálogos IMMAF/IBJJF; herramientas de entidades; errores y recorridos con personas; preparación de correo, copias y privacidad/menores. No se declaran cerrados por las pruebas automatizadas. Diseño provisional, a retomar al final mediante briefing con el fundador; #13 sigue abierta, sin sobrescribir el trabajo de Work.
+
+
+## 6 de octubre de 2026 — Revisión del trabajo de Codex y limpieza de enlaces muertos
+
+### Qué se pidió
+Tras una semana sin créditos, el fundador pidió comprobar todo lo que hicieron Codex y otros asistentes y dar una opinión honesta (resultado abajo), y recordó su regla: «no puede haber botones ni enlaces inservibles; todo lo que sea inservible, mejor quítalo».
+
+### Qué se comprobó
+Ejecutado por Claude desde cero con base de datos vacía: tipos, 406 unitarias, compilación, 16 guiones de navegador y accesibilidad, todo correcto (coincide con el CI #144). Valoración: trabajo serio y bien documentado; defectos que ninguna prueba cubría: cabecera de escritorio con los enlaces apilados, enlaces que no hacen nada y texto técnico en la ficha.
+
+### Qué se hizo
+- **Cabecera de escritorio y tableta:** los cinco enlaces principales ya no se encogen ni se apilan; la cuenta y el buscador pasan a una segunda línea si no caben (`globals.css`, comprobado a 1440, 1024, 900, 800 y 700 px).
+- **Enlaces muertos:** «Quitar filtros» ya solo aparece cuando hay filtros (y se llama «Quitar todos los filtros»); el aviso de ránking vacío solo ofrece «Quitar el nivel, la zona y el periodo» si la consulta es más estrecha que la general.
+- **Auditoría automática** `tests/e2e/enlaces.mjs` (ahora dentro de `test:e2e`): recorre la aplicación como sin cuenta, aficionado, peleador, organizador y moderador y falla si hay enlaces vacíos o a «#», anclas inexistentes, enlaces que llevan a la misma pantalla, botones sueltos sin formulario, elementos con cursor de mano que no son enlaces ni botones, o destinos que dan error.
+- **Textos:** «Grupo de edad y categoría sin confirmar» pasa a «Edad y categoría sin indicar» y la opción del selector a «Prefiero indicarlo más tarde».
+
+### Qué salió mal
+Dos enlaces muertos reales llevaban semanas en la aplicación (uno de ellos introducido en el bloque de Codex) porque ninguna prueba medía «¿este enlace hace algo?». El fallo de «seguir» que describió el fundador no se pudo reproducir: el enlace «Entra para seguir a este peleador» funciona sin cuenta; queda pendiente de que el fundador indique en qué pantalla y papel le pasó.
+
+### Estado y próximos pasos
+Pendiente: seguir puliendo funcionalidades según los fallos que anote el fundador; después, escalabilidad (fotos fuera de la base de datos, caché de páginas públicas, base de datos gestionada, cola de correos, prueba de carga); paneles A/B/C al registrarse (decisión de formato del fundador); cerrar propuestas de Dependabot (saltos mayores que fallan el CI) y la #9 duplicada.

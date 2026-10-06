@@ -40,7 +40,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Cuándo"><select name="past" defaultValue={period}><option value="">Hoy y próximas</option><option value="1">Ya celebradas</option><option value="todas">Todas</option></select></CampoFiltro>
-        <BotonesFiltro ruta="/veladas" />
+        <BotonesFiltro ruta="/veladas" hayFiltros={!!(q || disciplina || level || province || period)} />
       </form>
       <FiltrosActivos ruta="/veladas" params={{ q, disciplina, level, province, past: period }} activos={[
         ...(q ? [{ texto: `Búsqueda: ${q}`, claves: ["q"] }] : []),

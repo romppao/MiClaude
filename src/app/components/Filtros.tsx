@@ -6,11 +6,12 @@ export function CampoFiltro({ etiqueta, ayuda, children }: { etiqueta: string; a
 }
 
 /** Botón principal de un formulario de filtros y enlace para quitarlos todos. */
-export function BotonesFiltro({ ruta }: { ruta: string }) {
+export function BotonesFiltro({ ruta, hayFiltros }: { ruta: string; hayFiltros: boolean }) {
   return (
     <>
       <button>Aplicar filtros</button>
-      <Link href={ruta} className="btn secondary">Quitar filtros</Link>
+      {/* Solo cuando hay algo que quitar: un enlace a la misma pantalla no hace nada. */}
+      {hayFiltros && <Link href={ruta} className="btn secondary">Quitar todos los filtros</Link>}
     </>
   );
 }

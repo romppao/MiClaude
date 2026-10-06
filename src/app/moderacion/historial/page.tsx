@@ -32,7 +32,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
           <select name="entity" defaultValue={entidad ?? ""}><option value="">Todo</option>{Object.entries(AUDIT_ENTITY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
         </CampoFiltro>
         <CampoFiltro etiqueta="Identificador (opcional)" ayuda="Copia el identificador de una fila para ver solo su historial."><input name="id" defaultValue={id} maxLength={40} /></CampoFiltro>
-        <BotonesFiltro ruta="/moderacion/historial" />
+        <BotonesFiltro ruta="/moderacion/historial" hayFiltros={!!(entity || id)} />
       </form>
       {logs.length === 0 ? <p className="mut">No hay registros con esos filtros.</p> : (
         <>

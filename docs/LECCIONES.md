@@ -203,3 +203,12 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 - Al repetir el guion de volumen sobre una base ya usada, un check esperaba exactamente cinco filas en la tercera página pese a existir datos legítimos de otros guiones. Se calculan totales y posiciones según el mismo orden que la pantalla, manteniendo las comprobaciones de registros antiguos y limpieza por prefijo. **Regla:** una prueba puede exigir sus propios datos, pero no asumir que es la única fuente de datos en una base de pruebas reutilizable.
 
 - Comprobar solo que una ruta privada pide sesión no detecta que pierde el destino. El acceso público a `/respaldar` lo reveló tras desplegar #15; se transmite `next` por ambas guardas y se prueba el regreso después de entrar con permiso. **Regla:** comprobar motivo, destino y retorno completo en cada nueva página protegida, además de la denegación.
+
+
+## 6 de octubre de 2026 — enlaces muertos
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| «Quitar filtros» y «ampliar la consulta» llevaban a la misma pantalla en la que ya estabas | Se mostraban siempre, sin comprobar si había algo que quitar o ampliar | Un enlace o botón se muestra solo si puede hacer algo; `tests/e2e/enlaces.mjs` lo comprueba para todos los papeles |
+| La cabecera de escritorio se veía rota y ninguna prueba lo detectó | `nav` con `flex:1` y `flex-wrap` se encogía hasta apilar sus enlaces al añadir más elementos | Las pruebas de accesibilidad no miden maquetación: tras tocar la cabecera o el CSS global, mirar capturas a varios anchos (1440, 1024, 900, 700, 390) |
+| La auditoría marcó como «botón muerto» el botón del menú | Abre un diálogo (tiene `aria-controls`), no un formulario | Las auditorías automáticas necesitan excepciones explícitas y justificadas, no ampliar la sospecha |

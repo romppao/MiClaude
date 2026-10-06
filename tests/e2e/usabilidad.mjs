@@ -92,7 +92,9 @@ check("la pantalla «no encontrada» ofrece enlaces con aspecto de botón, sin b
 await visitante.goto(B + "/peleadores");
 const filtros = await visitante.evaluate(() => [...document.querySelectorAll("main form[role=search] select, main form[role=search] input[name=q]")].map((c) => !!c.closest("label")?.querySelector("span")?.textContent?.trim()));
 check("todos los filtros del listado tienen etiqueta visible", filtros.length >= 5 && filtros.every(Boolean));
-check("el formulario de filtros ofrece «Aplicar filtros» y «Quitar filtros»", await visitante.locator("main button", { hasText: "Aplicar filtros" }).count() === 1 && await visitante.locator("main a", { hasText: "Quitar filtros" }).count() === 1);
+check("sin filtros aplicados no hay un «Quitar todos los filtros» que no haga nada, solo «Aplicar filtros»", await visitante.locator("main button", { hasText: "Aplicar filtros" }).count() === 1 && await visitante.locator("main a", { hasText: "Quitar todos los filtros" }).count() === 0);
+await visitante.goto(B + "/peleadores?disciplina=BOXEO");
+check("con filtros aplicados sí aparece y lleva al listado completo", await visitante.locator("main a", { hasText: "Quitar todos los filtros" }).count() === 1 && (await visitante.locator("main a", { hasText: "Quitar todos los filtros" }).getAttribute("href")) === "/peleadores");
 
 // 7) Solicitudes: el motivo del rechazo es obligatorio, se muestra a quien lo recibe y se le responde por correo
 const solicitante = await newUser("Solicitante", "FAN");
