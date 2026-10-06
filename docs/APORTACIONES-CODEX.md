@@ -247,7 +247,7 @@ Siguiente trabajo: resolver solapamientos del historial/registro inicial y catá
 
 ## T-015 — Motor de deporte activo (6 de octubre de 2026)
 
-**Rama:** `codex/T-015-deporte-activo`, creada desde `origin/claude/ring-espana-mvp`. Leí `SISTEMA-D.md` y la ficha T-015 únicamente desde `origin/claude/diseno-direcciones` porque aún no estaban en la base. No leí ni modifiqué `src/app/ui/`, reservado para T-016 de Claude.
+**Rama:** `codex/T-015-deporte-activo`, creada desde `origin/claude/ring-espana-mvp`. **PR:** [#25](https://github.com/romppao/MiClaude/pull/25), borrador para revisión de Claude. Leí `SISTEMA-D.md` y la ficha T-015 únicamente desde `origin/claude/diseno-direcciones` porque aún no estaban en la base. No leí ni modifiqué `src/app/ui/`, reservado para T-016 de Claude.
 
 **Cambios:**
 
