@@ -88,7 +88,13 @@ export async function login(f: FormData) {
   await maybePurge(); // la limpieza de datos caducados no depende de que alguien se registre (como mucho una vez cada 30 minutos)
   // El intento se reserva ANTES de calcular el hash (si se anotara al terminar, peticiones simultáneas se saltarían el límite).
   const reservas = await Promise.all(claves.map(([clave, max]) => reservar(clave, max, 15 * MINUTO)));
-  if (reservas.some((r) => !r.permitido)) go(back, { problema: "demasiados_intentos" });
+  if (reservas.some((r) => !r.permitido)) {
+    // Si una de las dos claves (correo o IP) ya estaba bloqueada, no se debe
+    // gastar la reserva válida de la otra: esta petición no llegó a comprobar
+    // ninguna contraseña.
+    await Promise.all(reservas.map((reserva) => reserva.devolver()));
+    go(back, { problema: "demasiados_intentos" });
+  }
 
   const user = await db.user.findUnique({ where: { email } });
   // Con un correo que no existe se verifica igualmente contra un hash de mentira: así tarda lo mismo y no se puede averiguar qué correos hay registrados.
