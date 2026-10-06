@@ -63,7 +63,7 @@ La maqueta diseña **una** pantalla. Para el resto, se aplican los mismos ingred
 
 1. **¿El color cambia con el deporte?** La maqueta mantiene el violeta en los tres. Propuesta: **mantener el violeta** y que cambien la foto, las palabras de fondo, el vocabulario y los datos; así la marca no se diluye. Si quieres un acento propio por deporte, se añade después como variable.
 2. **Los seis deportes:** ¿completamos kickboxing, K-1 y jiu-jitsu? (Hoy el modelo de datos admite los seis.)
-3. **Fotografía:** ¿hay fotos propias de peleadores y gimnasios, o hay que conseguirlas con autorización? **Sin fotos propias no se puede publicar este diseño.** Mientras tanto se usan marcadores.
+3. **Fotografía:** ¿hay fotos propias de peleadores y gimnasios, o hay que conseguirlas con autorización? **Sin fotos propias no se puede publicar este diseño.** Mientras tanto se usan las fotos provisionales de `public/placeholders/deportes/` (dominio público o CC0; las sustituirá el fundador).
 4. **Dependencias nuevas** (GSAP y Lenis): [ADR-004](../decisiones/ADR-004-animacion-gsap-lenis.md).
 5. **Cursor propio:** ¿se mantiene en escritorio (con las correcciones del punto 6)? Propuesta: sí, es parte de la identidad.
 

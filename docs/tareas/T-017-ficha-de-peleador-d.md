@@ -18,7 +18,7 @@ La maqueta muestra solo cuatro datos y tres deportes. La ficha real tiene más y
 8. Documentar: `DISENO.md`, `DIARIO.md`, `LECCIONES.md`, mapa funcional (en Linux o CI), tu registro.
 
 ## Fotografías
-Mientras no haya fotos propias: **marcador** con las iniciales y el color de marca, no una foto de terceros. La foto real viene del almacén de imágenes de T-004 (recorte sin fondo y blanco y negro aplicados con CSS). **Prohibido** enlazar imágenes desde otros sitios.
+Mientras no haya fotos propias: las **fotos provisionales** de `public/placeholders/deportes/` (rama `claude/fotos-provisionales`; `<deporte>-hero.webp` y `<deporte>-panel.webp`, dominio público o CC0, ver `LICENCIAS.md`). El fundador las sustituirá por las suyas: usa siempre la ruta del registro de temas y nunca enlaces externos. Para la foto de un peleador concreto sin foto propia, marcador con sus iniciales. La foto real viene del almacén de imágenes de T-004 (recorte sin fondo y blanco y negro aplicados con CSS). **Prohibido** enlazar imágenes desde otros sitios.
 
 ## Criterios de aceptación
 - Capturas en 390 y 1280 px de los tres deportes de la maqueta, comparadas con ella.
