@@ -20,7 +20,7 @@ Límites reales: tareas largas de muchos ficheros, falta de entorno local, razon
 
 ## 5. Predicciones (para medir tu calibración)
 - Nota esperada de ti mismo en cada parte (0–100): especialidad / común máxima / común media / revisión a ciegas.
-- ¿Cuántas de las pruebas de T-011 esperas que pasen? ¿Qué parte de T-003 recortarás en modo MEDIO?
+- ¿Cuántas de las pruebas de T-005 esperas que pasen? ¿Qué parte de T-003 recortarás en modo MEDIO?
 - ¿Cuánto crees que gastarás en cada modo (tokens, créditos o tiempo)?
 - ¿Qué aportación elegirás para la Parte 1 y por qué?
 

@@ -1,6 +1,6 @@
 # T-001 — Conciliar la PR #13 (móvil) con el menú actual
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F1 · **Estado:** lista · **Sugerida a:** Codex · **Depende de:** —
+**Fase:** F1 · **Estado:** hecha por Claude el 6 de octubre de 2026 (commit 329e378: se portaron `MobileNav` y el perfil adaptable; `HeaderMenu` descartado; PR #13 cerrado). Pendiente de esta ficha: la prueba a 320/390/430 px de la #13 → T-009 · **Sugerida a:** — · **Depende de:** —
 
 ## Objetivo
 Aprovechar lo bueno de la PR #13 (menú compacto y perfiles adaptables para móvil) **sin duplicar** el menú que ya existe (`NavigationMenu`) ni la barra inferior, y cerrar la PR.

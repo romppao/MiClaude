@@ -71,3 +71,5 @@ nav.indice-pagina a{display:inline-flex;align-items:center;min-height:44px;paddi
 .paneles-registro{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin:16px 0 24px}
 a.panel-registro{display:flex;flex-direction:column;gap:6px;min-height:96px;justify-content:center;text-decoration:none}
 a.panel-registro strong{font-size:1.2rem}
+a.panel-registro .panel-accion{margin-top:6px;font-weight:700;color:#701295}
+a.panel-registro:hover,a.panel-registro:focus-visible{border-color:#701295}

@@ -22,7 +22,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | Fase | Objetivo | Tareas | Estado |
 |---|---|---|---|
 | **F0** | Base funcional, categorías de peso, perfiles, trayectoria y aura | (hecho; ver `DIARIO.md`) | ✔ |
-| **F1** | **Móvil y pulido funcional** | T-001, T-002, T-009, T-011 | en curso |
+| **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y la prueba de ingreso |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
 | **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
 | **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
@@ -34,8 +34,8 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 
 | Ficha | Título | Fase | Nivel | Sugerida a | Bloqueo |
 |---|---|---|---|---|---|
-| [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | N3 | Codex | — |
-| [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | permisos de GitHub |
+| [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | N3 | ✔ hecha (Claude, 6 oct) | — |
+| [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | N1 | ✔ hecha (Claude, 6 oct) | — |
 | [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | N2 | Antigravity (prueba de ingreso 2) o Codex | — |
 | [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | N3 | Codex | proveedor y credenciales (fundador) para la parte S3 |
 | [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | N3 | Codex | — |
@@ -44,7 +44,8 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-008](tareas/T-008-cola-de-correos.md) | Cola de correos | F2 | N3 | Codex | proveedor de correo (fundador) para el envío real |
 | [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | N2 | Antigravity o Copilot (prueba de ingreso 2) | — |
 | [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | N2 | Copilot o Antigravity | herramienta de errores (fundador) |
-| [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | Codex | — (especificación del fundador incluida) |
+| [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | ✔ hecha (Claude, 6 oct) | — |
+| [T-013](tareas/T-013-enlaces-externos-avisan.md) | Todo enlace que abre otra pestaña lo avisa | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | — |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 
 «Sugerida a» sigue el orden de rangos de [`RANGOS.md`](RANGOS.md) (Codex rango 2 con evidencia; Antigravity, Copilot y Open Code en periodo de prueba y sin ordenar). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.

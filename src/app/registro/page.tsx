@@ -33,6 +33,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
             <Link key={t} className="card panel-registro" href={`/registro?tipo=${t}${siguiente}`}>
               <strong>{PANELES[t].titulo}</strong>
               <span>{PANELES[t].descripcion}</span>
+              <span className="panel-accion">Elegir esta cuenta <span aria-hidden="true">→</span></span>
             </Link>
           ))}
         </div>

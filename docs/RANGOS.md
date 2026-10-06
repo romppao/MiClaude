@@ -16,16 +16,16 @@
 
 | Nivel | Qué es | Ejemplos (ver `PLAN.md`) | Quién |
 |---|---|---|---|
-| **N1** mecánica | Un fichero o configuración, sin lógica nueva ni datos | T-002 | Cualquiera |
+| **N1** mecánica | Un fichero o configuración, sin lógica nueva ni datos | T-013 (T-002 ya hecha) | Cualquiera |
 | **N2** acotada | Varios ficheros, lógica simple, con pruebas claras | T-003, T-007, T-009, T-010, T-012 | Rangos 2–4 (y 5 tras superar la prueba) |
-| **N3** compleja | Base de datos, permisos, flujos de usuario, varias capas | T-001, T-004, T-005, T-006, T-008, T-011 | Rango 2 (y quien lo alcance por mérito) |
+| **N3** compleja | Base de datos, permisos, flujos de usuario, varias capas | T-004, T-005, T-006, T-008 (T-001 y T-011 ya hechas) | Rango 2 (y quien lo alcance por mérito) |
 | **N4** crítica | Arquitectura, seguridad, privacidad, migraciones destructivas, reglas de aura/verificación | (no se delega) | Claude, con decisión del fundador cuando afecte a personas |
 
 ## Prueba de ingreso (para los puestos 3–5, y para subir de nivel)
 
 **Protocolo completo y vigente: [`PRUEBA-DE-INGRESO.md`](PRUEBA-DE-INGRESO.md)** (autodeclaración, especialidad elegida por cada asistente, prueba común en modo máximo y en modo medio, y revisión a ciegas). Lo que sigue es el resumen inicial; si difiere, manda el protocolo completo.
 
-1. **Prueba 1 (N1):** ejecutar **T-002** exactamente como está escrita. **Cada aspirante la hace en su propia rama (`<asistente>/T-002-prueba`) sin ver las de los demás**; Claude las compara con la misma tabla de puntuación y solo se integra una (la mejor); las demás se descartan sin penalizar: es una prueba, no trabajo útil duplicado. Se valora: ¿entiende y cumple la ficha?, ¿se ciñe al alcance?, ¿CI en verde?, ¿su informe dice la verdad sobre qué ejecutó y qué no?
+1. **Prueba 1 (N1):** ejecutar **T-013** exactamente como está escrita (T-002 se hizo antes de que ningún aspirante la tomara). **Cada aspirante la hace en su propia rama (`<asistente>/T-013-prueba`) sin ver las de los demás**; Claude las compara con la misma tabla de puntuación y solo se integra una (la mejor); las demás se descartan sin penalizar: es una prueba, no trabajo útil duplicado. Se valora: ¿entiende y cumple la ficha?, ¿se ciñe al alcance?, ¿CI en verde?, ¿su informe dice la verdad sobre qué ejecutó y qué no?
 2. **Prueba 2 (N2):** una parte acotada de **T-009** (dos personas nuevas de los escenarios, con informe visual) o **T-003**. Se valora además: ¿mira lo que produce?, ¿añade pruebas con esperas a estados visibles?
 3. Cada PR recibe una **puntuación de 0 a 5** en cada criterio (abajo) en la revisión de Claude. Superar un nivel = en **tres PR seguidos** de ese nivel: media ≥ 4, ningún criterio con 0, como mucho una ronda de cambios por PR.
 

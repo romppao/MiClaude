@@ -1,6 +1,6 @@
 # T-002 — Dependabot sin saltos mayores y limpieza de PRs
 **Nivel:** N1 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F1 · **Estado:** lista · **Sugerida a:** Antigravity, Copilot y Open Code (prueba de ingreso 1; el primero que la tome) · **Depende de:** —
+**Fase:** F1 · **Estado:** hecha por Claude el 6 de octubre de 2026 (a petición del fundador: «corrige todo lo que dijiste…»); ya no sirve como prueba de ingreso (la sustituye [T-013](T-013-enlaces-externos-avisan.md)) · **Sugerida a:** — · **Depende de:** —
 
 ## Objetivo
 Que Dependabot deje de proponer saltos mayores incompatibles (Next 16, Prisma 7, TypeScript 7) y que las PRs obsoletas queden identificadas para cerrar.

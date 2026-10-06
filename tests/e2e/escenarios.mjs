@@ -52,7 +52,7 @@ const aviso = (p, t) => p.locator("[role=status], [role=alert]", { hasText: t })
 async function registrarse(p, nombre, rol = "FAN") {
   const email = `${nombre.toLowerCase().replace(/[^a-z]/g, "")}${rnd}@test.es`;
   await p.goto(B + "/registro");
-  await p.locator("a.panel-registro", { hasText: rol === "FIGHTER" ? "Peleador" : "Usuario" }).click(); // la persona elige su panel
+  await p.locator(`a.panel-registro[href*="tipo=${rol === "FIGHTER" ? "peleador" : "usuario"}"]`).click(); // la persona elige su panel
   await p.fill("[name=name]", nombre); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
   await p.getByRole("button", { name: /^Crear mi cuenta/ }).click();
   await p.waitForURL("**/verificar");
@@ -192,21 +192,33 @@ await persona("promotora", "Clara, 41 años, organiza veladas amateur: pide ser 
 });
 
 // ───────────────────────── 5) Federación ─────────────────────────
-await persona("federacion", "Pedro, delegado de una federación autonómica: la moderación crea su perfil y le da acceso; él completa su perfil", async (p, paso) => {
-  const nombreFed = `Federación Escenario ${rnd}`; let emailPedro;
-  await paso("Pedro crea su cuenta y confirma el correo", async () => { emailPedro = await registrarse(p, "Pedro", "FAN"); await confirmarCorreo(p, emailPedro); });
-  let idFed;
-  await paso("[moderadora] crea el perfil de la federación y asigna a Pedro como titular", async () => {
+await persona("federacion", "Pedro, delegado de una federación autonómica: la solicita desde el registro, la moderación la aprueba y él completa su perfil", async (p, paso) => {
+  const nombreFed = `Federación Escenario ${rnd}`; let emailPedro = `pedro${rnd}@test.es`; let idFed;
+  await paso("Pedro elige el panel «Promotora o federación», rellena los datos de su federación y confirma el correo", async () => {
+    await p.goto(B + "/registro");
+    await p.locator('a.panel-registro[href*="tipo=entidad"]').click();
+    await p.fill("[name=name]", "Pedro"); await p.fill("[name=email]", emailPedro); await p.fill("[name=password]", "contraseña123");
+    await p.fill("[name=orgName]", nombreFed); await p.selectOption("[name=entityKind]", "FEDERACION"); await p.fill("[name=website]", "https://example.org"); await p.fill("[name=message]", "Web oficial de la federación");
+    await p.getByRole("button", { name: /Enviar solicitud/ }).click(); await p.waitForURL("**/verificar*");
+    if (!(await texto(p)).includes("un moderador la revisará")) throw new Error("no se le explica que un moderador revisará la solicitud");
+    await confirmarCorreo(p, emailPedro);
+  });
+  await paso("[moderadora] ve que es una federación, con su web, y la aprueba", async () => {
     const mctx = await browser.newContext({ ...devices["iPhone 14"], reducedMotion: "reduce" }); const m = await mctx.newPage();
     const memail = await registrarse(m, "Moderadora Dos", "FAN"); await confirmarCorreo(m, memail); hacerAdmin(memail);
-    await m.goto(B + "/federaciones");
-    await m.locator("main [name=name]").last().fill(nombreFed);
-    await m.getByRole("button", { name: /Crear perfil de federación/ }).click(); await m.waitForURL(/\/perfiles\/federacion\/.+\/editar/);
-    idFed = new URL(m.url()).pathname.split("/")[3];
-    await m.fill("[name=ownerEmail]", emailPedro); await m.getByRole("button", { name: /Guardar/ }).first().click(); await m.locator("[role=status]").first().waitFor({ timeout: 8000 });
+    await m.goto(B + "/moderacion");
+    const fila = m.locator("tr", { hasText: nombreFed });
+    await fila.waitFor({ timeout: 8000 });
+    const t = await fila.innerText();
+    if (!t.includes("Federación") || !(await fila.locator("a[href*='example.org']").count())) throw new Error("la cola no muestra el tipo de entidad y su web");
+    await fila.locator("input[name=note]").fill("Web oficial comprobada"); await fila.locator("button:has-text('Aprobar')").click(); await fila.waitFor({ state: "detached" });
     await mctx.close();
   });
-  await paso("Pedro encuentra su perfil en «Mi cuenta»", async () => { await p.goto(B + "/mi-cuenta"); if (!(await texto(p)).includes(nombreFed)) throw new Error("«Mi cuenta» no le enseña la federación que le han asignado"); });
+  await paso("Pedro encuentra su federación ya creada en «Mi cuenta», sin más pasos", async () => {
+    await p.goto(B + "/mi-cuenta");
+    if (!(await texto(p)).includes(nombreFed)) throw new Error("«Mi cuenta» no le enseña su federación aprobada");
+    idFed = (await p.locator('main a[href*="/perfiles/federacion/"]').first().getAttribute("href")).split("/")[3];
+  });
   await paso("edita su perfil: descripción, ciudad y web", async () => {
     await p.goto(B + `/perfiles/federacion/${idFed}/editar`);
     await p.fill("[name=bio]", "Federación de deportes de contacto de la comunidad."); await p.fill("[name=city]", "Valencia"); await p.fill("[name=website]", "https://example.org");
