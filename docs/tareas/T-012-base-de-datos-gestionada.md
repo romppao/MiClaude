@@ -1,5 +1,6 @@
 # T-012 — Base de datos gestionada, copias y restauración
-**Fase:** F2 · **Estado:** bloqueada (el fundador debe elegir proveedor) · **Sugerida a:** fundador + Claude (Claude redacta; un ejecutor aplica) · **Depende de:** decisión de alojamiento
+**Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F2 · **Estado:** bloqueada (el fundador debe elegir proveedor) · **Sugerida a:** fundador + Claude · **Depende de:** decisión de alojamiento
 
 ## Objetivo
 Que los datos **no se pierdan ni colapsen** al crecer: base de datos PostgreSQL gestionada, con copias automáticas, restauración **probada**, conexiones controladas y vigilancia.

@@ -1,4 +1,5 @@
 # T-008 — Cola de correos (outbox)
+**Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
 **Fase:** F2 · **Estado:** lista (cola y reintentos) / bloqueada (envío real: proveedor de correo, decisión del fundador) · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo

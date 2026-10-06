@@ -1,5 +1,6 @@
 # T-005 — Caché de lecturas públicas
-**Fase:** F2 · **Estado:** lista · **Sugerida a:** Codex / Open Code · **Depende de:** idealmente T-007 (medir antes y después)
+**Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F2 · **Estado:** lista · **Sugerida a:** Codex · **Depende de:** idealmente T-007 (medir antes y después)
 
 ## Objetivo
 Que ver fichas, ránking, calendario, gimnasios y entrenadores (lo que cualquiera ve sin cuenta y casi no cambia) **no golpee la base de datos en cada visita**, sin enseñar nunca datos desactualizados de forma visible tras una escritura.

@@ -32,22 +32,22 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 
 ## Índice de tareas
 
-| Ficha | Título | Fase | Sugerida a | Bloqueo |
-|---|---|---|---|---|
-| [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | Codex | — |
-| [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | Copilot / el más sencillo (tarea de calibrado) | permisos de GitHub |
-| [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | Codex / Open Code | — |
-| [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | Codex / Open Code | proveedor y credenciales (fundador) para la parte S3 |
-| [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | Codex / Open Code | — |
-| [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | Open Code / Copilot | necesita PostgreSQL local |
-| [T-007](tareas/T-007-prueba-de-carga.md) | Prueba de carga (k6) y presupuesto | F2 | Open Code / Antigravity | necesita ejecutar el servidor |
-| [T-008](tareas/T-008-cola-de-correos.md) | Cola de correos | F2 | Codex | proveedor de correo (fundador) para el envío real |
-| [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | cualquiera con navegador | — |
-| [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | Copilot / Open Code | herramienta de errores (fundador) |
-| [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | Codex | — (especificación del fundador incluida) |
-| [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | fundador + Claude | proveedor (fundador) |
+| Ficha | Título | Fase | Nivel | Sugerida a | Bloqueo |
+|---|---|---|---|---|---|
+| [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | N3 | Codex | — |
+| [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | permisos de GitHub |
+| [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | N2 | Antigravity (prueba de ingreso 2) o Codex | — |
+| [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | N3 | Codex | proveedor y credenciales (fundador) para la parte S3 |
+| [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | N3 | Codex | — |
+| [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | N3 | Codex si dispone de PostgreSQL local; si no, Claude | necesita PostgreSQL local |
+| [T-007](tareas/T-007-prueba-de-carga.md) | Prueba de carga (k6) y presupuesto | F2 | N2 | Antigravity (puede ejecutar el servidor) o Copilot | necesita ejecutar el servidor |
+| [T-008](tareas/T-008-cola-de-correos.md) | Cola de correos | F2 | N3 | Codex | proveedor de correo (fundador) para el envío real |
+| [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | N2 | Antigravity o Copilot (prueba de ingreso 2) | — |
+| [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | N2 | Copilot o Antigravity | herramienta de errores (fundador) |
+| [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | Codex | — (especificación del fundador incluida) |
+| [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 
-«Sugerida a» es una recomendación de Claude basada en lo observado (Codex trabaja bien con CI y documentación pero no tiene PostgreSQL local; los demás aún no se han calibrado). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
+«Sugerida a» sigue el orden de rangos de [`RANGOS.md`](RANGOS.md) (Codex rango 2 con evidencia; Antigravity, Copilot y Open Code en periodo de prueba). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
 
 ## Definición de «hecho» (para cualquier tarea)
 

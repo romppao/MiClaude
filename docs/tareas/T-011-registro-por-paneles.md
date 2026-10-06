@@ -1,4 +1,5 @@
 # T-011 — Registro por tres paneles (usuario · peleador · promotora o federación)
+**Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
 **Fase:** F1 · **Estado:** lista · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo

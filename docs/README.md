@@ -11,7 +11,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Retomar el proyecto** en otro ordenador o con Claude Code: ponerlo en marcha y saber en qué punto está | [`TRASLADO.md`](TRASLADO.md) |
 | **Saber dónde está cada cosa en el código** y por qué ruta ir para hacer algo (añadir una pantalla, una acción, un mensaje, cambiar la base de datos…) | [`DESARROLLO.md`](DESARROLLO.md) |
 | **Probar la aplicación en el navegador** con datos ficticios | [`DEMO.md`](DEMO.md) |
-| **Saber qué se hace, en qué orden y por qué** (plan maestro) | [`PLAN.md`](PLAN.md) |
+| **Saber qué se hace, en qué orden y por qué** (plan maestro) · rangos y rendimiento de los asistentes | [`PLAN.md`](PLAN.md) · [`RANGOS.md`](RANGOS.md) |
 | **Tomar una tarea y ejecutarla** (fichas) · revisar un PR · discutir una decisión | [`tareas/`](tareas/README.md) · [`REVISION.md`](REVISION.md) · [`decisiones/`](decisiones/README.md) |
 | **Colaborar con el resto de asistentes** (reglas, ramas, plantilla de relevo) | [`EQUIPO.md`](EQUIPO.md) |
 | **Móvil primero y camino a App Store / Google Play** | [`MOVIL.md`](MOVIL.md) |

@@ -12,6 +12,10 @@
 
 Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen para todos**, aunque el fichero se llame así. Los atajos `AGENTS.md` y `.github/copilot-instructions.md` apuntan aquí.
 
+## Rangos (resumen; detalle y registro en [`RANGOS.md`](RANGOS.md))
+
+1 **Claude** (líder técnico) · 2 **Codex** (ejecutor principal, con evidencia) · 3 **Antigravity** · 4 **GitHub Copilot** · 5 **Open Code con modelos locales (Ollama/Qwen)** (los tres últimos, en periodo de prueba). Las tareas se reparten por nivel N1–N4 según el rango y los resultados; el orden se revisa tras cada PR.
+
 ## Gobierno del equipo (decisión del fundador, 6 de octubre de 2026)
 
 > «Te pongo a ti como el líder del equipo […] quiero que idealices el plan, la arquitectura y los métodos a seguir […] dando también la posibilidad de que las otras herramientas, a su propio criterio, debatan y puedan sacar una mejor opinión de la que has podido hacer tú, porque a lo mejor tú no eres perfecto […] las demás son las que ejecutan las instrucciones. Así podemos ahorrar tokens y delegar funciones.»

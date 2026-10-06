@@ -1,5 +1,6 @@
 # T-009 — Ampliar los escenarios por persona
-**Fase:** F1 · **Estado:** lista · **Sugerida a:** cualquiera con PostgreSQL y navegador (o solo CI; entonces entrega solo el guion y las capturas se miran desde el artefacto del CI) · **Depende de:** —
+**Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F1 · **Estado:** lista · **Sugerida a:** Antigravity o Copilot (prueba de ingreso 2) · **Depende de:** —
 
 ## Objetivo
 Que los escenarios (`tests/e2e/escenarios.mjs`, `npm run test:escenarios`) cubran a **todos** los tipos de persona y los recorridos que de verdad harán, y dejen un informe revisable.

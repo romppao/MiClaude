@@ -1,5 +1,6 @@
 # T-003 — Web instalable (PWA)
-**Fase:** F3 · **Estado:** lista · **Sugerida a:** Codex / Open Code · **Depende de:** —
+**Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F3 · **Estado:** lista · **Sugerida a:** Antigravity (prueba de ingreso 2) o Codex · **Depende de:** —
 
 ## Objetivo
 Que la aplicación se pueda «instalar» desde el navegador del móvil (Android Chrome e iOS Safari «Añadir a pantalla de inicio»), con icono, nombre, color y una página clara cuando no hay conexión. Es el primer escalón hacia las tiendas (`docs/MOVIL.md`).

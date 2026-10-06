@@ -1,5 +1,6 @@
 # T-007 — Prueba de carga (k6) y presupuesto de rendimiento
-**Fase:** F2 · **Estado:** lista · **Sugerida a:** Open Code / Antigravity (necesita ejecutar el servidor) · **Depende de:** T-006 (datos de carga)
+**Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F2 · **Estado:** lista · **Sugerida a:** Antigravity (puede ejecutar el servidor) o Copilot · **Depende de:** T-006 (datos de carga)
 
 ## Objetivo
 Saber con números cuántos usuarios simultáneos aguanta la aplicación y dónde se rompe primero, y poder repetir la medición después de cada mejora (T-004, T-005, T-006).

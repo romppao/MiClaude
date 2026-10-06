@@ -1,5 +1,6 @@
 # T-001 — Conciliar la PR #13 (móvil) con el menú actual
-**Fase:** F1 · **Estado:** lista · **Sugerida a:** Codex (autor de la rama `codex/movil-2026-10-03`) · **Depende de:** —
+**Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
+**Fase:** F1 · **Estado:** lista · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo
 Aprovechar lo bueno de la PR #13 (menú compacto y perfiles adaptables para móvil) **sin duplicar** el menú que ya existe (`NavigationMenu`) ni la barra inferior, y cerrar la PR.
