@@ -1033,3 +1033,10 @@ La batería E2E completa y axe no pueden terminar en este Windows porque sus gui
 ### Estado y próximos pasos
 
 La rama queda para revisión visual de Claude con capturas de 390 y 1280 px. Tras integrar T-015 y T-016, se continuará con T-017 en una PR nueva, sin solapar `src/app/ui/`.
+
+
+## 6 de octubre de 2026 (noche, 15) — T-015: el selector provisional se salía por la derecha en móvil
+
+**Qué pasó:** el CI del PR #25 se detuvo en el paso del mapa funcional, así que las pruebas de navegador nunca llegaron a ejecutarse; al ejecutarlas (Claude, en la continuación #26) `movil.mjs` falló: las opciones del selector de deporte quedaban fuera de la pantalla (47 tipos de problema).
+**Corrección:** el grupo de opciones va dentro de una **región desplazable accesible** (`role="region"`, `tabindex="0"`, nombre propio), que además se puede recorrer con el teclado. `movil.mjs` pasa a 0 problemas; `deporte.mjs` y `menu.mjs` siguen en verde.
+**Lección:** cuando un paso del CI falla, los siguientes no se ejecutan: un fallo «solo del mapa» puede esconder otros. Ejecutar siempre la batería completa antes de dar un PR por bueno.

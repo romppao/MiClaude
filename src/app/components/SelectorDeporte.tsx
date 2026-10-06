@@ -29,13 +29,16 @@ export default function SelectorDeporte({ deporteActivo, accion }: Props) {
   return (
     <form action={accion} className="selector-deporte">
       <input type="hidden" name="back" value={pathname} />
-      <div role="radiogroup" aria-label="Deporte activo" onKeyDown={conFlechas} className="selector-deporte-opciones">
-        {DEPORTES.map((clave) => (
-          <label key={clave} className="selector-deporte-opcion">
-            <input type="radio" name="deporte" value={clave} checked={seleccion === clave} onChange={() => setSeleccion(clave)} />
-            <span>{TEMAS_POR_DEPORTE[clave].nombre}</span>
-          </label>
-        ))}
+      {/* Región desplazable accesible (se puede recorrer con el teclado) que contiene el grupo de opciones. */}
+      <div role="region" aria-label="Deportes disponibles" tabIndex={0} className="selector-deporte-opciones">
+        <div role="radiogroup" aria-label="Deporte activo" onKeyDown={conFlechas} className="selector-deporte-grupo">
+          {DEPORTES.map((clave) => (
+            <label key={clave} className="selector-deporte-opcion">
+              <input type="radio" name="deporte" value={clave} checked={seleccion === clave} onChange={() => setSeleccion(clave)} />
+              <span>{TEMAS_POR_DEPORTE[clave].nombre}</span>
+            </label>
+          ))}
+        </div>
       </div>
       <button type="submit" className="secondary">Aplicar deporte</button>
     </form>
