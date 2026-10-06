@@ -1,5 +1,5 @@
 # T-017 — Un tema por deporte (inmersión completa)
-**Nivel:** N2 (cada sub-tarea) · **Fase:** F4 · **Estado:** bloqueada hasta T-015 y T-016 · **Sugerida a:** Codex, **un PR por deporte** · **Depende de:** T-015, T-016
+**Nivel:** N2 (cada sub-tarea) · **Fase:** F4 · **Estado:** **bloqueada: diseño rechazado por el fundador el 6 oct 2026; hay que reescribirla con el diseño nuevo de Antigravity** · **Sugerida a:** Codex, **un PR por deporte** · **Depende de:** T-015, T-016
 
 ## Objetivo (una frase)
 Que al elegir su deporte, la persona vea la aplicación completa en el ambiente de ese deporte (color, tipografía, regla, textura, formas y vocabulario), tal como en la maqueta.

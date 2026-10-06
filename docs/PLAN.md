@@ -25,7 +25,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y las dos pruebas de ingreso ([1](PRUEBA-DE-INGRESO.md) y [2, «la escalera»](PRUEBA-ESCALERA.md)) |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
 | **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
-| **F4** | Diseño visual con identidad propia: base «Todos los deportes» + un tema por deporte | T-015, T-016, T-017 | maqueta lista ([`diseno/direcciones/`](diseno/direcciones/)); visto bueno del fundador el 6 oct; T-015 lista |
+| **F4** | Diseño visual con identidad propia (rehacer: maquetas de Claude rechazadas, pasa a Antigravity) | T-015, T-016, T-017 | maqueta lista ([`diseno/direcciones/`](diseno/direcciones/)); visto bueno del fundador el 6 oct; T-015 lista |
 | **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
 
 Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se ejecuta **antes y después** para demostrar la mejora; T-012 depende de elegir proveedor (decisión del fundador); T-003 no depende de F2.

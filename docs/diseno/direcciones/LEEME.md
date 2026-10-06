@@ -1,5 +1,8 @@
 # Tres direcciones de diseño para Ring España
 
+> **RECHAZADO por el fundador (6 de octubre de 2026):** «es muy plano […] no hay apenas aspectos visuales llamativos, se ve claramente como uno de los diseños típicos de Claude». Estas maquetas **no se implementan**. El diseño visual pasa a Antigravity. Se conservan solo como ejemplo de lo que **no** hacer y por la idea de «ambiente por deporte».
+
+
 **Autor:** Claude (diseño visual, por decisión del fundador del 6 de octubre de 2026) · **Estado:** propuesta para elegir. **La aplicación real no se ha tocado**: son maquetas aisladas (HTML sin programación) con datos ficticios.
 
 ## Qué pidió el fundador (briefing)

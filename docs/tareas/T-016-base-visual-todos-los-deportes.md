@@ -1,5 +1,5 @@
 # T-016 — Base visual «Todos los deportes» aplicada a la aplicación
-**Nivel:** N3 · **Fase:** F4 · **Estado:** bloqueada hasta T-015 · **Sugerida a:** Codex, **una pantalla o área por PR** · **Depende de:** T-015
+**Nivel:** N3 · **Fase:** F4 · **Estado:** **bloqueada: diseño rechazado por el fundador el 6 oct 2026; hay que reescribirla con el diseño nuevo de Antigravity** · **Sugerida a:** Codex, **una pantalla o área por PR** · **Depende de:** T-015
 
 ## Objetivo (una frase)
 Aplicar el ambiente «Todos los deportes» de la maqueta a las pantallas reales, usando solo las variables de tema, para que T-017 pueda cambiarlas por deporte sin tocar el código de las pantallas.
