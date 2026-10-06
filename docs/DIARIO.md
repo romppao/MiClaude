@@ -1015,3 +1015,12 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+
+## 6 de octubre de 2026 (noche, 11) — Fotos provisionales de deportes
+
+**Pedido por el fundador:** «coge imágenes de alguna biblioteca gratuita, ya luego yo cambiaré las imágenes por imágenes reales».
+**Qué se hizo:** 12 fotos (hero y panel de boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu) de Wikimedia Commons, solo dominio público o CC0, guardadas en `public/placeholders/deportes/` en WebP (≈ 1,2 MB en total) con su `manifest.json` y `LICENCIAS.md`.
+**Qué salió mal / se aprendió:** (1) Pexels, Unsplash y Pixabay devuelven 403/401 a peticiones sin navegador ni clave: se usó Wikimedia Commons, que da la licencia en sus metadatos; (2) Openverse devolvió pocas fotos de boxeo y MMA; (3) no se enlazan imágenes de terceros porque se rompen (una de la maqueta ya no cargaba).
+**Estado y próximos pasos:** el fundador sustituirá las fotos por las suyas; mientras tanto T-017 y las demás pantallas pueden usarlas.
+

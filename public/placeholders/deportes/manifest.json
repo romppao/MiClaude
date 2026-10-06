@@ -1,0 +1,149 @@
+{
+  "aviso": "FOTOS PROVISIONALES de bibliotecas libres (Wikimedia Commons). El fundador las sustituirá por fotos propias. Solo dominio público o CC0: no exigen atribución. No son fotos de personas de Ring España.",
+  "fotos": [
+    {
+      "deporte": "boxeo",
+      "rol": "hero",
+      "archivo": "boxeo-hero.webp",
+      "licencia": "Public domain",
+      "autor": "Department of Defense. American Forces I",
+      "titulo": "US Air Force boxer Bobby DeLeon (Right) and US Army boxer Torrence Daniels square off in the ring at this year's Armed Forces Boxing Competition in Fort Huachuca, Arizona. DeLeon an - DPLA - b81a1430a701a2654225d79bf3d5a66d.jpeg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:US_Air_Force_boxer_Bobby_DeLeon_(Right)_and_US_Army_boxer_Torrence_Daniels_square_off_in_the_ring_at_this_year%27s_Armed_Forces_Boxing_Competition_in_Fort_Huachuca,_Arizona._DeLeon_an_-_DPLA_-_b81a1430a701a2654225d79bf3d5a66d.jpeg",
+      "ancho": 1400,
+      "alto": 846,
+      "kb": 99
+    },
+    {
+      "deporte": "boxeo",
+      "rol": "panel",
+      "archivo": "boxeo-panel.webp",
+      "licencia": "Public domain",
+      "autor": "U.S. Navy photo by Mass Communication Sp",
+      "titulo": "US Navy 110215-N-2610F-097 Master-at-Arms Seaman Rhonda McGee, left, spars with Patricia Cuevas during an exhibition match in the preliminary round.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:US_Navy_110215-N-2610F-097_Master-at-Arms_Seaman_Rhonda_McGee,_left,_spars_with_Patricia_Cuevas_during_an_exhibition_match_in_the_preliminary_round.jpg",
+      "ancho": 1600,
+      "alto": 1146,
+      "kb": 107
+    },
+    {
+      "deporte": "mma",
+      "rol": "hero",
+      "archivo": "mma-hero.webp",
+      "licencia": "Public domain",
+      "autor": "U.S. Marine Corps photo by Lance Cpl. De",
+      "titulo": "Friday night lights with MMA Fight Night 160610-M-XY415-420.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:Friday_night_lights_with_MMA_Fight_Night_160610-M-XY415-420.jpg",
+      "ancho": 1400,
+      "alto": 933,
+      "kb": 63
+    },
+    {
+      "deporte": "mma",
+      "rol": "panel",
+      "archivo": "mma-panel.webp",
+      "licencia": "Public domain",
+      "autor": "U.S. Air Force photo by Airman 1st Class",
+      "titulo": "Buckley MMA Fight Night (863903).jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:Buckley_MMA_Fight_Night_(863903).jpg",
+      "ancho": 1600,
+      "alto": 1064,
+      "kb": 176
+    },
+    {
+      "deporte": "muaythai",
+      "rol": "hero",
+      "archivo": "muaythai-hero.webp",
+      "licencia": "cc0",
+      "autor": "JP.BJP",
+      "titulo": "Jiří Denisa Procházka 2011 Windy® Cup Finals CMTA National Muaythai Championships Ring Walk 2011-06-30 SaSaZu Club Praha.jpg",
+      "pagina": "https://commons.wikimedia.org/w/index.php?curid=104719839",
+      "ancho": 1200,
+      "alto": 799,
+      "kb": 21
+    },
+    {
+      "deporte": "muaythai",
+      "rol": "panel",
+      "archivo": "muaythai-panel.webp",
+      "licencia": "cc0",
+      "autor": "Datapty",
+      "titulo": "Kick WBC MuayThai Verona2025 Gladius Action.jpg",
+      "pagina": "https://commons.wikimedia.org/w/index.php?curid=175113185",
+      "ancho": 1280,
+      "alto": 853,
+      "kb": 108
+    },
+    {
+      "deporte": "kickboxing",
+      "rol": "hero",
+      "archivo": "kickboxing-hero.webp",
+      "licencia": "Public domain",
+      "autor": "Sgt. Rocco DeFilippis",
+      "titulo": "USMC-081025-M-0884D-005.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:USMC-081025-M-0884D-005.jpg",
+      "ancho": 1400,
+      "alto": 1120,
+      "kb": 96
+    },
+    {
+      "deporte": "kickboxing",
+      "rol": "panel",
+      "archivo": "kickboxing-panel.webp",
+      "licencia": "Public domain",
+      "autor": "Sgt. Rocco DeFilippis",
+      "titulo": "USMC-081025-M-0884D-004.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:USMC-081025-M-0884D-004.jpg",
+      "ancho": 1600,
+      "alto": 1143,
+      "kb": 106
+    },
+    {
+      "deporte": "k1",
+      "rol": "hero",
+      "archivo": "k1-hero.webp",
+      "licencia": "Public domain",
+      "autor": "Sgt. Rocco DeFilippis",
+      "titulo": "USMC-081025-M-0884D-002.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:USMC-081025-M-0884D-002.jpg",
+      "ancho": 1400,
+      "alto": 1000,
+      "kb": 63
+    },
+    {
+      "deporte": "k1",
+      "rol": "panel",
+      "archivo": "k1-panel.webp",
+      "licencia": "Public domain",
+      "autor": "Sgt. Rocco DeFilippis",
+      "titulo": "USMC-081025-M-0884D-005.jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:USMC-081025-M-0884D-005.jpg",
+      "ancho": 1600,
+      "alto": 1280,
+      "kb": 118
+    },
+    {
+      "deporte": "jiujitsu",
+      "rol": "hero",
+      "archivo": "jiujitsu-hero.webp",
+      "licencia": "Public domain",
+      "autor": "U.S. Air Force photo by Senior Airman Ke",
+      "titulo": "Staying Fit to Fight with Jiu-Jitsu (6858027).jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:Staying_Fit_to_Fight_with_Jiu-Jitsu_(6858027).jpg",
+      "ancho": 1400,
+      "alto": 862,
+      "kb": 138
+    },
+    {
+      "deporte": "jiujitsu",
+      "rol": "panel",
+      "archivo": "jiujitsu-panel.webp",
+      "licencia": "Public domain",
+      "autor": "U.S. Air Force photo by Senior Airman Ke",
+      "titulo": "Staying Fit to Fight with Jiu-Jitsu (6858026).jpg",
+      "pagina": "https://commons.wikimedia.org/wiki/File:Staying_Fit_to_Fight_with_Jiu-Jitsu_(6858026).jpg",
+      "ancho": 1600,
+      "alto": 1053,
+      "kb": 107
+    }
+  ]
+}
