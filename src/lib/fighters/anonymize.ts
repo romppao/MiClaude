@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client";
+import { getImageStore } from "../common/imageStore";
+import { imageKey } from "../common/imageKeys";
 
 /**
  * Vacía de datos personales el historial de cambios de una ficha: las filas se conservan (qué pasó y cuándo) pero sin el «antes» y el «después»,
@@ -28,6 +30,9 @@ export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: 
       listed: false, hiddenAt: new Date(),
     },
   });
+  const store = getImageStore();
+  await store.delete(imageKey("peleador", fighterId, "avatar"), tx);
+  await store.delete(imageKey("peleador", fighterId, "banner"), tx);
   await tx.profile.deleteMany({ where: { kind: "peleador", entityId: fighterId } });
   await tx.fighterDiscipline.updateMany({ where: { fighterId }, data: { belt: null, beltDegrees: null } });
   await scrubFighterHistory(tx, fighterId);
