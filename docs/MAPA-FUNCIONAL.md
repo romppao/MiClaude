@@ -139,6 +139,12 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `createFederation` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: FEDERATION_CREATED | — | — |
 | `saveProfile` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: PROFILE_UPDATED | — | perfil_guardado |
 
+### `tema`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `elegirDeporte` | Cualquiera | — | — | — | — |
+
 ### `trajectory`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
@@ -225,6 +231,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `paths.ts` | `internalPath`, `loginPath` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
+| `temas.ts` | `ClaveDeporte`, `TEMAS_POR_DEPORTE`, `TemaDeporte`, `claveDeDisciplina`, `claveDeporteSegura`, `esClaveDeporte` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
 | `url.ts` | `safeHttpUrl` |
 
