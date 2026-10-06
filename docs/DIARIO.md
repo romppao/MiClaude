@@ -1015,3 +1015,30 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+## 6 de octubre de 2026 — T-015: deporte activo para el sistema D
+
+### Qué se pidió
+
+El fundador eligió la maqueta de Antigravity como dirección de toda la aplicación. Codex implementa en paralelo T-015 desde `claude/ring-espana-mvp`; Claude prepara T-016 dentro de `src/app/ui/`, que no se modifica en esta tarea.
+
+### Qué se hizo
+
+Se añadió el catálogo tipado de temas deportivos, la preferencia de cookie validada con claves propias, `data-deporte` en el elemento HTML y un selector provisional con radios, teclado y envío sin JavaScript. Las categorías proceden del catálogo existente; no se crean pesos, campos de base de datos, colores ni filtros de listados. Las pruebas unitarias cubren todas las disciplinas y valores hostiles; el E2E propio comprueba teclado, cambio, recarga y cookie manipulada.
+
+### Qué salió mal / límite honesto
+
+La batería E2E completa y axe no pueden terminar en este Windows porque sus guiones invocan el ejecutable externo `psql` con sintaxis de comillas POSIX y el cliente no está instalado. La base aislada, migraciones y el E2E específico sí se ejecutaron; CI/Linux debe ejecutar las baterías completas antes de integrar. `npm run mapa` se reserva para Linux o CI, como establece la ficha.
+
+### Estado y próximos pasos
+
+La rama queda para revisión visual de Claude con capturas de 390 y 1280 px. Tras integrar T-015 y T-016, se continuará con T-017 en una PR nueva, sin solapar `src/app/ui/`.
+
+
+## 6 de octubre de 2026 (noche, 15) — T-015: el selector provisional se salía por la derecha en móvil
+
+**Qué pasó:** el CI del PR #25 se detuvo en el paso del mapa funcional, así que las pruebas de navegador nunca llegaron a ejecutarse; al ejecutarlas (Claude, en la continuación #26) `movil.mjs` falló: las opciones del selector de deporte quedaban fuera de la pantalla (47 tipos de problema).
+**Corrección:** el grupo de opciones va dentro de una **región desplazable accesible** (`role="region"`, `tabindex="0"`, nombre propio), que además se puede recorrer con el teclado. `movil.mjs` pasa a 0 problemas; `deporte.mjs` y `menu.mjs` siguen en verde.
+**Lección:** cuando un paso del CI falla, los siguientes no se ejecutan: un fallo «solo del mapa» puede esconder otros. Ejecutar siempre la batería completa antes de dar un PR por bueno.
+
+**Segunda corrección (misma jornada):** la batería completa del kit mostró que `usabilidad.mjs` exigía 44 px a los controles de la cabecera y las casillas de radio del selector medían 20 px. Cada opción pasa a ser una píldora de 44 px con la casilla invisible encima (marca de selección con fondo oscuro, no solo con el círculo). `usabilidad`, `movil`, `deporte` y `menu` en verde.

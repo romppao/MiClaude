@@ -25,7 +25,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y las dos pruebas de ingreso ([1](PRUEBA-DE-INGRESO.md) y [2, «la escalera»](PRUEBA-ESCALERA.md)) |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
 | **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
-| **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
+| **F4** | Diseño visual con el sistema D elegido por el fundador | T-015 y T-016 en paralelo; después T-017, T-019 a T-022 | en curso: T-015 en revisión |
 | **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
 
 Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se ejecuta **antes y después** para demostrar la mejora; T-012 depende de elegir proveedor (decisión del fundador); T-003 no depende de F2.
@@ -46,6 +46,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | N2 | Copilot o Antigravity | herramienta de errores (fundador) |
 | [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | ✔ hecha (Claude, 6 oct) | — |
 | [T-014](tareas/T-014-politica-de-menores.md) | Política de menores en la aplicación | F2 | N3 | Codex | respuestas del fundador (ADR-003) |
+| T-015 | Motor de deporte activo (cookie, selector y textos por deporte) | F4 | N3 | Codex | PR de revisión; depende de sincronizar la ficha de diseño en la base |
 | [T-013](tareas/T-013-enlaces-externos-avisan.md) | Todo enlace que abre otra pestaña lo avisa | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | — |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 

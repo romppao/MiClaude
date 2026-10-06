@@ -73,3 +73,14 @@ a.panel-registro{display:flex;flex-direction:column;gap:6px;min-height:96px;just
 a.panel-registro strong{font-size:1.2rem}
 a.panel-registro .panel-accion{margin-top:6px;font-weight:700;color:#701295}
 a.panel-registro:hover,a.panel-registro:focus-visible{border-color:#701295}
+
+/* T-015: selector funcional provisional; T-016 sustituirá su presentación por el kit de interfaz. */
+.selector-deporte{display:flex;gap:8px;align-items:center;flex:1 1 100%;flex-wrap:wrap;min-width:0}
+.selector-deporte-opciones{display:flex;gap:6px;flex:1 1 420px;max-width:100%;min-width:0;overflow-x:auto;padding:2px}
+.selector-deporte-grupo{display:flex;gap:6px;width:max-content}
+.selector-deporte-opcion{position:relative;display:inline-flex;align-items:center;min-height:44px;white-space:nowrap;cursor:pointer}
+.selector-deporte-opcion input{position:absolute;inset:0;width:100%;height:100%;min-height:44px;margin:0;opacity:0;cursor:pointer}
+.selector-deporte-opcion span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--field-border);border-radius:99px;background:white;color:var(--text);font-weight:600}
+.selector-deporte-opcion input:checked+span{background:#17111c;border-color:#17111c;color:white}
+.selector-deporte-opcion input:focus-visible+span{outline:3px solid #701295;outline-offset:2px}
+@media(max-width:720px){.selector-deporte{align-items:stretch}.selector-deporte-opciones{flex-basis:100%}.selector-deporte>button{width:100%}}

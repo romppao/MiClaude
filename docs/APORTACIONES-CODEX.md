@@ -244,3 +244,20 @@ Validación local del retorno: 406 unitarias, build de producción y 30 checks d
 El 3 de octubre a las 23:03 UTC, Render sirve también #16: `/respaldar` sin sesión lleva a `/entrar?next=%2Frespaldar&problema=sin_sesion`; portada, ayuda y salud responden 200 por HTTPS con verificación TLS. El regreso autenticado se recorrió en navegador local y en CI; no se crearon cuentas ni fixtures en la demo para esta comprobación. Los datos existentes se conservan. Esta continuación de cierre modifica solo documentación.
 
 Siguiente trabajo: resolver solapamientos del historial/registro inicial y catálogos IMMAF/IBJJF; herramientas de entidades; errores y recorridos con personas; preparación de correo, copias y privacidad/menores. No se declaran cerrados por las pruebas automatizadas. Diseño provisional, a retomar al final mediante briefing con el fundador; #13 sigue abierta, sin sobrescribir el trabajo de Work.
+
+## T-015 — Motor de deporte activo (6 de octubre de 2026)
+
+**Rama:** `codex/T-015-deporte-activo`, creada desde `origin/claude/ring-espana-mvp`. **PR:** [#25](https://github.com/romppao/MiClaude/pull/25), borrador para revisión de Claude. Leí `SISTEMA-D.md` y la ficha T-015 únicamente desde `origin/claude/diseno-direcciones` porque aún no estaban en la base. No leí ni modifiqué `src/app/ui/`, reservado para T-016 de Claude.
+
+**Cambios:**
+
+- `src/lib/common/temas.ts`: claves tipadas, mapeo desde cada disciplina, validación con `hasOwn`, textos/ambiente y categorías ya existentes. Kickboxing, K-1 y jiu-jitsu quedan señalados como pendientes de Antigravity.
+- `src/app/actions/tema.ts`: acción pública `elegirDeporte`, cookie no personal de un año (`SameSite=Lax`, `Path=/`) y retorno validado por `internalPath`.
+- `src/app/layout.tsx` (archivo delicado): cookie leída en servidor; `<html lang="es" data-deporte="…">` solo recibe una clave segura. Añade el selector provisional sin tocar el kit de interfaz de Claude.
+- `src/app/components/SelectorDeporte.tsx`: radios y envío HTML para no depender de JavaScript; flechas y foco como mejora. `tests/unit/temas.test.ts`, `tests/e2e/deporte.mjs` y la clasificación de autorización cubren el contrato.
+
+**Ejecutado por Codex:** `npm run typecheck` (verde), `npm test` (420 pruebas verdes), compilación de producción que generó `.next/BUILD_ID`, migraciones en la base efímera `ring_codex_t015` y el E2E nuevo (6 checks verdes: teclado, cambio, recarga, cookie manipulada y envío sin JavaScript).
+
+**Pendiente de CI/Linux:** `npm run mapa` (la ficha exige Linux o CI), batería E2E completa y `npm run test:a11y`. En este Windows la batería completa se detiene antes de sus aserciones porque el arnés llama a `psql` con comillas POSIX y no hay cliente instalado. No lo atribuyo a la implementación ni lo marco como verde. Claude debe revisar con capturas 390/1280 y cada deporte antes de aprobar el PR.
+
+**Entorno declarado:** Codex basado en GPT-5, modo máximo indicado por el fundador; la plataforma no expone el identificador exacto del modelo ni contadores de consumo en esta sesión. No se han usado secretos ni credenciales del proyecto; la contraseña del contenedor de pruebas no se imprimió ni se incluye en la rama.
