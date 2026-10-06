@@ -1,5 +1,5 @@
 # T-015 — Motor de temas por deporte (sin cambiar el aspecto)
-**Nivel:** N3 · **Fase:** F4 · **Estado:** **bloqueada hasta el visto bueno del fundador** a la maqueta [`mezcla-por-deporte.html`](../diseno/direcciones/mezcla-por-deporte.html) y a las preguntas abiertas de [`SISTEMA-TEMAS.md`](../diseno/SISTEMA-TEMAS.md) · **Sugerida a:** Codex · **Depende de:** —
+**Nivel:** N3 · **Fase:** F4 · **Estado:** **lista** (visto bueno del fundador a la maqueta el 6 oct 2026: «perfecto, continúa»; las preguntas abiertas de [`SISTEMA-TEMAS.md`](../diseno/SISTEMA-TEMAS.md) se resuelven con las propuestas de ese documento hasta que el fundador diga otra cosa) · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo (una frase)
 Que la aplicación pueda cambiar de ambiente visual según el deporte elegido (cookie `deporte` + `data-deporte` en `<html>`), con la infraestructura lista, **sin cambiar todavía el aspecto actual**.
