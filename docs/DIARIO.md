@@ -1054,3 +1054,5 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Pedido por el fundador:** «yo quiero que la web se base en este diseño: `D-awwwards-ring.html`».
 **Qué se hizo:** las fichas T-015 a T-022, el ADR-004 y `SISTEMA-D.md` pasan a apuntar a `referencia/D-awwwards-ring.html` (copia añadida). La versión «-3» queda como referencia del comportamiento móvil, sin su bloqueo del zoom. Un archivo de origen desconocido (`ring-espana-app-completa.html`, con portada, ficha, velada, ránking, registro y estados) apareció sin confirmar en la carpeta de trabajo; **no se ha incorporado**.
 **Qué se aprendió:** la maqueta original se rompe en móvil; la corrección posterior bloqueó el zoom. Hay que tomar lo bueno de cada una.
+
+**Corrección:** por descuido, ese archivo se subió por error junto a los documentos; se ha retirado de la rama (queda solo en el disco del fundador, sin versionar).
