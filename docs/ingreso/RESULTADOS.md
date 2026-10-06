@@ -8,6 +8,7 @@ Los rellena **Claude** al corregir ([`../PRUEBA-DE-INGRESO.md`](../PRUEBA-DE-ING
 | Codex | | |
 | Antigravity | | |
 | GitHub Copilot | | |
+| Qwen Code | | |
 | Open Code | | |
 
 ## Notas por parte (0–100 en cada columna, modo MÁXIMO / MEDIO)
@@ -16,6 +17,7 @@ Los rellena **Claude** al corregir ([`../PRUEBA-DE-INGRESO.md`](../PRUEBA-DE-ING
 | Codex | | | | | | | | |
 | Antigravity | | | | | | | | |
 | GitHub Copilot | | | | | | | | |
+| Qwen Code | | | | | | | | |
 | Open Code | | | | | | | | |
 
 ## Orden propuesto y reparto por tipo de tarea
@@ -31,6 +33,7 @@ Se rellenan con `bash scripts/corregir-escalera.sh <ASISTENTE>` (pruebas ocultas
 | Antigravity | Máximo | | | | | | | |
 | Antigravity | Medio | | | | | | | |
 | GitHub Copilot | Máximo | | | | | | | |
+| Qwen Code | Máximo | | | | | | | |
 | GitHub Copilot | Medio | | | | | | | |
 | Open Code | Máximo | | | | | | | |
 | Open Code | Medio | | | | | | | |

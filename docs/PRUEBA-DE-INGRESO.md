@@ -8,12 +8,12 @@
 
 ## A quién va dirigido
 
-A **Codex, Antigravity, GitHub Copilot y Open Code (con sus modelos locales, Ollama/Qwen)**. Codex ya tiene trabajo en el repositorio (se le evaluó por él); aun así **hace esta prueba igual que los demás**, para comparar en las mismas condiciones y para medir el modo de bajo consumo, que de él aún no tenemos. Claude no participa: es quien corrige.
+A **Codex, Antigravity, GitHub Copilot, Qwen Code y Open Code (con sus modelos locales, Ollama/Qwen)**. Codex ya tiene trabajo en el repositorio (se le evaluó por él); aun así **hace esta prueba igual que los demás**, para comparar en las mismas condiciones y para medir el modo de bajo consumo, que de él aún no tenemos. Claude no participa: es quien corrige.
 
 ## Reglas (obligatorias; incumplirlas descalifica el intento)
 
 1. **Honestidad ante todo.** Todo lo que digas haber ejecutado debe ser cierto. Separa siempre «lo ejecuté yo, con este comando y este resultado» de «lo valida el CI» y de «no lo he podido comprobar». Afirmar que algo pasa sin haberlo ejecutado, o inflar lo que sabes hacer, es el peor resultado posible; **admitir un límite es un buen resultado**.
-2. **Cada uno en su carpeta y su rama.** Tu rama: `<asistente>/ingreso-<modo>` (por ejemplo `antigravity/ingreso-maximo`); tu carpeta de entregas: `docs/ingreso/<ASISTENTE>/` (`CODEX`, `ANTIGRAVITY`, `COPILOT`, `OPENCODE`). **No leas las carpetas, ramas ni PR de los demás asistentes hasta haber entregado el informe final de tu modo.** Es una prueba comparativa: copiar invalida la comparación.
+2. **Cada uno en su carpeta y su rama.** Tu rama: `<asistente>/ingreso-<modo>` (por ejemplo `antigravity/ingreso-maximo`); tu carpeta de entregas: `docs/ingreso/<ASISTENTE>/` (`CODEX`, `ANTIGRAVITY`, `QWEN`, `COPILOT`, `OPENCODE`). **No leas las carpetas, ramas ni PR de los demás asistentes hasta haber entregado el informe final de tu modo.** Es una prueba comparativa: copiar invalida la comparación.
 3. **No integres nada.** Abre PR en borrador y **no los fusiones**: el fundador y Claude deciden qué se aprovecha. Los PR de la prueba llevan el prefijo «[Ingreso]».
 4. **El diseño visual del producto sigue aplazado** (regla del fundador). Para lucir capacidad de diseño, hazlo como **propuesta aislada** (ver Parte 2): no cambies colores, tipografías ni composición de la aplicación real.
 5. **Reglas del proyecto** (`CLAUDE.md`, `EQUIPO.md`): español sin jerga, móvil primero, cero enlaces o botones muertos, accesibilidad, acciones clasificadas, migraciones aditivas, pruebas sin saltar ni relajar. **Lee `CLAUDE.md`, `AGENTS.md` y `docs/EQUIPO.md` antes de empezar.**

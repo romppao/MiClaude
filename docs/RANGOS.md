@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | **1** | **Claude** | Líder técnico: plan, arquitectura, métodos, fichas de tarea, revisión de todos los PR | N4 y todo lo demás | Decisión del fundador |
 | **2** | **Codex** | **Ejecutor principal**: la mayor parte del código | N3 y por debajo | **Con evidencia** (ver registro): 9 PR propios integrados con CI en verde, documentación fiel y honesta, lo que afirma haber probado es cierto |
-| **Sin ordenar** | Antigravity · GitHub Copilot · Open Code (Ollama / Qwen) | Ejecutores **en periodo de prueba** | N1 y N2 (tras la prueba de ingreso) | **Sin evidencia todavía.** Claude los ordenará (puestos 3, 4 y 5) cuando tenga una primera toma de contacto con el trabajo de cada uno; hasta entonces no hay jerarquía entre ellos |
+| **Sin ordenar** | Antigravity · GitHub Copilot · **Qwen Code** (añadido el 6 oct 2026) · Open Code (Ollama / Qwen) | Ejecutores **en periodo de prueba** | N1 y N2 (tras la prueba de ingreso) | **Sin evidencia todavía.** Claude los ordenará (puestos 3, 4 y 5) cuando tenga una primera toma de contacto con el trabajo de cada uno; hasta entonces no hay jerarquía entre ellos |
 
 **Decisión del fundador (6 de octubre de 2026, después):** «cuando ya tengas pruebas del trabajo de las otras herramientas, ya decidirás […] ahora todavía no hace falta». Por eso **no se ordenan los puestos 3–5 hasta tener resultados reales**. **El modelo que cada herramienta usa pesa más que la herramienta.** **Pendiente del fundador:** decir qué modelo ejecuta cada herramienta y si Codex dispone de PostgreSQL y navegador locales (hoy valida solo con el CI).
 
@@ -55,4 +55,16 @@
 | 2026-10-06 | **Codex** | 9 PR (#8–#16, 2–4 oct), revisados en conjunto | 4 | 4 | 4 | 5 | 3 | 5 | Todo lo que afirma haber ejecutado se verificó cierto (tipos, 406 unitarias, 16 guiones de navegador y axe en verde en mi ejecución con base vacía; CI en verde). Documentación muy buena y honesta (reconoce lo que no pudo ejecutar y los fallos intermitentes sin causa). Descuentos: cabecera de escritorio apilada y enlaces muertos sin detectar (sus pruebas miden accesibilidad, no «¿hace algo?» ni la maqueta), varias rondas de CI en rojo por selectores de pruebas (no ejecuta el navegador en local), instrucciones de `CLAUDE.md` contradictorias («diseño aplicado» y «implementación pendiente»), PR duplicada (#9) sin cerrar |
 | — | Antigravity (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
 | — | GitHub Copilot (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+| — | Qwen Code (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso (modo máximo) |
 | — | Open Code, Ollama / Qwen (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+
+## Nota del 6 de octubre de 2026: Qwen Code entra en la prueba de ingreso
+
+**Decisión del fundador:** «2» (meter a Qwen Code en el equipo con la misma prueba que los demás). Condiciones, aprendidas de las pruebas anteriores:
+
+- **Solo modo MÁXIMO.** El fundador canceló las sesiones en modo MEDIO para todos («así terminamos antes»).
+- **Su propia carpeta de trabajo**, distinta de la de los demás asistentes (en la primera ronda Antigravity y Copilot compartieron carpeta y se mezclaron sus ramas: la comparación quedó contaminada). Rama `qwen/ingreso-maximo`; entregas en `docs/ingreso/QWEN/`.
+- **No leer** la rama `claude/clave-escalera` ni las carpetas, ramas o PR de los demás.
+- **La guía que aporta el fundador** (`OLLAMA QWEN/GUIA_POTENCIAL_QWEN.md`) es un texto de Qwen Code sobre sí mismo: describe capacidades sin demostrarlas. **No sustituye a la autodeclaración**; lo que cuenta es lo que ejecute y compruebe.
+- Su acuerdo de «prudencia manual» con el fundador (escribir o ejecutar solo con su confirmación) puede ralentizar la prueba: que lo anote en su informe, con el tiempo real.
+- Qwen Code **no es** el modelo local de Ollama que se descartó con Open Code: debe declarar qué modelo usa realmente y dónde se ejecuta.
