@@ -34,3 +34,10 @@ La aplicación es una web (Next.js). Hay tres caminos, de menos a más trabajo:
 - Auditoría automática en `tests/e2e/movil.mjs`. Hallazgos de la primera ejecución y su corrección en [`APORTACIONES-CLAUDE.md`](APORTACIONES-CLAUDE.md).
 - PR #13 de Codex/Work (menú compacto y perfiles adaptables) sigue abierta y **debe conciliarse con `NavigationMenu`** antes de integrarse; no duplicar controles de menú.
 - Pendiente: PWA (manifiesto, iconos, `theme-color`, página sin conexión), pruebas en dispositivos reales, teclado y zonas seguras de iOS, pantallas largas (moderación) en móvil.
+
+### Actualización (6 de octubre de 2026, noche)
+- **PR #13 conciliado y cerrado:** se aprovecharon la barra inferior con iconos y página activa (`MobileNav`) y la adaptación del perfil a pantallas pequeñas; se descartó `HeaderMenu` (duplicaba el menú).
+- **Fallo del CI corregido:** los enlaces de paginación («Página anterior/siguiente») eran de 26 px y los nombres largos de las tablas, de 43 px; ahora miden al menos 44 px. La auditoría `movil.mjs` depende de los datos: pasarla **tras** las pruebas que crean datos (como el CI), no con la base vacía.
+- **Registro por tres paneles** pensado para pulsar con el pulgar (cada panel mide más de 44 px y muestra «Elegir esta cuenta →»).
+- **Escenarios por persona** (`npm run test:escenarios`, necesita la base con datos de ejemplo): visitante, aficionado, peleador, promotora y federación completan sus recorridos en iPhone emulado; las capturas se guardan en `/tmp/escenarios`.
+- Sigue pendiente lo que solo se ve en un aparato real: Safari de iOS (barra de direcciones, teclado, zonas seguras). Lo prueba el fundador con Claude Code en su ordenador.

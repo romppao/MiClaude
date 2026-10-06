@@ -994,3 +994,11 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Hallazgos importantes:** la base de datos gratuita de la demo en Render **caduca a los 30 días**; sin dominio propio **no se pueden enviar correos reales** (ni verificar cuentas); Vercel no vale para una aplicación que se monetice (su plan gratis es no comercial).
 **Qué salió mal / límite honesto:** el entorno bloquea las páginas oficiales de los proveedores, así que **ninguna cifra se leyó en la fuente**: todas salen de resúmenes de búsqueda y hay una lista de comprobación en el ADR. Lo jurídico es un borrador que debe confirmar una persona cualificada.
 **Estado y próximos pasos:** el fundador aprueba (o corrige) el ADR y responde a dos preguntas de producto sobre menores; después, T-012 (Neon y copias) es lo primero, por la caducidad de la base de la demo.
+
+
+## 6 de octubre de 2026 (noche, 4) — Documentación completa de la jornada
+
+**Pedido por el fundador:** «Documenta todo».
+**Qué se hizo:** repaso de toda la documentación frente a lo hecho hoy y actualización de lo desfasado: `README.md` (índice, fila de proveedores), `TRASLADO.md` (estado, aviso de caducidad de la base de la demo, decisiones 4, 11 y nueva 17), `DEMO.md` (aviso de caducidad), `MOVIL.md` (PR #13 conciliado, fallo del CI, paneles, escenarios), `pruebas/personas.md` (persona 14: registro por paneles), `ARQUITECTURA.md` (infraestructura prevista y cambios técnicos), `CLAUDE.md` y `AGENTS.md` (principio de presupuesto mínimo y regla de no contratar sin aprobación), `IDEAS.md`, `LECCIONES.md` y `APORTACIONES-CLAUDE.md`.
+**Qué salió mal:** nada nuevo; se anotó como lección que los precios no se pudieron leer en la fuente.
+**Estado y próximos pasos:** a la espera del visto bueno del fundador al ADR-003 y de sus respuestas sobre menores; después, T-012 (migrar la base de la demo a Neon con copia nocturna).

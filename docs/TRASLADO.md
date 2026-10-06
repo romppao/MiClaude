@@ -70,6 +70,8 @@ El diseño gráfico/visual se hace **al final**, cuando lo pida el fundador. Al 
 
 **Pulido en esta continuación:** paginación de colas/historial, contexto tras acciones, categoría y respaldo efectivo en revisión, decisiones concurrentes y opciones desconocidas. No cambia diseño, escala o esquema. Estado y pendientes vigentes: [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md). La interfaz actual es provisional por la última petición expresa del fundador; no retomar ahora otro rediseño.
 
+**Continuación del 6 de octubre de 2026 (noche):** CI en verde hasta `490cfd2`. Hecho por Claude: registro por tres paneles (T-011, con migración aditiva `OrganizerRequest.kind`/`website`, aterrizaje por papel y perfil de federación al aprobar), arreglo de la auditoría móvil (paginación y enlaces de tabla a 44 px), aportes del PR #13 (barra móvil con iconos), PRs de Dependabot cerrados y sin saltos mayores, imágenes con ETag/304 y la prueba de ingreso rehecha (T-005 y T-013). Propuesta de proveedores de coste casi cero en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md) **pendiente de aprobación**. **Aviso: la base de datos gratuita de la demo en Render caduca a los 30 días de crearse (14 de gracia) y luego se borra: migrarla (T-012).**
+
 **Auditoría histórica:** el cuadro de 99 hallazgos se ha revalidado donde existían estados obsoletos; los parciales y decisiones siguen abiertos. Consultar [AUDITORIA.md](AUDITORIA.md), no asumir que sus citas antiguas de fichero/línea siguen vigentes. Los defectos nuevos de este pulido están en PULIDO-FUNCIONAL.
 
 **Validación:** #14 pasó CI #131 con 393 unitarias, 365 comprobaciones de navegador y axe sin incumplimientos. El pulido #15 y el retorno a respaldos #16 pasan CI final #142 con 406 unitarias, 395 comprobaciones de navegador (30 del guion nuevo de volumen/integridad/acceso) y axe en 37 pantallas sin incumplimientos; publicación y referencias exactas en APORTACIONES-CODEX. Una batería verde no sustituye a probar con personas ni resuelve los requisitos de producción.
@@ -102,14 +104,14 @@ La demo de Render está publicada; eso no implica servicio real preparado. Mante
 1. **Aura:** ¿una por persona y combate, o por persona, combate **y peleador**? Hoy vale la segunda (en un combate se puede dar aura a los dos). Hallazgo 41.
 2. **Tuteo o «usted»:** hoy la aplicación tutea. Conviene decidirlo y mantenerlo en toda la app.
 3. **Récord de partida:** ¿se puede editar después del primer combate registrado, o lo revisa un moderador? ¿Se descuenta lo registrado en la app? Hallazgo 36.
-4. **Menores de edad:** el amateur incluye juveniles. Falta una política (edad mínima, consentimiento de madre, padre o tutor, qué se muestra de su ficha). **Es lo más importante antes de abrir al público** y necesita criterio jurídico.
+4. **Menores de edad:** el amateur incluye juveniles. **Hay un borrador de política en el [ADR-003](decisiones/ADR-003-proveedores-fase-0.md)** (edad mínima 14 como parámetro, sin cuenta propia por debajo, perfiles de menores sin foto y con apellido abreviado) y la ficha [T-014](tareas/T-014-politica-de-menores.md). **Es lo más importante antes de abrir al público** y necesita criterio jurídico; faltan dos respuestas de producto del fundador (aura/comentarios de desconocidos a menores; fecha de nacimiento y sexo en el alta).
 5. **Texto de privacidad:** lo redactó la IA a partir de lo que la aplicación hace de verdad; **debe revisarlo una persona con conocimientos jurídicos** antes de publicarse. Faltan el responsable del tratamiento y el correo de contacto (`RESPONSABLE_NOMBRE` y `CONTACT_EMAIL`).
 6. **Veladas de cualquier usuario:** hoy cualquier usuario verificado publica veladas sin moderación previa (llevan distintivo de organizador oficial solo si lo son). ¿Se modera antes de publicar? Hallazgo 22.
 7. **Registro y privacidad de los correos:** el formulario de registro dice «ya hay una cuenta con ese correo» (claro para la persona, pero revela quién tiene cuenta). Se limita por IP. ¿Se acepta ese riesgo?
 8. **Aura:** ¿se normaliza por número de combates o se pondera (lo vi en directo, antigüedad)? Hoy es el total absoluto.
 9. **Categorías de peso:** son orientativas; validarlas con las federaciones.
 10. **Nombre de la marca** («Ring España» encaja peor ahora que hay MMA, K-1…) y **si el código también debe ir en español** (supone un renombrado grande).
-11. **Alojamiento y correo:** dónde se despliega, cuenta de Resend y dominio para los correos.
+11. **Alojamiento y correo:** propuesta en el [ADR-003](decisiones/ADR-003-proveedores-fase-0.md) (Neon, Render, Cloudflare R2, Resend, Sentry, UptimeRobot): el fundador la aprueba y crea las cuentas gratuitas; **sin dominio propio (~7 €/año) no hay correos reales**.
 12. **Personas para probar la usabilidad** (edades y familiaridad con la tecnología).
 13. **Correo de contacto y responsable** (`CONTACT_EMAIL`, `RESPONSABLE_NOMBRE`): hoy, sin ellos, la privacidad no ofrece ningún medio de contacto a quien no tiene cuenta. Hay que decidir cuál es.
 14. **Carteles oficiales y fichas provisionales:** cuando un organizador añade a un cartel una ficha que creó otra persona al registrar un combate, esa ficha pasa a ser pública con nombre completo (hoy se acepta porque un cartel de una velada es público). Revisión pendiente: ¿debe confirmar antes la persona afectada?
@@ -123,3 +125,5 @@ El análisis revisado y sus fuentes comprobadas están en [COMPETENCIA.md](COMPE
 ## 9. Cómo se documenta (petición expresa del fundador)
 
 Al terminar cada bloque de trabajo: entrada nueva **al final** de `docs/DIARIO.md` (antes de la plantilla; sin reescribir las anteriores), actualizar `docs/IDEAS.md` (con el origen de cada idea), añadir a `docs/LECCIONES.md` cada error con su causa real y su regla, y actualizar `docs/ARQUITECTURA.md` si cambia el estado técnico. Sé honesto con lo que salió mal: el valor de esos documentos es que sean fiables.
+
+17. **Principio de coste (6 de octubre de 2026):** «quiero utilizar el mínimo capital posible y que me funcione la aplicación […] herramientas gratuitas o de mínimo coste, muy top, fiables, escalables y **fáciles de modificar en un futuro**». Toda elección de proveedor se justifica por coste inicial, escalado y facilidad de cambio, y se registra en un ADR. Ver [ADR-003](decisiones/ADR-003-proveedores-fase-0.md).

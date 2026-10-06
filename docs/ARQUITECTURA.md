@@ -239,3 +239,9 @@ La verificación básica de moderación no concede bonus de respaldo. Su formula
 No hay migración ni cambios de política de aura. Pendientes vigentes y diseño provisional: PULIDO-FUNCIONAL. Un diseño publicado no se considera definitivo cuando el fundador lo ha rechazado expresamente.
 
 Las guardas `requireVerifiedUser(next?)` y `requireSupportActor(next?)` admiten el destino de una página protegida. `/respaldar` lo indica explícitamente; las acciones conservan sus llamadas y permisos. La ruta de vuelta sigue validada por `loginPath`/`internalPath`, sin sustituir las comprobaciones de sesión, correo ni acreditación.
+
+
+## Infraestructura prevista para la fase 0 (6 de octubre de 2026, propuesta pendiente de aprobación)
+Detalle, costes y fuentes en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md). Resumen: **base de datos** Neon (PostgreSQL estándar, Fráncfort) con `DATABASE_URL` agrupada y `DIRECT_URL` para migraciones, más copia nocturna `pg_dump` a un cubo de R2; **web** Render (Starter al abrir); **imágenes** Cloudflare R2 en jurisdicción UE detrás de una interfaz `ImageStore` (drivers `db` y `s3`), servidas por la propia aplicación para ocultar al instante lo que modere un moderador; **correo** Resend (ya integrado en `src/lib/common/mail.ts`) con dominio propio; **errores** Sentry (UE) con filtro de datos personales; **vigilancia** UptimeRobot sobre `/salud`. Criterio: coste inicial ≈ 0, estándares abiertos y cambio de proveedor sin reescribir.
+
+**Cambios técnicos ya hechos hoy:** la ruta de imágenes (`src/app/imagenes/[kind]/[id]/[slot]/route.ts`) comprueba antes la visibilidad, lee solo la versión (`updatedAt`) y responde 304 con ETag si la persona ya tiene la imagen; `Cache-Control: private, no-cache`. `OrganizerRequest` gana `kind` (`PROMOTORA`|`FEDERACION`) y `website`. El aterrizaje por papel vive en `src/lib/accounts/landing.ts`.
