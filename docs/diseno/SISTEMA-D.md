@@ -1,7 +1,9 @@
 # Sistema de diseño «D» (basado en la maqueta de Antigravity)
 
-**Fuente:** [`referencia/D-awwwards-ring-3.html`](referencia/D-awwwards-ring-3.html), de Antigravity, **elegida por el fundador el 6 de octubre de 2026** («este es el mockup que me ha dado Antigravity; quiero que tú y Codex trabajéis en él para toda la aplicación»). Sustituye a las maquetas de Claude, rechazadas ([`direcciones/LEEME.md`](direcciones/LEEME.md)). El fundador ya había señalado `mockup-peleador-pro.html` como «el mejor diseño que he visto».
+**Fuente de la apariencia:** [`referencia/D-awwwards-ring.html`](referencia/D-awwwards-ring.html), de Antigravity, **elegida por el fundador el 6 de octubre de 2026** («yo quiero que la web se base en este diseño»; antes había dicho «quiero que tú y Codex trabajéis en él para toda la aplicación»). **Fuente de la versión móvil:** [`referencia/D-awwwards-ring-3.html`](referencia/D-awwwards-ring-3.html), la misma maqueta con las correcciones de móvil (tarjetas apiladas, selector que se desplaza), **sin** su bloqueo del zoom. Sustituye a las maquetas de Claude, rechazadas ([`direcciones/LEEME.md`](direcciones/LEEME.md)). El fundador ya había señalado `mockup-peleador-pro.html` como «el mejor diseño que he visto».
 **Autor de este documento:** Claude · **Para:** Codex y Claude · **Estado:** propuesta de implementación; **hay una decisión que aprobar** ([ADR-004](../decisiones/ADR-004-animacion-gsap-lenis.md)).
+
+> **Dos versiones de la misma maqueta (comprobado el 6 de octubre de 2026):** la **original** (`D-awwwards-ring.html`) es el diseño pensado para escritorio y se ve igual que la «-3» a 1440 px; **en móvil (390 px) se rompe** (las tarjetas se aprietan en columnas estrechas y el selector de deporte pisa el logotipo). La «-3» añade el diseño móvil, pero también `maximum-scale=1.0, user-scalable=no` (**bloquea el zoom**, punto 1 de §3). Regla: **apariencia = original; comportamiento móvil = el de la «-3» sin bloquear el zoom.**
 
 ## 1. Qué es el diseño «D»
 
@@ -29,7 +31,7 @@ Detalles de cine: grano de película, pantalla de carga que sube, cursor propio 
 
 ## 3. Correcciones obligatorias (lo que la maqueta no cumple y la aplicación sí debe cumplir)
 
-Comprobado al abrir la maqueta el 6 de octubre de 2026 (Chromium, 1440 y 390 px). Estas correcciones **no cambian el aspecto**: lo hacen utilizable por todo el mundo, que es requisito del fundador («intuitiva para todos»).
+Comprobado al abrir la maqueta (la «-3», que es la que incluye móvil) el 6 de octubre de 2026 (Chromium, 1440 y 390 px). La original no bloquea el zoom pero tampoco tiene diseño móvil. Estas correcciones **no cambian el aspecto**: lo hacen utilizable por todo el mundo, que es requisito del fundador («intuitiva para todos»).
 
 | # | Fallo en la maqueta | Corrección |
 |---|---|---|

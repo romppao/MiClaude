@@ -5,7 +5,7 @@
 Que la aplicación sepa cuál es el **deporte activo** de cada persona (cookie `deporte` → `data-deporte` en `<html>`) y que cada deporte aporte sus **textos y datos de ambiente** (palabras de fondo, vocabulario, categorías), sin cambiar todavía el aspecto actual.
 
 ## Contexto
-Diseño elegido por el fundador: [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) y la maqueta [`referencia/D-awwwards-ring-3.html`](../diseno/referencia/D-awwwards-ring-3.html). En el diseño «D» el color de marca (violeta) **no cambia** con el deporte: cambian la fotografía, las **palabras de fondo** («BOXEO / ESPAÑA», «ARTES / MIXTAS», «NAK / MUAY»), el vocabulario y los datos. Archivos delicados que se tocan (avisar en tu registro): `src/app/layout.tsx`. Disciplinas existentes: `src/lib/common/disciplines.ts` (`Discipline`).
+Diseño elegido por el fundador: [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) y la maqueta [`referencia/D-awwwards-ring.html`](../diseno/referencia/D-awwwards-ring.html). En el diseño «D» el color de marca (violeta) **no cambia** con el deporte: cambian la fotografía, las **palabras de fondo** («BOXEO / ESPAÑA», «ARTES / MIXTAS», «NAK / MUAY»), el vocabulario y los datos. Archivos delicados que se tocan (avisar en tu registro): `src/app/layout.tsx`. Disciplinas existentes: `src/lib/common/disciplines.ts` (`Discipline`).
 
 ## Pasos
 1. Rama `codex/T-015-deporte-activo`.

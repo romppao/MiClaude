@@ -5,7 +5,7 @@
 Tener en `src/app/ui/` las variables de diseño y los componentes reutilizables del diseño «D» ([`SISTEMA-D.md`](../diseno/SISTEMA-D.md)), ya con las correcciones de accesibilidad, para que las pantallas (Codex) solo los compongan.
 
 ## Contexto
-Referencia: [`referencia/D-awwwards-ring-3.html`](../diseno/referencia/D-awwwards-ring-3.html). La aplicación usa CSS propio (`src/app/globals.css`); **no se añade Tailwind**. T-015 toca `layout.tsx` y la acción del tema; este kit va en carpeta nueva (`src/app/ui/`) y en un archivo de estilos nuevo (`src/app/ui/diseno-d.css`) que `layout.tsx` importa una vez integrada T-015. **Un PR para T-015 y otro distinto para T-016**, para que Claude pueda revisarlos por separado.
+Referencia: [`referencia/D-awwwards-ring.html`](../diseno/referencia/D-awwwards-ring.html). La aplicación usa CSS propio (`src/app/globals.css`); **no se añade Tailwind**. T-015 toca `layout.tsx` y la acción del tema; este kit va en carpeta nueva (`src/app/ui/`) y en un archivo de estilos nuevo (`src/app/ui/diseno-d.css`) que `layout.tsx` importa una vez integrada T-015. **Un PR para T-015 y otro distinto para T-016**, para que Claude pueda revisarlos por separado.
 
 ## Pasos
 1. Rama `codex/T-016-kit-d`.

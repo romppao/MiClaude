@@ -1047,3 +1047,10 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué se hizo:** T-016 (kit de interfaz) pasa de Claude a Codex; el orden queda T-015 → T-016 → T-017 → T-019 a T-022, un PR por ficha. Claude solo revisa cada PR (lista de `SISTEMA-D.md` §7).
 **Estado y próximos pasos:** el fundador integra los PR pendientes (#23, #24 y las ramas de documentos y de fotos) y lanza a Codex; falta aprobar el ADR-004.
 
+
+
+## 6 de octubre de 2026 (noche, 13) — La base es la maqueta original
+
+**Pedido por el fundador:** «yo quiero que la web se base en este diseño: `D-awwwards-ring.html`».
+**Qué se hizo:** las fichas T-015 a T-022, el ADR-004 y `SISTEMA-D.md` pasan a apuntar a `referencia/D-awwwards-ring.html` (copia añadida). La versión «-3» queda como referencia del comportamiento móvil, sin su bloqueo del zoom. Un archivo de origen desconocido (`ring-espana-app-completa.html`, con portada, ficha, velada, ránking, registro y estados) apareció sin confirmar en la carpeta de trabajo; **no se ha incorporado**.
+**Qué se aprendió:** la maqueta original se rompe en móvil; la corrección posterior bloqueó el zoom. Hay que tomar lo bueno de cada una.

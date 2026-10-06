@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ring España | Máximo Nivel (Awwwards)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #BE33F5;
+            --bg-base: #050505;
+        }
+
+        body {
+            background-color: var(--bg-base); color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; cursor: none; margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---------------------------------------------------
+           ACCESIBILIDAD ESTRICTA (CLAUDE.md)
+        --------------------------------------------------- */
+        *:focus-visible {
+            outline: 3px solid var(--primary) !important;
+            outline-offset: -3px !important;
+            box-shadow: inset 0 0 0 2px var(--bg-base) !important;
+        }
+        
+        button, a, .hover-target {
+            min-height: 44px; min-width: 44px; /* Zonas Tǭctiles */
+        }
+
+        /* 1. Ruido Cinematográfico (Canvas) */
+        #noise {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 10; mix-blend-mode: overlay; opacity: 0.15;
+        }
+
+        /* 2. Custom Cursor con Retraso Físico y Acento Violeta */
+        .cursor-dot, .cursor-ring {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; pointer-events: none; z-index: 99999;
+        }
+        .cursor-dot { width: 6px; height: 6px; background: var(--primary); }
+        .cursor-ring {
+            width: 40px; height: 40px; border: 1px solid rgba(190, 51, 245, 0.5);
+            transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+        }
+        .cursor-ring.hover { 
+            width: 80px; height: 80px; border-color: var(--primary); 
+            background: rgba(190, 51, 245, 0.1); backdrop-filter: blur(4px); 
+        }
+
+        /* 3. Tipografía Gigante de Fondo (Inmersión) */
+        .bg-text-container {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100vw; text-align: center; z-index: 0; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .bg-text {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(4rem, 15vw, 20rem);
+            font-weight: 700; line-height: 0.8; margin: 0;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255,255,255,0.05);
+            text-transform: uppercase; transition: opacity 0.5s;
+        }
+        .bg-text.filled { color: rgba(190, 51, 245, 0.05); -webkit-text-stroke: 0; }
+
+        /* 4. Contenedor del Peleador (Recorte por degradado) */
+        .fighter-container {
+            position: relative; width: 100%; height: 120vh;
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 20;
+        }
+        .fighter-img {
+            height: 90vh; width: auto; object-fit: contain;
+            -webkit-mask-image: linear-gradient(to top, transparent 0%, black 20%, black 100%);
+            mask-image: linear-gradient(to top, transparent 0%, black 20%, black 100%);
+            filter: grayscale(100%) contrast(120%);
+            transition: opacity 0.5s;
+        }
+
+        /* 5. Tarjetas Glassmorphism Destructuradas */
+        .glass-card {
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px; padding: 2.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: absolute; overflow: hidden;
+        }
+        /* Detalle nen superior */
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.5;
+        }
+
+        .stat-card-1 { top: 30%; left: 10%; width: 320px; }
+        .stat-card-2 { top: 60%; right: 10%; width: 380px; }
+        .stat-card-3 { top: 80%; left: 15%; width: 300px; }
+
+        @media (max-width: 1024px) {
+            .glass-card { position: relative; top: auto !important; left: auto !important; right: auto !important; margin: 2rem auto; width: 90% !important; }
+            .fighter-container { height: 70vh; }
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed; inset: 0; background: var(--bg-base); z-index: 999999;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--primary); font-family: 'Syncopate', sans-serif; font-size: 2rem;
+        }
+
+        .metric-value { font-family: 'Syncopate', sans-serif; font-size: 4.5rem; line-height: 1; letter-spacing: -0.05em; }
+
+        /* Selector Temǭtico (Inmersin) */
+        .sport-selector {
+            position: fixed; top: 2rem; left: 2rem; z-index: 100;
+            display: flex; gap: 1rem;
+        }
+        .sport-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+            padding: 0 1.5rem; border-radius: 99px; cursor: none; text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .sport-btn.active {
+            background: var(--primary); color: white; border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(190, 51, 245, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de Carga -->
+    <div class="loader" id="loader">RING ESPAÑA</div>
+
+    <!-- Motor de Ruido -->
+    <canvas id="noise"></canvas>
+
+    <!-- Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Navegacin Minimalista -->
+    <nav class="fixed top-0 right-0 w-full z-50 p-8 flex justify-end items-center mix-blend-difference pointer-events-none">
+        <a href="#" class="font-bold text-2xl pointer-events-auto hover-target text-white" style="font-family: 'Syncopate', sans-serif; text-decoration: none;">RING ESPAÑA</a>
+    </nav>
+
+    <!-- Selector de Inmersin Temǭtica -->
+    <div class="sport-selector pointer-events-auto">
+        <button class="sport-btn active hover-target" onclick="setTheme('boxeo')" id="btn-boxeo">Boxeo</button>
+        <button class="sport-btn hover-target" onclick="setTheme('mma')" id="btn-mma">MMA</button>
+        <button class="sport-btn hover-target" onclick="setTheme('muaythai')" id="btn-muaythai">Muay Thai</button>
+    </div>
+
+    <main class="relative w-full min-h-[200vh]">
+        <!-- Fondo Tipogrǭfico 3D -->
+        <div class="bg-text-container" id="bgText">
+            <h1 class="bg-text filled" id="theme-text-1">BOXEO</h1>
+            <h1 class="bg-text" id="theme-text-2">ESPAÑA</h1>
+        </div>
+
+        <!-- Capa Principal: Peleador e Interfaz -->
+        <div class="fighter-container" id="fighterArea">
+            <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1000&q=80" class="fighter-img" id="fighterImg" alt="Fighter">
+            
+            <div class="glass-card stat-card-1 hover-target parallax-ui" data-speed="0.05">
+                <div class="text-xs uppercase tracking-[0.2em] text-white/50 mb-2">Categoría</div>
+                <div class="text-3xl font-bold mb-1" id="cat-text">Peso Welter</div>
+                <div class="text-white/40 font-mono">-69 KG</div>
+            </div>
+
+            <div class="glass-card stat-card-2 hover-target parallax-ui" data-speed="-0.03">
+                <div class="text-xs uppercase tracking-[0.2em] text-white/50 mb-2">Récord Verificado</div>
+                <div class="flex gap-8 mt-4">
+                    <div>
+                        <div class="metric-value text-white counter" data-target="14">0</div>
+                        <div class="text-sm text-white/40 mt-1 font-semibold tracking-wider uppercase">Victorias</div>
+                    </div>
+                    <div>
+                        <div class="metric-value counter" style="color: var(--primary);" data-target="9" id="fin-metric">0</div>
+                        <div class="text-sm text-white/40 mt-1 font-semibold tracking-wider uppercase" id="fin-text">Por KO</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card-3 hover-target parallax-ui" data-speed="0.08">
+                <div class="text-xs uppercase tracking-[0.2em] text-white/50 mb-2">Club Actual</div>
+                <div class="text-xl font-bold" id="club-text">Detroit Gym Madrid</div>
+                <div class="mt-4 pt-4 border-t border-white/10 text-sm text-white/60 flex items-center gap-2">
+                    <!-- SVG sin emojis -->
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Siguiente velada: 12.NOV</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-screen w-full flex items-center justify-center relative z-20">
+            <p class="text-2xl md:text-5xl text-center max-w-4xl leading-tight font-bold text-white p-8 hover-target" style="letter-spacing: -0.03em;">
+                <span style="color: var(--primary);">La lona</span> es el único lugar donde no puedes mentir. Récords inmutables por la comunidad.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        // 1. Lenis Smooth Scroll
+        const lenis = new Lenis({ duration: 1.5, smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 2. Ruido Canvas
+        const canvas = document.getElementById('noise');
+        const ctx = canvas.getContext('2d');
+        let wWidth, wHeight;
+        let noiseData = [];
+        let frame = 0;
+
+        const createNoise = () => {
+            const idata = ctx.createImageData(wWidth, wHeight);
+            const buffer32 = new Uint32Array(idata.data.buffer);
+            for (let i = 0; i < buffer32.length; i++) {
+                if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+            }
+            noiseData.push(idata);
+        };
+        const playNoise = () => {
+            frame = frame === 9 ? 0 : frame + 1;
+            ctx.putImageData(noiseData[frame], 0, 0);
+            setTimeout(() => requestAnimationFrame(playNoise), 40);
+        };
+        const setupNoise = () => {
+            wWidth = window.innerWidth; wHeight = window.innerHeight;
+            canvas.width = wWidth; canvas.height = wHeight;
+            for (let i = 0; i < 10; i++) createNoise();
+            playNoise();
+        };
+        setupNoise();
+
+        // 3. Físicas del Cursor
+        const dot = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX = mouseX, ringY = mouseY;
+
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+        gsap.ticker.add(() => {
+            gsap.set(dot, { x: mouseX, y: mouseY });
+            ringX += (mouseX - ringX) * 0.15; ringY += (mouseY - ringY) * 0.15;
+            gsap.set(ring, { x: ringX, y: ringY });
+        });
+
+        document.querySelectorAll('.hover-target, button, a').forEach(el => {
+            el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+            el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+        });
+
+        // 4. Parallax
+        const bgText = document.getElementById('bgText');
+        const uiCards = document.querySelectorAll('.parallax-ui');
+        
+        window.addEventListener('mousemove', e => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            gsap.to(bgText, { x: -x * 50, y: -y * 50, duration: 1, ease: "power2.out" });
+            uiCards.forEach(card => {
+                const speed = card.getAttribute('data-speed');
+                gsap.to(card, { x: x * 100 * speed, y: y * 100 * speed, duration: 1.5, ease: "power2.out" });
+            });
+        });
+
+        // 5. Animación de Entrada
+        setTimeout(() => {
+            const tl = gsap.timeline();
+            tl.to("#loader", { yPercent: -100, duration: 1, ease: "expo.inOut" })
+              .from("#bgText h1", { y: 100, opacity: 0, stagger: 0.1, duration: 1.5, ease: "power4.out" }, "-=0.5")
+              .from("#fighterImg", { scale: 1.1, opacity: 0, duration: 2, ease: "power3.out", filter: "blur(10px)" }, "-=1.2")
+              .from(".glass-card", { y: 50, opacity: 0, stagger: 0.2, duration: 1, ease: "power3.out" }, "-=1.5");
+
+            document.querySelectorAll('.counter').forEach(counter => {
+                ScrollTrigger.create({
+                    trigger: counter, start: "top 80%", once: true,
+                    onEnter: () => gsap.to(counter, { innerHTML: counter.getAttribute('data-target'), duration: 2, snap: { innerHTML: 1 }, ease: "power2.out" })
+                });
+            });
+
+            gsap.to("#bgText", { yPercent: 30, scrollTrigger: { trigger: "body", start: "top top", end: "bottom top", scrub: true }});
+            gsap.to("#fighterImg", { yPercent: 10, scrollTrigger: { trigger: "body", start: "top top", end: "bottom top", scrub: true }});
+        }, 300);
+
+        // 6. Inmersión Temática por Deporte
+        function setTheme(sport) {
+            document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + sport).classList.add('active');
+
+            const img = document.getElementById('fighterImg');
+            const t1 = document.getElementById('theme-text-1');
+            const t2 = document.getElementById('theme-text-2');
+            const cat = document.getElementById('cat-text');
+            const club = document.getElementById('club-text');
+            const finText = document.getElementById('fin-text');
+            const finMetric = document.getElementById('fin-metric');
+
+            gsap.to([img, t1, t2], { opacity: 0, duration: 0.3, onComplete: () => {
+                if(sport === 'boxeo') {
+                    t1.textContent = 'BOXEO'; t2.textContent = 'ESPAÑA';
+                    img.src = 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1000&q=80';
+                    cat.textContent = 'Peso Welter'; club.textContent = 'Detroit Gym Madrid';
+                    finText.textContent = 'Por KO'; finMetric.setAttribute('data-target', '9'); finMetric.innerHTML = '9';
+                } else if(sport === 'mma') {
+                    t1.textContent = 'ARTES'; t2.textContent = 'MIXTAS';
+                    img.src = 'https://images.unsplash.com/photo-1599586120429-48281b6f0ece?w=1000&q=80';
+                    cat.textContent = 'Peso Ligero'; club.textContent = 'Climent Club';
+                    finText.textContent = 'Sumisión'; finMetric.setAttribute('data-target', '5'); finMetric.innerHTML = '5';
+                } else if(sport === 'muaythai') {
+                    t1.textContent = 'NAK'; t2.textContent = 'MUAY';
+                    img.src = 'https://images.unsplash.com/photo-1620188467120-5042ed1ce5ea?w=1000&q=80';
+                    cat.textContent = 'Peso Pluma'; club.textContent = 'Muay Sapein';
+                    finText.textContent = 'TKO'; finMetric.setAttribute('data-target', '7'); finMetric.innerHTML = '7';
+                }
+                gsap.to([img, t1, t2], { opacity: 1, duration: 0.5 });
+            }});
+        }
+    </script>
+</body>
+</html>

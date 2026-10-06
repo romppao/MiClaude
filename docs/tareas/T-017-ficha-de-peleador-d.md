@@ -2,7 +2,7 @@
 **Nivel:** N3 · **Fase:** F4 · **Estado:** bloqueada hasta T-015 y T-016 · **Sugerida a:** Codex · **Depende de:** T-015, T-016
 
 ## Objetivo (una frase)
-Que la ficha pública de un peleador (`/peleadores/[slug]`) tenga el aspecto de la maqueta [`referencia/D-awwwards-ring-3.html`](../diseno/referencia/D-awwwards-ring-3.html), **con los datos reales** de la aplicación y las correcciones de [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) §3.
+Que la ficha pública de un peleador (`/peleadores/[slug]`) tenga el aspecto de la maqueta [`referencia/D-awwwards-ring.html`](../diseno/referencia/D-awwwards-ring.html), **con los datos reales** de la aplicación y las correcciones de [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) §3.
 
 ## Contexto
 La maqueta muestra solo cuatro datos y tres deportes. La ficha real tiene más y **cada dato lleva su origen**. No se inventa ningún dato ni se pierde ninguno de los actuales. Reglas del fundador: móvil primero, español claro, cero enlaces muertos, una acción principal («Dar aura a este peleador»).

@@ -5,7 +5,7 @@
 Que los listados (peleadores, ránking, veladas, gimnasios y entrenadores) usen el diseño «D» manteniendo filtros, paginación y búsqueda.
 
 ## Contexto
-Sistema de diseño: [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) (§3 correcciones obligatorias, §4 cómo extender el diseño al resto, §7 lista de revisión). Maqueta de referencia: [`referencia/D-awwwards-ring-3.html`](../diseno/referencia/D-awwwards-ring-3.html). Usa **solo** los componentes de `src/app/ui/` (T-016): si falta alguno, pídelo en el PR. Reglas del fundador: móvil primero, español claro, 5 enlaces como máximo, cero enlaces muertos, sin emojis, una acción principal por pantalla.
+Sistema de diseño: [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) (§3 correcciones obligatorias, §4 cómo extender el diseño al resto, §7 lista de revisión). Maqueta de referencia: [`referencia/D-awwwards-ring.html`](../diseno/referencia/D-awwwards-ring.html). Usa **solo** los componentes de `src/app/ui/` (T-016): si falta alguno, pídelo en el PR. Reglas del fundador: móvil primero, español claro, 5 enlaces como máximo, cero enlaces muertos, sin emojis, una acción principal por pantalla.
 
 ## Pasos
 1. Rama `codex/T-020-listados-d`.
