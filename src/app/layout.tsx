@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
@@ -7,11 +8,14 @@ import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
 import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
+import SelectorDeporte from "./components/SelectorDeporte";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
+import { elegirDeporte } from "./actions/tema";
 import { APP_URL } from "../lib/common/mail";
 import { demoActiva } from "../lib/common/demo";
+import { claveDeporteSegura } from "../lib/common/temas";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -20,6 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const jar = await cookies();
+  const deporteActivo = claveDeporteSegura(jar.get("deporte")?.value);
   const user = await getUser();
   const [accreditation, managedProfileCount] = await Promise.all([
     user && user.role !== "ADMIN" ? db.supportAccreditation.findUnique({ where: { userId: user.id } }) : Promise.resolve(null),
@@ -27,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ]);
   const tieneFicha = !!user && (!!user.fighter || user.role === "FIGHTER");
   return (
-    <html lang="es">
+    <html lang="es" data-deporte={deporteActivo}>
       <body>
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
@@ -59,6 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <input name="q" aria-label="Buscar peleadores, gimnasios, entrenadores o veladas" placeholder="Buscar…" maxLength={80} />
               <button className="secondary">Buscar</button>
             </form>
+            <SelectorDeporte deporteActivo={deporteActivo} accion={elegirDeporte} />
           </div>
         </header>
         {demoActiva() && (
