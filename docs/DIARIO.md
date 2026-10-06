@@ -1015,3 +1015,12 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+
+## 6 de octubre de 2026 (noche, 6) — T-004 parte 1: almacén de imágenes
+
+**Pedido por el fundador:** «sí, empieza así» (Claude Code en el portátil retoma el proyecto; primera tarea, T-004 parte 1, sin proveedor).
+**Qué se hizo:** interfaz `ImageStore` (`src/lib/common/imageStore.ts`) con el almacén `db` (`dbImageStore.ts`), claves validadas (`imageKeys.ts`), migración aditiva `20261006150000_imagenes_clave` (`avatarKey`, `bannerKey`), subida/borrado, exportación de cuenta y anonimización pasadas por la interfaz, y la ruta de imágenes con caché pública inmutable por versión (`?v=`), `private, no-cache` sin versión y `private, no-store` en fichas ocultas. Detalle en `ARQUITECTURA.md`.
+**Qué salió mal / se aprendió:** (1) la regla de arquitectura prohíbe que `fighters` importe de `profiles`: el almacén se movió a `lib/common`. (2) `npm run mapa` en Windows genera «0 pantallas»; hay que ejecutarlo en Linux o en el CI. (3) Las miniaturas de gimnasios y entrenadores aún no llevan `?v=`, así que siguen revalidando.
+**Qué se ejecutó:** tipos, 423 pruebas unitarias, migraciones frente a `schema.prisma` («No difference detected»), mapa funcional, compilación, batería de navegador completa y accesibilidad (0 incumplimientos) en contenedores Linux con base vacía. **No** se ha probado `IMAGE_STORE=s3` (parte 2, pendiente del proveedor).
+**Estado y próximos pasos:** rama `claude/T-004-imagenes` pendiente de PR y de que el fundador la integre. Parte 2 (R2) tras crear la cuenta; `scripts/migrar-imagenes.mjs` y el controlador S3 se hacen entonces.

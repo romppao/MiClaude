@@ -19,7 +19,7 @@
 | `/federaciones/:id` | (ficha individual: el título depende del elemento) | Pública | — | Profile |
 | `/gimnasios` | Gimnasios | Pública | — | Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Gym |
-| `/imagenes/:kind/:id/:slot` | Siempre se revalida (`no-cache`, `private`): quien ya tiene la imagen recibe un 304 sin bytes, y una ficha ocultada deja de verse al instante. | Pública (cambia lo que ve según la cuenta) | — | Profile |
+| `/imagenes/:kind/:id/:slot` | Imagen de una ficha visible pedida con su versión actual (`?v=`): el contenido de esa URL nunca cambia, así que puede guardarse un año. | Pública (cambia lo que ve según la cuenta) | — | Profile |
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
 | `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, FighterAchievement, Follow, OrganizerRequest, Profile, Report, SupportAccreditation |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
@@ -214,9 +214,12 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `competition.ts` | `COMPETITION_DIVISIONS`, `CompetitionDivision`, `divisionAgeEligible`, `divisionById`, `divisionEligible`, `divisionLabel`, `divisionsFor`, `knownBoxingAgeEligible` |
 | `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayKey`, `eventDayReached`, `parseBirthDate`, `parseDay`, `todayMadrid` |
 | `db.ts` | `db` |
+| `dbImageStore.ts` | `dbImageStore` |
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
+| `imageKeys.ts` | `ImageSlot`, `imageKey`, `parseImageKey` |
+| `imageStore.ts` | `ImageStore`, `StoredImage`, `getImageStore` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |

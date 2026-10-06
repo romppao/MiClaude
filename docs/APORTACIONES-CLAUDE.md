@@ -47,3 +47,14 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 - **Correcciones de la revisión de Codex (6 oct, noche):** paneles A/B/C del registro (T-011, hecho por Claude a petición del fundador), PRs sobrantes cerrados (#1–#7, #9, #13 con lo útil portado), Dependabot sin saltos mayores, textos técnicos en lenguaje llano, `CLAUDE.md` sin contradicción, imágenes con ETag/304 y arreglo del fallo del CI en la auditoría móvil (paginación y enlaces de tabla a 44 px).
 - **Proveedores de la fase 0 (6 oct, noche):** cuatro investigaciones en paralelo y su síntesis en ADR-003 (Neon, R2, Resend, Sentry, UptimeRobot; política de menores en borrador); nueva ficha T-014 y fichas T-004/T-008/T-010/T-012 ajustadas. Límite: precios no verificados en la fuente.
 - **Prueba de ingreso rehecha (6 oct, noche):** T-005 (prueba común máxima) y T-013 (nivel 1) sustituyen a T-011 y T-002, que hizo Claude.
+
+
+## 6 de octubre de 2026 (noche) — T-004, parte 1 (almacén de imágenes)
+
+**Pedido por el fundador:** «sí, empieza así» (tarea sin proveedor primero).
+**Base:** `74e3f56`. **Rama de trabajo:** `claude/T-004-imagenes`. **PR:** pendiente.
+**Qué cambié y por qué:** interfaz `ImageStore` y almacén `db`; migración aditiva de claves; caché larga versionada en la ruta de imágenes (ver `ARQUITECTURA.md` y `DIARIO.md`).
+**Qué ejecuté yo:** tipos, 423 unitarias, migraciones vs esquema, mapa, compilación, navegador y accesibilidad con base vacía en contenedores Linux (Windows con Docker). **Solo lo valida el CI:** que sea idéntico en GitHub.
+**Qué salió mal:** el mapa funcional no se puede generar en Windows (ver `LECCIONES.md`).
+**Qué debe hacer el siguiente asistente:** 1) parte 2 de T-004 cuando el fundador cree la cuenta de R2; 2) pasar `?v=` a las miniaturas de gimnasios y entrenadores.
+**Decisiones del fundador abiertas:** proveedor y cuenta de almacenamiento (ADR-003).
