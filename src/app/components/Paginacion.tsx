@@ -16,8 +16,8 @@ export default function Paginacion({ ruta, params, actual, paginas, desde, hasta
   return (
     <nav aria-label={etiqueta} style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "16px 0" }}>
       <span className="mut">Mostrando del {desde} al {hasta} de {total} {total === 1 ? unidad[0] : unidad[1]}{paginas > 1 ? ` · página ${actual} de ${paginas}` : ""}</span>
-      {actual > 1 && <Link href={href(actual - 1)} rel="prev">← Página anterior</Link>}
-      {actual < paginas && <Link href={href(actual + 1)} rel="next">Página siguiente →</Link>}
+      {actual > 1 && <Link href={href(actual - 1)} rel="prev" className="btn secondary">← Página anterior</Link>}
+      {actual < paginas && <Link href={href(actual + 1)} rel="next" className="btn secondary">Página siguiente →</Link>}
     </nav>
   );
 }

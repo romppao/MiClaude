@@ -28,7 +28,7 @@ header.top form.buscador{flex:1 1 240px;min-width:200px}
 @media(max-width:900px){header.top .cuenta{flex-wrap:nowrap;margin-left:auto}header.top form.buscador{flex-basis:100%}header.top .menu-open{margin-left:0}}
 
 /* Móvil primero: en las tablas apiladas, todo enlace de una celda es una zona táctil de al menos 44 px (no una línea de texto de 26 px). */
-@media(max-width:720px){table.apilada td a:not(.btn){display:inline-flex;align-items:center;min-height:44px}}
+@media(max-width:720px){table td a:not(.btn){display:inline-flex;align-items:center;min-height:44px}}
 
 /* Móvil: la barra fija inferior no debe tapar lo que recibe el foco ni lo que se desplaza a la vista (WCAG 2.4.11). El margen superior evita que la cabecera tape los avisos. */
 @media(max-width:650px){html{scroll-padding-bottom:calc(120px + env(safe-area-inset-bottom));scroll-padding-top:16px}}
