@@ -71,12 +71,12 @@ La maqueta diseña **una** pantalla. Para el resto, se aplican los mismos ingred
 
 | Quién | Qué |
 |---|---|
-| **Claude** | Este sistema y el ADR; el **kit de interfaz** (T-016: variables, componentes y primitivas de movimiento accesibles); revisión visual y de accesibilidad de cada PR con capturas |
-| **Codex** | El motor de temas por deporte (T-015) y las pantallas, una por PR: ficha de peleador (T-017), portada (T-019), listados (T-020), formularios y cuenta (T-021), velada y estados (T-022) |
+| **Claude** | Este sistema y el ADR; **revisión** visual y de accesibilidad de cada PR con capturas (no programa) |
+| **Codex** (decisión del fundador, 6 oct: «delega todo a Codex») | Todo el desarrollo, un PR por ficha y en este orden: motor de deporte activo (T-015), kit de interfaz (T-016), ficha de peleador (T-017), portada (T-019), listados (T-020), formularios y cuenta (T-021), velada y estados (T-022) |
 | **Antigravity** | Autor de la maqueta; resuelve las dudas visuales; entrega los activos de cada deporte (palabras, fotos, categorías) y las pantallas que falten en la maqueta |
 | **Fundador** | Aprueba el ADR-004, aporta las fotos y decide las preguntas del §5 |
 
-Orden: **T-015 y T-016 en paralelo** (archivos distintos: Codex toca `layout.tsx` y la acción del tema; Claude crea `src/app/ui/` y las variables) → T-017 → T-019 a T-022.
+Orden: T-015 → T-016 → T-017 → T-019 a T-022 (un asistente, un PR por ficha, así no se pisan los archivos delicados).
 
 ## 7. Cómo se revisa cada PR visual (lista de Claude)
 

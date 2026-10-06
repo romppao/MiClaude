@@ -26,7 +26,7 @@ El diseño elegido por el fundador (maqueta de Antigravity) usa **GSAP** con **S
 5. Una capa fina propia (`src/app/ui/movimiento/`) envuelve a GSAP y Lenis: si algún día hay que cambiarlos, se cambia en un solo sitio.
 
 ## Qué hace falta del fundador
-Aprobar la opción A (o elegir otra). **Hasta entonces, T-016 y las pantallas se desarrollan sin movimiento** (todo lo demás del diseño es CSS) y el movimiento se añade al aprobarse.
+Aprobar la opción A (o elegir otra). **Hasta entonces, T-016 y las pantallas (Codex) se desarrollan sin movimiento** (todo lo demás del diseño es CSS) y el movimiento se añade al aprobarse.
 
 ## Lo que no está verificado
 El peso exacto en KB de `gsap` + `ScrollTrigger` + `lenis` con el empaquetado de Next 15: se medirá en la primera implementación. No se afirma una cifra aquí.

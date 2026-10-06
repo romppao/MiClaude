@@ -1,5 +1,5 @@
 # T-015 — Motor de deporte activo (cookie, selector y textos por deporte)
-**Nivel:** N3 · **Fase:** F4 · **Estado:** **lista** · **Sugerida a:** Codex · **Depende de:** — (en paralelo con T-016 de Claude: **tú tocas `layout.tsx` y la acción; Claude crea `src/app/ui/`**)
+**Nivel:** N3 · **Fase:** F4 · **Estado:** **lista** · **Sugerida a:** Codex · **Depende de:** — (después, T-016 en otro PR)
 
 ## Objetivo (una frase)
 Que la aplicación sepa cuál es el **deporte activo** de cada persona (cookie `deporte` → `data-deporte` en `<html>`) y que cada deporte aporte sus **textos y datos de ambiente** (palabras de fondo, vocabulario, categorías), sin cambiar todavía el aspecto actual.

@@ -49,7 +49,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-013](tareas/T-013-enlaces-externos-avisan.md) | Todo enlace que abre otra pestaña lo avisa | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | — |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 | [T-015](tareas/T-015-motor-de-temas-por-deporte.md) | Motor de deporte activo (cookie, selector, textos por deporte) | F4 | N3 | Codex | — (lista) |
-| [T-016](tareas/T-016-kit-de-interfaz-d.md) | Kit de interfaz «D» (variables y componentes accesibles) | F4 | N3 | **Claude** | movimiento: ADR-004 |
+| [T-016](tareas/T-016-kit-de-interfaz-d.md) | Kit de interfaz «D» (variables y componentes accesibles) | F4 | N3 | Codex | T-015; movimiento: ADR-004 |
 | [T-017](tareas/T-017-ficha-de-peleador-d.md) | Ficha de peleador con el diseño «D» | F4 | N3 | Codex | T-015, T-016 |
 | [T-019](tareas/T-019-portada-d.md) | Portada con el diseño «D» | F4 | N3 | Codex | T-015, T-016 |
 | [T-020](tareas/T-020-listados-d.md) | Listados con el diseño «D» | F4 | N3 | Codex | T-015, T-016 |

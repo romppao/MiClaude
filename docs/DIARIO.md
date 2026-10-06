@@ -1039,3 +1039,11 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué se hizo:** análisis de la maqueta (abierta en Chromium a 1440 y 390 px), [`diseno/SISTEMA-D.md`](diseno/SISTEMA-D.md) con los ingredientes y **12 correcciones obligatorias** (zoom bloqueado, textos de 10 y 12 px, contraste de 3,7:1, sin «reducir movimiento», pantalla de carga fija, cursor oculto, contenido invisible sin JavaScript, fotos enlazadas —una ya no carga—, CDN y Tailwind, grano de ≈ 50 MB), [ADR-004](decisiones/ADR-004-animacion-gsap-lenis.md) (GSAP y Lenis; licencias leídas en las fuentes oficiales) y las fichas T-015 a T-017 y T-019 a T-022.
 **Qué salió mal / se aprendió:** (1) las maquetas de Claude se rechazaron; el diseño elegido lo hizo Antigravity a partir de referencias del fundador; (2) una maqueta con fotos enlazadas se rompe sola: hacen falta fotos propias.
 **Estado y próximos pasos:** Codex hace T-015 y, después, las pantallas; Claude hace T-016 (kit de interfaz) y revisa los PR visuales; falta que el fundador apruebe el ADR-004 y aporte las fotos.
+
+
+## 6 de octubre de 2026 (noche, 12) — Todo el desarrollo, a Codex
+
+**Pedido por el fundador:** «delega todo a Codex».
+**Qué se hizo:** T-016 (kit de interfaz) pasa de Claude a Codex; el orden queda T-015 → T-016 → T-017 → T-019 a T-022, un PR por ficha. Claude solo revisa cada PR (lista de `SISTEMA-D.md` §7).
+**Estado y próximos pasos:** el fundador integra los PR pendientes (#23, #24 y las ramas de documentos y de fotos) y lanza a Codex; falta aprobar el ADR-004.
+
