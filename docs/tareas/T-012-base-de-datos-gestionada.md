@@ -1,6 +1,6 @@
 # T-012 — Base de datos gestionada, copias y restauración
 **Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** **propuesta en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Neon Free (Fráncfort) + copia nocturna a R2; urgente: la base gratuita de Render caduca a los 30 días** · **Sugerida a:** fundador + Claude · **Depende de:** decisión de alojamiento
+**Fase:** F2 · **Estado:** **ADR-003 aprobado por el fundador (6 oct): Neon Free (Fráncfort, 0,5 GB) + copia nocturna a R2; URGENTE: la base gratuita de Render caduca hacia el 1–2 de noviembre de 2026 (confirmar la fecha en el panel) y se borra 14 días después. Pasos con las cuentas: [`RELEVO-PORTATIL.md`](../RELEVO-PORTATIL.md)** · **Sugerida a:** fundador + Claude · **Depende de:** decisión de alojamiento
 
 ## Objetivo
 Que los datos **no se pierdan ni colapsen** al crecer: base de datos PostgreSQL gestionada, con copias automáticas, restauración **probada**, conexiones controladas y vigilancia.

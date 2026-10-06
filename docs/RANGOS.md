@@ -23,7 +23,7 @@
 
 ## Prueba de ingreso (para los puestos 3–5, y para subir de nivel)
 
-**Protocolo completo y vigente: [`PRUEBA-DE-INGRESO.md`](PRUEBA-DE-INGRESO.md)** (autodeclaración, especialidad elegida por cada asistente, prueba común en modo máximo y en modo medio, y revisión a ciegas). Lo que sigue es el resumen inicial; si difiere, manda el protocolo completo.
+**Protocolo completo y vigente: [`PRUEBA-DE-INGRESO.md`](PRUEBA-DE-INGRESO.md)** y su complemento objetivo [`PRUEBA-ESCALERA.md`](PRUEBA-ESCALERA.md) (retos con pruebas ocultas, trampas de honestidad y calibración) (autodeclaración, especialidad elegida por cada asistente, prueba común en modo máximo y en modo medio, y revisión a ciegas). Lo que sigue es el resumen inicial; si difiere, manda el protocolo completo.
 
 1. **Prueba 1 (N1):** ejecutar **T-013** exactamente como está escrita (T-002 se hizo antes de que ningún aspirante la tomara). **Cada aspirante la hace en su propia rama (`<asistente>/T-013-prueba`) sin ver las de los demás**; Claude las compara con la misma tabla de puntuación y solo se integra una (la mejor); las demás se descartan sin penalizar: es una prueba, no trabajo útil duplicado. Se valora: ¿entiende y cumple la ficha?, ¿se ciñe al alcance?, ¿CI en verde?, ¿su informe dice la verdad sobre qué ejecutó y qué no?
 2. **Prueba 2 (N2):** una parte acotada de **T-009** (dos personas nuevas de los escenarios, con informe visual) o **T-003**. Se valora además: ¿mira lo que produce?, ¿añade pruebas con esperas a estados visibles?

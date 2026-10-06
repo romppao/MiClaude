@@ -10,6 +10,7 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 - **Demo alojada (2 oct):** `render.yaml`, `scripts/arranque-demo.sh`, modo demostración (`DEMO_MODE=si`: confirmar correo y cambiar de papel).
 - **Categorías de peso por disciplina y nivel (2 oct):** fuentes en `DISENO-PESOS.md` (luego ampliadas por Codex con edad y sexo).
 - **Revisión del trabajo de Codex (6 oct):** ejecutada desde cero con base vacía: tipos, 406 unitarias, compilación, 16 guiones de navegador y axe, todo en verde; ver `DIARIO.md`.
+- **Segunda prueba de ingreso «La escalera» y relevo al portátil (6 oct, noche):** [PRUEBA-ESCALERA.md](PRUEBA-ESCALERA.md) con 4 retos, 37 pruebas ocultas (rama `claude/clave-escalera`), trampas de honestidad y calibración; script `scripts/corregir-escalera.sh`; segunda verificación de proveedores (ADR-003 aprobado, con correcciones de Neon y Resend); [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md).
 
 ## 6 de octubre de 2026 — enlaces muertos, cabecera y móvil
 

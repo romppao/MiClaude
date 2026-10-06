@@ -12,3 +12,4 @@ next-env.d.ts
 .DS_Store
 .vercel
 test-results
+docs/ingreso/.clave-temporal/

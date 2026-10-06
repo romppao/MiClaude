@@ -4,6 +4,8 @@
 
 > Palabras del fundador: «Crea un documento en el que exijas a cada una de las herramientas que haga una aportación al proyecto **a máximo nivel**, y también **a medio**, porque no siempre utilizaremos la máxima potencia: quiero ver cómo rinden con **bajo consumo de tokens**. […] Quiero que les pongas a prueba de verdad. […] Pregúntales primero **qué es lo que mejor se les da** según ellos mismos, y después una **prueba común de exigencia máxima** en desarrollo o diseño o lo que sea. Cuando cada herramienta lea este documento, sabrá lo que tiene que hacer como primera toma de contacto. De ahí saldrá el orden.»
 
+> **Hay una segunda prueba, objetiva y con corrección automática: [«La escalera»](PRUEBA-ESCALERA.md)** (6 de octubre de 2026, a petición del fundador: «medir bien el nivel de nuestros ayudantes»). Esta primera prueba mide trabajo real y la puntúa Claude a juicio; la escalera añade cuatro retos con pruebas ocultas, dos trampas de honestidad y calibración. Se hacen las dos y se anotan por separado.
+
 ## A quién va dirigido
 
 A **Codex, Antigravity, GitHub Copilot y Open Code (con sus modelos locales, Ollama/Qwen)**. Codex ya tiene trabajo en el repositorio (se le evaluó por él); aun así **hace esta prueba igual que los demás**, para comparar en las mismas condiciones y para medir el modo de bajo consumo, que de él aún no tenemos. Claude no participa: es quien corrige.
