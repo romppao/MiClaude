@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es" data-sport="todos">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring España · Portada y estados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,500&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;900&family=Saira+Extra+Condensed:wght@600;800&family=Archivo+Narrow:wght@600;700&family=Teko:wght@600;700&family=Bebas+Neue&family=Spectral:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+/* ===== Marca: lo que NO cambia en ningún deporte ===== */
+:root{
+  --brand:#BE33F5;          /* color oficial */
+  --on-brand:#0C0B0F;       /* texto sobre el violeta: 4,6:1 */
+  --texto:"Barlow",system-ui,sans-serif;
+  --radius:0px; --upper:none; --skew:0deg;
+  --cut:none; --btn-cut:none;
+}
+/* ===== Tema por deporte: solo cambian estas variables ===== */
+[data-sport="todos"]{
+  --bg:#F3EFE6; --bg-2:#EAE4D6; --fg:#111014; --fg-2:#4A4650; --line:#CFC8B8; --on-bg-accent:#8E1FBD; --accent2:#111014;
+  --display:"Newsreader",Georgia,serif; --num:"Barlow Condensed",sans-serif; --upper:none;
+  --regla-h:6px; --regla-bg:linear-gradient(var(--fg) 0 1px,transparent 1px 5px,var(--fg) 5px 6px);
+  --motif:repeating-linear-gradient(90deg,transparent 0 11px,rgba(17,16,20,.06) 11px 12px);
+  --card:#FFFFFF; --on-fg:#F3EFE6;
+}
+[data-sport="boxeo"]{
+  --bg:#0C0B0F; --bg-2:#16141B; --fg:#F2EEE8; --fg-2:#B8B2C0; --line:#34303E; --on-bg-accent:#D77CFB; --accent2:#F2EEE8;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif; --num:"Big Shoulders Display",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:linear-gradient(var(--brand) 0 2px,transparent 2px 6px,var(--fg) 6px 8px,transparent 8px 12px,var(--brand) 12px 14px);
+  --motif:repeating-linear-gradient(0deg,transparent 0 9px,rgba(255,255,255,.045) 9px 10px);
+  --card:#16141B; --on-fg:#0C0B0F; --radius:2px;
+}
+[data-sport="mma"]{
+  --bg:#101214; --bg-2:#181B1E; --fg:#E9EDF0; --fg-2:#A9B1B8; --line:#2F353A; --on-bg-accent:#FF8A4C; --accent2:#FF6A2B;
+  --display:"Saira Extra Condensed","Arial Narrow",sans-serif; --num:"Saira Extra Condensed",sans-serif; --upper:uppercase;
+  --regla-h:16px; --regla-bg:repeating-linear-gradient(45deg,#3A4046 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,#3A4046 0 6px,transparent 6px 12px);
+  --motif:repeating-linear-gradient(45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px),repeating-linear-gradient(-45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px);
+  --card:#181B1E; --on-fg:#101214;
+  --cut:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
+  --btn-cut:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px);
+}
+[data-sport="muaythai"]{
+  --bg:#F5EADB; --bg-2:#EBDAC3; --fg:#2A1810; --fg-2:#6A493A; --line:#D6BEA2; --on-bg-accent:#9E1F17; --accent2:#B3261E;
+  --display:"Archivo Narrow","Arial Narrow",sans-serif; --num:"Archivo Narrow",sans-serif; --upper:uppercase;
+  --regla-h:12px; --regla-bg:repeating-linear-gradient(90deg,#B3261E 0 18px,#F5EADB 18px 22px,#2A1810 22px 26px,#F5EADB 26px 30px);
+  --motif:repeating-linear-gradient(135deg,transparent 0 14px,rgba(42,24,16,.07) 14px 16px);
+  --card:#FFF8EE; --on-fg:#F5EADB;
+}
+[data-sport="kickboxing"]{
+  --bg:#0A0A0A; --bg-2:#151515; --fg:#FFFFFF; --fg-2:#C2C2C2; --line:#2C2C2C; --on-bg-accent:#FFD400; --accent2:#FFD400;
+  --display:"Teko","Arial Narrow",sans-serif; --num:"Teko",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:repeating-linear-gradient(-60deg,#FFD400 0 14px,#0A0A0A 14px 28px);
+  --motif:repeating-linear-gradient(-60deg,transparent 0 22px,rgba(255,212,0,.06) 22px 24px);
+  --card:#151515; --on-fg:#0A0A0A;
+  --btn-cut:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+[data-sport="k1"]{
+  --bg:#F6F6F4; --bg-2:#ECECE8; --fg:#0E0E0E; --fg-2:#4D4D4D; --line:#CFCFCA; --on-bg-accent:#B50018; --accent2:#D6001C;
+  --display:"Bebas Neue","Arial Narrow",sans-serif; --num:"Bebas Neue",sans-serif; --upper:uppercase;
+  --regla-h:8px; --regla-bg:linear-gradient(90deg,#D6001C 0 62%,#0E0E0E 62% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/84px 100%,linear-gradient(0deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/100% 56px;
+  --card:#FFFFFF; --on-fg:#F6F6F4;
+}
+[data-sport="jiujitsu"]{
+  --bg:#EFF1F6; --bg-2:#E1E5EF; --fg:#14183A; --fg-2:#464C72; --line:#C6CCDF; --on-bg-accent:#6A1B9A; --accent2:#14183A;
+  --display:"Spectral",Georgia,serif; --num:"Spectral",Georgia,serif; --upper:none;
+  --regla-h:10px; --regla-bg:linear-gradient(90deg,#FFFFFF 0 20%,#1F5FBF 20% 40%,#7B2CBF 40% 60%,#6B4423 60% 80%,#111 80% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px,linear-gradient(0deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px;
+  --card:#FFFFFF; --on-fg:#EFF1F6; --radius:6px;
+}
+
+*{box-sizing:border-box;margin:0}
+body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 17px/1.55 var(--texto);transition:background .35s,color .35s}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--on-bg-accent);outline-offset:3px}
+.c{max-width:1180px;margin:0 auto;padding:0 20px}
+.aviso{background:var(--fg);color:var(--bg);text-align:center;padding:8px 16px;font-size:14px}
+.regla{height:var(--regla-h);background:var(--regla-bg)}
+
+.pie{padding:28px 0;color:var(--fg-2);font-size:15px}
+
+/* ===== Componentes de la portada ===== */
+.pad{padding-bottom:0}
+.cab .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.marca{display:inline-flex;align-items:center;gap:.28em;min-height:44px;font:700 28px/1 var(--display);text-transform:var(--upper);text-decoration:none;letter-spacing:.01em}
+.marca b{color:var(--on-bg-accent);font-weight:inherit}
+.marca small{font:600 15px/1 var(--texto);text-transform:uppercase;letter-spacing:.14em;color:var(--fg-2);margin-left:.9em;padding-left:.9em;border-left:1px solid var(--line)}
+.menu{display:flex;gap:2px;list-style:none;padding:0}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 13px;text-decoration:none;font:600 15px/1 var(--texto);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2)}
+.menu a:hover,.menu a[aria-current]{color:var(--fg)}
+.menu a[aria-current]{box-shadow:inset 0 -3px 0 var(--brand)}
+.menu .entrar{background:var(--brand);color:var(--on-brand);padding:0 20px;font-weight:700;clip-path:var(--btn-cut);border-radius:var(--radius)}
+@media (max-width:860px){.menu{display:none}.marca small{display:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;background:var(--brand);color:var(--on-brand);font:700 16px/1 var(--texto);text-decoration:none;clip-path:var(--btn-cut);border-radius:var(--radius);border:0;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.btn.sec{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg-2);clip-path:none}
+h2{font:700 clamp(30px,4.4vw,48px)/1.05 var(--display);text-transform:var(--upper);margin-bottom:8px}
+.baj{color:var(--fg-2);margin-bottom:22px;max-width:56ch}
+
+/* Hero con elección de deporte */
+.hero{position:relative;padding:56px 0 36px}
+.hero::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;background:var(--motif);z-index:-1}
+.sobre{font:600 15px/1.35 var(--texto);letter-spacing:.16em;text-transform:uppercase;color:var(--on-bg-accent)}
+h1{font:700 clamp(46px,8.6vw,118px)/.92 var(--display);text-transform:var(--upper);letter-spacing:-.01em;margin:14px 0 16px;max-width:15ch}
+.lema{font-size:21px;color:var(--fg-2);max-width:46ch}
+.fichas{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px;list-style:none;padding:0}
+.ficha{display:flex;flex-direction:column;justify-content:space-between;gap:18px;min-height:176px;width:100%;text-align:left;padding:0 0 16px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;font:inherit;clip-path:var(--cut);border-radius:var(--radius);overflow:hidden}
+.ficha .r{display:block;height:var(--regla-h);background:var(--regla-bg)}
+.ficha .t{padding:0 16px;font:700 34px/1 var(--display);text-transform:var(--upper)}
+.ficha .d{padding:0 16px;color:var(--fg-2);font-size:15px;line-height:1.35}
+.ficha .ir{padding:0 16px;font:700 15px/1 var(--texto);color:var(--on-bg-accent);text-transform:uppercase;letter-spacing:.1em}
+.ficha:hover{box-shadow:0 0 0 2px var(--brand)}
+.ficha[aria-pressed="true"]{box-shadow:0 0 0 3px var(--brand)}
+.fichas li:first-child{grid-column:1/-1}
+.fichas li:first-child .ficha{min-height:104px;gap:10px}
+.todos{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;color:var(--fg);font-weight:600}
+@media (max-width:860px){.fichas{grid-template-columns:1fr 1fr;gap:10px}.ficha{min-height:150px}.ficha .t{font-size:28px}}
+@media (max-width:340px){.fichas{grid-template-columns:1fr}}
+
+/* Secciones */
+.bloque{padding:48px 0;border-top:1px solid var(--line)}
+.entradas{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ent{background:var(--card);border:1px solid var(--line);padding:20px;clip-path:var(--cut);border-radius:var(--radius);text-decoration:none}
+.ent .dia{font:700 64px/.9 var(--num)}
+.ent .dia span{display:block;font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:var(--on-bg-accent)}
+.ent hr{border:0;border-top:2px dashed var(--line);margin:14px 0}
+.ent small{color:var(--fg-2);font-size:15px}
+@media (max-width:860px){.entradas{grid-template-columns:1fr}}
+.fila{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 12px;border-top:1px solid var(--line);text-decoration:none}
+.fila:last-child{border-bottom:1px solid var(--line)}
+.fila:hover{background:var(--bg-2)}
+.pos{font:700 44px/1 var(--num);color:var(--fg-2)}
+.fila:first-of-type .pos{color:var(--on-bg-accent)}
+.n{font:700 26px/1.05 var(--display);text-transform:var(--upper)}
+.fila small{color:var(--fg-2);font-size:15px}
+.cifra{font:700 34px/1 var(--num);text-align:right}
+.cifra small{display:block;font:600 14px/1.2 var(--texto);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);background:var(--card);border-radius:var(--radius);list-style:none;padding:0}
+.pasos li{padding:24px 22px;border-right:1px solid var(--line)}
+.pasos li:last-child{border-right:0}
+.pasos .nº{font:700 56px/1 var(--num);color:var(--on-bg-accent)}
+.pasos b{display:block;font:700 22px/1.2 var(--display);text-transform:var(--upper);margin:6px 0}
+.pasos p{color:var(--fg-2);font-size:16px}
+@media (max-width:860px){.pasos{grid-template-columns:1fr}.pasos li{border-right:0;border-bottom:1px solid var(--line)}.pasos li:last-child{border-bottom:0}}
+.cierre{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:36px;background:var(--fg);color:var(--on-fg);clip-path:var(--cut);border-radius:var(--radius)}
+.cierre h2{margin:0;color:var(--on-fg);max-width:20ch}
+.cierre .btn{background:var(--brand)}
+
+/* Estados */
+.estados{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.estado{border:1px solid var(--line);background:var(--card);padding:20px;border-radius:var(--radius)}
+.estado h3{font:700 14px/1.2 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-2);margin-bottom:12px}
+.estado p{font-size:16px}
+.vacio .glifo{display:block;margin-bottom:10px;color:var(--on-bg-accent)}
+.vacio b{display:block;font:700 24px/1.15 var(--display);text-transform:var(--upper);margin-bottom:6px}
+.aviso-estado{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:2px solid var(--fg);background:var(--bg);margin-bottom:12px;border-radius:var(--radius)}
+.aviso-estado svg{flex:none;margin-top:2px}
+.aviso-estado b{display:block}
+.aviso-estado.error{border-color:var(--on-bg-accent)}
+@media (max-width:860px){.estados{grid-template-columns:1fr}}
+
+/* Barra inferior móvil */
+.tabs{display:none}
+@media (max-width:860px){
+  body{padding-bottom:76px}
+  .tabs{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--fg);padding-bottom:env(safe-area-inset-bottom)}
+  .tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;text-decoration:none;font:600 13px/1 var(--texto);color:var(--fg-2);letter-spacing:.04em}
+  .tabs a[aria-current]{color:var(--fg);box-shadow:inset 0 3px 0 var(--brand)}
+  .tabs svg{width:24px;height:24px}
+}
+@media (prefers-reduced-motion:no-preference){.ficha,.btn,.fila{transition:box-shadow .15s,background .15s,filter .15s}}
+</style>
+</head>
+<body>
+<p class="aviso">Maqueta de diseño · Portada, menú móvil y estados · Elige un deporte para ver cómo cambia toda la página · Datos ficticios</p>
+<div class="regla" aria-hidden="true"></div>
+<header class="cab"><div class="c in">
+  <a class="marca" href="#">Ring <b>España</b><small id="etq">Todos los deportes</small></a>
+  <nav aria-label="Principal"><ul class="menu">
+    <li><a href="#" aria-current="page">Inicio</a></li><li><a href="#">Veladas</a></li><li><a href="#">Clubes</a></li><li><a href="#">Ránking</a></li><li><a class="entrar" href="#">Entrar</a></li>
+  </ul></nav>
+</div></header>
+
+<main class="c" id="app"><noscript>Esta maqueta necesita JavaScript para cambiar de deporte.</noscript></main>
+<footer class="c pie">Ring España · Deportes de contacto de toda España · <a href="#">Cómo funciona</a> · <a href="#">Privacidad</a></footer>
+
+<nav class="tabs" aria-label="Principal (móvil)">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Veladas</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg>Clubes</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-7M12 20V5M19 20v-10"/></svg>Ránking</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Cuenta</a>
+</nav>
+
+<script>
+const D = {
+  todos:{n:"Todos los deportes", tile:"Todos", d:"Boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu, juntos.", sobre:"Deportes de contacto de toda España",
+    h1:"Elige tu deporte de contacto", lema:"Fichas, récords y veladas de toda España. Cuando eliges el tuyo, la aplicación entera se viste de ese deporte.",
+    ev:[["Oct","24","Gladiator Night III","Palomares del Río · Muay Thai"],["Oct","31","Cage Night Zaragoza","Zaragoza · MMA"],["Nov","07","Gran Gala del Pluma","Valencia · Boxeo"]],
+    top:[["Lucía Herrero Bravo","Boxeo · Valencia","1.204"],["Marcos Vidal Ortega","Muay Thai · Sevilla","874"],["Nuria Molina Díaz","MMA · Zaragoza","811"],["Javier Rubio Soler","Kickboxing · Bilbao","790"]],
+    pasos:["Crea tu ficha|Tu deporte, tu categoría y tu ciudad.","Declara tus combates|Tu rival los confirma o los respalda una federación.","Consigue aura|La comunidad reconoce tu trayectoria."], vac:"Todavía no hay combates", vacd:"Cuando se registre el primero, aparecerá aquí con su origen."},
+  boxeo:{n:"Boxeo", tile:"Boxeo", d:"Asaltos, pesos y veladas de toda España.", sobre:"Boxeo · Amateur y profesional",
+    h1:"Tu carrera en el ring, asalto a asalto", lema:"Récord, categoría de peso y aura. Cada resultado dice quién lo ha confirmado.",
+    ev:[["Nov","07","Gran Gala del Pluma","Valencia"],["Nov","14","Noche de Boxeo Ciudad","Madrid"],["Nov","28","Velada del Puerto","Cádiz"]],
+    top:[["Lucía Herrero Bravo","Pluma · Valencia","1.204"],["Pablo Díaz Prieto","Wélter · Madrid","1.087"],["Sara Gil Molina","Ligero · Sevilla","932"],["Hugo Núñez Vidal","Medio · Bilbao","901"]],
+    pasos:["Crea tu ficha|Tu peso, tu nivel y tu ciudad.","Declara tus asaltos|Tu rival los confirma o los respalda la federación.","Consigue aura|La comunidad reconoce cada velada."], vac:"Todavía no hay asaltos", vacd:"Cuando se registre el primer combate, aparecerá aquí con su origen."},
+  mma:{n:"MMA", tile:"MMA", d:"Rondas, sumisiones y categorías de peso.", sobre:"MMA · Amateur y profesional",
+    h1:"Tu camino en la jaula, ronda a ronda", lema:"Cada victoria indica cómo terminó: golpes, sumisión o decisión.",
+    ev:[["Oct","31","Cage Night Zaragoza","Zaragoza"],["Nov","15","Octógono Norte","Bilbao"],["Dic","05","Copa Pirineos","Huesca"]],
+    top:[["Nuria Molina Díaz","Mosca · Zaragoza","811"],["Adrián Cano Bravo","Pluma · Barcelona","778"],["Marcos Esteban Gil","Ligero · Murcia","702"],["Irene Lara Soler","Gallo · Granada","655"]],
+    pasos:["Crea tu ficha|Tu categoría, tu gimnasio y tu ciudad.","Declara tus rondas|Tu rival las confirma o las respalda la federación.","Consigue aura|La comunidad reconoce tus finalizaciones."], vac:"Todavía no hay combates", vacd:"Cuando se registre el primero, aparecerá aquí con su forma de terminar."},
+  muaythai:{n:"Muay Thai", tile:"Muay Thai", d:"Asaltos, pesos y galas de toda España.", sobre:"Muay Thai · Amateur y profesional",
+    h1:"Tu trayectoria en el ring de Muay Thai", lema:"Récord confirmado, categoría y aura. Todo con su origen a la vista.",
+    ev:[["Oct","24","Gladiator Night III","Palomares del Río"],["Nov","08","Noche de Muay Thai","Sevilla"],["Nov","22","Copa del Sur","Málaga"]],
+    top:[["Marcos Vidal Ortega","Wélter · Sevilla","874"],["Daniel Ibáñez Cano","Pluma · Málaga","840"],["Irene Prieto Ruiz","Mosca · Valencia","760"],["Álvaro Soler Gil","Medio · Cádiz","731"]],
+    pasos:["Crea tu ficha|Tu peso, tu nivel y tu ciudad.","Declara tus asaltos|Tu rival los confirma o los respalda la federación.","Consigue aura|La comunidad reconoce tu carrera."], vac:"Todavía no hay asaltos", vacd:"Cuando se registre el primer combate, aparecerá aquí con su origen."},
+  kickboxing:{n:"Kickboxing", tile:"Kickboxing", d:"Rondas, modalidades y veladas.", sobre:"Kickboxing · Amateur y profesional",
+    h1:"Tu velocidad, tu récord comprobable", lema:"Por modalidad y peso. Cada ronda cuenta y cada resultado dice quién lo respalda.",
+    ev:[["Nov","14","Fight Night Bilbao","Bilbao"],["Nov","29","Copa Cantábrica","Santander"],["Dic","12","Gala del Norte","Vitoria"]],
+    top:[["Javier Rubio Soler","Medio · Bilbao","790"],["Sara Núñez Vidal","Pluma · Valencia","742"],["Marcos Cano Prieto","Ligero · Madrid","690"],["Elena Díaz Ferrer","Mosca · Sevilla","648"]],
+    pasos:["Crea tu ficha|Tu modalidad, tu peso y tu ciudad.","Declara tus rondas|Tu rival las confirma o las respalda la federación.","Consigue aura|La comunidad reconoce tu ritmo."], vac:"Todavía no hay rondas", vacd:"Cuando se registre el primer combate, aparecerá aquí con su origen."},
+  k1:{n:"K-1", tile:"K-1", d:"Torneos, eliminatorias y pesos.", sobre:"K-1 · Amateur y profesional",
+    h1:"Tu torneo, eliminatoria a eliminatoria", lema:"Cuartos, semifinal y final: cada combate del torneo queda en tu ficha.",
+    ev:[["Dic","05","K-1 Gran Premio de España","Madrid"],["Dic","19","Copa Norte","Zaragoza"],["Ene","16","Torneo Capital","Madrid"]],
+    top:[["Hugo Prieto Vidal","Pesado · Madrid","701"],["Álvaro Molina Cano","Medio · Valencia","668"],["Tomás Ruiz Lara","Pesado · Zaragoza","640"],["Daniel Soler Gil","Ligero · Murcia","612"]],
+    pasos:["Crea tu ficha|Tu peso, tu nivel y tu ciudad.","Declara tus eliminatorias|Tu rival las confirma o las respalda la federación.","Consigue aura|La comunidad reconoce tus torneos."], vac:"Todavía no hay torneos", vacd:"Cuando se registre el primero, aparecerá aquí con sus eliminatorias."},
+  jiujitsu:{n:"Jiu-jitsu", tile:"Jiu-jitsu", d:"Cinturones, pesos y campeonatos.", sobre:"Jiu-jitsu · Todas las graduaciones",
+    h1:"Tu graduación y tu camino en el tatami", lema:"Cinturón, sumisiones y campeonatos, con quién respalda cada resultado.",
+    ev:[["Nov","22","Open Nacional de Jiu-jitsu","Valencia"],["Dic","06","Campeonato Mediterráneo","Alicante"],["Dic","20","Copa Levante","Castellón"]],
+    top:[["Elena Ferrer Cano","Marrón · Valencia","1.012"],["Adrián Rubio Gil","Negro · Barcelona","980"],["Carmen Prieto Soler","Morado · Sevilla","804"],["Pablo Lara Díaz","Azul · Madrid","733"]],
+    pasos:["Crea tu ficha|Tu cinturón, tu peso y tu ciudad.","Declara tus combates|Tu rival los confirma o los respalda la federación.","Consigue aura|La comunidad reconoce tu graduación."], vac:"Todavía no hay combates", vacd:"Cuando se registre el primero, aparecerá aquí con su origen."}
+};
+const ORDEN=["todos","boxeo","mma","muaythai","kickboxing","k1","jiujitsu"];
+const ICO={ok:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/></svg>',
+  err:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17.5v.01"/></svg>',
+  vac:'<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4M9 15h6"/></svg>'};
+const $=s=>document.querySelector(s);
+function pintar(k){
+  const d=D[k]; document.documentElement.dataset.sport=k; $("#etq").textContent=d.n; document.title="Ring España · "+d.n;
+  const fichas=ORDEN.map(x=>`<li><button type="button" class="ficha" data-sport="${x}" data-k="${x}" aria-pressed="${x===k}"><span class="r" aria-hidden="true"></span><span class="t">${D[x].tile}</span><span class="d">${D[x].d}</span><span class="ir">${x===k?"Elegido":"Entrar"}</span></button></li>`).join("");
+  const ev=d.ev.map(e=>`<a class="ent" href="#"><p class="dia"><span>${e[0]}</span>${e[1]}</p><hr><b>${e[2]}</b><br><small>${e[3]}</small></a>`).join("");
+  const top=d.top.map((t,i)=>`<a class="fila" href="#"><span class="pos">${i+1}</span><span><span class="n">${t[0]}</span><br><small>${t[1]}</small></span><span class="cifra">${t[2]}<small>Aura</small></span></a>`).join("");
+  const pasos=d.pasos.map((p,i)=>{const [a,b]=p.split("|");return `<li><span class="nº">${i+1}</span><b>${a}</b><p>${b}</p></li>`}).join("");
+  $("#app").innerHTML=`
+  <section class="hero" aria-labelledby="h1"><p class="sobre">${d.sobre}</p><h1 id="h1">${d.h1}</h1><p class="lema">${d.lema}</p>
+    <ul class="fichas" aria-label="Elige tu deporte">${fichas}</ul>
+    <a class="todos" href="#" data-k="todos">Ver todos los deportes juntos</a></section>
+  <section class="bloque" aria-labelledby="s1"><h2 id="s1">Próximas veladas</h2><p class="baj">Las tres siguientes en ${k==="todos"?"toda España":d.n}.</p><div class="entradas">${ev}</div></section>
+  <section class="bloque" aria-labelledby="s2"><h2 id="s2">Los más respaldados</h2><p class="baj">Ordenados por aura. Una persona, una voz por combate.</p>${top}</section>
+  <section class="bloque" aria-labelledby="s3"><h2 id="s3">Cómo funciona</h2><p class="baj">Tres pasos. Sin saber de tecnología.</p><ol class="pasos">${pasos}</ol></section>
+  <section class="bloque"><div class="cierre"><h2>Empieza por tu ficha</h2><a class="btn" href="#">Crear mi ficha</a></div></section>
+  <section class="bloque" aria-labelledby="s4"><h2 id="s4">Estados de la aplicación</h2><p class="baj">Cómo se ven una lista vacía, un error y una confirmación.</p>
+    <div class="estados">
+      <div class="estado vacio"><h3>Lista vacía</h3><span class="glifo">${ICO.vac}</span><b>${d.vac}</b><p>${d.vacd}</p><p style="margin-top:14px"><a class="btn sec" href="#" style="min-height:44px">Registrar un combate</a></p></div>
+      <div class="estado"><h3>Error (con salida)</h3><div class="aviso-estado error" role="alert">${ICO.err}<div><b>No hemos podido guardar los cambios</b>Parece que se ha cortado la conexión. No has perdido lo que escribiste. Pulsa «Guardar cambios» otra vez.</div></div><a class="btn" href="#" style="min-height:44px">Guardar cambios</a></div>
+      <div class="estado"><h3>Confirmación</h3><div class="aviso-estado" role="status">${ICO.ok}<div><b>Tu aura se ha guardado</b>Ya cuenta para el ránking. Puedes quitarla cuando quieras desde el combate.</div></div><a class="btn sec" href="#" style="min-height:44px">Ver el ránking</a></div>
+    </div></section>`;
+  document.querySelectorAll("[data-k]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();pintar(b.dataset.k);window.scrollTo({top:0})}));
+  try{localStorage.setItem("deporte",k)}catch(e){}
+}
+let ini="todos";try{const g=localStorage.getItem("deporte");if(D[g])ini=g}catch(e){}
+const q=new URLSearchParams(location.search).get("deporte"); if(D[q])ini=q;
+pintar(ini);
+</script>
+</body>
+</html>
