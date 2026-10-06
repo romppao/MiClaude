@@ -1015,3 +1015,12 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+
+## 6 de octubre de 2026 (noche, 7) — T-006: índices y consultas con volumen
+
+**Pedido por el fundador:** «sigue con T-006» (y, a partir de ahora, «tú haz el diseño y Codex desarrolle lo demás»).
+**Qué se hizo:** generador de datos de carga (`scripts/datos-de-carga.mjs`), medición con `EXPLAIN (ANALYZE, BUFFERS)` de nueve consultas críticas, índice de trigramas para la búsqueda de peleadores y una propuesta (RFC-001) para el ránking, que no cabe en el presupuesto con volumen.
+**Qué salió mal / se aprendió:** (1) el primer generador repetía parejas de combate dentro de una velada y chocaba con la clave única (`eventId`, `pairKey`): se llenó cada velada con combates consecutivos. (2) `strpos` no puede usar índices: había que cambiar a `LIKE`, con `coalesce` y `||` en lugar de `concat_ws` (no inmutable). (3) Los índices no resuelven el ránking sin filtros: es un problema de diseño del cálculo.
+**Qué se ejecutó:** tipos, 415 pruebas unitarias, migraciones frente a `schema.prisma` («No difference detected») y las mediciones del informe. La batería de navegador completa se ejecuta antes de abrir el PR.
+**Estado y próximos pasos:** PR de T-006; RFC-001 pendiente de decisión; comprobar `pg_trgm` en Neon (T-012).

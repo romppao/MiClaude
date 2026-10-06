@@ -1,6 +1,6 @@
 # T-006 — Índices y consultas de listados
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** lista · **Sugerida a:** Codex si dispone de PostgreSQL local; si no, Claude · **Depende de:** —
+**Fase:** F2 · **Estado:** en revisión (Claude, rama `claude/T-006-indices`, 6 oct 2026) · **Sugerida a:** Codex si dispone de PostgreSQL local; si no, Claude · **Depende de:** —
 
 ## Objetivo
 Que los listados y el ránking sigan rápidos con mucho volumen (100 000 peleadores, 1 000 000 de combates) con índices y consultas revisadas con datos reales.

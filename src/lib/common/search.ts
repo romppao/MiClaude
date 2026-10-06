@@ -32,8 +32,11 @@ export async function searchIds(kind: SearchKind, q: string | undefined | null):
   const words = searchWords(q ?? "");
   if (words.length === 0) return null;
   const src = SOURCES[kind];
-  const haystack = Prisma.sql`translate(lower(concat_ws(' ', ${Prisma.join(src.fields.map((f) => Prisma.raw(`"${f}"`)), ", ")})), ${ACCENT_FROM}::text, ${ACCENT_TO}::text)`;
-  const conditions = Prisma.join(words.map((w) => Prisma.sql`strpos(${haystack}, ${w}::text) > 0`), " AND ");
+  // La expresión es EXACTAMENTE la del índice `Fighter_nombre_trgm_idx` (migración 20261006160000_indices_listados): si se cambia aquí, hay que cambiarla allí.
+  // Se usa `||` y `coalesce` (inmutables) y no `concat_ws` (estable), porque PostgreSQL solo admite expresiones inmutables en un índice.
+  const haystack = Prisma.sql`translate(lower(${Prisma.join(src.fields.map((f) => Prisma.sql`coalesce(${Prisma.raw(`"${f}"`)}, '')`), " || ' ' || ")}), ${ACCENT_FROM}::text, ${ACCENT_TO}::text)`;
+  // LIKE (y no strpos) para poder usar el índice de trigramas; los comodines que escriba la persona se escapan para que cuenten como letras.
+  const conditions = Prisma.join(words.map((w) => Prisma.sql`${haystack} LIKE ${`%${w.replace(/[\%_]/g, "\$&")}%`}`), " AND ");
   const rows = await db.$queryRaw<{ id: string }[]>`
     SELECT id FROM ${Prisma.raw(`"${src.table}"`)}
     WHERE ${src.where} AND ${conditions}
