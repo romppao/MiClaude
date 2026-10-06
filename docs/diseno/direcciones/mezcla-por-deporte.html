@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es" data-sport="todos">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring España · Mezcla por deporte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,500&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;900&family=Saira+Extra+Condensed:wght@600;800&family=Archivo+Narrow:wght@600;700&family=Teko:wght@600;700&family=Bebas+Neue&family=Spectral:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+/* ===== Marca: lo que NO cambia en ningún deporte ===== */
+:root{
+  --brand:#BE33F5;          /* color oficial */
+  --on-brand:#0C0B0F;       /* texto sobre el violeta: 4,6:1 */
+  --texto:"Barlow",system-ui,sans-serif;
+  --radius:0px; --upper:none; --skew:0deg;
+  --cut:none; --btn-cut:none;
+}
+/* ===== Tema por deporte: solo cambian estas variables ===== */
+[data-sport="todos"]{
+  --bg:#F3EFE6; --bg-2:#EAE4D6; --fg:#111014; --fg-2:#4A4650; --line:#CFC8B8; --on-bg-accent:#8E1FBD; --accent2:#111014;
+  --display:"Newsreader",Georgia,serif; --num:"Barlow Condensed",sans-serif; --upper:none;
+  --regla-h:6px; --regla-bg:linear-gradient(var(--fg) 0 1px,transparent 1px 5px,var(--fg) 5px 6px);
+  --motif:repeating-linear-gradient(90deg,transparent 0 11px,rgba(17,16,20,.06) 11px 12px);
+  --card:#FFFFFF; --on-fg:#F3EFE6;
+}
+[data-sport="boxeo"]{
+  --bg:#0C0B0F; --bg-2:#16141B; --fg:#F2EEE8; --fg-2:#B8B2C0; --line:#34303E; --on-bg-accent:#D77CFB; --accent2:#F2EEE8;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif; --num:"Big Shoulders Display",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:linear-gradient(var(--brand) 0 2px,transparent 2px 6px,var(--fg) 6px 8px,transparent 8px 12px,var(--brand) 12px 14px);
+  --motif:repeating-linear-gradient(0deg,transparent 0 9px,rgba(255,255,255,.045) 9px 10px);
+  --card:#16141B; --on-fg:#0C0B0F; --radius:2px;
+}
+[data-sport="mma"]{
+  --bg:#101214; --bg-2:#181B1E; --fg:#E9EDF0; --fg-2:#A9B1B8; --line:#2F353A; --on-bg-accent:#FF8A4C; --accent2:#FF6A2B;
+  --display:"Saira Extra Condensed","Arial Narrow",sans-serif; --num:"Saira Extra Condensed",sans-serif; --upper:uppercase;
+  --regla-h:16px; --regla-bg:repeating-linear-gradient(45deg,#3A4046 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,#3A4046 0 6px,transparent 6px 12px);
+  --motif:repeating-linear-gradient(45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px),repeating-linear-gradient(-45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px);
+  --card:#181B1E; --on-fg:#101214;
+  --cut:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
+  --btn-cut:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px);
+}
+[data-sport="muaythai"]{
+  --bg:#F5EADB; --bg-2:#EBDAC3; --fg:#2A1810; --fg-2:#6A493A; --line:#D6BEA2; --on-bg-accent:#9E1F17; --accent2:#B3261E;
+  --display:"Archivo Narrow","Arial Narrow",sans-serif; --num:"Archivo Narrow",sans-serif; --upper:uppercase;
+  --regla-h:12px; --regla-bg:repeating-linear-gradient(90deg,#B3261E 0 18px,#F5EADB 18px 22px,#2A1810 22px 26px,#F5EADB 26px 30px);
+  --motif:repeating-linear-gradient(135deg,transparent 0 14px,rgba(42,24,16,.07) 14px 16px);
+  --card:#FFF8EE; --on-fg:#F5EADB;
+}
+[data-sport="kickboxing"]{
+  --bg:#0A0A0A; --bg-2:#151515; --fg:#FFFFFF; --fg-2:#C2C2C2; --line:#2C2C2C; --on-bg-accent:#FFD400; --accent2:#FFD400;
+  --display:"Teko","Arial Narrow",sans-serif; --num:"Teko",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:repeating-linear-gradient(-60deg,#FFD400 0 14px,#0A0A0A 14px 28px);
+  --motif:repeating-linear-gradient(-60deg,transparent 0 22px,rgba(255,212,0,.06) 22px 24px);
+  --card:#151515; --on-fg:#0A0A0A;
+  --btn-cut:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+[data-sport="k1"]{
+  --bg:#F6F6F4; --bg-2:#ECECE8; --fg:#0E0E0E; --fg-2:#4D4D4D; --line:#CFCFCA; --on-bg-accent:#B50018; --accent2:#D6001C;
+  --display:"Bebas Neue","Arial Narrow",sans-serif; --num:"Bebas Neue",sans-serif; --upper:uppercase;
+  --regla-h:8px; --regla-bg:linear-gradient(90deg,#D6001C 0 62%,#0E0E0E 62% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/84px 100%,linear-gradient(0deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/100% 56px;
+  --card:#FFFFFF; --on-fg:#F6F6F4;
+}
+[data-sport="jiujitsu"]{
+  --bg:#EFF1F6; --bg-2:#E1E5EF; --fg:#14183A; --fg-2:#464C72; --line:#C6CCDF; --on-bg-accent:#6A1B9A; --accent2:#14183A;
+  --display:"Spectral",Georgia,serif; --num:"Spectral",Georgia,serif; --upper:none;
+  --regla-h:10px; --regla-bg:linear-gradient(90deg,#FFFFFF 0 20%,#1F5FBF 20% 40%,#7B2CBF 40% 60%,#6B4423 60% 80%,#111 80% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px,linear-gradient(0deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px;
+  --card:#FFFFFF; --on-fg:#EFF1F6; --radius:6px;
+}
+
+*{box-sizing:border-box;margin:0}
+body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 17px/1.55 var(--texto);transition:background .35s,color .35s}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--on-bg-accent);outline-offset:3px}
+.c{max-width:1180px;margin:0 auto;padding:0 20px}
+.aviso{background:var(--fg);color:var(--bg);text-align:center;padding:8px 16px;font-size:14px}
+.regla{height:var(--regla-h);background:var(--regla-bg)}
+
+/* Cabecera */
+.cab .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.marca{display:inline-flex;align-items:center;gap:.28em;min-height:44px;font:700 28px/1 var(--display);text-transform:var(--upper);text-decoration:none;letter-spacing:.01em}
+.marca b{color:var(--on-bg-accent);font-weight:inherit}
+.marca small{font:600 15px/1 var(--texto);text-transform:uppercase;letter-spacing:.14em;color:var(--fg-2);margin-left:.9em;padding-left:.9em;border-left:1px solid var(--line)}
+.menu{display:flex;gap:2px;list-style:none;padding:0}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 13px;text-decoration:none;font:600 15px/1 var(--texto);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2)}
+.menu a:hover,.menu a[aria-current]{color:var(--fg)}
+.menu a[aria-current]{box-shadow:inset 0 -3px 0 var(--brand)}
+.menu .entrar{background:var(--brand);color:var(--on-brand);padding:0 20px;font-weight:700;clip-path:var(--btn-cut);border-radius:var(--radius)}
+@media (max-width:860px){.menu li:not(:last-child){display:none}.marca small{display:none}}
+
+/* Selector de deporte */
+.elige{background:var(--bg-2);border-block:1px solid var(--line)}
+.elige .in{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 20px}
+.elige p{font:600 15px/1 var(--texto);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-2)}
+.deportes{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0}
+.deportes button{min-height:44px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--fg);font:600 15px/1 var(--texto);cursor:pointer;border-radius:var(--radius)}
+.deportes button:hover{border-color:var(--fg)}
+.deportes button[aria-checked="true"]{background:var(--fg);color:var(--on-fg);border-color:var(--fg)}
+
+/* Ficha */
+.hero{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:40px;padding:52px 0 40px;align-items:end}
+.hero::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;background:var(--motif);z-index:-1}
+.sobre{font:600 15px/1.35 var(--texto);letter-spacing:.16em;text-transform:uppercase;color:var(--on-bg-accent)}
+h1{font:700 clamp(58px,11vw,150px)/.88 var(--display);text-transform:var(--upper);letter-spacing:-.01em;margin:14px 0 18px}
+h1 span{display:block;font-weight:500;font-style:italic;font-size:.6em}
+[data-sport="boxeo"] h1 span,[data-sport="mma"] h1 span,[data-sport="muaythai"] h1 span,[data-sport="kickboxing"] h1 span,[data-sport="k1"] h1 span{font-style:normal;font-weight:700;color:transparent;-webkit-text-stroke:2px var(--fg);font-size:1em}
+.lema{font-size:20px;color:var(--fg-2);max-width:38ch}
+.acc{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;background:var(--brand);color:var(--on-brand);font:700 16px/1 var(--texto);text-decoration:none;clip-path:var(--btn-cut);border-radius:var(--radius);letter-spacing:.02em}
+.btn:hover{filter:brightness(1.1)}
+.btn.sec{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg-2);clip-path:none}
+.retrato{aspect-ratio:4/5;background:var(--bg-2);border:1px solid var(--line);display:flex;align-items:flex-end;padding:14px;color:var(--fg-2);font-size:14px;clip-path:var(--cut);border-radius:var(--radius)}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}.retrato{aspect-ratio:16/10;order:-1}}
+
+/* Marcador */
+.marc{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);background:var(--card);border-radius:var(--radius)}
+.marc div{padding:22px 20px;border-right:1px solid var(--line)}
+.marc div:last-child{border-right:0}
+.marc dt{font:600 14px/1.2 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-2)}
+.marc dd{font:700 clamp(50px,7vw,92px)/.95 var(--num);margin-top:8px;text-transform:var(--upper)}
+.marc dd.txt{font-size:clamp(34px,4.4vw,52px)}
+.marc dd small{display:block;font:400 14px/1.4 var(--texto);color:var(--fg-2);margin-top:6px;text-transform:none}
+.marc .aura dd{color:var(--on-bg-accent)}
+@media (max-width:860px){.marc{grid-template-columns:1fr 1fr}.marc div:nth-child(2){border-right:0}.marc div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+/* Cuerpo */
+.cuerpo{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr);gap:40px;padding:56px 0}
+h2{font:700 clamp(32px,4.6vw,52px)/1.05 var(--display);text-transform:var(--upper);margin-bottom:8px}
+.baj{color:var(--fg-2);margin-bottom:22px;max-width:56ch}
+.cb{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 0;border-top:1px solid var(--line)}
+.cb:last-child{border-bottom:1px solid var(--line)}
+.sello{width:44px;height:44px;display:grid;place-items:center;font:700 22px/1 var(--num)}
+.sello.v{background:var(--fg);color:var(--on-fg)}.sello.d{border:2px solid var(--fg)}.sello.e{border:2px dashed var(--fg)}
+[data-sport="mma"] .sello{clip-path:var(--btn-cut)}
+[data-sport="jiujitsu"] .sello,[data-sport="boxeo"] .sello{border-radius:var(--radius)}
+.cb b{font-size:19px;display:block}.cb small{display:block;color:var(--fg-2);font-size:15px}
+.cb .f{color:var(--fg-2);font-size:15px;text-align:right}
+.ent{align-self:start;background:var(--card);border:1px solid var(--line);padding:22px;clip-path:var(--cut);border-radius:var(--radius)}
+.ent h3{font:600 14px/1.2 var(--texto);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2)}
+.ent .dia{font:700 88px/.9 var(--num);margin-top:10px}
+.ent .dia span{display:block;font-size:24px;letter-spacing:.12em;text-transform:uppercase;color:var(--on-bg-accent)}
+.ent hr{border:0;border-top:2px dashed var(--line);margin:16px 0}
+.ent .btn{width:100%;margin-top:14px}
+@media (max-width:860px){.cuerpo{grid-template-columns:1fr;gap:36px;padding:36px 0}}
+
+/* Listado */
+.lis{border-top:1px solid var(--line);padding:56px 0 80px}
+.fil{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.fil a{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px solid var(--line);text-decoration:none;font:600 15px/1 var(--texto);color:var(--fg-2);border-radius:var(--radius)}
+.fil a[aria-current]{background:var(--fg);color:var(--on-fg);border-color:var(--fg)}
+.fila{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 14px;border-top:1px solid var(--line);text-decoration:none}
+.fila:last-child{border-bottom:1px solid var(--line)}
+.fila:hover{background:var(--bg-2)}
+.fila:hover .n{color:var(--on-bg-accent)}
+.pos{font:700 48px/1 var(--num);color:var(--fg-2)}
+.fila:first-of-type .pos{color:var(--on-bg-accent)}
+.n{font:700 28px/1.05 var(--display);text-transform:var(--upper)}
+.fila small{color:var(--fg-2);font-size:15px}
+.cifra{font:700 36px/1 var(--num);text-align:right}
+.cifra small{display:block;font:600 14px/1.2 var(--texto);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.pie{padding:28px 0;color:var(--fg-2);font-size:15px}
+@media (prefers-reduced-motion:no-preference){.fila,.btn{transition:background .15s,filter .15s}}
+</style>
+</head>
+<body>
+<p class="aviso">Maqueta de diseño · Mezcla por deporte · Elige un deporte y mira cómo cambia todo · Nombres y cifras ficticios</p>
+<div class="regla" aria-hidden="true"></div>
+<header class="cab"><div class="c in">
+  <a class="marca" href="#">Ring <b>España</b><small id="etq">Todos los deportes</small></a>
+  <nav aria-label="Principal"><ul class="menu">
+    <li><a href="#" aria-current="page">Deportistas</a></li><li><a href="#">Veladas</a></li><li><a href="#">Clubes</a></li><li><a href="#">Ránking</a></li><li><a class="entrar" href="#">Entrar</a></li>
+  </ul></nav>
+</div></header>
+
+<div class="elige"><div class="c in">
+  <p id="lbl-dep">Tu deporte</p>
+  <ul class="deportes" role="radiogroup" aria-labelledby="lbl-dep" id="deportes"></ul>
+</div></div>
+
+<main class="c" id="app"><noscript>Esta maqueta necesita JavaScript para cambiar de deporte.</noscript></main>
+<footer class="c pie">Ring España · Deportes de contacto de toda España · <a href="#">Cómo funciona</a> · <a href="#">Privacidad</a></footer>
+
+<script>
+const DEP = {
+  todos:{n:"Todos los deportes", sobre:"Muay Thai · Profesional · Sevilla", p:"Marcos", a:"Vidal Ortega", lema:"Peleador de Muay Thai y boxeo. Cada resultado dice quién lo ha confirmado.",
+    rec:[["Victorias","12","7 por KO o TKO"],["Derrotas","2","ninguna por KO"],["Empates","1","marzo de 2026"]], cb:[["v","Iván Cano","TKO, 3.er asalto · Gala Giralda · Confirmado por el rival","12 sep 2026"],["v","Hugo Prieto","Decisión unánime · Noche de Muay Thai · Respaldado por federación","20 jun 2026"],["e","Daniel Soler","Empate · Trofeo del Sur · Confirmado por el rival","14 mar 2026"],["d","Álvaro Gil","Decisión dividida · Copa de Andalucía · Declarado por el peleador","30 nov 2025"]],
+    ev:["Octubre","24","Gladiator Night III","Palomares del Río, Sevilla"], fil:["Todas","Boxeo","Muay Thai","MMA","Jiu-jitsu"], lis:[["Lucía Herrero Bravo","Boxeo · Profesional · Valencia","1.204"],["Marcos Vidal Ortega","Muay Thai · Profesional · Sevilla","874"],["Nuria Molina Díaz","MMA · Amateur · Zaragoza","811"],["Javier Rubio Soler","Kickboxing · Profesional · Bilbao","790"]], tl:"Peleadores", tb:"Ordenados por aura. Una persona, una voz por combate.", tc:"Últimos combates", bc:"De más reciente a más antiguo."},
+  boxeo:{n:"Boxeo", sobre:"Boxeo · Profesional · Valencia", p:"Lucía", a:"Herrero Bravo", lema:"Campeona de España amateur y profesional del peso pluma. Cada asalto, a la vista.",
+    rec:[["Victorias","14","9 por KO"],["Derrotas","1","por decisión"],["Empates","0","sin empates"]], cb:[["v","Carmen Abad","KO, 2.º asalto · Velada Ciudad del Turia · Respaldado por federación","19 sep 2026"],["v","Sara Lara","Decisión unánime, 8 asaltos · Gran Gala Mestalla · Confirmado por la rival","04 jul 2026"],["v","Elena Ferrer","TKO, 5.º asalto · Noche de Pluma · Confirmado por la rival","22 abr 2026"],["d","Irene Cano","Decisión dividida, 6 asaltos · Copa del Mediterráneo · Declarado por la peleadora","15 dic 2025"]],
+    ev:["Noviembre","07","Gran Gala del Pluma","Valencia"], fil:["Todos","Pluma","Ligero","Wélter","Medio"], lis:[["Lucía Herrero Bravo","Pluma · Profesional · Valencia","1.204"],["Pablo Díaz Prieto","Wélter · Profesional · Madrid","1.087"],["Sara Gil Molina","Ligero · Amateur · Sevilla","932"],["Hugo Núñez Vidal","Medio · Profesional · Bilbao","901"]], tl:"Boxeo", tb:"Clasificación por peso, ordenada por aura.", tc:"Últimos asaltos", bc:"De más reciente a más antiguo."},
+  mma:{n:"MMA", sobre:"MMA · Profesional · Zaragoza", p:"Nuria", a:"Molina Díaz", lema:"Peso mosca. Cada victoria indica cómo terminó: golpes, sumisión o decisión.",
+    rec:[["Victorias","11","5 sumisiones · 4 KO"],["Derrotas","3","1 por sumisión"],["Empates","0","sin empates"]], cb:[["v","Vera Ortega","Sumisión (estrangulación), ronda 2 · Cage Fight Aragón · Confirmado por la rival","27 sep 2026"],["v","Alba Rubio","TKO, ronda 1 · Octógono Norte · Respaldado por federación","11 jul 2026"],["d","Irene Soler","Decisión unánime · Liga Nacional MMA · Confirmado por la rival","09 may 2026"],["v","Elena Gil","Decisión dividida · Copa Pirineos · Declarado por la peleadora","28 feb 2026"]],
+    ev:["Octubre","31","Cage Night Zaragoza","Zaragoza"], fil:["Todas","Mosca","Gallo","Pluma","Ligero"], lis:[["Nuria Molina Díaz","Mosca · Profesional · Zaragoza","811"],["Adrián Cano Bravo","Pluma · Profesional · Barcelona","778"],["Marcos Esteban Gil","Ligero · Amateur · Murcia","702"],["Irene Lara Soler","Gallo · Amateur · Granada","655"]], tl:"MMA", tb:"Por categoría de peso. Ordenados por aura.", tc:"Últimos combates", bc:"Cada resultado indica cómo terminó."},
+  muaythai:{n:"Muay Thai", sobre:"Muay Thai · Profesional · Sevilla", p:"Marcos", a:"Vidal Ortega", lema:"Peso wélter. Doce victorias confirmadas, siete de ellas por KO o TKO.",
+    rec:[["Victorias","12","7 por KO o TKO"],["Derrotas","2","ninguna por KO"],["Empates","1","marzo de 2026"]], cb:[["v","Iván Cano","TKO, 3.er asalto · Gala Giralda · Confirmado por el rival","12 sep 2026"],["v","Hugo Prieto","Decisión unánime, 5 asaltos · Noche de Muay Thai · Respaldado por federación","20 jun 2026"],["e","Daniel Soler","Empate · Trofeo del Sur · Confirmado por el rival","14 mar 2026"],["d","Álvaro Gil","Decisión dividida · Copa de Andalucía · Declarado por el peleador","30 nov 2025"]],
+    ev:["Octubre","24","Gladiator Night III","Palomares del Río, Sevilla"], fil:["Todos","Mosca","Pluma","Wélter","Medio"], lis:[["Marcos Vidal Ortega","Wélter · Profesional · Sevilla","874"],["Daniel Ibáñez Cano","Pluma · Profesional · Málaga","840"],["Irene Prieto Ruiz","Mosca · Amateur · Valencia","760"],["Álvaro Soler Gil","Medio · Profesional · Cádiz","731"]], tl:"Muay Thai", tb:"Por peso y nivel. Ordenados por aura.", tc:"Últimos asaltos", bc:"De más reciente a más antiguo."},
+  kickboxing:{n:"Kickboxing", sobre:"Kickboxing · Profesional · Bilbao", p:"Javier", a:"Rubio Soler", lema:"Peso medio. Golpes rápidos, combates de tres rondas y un récord que se comprueba.",
+    rec:[["Victorias","16","6 por KO"],["Derrotas","4","1 por KO"],["Empates","1","febrero de 2026"]], cb:[["v","Pablo Ortega","KO, ronda 3 · Fight Night Bilbao · Respaldado por federación","03 oct 2026"],["v","Tomás Lara","Decisión unánime · Copa Cantábrica · Confirmado por el rival","18 jul 2026"],["d","Hugo Vidal","Decisión dividida · Liga Kick Norte · Confirmado por el rival","30 may 2026"],["v","Adrián Gil","TKO, ronda 2 · Gala del Norte · Declarado por el peleador","14 mar 2026"]],
+    ev:["Noviembre","14","Fight Night Bilbao","Bilbao"], fil:["Todos","Light contact","Full contact","Low kick"], lis:[["Javier Rubio Soler","Medio · Profesional · Bilbao","790"],["Sara Núñez Vidal","Pluma · Profesional · Valencia","742"],["Marcos Cano Prieto","Ligero · Amateur · Madrid","690"],["Elena Díaz Ferrer","Mosca · Amateur · Sevilla","648"]], tl:"Kickboxing", tb:"Por modalidad y peso. Ordenados por aura.", tc:"Últimas rondas", bc:"De más reciente a más antiguo."},
+  k1:{n:"K-1", sobre:"K-1 · Profesional · Madrid", p:"Hugo", a:"Prieto Vidal", lema:"Peso pesado. Torneos de eliminatoria: cuartos, semifinal y final, todo en su ficha.",
+    rec:[["Victorias","9","5 por KO"],["Derrotas","2","ninguna por KO"],["Torneos","3","1 título"]], cb:[["v","Carlos Esteban","KO · Final del Torneo Capital · Respaldado por federación","26 sep 2026"],["v","Daniel Núñez","Decisión unánime · Semifinal del Torneo Capital · Respaldado por federación","26 sep 2026"],["v","Iván Soler","TKO · Cuartos del Torneo Capital · Respaldado por federación","26 sep 2026"],["d","Pablo Lara","Decisión dividida · Semifinal Copa Norte · Confirmado por el rival","18 may 2026"]],
+    ev:["Diciembre","05","K-1 Gran Premio de España","Madrid"], fil:["Todos","Pesado","Medio","Ligero"], lis:[["Hugo Prieto Vidal","Pesado · Profesional · Madrid","701"],["Álvaro Molina Cano","Medio · Profesional · Valencia","668"],["Tomás Ruiz Lara","Pesado · Amateur · Zaragoza","640"],["Daniel Soler Gil","Ligero · Profesional · Murcia","612"]], tl:"K-1", tb:"Por torneo y peso. Ordenados por aura.", tc:"Últimos torneos", bc:"Cada eliminatoria cuenta como un combate."},
+  jiujitsu:{n:"Jiu-jitsu", sobre:"Jiu-jitsu brasileño · Cinturón marrón · Valencia", p:"Elena", a:"Ferrer Cano", lema:"Peso ligero. Su graduación y cada sumisión, con quién la respalda.",
+    rec:[["Victorias","31","19 sumisiones"],["Derrotas","6","2 por sumisión"],["Cinturón","Marrón","2 grados"]], cb:[["v","Alba Núñez","Sumisión (triángulo) · Open de Valencia · Respaldado por federación","21 sep 2026"],["v","Carmen Díaz","Por puntos 6–2 · Campeonato Mediterráneo · Respaldado por federación","08 ago 2026"],["d","Irene Vidal","Por ventajas · Open de Madrid · Confirmado por la rival","13 jun 2026"],["v","Sara Ortega","Sumisión (palanca de brazo) · Copa Levante · Declarado por la peleadora","02 may 2026"]],
+    ev:["Noviembre","22","Open Nacional de Jiu-jitsu","Valencia"], fil:["Todos","Blanco","Azul","Morado","Marrón","Negro"], lis:[["Elena Ferrer Cano","Marrón · Ligero · Valencia","1.012"],["Adrián Rubio Gil","Negro · Medio · Barcelona","980"],["Carmen Prieto Soler","Morado · Pluma · Sevilla","804"],["Pablo Lara Díaz","Azul · Pesado · Madrid","733"]], tl:"Jiu-jitsu", tb:"Por cinturón y peso. Ordenados por aura.", tc:"Últimos combates", bc:"De más reciente a más antiguo."}
+};
+const ORDEN=["todos","boxeo","mma","muaythai","kickboxing","k1","jiujitsu"];
+const $=s=>document.querySelector(s);
+function pintar(k){
+  const d=DEP[k]; document.documentElement.dataset.sport=k; $("#etq").textContent=d.n;
+  document.title="Ring España · "+d.n;
+  const rec=d.rec.map(r=>`<div><dt>${r[0]}</dt><dd${r[1].length>3?' class="txt"':''}>${r[1]}<small>${r[2]}</small></dd></div>`).join("");
+  const cb=d.cb.map(c=>`<div class="cb"><span class="sello ${c[0]}" aria-label="${{v:"Victoria",d:"Derrota",e:"Empate"}[c[0]]}">${c[0].toUpperCase()}</span><div><b>${c[1]}</b><small>${c[2]}</small></div><span class="f">${c[3]}</span></div>`).join("");
+  const fil=d.fil.map((f,i)=>`<a href="#"${i===0?' aria-current="true"':''}>${f}</a>`).join("");
+  const lis=d.lis.map((l,i)=>`<a class="fila" href="#"><span class="pos">${i+1}</span><span><span class="n">${l[0]}</span><br><small>${l[1]}</small></span><span class="cifra">${l[2]}<small>Aura</small></span></a>`).join("");
+  $("#app").innerHTML=`
+  <article class="hero"><div><p class="sobre">${d.sobre}</p><h1>${d.p}<span>${d.a}</span></h1><p class="lema">${d.lema}</p>
+    <div class="acc"><a class="btn" href="#">Dar aura a este peleador</a><a class="btn sec" href="#">Seguir</a></div></div>
+    <div class="retrato" role="img" aria-label="Espacio reservado para la fotografía de ${d.p} ${d.a}">Fotografía de ${d.p} ${d.a} · pendiente</div></article>
+  <dl class="marc">${rec}<div class="aura"><dt>Aura</dt><dd>874<small>Trayectoria, respaldo y comunidad. <a href="#" style="color:var(--on-bg-accent)">Cómo se calcula</a></small></dd></div></dl>
+  <div class="cuerpo"><section aria-labelledby="t1"><h2 id="t1">${d.tc}</h2><p class="baj">${d.bc}</p>${cb}</section>
+    <aside class="ent" aria-labelledby="t2"><h3 id="t2">Próxima velada</h3><p class="dia"><span>${d.ev[0]}</span>${d.ev[1]}</p><hr><p><strong>${d.ev[2]}</strong><br>${d.ev[3]}</p><a class="btn" href="#">Ver el cartel completo</a></aside></div>
+  <section class="lis" aria-labelledby="t3"><h2 id="t3">${d.tl}</h2><p class="baj">${d.tb}</p><nav class="fil" aria-label="Filtrar">${fil}</nav>${lis}</section>`;
+  document.querySelectorAll("#deportes button").forEach(b=>b.setAttribute("aria-checked",b.dataset.k===k));
+  try{localStorage.setItem("deporte",k)}catch(e){}
+}
+$("#deportes").innerHTML=ORDEN.map(k=>`<li><button type="button" role="radio" data-k="${k}">${DEP[k].n}</button></li>`).join("");
+$("#deportes").addEventListener("click",e=>{const b=e.target.closest("button");if(b)pintar(b.dataset.k)});
+let ini="todos";try{const g=localStorage.getItem("deporte");if(DEP[g])ini=g}catch(e){}
+const q=new URLSearchParams(location.search).get("deporte"); if(DEP[q])ini=q;
+pintar(ini);
+</script>
+</body>
+</html>

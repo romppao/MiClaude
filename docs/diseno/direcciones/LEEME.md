@@ -39,3 +39,13 @@ Pidió «completamente orientado al boxeo». `CLAUDE.md` dice que la comunicaci�
 1. El fundador elige una dirección (o una mezcla concreta, por ejemplo «estructura de B con la energía de C»).
 2. Se afina en una segunda ronda: logotipo, fotografía, portada, menú móvil, estados vacíos y errores.
 3. Se documenta en `docs/DISENO.md` y se convierte en fichas de tarea para Codex (tokens de diseño en `globals.css`, componentes y pantallas). Claude revisa cada PR visual.
+
+---
+
+## Segunda ronda: la mezcla por deporte (6 de octubre de 2026)
+
+**Palabras del fundador:** «haz una mezcla, de todos los deportes de contacto; luego, cuando el usuario elija su deporte de contacto, la aplicación se sumerge por completo en esa temática».
+
+[`mezcla-por-deporte.html`](mezcla-por-deporte.html) es **una sola maqueta con siete ambientes**: la base «Todos los deportes» (mezcla de A, B y C) y un tema por boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu. El selector «Tu deporte» cambia color, tipografía, textura, formas y vocabulario en directo; también se puede abrir con `?deporte=boxeo`, `?deporte=mma`, etc. Capturas en `capturas/M-*.png` (390 y 1280 px). La especificación para desarrollo está en [`../SISTEMA-TEMAS.md`](../SISTEMA-TEMAS.md) y las fichas para Codex son T-015, T-016 y T-017.
+
+**Comprobado** (los 7 ambientes, en 390 y 1280 px): sin desbordes, zonas táctiles ≥ 44 px, texto ≥ 14 px, y contraste calculado: el menor de los pares medidos es 5,8:1. **No comprobado:** lector de pantalla, prueba con personas reales, licencias de las tipografías y fotografía real.

@@ -25,7 +25,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y las dos pruebas de ingreso ([1](PRUEBA-DE-INGRESO.md) y [2, «la escalera»](PRUEBA-ESCALERA.md)) |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
 | **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
-| **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
+| **F4** | Diseño visual con identidad propia: base «Todos los deportes» + un tema por deporte | T-015, T-016, T-017 | maqueta lista ([`diseno/direcciones/`](diseno/direcciones/)); **a la espera del visto bueno del fundador** |
 | **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
 
 Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se ejecuta **antes y después** para demostrar la mejora; T-012 depende de elegir proveedor (decisión del fundador); T-003 no depende de F2.
@@ -48,6 +48,9 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-014](tareas/T-014-politica-de-menores.md) | Política de menores en la aplicación | F2 | N3 | Codex | respuestas del fundador (ADR-003) |
 | [T-013](tareas/T-013-enlaces-externos-avisan.md) | Todo enlace que abre otra pestaña lo avisa | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | — |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
+| [T-015](tareas/T-015-motor-de-temas-por-deporte.md) | Motor de temas por deporte (cookie, `data-deporte`, selector) | F4 | N3 | Codex | visto bueno del fundador a la maqueta |
+| [T-016](tareas/T-016-base-visual-todos-los-deportes.md) | Base visual «Todos los deportes» en las pantallas (un PR por área) | F4 | N3 | Codex (Claude revisa con capturas) | T-015 |
+| [T-017](tareas/T-017-temas-por-deporte.md) | Un tema por deporte (6 PR: boxeo, Muay Thai, MMA, kickboxing, K-1, jiu-jitsu) | F4 | N2 | Codex (Claude revisa con capturas) | T-015, T-016 |
 
 «Sugerida a» sigue el orden de rangos de [`RANGOS.md`](RANGOS.md) (Codex rango 2 con evidencia; Antigravity, Copilot y Open Code en periodo de prueba y sin ordenar). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
 

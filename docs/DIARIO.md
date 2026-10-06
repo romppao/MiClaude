@@ -1015,3 +1015,11 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+
+## 6 de octubre de 2026 (noche, 8) — Diseño: direcciones y mezcla por deporte
+
+**Pedido por el fundador:** «quiero que tú hagas el diseño y Codex desarrolle lo demás»; sensación «comunidad y cercanía, seria y profesional, deportiva y de élite», referencias Apple y The Ring, «sin emojis»; después: «haz una mezcla, de todos los deportes de contacto […] cuando el usuario elija su deporte […] la aplicación se sumerge por completo en esa temática».
+**Qué se hizo:** tres direcciones (A Revista, B Aparato, C Lona), la mezcla con un ambiente por deporte (`direcciones/mezcla-por-deporte.html`), la especificación [`diseno/SISTEMA-TEMAS.md`](diseno/SISTEMA-TEMAS.md) y las fichas T-015, T-016 y T-017 para Codex, **bloqueadas hasta el visto bueno del fundador**.
+**Qué salió mal / se aprendió:** (1) en B un estilo de `strong` se filtró a otro bloque; (2) las comprobaciones automáticas (desborde, 44 px, tamaño de letra, contraste) detectaron etiquetas de 12–13 px, un logotipo de 40 px de alto y un desborde horizontal por un fondo decorativo; se corrigieron antes de enseñarlo; (3) tensión con la regla de comunicación inclusiva del 3 de octubre: se resuelve con ambiente por defecto neutro y tema solo cuando la persona elige.
+**Estado y próximos pasos:** el fundador elige o ajusta; después, T-015, T-016 y T-017 con Codex; Claude revisa cada PR visual con capturas.
