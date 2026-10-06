@@ -1031,3 +1031,11 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué se hizo:** maquetas de la portada con elección de deporte, la barra inferior móvil y los estados; del registro con formularios; y de la ficha de velada, todas en los siete ambientes. Ficha [T-018](tareas/T-018-nombre-de-la-app-en-un-solo-sitio.md) para dejar el nombre de la app en un solo sitio (N1).
 **Qué salió mal / se aprendió:** (1) un nombre de clase repetido dejó dos botones vacíos; (2) con `clip-path` el aro de foco y la selección exteriores desaparecen: se dibujan por dentro; (3) el logotipo se aplaza hasta tener el nombre oficial.
 **Estado y próximos pasos:** pendiente el visto bueno del fundador; quedan dirección fotográfica y formularios de «Mi ficha»; Codex ejecuta T-015 a T-017 cuando el fundador las lance.
+
+
+## 6 de octubre de 2026 (noche, 10) — Diseño «D»: el fundador elige la maqueta de Antigravity
+
+**Pedido por el fundador:** «este es el mockup que me ha dado Antigravity, quiero que tú y Codex trabajéis en él para toda la aplicación»; después: «dile a Codex y a GitHub que lo continúen».
+**Qué se hizo:** análisis de la maqueta (abierta en Chromium a 1440 y 390 px), [`diseno/SISTEMA-D.md`](diseno/SISTEMA-D.md) con los ingredientes y **12 correcciones obligatorias** (zoom bloqueado, textos de 10 y 12 px, contraste de 3,7:1, sin «reducir movimiento», pantalla de carga fija, cursor oculto, contenido invisible sin JavaScript, fotos enlazadas —una ya no carga—, CDN y Tailwind, grano de ≈ 50 MB), [ADR-004](decisiones/ADR-004-animacion-gsap-lenis.md) (GSAP y Lenis; licencias leídas en las fuentes oficiales) y las fichas T-015 a T-017 y T-019 a T-022.
+**Qué salió mal / se aprendió:** (1) las maquetas de Claude se rechazaron; el diseño elegido lo hizo Antigravity a partir de referencias del fundador; (2) una maqueta con fotos enlazadas se rompe sola: hacen falta fotos propias.
+**Estado y próximos pasos:** Codex hace T-015 y, después, las pantallas; Claude hace T-016 (kit de interfaz) y revisa los PR visuales; falta que el fundador apruebe el ADR-004 y aporte las fotos.

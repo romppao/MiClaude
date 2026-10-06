@@ -1,33 +1,29 @@
-# T-015 — Motor de temas por deporte (sin cambiar el aspecto)
-**Nivel:** N3 · **Fase:** F4 · **Estado:** **lista** (visto bueno del fundador a la maqueta el 6 oct 2026: «perfecto, continúa»; las preguntas abiertas de [`SISTEMA-TEMAS.md`](../diseno/SISTEMA-TEMAS.md) se resuelven con las propuestas de ese documento hasta que el fundador diga otra cosa) · **Sugerida a:** Codex · **Depende de:** —
+# T-015 — Motor de deporte activo (cookie, selector y textos por deporte)
+**Nivel:** N3 · **Fase:** F4 · **Estado:** **lista** · **Sugerida a:** Codex · **Depende de:** — (en paralelo con T-016 de Claude: **tú tocas `layout.tsx` y la acción; Claude crea `src/app/ui/`**)
 
 ## Objetivo (una frase)
-Que la aplicación pueda cambiar de ambiente visual según el deporte elegido (cookie `deporte` + `data-deporte` en `<html>`), con la infraestructura lista, **sin cambiar todavía el aspecto actual**.
+Que la aplicación sepa cuál es el **deporte activo** de cada persona (cookie `deporte` → `data-deporte` en `<html>`) y que cada deporte aporte sus **textos y datos de ambiente** (palabras de fondo, vocabulario, categorías), sin cambiar todavía el aspecto actual.
 
 ## Contexto
-Lee `docs/diseno/SISTEMA-TEMAS.md` (lista de variables, registro de temas, cookie y preguntas abiertas) y abre la maqueta en el navegador con `?deporte=boxeo`, `mma`, etc. Archivos delicados que se tocan (avisar en tu registro): `src/app/layout.tsx` y `src/app/globals.css`. Las disciplinas ya existen en `src/lib/common/disciplines.ts` (`Discipline`). Las acciones de servidor van en `src/app/actions/<dominio>.ts` y la lógica en `src/lib/<dominio>`.
+Diseño elegido por el fundador: [`SISTEMA-D.md`](../diseno/SISTEMA-D.md) y la maqueta [`referencia/D-awwwards-ring-3.html`](../diseno/referencia/D-awwwards-ring-3.html). En el diseño «D» el color de marca (violeta) **no cambia** con el deporte: cambian la fotografía, las **palabras de fondo** («BOXEO / ESPAÑA», «ARTES / MIXTAS», «NAK / MUAY»), el vocabulario y los datos. Archivos delicados que se tocan (avisar en tu registro): `src/app/layout.tsx`. Disciplinas existentes: `src/lib/common/disciplines.ts` (`Discipline`).
 
 ## Pasos
-1. Rama `codex/T-015-temas`.
-2. `src/lib/common/temas.ts`: tipo `ClaveTema` (`todos|boxeo|mma|muaythai|kickboxing|k1|jiujitsu`), `temaDeDisciplina(d: Discipline)`, `esClaveTema(x)` (validar con `hasOwn` de `lib/common/safe.ts`, nunca fiarse del valor de la cookie), nombre visible de cada tema y su vocabulario (`ronda`: «asalto»/«ronda»; `graduacion`; `torneo`). Sin colores aquí.
-3. `src/app/actions/tema.ts`: acción de servidor `elegirDeporte(f: FormData)` que valida la clave, guarda la cookie (`deporte`, un año, `SameSite=Lax`, `Path=/`, **sin** datos personales) y vuelve a la página de origen con `internalPath` (como el resto de acciones). Clasificarla en `tests/unit/autorizacion.test.ts` como pública.
+1. Rama `codex/T-015-deporte-activo`.
+2. `src/lib/common/temas.ts`: tipo `ClaveDeporte` (`todos|boxeo|mma|muaythai|kickboxing|k1|jiujitsu`), `claveDeDisciplina(d: Discipline)`, `esClaveDeporte(x)` (con `hasOwn` de `lib/common/safe.ts`; nunca fiarse de la cookie) y, por deporte: nombre visible, **dos palabras de fondo**, vocabulario (`asalto`/`ronda`, graduación, torneo) y la lista de categorías de peso que ya existe en `disciplines.ts`. **Sin colores ni estilos aquí.** Para kickboxing, K-1 y jiu-jitsu (no están en la maqueta) usa el mismo patrón y deja las palabras de fondo marcadas «pendiente de Antigravity».
+3. `src/app/actions/tema.ts`: acción `elegirDeporte(f: FormData)`: valida la clave, guarda la cookie (`deporte`, un año, `SameSite=Lax`, `Path=/`, sin datos personales) y vuelve con `internalPath`. Clasificada como pública en `tests/unit/autorizacion.test.ts`.
 4. `src/app/layout.tsx`: leer la cookie en el servidor y poner `<html lang="es" data-deporte={clave}>`; clave desconocida → `todos`.
-5. `src/app/globals.css`: añadir los bloques `[data-deporte="…"]` **solo con las variables** de `SISTEMA-TEMAS.md` y los siete valores de la maqueta (copiar de `mezcla-por-deporte.html`). **No** cambiar ningún estilo existente: en esta ficha los componentes aún no usan esas variables.
-6. Componente `SelectorDeporte` (`src/app/components/`): formulario sin JavaScript con siete botones (`role="radiogroup"` visible para lectores de pantalla, la opción activa con `aria-checked`), zonas táctiles de 44 px. Colócalo bajo la cabecera.
-7. Prueba unitaria `tests/unit/temas.test.ts`: la clave de cada `Discipline` existe; una clave inventada, `__proto__` o vacía cae en `todos`.
-8. Prueba unitaria de contraste: para cada tema, calcular la razón de contraste de `--fg`/`--bg`, `--fg-2`/`--bg`, `--fg-2`/`--bg-2`, `--on-bg-accent`/`--bg` y `--on-bg-accent`/`--card`, y fallar por debajo de 4,5. Los valores se leen del propio `globals.css` para que no puedan desalinearse.
-9. `tests/e2e/temas.mjs` (añadir a `test:e2e`): elegir cada deporte, comprobar `data-deporte`, recargar y ver que persiste, y que con la cookie manipulada la página sigue funcionando.
-10. Documentar: `ARQUITECTURA.md`, `PLAN.md`, `.env.example` (si procede), `DIARIO.md`, `LECCIONES.md`, `docs/MAPA-FUNCIONAL.md` (`npm run mapa`, **en Linux o en el CI**), tu registro.
+5. `SelectorDeporte` **provisional** (formulario sin JavaScript, `role="radiogroup"`, flechas, zonas de 44 px) en `src/app/components/`; cuando exista el de T-016 se sustituirá por él.
+6. Pruebas: `tests/unit/temas.test.ts` (cada `Discipline` tiene clave; `__proto__`, vacío o inventado → `todos`) y `tests/e2e/deporte.mjs` (elegir deporte, `data-deporte` correcto, persiste al recargar, cookie manipulada no rompe la página). Añadirla a `test:e2e`.
+7. Documentar: `ARQUITECTURA.md`, `PLAN.md`, `DIARIO.md`, `LECCIONES.md`, mapa funcional (`npm run mapa` **en Linux o CI**), tu registro.
 
 ## Criterios de aceptación
-- El aspecto actual **no cambia** (capturas antes/después idénticas en 390 y 1280 px).
-- Elegir deporte guarda la cookie, la página la respeta al recargar y sin JavaScript.
+- El aspecto actual no cambia (capturas idénticas en 390 y 1280 px).
+- El deporte elegido se guarda, sobrevive a recargar y funciona sin JavaScript.
 - Una cookie inválida nunca rompe la página.
-- Prueba de contraste de los siete temas en verde.
 - `typecheck`, `test`, `test:e2e` y `test:a11y` en verde con base vacía.
 
 ## No hacer
-No rediseñar pantallas (eso es T-016 y T-017). No añadir campos a la base de datos. No cargar tipografías todavía (lo hace T-017). No hacer que la elección filtre los listados hasta que el fundador lo decida.
+No rediseñar pantallas. No añadir campos a la base de datos. No instalar dependencias. No filtrar listados según el deporte (decisión pendiente del fundador).
 
 ## Documentar
-Lo indicado en el paso 10.
+Lo indicado en el paso 7.

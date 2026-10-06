@@ -1,5 +1,7 @@
 # Sistema de temas por deporte (especificación para desarrollo)
 
+> **Sustituido por [`SISTEMA-D.md`](SISTEMA-D.md)** (diseño elegido por el fundador el 6 de octubre de 2026: la maqueta de Antigravity).
+
 > **RECHAZADO por el fundador (6 de octubre de 2026):** «es muy plano […] no hay apenas aspectos visuales llamativos, se ve claramente como uno de los diseños típicos de Claude». Estas maquetas **no se implementan**. El diseño visual pasa a Antigravity. Se conservan solo como ejemplo de lo que **no** hacer y por la idea de «ambiente por deporte».
 
 
