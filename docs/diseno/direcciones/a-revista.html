@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring España · Dirección A · Revista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,500;1,6..72,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#F3EFE6; --papel-2:#EAE4D6; --tinta:#111014; --tinta-2:#4A4650; --linea:#CFC8B8;
+  --aura:#BE33F5; --aura-oscuro:#8E1FBD; --blanco:#FFFFFF;
+  --titular:"Newsreader",Georgia,serif; --rotulo:"Barlow Condensed","Arial Narrow",sans-serif; --texto:"Barlow",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--papel);color:var(--tinta);font:400 17px/1.55 var(--texto)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--aura-oscuro);outline-offset:3px}
+.contenedor{max-width:1180px;margin:0 auto;padding:0 20px}
+.rotulo{font:600 14px/1 var(--rotulo);letter-spacing:.14em;text-transform:uppercase}
+.aviso{background:var(--tinta);color:var(--papel);text-align:center;padding:8px 16px;font:500 14px/1.3 var(--texto)}
+
+/* Cabecera: doble filete como las cuerdas de un ring */
+.cabecera{border-bottom:1px solid var(--tinta);box-shadow:0 4px 0 -3px var(--papel),0 5px 0 -3px var(--tinta)}
+.cabecera .contenedor{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px}
+.marca{display:inline-flex;align-items:center;gap:.28em;min-height:44px;font:700 28px/1 var(--titular);text-decoration:none;letter-spacing:-.01em}
+.marca b{color:var(--aura);font-style:italic}
+.menu{display:flex;gap:4px;list-style:none;padding:0}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;text-decoration:none;font:600 15px/1 var(--rotulo);letter-spacing:.12em;text-transform:uppercase}
+.menu a:hover{color:var(--aura-oscuro)}
+.menu a[aria-current]{box-shadow:inset 0 -3px 0 var(--aura)}
+.entrar{background:var(--tinta);color:var(--papel)!important;padding:0 18px!important}
+@media (max-width:820px){.menu li:not(:last-child){display:none}.menu{margin-left:auto}}
+
+/* Ficha del peleador */
+.ficha{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;padding:48px 0 40px;border-bottom:1px solid var(--tinta)}
+.migas{color:var(--tinta-2);margin-bottom:18px}
+.migas a{color:var(--tinta-2)}
+.disciplinas{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;list-style:none;padding:0}
+.disciplinas li{border:1px solid var(--tinta);padding:8px 12px;font:600 14px/1 var(--rotulo);letter-spacing:.12em;text-transform:uppercase}
+.disciplinas li.pro{background:var(--tinta);color:var(--papel)}
+h1{font:700 clamp(54px,9vw,120px)/.9 var(--titular);letter-spacing:-.025em}
+h1 em{display:block;font-style:italic;font-weight:500;color:var(--aura-oscuro);font-size:.42em;letter-spacing:0;margin-bottom:.15em}
+.entradilla{max-width:34ch;margin-top:22px;font:500 22px/1.4 var(--titular);color:var(--tinta-2)}
+.retrato{position:relative;min-height:380px;background:
+  repeating-linear-gradient(90deg,transparent 0 11px,rgba(17,16,20,.07) 11px 12px),var(--papel-2);
+  border:1px solid var(--tinta);display:flex;align-items:flex-end;padding:16px}
+.retrato::after{content:"";position:absolute;inset:14px;border:1px solid rgba(17,16,20,.25);pointer-events:none}
+.retrato span{position:relative;background:var(--papel);padding:6px 10px;font:500 14px/1.3 var(--texto);color:var(--tinta-2)}
+
+/* Marcador: récord y aura */
+.marcador{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--tinta)}
+.marcador div{padding:28px 20px;border-right:1px solid var(--linea)}
+.marcador div:last-child{border-right:0}
+.marcador dt{color:var(--tinta-2)}
+.marcador dd{font:700 clamp(44px,6vw,76px)/1 var(--rotulo);margin-top:8px;letter-spacing:.01em}
+.marcador dd small{display:block;font:500 14px/1.4 var(--texto);letter-spacing:0;color:var(--tinta-2);margin-top:6px}
+.marcador .aura dd{color:var(--aura-oscuro)}
+@media (max-width:820px){.ficha{grid-template-columns:1fr;gap:28px;padding-top:28px}.retrato{min-height:240px;order:-1}.marcador{grid-template-columns:1fr 1fr}.marcador div:nth-child(2){border-right:0}.marcador div:nth-child(-n+2){border-bottom:1px solid var(--linea)}}
+
+/* Cuerpo: combates y próxima velada */
+.cuerpo{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr);gap:48px;padding:48px 0}
+h2{font:700 34px/1.1 var(--titular);letter-spacing:-.01em;margin-bottom:6px}
+.bajada{color:var(--tinta-2);margin-bottom:20px;max-width:56ch}
+table{width:100%;border-collapse:collapse}
+caption{text-align:left}
+th{font:600 15px/1 var(--rotulo);letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);text-align:left;padding:10px 8px;border-bottom:2px solid var(--tinta)}
+td{padding:14px 8px;border-bottom:1px solid var(--linea);vertical-align:top}
+td .res{display:inline-block;min-width:32px;text-align:center;font:700 16px/1 var(--rotulo);letter-spacing:.08em;padding:6px 8px}
+.v{background:var(--tinta);color:var(--papel)} .d{border:1px solid var(--tinta)} .e{border:1px dashed var(--tinta)}
+.estado{display:block;color:var(--tinta-2);font-size:14px}
+.proxima{border:1px solid var(--tinta);padding:24px;background:var(--blanco);align-self:start}
+.proxima .fecha{font:700 64px/.9 var(--rotulo)}
+.proxima .fecha span{display:block;color:var(--aura-oscuro);font-size:22px;letter-spacing:.14em}
+.boton{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;margin-top:20px;background:var(--aura);color:var(--tinta);font:700 16px/1 var(--rotulo);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border:1px solid var(--tinta)}
+.boton:hover{background:var(--tinta);color:var(--papel)}
+@media (max-width:820px){.cuerpo{grid-template-columns:1fr;gap:32px}}
+
+/* Listado: clasificación al estilo de las revistas de boxeo */
+.listado{border-top:1px solid var(--tinta);padding:48px 0 72px}
+.cabecera-listado{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.filtros{display:flex;flex-wrap:wrap;gap:8px}
+.filtros a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--tinta);text-decoration:none;font:600 14px/1 var(--rotulo);letter-spacing:.12em;text-transform:uppercase}
+.filtros a[aria-current]{background:var(--tinta);color:var(--papel)}
+.fila{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid var(--linea);text-decoration:none}
+.fila:hover .nombre{color:var(--aura-oscuro);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.puesto{font:700 44px/1 var(--rotulo);color:var(--tinta-2)}
+.fila:first-of-type .puesto{color:var(--aura-oscuro)}
+.nombre{font:700 26px/1.1 var(--titular)}
+.meta{color:var(--tinta-2);font-size:15px}
+.cifra{text-align:right;font:700 30px/1 var(--rotulo)}
+.cifra small{display:block;font:600 14px/1.2 var(--rotulo);letter-spacing:.14em;color:var(--tinta-2);text-transform:uppercase;margin-top:4px}
+.pie{background:var(--tinta);color:var(--papel);padding:36px 0;font-size:15px}
+.pie a{color:var(--papel)}
+@media (prefers-reduced-motion:no-preference){.fila,.boton{transition:color .15s,background .15s}}
+</style>
+</head>
+<body>
+<p class="aviso">Maqueta de diseño · Dirección A «Revista» · Todos los nombres y cifras son ficticios</p>
+<header class="cabecera">
+  <div class="contenedor">
+    <a class="marca" href="#">Ring <b>España</b></a>
+    <nav aria-label="Principal"><ul class="menu">
+      <li><a href="#" aria-current="page">Deportistas</a></li>
+      <li><a href="#">Veladas</a></li>
+      <li><a href="#">Clubes</a></li>
+      <li><a href="#">Ránking</a></li>
+      <li><a class="entrar" href="#">Entrar</a></li>
+    </ul></nav>
+  </div>
+</header>
+
+<main>
+  <div class="contenedor">
+    <article class="ficha">
+      <div>
+        <p class="migas rotulo"><a href="#">Deportistas</a> / Sevilla / Muay Thai</p>
+        <h1><em>Marcos</em>Vidal Ortega</h1>
+        <p class="entradilla">Peleador de Muay Thai y boxeo desde Sevilla. Compite en amateur y profesional.</p>
+        <ul class="disciplinas" aria-label="Disciplinas">
+          <li class="pro">Muay Thai · Profesional</li>
+          <li>Boxeo · Amateur</li>
+          <li>Sevilla</li>
+        </ul>
+      </div>
+      <div class="retrato" role="img" aria-label="Espacio reservado para la fotografía de Marcos Vidal"><span>Fotografía de Marcos Vidal · pendiente</span></div>
+    </article>
+
+    <dl class="marcador">
+      <div><dt class="rotulo">Victorias</dt><dd>12<small>7 por KO o TKO</small></dd></div>
+      <div><dt class="rotulo">Derrotas</dt><dd>2<small>ninguna por KO</small></dd></div>
+      <div><dt class="rotulo">Empates</dt><dd>1<small>último: marzo de 2026</small></dd></div>
+      <div class="aura"><dt class="rotulo">Aura</dt><dd>874<small>Trayectoria, respaldo y comunidad. <a href="#">¿Cómo se calcula?</a></small></dd></div>
+    </dl>
+
+    <div class="cuerpo">
+      <section aria-labelledby="t-combates">
+        <h2 id="t-combates">Últimos combates</h2>
+        <p class="bajada">Cada resultado indica quién lo ha confirmado: tu rival, un organizador o una federación.</p>
+        <table>
+          <caption class="rotulo" style="padding:0 0 10px">Muay Thai y boxeo, de más reciente a más antiguo</caption>
+          <thead><tr><th scope="col">Resultado</th><th scope="col">Rival y velada</th><th scope="col">Fecha</th></tr></thead>
+          <tbody>
+            <tr><td><span class="res v">V</span></td><td><strong>Iván Cano</strong>, TKO en el 3.º asalto<span class="estado">Gala Giralda · Confirmado por el rival</span></td><td>12 sep 2026</td></tr>
+            <tr><td><span class="res v">V</span></td><td><strong>Hugo Prieto</strong>, decisión unánime<span class="estado">Noche de Muay Thai · Respaldado por federación</span></td><td>20 jun 2026</td></tr>
+            <tr><td><span class="res e">E</span></td><td><strong>Daniel Soler</strong>, empate<span class="estado">Trofeo del Sur · Confirmado por el rival</span></td><td>14 mar 2026</td></tr>
+            <tr><td><span class="res d">D</span></td><td><strong>Álvaro Gil</strong>, decisión dividida<span class="estado">Copa de Andalucía · Declarado por el peleador</span></td><td>30 nov 2025</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <aside class="proxima" aria-labelledby="t-proxima">
+        <h2 id="t-proxima" class="rotulo" style="font:600 14px/1 var(--rotulo);letter-spacing:.14em;margin-bottom:16px">Próxima velada</h2>
+        <p class="fecha"><span>Octubre</span>24</p>
+        <p style="margin-top:14px"><strong>Gladiator Night III</strong><br>Palomares del Río, Sevilla</p>
+        <a class="boton" href="#">Ver el cartel completo</a>
+      </aside>
+    </div>
+
+    <section class="listado" aria-labelledby="t-listado">
+      <div class="cabecera-listado">
+        <div><h2 id="t-listado">Peleadores</h2><p class="bajada" style="margin:0">Ordenados por aura. Una persona, una voz por combate.</p></div>
+        <nav class="filtros" aria-label="Filtrar por disciplina"><a href="#" aria-current="true">Todas</a><a href="#">Boxeo</a><a href="#">Muay Thai</a><a href="#">MMA</a><a href="#">Jiu-jitsu</a></nav>
+      </div>
+      <a class="fila" href="#"><span class="puesto">1</span><span><span class="nombre">Lucía Herrero Bravo</span><br><span class="meta">Boxeo · Profesional · Valencia</span></span><span class="cifra">1.204<small>Aura</small></span></a>
+      <a class="fila" href="#"><span class="puesto">2</span><span><span class="nombre">Marcos Vidal Ortega</span><br><span class="meta">Muay Thai · Profesional · Sevilla</span></span><span class="cifra">874<small>Aura</small></span></a>
+      <a class="fila" href="#"><span class="puesto">3</span><span><span class="nombre">Nuria Molina Díaz</span><br><span class="meta">MMA · Amateur · Zaragoza</span></span><span class="cifra">811<small>Aura</small></span></a>
+      <a class="fila" href="#"><span class="puesto">4</span><span><span class="nombre">Javier Rubio Soler</span><br><span class="meta">Kickboxing · Profesional · Bilbao</span></span><span class="cifra">790<small>Aura</small></span></a>
+    </section>
+  </div>
+</main>
+<footer class="pie"><div class="contenedor">Ring España · Deportes de contacto de toda España · <a href="#">Cómo funciona</a> · <a href="#">Privacidad</a></div></footer>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring España · Dirección C · Lona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lona:#0C0B0F; --lona-2:#16141B; --lona-3:#201D28; --hueso:#F2EEE8; --hueso-2:#B8B2C0; --linea:#34303E;
+  --aura:#BE33F5; --aura-claro:#D77CFB;
+  --cartel:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --texto:"Hanken Grotesk",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--lona);color:var(--hueso);font:400 17px/1.55 var(--texto)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--aura-claro);outline-offset:3px}
+.aviso{background:var(--lona-3);color:var(--hueso-2);text-align:center;padding:8px 16px;font-size:14px}
+.cuerdas{height:14px;background:
+  linear-gradient(var(--aura) 0 2px,transparent 2px 6px,var(--hueso) 6px 8px,transparent 8px 12px,var(--aura) 12px 14px)}
+.cabecera .in,.contenedor{max-width:1180px;margin:0 auto;padding:0 20px}
+.cabecera .in{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px}
+.marca{display:inline-flex;align-items:center;gap:.28em;min-height:44px;font:900 30px/1 var(--cartel);letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.marca b{color:var(--aura)}
+.menu{display:flex;gap:4px;list-style:none;padding:0}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;text-decoration:none;font:600 15px/1 var(--texto);color:var(--hueso-2)}
+.menu a:hover,.menu a[aria-current]{color:var(--hueso)}
+.menu a[aria-current]{box-shadow:inset 0 -3px 0 var(--aura)}
+.menu .entrar{background:var(--aura);color:#fff;border-radius:2px;padding:0 20px;font-weight:700}
+.menu .entrar:hover{background:var(--aura-claro);color:var(--lona)}
+@media (max-width:820px){.menu li:not(:last-child){display:none}}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:40px;padding:56px 0 40px;align-items:end}
+.sobre{font:600 15px/1 var(--texto);letter-spacing:.18em;text-transform:uppercase;color:var(--aura-claro)}
+h1{font:900 clamp(64px,13vw,176px)/.84 var(--cartel);text-transform:uppercase;letter-spacing:-.01em;margin:16px 0 20px}
+h1 span{display:block;color:transparent;-webkit-text-stroke:2px var(--hueso)}
+.lema{font-size:20px;color:var(--hueso-2);max-width:38ch}
+.acciones{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.boton{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;background:var(--aura);color:#fff;font:700 16px/1 var(--texto);text-decoration:none;border-radius:2px}
+.boton:hover{background:var(--aura-claro);color:var(--lona)}
+.boton.sec{background:transparent;border:1px solid var(--hueso-2);color:var(--hueso)}
+.boton.sec:hover{border-color:var(--hueso);background:var(--lona-3);color:var(--hueso)}
+.retrato{aspect-ratio:4/5;background:
+  radial-gradient(120% 70% at 50% 0,var(--lona-3),transparent 70%),repeating-linear-gradient(0deg,transparent 0 9px,rgba(255,255,255,.04) 9px 10px),var(--lona-2);
+  border:1px solid var(--linea);display:flex;align-items:flex-end;padding:14px;color:var(--hueso-2);font-size:14px}
+@media (max-width:820px){.hero{grid-template-columns:1fr;padding-top:32px}.retrato{aspect-ratio:16/10;order:-1}}
+
+.marcador{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--linea);background:var(--lona-2)}
+.marcador div{padding:24px 20px;border-right:1px solid var(--linea)}
+.marcador div:last-child{border-right:0;background:var(--lona-3)}
+.marcador dt{font:600 14px/1 var(--texto);letter-spacing:.16em;text-transform:uppercase;color:var(--hueso-2)}
+.marcador dd{font:900 clamp(56px,8vw,104px)/.95 var(--cartel);margin-top:10px}
+.marcador dd small{display:block;font:400 14px/1.4 var(--texto);color:var(--hueso-2);margin-top:6px}
+.marcador .aura dd{color:var(--aura-claro)}
+@media (max-width:820px){.marcador{grid-template-columns:1fr 1fr}.marcador div:nth-child(2){border-right:0}.marcador div:nth-child(-n+2){border-bottom:1px solid var(--linea)}}
+
+.cuerpo{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr);gap:40px;padding:64px 0}
+h2{font:800 clamp(34px,5vw,56px)/1 var(--cartel);text-transform:uppercase;letter-spacing:.01em;margin-bottom:8px}
+.bajada{color:var(--hueso-2);margin-bottom:24px;max-width:54ch}
+.combate{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 0;border-top:1px solid var(--linea)}
+.combate:last-child{border-bottom:1px solid var(--linea)}
+.sello{width:44px;height:44px;display:grid;place-items:center;font:900 24px/1 var(--cartel)}
+.sello.v{background:var(--hueso);color:var(--lona)}.sello.d{border:2px solid var(--hueso)}.sello.e{border:2px dashed var(--hueso)}
+.combate b{font-size:19px}.combate small{display:block;color:var(--hueso-2);font-size:15px}
+.combate .f{color:var(--hueso-2);font-size:15px;text-align:right}
+
+/* Entrada de velada con muescas de talonario */
+.entrada{position:relative;align-self:start;background:var(--hueso);color:var(--lona);padding:24px 24px 28px;
+  -webkit-mask:radial-gradient(circle 11px at 0 58%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 58%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 11px at 0 58%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 58%,#0000 98%,#000) right/51% 100% no-repeat}
+.entrada h3{font:600 14px/1 var(--texto);letter-spacing:.18em;text-transform:uppercase;color:#6B3E86}
+.entrada .dia{font:900 96px/.9 var(--cartel);margin-top:12px}
+.entrada .dia span{display:block;font-size:26px;letter-spacing:.12em;color:#8E1FBD}
+.entrada hr{border:0;border-top:2px dashed rgba(12,11,15,.35);margin:18px -24px}
+.entrada .boton{background:var(--lona);color:var(--hueso);margin-top:14px;width:100%}
+@media (max-width:820px){.cuerpo{grid-template-columns:1fr;gap:40px;padding:40px 0}}
+
+.listado{border-top:1px solid var(--linea);padding:64px 0 88px}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.filtros a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--linea);text-decoration:none;font-weight:600;font-size:15px;color:var(--hueso-2)}
+.filtros a[aria-current]{background:var(--hueso);color:var(--lona);border-color:var(--hueso)}
+.fila{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:center;padding:20px 16px;border-top:1px solid var(--linea);text-decoration:none}
+.fila:last-child{border-bottom:1px solid var(--linea)}
+.fila:hover{background:var(--lona-2)}
+.fila:hover .n{color:var(--aura-claro)}
+.puesto{font:900 52px/1 var(--cartel);color:var(--hueso-2)}
+.fila:first-of-type .puesto{color:var(--aura-claro)}
+.n{font:800 30px/1.05 var(--cartel);text-transform:uppercase;letter-spacing:.02em}
+.fila small{color:var(--hueso-2);font-size:15px}
+.cifra{font:900 38px/1 var(--cartel);text-align:right}
+.cifra small{display:block;font:600 14px/1.2 var(--texto);letter-spacing:.16em;text-transform:uppercase;margin-top:4px}
+.pie{padding:32px 0;color:var(--hueso-2);font-size:15px;border-top:1px solid var(--linea)}
+@media (prefers-reduced-motion:no-preference){.fila,.boton{transition:background .15s,color .15s}}
+</style>
+</head>
+<body>
+<p class="aviso">Maqueta de diseño · Dirección C «Lona» · Todos los nombres y cifras son ficticios</p>
+<div class="cuerdas" aria-hidden="true"></div>
+<header class="cabecera"><div class="in">
+  <a class="marca" href="#">Ring <b>España</b></a>
+  <nav aria-label="Principal"><ul class="menu">
+    <li><a href="#" aria-current="page">Deportistas</a></li>
+    <li><a href="#">Veladas</a></li>
+    <li><a href="#">Clubes</a></li>
+    <li><a href="#">Ránking</a></li>
+    <li><a class="entrar" href="#">Entrar</a></li>
+  </ul></nav>
+</div></header>
+
+<main class="contenedor">
+  <article class="hero">
+    <div>
+      <p class="sobre">Muay Thai · Profesional · Sevilla</p>
+      <h1>Marcos<span>Vidal Ortega</span></h1>
+      <p class="lema">Peleador de Muay Thai y boxeo. Cada resultado de su carrera dice quién lo ha confirmado.</p>
+      <div class="acciones"><a class="boton" href="#">Dar aura a este peleador</a><a class="boton sec" href="#">Seguir</a></div>
+    </div>
+    <div class="retrato" role="img" aria-label="Espacio reservado para la fotografía de Marcos Vidal">Fotografía de Marcos Vidal · pendiente</div>
+  </article>
+
+  <dl class="marcador">
+    <div><dt>Victorias</dt><dd>12<small>7 por KO o TKO</small></dd></div>
+    <div><dt>Derrotas</dt><dd>2<small>ninguna por KO</small></dd></div>
+    <div><dt>Empates</dt><dd>1<small>marzo de 2026</small></dd></div>
+    <div class="aura"><dt>Aura</dt><dd>874<small>Trayectoria, respaldo y comunidad. <a href="#" style="color:var(--aura-claro)">Cómo se calcula</a></small></dd></div>
+  </dl>
+
+  <div class="cuerpo">
+    <section aria-labelledby="t-comb">
+      <h2 id="t-comb">Últimos combates</h2>
+      <p class="bajada">De más reciente a más antiguo.</p>
+      <div class="combate"><span class="sello v" aria-label="Victoria">V</span><div><b>Iván Cano</b><small>TKO, 3.er asalto · Gala Giralda · Confirmado por el rival</small></div><span class="f">12 sep 2026</span></div>
+      <div class="combate"><span class="sello v" aria-label="Victoria">V</span><div><b>Hugo Prieto</b><small>Decisión unánime · Noche de Muay Thai · Respaldado por federación</small></div><span class="f">20 jun 2026</span></div>
+      <div class="combate"><span class="sello e" aria-label="Empate">E</span><div><b>Daniel Soler</b><small>Empate · Trofeo del Sur · Confirmado por el rival</small></div><span class="f">14 mar 2026</span></div>
+      <div class="combate"><span class="sello d" aria-label="Derrota">D</span><div><b>Álvaro Gil</b><small>Decisión dividida · Copa de Andalucía · Declarado por el peleador</small></div><span class="f">30 nov 2025</span></div>
+    </section>
+    <aside class="entrada" aria-labelledby="t-ent">
+      <h3 id="t-ent">Próxima velada</h3>
+      <p class="dia"><span>Octubre</span>24</p>
+      <hr>
+      <p><strong>Gladiator Night III</strong><br>Palomares del Río, Sevilla</p>
+      <a class="boton" href="#">Ver el cartel completo</a>
+    </aside>
+  </div>
+
+  <section class="listado" aria-labelledby="t-lista">
+    <h2 id="t-lista">Peleadores</h2>
+    <p class="bajada">Ordenados por aura. Una persona, una voz por combate.</p>
+    <nav class="filtros" aria-label="Filtrar por disciplina"><a href="#" aria-current="true">Todas</a><a href="#">Boxeo</a><a href="#">Muay Thai</a><a href="#">MMA</a><a href="#">Jiu-jitsu</a></nav>
+    <a class="fila" href="#"><span class="puesto">1</span><span><span class="n">Lucía Herrero Bravo</span><br><small>Boxeo · Profesional · Valencia</small></span><span class="cifra">1.204<small>Aura</small></span></a>
+    <a class="fila" href="#"><span class="puesto">2</span><span><span class="n">Marcos Vidal Ortega</span><br><small>Muay Thai · Profesional · Sevilla</small></span><span class="cifra">874<small>Aura</small></span></a>
+    <a class="fila" href="#"><span class="puesto">3</span><span><span class="n">Nuria Molina Díaz</span><br><small>MMA · Amateur · Zaragoza</small></span><span class="cifra">811<small>Aura</small></span></a>
+    <a class="fila" href="#"><span class="puesto">4</span><span><span class="n">Javier Rubio Soler</span><br><small>Kickboxing · Profesional · Bilbao</small></span><span class="cifra">790<small>Aura</small></span></a>
+  </section>
+</main>
+<footer class="pie"><div class="contenedor">Ring España · Deportes de contacto de toda España · <a href="#">Cómo funciona</a> · <a href="#">Privacidad</a></div></footer>
+</body>
+</html>
