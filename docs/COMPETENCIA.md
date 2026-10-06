@@ -56,3 +56,47 @@ Fuentes: [portada](https://boxrec.com/), [ayuda oficial](https://boxrec.com/en/s
 4. Probar con personas reales de distintas edades antes de dar por buena la claridad.
 
 El diseño gráfico queda para el final. Detalle de cambios y relevo: [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md).
+
+---
+
+## Actualización del 6 de octubre de 2026 (Claude, con acceso a internet)
+
+**Petición del fundador:** «queremos mejorar las mejores funciones de nuestros competidores, y mejorar las peores virtudes de ellos» (Raunder y BoxRec).
+
+**Cómo se ha hecho:** lectura de las páginas públicas de Raunder (portada, `/clasificacion`, `/gimnasios`) el 6 de octubre de 2026, sin crear cuentas ni modificar nada. **BoxRec:** su portada se pudo leer con la herramienta de indexación (con una petición simple devolvía «Just a moment…», HTTP 403, y su ayuda dio 403): solo se recoge lo visible en la portada. Las cifras de Raunder cambian con el tiempo: son las del momento de la lectura. Lo marcado como **hipótesis** no se ha comprobado.
+
+### Lo que Raunder muestra hoy (hechos leídos)
+
+- Portada: «128 gimnasios de boxeo, kickboxing, muay thai, MMA y BJJ», con el texto de presentación citando Vilanova i la Geltrú, Barcelona, Almería, Sant Joan Despí y Viladecans, «27 de ellos con su horario de la semana publicado clase a clase». Secciones: gimnasios, clases (día y hora), **sparrings**, veladas («5 publicadas, con su cartelera y sus entradas»), peleadores («récord de combates contra actas de federación») y clasificación; listados «por ciudad y disciplina» (por ejemplo «Boxeo en Barcelona · 8 clubes»). Dice: «Horarios, precios y reserva en la ficha de cada gimnasio». No se ha comprobado cómo funcionan sparrings, precios ni reservas.
+- Gimnasios: cada uno indica ciudad y «N clases a la semana» (de 1 a 96).
+- Clasificación: «16.238 combates y 11.426 podios de actas de federación»; «se ordena por combates y por medallas, nunca por victorias y derrotas»; clubes con combates, medallas y número de peleadores. Cuatro disciplinas (boxeo, kickboxing, muay thai, MMA); no aparece jiu-jitsu ni K-1.
+- Veladas próximas (6 oct): cinco, del 9 al 31 de octubre; tres en Cataluña (Rubí, Castellbisbal, Barcelona), una en la Comunidad de Madrid (Guadalix de la Sierra) y una en Sevilla (Palomares del Río).
+- Alcance geográfico visible: los gimnasios listados incluyen Barcelona y su entorno, Almería, **Madrid** y **Mahón**; la clasificación de clubes incluye también **Sevilla, Valencia y Tarragona**. Predomina con claridad Cataluña.
+
+### Qué mejorar de lo que hace bien (y qué hacemos nosotros)
+
+| Fortaleza de Raunder | Cómo la mejoramos en Ring España | Estado |
+|---|---|---|
+| Horario publicado clase a clase en los gimnasios | Mismo valor, pero **mantenido por el propio gimnasio** y con fecha de última actualización visible; sin copiar cifras ajenas | **Propuesta nueva**: ficha de tarea pendiente (necesita modelo de datos y titular de ficha; ver abajo) |
+| Récord ligado a actas de federación | Aceptamos además trayectoria declarada con **respaldo opcional** y mostramos de dónde sale cada dato (declarado, confirmado por el rival, respaldado por federación) | Ya publicado (aura = trayectoria + respaldo + comunidad) |
+| Clasificación que explica qué mide | Explicarlo igual **en la propia página de ránking**, con el periodo y la fórmula, y por disciplina | Publicado en `/ayuda#aura`; falta llevar la explicación junto a cada lista |
+| Entrada por objetivo (entrenar, sparring, veladas) y secciones propias de **sparrings**, **clases** y reserva en la ficha del gimnasio | Menú por actividades. Sparring y reservas son sus funciones diferenciales: no se presentan como disponibles mientras no existan reglas, datos y responsable; candidatas a fase posterior | Menú publicado (#14); sparring y reservas, sin implementar |
+| Entradas de velada | Enlace a la venta del organizador (campo `ticketUrl` existente); vender entradas nosotros requiere pagos y es decisión del fundador | Sin cambios |
+
+### Qué mejorar de lo que hace peor o deja sin cubrir
+
+Los puntos 1–3 son **hechos observados**; el 4 y el 5 son **hipótesis a comprobar** con personas reales.
+
+1. **Cobertura geográfica muy concentrada en Cataluña** (con presencia puntual en Madrid, Sevilla, Valencia, Almería y Menorca). Ring España parte de **toda España** y de seis disciplinas. Esta ventaja solo existe si se llena de datos: no afirmar cobertura que aún no tenemos (regla del fundador).
+2. **Disciplinas:** su clasificación pública cita boxeo, kickboxing, muay thai y MMA (los gimnasios sí incluyen BJJ); no aparecen K-1 ni jiu-jitsu en la clasificación. Nosotros cubrimos las seis.
+3. **Solo actas de federación:** deja fuera a quien compite sin acta o sin federación. Nuestro recorrido de «declarar y respaldar» cubre ese hueco, pero cada dato lleva su origen visible para que no se confunda con uno verificado.
+4. *(Hipótesis)* La clasificación es larga (445 líneas de texto) y mezcla varias listas en una página: probar con personas si se entiende sin ayuda; nuestra respuesta sería **una lista por pantalla, con filtros y una frase que diga qué mide**.
+5. *(Hipótesis)* El valor para el peleador individual depende de que su gimnasio y su federación aparezcan: nuestra ficha debe poder usarse **desde el primer día sin depender de terceros**.
+
+### Qué hacer a partir de esto (propuesta de Claude; decide el fundador)
+
+1. **Ficha nueva «Información práctica del gimnasio»** (horarios por clase, disciplinas, contacto, fecha de actualización, editable solo por su titular). Nivel N3 (modelo de datos y permisos). No incluir reservas ni pases hasta que existan reglas, pagos y un responsable.
+2. **Explicación de qué mide cada ránking junto a la lista** (nivel N1, mejora de claridad).
+3. **Jiu-jitsu y K-1 en la clasificación pública y en la comunicación** como diferencia verificable.
+4. **Pruebas con personas reales** de las dos hipótesis anteriores antes de decidir cambios de diseño.
+5. **BoxRec (portada, 6 oct):** buscador con filtros por sexo y por unos 25 códigos de deporte y nivel (`Box-pro`, `Box-am`, `Mt-am`, `Kb-pro`, `Mf-pro`…), por funciones (entrenador, juez, árbitro, promotor, matchmaker, médico, inspector…) y periodo («últimos 3 años» o «todo el tiempo»); calendario de combates y banner de un socio oficial. Confirma lo anotado arriba: códigos abreviados que un público nuevo no entiende sin ayuda. **Aprovechar:** buscar también por entrenador, árbitro o promotor. **Mejorar:** palabras completas y una sola búsqueda sencilla. No se ha visto su sistema de pago ni sus precios.
