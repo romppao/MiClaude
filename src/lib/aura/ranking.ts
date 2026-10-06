@@ -4,6 +4,7 @@ import { DISCIPLINE_ORDER, LEVEL_ORDER, weightClassesFor } from "../common/disci
 import { AURA_POLICY, auraCategoryKey, boutBackingPoints, trajectoryByCategory } from "./trajectory";
 import { calendarDayStart } from "../common/dates";
 import { db } from "../common/db";
+import { leerCacheado } from "../common/cache";
 
 export type AuraEntry = { fighterId: string; name: string; slug: string; level: Level; weightClass: string | null; divisionId?: string | null; aura: number; trajectory?: number; backing?: number; community?: number; declared?: boolean };
 export type RankedEntry = AuraEntry & { position: number };
@@ -47,6 +48,13 @@ export function rankByCategory(entries: AuraEntry[], discipline: Discipline): Ca
  * Cada categoría conserva su historia. El periodo limita el reconocimiento de la comunidad, no borra la carrera previa.
  */
 export async function auraRanking(opts: { discipline?: Discipline; level?: Level; province?: string; sinceDays?: number; fighterId?: string } = {}): Promise<(CategoryRanking & { discipline: Discipline })[]> {
+  // La salida contiene únicamente texto, números, booleanos y nulos. No se
+  // cachean aquí datos de sesión ni fechas que requieran rehidratarse.
+  const clave = `ranking:${JSON.stringify({ discipline: opts.discipline ?? null, level: opts.level ?? null, province: opts.province ?? null, sinceDays: opts.sinceDays ?? null, fighterId: opts.fighterId ?? null })}`;
+  return leerCacheado(clave, ["ranking"], 60, () => auraRankingSinCache(opts));
+}
+
+async function auraRankingSinCache(opts: { discipline?: Discipline; level?: Level; province?: string; sinceDays?: number; fighterId?: string }): Promise<(CategoryRanking & { discipline: Discipline })[]> {
   const fighterWhere = { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }), ...(opts.fighterId && { id: opts.fighterId }) };
   const eventWhere = { discipline: opts.discipline, level: opts.level, date: { lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { not: "CANCELLED" as const } };
   const [totals, achievements, supportedBouts] = await Promise.all([

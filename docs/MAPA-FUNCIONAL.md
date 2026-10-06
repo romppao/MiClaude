@@ -8,45 +8,6 @@
 
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
-| `/` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | Aura, Event, Fighter, Gym |
-| `/ayuda` | ¿Cómo funciona Ring España? | Pública | — | — |
-| `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
-| `/buscar` | Buscar | Pública | — | Event, Fighter, Gym, Trainer |
-| `/entrar` | Entrar en tu cuenta | Pública | `accounts.login` | — |
-| `/entrenadores` | Entrenadores | Pública | — | Trainer |
-| `/entrenadores/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Trainer |
-| `/federaciones` | Federaciones | Pública (cambia lo que ve según la cuenta) | `profiles.createFederation` | Profile |
-| `/federaciones/:id` | (ficha individual: el título depende del elemento) | Pública | — | Profile |
-| `/gimnasios` | Gimnasios | Pública | — | Gym |
-| `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Gym |
-| `/imagenes/:kind/:id/:slot` | Siempre se revalida (`no-cache`, `private`): quien ya tiene la imagen recibe un 304 sin bytes, y una ficha ocultada deja de verse al instante. | Pública (cambia lo que ve según la cuenta) | — | Profile |
-| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
-| `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, FighterAchievement, Follow, OrganizerRequest, Profile, Report, SupportAccreditation |
-| `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
-| `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym |
-| `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
-| `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
-| `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
-| `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
-| `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
-| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent` | Event, Fighter |
-| `/peleadores` | Peleadores | Pública | — | Fighter |
-| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, FighterAchievement, Follow |
-| `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | User |
-| `/privacidad` | Privacidad y tus datos | Pública | — | — |
-| `/promotores` | Promotores | Pública | — | User |
-| `/promotores/:id` | (ficha individual: el título depende del elemento) | Pública | — | Event, User |
-| `/ranking` | Ránking de aura | Pública | — | — |
-| `/recuperar` | ¿Has olvidado tu contraseña? | Pública | `accounts.requestPasswordReset` | — |
-| `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
-| `/registro` | Crear cuenta | Pública | `accounts.register` | — |
-| `/respaldar` | Respaldar resultados y títulos | Moderación o cuenta acreditada para la disciplina (correo verificado) | `trajectory.endorseBout`, `trajectory.reviewAchievement` | Bout, FighterAchievement |
-| `/salud` | Comprobación de salud para el alojamiento: responde 200 si la aplicación y la base de datos funcionan, y 503 si no. | Pública | — | — |
-| `/siguiendo` | Peleadores que sigo | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
-| `/veladas` | Calendario de veladas | Pública | — | Event |
-| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Event |
-| `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
 «Quién puede entrar» se deduce del código de cada pantalla; las acciones comprueban sus permisos por su cuenta (siguiente tabla), nunca se fían de que la pantalla los haya comprobado.
 
@@ -211,6 +172,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | Fichero | Exporta |
 |---|---|
 | `audit.ts` | `audit` |
+| `cache.ts` | `ETIQUETAS_CACHE`, `EtiquetaCache`, `leerCacheado` |
 | `competition.ts` | `COMPETITION_DIVISIONS`, `CompetitionDivision`, `divisionAgeEligible`, `divisionById`, `divisionEligible`, `divisionLabel`, `divisionsFor`, `knownBoxingAgeEligible` |
 | `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayKey`, `eventDayReached`, `parseBirthDate`, `parseDay`, `todayMadrid` |
 | `db.ts` | `db` |

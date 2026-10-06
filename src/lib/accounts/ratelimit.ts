@@ -45,8 +45,12 @@ export async function isBlocked(key: string, max: number, windowMs: number): Pro
 
 /** Anota un intento y dice si sigue dentro del límite (el intento que llega al máximo todavía se admite). */
 export async function allow(key: string, max: number, windowMs: number): Promise<boolean> {
-  await addHit(key);
-  return (await countHits(key, windowMs)) <= max;
+  const hit = await db.rateHit.create({ data: { key }, select: { id: true } });
+  const permitido = (await countHits(key, windowMs)) <= max;
+  // Un intento rechazado no debe alargar indefinidamente el bloqueo: conserva los
+  // intentos que ya habían llegado al límite y retira únicamente su propia fila.
+  if (!permitido) await db.rateHit.deleteMany({ where: { id: hit.id } });
+  return permitido;
 }
 
 /**
@@ -57,7 +61,11 @@ export async function allow(key: string, max: number, windowMs: number): Promise
 export async function reservar(key: string, max: number, windowMs: number): Promise<{ permitido: boolean; devolver: () => Promise<unknown> }> {
   const hit = await db.rateHit.create({ data: { key }, select: { id: true } });
   const permitido = (await countHits(key, windowMs)) <= max;
-  return { permitido, devolver: () => db.rateHit.deleteMany({ where: { id: hit.id } }) };
+  const devolver = () => db.rateHit.deleteMany({ where: { id: hit.id } });
+  // Igual que en `allow`, una reserva que no se concede no puede ampliar la
+  // ventana de bloqueo. `devolver` sigue siendo seguro de llamar dos veces.
+  if (!permitido) await devolver();
+  return { permitido, devolver };
 }
 
 /** Borra los intentos de una clave (por ejemplo, tras iniciar sesión correctamente). */

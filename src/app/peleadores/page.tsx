@@ -13,6 +13,7 @@ import { PROVINCES } from "../../lib/common/labels";
 import { divisionById, divisionLabel } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor } from "../../lib/common/disciplines";
 import { plural } from "../../lib/common/text";
+import { leerCacheado } from "../../lib/common/cache";
 
 export const metadata = { title: "Peleadores" };
 export const dynamic = "force-dynamic";
@@ -31,9 +32,20 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
     ...(province && { province }),
     ...(porDisciplina && { disciplines: { some: { ...(discipline && { discipline }), ...(nivel && { level: nivel }), ...(categoria && { weightClass: categoria }), ...(divisionId && { divisionId }) } } }),
   };
-  const total = await db.fighter.count({ where });
+  // Esta consulta no depende de la sesión. La selección evita fechas, que
+  // `unstable_cache` serializa como texto, y conserva el filtro de visibilidad.
+  const clave = `fichas:listado:${JSON.stringify({ q: q ?? null, ids: ids ?? null, discipline: discipline ?? null, nivel: nivel ?? null, province: province ?? null, categoria: categoria ?? null, divisionId: divisionId ?? null, pagina: pagina ?? null })}`;
+  const consulta = await leerCacheado(clave, ["fichas"], 60, async () => {
+    const total = await db.fighter.count({ where });
+    const ventana = pageWindow(total, pageNumber(pagina));
+    const fighters = await db.fighter.findMany({
+      where, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }], skip: ventana.skip, take: ventana.take,
+      select: { id: true, slug: true, firstName: true, lastName: true, alias: true, province: true, gym: { select: { name: true } }, disciplines: { select: { discipline: true, level: true, divisionId: true, weightClass: true } } },
+    });
+    return { total, fighters };
+  });
+  const { total, fighters } = consulta;
   const w = pageWindow(total, pageNumber(pagina));
-  const fighters = await db.fighter.findMany({ where, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { gym: true, disciplines: true } });
 
   // Texto de cada filtro aplicado (con «✕» para quitarlo) y qué parámetros de la dirección quita.
   const etiquetaCategoria = categoria && discipline ? weightClassLabel(discipline, nivel ?? (weightClassesFor(discipline, "PRO").some((c) => c.valor === categoria) ? "PRO" : "AMATEUR"), categoria, divisionId) : categoria;

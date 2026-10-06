@@ -13,7 +13,7 @@ vi.mock("../../src/lib/common/db", () => ({
 }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
 
-import { MINUTO, normalizeIp, reservar } from "../../src/lib/accounts/ratelimit";
+import { MINUTO, allow, normalizeIp, reservar } from "../../src/lib/accounts/ratelimit";
 
 describe("dirección IP del cliente", () => {
   it("toma la que añadió el proxy de confianza (la última), no la que escribe el propio cliente (la primera)", () => {
@@ -35,6 +35,7 @@ describe("reserva de intentos antes de comprobar una contraseña", () => {
   it("admite los intentos hasta el máximo y rechaza el siguiente", async () => {
     for (let i = 1; i <= 8; i++) expect((await reservar("acceso:correo:a@x.es", 8, 15 * MINUTO)).permitido).toBe(true);
     expect((await reservar("acceso:correo:a@x.es", 8, 15 * MINUTO)).permitido).toBe(false);
+    expect(tabla.filas.filter((fila) => fila.key === "acceso:correo:a@x.es")).toHaveLength(8);
   });
   it("con 200 peticiones simultáneas nunca se admiten más del máximo (comprobar y anotar no se separan)", async () => {
     const r = await Promise.all(Array.from({ length: 200 }, () => reservar("acceso:correo:b@x.es", 8, 15 * MINUTO)));
@@ -49,5 +50,11 @@ describe("reserva de intentos antes de comprobar una contraseña", () => {
   it("cada clave tiene su propio contador", async () => {
     for (let i = 0; i < 9; i++) await reservar("acceso:correo:d@x.es", 8, 15 * MINUTO);
     expect((await reservar("acceso:correo:otro@x.es", 8, 15 * MINUTO)).permitido).toBe(true);
+  });
+
+  it("un envío rechazado no prolonga el bloqueo", async () => {
+    for (let i = 0; i < 3; i++) expect(await allow("recuperar:correo:e@x.es", 3, 15 * MINUTO)).toBe(true);
+    expect(await allow("recuperar:correo:e@x.es", 3, 15 * MINUTO)).toBe(false);
+    expect(tabla.filas.filter((fila) => fila.key === "recuperar:correo:e@x.es")).toHaveLength(3);
   });
 });

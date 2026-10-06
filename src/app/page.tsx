@@ -8,17 +8,26 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../lib/com
 import { getUser } from "../lib/accounts/auth";
 import { plural } from "../lib/common/text";
 import { calendarDayStart } from "../lib/common/dates";
+import { leerCacheado } from "../lib/common/cache";
 
 export const dynamic = "force-dynamic";
 
+async function portadaPublica() {
+  return leerCacheado("portada:publica", ["fichas", "ranking", "veladas", "gimnasios"], 60, async () => {
+    const [events, fighters, counts, topGroups] = await Promise.all([
+      db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 6, select: { id: true, slug: true, discipline: true, level: true, name: true, date: true, venue: true, city: true } }),
+      db.fighter.findMany({ where: { listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, select: { id: true, slug: true, firstName: true, lastName: true, alias: true, city: true, gym: { select: { name: true } }, disciplines: { select: { discipline: true, level: true } } } }),
+      Promise.all([db.fighter.count({ where: { listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
+      auraRanking(),
+    ]);
+    return { events: events.map(({ date, ...event }) => ({ ...event, date: date.toISOString() })), fighters, counts, topGroups };
+  });
+}
+
 export default async function Home() {
   const user = await getUser();
-  const [events, fighters, counts, topGroups] = await Promise.all([
-    db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 6 }),
-    db.fighter.findMany({ where: { listed: true, hiddenAt: null }, orderBy: { createdAt: "desc" }, take: 6, include: { gym: true, disciplines: true } }),
-    Promise.all([db.fighter.count({ where: { listed: true, hiddenAt: null } }), db.event.count(), db.gym.count(), db.aura.count()]),
-    auraRanking(),
-  ]);
+  const { events: eventosCacheados, fighters, counts, topGroups } = await portadaPublica();
+  const events = eventosCacheados.map((event) => ({ ...event, date: new Date(event.date) }));
   const top = topGroups.flatMap((g) => g.entries.map((e) => ({ ...e, discipline: g.discipline, category: `${divisionLabel(g.divisionId)}${g.weightClass ? ` · ${weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId)}` : ""}` }))).sort((a, b) => b.aura - a.aura || a.name.localeCompare(b.name, "es")).slice(0, 5);
   return (
     <>

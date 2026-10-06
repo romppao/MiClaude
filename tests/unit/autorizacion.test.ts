@@ -40,7 +40,7 @@ vi.mock("next/navigation", () => ({
   redirect: (destino: string) => { throw new mundo.Redireccion(destino); },
   notFound: () => { throw new mundo.Redireccion("404"); },
 }));
-vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }));
 vi.mock("next/server", () => ({ after: vi.fn() }));
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: (n: string) => (n === "session" && mundo.estado.usuario ? { value: "token-de-prueba" } : undefined), set: vi.fn(), delete: vi.fn() }),

@@ -5,6 +5,7 @@ import { flatParams } from "../../lib/common/safe";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
 import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
+import { leerCacheado } from "../../lib/common/cache";
 
 export const metadata = { title: "Entrenadores" };
 export const dynamic = "force-dynamic";
@@ -13,9 +14,14 @@ export default async function Trainers({ searchParams }: { searchParams: Promise
   const { q, pagina } = flatParams(await searchParams);
   const ids = await searchIds("trainer", q);
   const where = ids ? { id: { in: ids } } : {};
-  const total = await db.trainer.count({ where });
+  const consulta = await leerCacheado(`entrenadores:listado:${JSON.stringify({ q: q ?? null, ids: ids ?? null, pagina: pagina ?? null })}`, ["entrenadores"], 60, async () => {
+    const total = await db.trainer.count({ where });
+    const ventana = pageWindow(total, pageNumber(pagina));
+    const trainers = await db.trainer.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], skip: ventana.skip, take: ventana.take, select: { id: true, slug: true, name: true, gym: { select: { name: true } }, _count: { select: { fighters: true } } } });
+    return { total, trainers };
+  });
+  const { total, trainers } = consulta;
   const w = pageWindow(total, pageNumber(pagina));
-  const trainers = await db.trainer.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { gym: true, _count: { select: { fighters: true } } } });
   return (
     <>
       <h1>Entrenadores</h1>
