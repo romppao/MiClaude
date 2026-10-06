@@ -14,7 +14,7 @@ import { audit } from "../../lib/common/audit";
 import { notifyDecision } from "../../lib/community/notify";
 import { anonymizeFighter } from "../../lib/fighters/anonymize";
 import { LIMITS, oneLine } from "../../lib/common/text";
-import { Rechazo, fullNameSlug, go, guard, listFighters, returnTo, str } from "./shared";
+import { Rechazo, fullNameSlug, go, guard, invalidar, listFighters, returnTo, str } from "./shared";
 
 /** Cola de moderación de combates: verificar, rechazar o restaurar uno rechazado. Solo moderadores. */
 export async function adminDecide(f: FormData) {
@@ -127,6 +127,7 @@ export async function setGymVerified(f: FormData) {
     db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null } }),
     audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } }, db),
   ]);
+  invalidar("gimnasios");
   revalidatePath("/", "layout");
   go(back, { aviso: verify ? "sello_concedido" : "sello_retirado" });
 }

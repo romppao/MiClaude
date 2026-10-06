@@ -6,6 +6,7 @@ import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
 import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
 import { PROVINCES } from "../../lib/common/labels";
+import { leerCacheado } from "../../lib/common/cache";
 
 export const metadata = { title: "Gimnasios" };
 export const dynamic = "force-dynamic";
@@ -14,9 +15,14 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
   const { q, province, pagina } = flatParams(await searchParams);
   const ids = await searchIds("gym", q);
   const where = { ...(province && { province }), ...(ids && { id: { in: ids } }) };
-  const total = await db.gym.count({ where });
+  const consulta = await leerCacheado(`gimnasios:listado:${JSON.stringify({ q: q ?? null, ids: ids ?? null, province: province ?? null, pagina: pagina ?? null })}`, ["gimnasios"], 60, async () => {
+    const total = await db.gym.count({ where });
+    const ventana = pageWindow(total, pageNumber(pagina));
+    const gyms = await db.gym.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], skip: ventana.skip, take: ventana.take, select: { id: true, slug: true, name: true, city: true, province: true, verifiedAt: true, _count: { select: { fighters: true } } } });
+    return { total, gyms: gyms.map(({ verifiedAt, ...gym }) => ({ ...gym, verifiedAt: verifiedAt ? true : null })) };
+  });
+  const { total, gyms } = consulta;
   const w = pageWindow(total, pageNumber(pagina));
-  const gyms = await db.gym.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { _count: { select: { fighters: true } } } });
   return (
     <>
       <h1>Gimnasios</h1>
