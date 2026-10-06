@@ -2,7 +2,9 @@
 // Las guardas de permisos («quién puede hacer qué») no están aquí sino en lib/accounts/permissions.ts, porque las usan también las pantallas.
 
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { Prisma } from "@prisma/client";
+import type { EtiquetaCache } from "../../lib/common/cache";
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { PROVINCES, slugify } from "../../lib/common/labels";
@@ -34,6 +36,11 @@ export function go(path: string, mensaje?: { aviso?: string; problema?: string }
   if (mensaje.aviso) { params.delete("problema"); params.set("aviso", mensaje.aviso); }
   if (mensaje.problema) { params.delete("aviso"); params.set("problema", mensaje.problema); }
   redirect(`${base}?${params.toString()}`);
+}
+
+/** Invalida las lecturas públicas afectadas por una escritura ya confirmada. */
+export function invalidar(...etiquetas: EtiquetaCache[]) {
+  for (const etiqueta of new Set(etiquetas)) revalidateTag(etiqueta);
 }
 
 /** Conserva filtros/página y sección de una cola, sin permitir cambiar el destino de la acción. */

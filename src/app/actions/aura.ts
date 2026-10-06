@@ -8,7 +8,7 @@ import { db } from "../../lib/common/db";
 import { getUser } from "../../lib/accounts/auth";
 import { internalPath, loginPath } from "../../lib/common/paths";
 import { AURA_COMMENT_MAX, AURA_PER_DAY, canGiveAura } from "../../lib/aura/rules";
-import { go, str, withLock } from "./shared";
+import { go, invalidar, str, withLock } from "./shared";
 
 /**
  * Dar aura a un peleador por su actuación en un combate. Las reglas están en `canGiveAura` (lib/rules.ts):
@@ -41,6 +41,7 @@ export async function giveAura(f: FormData) {
     return "ok" as const;
   });
   if (status === "limite") go(back, { problema: "aura_limite" });
+  invalidar("ranking");
   revalidatePath("/", "layout");
   go(back, { aviso: "aura_dada" });
 }
@@ -50,6 +51,7 @@ export async function removeAura(f: FormData) {
   const back = internalPath(str(f, "back"));
   if (!user) redirect(loginPath(back));
   await db.aura.deleteMany({ where: { userId: user.id, boutId: str(f, "boutId"), fighterId: str(f, "fighterId") } });
+  invalidar("ranking");
   revalidatePath("/", "layout");
   go(back, { aviso: "aura_quitada" });
 }

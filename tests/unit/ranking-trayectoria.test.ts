@@ -12,6 +12,7 @@ vi.mock("../../src/lib/common/db", () => ({ db: {
   bout: { findMany: (args: { include?: unknown }) => { mocks.boutQuery(args); return args.include ? mocks.supported : mocks.communityBouts; } },
   fighter: { findMany: (args: unknown) => { mocks.fighterQuery(args); return mocks.publicFighters; } },
 } }));
+vi.mock("../../src/lib/common/cache", () => ({ leerCacheado: (_clave: string, _etiquetas: string[], _segundos: number, fn: () => Promise<unknown>) => fn() }));
 import { auraRanking } from "../../src/lib/aura/ranking";
 
 const title = () => ({ fighterId: "f1", scope: "NATIONAL", discipline: "BOXEO", level: "AMATEUR", weightClass: "M70", divisionId: null, supportKind: "FEDERATION", supportAccreditationId: null, rejectedAt: null, withdrawnAt: null });
