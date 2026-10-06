@@ -14,7 +14,7 @@ Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen p
 
 ## Rangos (resumen; detalle y registro en [`RANGOS.md`](RANGOS.md))
 
-1 **Claude** (líder técnico) · 2 **Codex** (ejecutor principal, con evidencia) · 3 **Antigravity** · 4 **GitHub Copilot** · 5 **Open Code con modelos locales (Ollama/Qwen)** (los tres últimos, en periodo de prueba). Las tareas se reparten por nivel N1–N4 según el rango y los resultados; el orden se revisa tras cada PR.
+1 **Claude** (líder técnico) · 2 **Codex** (ejecutor principal, con evidencia) · **Antigravity, GitHub Copilot y Open Code (Ollama/Qwen): en periodo de prueba, sin ordenar** hasta que Claude tenga una primera toma de contacto con su trabajo (decisión del fundador). Las tareas se reparten por nivel N1–N4 según el rango y los resultados; el orden se revisa tras cada PR.
 
 ## Gobierno del equipo (decisión del fundador, 6 de octubre de 2026)
 

@@ -6,13 +6,11 @@
 
 | Rango | Quién | Papel | Nivel de tarea que puede recibir | Fundamento |
 |---|---|---|---|---|
-| **1** | **Claude** | Líder técnico: plan, arquitectura, métodos, fichas de tarea, revisión de todos los PR | N4 (arquitectura, seguridad, datos) y todo lo demás | Decisión del fundador |
+| **1** | **Claude** | Líder técnico: plan, arquitectura, métodos, fichas de tarea, revisión de todos los PR | N4 y todo lo demás | Decisión del fundador |
 | **2** | **Codex** | **Ejecutor principal**: la mayor parte del código | N3 y por debajo | **Con evidencia** (ver registro): 9 PR propios integrados con CI en verde, documentación fiel y honesta, lo que afirma haber probado es cierto |
-| **3** | **Antigravity** | Ejecutor (periodo de prueba) | N2 y N1 hasta superar la prueba de ingreso | **Sin evidencia todavía** (a priori: puede ejecutar el servidor y el navegador en local, lo que Codex no puede) |
-| **4** | **GitHub Copilot** | Ejecutor (periodo de prueba) | N2 y N1 hasta superar la prueba de ingreso | **Sin evidencia todavía** (a priori: trabaja bien en tareas pequeñas y bien delimitadas dentro de GitHub) |
-| **5** | **Open Code con modelos locales (Ollama / Qwen)** | Ejecutor de tareas mecánicas (periodo de prueba) | N1; N2 solo tras superar la prueba | **Sin evidencia todavía** (a priori: los modelos locales pequeños aguantan peor tareas largas de varios ficheros; su ventaja es que no gastan créditos) |
+| **Sin ordenar** | Antigravity · GitHub Copilot · Open Code (Ollama / Qwen) | Ejecutores **en periodo de prueba** | N1 y N2 (tras la prueba de ingreso) | **Sin evidencia todavía.** Claude los ordenará (puestos 3, 4 y 5) cuando tenga una primera toma de contacto con el trabajo de cada uno; hasta entonces no hay jerarquía entre ellos |
 
-**Los puestos 3–5 son una hipótesis de partida, no un juicio.** Se confirman o se reordenan con los resultados reales (abajo). **El modelo que cada herramienta usa pesa más que la herramienta**: Antigravity o Open Code con un modelo de primer nivel rinden muy distinto que con uno pequeño. **Pendiente del fundador:** decirme qué modelo ejecuta cada herramienta en su cuenta y si Codex dispone de PostgreSQL y navegador locales (hoy valida solo con el CI).
+**Decisión del fundador (6 de octubre de 2026, después):** «cuando ya tengas pruebas del trabajo de las otras herramientas, ya decidirás […] ahora todavía no hace falta». Por eso **no se ordenan los puestos 3–5 hasta tener resultados reales**. **El modelo que cada herramienta usa pesa más que la herramienta.** **Pendiente del fundador:** decir qué modelo ejecuta cada herramienta y si Codex dispone de PostgreSQL y navegador locales (hoy valida solo con el CI).
 
 ## Niveles de tarea
 
@@ -53,6 +51,6 @@
 | Fecha | Asistente | PR / trabajo | Cumpl. | Calidad | Pruebas | Verdad | Autonomía | Doc. | Notas de Claude |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-10-06 | **Codex** | 9 PR (#8–#16, 2–4 oct), revisados en conjunto | 4 | 4 | 4 | 5 | 3 | 5 | Todo lo que afirma haber ejecutado se verificó cierto (tipos, 406 unitarias, 16 guiones de navegador y axe en verde en mi ejecución con base vacía; CI en verde). Documentación muy buena y honesta (reconoce lo que no pudo ejecutar y los fallos intermitentes sin causa). Descuentos: cabecera de escritorio apilada y enlaces muertos sin detectar (sus pruebas miden accesibilidad, no «¿hace algo?» ni la maqueta), varias rondas de CI en rojo por selectores de pruebas (no ejecuta el navegador en local), instrucciones de `CLAUDE.md` contradictorias («diseño aplicado» y «implementación pendiente»), PR duplicada (#9) sin cerrar |
-| — | Antigravity | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
-| — | GitHub Copilot | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
-| — | Open Code (Ollama / Qwen) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+| — | Antigravity (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+| — | GitHub Copilot (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+| — | Open Code, Ollama / Qwen (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |

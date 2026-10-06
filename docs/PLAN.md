@@ -47,7 +47,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | Codex | — (especificación del fundador incluida) |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 
-«Sugerida a» sigue el orden de rangos de [`RANGOS.md`](RANGOS.md) (Codex rango 2 con evidencia; Antigravity, Copilot y Open Code en periodo de prueba). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
+«Sugerida a» sigue el orden de rangos de [`RANGOS.md`](RANGOS.md) (Codex rango 2 con evidencia; Antigravity, Copilot y Open Code en periodo de prueba y sin ordenar). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
 
 ## Definición de «hecho» (para cualquier tarea)
 
