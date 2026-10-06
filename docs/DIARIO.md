@@ -1023,3 +1023,11 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué se hizo:** tres direcciones (A Revista, B Aparato, C Lona), la mezcla con un ambiente por deporte (`direcciones/mezcla-por-deporte.html`), la especificación [`diseno/SISTEMA-TEMAS.md`](diseno/SISTEMA-TEMAS.md) y las fichas T-015, T-016 y T-017 para Codex, **bloqueadas hasta el visto bueno del fundador**.
 **Qué salió mal / se aprendió:** (1) en B un estilo de `strong` se filtró a otro bloque; (2) las comprobaciones automáticas (desborde, 44 px, tamaño de letra, contraste) detectaron etiquetas de 12–13 px, un logotipo de 40 px de alto y un desborde horizontal por un fondo decorativo; se corrigieron antes de enseñarlo; (3) tensión con la regla de comunicación inclusiva del 3 de octubre: se resuelve con ambiente por defecto neutro y tema solo cuando la persona elige.
 **Estado y próximos pasos:** el fundador elige o ajusta; después, T-015, T-016 y T-017 con Codex; Claude revisa cada PR visual con capturas.
+
+
+## 6 de octubre de 2026 (noche, 9) — Diseño: portada, registro, velada y estados
+
+**Pedido por el fundador:** «continúa con el diseño»; después: «todavía no haremos el logo, ya que todavía no tengo un nombre oficial para la app».
+**Qué se hizo:** maquetas de la portada con elección de deporte, la barra inferior móvil y los estados; del registro con formularios; y de la ficha de velada, todas en los siete ambientes. Ficha [T-018](tareas/T-018-nombre-de-la-app-en-un-solo-sitio.md) para dejar el nombre de la app en un solo sitio (N1).
+**Qué salió mal / se aprendió:** (1) un nombre de clase repetido dejó dos botones vacíos; (2) con `clip-path` el aro de foco y la selección exteriores desaparecen: se dibujan por dentro; (3) el logotipo se aplaza hasta tener el nombre oficial.
+**Estado y próximos pasos:** pendiente el visto bueno del fundador; quedan dirección fotográfica y formularios de «Mi ficha»; Codex ejecuta T-015 a T-017 cuando el fundador las lance.

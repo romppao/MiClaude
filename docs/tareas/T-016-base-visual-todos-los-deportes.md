@@ -24,6 +24,9 @@ En todos: sustituir colores y fuentes escritos a mano por variables; ningún est
 - `test:a11y` en verde (0 incumplimientos graves o críticos) y `tests/e2e/enlaces.mjs` y `movil.mjs` en verde.
 - Ningún color escrito a mano nuevo (revisar `globals.css` y los componentes).
 
+## Regla de accesibilidad añadida
+Ningún elemento con `clip-path` (botones octogonales o en paralelogramo, tarjetas recortadas) puede depender de un contorno o una sombra **exterior**: el recorte los oculta. Foco: `outline: 3px solid var(--fg); outline-offset: -6px`; selección: `box-shadow: inset …`. Comprobar con el teclado en MMA y kickboxing.
+
 ## No hacer
 No inventar elementos que la aplicación no tiene (datos, botones sin destino, sparring, reservas). No cambiar textos de producto ni permisos. No usar emojis. No incorporar marcas de terceros.
 

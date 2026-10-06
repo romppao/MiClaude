@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es" data-sport="todos">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring España · Registro y formularios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,500&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;900&family=Saira+Extra+Condensed:wght@600;800&family=Archivo+Narrow:wght@600;700&family=Teko:wght@600;700&family=Bebas+Neue&family=Spectral:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+/* ===== Marca: lo que NO cambia en ningún deporte ===== */
+:root{
+  --brand:#BE33F5;          /* color oficial */
+  --on-brand:#0C0B0F;       /* texto sobre el violeta: 4,6:1 */
+  --texto:"Barlow",system-ui,sans-serif;
+  --radius:0px; --upper:none; --skew:0deg;
+  --cut:none; --btn-cut:none;
+}
+/* ===== Tema por deporte: solo cambian estas variables ===== */
+[data-sport="todos"]{
+  --bg:#F3EFE6; --bg-2:#EAE4D6; --fg:#111014; --fg-2:#4A4650; --line:#CFC8B8; --on-bg-accent:#8E1FBD; --accent2:#111014;
+  --display:"Newsreader",Georgia,serif; --num:"Barlow Condensed",sans-serif; --upper:none;
+  --regla-h:6px; --regla-bg:linear-gradient(var(--fg) 0 1px,transparent 1px 5px,var(--fg) 5px 6px);
+  --motif:repeating-linear-gradient(90deg,transparent 0 11px,rgba(17,16,20,.06) 11px 12px);
+  --card:#FFFFFF; --on-fg:#F3EFE6;
+}
+[data-sport="boxeo"]{
+  --bg:#0C0B0F; --bg-2:#16141B; --fg:#F2EEE8; --fg-2:#B8B2C0; --line:#34303E; --on-bg-accent:#D77CFB; --accent2:#F2EEE8;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif; --num:"Big Shoulders Display",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:linear-gradient(var(--brand) 0 2px,transparent 2px 6px,var(--fg) 6px 8px,transparent 8px 12px,var(--brand) 12px 14px);
+  --motif:repeating-linear-gradient(0deg,transparent 0 9px,rgba(255,255,255,.045) 9px 10px);
+  --card:#16141B; --on-fg:#0C0B0F; --radius:2px;
+}
+[data-sport="mma"]{
+  --bg:#101214; --bg-2:#181B1E; --fg:#E9EDF0; --fg-2:#A9B1B8; --line:#2F353A; --on-bg-accent:#FF8A4C; --accent2:#FF6A2B;
+  --display:"Saira Extra Condensed","Arial Narrow",sans-serif; --num:"Saira Extra Condensed",sans-serif; --upper:uppercase;
+  --regla-h:16px; --regla-bg:repeating-linear-gradient(45deg,#3A4046 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,#3A4046 0 6px,transparent 6px 12px);
+  --motif:repeating-linear-gradient(45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px),repeating-linear-gradient(-45deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px);
+  --card:#181B1E; --on-fg:#101214;
+  --cut:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
+  --btn-cut:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px);
+}
+[data-sport="muaythai"]{
+  --bg:#F5EADB; --bg-2:#EBDAC3; --fg:#2A1810; --fg-2:#6A493A; --line:#D6BEA2; --on-bg-accent:#9E1F17; --accent2:#B3261E;
+  --display:"Archivo Narrow","Arial Narrow",sans-serif; --num:"Archivo Narrow",sans-serif; --upper:uppercase;
+  --regla-h:12px; --regla-bg:repeating-linear-gradient(90deg,#B3261E 0 18px,#F5EADB 18px 22px,#2A1810 22px 26px,#F5EADB 26px 30px);
+  --motif:repeating-linear-gradient(135deg,transparent 0 14px,rgba(42,24,16,.07) 14px 16px);
+  --card:#FFF8EE; --on-fg:#F5EADB;
+}
+[data-sport="kickboxing"]{
+  --bg:#0A0A0A; --bg-2:#151515; --fg:#FFFFFF; --fg-2:#C2C2C2; --line:#2C2C2C; --on-bg-accent:#FFD400; --accent2:#FFD400;
+  --display:"Teko","Arial Narrow",sans-serif; --num:"Teko",sans-serif; --upper:uppercase;
+  --regla-h:14px; --regla-bg:repeating-linear-gradient(-60deg,#FFD400 0 14px,#0A0A0A 14px 28px);
+  --motif:repeating-linear-gradient(-60deg,transparent 0 22px,rgba(255,212,0,.06) 22px 24px);
+  --card:#151515; --on-fg:#0A0A0A;
+  --btn-cut:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+[data-sport="k1"]{
+  --bg:#F6F6F4; --bg-2:#ECECE8; --fg:#0E0E0E; --fg-2:#4D4D4D; --line:#CFCFCA; --on-bg-accent:#B50018; --accent2:#D6001C;
+  --display:"Bebas Neue","Arial Narrow",sans-serif; --num:"Bebas Neue",sans-serif; --upper:uppercase;
+  --regla-h:8px; --regla-bg:linear-gradient(90deg,#D6001C 0 62%,#0E0E0E 62% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/84px 100%,linear-gradient(0deg,transparent 0 calc(100% - 2px),rgba(14,14,14,.1) calc(100% - 2px)) 0 0/100% 56px;
+  --card:#FFFFFF; --on-fg:#F6F6F4;
+}
+[data-sport="jiujitsu"]{
+  --bg:#EFF1F6; --bg-2:#E1E5EF; --fg:#14183A; --fg-2:#464C72; --line:#C6CCDF; --on-bg-accent:#6A1B9A; --accent2:#14183A;
+  --display:"Spectral",Georgia,serif; --num:"Spectral",Georgia,serif; --upper:none;
+  --regla-h:10px; --regla-bg:linear-gradient(90deg,#FFFFFF 0 20%,#1F5FBF 20% 40%,#7B2CBF 40% 60%,#6B4423 60% 80%,#111 80% 100%);
+  --motif:linear-gradient(90deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px,linear-gradient(0deg,transparent 0 calc(100% - 1px),rgba(20,24,58,.09) calc(100% - 1px)) 0 0/64px 64px;
+  --card:#FFFFFF; --on-fg:#EFF1F6; --radius:6px;
+}
+
+*{box-sizing:border-box;margin:0}
+body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 17px/1.55 var(--texto);transition:background .35s,color .35s}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--on-bg-accent);outline-offset:3px}
+/* Con formas recortadas (clip-path) el aro exterior se oculta: en esos elementos se dibuja por dentro */
+.btn:focus-visible,.menu .entrar:focus-visible,.ficha:focus-visible,.opc input:focus-visible+span,.tipo:focus-visible,.ent:focus-visible,.fila:focus-visible{outline:3px solid var(--fg);outline-offset:-6px}
+.c{max-width:1180px;margin:0 auto;padding:0 20px}
+.aviso{background:var(--fg);color:var(--bg);text-align:center;padding:8px 16px;font-size:14px}
+.regla{height:var(--regla-h);background:var(--regla-bg)}
+
+.pie{padding:28px 0;color:var(--fg-2);font-size:15px}
+
+/* ===== Componentes de la portada ===== */
+.pad{padding-bottom:0}
+.cab .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.marca{display:inline-flex;align-items:center;gap:.28em;min-height:44px;font:700 28px/1 var(--display);text-transform:var(--upper);text-decoration:none;letter-spacing:.01em}
+.marca b{color:var(--on-bg-accent);font-weight:inherit}
+.marca small{font:600 15px/1 var(--texto);text-transform:uppercase;letter-spacing:.14em;color:var(--fg-2);margin-left:.9em;padding-left:.9em;border-left:1px solid var(--line)}
+.menu{display:flex;gap:2px;list-style:none;padding:0}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 13px;text-decoration:none;font:600 15px/1 var(--texto);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2)}
+.menu a:hover,.menu a[aria-current]{color:var(--fg)}
+.menu a[aria-current]{box-shadow:inset 0 -3px 0 var(--brand)}
+.menu .entrar{background:var(--brand);color:var(--on-brand);padding:0 20px;font-weight:700;clip-path:var(--btn-cut);border-radius:var(--radius)}
+@media (max-width:860px){.menu{display:none}.marca small{display:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;background:var(--brand);color:var(--on-brand);font:700 16px/1 var(--texto);text-decoration:none;clip-path:var(--btn-cut);border-radius:var(--radius);border:0;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.btn.sec{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg-2);clip-path:none}
+h2{font:700 clamp(30px,4.4vw,48px)/1.05 var(--display);text-transform:var(--upper);margin-bottom:8px}
+.baj{color:var(--fg-2);margin-bottom:22px;max-width:56ch}
+
+.pie{padding:28px 0;color:var(--fg-2);font-size:15px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.elige{background:var(--bg-2);border-block:1px solid var(--line)}
+.elige .in{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 20px}
+.elige p{font:600 15px/1 var(--texto);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-2)}
+.deportes{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0}
+.deportes button{min-height:44px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--fg);font:600 15px/1 var(--texto);cursor:pointer;border-radius:var(--radius)}
+.deportes button[aria-checked="true"]{background:var(--fg);color:var(--on-fg);border-color:var(--fg)}
+
+.pag{padding:44px 0 56px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:48px;align-items:start}
+.pag h1{font:700 clamp(40px,6vw,76px)/.95 var(--display);text-transform:var(--upper);margin:6px 0 14px}
+.sobre{font:600 15px/1.35 var(--texto);letter-spacing:.16em;text-transform:uppercase;color:var(--on-bg-accent)}
+.lema{font-size:19px;color:var(--fg-2);max-width:40ch}
+.tipos{display:grid;gap:10px;margin-top:28px;list-style:none;padding:0}
+.tipo{display:block;text-decoration:none;border:1px solid var(--line);background:var(--card);padding:16px 18px;border-radius:var(--radius);clip-path:var(--cut)}
+.tipo[aria-current="true"]{box-shadow:inset 0 0 0 3px var(--brand)}
+.tipo b{display:block;font:700 22px/1.1 var(--display);text-transform:var(--upper)}
+.tipo span{color:var(--fg-2);font-size:16px}
+.form{background:var(--card);border:1px solid var(--line);padding:28px;border-radius:var(--radius);clip-path:var(--cut)}
+.form h2{font:700 30px/1.1 var(--display);text-transform:var(--upper);margin:0 0 4px}
+.campo{margin-top:20px}
+.campo label,.campo legend{display:block;font:600 16px/1.3 var(--texto);margin-bottom:6px}
+.ayuda{display:block;color:var(--fg-2);font-size:15px;margin-bottom:8px}
+input[type=text],input[type=email],input[type=password],select{width:100%;min-height:50px;padding:0 14px;font:400 17px/1 var(--texto);color:var(--fg);background:var(--bg);border:2px solid var(--fg-2);border-radius:var(--radius)}
+input:focus-visible,select:focus-visible{outline:3px solid var(--on-bg-accent);outline-offset:2px;border-color:var(--fg)}
+.campo.error input{border-color:var(--on-bg-accent)}
+.msg{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:15px;color:var(--fg)}
+.msg svg{flex:none;margin-top:2px;color:var(--on-bg-accent)}
+.clave{display:flex;gap:8px}
+.clave button{flex:none;min-height:50px;padding:0 16px;background:transparent;color:var(--fg);border:2px solid var(--fg-2);font:600 15px/1 var(--texto);border-radius:var(--radius);cursor:pointer}
+.opciones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border:0;padding:0}
+.opc{position:relative}
+.opc input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;margin:0}
+.opc span{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:84px;padding:0 0 12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);overflow:hidden;border-radius:var(--radius);clip-path:var(--cut)}
+.opc span i{display:block;height:var(--regla-h);background:var(--regla-bg)}
+.opc span b{padding:0 12px;font:700 22px/1 var(--display);text-transform:var(--upper)}
+.opc input:checked+span{box-shadow:inset 0 0 0 3px var(--brand)}
+@media (max-width:420px){.opciones{grid-template-columns:1fr 1fr}}
+.btn.grande{width:100%;margin-top:26px;min-height:54px;font-size:17px}
+.pie-form{margin-top:16px;font-size:15px;color:var(--fg-2)}
+@media (max-width:860px){.pag{grid-template-columns:1fr;gap:28px;padding-top:28px}}
+
+/* Barra inferior móvil */
+.tabs{display:none}
+@media (max-width:860px){
+  body{padding-bottom:76px}
+  .tabs{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--fg);padding-bottom:env(safe-area-inset-bottom)}
+  .tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;text-decoration:none;font:600 13px/1 var(--texto);color:var(--fg-2);letter-spacing:.04em}
+  .tabs a[aria-current]{color:var(--fg);box-shadow:inset 0 3px 0 var(--brand)}
+  .tabs svg{width:24px;height:24px}
+}
+@media (prefers-reduced-motion:no-preference){.ficha,.btn,.fila{transition:box-shadow .15s,background .15s,filter .15s}}
+
+</style>
+</head>
+<body>
+<p class="aviso">Maqueta de diseño · Ring España · Registro y formularios · Elige un deporte arriba para ver cómo cambia · Datos ficticios</p>
+<div class="regla" aria-hidden="true"></div>
+<header class="cab"><div class="c in">
+  <a class="marca" href="#">Ring <b>España</b><small id="etq">Todos los deportes</small></a>
+  <nav aria-label="Principal"><ul class="menu">
+    <li><a href="#" aria-current="page">Inicio</a></li><li><a href="#">Veladas</a></li><li><a href="#">Clubes</a></li><li><a href="#">Ránking</a></li><li><a class="entrar" href="#">Entrar</a></li>
+  </ul></nav>
+</div></header>
+<div class="elige"><div class="c in"><p id="lbl-dep">Tu deporte</p><ul class="deportes" role="radiogroup" aria-labelledby="lbl-dep" id="deportes"></ul></div></div>
+<main class="c" id="app">
+<div class="pag">
+  <div>
+    <p class="sobre">Crear cuenta</p>
+    <h1 id="tit">Empieza por tu ficha</h1>
+    <p class="lema">Elige qué quieres hacer. Puedes cambiarlo más adelante.</p>
+    <ul class="tipos" aria-label="Tipo de cuenta">
+      <li><a class="tipo" href="#"><b>Usuario</b><span>Sigue a peleadores, da aura y consulta veladas.</span></a></li>
+      <li><a class="tipo" href="#" aria-current="true"><b>Peleador</b><span>Crea tu ficha y lleva tu trayectoria.</span></a></li>
+      <li><a class="tipo" href="#"><b>Promotora o federación</b><span>Publica veladas y presenta tu entidad. Un moderador revisa la solicitud.</span></a></li>
+    </ul>
+  </div>
+  <form class="form" aria-labelledby="f-tit" onsubmit="return false">
+    <h2 id="f-tit">Crear cuenta de peleador</h2>
+    <p class="ayuda" style="margin-top:6px">Son cuatro datos. No te pedimos tu edad ahora.</p>
+    <fieldset class="campo" style="border:0;padding:0">
+      <legend>¿Cuál es tu deporte?</legend>
+      <span class="ayuda">La aplicación se vestirá de tu deporte. Podrás cambiarlo cuando quieras.</span>
+      <div class="opciones" id="opc"></div>
+    </fieldset>
+    <div class="campo"><label for="prov">Provincia</label><select id="prov"><option>Sevilla</option><option>Madrid</option><option>Valencia</option></select></div>
+    <div class="campo"><label for="nom">Nombre y apellidos</label><input id="nom" type="text" autocomplete="name" value="Marcos Vidal Ortega"></div>
+    <div class="campo error"><label for="mail">Correo electrónico</label><span class="ayuda">Te enviaremos un enlace para confirmarlo.</span>
+      <input id="mail" type="email" autocomplete="email" value="marcos.vidal.ejemplo.es" aria-invalid="true" aria-describedby="mail-e">
+      <p class="msg" id="mail-e" role="alert"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17.5v.01"/></svg><span><b>Este correo no parece correcto.</b> Revisa que tenga una @, por ejemplo nombre@ejemplo.es.</span></p></div>
+    <div class="campo"><label for="clave">Contraseña</label><span class="ayuda">Mínimo 10 caracteres. Mejor una frase que una palabra.</span>
+      <div class="clave"><input id="clave" type="password" autocomplete="new-password" value="una frase larga y mia"><button type="button" onclick="const i=document.getElementById('clave');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'Mostrar':'Ocultar'">Mostrar</button></div></div>
+    <button class="btn grande" type="submit">Crear mi cuenta de peleador</button>
+    <p class="pie-form">¿Ya tienes cuenta? <a href="#">Entrar</a> · Al crear la cuenta aceptas la <a href="#">política de privacidad</a>.</p>
+  </form>
+</div>
+</main>
+<footer class="c pie">Ring España · Deportes de contacto de toda España · <a href="#">Cómo funciona</a> · <a href="#">Privacidad</a></footer>
+<nav class="tabs" aria-label="Principal (móvil)">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Veladas</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg>Clubes</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-7M12 20V5M19 20v-10"/></svg>Ránking</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Cuenta</a>
+</nav>
+<script>
+
+const NOMB={"todos": "Todos los deportes", "boxeo": "Boxeo", "mma": "MMA", "muaythai": "Muay Thai", "kickboxing": "Kickboxing", "k1": "K-1", "jiujitsu": "Jiu-jitsu"}, ORDEN=Object.keys(NOMB);
+const $=s=>document.querySelector(s);
+function barra(k){ $("#deportes").innerHTML=ORDEN.map(x=>`<li><button type="button" role="radio" data-k="${x}" aria-checked="${x===k}">${NOMB[x]}</button></li>`).join(""); }
+$("#deportes").addEventListener("click",e=>{const b=e.target.closest("button");if(b)pintar(b.dataset.k)});
+function inicio(){ let k="todos"; try{const g=localStorage.getItem("deporte"); if(NOMB[g]) k=g;}catch(e){} const q=new URLSearchParams(location.search).get("deporte"); if(NOMB[q]) k=q; return k; }
+
+
+function pintar(k){
+  document.documentElement.dataset.sport=k; barra(k);
+  const lista=ORDEN.filter(x=>x!=="todos");
+  $("#opc").innerHTML=lista.map(x=>`<label class="opc" data-sport="${x}"><input type="radio" name="deporte" value="${x}" ${x===(k==="todos"?"muaythai":k)?"checked":""}><span><i aria-hidden="true"></i><b>${NOMB[x]}</b></span></label>`).join("");
+  try{localStorage.setItem("deporte",k)}catch(e){}
+}
+pintar(inicio());
+
+</script>
+</body>
+</html>
