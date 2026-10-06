@@ -1,5 +1,7 @@
 # Ring España — instrucciones para Claude
 
+> **Equipo y prioridad móvil — 6 de octubre de 2026:** el fundador trabaja con varios asistentes (Claude, Codex, GitHub Copilot, Open Code, Antigravity): lee [docs/EQUIPO.md](docs/EQUIPO.md) y registra tu trabajo en tu `docs/APORTACIONES-<NOMBRE>.md`. **El móvil (iOS y Android) es la prioridad**, con el objetivo de publicar en App Store y Google Play: ver [docs/MOVIL.md](docs/MOVIL.md). Cero enlaces o botones muertos (`tests/e2e/enlaces.mjs`).
+
 > **Última prioridad del fundador — 3 de octubre de 2026:** «pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El aspecto actual es provisional, aunque se publicaran decisiones anteriores. No hacer ahora otro rediseño. Corregir funciones, datos, errores y claridad; retomar composición e identidad con el fundador al final. Pendientes vigentes y evidencias: [docs/PULIDO-FUNCIONAL.md](docs/PULIDO-FUNCIONAL.md).
 
 > **Relevo de Codex (3 de octubre de 2026):** el diseño aprobado está integrado en PR #12 y comprobado públicamente en Render; CI #111 correcto. Color oficial #BE33F5, glow, bordes redondeados y perfiles con foto y banner propios. Lee [docs/APORTACIONES-CODEX.md](docs/APORTACIONES-CODEX.md) y [docs/DISENO.md](docs/DISENO.md) antes de continuar. Se han conservado los cambios recientes de categorías por edad, comunicación inclusiva y calendario de la rama de la demo.

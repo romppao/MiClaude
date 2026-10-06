@@ -119,7 +119,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             <input type="hidden" name="fighterId" value={fighter.id} /><input type="hidden" name="back" value={back} />
             <button className={following ? "secondary" : undefined}>{following ? "Dejar de seguir" : "Seguir a este peleador"}</button>
           </form>
-        ) : <Link href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para seguir a este peleador</Link>)}
+        ) : <Link className="btn secondary" href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para seguir a este peleador</Link>)}
         <span className="mut">{plural(followerCount, "seguidor", "seguidores")}</span>
       </div>
 
@@ -203,7 +203,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                       </form>
                     )
                   ) : user ? <Link href="/verificar">Confirma tu correo electrónico para dar aura</Link>
-                    : <Link href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para dar aura</Link>)}
+                    : <Link className="btn secondary" href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para dar aura</Link>)}
                   {notaAura && <span className="mut">{notaAura}</span>}
                 </td>
               </tr>

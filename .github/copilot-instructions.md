@@ -1,0 +1,1 @@
+Lee `AGENTS.md`, `CLAUDE.md` y `docs/EQUIPO.md` antes de proponer cambios: son las reglas del proyecto y del equipo de asistentes. Todo lo que llegue a una persona va en español. Prioridad vigente: móvil primero (iOS y Android). Una rama y un PR por trabajo, con el CI en verde; documenta cada cambio en tu registro `docs/APORTACIONES-<NOMBRE>.md`.
