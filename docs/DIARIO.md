@@ -926,3 +926,21 @@ Dos enlaces muertos reales llevaban semanas en la aplicación (uno de ellos intr
 
 ### Estado y próximos pasos
 Pendiente: seguir puliendo funcionalidades según los fallos que anote el fundador; después, escalabilidad (fotos fuera de la base de datos, caché de páginas públicas, base de datos gestionada, cola de correos, prueba de carga); paneles A/B/C al registrarse (decisión de formato del fundador); cerrar propuestas de Dependabot (saltos mayores que fallan el CI) y la #9 duplicada.
+
+
+## 6 de octubre de 2026 (tarde) — Probar como personas reales, desde el móvil
+
+### Qué se pidió
+«Cuando tú compruebes cosas de la aplicación, hazlo como si fueras uno de los usuarios […] como si fueses peleador, o un usuario, o una promotora, o una federación; un escenario ficticio de casos de uso de cada tipo de usuario» y «nos tenemos que enfocar al mil por mil en cómo funciona la aplicación en dispositivos móviles, tanto iOS como Android […] el objetivo es publicarla en App Store o Google Play». Además: documentar todo para el resto de asistentes (Antigravity, Codex, Open Code, GitHub Copilot).
+
+### Qué se hizo
+- **Colaboración:** `docs/EQUIPO.md` (protocolo común, ramas por asistente, plantilla de relevo), `AGENTS.md` y `.github/copilot-instructions.md` apuntando a él, `docs/APORTACIONES-CLAUDE.md` (mi registro), enlace en `CLAUDE.md` y en `docs/README.md`.
+- **Móvil:** `docs/MOVIL.md` (reglas, límites de las pruebas y camino a las tiendas) y `tests/e2e/movil.mjs` (iPhone SE, iPhone 14, Pixel 7 y Android de 360 px; cuatro papeles).
+- **Escenarios por persona:** `tests/e2e/escenarios.mjs` (visitante, aficionado, peleador, promotora, federación) con capturas.
+- **Correcciones** (detalle en `APORTACIONES-CLAUDE.md`): cabecera de escritorio, enlaces muertos, índice de «Mi ficha», formulario de combate más corto, margen para la barra fija, zonas táctiles de 44 px, letra de 16 px.
+
+### Qué salió mal
+La primera versión de mis auditorías daba falsos positivos (botones del menú que abren un diálogo; enlaces de una frase) y hubo que afinarla. El fallo de «seguir» que describió el fundador no se pudo reproducir como error: el enlace funcionaba, pero era una línea de texto de 26 px que no parecía pulsable.
+
+### Estado y próximos pasos
+Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y Android reales, conciliar la PR #13 (móvil) con `NavigationMenu`, paneles A/B/C al registrarse, escalabilidad antes del diseño, más personas en los escenarios.

@@ -29,3 +29,17 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 3. PWA: manifiesto, iconos, `theme-color`, página sin conexión (ver `MOVIL.md`).
 4. Escalabilidad antes del diseño: fotos de perfil fuera de PostgreSQL (almacenamiento de objetos + CDN), caché de páginas públicas (hoy casi todo es `force-dynamic`), cola de correos, base de datos gestionada con copias y prueba de restauración, prueba de carga.
 **Decisiones del fundador abiertas:** ver `TRASLADO.md` §7 y `PULIDO-FUNCIONAL.md` (menores, aura, correo/responsable, paneles A/B/C al registrarse, almacenamiento de fotos, camino hacia las tiendas).
+
+
+## 6 de octubre de 2026 (tarde) — escenarios de uso por persona y móvil
+
+**Pedido por el fundador:** «cuando compruebes cosas de la aplicación, hazlo como si fueras uno de los usuarios […] como peleador, como usuario, como promotora o como federación; un escenario ficticio con los casos de uso de cada tipo de usuario».
+**Qué cambia en la forma de probar:** además de las comprobaciones sueltas, existe **`tests/e2e/escenarios.mjs`** (`npm run test:escenarios`): cinco personas desde un iPhone emulado — Marta (visitante), Lucas (aficionado), Diego (peleador), Clara (promotora, con la moderadora que aprueba su solicitud) y Pedro (delegado de federación, al que la moderación crea el perfil y asigna como titular) — hacen lo que haría cada una con los textos que ven, y **cada paso deja una captura** (`/tmp/escenarios/*.png`, o `ESC_DIR`) que se revisa a ojo. Anota además fricciones automáticas (errores de consola, respuestas 5xx, pasos de más de 4 s, desplazamiento horizontal). No está en `test:e2e` (es de revisión, escribe capturas).
+**Qué salió de los escenarios (todo corregido):**
+- «Mi ficha» medía más de 4.000 px de alto en móvil y lo principal (registrar combate) quedaba al fondo → índice «Ir a: Registrar un combate · Mis combates · Mis datos · Mis disciplinas» arriba (enlaces de 44 px a secciones con `id`).
+- El formulario «Registrar un combate» medía unos 2.300 px → recinto, asaltos y enlace de respaldo pasan a un apartado desplegable «Más datos del combate (opcional)» (se abre solo si hay un error en ellos; el ayudante `registrar()` de las pruebas lo abre).
+- La barra fija inferior tapaba botones y campos al llevarles el foco o el desplazamiento → `scroll-padding-bottom` en móvil (WCAG 2.4.11) y margen final de página.
+- «Entra para seguir a este peleador» y «Entra para dar aura» eran líneas de texto de 26 px (probablemente lo que el fundador pulsó sin éxito) → botones táctiles; enlaces de tablas apiladas y resultados de búsqueda con 44 px.
+- Ayudas de campo de 15 px → 16 px.
+**Qué ejecuté yo:** `movil.mjs` (4 emulaciones × 4 papeles, sin problemas), `escenarios.mjs` (5 personas, 43 pasos, 0 fallos), `enlaces.mjs`, tipos y 406 unitarias; batería completa con base vacía (resultado en `DIARIO.md`). **No se puede ejecutar aquí:** Safari/WebKit ni dispositivos reales (ver `MOVIL.md`).
+**Qué debe hacer el siguiente asistente:** ampliar `escenarios.mjs` con las personas que faltan (entrenador y gimnasio titulares de su perfil, moderadora recorriendo todas sus colas, peleador menor de edad cuando se decida la política, persona mayor con letra grande y zoom); mantenerlo al día cuando cambie un recorrido; mirar las capturas, no solo el resultado.

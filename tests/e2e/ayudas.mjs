@@ -67,6 +67,8 @@ export const registrar = async (p, o) => {
   if (o.resultado !== null) { await form.locator("select[name=outcome]").selectOption(o.resultado ?? "WIN"); if (o.metodo !== null) await form.locator("select[name=method]").selectOption(o.metodo ?? "UD"); }
   if (o.peso) await form.locator("select[name=weightClass]").selectOption(o.peso);
   // Tras un error el formulario conserva lo escrito: el enlace se fija siempre de forma explícita (vacío si no se pide) para no heredar el de un intento anterior.
+  // El enlace de respaldo está en «Más datos del combate (opcional)»: se abre como lo haría una persona.
+  const mas = form.locator("details.opcionales"); if (!(await mas.evaluate((d) => d.open))) await mas.locator("summary").click();
   await form.locator("[name=evidenceUrl]").fill(o.evidencia ?? "");
   const guardar = form.getByRole("button", { name: "Registrar este combate", exact: true });
   if (o.dobleClic) await guardar.dblclick(); else await guardar.click();

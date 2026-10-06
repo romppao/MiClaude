@@ -212,3 +212,12 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | «Quitar filtros» y «ampliar la consulta» llevaban a la misma pantalla en la que ya estabas | Se mostraban siempre, sin comprobar si había algo que quitar o ampliar | Un enlace o botón se muestra solo si puede hacer algo; `tests/e2e/enlaces.mjs` lo comprueba para todos los papeles |
 | La cabecera de escritorio se veía rota y ninguna prueba lo detectó | `nav` con `flex:1` y `flex-wrap` se encogía hasta apilar sus enlaces al añadir más elementos | Las pruebas de accesibilidad no miden maquetación: tras tocar la cabecera o el CSS global, mirar capturas a varios anchos (1440, 1024, 900, 700, 390) |
 | La auditoría marcó como «botón muerto» el botón del menú | Abre un diálogo (tiene `aria-controls`), no un formulario | Las auditorías automáticas necesitan excepciones explícitas y justificadas, no ampliar la sospecha |
+
+## 6 de octubre de 2026 (tarde) — móvil y escenarios
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Comprobaciones aisladas dieron «todo verde» y aun así la experiencia móvil tenía problemas (página de 4.000 px, formulario de 2.300 px, enlaces de 26 px) | Las pruebas miden «¿funciona?», no «¿es cómodo y se entiende?» | Probar con escenarios de personas reales y **mirar las capturas**; medir zonas táctiles y largo de pantallas en móvil |
+| La barra fija inferior tapaba el botón al que se llevaba el foco | Faltaba `scroll-padding-bottom` | Todo elemento fijo en un borde necesita reservar ese espacio (`scroll-padding` + margen final) |
+| Playwright no podía pulsar un botón («element is not stable») | `scroll-behavior:smooth` mantenía la página moviéndose; la aplicación ya lo desactiva con `prefers-reduced-motion` | En las pruebas de navegador usar `reducedMotion: "reduce"` (una función real de accesibilidad), no esperas arbitrarias |
+| Un enlace a una acción principal parecía texto | Estaba escrito como `<a>` sin aspecto de botón | Las acciones (seguir, dar aura, entrar) son botones táctiles; los enlaces de texto son para navegar dentro de una frase |

@@ -29,3 +29,22 @@ header.top form.buscador{flex:1 1 240px;min-width:200px}
 
 /* Móvil primero: en las tablas apiladas, todo enlace de una celda es una zona táctil de al menos 44 px (no una línea de texto de 26 px). */
 @media(max-width:720px){table.apilada td a:not(.btn){display:inline-flex;align-items:center;min-height:44px}}
+
+/* Móvil: la barra fija inferior no debe tapar lo que recibe el foco ni lo que se desplaza a la vista (WCAG 2.4.11). El margen superior evita que la cabecera tape los avisos. */
+@media(max-width:650px){html{scroll-padding-bottom:calc(120px + env(safe-area-inset-bottom));scroll-padding-top:16px}}
+
+details.opcionales{border:1px solid var(--line);border-radius:12px;padding:4px 14px;margin:6px 0}
+details.opcionales summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+details.opcionales[open] summary{margin-bottom:8px}
+details.opcionales .field{margin-bottom:12px}
+
+details.opcionales{border:1px solid var(--line);border-radius:12px;padding:4px 14px;margin:6px 0}
+details.opcionales summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+details.opcionales[open] summary{margin-bottom:8px}
+details.opcionales .field{margin-bottom:12px}
+
+nav.indice-pagina{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 20px}
+nav.indice-pagina a{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1px solid var(--field-border,#8a8a96);border-radius:999px;font-weight:700;text-decoration:none}
+
+/* Móvil primero: un enlace que ocupa por sí solo su línea o su elemento de lista (resultados de búsqueda, «¿Has olvidado tu contraseña?») es una zona táctil de al menos 44 px. */
+@media(max-width:720px){main p>a:only-child,main li>a:only-child{display:inline-flex;align-items:center;min-height:44px}}
