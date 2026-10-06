@@ -15,7 +15,7 @@ import { divisionAgeEligible } from "../../lib/common/competition";
 import { parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parsePrior } from "../../lib/fighters/prior";
 import { LIMITS } from "../../lib/common/text";
-import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
+import { checkLengths, go, guard, invalidar, readProvince, str, uniqueSlug } from "./shared";
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
 function readDisciplineForm(f: FormData) {
@@ -65,6 +65,8 @@ export async function createMyFighter(f: FormData) {
     });
   });
   await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorDeclared: prior.prior } });
+  invalidar("fichas", "gimnasios");
+  revalidatePath("/", "layout");
   go(back, { aviso: "ficha_creada" });
 }
 
@@ -106,6 +108,7 @@ export async function updateMyFighter(f: FormData) {
     await tx.fighter.update({ where: { id: me.id }, data: { ...patch, gymId } });
     await audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: "PROFILE_UPDATED", before: { firstName: me.firstName, lastName: me.lastName, alias: me.alias, city: me.city, province: me.province, gymId: me.gymId }, after: { firstName, lastName, alias: patch.alias, city, province, gymId } }, tx);
   }));
+  invalidar("fichas", "gimnasios");
   revalidatePath("/", "layout");
   go(back, { aviso: "ficha_actualizada" });
 }
@@ -131,6 +134,7 @@ export async function saveDiscipline(f: FormData) {
     }),
     audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: before ? "DISCIPLINE_UPDATED" : "DISCIPLINE_ADDED", before: before ?? undefined, after: { discipline: choice.discipline, ...data } }, db),
   ]);
+  invalidar("fichas");
   revalidatePath("/", "layout");
   go("/mi-ficha", { aviso: "disciplina_guardada" });
 }
