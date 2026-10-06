@@ -1,5 +1,7 @@
 # Instrucciones para asistentes de código (Codex, Copilot, Open Code, Antigravity y otros)
 
+> **Aviso del fundador (6 de octubre de 2026): Open Code queda fuera del equipo.** Su modelo local (Ollama/Qwen) no es capaz de hacer la prueba de ingreso y se ha desinstalado. El equipo es: Claude (líder), Codex, Antigravity y GitHub Copilot. Donde este documento nombre a Open Code o al prefijo `opencode/`, ignóralo.
+
 Este repositorio lo desarrolla un equipo de varios asistentes coordinados por el fundador. **Las reglas del proyecto y del fundador están en [`CLAUDE.md`](CLAUDE.md) y valen para todos**, aunque el fichero lleve ese nombre.
 
 Antes de cambiar nada, lee **[`docs/EQUIPO.md`](docs/EQUIPO.md)** (protocolo de colaboración, ramas, documentación obligatoria y plantilla de relevo) y los registros de los demás asistentes (`docs/APORTACIONES-*.md`). Registra tu trabajo en tu propio `docs/APORTACIONES-<NOMBRE>.md`.

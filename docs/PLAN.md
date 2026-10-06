@@ -1,5 +1,7 @@
 # Plan maestro del proyecto
 
+> **Aviso del fundador (6 de octubre de 2026): Open Code queda fuera del equipo.** Su modelo local (Ollama/Qwen) no es capaz de hacer la prueba de ingreso y se ha desinstalado. El equipo es: Claude (líder), Codex, Antigravity y GitHub Copilot. Donde este documento nombre a Open Code o al prefijo `opencode/`, ignóralo.
+
 **Autor:** Claude (líder técnico, por decisión del fundador el 6 de octubre de 2026 — ver [`decisiones/ADR-001-gobierno-del-equipo.md`](decisiones/ADR-001-gobierno-del-equipo.md)). **Se discute con propuestas** ([`decisiones/README.md`](decisiones/README.md)); **lo decide el fundador** en lo que le corresponde. Reparto del equipo y flujo de trabajo: [`EQUIPO.md`](EQUIPO.md). Fichas de tarea: [`tareas/`](tareas/).
 
 ## Qué estamos construyendo

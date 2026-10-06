@@ -1,5 +1,7 @@
 # Rangos del equipo y registro de rendimiento
 
+> **Aviso del fundador (6 de octubre de 2026): Open Code queda fuera del equipo.** Su modelo local (Ollama/Qwen) no es capaz de hacer la prueba de ingreso y se ha desinstalado. El equipo es: Claude (líder), Codex, Antigravity y GitHub Copilot. Donde este documento nombre a Open Code o al prefijo `opencode/`, ignóralo.
+
 **Decisión del fundador (6 de octubre de 2026):** «quiero que tú, bajo tu criterio y resultados que te hayan dado en una primera toma de contacto las diferentes herramientas, designes el orden de rango […] las tareas más importantes las harán los que tengan un rango más alto». Reglas de decisión: [`decisiones/ADR-002-rangos-del-equipo.md`](decisiones/ADR-002-rangos-del-equipo.md). Reparto y flujo: [`EQUIPO.md`](EQUIPO.md).
 
 ## Orden vigente
@@ -55,4 +57,4 @@
 | 2026-10-06 | **Codex** | 9 PR (#8–#16, 2–4 oct), revisados en conjunto | 4 | 4 | 4 | 5 | 3 | 5 | Todo lo que afirma haber ejecutado se verificó cierto (tipos, 406 unitarias, 16 guiones de navegador y axe en verde en mi ejecución con base vacía; CI en verde). Documentación muy buena y honesta (reconoce lo que no pudo ejecutar y los fallos intermitentes sin causa). Descuentos: cabecera de escritorio apilada y enlaces muertos sin detectar (sus pruebas miden accesibilidad, no «¿hace algo?» ni la maqueta), varias rondas de CI en rojo por selectores de pruebas (no ejecuta el navegador en local), instrucciones de `CLAUDE.md` contradictorias («diseño aplicado» y «implementación pendiente»), PR duplicada (#9) sin cerrar |
 | — | Antigravity (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
 | — | GitHub Copilot (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
-| — | Open Code, Ollama / Qwen (sin ordenar) | sin trabajo en el repositorio | — | — | — | — | — | — | Pendiente de prueba de ingreso |
+| 2026-10-06 | Open Code | descartado por decisión del fundador (el modelo local no puede hacer la prueba) | — | — | — | — | — | — | Fuera del equipo |

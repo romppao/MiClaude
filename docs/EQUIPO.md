@@ -1,5 +1,7 @@
 # Equipo de desarrollo: cómo colaboramos
 
+> **Aviso del fundador (6 de octubre de 2026): Open Code queda fuera del equipo.** Su modelo local (Ollama/Qwen) no es capaz de hacer la prueba de ingreso y se ha desinstalado. El equipo es: Claude (líder), Codex, Antigravity y GitHub Copilot. Donde este documento nombre a Open Code o al prefijo `opencode/`, ignóralo.
+
 **Petición expresa del fundador (6 de octubre de 2026):** «necesito que documentéis todo lo que hagáis para mantenerlos comunicados entre vosotros […] Antigravity, Codex, Open Code, GitHub Copilot, que son nuestros hermanos. Formamos el equipo de desarrollo. Es nuestro ecosistema.» La comunicación entre asistentes **es este repositorio**: ninguno ve la conversación de los demás.
 
 ## Quién es quién
