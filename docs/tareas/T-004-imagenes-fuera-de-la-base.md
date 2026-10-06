@@ -1,6 +1,6 @@
 # T-004 — Imágenes fuera de PostgreSQL
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** lista (parte 1) / bloqueada (parte 2: proveedor y credenciales, decisión del fundador) · **Sugerida a:** Codex · **Depende de:** —
+**Fase:** F2 · **Estado:** lista (parte 1) / parte 2 **propuesta en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Cloudflare R2 en jurisdicción UE** (pendiente de que el fundador apruebe y cree la cuenta; imágenes servidas a través de la aplicación) · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo
 Que las fotos y banners de perfil no engorden la base de datos ni la ralenticen: guardarlas en un almacenamiento de objetos con CDN, manteniendo la base de datos solo con la referencia.

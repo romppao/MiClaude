@@ -1,6 +1,6 @@
 # T-012 — Base de datos gestionada, copias y restauración
 **Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** bloqueada (el fundador debe elegir proveedor) · **Sugerida a:** fundador + Claude · **Depende de:** decisión de alojamiento
+**Fase:** F2 · **Estado:** **propuesta en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Neon Free (Fráncfort) + copia nocturna a R2; urgente: la base gratuita de Render caduca a los 30 días** · **Sugerida a:** fundador + Claude · **Depende de:** decisión de alojamiento
 
 ## Objetivo
 Que los datos **no se pierdan ni colapsen** al crecer: base de datos PostgreSQL gestionada, con copias automáticas, restauración **probada**, conexiones controladas y vigilancia.

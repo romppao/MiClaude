@@ -1,6 +1,6 @@
 # T-010 — Observabilidad: registros, errores y salud
 **Nivel:** N2 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** lista (registros y salud) / bloqueada (envío de errores a un servicio: decisión del fundador) · **Sugerida a:** Copilot o Antigravity · **Depende de:** —
+**Fase:** F2 · **Estado:** lista (registros y salud) / errores **propuestos en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Sentry gratis (región UE) con filtro de datos personales + UptimeRobot sobre `/salud`** · **Sugerida a:** Copilot o Antigravity · **Depende de:** —
 
 ## Objetivo
 Enterarnos de los fallos **antes que los usuarios** y poder diagnosticarlos: registros estructurados, identificador por petición, captura de errores del servidor y una comprobación de salud útil.

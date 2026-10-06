@@ -45,6 +45,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 | [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | N2 | Antigravity o Copilot (prueba de ingreso 2) | — |
 | [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | N2 | Copilot o Antigravity | herramienta de errores (fundador) |
 | [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | N3 | ✔ hecha (Claude, 6 oct) | — |
+| [T-014](tareas/T-014-politica-de-menores.md) | Política de menores en la aplicación | F2 | N3 | Codex | respuestas del fundador (ADR-003) |
 | [T-013](tareas/T-013-enlaces-externos-avisan.md) | Todo enlace que abre otra pestaña lo avisa | F1 | N1 | Antigravity, Copilot y Open Code, cada uno en su rama (prueba de ingreso 1, ver `RANGOS.md`) | — |
 | [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | N2 | fundador + Claude | proveedor (fundador) |
 
@@ -55,5 +56,7 @@ Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se 
 Ficha cumplida punto por punto + criterios de aceptación verificados + CI en verde + registro del asistente actualizado + revisión de Claude aprobada (`REVISION.md`). Si algo de la ficha no se puede cumplir, se **para y se pregunta** (RFC o comentario en el PR); no se improvisa.
 
 ## Decisiones del fundador que bloquean fases
+
+**Proveedores y menores (6 oct 2026): hay una propuesta completa y de coste casi cero en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md); falta que el fundador la apruebe y que se verifiquen los precios.** Lo que sigue es la lista general:
 
 Alojamiento y proveedor de base de datos, almacenamiento de imágenes, proveedor de correo, herramienta de errores, dominio, política de menores, responsable del tratamiento de datos y correo de contacto, sexo/edad en la ficha, calibración del aura, camino hacia las tiendas. Lista viva en `TRASLADO.md` §7 y `PULIDO-FUNCIONAL.md`.
