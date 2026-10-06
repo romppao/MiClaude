@@ -234,3 +234,9 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | Se afirmó «1 GB gratis» en Neon y eran 0,5 GB; se dio por buena la primera cifra de un resumen de búsqueda | No se contrastó con una segunda fuente antes de escribirla en un ADR | Verificar cada cifra con una segunda búsqueda antes de aprobar un ADR, y dejar escrito qué se corrigió y por qué (sección «Segunda verificación» del ADR-003) |
 | Una prueba con corrección a juicio (la de ingreso 1) mide poco cuando cada tarea se hace una sola vez | Sin casos límite escritos de antemano, la nota depende de mi lectura | Complementar con una prueba objetiva con pruebas ocultas, comprobadas **antes** contra una solución de referencia y contra versiones ingenuas (que deben fallar), para saber que la prueba mide algo |
 | En un primer borrador, el enunciado público de la prueba revelaba la respuesta correcta de las trampas | Quise explicar el criterio en el mismo documento que leen los aspirantes | El criterio de corrección de una prueba no se publica donde la leen los aspirantes: va en la clave (rama aparte) |
+
+## 6 de octubre de 2026 — Preferencias públicas y pruebas entre plataformas
+
+- Una cookie es una entrada no fiable aunque la escriba la propia aplicación. Para diccionarios de claves, se valida con `hasOwn`, no con `in`, y se define una alternativa segura antes de usarla en el HTML.
+- El comportamiento sin JavaScript se conserva con controles HTML y un envío normal; el código cliente añade flechas y foco, pero no es la única forma de elegir una preferencia.
+- Un E2E nuevo puede pasar en una base aislada y la batería completa seguir bloqueada por una herramienta del arnés ausente en la plataforma. Registrar ambos hechos por separado: no atribuir el bloqueo de `psql` al código de la pantalla ni declarar verde lo que CI/Linux todavía debe ejecutar.

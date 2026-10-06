@@ -56,9 +56,10 @@ import * as moderacion from "../../src/app/actions/moderation";
 import * as comunidad from "../../src/app/actions/community";
 import * as trayectoria from "../../src/app/actions/trajectory";
 import * as demo from "../../src/app/actions/demo";
+import * as tema from "../../src/app/actions/tema";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...tema };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -81,7 +82,7 @@ const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDis
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
-const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
+const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail", "elegirDeporte"] as const;
 
 describe("clasificación de las acciones", () => {
   it("toda acción exportada está en una lista de autorización (si añades una, clasifícala arriba)", () => {

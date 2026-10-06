@@ -1015,3 +1015,21 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
 **Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
 **Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+## 6 de octubre de 2026 — T-015: deporte activo para el sistema D
+
+### Qué se pidió
+
+El fundador eligió la maqueta de Antigravity como dirección de toda la aplicación. Codex implementa en paralelo T-015 desde `claude/ring-espana-mvp`; Claude prepara T-016 dentro de `src/app/ui/`, que no se modifica en esta tarea.
+
+### Qué se hizo
+
+Se añadió el catálogo tipado de temas deportivos, la preferencia de cookie validada con claves propias, `data-deporte` en el elemento HTML y un selector provisional con radios, teclado y envío sin JavaScript. Las categorías proceden del catálogo existente; no se crean pesos, campos de base de datos, colores ni filtros de listados. Las pruebas unitarias cubren todas las disciplinas y valores hostiles; el E2E propio comprueba teclado, cambio, recarga y cookie manipulada.
+
+### Qué salió mal / límite honesto
+
+La batería E2E completa y axe no pueden terminar en este Windows porque sus guiones invocan el ejecutable externo `psql` con sintaxis de comillas POSIX y el cliente no está instalado. La base aislada, migraciones y el E2E específico sí se ejecutaron; CI/Linux debe ejecutar las baterías completas antes de integrar. `npm run mapa` se reserva para Linux o CI, como establece la ficha.
+
+### Estado y próximos pasos
+
+La rama queda para revisión visual de Claude con capturas de 390 y 1280 px. Tras integrar T-015 y T-016, se continuará con T-017 en una PR nueva, sin solapar `src/app/ui/`.
