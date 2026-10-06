@@ -1,0 +1,58 @@
+# Plan maestro del proyecto
+
+**Autor:** Claude (líder técnico, por decisión del fundador el 6 de octubre de 2026 — ver [`decisiones/ADR-001-gobierno-del-equipo.md`](decisiones/ADR-001-gobierno-del-equipo.md)). **Se discute con propuestas** ([`decisiones/README.md`](decisiones/README.md)); **lo decide el fundador** en lo que le corresponde. Reparto del equipo y flujo de trabajo: [`EQUIPO.md`](EQUIPO.md). Fichas de tarea: [`tareas/`](tareas/).
+
+## Qué estamos construyendo
+
+La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxing, K-1 y jiu-jitsu; amateur y profesional; toda España): fichas y récords de peleadores, veladas, gimnasios, entrenadores, promotoras y federaciones, y el **aura** como reconocimiento de la comunidad. **Uso principal: móvil (iOS y Android)** y, después, App Store y Google Play. Reglas del fundador en `CLAUDE.md` (intuitiva para todos, español sin jerga, cero enlaces muertos, honestidad con los datos, diseño visual al final).
+
+## Principios de arquitectura (y por qué)
+
+1. **Monolito modular**: Next.js 15 + TypeScript + PostgreSQL + Prisma, tal como está (`src/app` pantallas y acciones, `src/lib/<dominio>` lógica, reglas de dependencia comprobadas por `tests/unit/arquitectura.test.ts`). Con el volumen esperable (miles a decenas de miles de usuarios) no hacen falta microservicios: serían complejidad sin beneficio. Se escala por capas (caché, CDN, base gestionada, réplicas de lectura), no reescribiendo.
+2. **La base de datos guarda datos, no archivos**: las fotos y banners salen de PostgreSQL a un almacenamiento de objetos con CDN (T-004). Migraciones **aditivas** siempre; nunca se edita una migración integrada.
+3. **Lectura pública barata**: casi todo lo que se ve sin cuenta (fichas, ránking, calendario, gimnasios) cambia poco: las consultas pesadas se cachean por etiquetas (`unstable_cache` + `revalidateTag` al escribir) y las imágenes llevan caché larga (T-005). Las partes por usuario siguen dinámicas.
+4. **Escritura segura**: acciones de servidor con guardas de permisos clasificadas y probadas (`autorizacion.test.ts`), idempotentes, condicionadas al estado leído. Tareas lentas (correos) salen de la petición por una cola (T-008).
+5. **Medir antes de optimizar**: prueba de carga (k6) con presupuesto de rendimiento (T-007), `EXPLAIN` de las consultas de listados (T-006) y observabilidad real (T-010).
+6. **Móvil primero**: web adaptable → PWA instalable (T-003) → envoltorio nativo (Capacitor) para las tiendas. Se mide en CI con `movil.mjs` y se revisa con `escenarios.mjs`.
+7. **Pruebas por capas**: unitarias (reglas), escenarios por persona (recorridos reales, con capturas), auditorías automáticas (`enlaces`, `movil`, axe), carga. Nada «hecho» sin que funcione de punta a punta como cada papel.
+8. **Producción distinta de demo**: la demo (`render.yaml`, `DEMO_MODE=si`) es un andamio. La producción exige decisiones del fundador (alojamiento, correo, dominio, privacidad, menores).
+
+## Fases (orden de ejecución)
+
+| Fase | Objetivo | Tareas | Estado |
+|---|---|---|---|
+| **F0** | Base funcional, categorías de peso, perfiles, trayectoria y aura | (hecho; ver `DIARIO.md`) | ✔ |
+| **F1** | **Móvil y pulido funcional** | T-001, T-002, T-009, T-011 | en curso |
+| **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
+| **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
+| **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
+| **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
+
+Dependencias: T-004, T-005 y T-006 pueden hacerse en paralelo; T-007 (carga) se ejecuta **antes y después** para demostrar la mejora; T-012 depende de elegir proveedor (decisión del fundador); T-003 no depende de F2.
+
+## Índice de tareas
+
+| Ficha | Título | Fase | Sugerida a | Bloqueo |
+|---|---|---|---|---|
+| [T-001](tareas/T-001-conciliar-movil-pr13.md) | Conciliar la PR #13 (móvil) con el menú actual | F1 | Codex | — |
+| [T-002](tareas/T-002-dependabot-y-prs.md) | Dependabot sin saltos mayores y limpieza de PRs | F1 | Copilot / el más sencillo (tarea de calibrado) | permisos de GitHub |
+| [T-003](tareas/T-003-pwa.md) | Web instalable (PWA) | F3 | Codex / Open Code | — |
+| [T-004](tareas/T-004-imagenes-fuera-de-la-base.md) | Imágenes fuera de PostgreSQL | F2 | Codex / Open Code | proveedor y credenciales (fundador) para la parte S3 |
+| [T-005](tareas/T-005-cache-de-lecturas-publicas.md) | Caché de lecturas públicas | F2 | Codex / Open Code | — |
+| [T-006](tareas/T-006-indices-y-consultas.md) | Índices y consultas de listados | F2 | Open Code / Copilot | necesita PostgreSQL local |
+| [T-007](tareas/T-007-prueba-de-carga.md) | Prueba de carga (k6) y presupuesto | F2 | Open Code / Antigravity | necesita ejecutar el servidor |
+| [T-008](tareas/T-008-cola-de-correos.md) | Cola de correos | F2 | Codex | proveedor de correo (fundador) para el envío real |
+| [T-009](tareas/T-009-ampliar-escenarios.md) | Ampliar los escenarios por persona | F1 | cualquiera con navegador | — |
+| [T-010](tareas/T-010-observabilidad.md) | Observabilidad: registros, errores y salud | F2 | Copilot / Open Code | herramienta de errores (fundador) |
+| [T-011](tareas/T-011-registro-por-paneles.md) | Registro y acceso por tres paneles (A/B/C) | F1 | Codex | — (especificación del fundador incluida) |
+| [T-012](tareas/T-012-base-de-datos-gestionada.md) | Base de datos gestionada, copias y restauración | F2 | fundador + Claude | proveedor (fundador) |
+
+«Sugerida a» es una recomendación de Claude basada en lo observado (Codex trabaja bien con CI y documentación pero no tiene PostgreSQL local; los demás aún no se han calibrado). **Se ajusta cuando cada asistente declare qué puede ejecutar** (ver `EQUIPO.md`). El fundador puede dar cualquier ficha a cualquiera.
+
+## Definición de «hecho» (para cualquier tarea)
+
+Ficha cumplida punto por punto + criterios de aceptación verificados + CI en verde + registro del asistente actualizado + revisión de Claude aprobada (`REVISION.md`). Si algo de la ficha no se puede cumplir, se **para y se pregunta** (RFC o comentario en el PR); no se improvisa.
+
+## Decisiones del fundador que bloquean fases
+
+Alojamiento y proveedor de base de datos, almacenamiento de imágenes, proveedor de correo, herramienta de errores, dominio, política de menores, responsable del tratamiento de datos y correo de contacto, sexo/edad en la ficha, calibración del aura, camino hacia las tiendas. Lista viva en `TRASLADO.md` §7 y `PULIDO-FUNCIONAL.md`.

@@ -944,3 +944,11 @@ La primera versión de mis auditorías daba falsos positivos (botones del menú 
 
 ### Estado y próximos pasos
 Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y Android reales, conciliar la PR #13 (móvil) con `NavigationMenu`, paneles A/B/C al registrarse, escalabilidad antes del diseño, más personas en los escenarios.
+
+
+## 6 de octubre de 2026 (noche) — Claude, líder técnico del equipo
+
+**Pedido por el fundador:** «te pongo a ti como el líder del equipo […] idealices el plan, la arquitectura y los métodos a seguir, dando también la posibilidad de que las otras herramientas debatan y puedan sacar una mejor opinión […] las demás son las que ejecutan las instrucciones […] para ahorrar tokens y delegar funciones […] pauta por pauta, detalle a detalle, para que no se vayan por las ramas.»
+**Qué se hizo:** gobierno del equipo (`EQUIPO.md`, `decisiones/ADR-001`), cómo se discrepa con evidencia (`decisiones/README.md`, plantilla de propuestas RFC), lista de revisión de PR (`REVISION.md`), **plan maestro** (`PLAN.md`: principios de arquitectura, fases F0–F5, definición de «hecho») y **12 fichas de tarea** exactas (`tareas/T-001…T-012`): conciliar la PR del móvil, Dependabot, PWA, imágenes fuera de la base de datos, caché de lecturas públicas, índices, prueba de carga, cola de correos, ampliar escenarios, observabilidad, registro por tres paneles A/B/C (con las palabras del fundador) y base de datos gestionada. `CLAUDE.md` y `AGENTS.md` lo recogen.
+**Decisiones de Claude que el fundador puede revocar:** el acceso (`/entrar`) sigue siendo un formulario único porque las credenciales ya identifican a la persona (los tres paneles van en el registro); una federación aprobada recibe su perfil y titularidad automáticamente.
+**Límites honestos:** los asistentes solo actúan cuando el fundador los lanza (no se mensajean entre sí; la comunicación es el repositorio); las sugerencias de reparto («sugerida a») se basan en lo observado de Codex y deben calibrarse con los demás; Claude puede equivocarse y sus decisiones son discutibles por RFC.
