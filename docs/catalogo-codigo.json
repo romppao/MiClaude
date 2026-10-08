@@ -100,6 +100,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261009090000_inscripciones_en_veladas/migration.sql",
+    "purpose": "Migración: inscripción abierta, requisitos y fecha límite en Event, y solicitudes de participación (EventRegistration) con su estado.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -267,6 +272,11 @@
   {
     "path": "src/app/actions/proposals.ts",
     "purpose": "Acciones de retos a combate y propuestas de sparring: proponer, aceptar o rechazar, y cancelar, con correos y bloqueo contra el doble clic.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/registrations.ts",
+    "purpose": "Acciones de inscripción: abrir o cerrar (organizador), pedir participar y retirarse (peleador), aceptar o rechazar una o varias solicitudes.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -460,6 +470,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/SeleccionLote.tsx",
+    "purpose": "«Marcar todas» y recuento de casillas marcadas para responder a varias solicitudes a la vez.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/SelectorCategoria.tsx",
     "purpose": "Selector de categoría para ficha o filtros con obligatoriedad diferente; comparte catálogo deportivo versionado.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -615,6 +630,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/mis-inscripciones/page.tsx",
+    "purpose": "Pantalla del peleador con sus solicitudes para participar en veladas e interclubs y la respuesta de cada organizador.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/mis-reservas/page.tsx",
     "purpose": "Pantalla «Mis reservas de clases»: las solicitudes de la persona, la respuesta del entrenador y el botón para cancelar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -652,6 +672,16 @@
   {
     "path": "src/app/noticias/page.tsx",
     "purpose": "Todas las noticias con filtro por disciplina (sin filtro por defecto); lanza la actualización si toca.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/inscripciones/csv/route.ts",
+    "purpose": "Descarga en CSV de las solicitudes de un evento con los mismos filtros y orden que la pantalla; solo su organizador o la administración.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/inscripciones/page.tsx",
+    "purpose": "Lista de solicitudes del organizador: estados, filtros (categoría, provincia, combates, edad, peso), siete órdenes y respuesta una a una o en bloque.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -782,6 +812,11 @@
   {
     "path": "src/app/subidas/route.ts",
     "purpose": "Pide permiso para subir un vídeo: sesión verificada, formato, tamaño, límite diario y almacén disponible; devuelve clave y dirección de subida.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/veladas/[slug]/inscribirme/page.tsx",
+    "purpose": "Formulario del peleador para pedir participar en un evento con su categoría, peso y mensaje; muestra y deja retirar la solicitud existente.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -982,6 +1017,16 @@
   {
     "path": "src/lib/community/reports.ts",
     "purpose": "Catálogo de motivos de aviso por entidad (incluida MEDIA con «Aparezco yo y no doy permiso») y límite diario; separa solicitud de revisión de decisión moderadora.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/registrations-data.ts",
+    "purpose": "Carga las solicitudes de un evento con el récord de cada peleador en la disciplina y el nivel del evento, su aura y su edad.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/registrations.ts",
+    "purpose": "Reglas de la inscripción: cuándo está abierta, validación del peso y los requisitos, filtros y órdenes de la lista del organizador.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1190,6 +1235,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/inscripciones.mjs",
+    "purpose": "Prueba de navegador de la inscripción: abrir, pedir participar, filtrar, ordenar, CSV, aceptar en bloque, rechazar, retirarse y cartel.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/integridad.mjs",
     "purpose": "Comprueba coherencia de datos y protección de acciones ante duplicados/operaciones indebidas en flujos reales.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1302,6 +1352,11 @@
   {
     "path": "tests/unit/env.test.ts",
     "purpose": "Prueba validación de entorno y requisitos al arrancar producción sin depender de secretos reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/inscripciones.test.ts",
+    "purpose": "Pruebas unitarias de las reglas de inscripción, filtros y órdenes.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

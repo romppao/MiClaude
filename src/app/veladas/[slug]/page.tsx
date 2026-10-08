@@ -10,6 +10,7 @@ import { publicFighterName } from "../../../lib/common/names";
 import VerificationTag from "../../components/VerificationTag";
 import { eventDayReached, todayMadrid } from "../../../lib/common/dates";
 import { getUser } from "../../../lib/accounts/auth";
+import { REG_STATUS_LABEL, inscripcionAbierta } from "../../../lib/events/registrations";
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { createReport } from "../../actions/community";
@@ -37,6 +38,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const oficial = !!e.organizerId && org?.status === "APPROVED";
   const entrenador = e.organizer?.role === "TRAINER" ? e.organizer.trainer : null;
   const [user, medios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  const miInscripcion = user?.fighter ? await db.eventRegistration.findUnique({ where: { eventId_fighterId: { eventId: e.id, fighterId: user.fighter.id } }, select: { status: true } }) : null;
   const compartir = veladaAbiertaAlPublico(e, todayMadrid());
   return (
     <>
@@ -53,6 +55,17 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         {e.promoter && <> · Promotor indicado por el organizador: {e.promoter}</>}
       </p>
       {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
+      {/* Inscripción de peleadores (propuesta n.º 3 del diseño v3): visible mientras el organizador la tenga abierta. */}
+      {inscripcionAbierta(e, todayMadrid()) && (
+        <section className="tarjeta" aria-labelledby="titulo-inscripcion" style={{ borderColor: "var(--acc)", gap: 10, margin: "12px 0" }}>
+          <h2 id="titulo-inscripcion" style={{ margin: 0, font: "800 20px var(--font)" }}>Inscripción abierta</h2>
+          <p style={{ margin: 0 }}>Los peleadores de {DISCIPLINE_LABEL[e.discipline]} pueden pedir participar. El organizador elige a quién empareja en el cartel.{e.registrationUntil ? ` Hasta el ${fmtDate(e.registrationUntil)}.` : ""}</p>
+          {e.registrationNote && <p className="mut" style={{ margin: 0 }}><strong>Requisitos:</strong> {e.registrationNote}</p>}
+          {miInscripcion
+            ? <p style={{ margin: 0 }}>Tu solicitud: <strong>{REG_STATUS_LABEL[miInscripcion.status]}</strong>. <Link href={`/veladas/${e.slug}/inscribirme`}>Ver mi solicitud</Link></p>
+            : <Link className="btn" href={`/veladas/${e.slug}/inscribirme`}>Solicitar participar</Link>}
+        </section>
+      )}
       <h2>Cartel</h2>
       <div className="table-wrap" tabIndex={0} role="region" aria-label={`Cartel de ${e.name}`}>
       <table className="apilada">

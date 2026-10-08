@@ -16,7 +16,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/pulido.mjs && node tests/e2e/menu.mjs && node tests/e2e/trayectoria.mjs && node tests/e2e/perfiles.mjs && node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/paneles.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs && node tests/e2e/filtros.mjs && node tests/e2e/enlaces.mjs && node tests/e2e/movil.mjs && node tests/e2e/calendario.mjs && node tests/e2e/respaldo.mjs && node tests/e2e/categorias.mjs && node tests/e2e/inclusiva.mjs && node tests/e2e/usabilidad.mjs && node tests/e2e/diseno.mjs && node tests/e2e/fase2a.mjs && node tests/e2e/creador.mjs && node tests/e2e/arreglos.mjs && node tests/e2e/servicios.mjs",
+    "test:e2e": "node tests/e2e/pulido.mjs && node tests/e2e/menu.mjs && node tests/e2e/trayectoria.mjs && node tests/e2e/perfiles.mjs && node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/paneles.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs && node tests/e2e/filtros.mjs && node tests/e2e/enlaces.mjs && node tests/e2e/movil.mjs && node tests/e2e/calendario.mjs && node tests/e2e/respaldo.mjs && node tests/e2e/categorias.mjs && node tests/e2e/inclusiva.mjs && node tests/e2e/usabilidad.mjs && node tests/e2e/diseno.mjs && node tests/e2e/fase2a.mjs && node tests/e2e/creador.mjs && node tests/e2e/arreglos.mjs && node tests/e2e/servicios.mjs && node tests/e2e/inscripciones.mjs",
     "test:escenarios": "node tests/e2e/escenarios.mjs",
     "test:a11y": "node tests/e2e/accesibilidad.mjs"
   },

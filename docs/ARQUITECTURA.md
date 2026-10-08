@@ -315,3 +315,9 @@ El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/In
 - `FightProposal` (de, a, tipo FIGHT/SPARRING, disciplina del rival, día/lugar/mensaje opcionales, estado, respuesta). Acciones `proposeFight`/`answerProposal`/`cancelProposal` en `actions/proposals.ts` (correo confirmado, ficha propia, rival con titular, una abierta por tipo y pareja con `withLock`, 10 al día, correos con `after()` y dirección de respuesta). Reglas en `lib/fighters/proposals.ts`. Pantallas `/peleadores/[slug]/proponer` y `/propuestas`.
 - `ClassRequest.day/fromMinute/toMinute`: el texto `preferred` se compone en el servidor (`textoDeHorario`). Componente `ElegirHorario`.
 - `AccionesPrincipales` (`_inicio/comun.tsx`): las acciones de cada tipo de cuenta, arriba de «Mi panel». `/clases`: búsqueda de clases publicadas.
+
+### Inscripción de peleadores en veladas e interclubs (9 de octubre de 2026)
+- `Event.registrationOpen`, `registrationNote`, `registrationUntil` (fecha límite incluida). `EventRegistration` (evento, peleador, división y categoría elegidas, peso declarado, mensaje, estado PENDING/ACCEPTED/DECLINED/WITHDRAWN, respuesta), única por evento y peleador.
+- Acciones en `actions/registrations.ts`: `setRegistration` (organizador del evento: abrir, cerrar, requisitos), `requestRegistration` (correo confirmado, ficha con la disciplina del evento, inscripción abierta, `withLock`, 10 al día), `withdrawRegistration` (el propio peleador), `answerRegistrations` (organizador: una con `solo=id:decisión` o varias con `ids`, hasta 200; no pisa una solicitud retirada mientras tanto).
+- Dominio nuevo `lib/events` (→ `common`, `fighters`): reglas y filtros en `registrations.ts`; `registrations-data.ts` calcula récord en la disciplina y nivel del evento, aura y edad para la lista y el CSV.
+- Aceptar no crea combates: los aceptados salen primero en las listas del cartel. El correo del peleador solo lo ve el organizador si está aceptado.

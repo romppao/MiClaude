@@ -42,6 +42,8 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
   ]);
   // Retos y sparrings recibidos que esperan respuesta.
   const propuestas = await db.fightProposal.count({ where: { toId: me.id, status: "PENDING" } });
+  // Inscripciones aceptadas en eventos que aún no se han celebrado.
+  const inscripciones = await db.eventRegistration.count({ where: { fighterId: me.id, status: "ACCEPTED", event: { date: { gte: calendarDayStart() } } } });
   const principal = me.disciplines[0];
   const tally = principal ? computeRecords(me.id, bouts)[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
   const rec = combinedRecord(tally, principal ? { total: principal.priorTotal, wins: principal.priorWins, losses: principal.priorLosses, draws: principal.priorDraws } : null);
@@ -74,6 +76,8 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
         { href: "/mi-ficha#registrar-combate", titulo: "Registrar un combate", detalle: "Suma a tu récord", icono: "mas" },
         { href: "/propuestas#proponer", titulo: "Retar o proponer sparring", detalle: "A otro peleador", icono: "reto" },
         { href: "/propuestas", titulo: "Mis propuestas", detalle: "Retos y sparrings", icono: "bandeja", aviso: propuestas },
+        { href: "/veladas?inscripcion=abierta", titulo: "Inscribirme en una velada", detalle: "Veladas e interclubs que buscan peleadores", icono: "enviar" },
+        { href: "/mis-inscripciones", titulo: "Mis inscripciones", detalle: "Lo que responde cada organizador", icono: "check", aviso: inscripciones },
         { href: "/mi-ficha#publicar-highlight", titulo: "Publicar un highlight", detalle: "Tu mejor vídeo o foto", icono: "camara" },
         { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "calendario" },
         { href: "/mi-ficha/trayectoria", titulo: "Mis títulos y mi aura", detalle: "Tu trayectoria", icono: "trofeo" },

@@ -567,3 +567,12 @@ nav.pestanas-barra{flex:none;flex-wrap:nowrap;display:flex;padding:4px;border-ra
 .barra-horas input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid var(--acc2);outline-offset:2px}
 .marcas-hora{display:flex;justify-content:space-between;color:rgba(255,255,255,.65);font-size:16px;padding:0 4px}
 .resumen-horario{margin:0;font-size:16px}
+/* Inscripciones: casillas para elegir solicitudes y responderlas a la vez (9 de octubre de 2026). */
+.marcar{display:inline-flex;align-items:center;gap:10px;min-height:44px;font:600 16px var(--font);cursor:pointer}
+.marcar input{width:24px;height:24px;margin:0;accent-color:var(--acc);flex:none}
+.estados-lista{display:flex;gap:8px;flex-wrap:wrap}
+.datos-solicitud{display:flex;gap:6px 14px;flex-wrap:wrap;margin:0}
+.datos-solicitud div{display:flex;gap:4px}
+.datos-solicitud dt{color:rgba(255,255,255,.7)}
+.datos-solicitud dd{margin:0;font-weight:700}
+.lote-inscripciones{display:flex;flex-direction:column;gap:10px;background:var(--bg);border:1px solid var(--acc);border-radius:20px;padding:12px}

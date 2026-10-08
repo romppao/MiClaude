@@ -292,3 +292,11 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | El fundador creyó que se había quitado «retar o pedir sparring» | Venía en el diseño v3 aprobado, pero al pasarlo al código quedó como «fase 2» sin avisarle de que la demo no lo tenía | Al implementar un diseño aprobado, se lista al fundador lo que **no** se ha implementado todavía, y se comprueba en el historial antes de afirmar que algo existió o no |
 | Los servicios (clases, crear velada o interclub) quedaban al fondo de los paneles | Los paneles se diseñaron como resumen de datos y las acciones se añadieron al final | Cada panel empieza por las acciones principales de su tipo de cuenta (`AccionesPrincipales`); los datos van después |
 | Pedir una clase obligaba a escribir | Se diseñó el formulario para el servidor (un texto libre) y no para el móvil | En el móvil se elige (calendario, barra, botones) en lugar de escribir; el texto libre queda para lo opcional |
+
+## 9 de octubre de 2026 — Inscripciones en veladas (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| El fundador preguntó si se había quitado «solicitar participar en una velada» | Era otra propuesta del diseño v3 que nunca se implementó, y no se le había avisado (la misma causa que con los retos) | Antes de cerrar cada entrega, repasar la lista de propuestas del diseño aprobado y decir al fundador cuáles faltan |
+| La primera migración de inscripciones salió vacía y quedó marcada como aplicada | Se generó con Postgres todavía arrancando tras reiniciar el contenedor | Comprobar que Postgres responde antes de generar una migración y leer el SQL generado antes de aplicarlo |
+| Una comprobación falló porque «Kickboxing» aparecía dos veces en la página | `getByText` sin acotar choca con el modo estricto de Playwright | En las pruebas, acotar el texto al bloque que se comprueba (aviso, tarjeta), no a toda la página |
