@@ -8,7 +8,7 @@ import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { requireOrganizer } from "../../lib/accounts/permissions";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
-import { slugify } from "../../lib/common/labels";
+import { parseEventKind, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
 import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
@@ -50,6 +50,8 @@ export async function createEvent(f: FormData) {
   const date = parseDay(str(f, "date"));
   if (!date) go(back, { problema: "fecha_invalida" });
   const level = str(f, "level") === "PRO" ? "PRO" : "AMATEUR";
+  const kind = parseEventKind(str(f, "kind") || "VELADA");
+  if (!kind) go(back, { problema: "velada_tipo" });
   const disciplineRaw = str(f, "discipline");
   if (!isDiscipline(disciplineRaw)) go(back, { problema: "disciplina_no_valida" });
   const discipline = disciplineRaw;
@@ -63,14 +65,14 @@ export async function createEvent(f: FormData) {
     const slug = await uniqueSlug(base, async (s) => !!(await db.event.findUnique({ where: { slug: s } })));
     return db.event.create({
       data: {
-        slug, name, date, discipline, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province,
+        slug, name, kind, date, discipline, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province,
         promoter: str(f, "promoter") || null, ticketUrl, organizerId: user.id, createdById: user.id,
       },
     });
   });
-  await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, date, level, discipline } });
+  await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, kind, date, level, discipline } });
   revalidatePath("/", "layout");
-  go(`/organizador/${created.slug}`, { aviso: "velada_creada" });
+  go(`/organizador/${created.slug}`, { aviso: kind === "INTERCLUB" ? "interclub_creado" : "velada_creada" });
 }
 
 /** Añade un combate al cartel. Lo introduce el organizador del evento, así que nace VERIFIED. */
@@ -160,7 +162,8 @@ export async function updateEvent(f: FormData) {
   if (ticketRaw && !ticketUrl) go(back, { problema: "url_invalida" });
   const disciplineRaw = str(f, "discipline");
   const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
-  const data = { name, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl };
+  const kind = parseEventKind(str(f, "kind")) ?? event.kind;
+  const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl };
   await guard(back, () => db.$transaction(async (tx) => {
     // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
@@ -168,7 +171,7 @@ export async function updateEvent(f: FormData) {
     if (bouts.some(b => !knownBoxingAgeEligible(event.discipline,event.level,b.fighterA.birthDate,date) || !knownBoxingAgeEligible(event.discipline,event.level,b.fighterB.birthDate,date) || (b.divisionId !== null && (!divisionEligible(b.divisionId, b.fighterA.birthDate, date) || !divisionEligible(b.divisionId, b.fighterB.birthDate, date))))) throw new Rechazo("categoria_edad_combate");
     if (dayKey(date) !== dayKey(event.date) || name !== event.name) await tx.bout.updateMany({ where: { eventId: event.id }, data: WITHOUT_BOUT_BACKING });
     await tx.event.update({ where: { id: event.id }, data });
-    await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, date, discipline, venue: data.venue, city: data.city, province } }, tx);
+    await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, kind: event.kind, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, kind, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));
   revalidatePath("/", "layout");
   go(back, { aviso: "velada_actualizada" });

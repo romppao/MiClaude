@@ -19,6 +19,8 @@ Esto es **funcionalidad y usabilidad, no diseño visual**: se aplica ya.
 
 ## Hacia las tiendas (App Store y Google Play): qué hay que decidir
 
+> **8 de octubre de 2026:** el proceso completo (trámites, requisitos que faltan, web frente a app, costes con 500 usuarios y calendario) está en [`PUBLICACION.md`](PUBLICACION.md). Lo de abajo es el análisis inicial.
+
 La aplicación es una web (Next.js). Hay tres caminos, de menos a más trabajo:
 
 | Camino | Qué es | Pros | Contras |

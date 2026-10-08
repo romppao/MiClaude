@@ -103,13 +103,13 @@ model Gym {
 }
 
 model Trainer {
-  id       String    @id @default(cuid())
-  slug     String    @unique
-  name     String
-  bio      String?
-  gymId    String?
-  gym      Gym?      @relation(fields: [gymId], references: [id])
-  fighters Fighter[]
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  name          String
+  bio           String?
+  gymId         String?
+  gym           Gym?            @relation(fields: [gymId], references: [id])
+  fighters      Fighter[]
   // Cuenta del propio entrenador (registro «Entrenador»). Null en los perfiles creados por moderación.
   userId        String?         @unique
   user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -161,6 +161,9 @@ model Highlight {
   kind      HighlightKind
   title     String
   videoUrl  String?
+  // Vídeo subido a la aplicación (clave en el almacén de vídeos; ver src/lib/media/storage.ts). Si no, enlace en videoUrl.
+  videoKey  String?
+  videoType String?
   image     Bytes?
   hasImage  Boolean       @default(false)
   boutId    String?
@@ -173,40 +176,40 @@ model Highlight {
 }
 
 model Fighter {
-  id            String              @id @default(cuid())
-  slug          String              @unique
+  id            String               @id @default(cuid())
+  slug          String               @unique
   firstName     String
   lastName      String
   alias         String?
   birthDate     DateTime?
   city          String?
   province      String?
-  nationality   String              @default("España")
+  nationality   String               @default("España")
   stance        Stance?
   heightCm      Int?
   reachCm       Int?
-  level         Level               @default(AMATEUR)
+  level         Level                @default(AMATEUR)
   // Récord amateur completo visible para el público. Por defecto solo se muestra el número de combates (decisión del fundador, 7 oct 2026).
-  recordPublic  Boolean             @default(false)
+  recordPublic  Boolean              @default(false)
   highlights    Highlight[]
   // false = ficha creada por un tercero (rival) que aún no ha sido reclamada ni confirmada: no sale en listados ni buscadores.
-  listed        Boolean             @default(true)
+  listed        Boolean              @default(true)
   hiddenAt      DateTime?
   bio           String?
   gymId         String?
-  gym           Gym?                @relation(fields: [gymId], references: [id])
+  gym           Gym?                 @relation(fields: [gymId], references: [id])
   trainerId     String?
-  trainer       Trainer?            @relation(fields: [trainerId], references: [id])
-  userId        String?             @unique
-  user          User?               @relation(fields: [userId], references: [id])
-  achievements FighterAchievement[]
+  trainer       Trainer?             @relation(fields: [trainerId], references: [id])
+  userId        String?              @unique
+  user          User?                @relation(fields: [userId], references: [id])
+  achievements  FighterAchievement[]
   disciplines   FighterDiscipline[]
   auras         Aura[]
   followers     Follow[]
   claimRequests ClaimRequest[]
-  boutsAsA      Bout[]              @relation("FighterA")
-  boutsAsB      Bout[]              @relation("FighterB")
-  createdAt     DateTime            @default(now())
+  boutsAsA      Bout[]               @relation("FighterA")
+  boutsAsB      Bout[]               @relation("FighterB")
+  createdAt     DateTime             @default(now())
 
   @@index([gymId])
   @@index([trainerId])
@@ -215,10 +218,17 @@ model Fighter {
   @@index([province])
 }
 
+// Velada (abierta, con cartel de varios clubes o promotora) o interclub (encuentro entre clubes, normalmente amateur).
+enum EventKind {
+  VELADA
+  INTERCLUB
+}
+
 model Event {
   id          String      @id @default(cuid())
   slug        String      @unique
   name        String
+  kind        EventKind   @default(VELADA)
   date        DateTime
   discipline  Discipline  @default(BOXEO)
   level       Level
@@ -232,6 +242,7 @@ model Event {
   organizerId String?
   organizer   User?       @relation("EventOrganizer", fields: [organizerId], references: [id])
   bouts       Bout[]
+  media       MediaItem[]
 
   @@index([discipline, date])
   @@index([organizerId])
@@ -241,26 +252,26 @@ model Event {
 }
 
 model Bout {
-  id           String       @id @default(cuid())
-  eventId      String
-  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  order        Int          @default(0)
-  fighterAId   String
-  fighterA     Fighter      @relation("FighterA", fields: [fighterAId], references: [id])
-  fighterBId   String
-  fighterB     Fighter      @relation("FighterB", fields: [fighterBId], references: [id])
-  weightClass  String?
+  id                     String                @id @default(cuid())
+  eventId                String
+  event                  Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order                  Int                   @default(0)
+  fighterAId             String
+  fighterA               Fighter               @relation("FighterA", fields: [fighterAId], references: [id])
+  fighterBId             String
+  fighterB               Fighter               @relation("FighterB", fields: [fighterBId], references: [id])
+  weightClass            String?
   // División federativa versionada (edad, sexo y modalidad); propia del combate, no de la ficha actual.
-  divisionId   String?
-  rounds       Int?
-  result       Result?
-  method       Method?
-  endRound     Int?
-  verification Verification @default(SELF_REPORTED)
-  createdById  String?
-  createdBy    User?        @relation("BoutCreator", fields: [createdById], references: [id])
-  auras        Aura[]
-  flags        String[]     @default([])
+  divisionId             String?
+  rounds                 Int?
+  result                 Result?
+  method                 Method?
+  endRound               Int?
+  verification           Verification          @default(SELF_REPORTED)
+  createdById            String?
+  createdBy              User?                 @relation("BoutCreator", fields: [createdById], references: [id])
+  auras                  Aura[]
+  flags                  String[]              @default([])
   supportKind            SupportKind?
   supportAuthority       String?
   supportNote            String?
@@ -269,10 +280,11 @@ model Bout {
   supportReviewedBy      User?                 @relation("BoutReviewer", fields: [supportReviewedById], references: [id], onDelete: SetNull)
   supportAccreditationId String?
   supportAccreditation   SupportAccreditation? @relation(fields: [supportAccreditationId], references: [id], onDelete: SetNull)
-  evidenceUrl  String?
+  evidenceUrl            String?
   // Pareja canónica (ids ordenados): impide registrar dos veces el mismo enfrentamiento en una velada, en cualquier esquina.
-  pairKey      String?
-  highlights   Highlight[]
+  pairKey                String?
+  highlights             Highlight[]
+  media                  MediaItem[]
 
   @@unique([eventId, pairKey])
   @@index([createdById])
@@ -282,35 +294,36 @@ model Bout {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  email            String            @unique
-  name             String
-  passwordHash     String
-  role             Role              @default(FAN)
-  notifyEmails     Boolean           @default(true)
-  emailVerifiedAt  DateTime?
-  createdAt        DateTime          @default(now())
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  name                  String
+  passwordHash          String
+  role                  Role                   @default(FAN)
+  notifyEmails          Boolean                @default(true)
+  emailVerifiedAt       DateTime?
+  createdAt             DateTime               @default(now())
   accreditation         SupportAccreditation?  @relation("AccreditedUser")
   grantedAccreditations SupportAccreditation[] @relation("AccreditationGrantor")
   reviewedAchievements  FighterAchievement[]   @relation("AchievementReviewer")
   endorsedBouts         Bout[]                 @relation("BoutReviewer")
-  profiles         Profile[]
-  sessions         Session[]
-  fighter          Fighter?
-  boutsCreated     Bout[]            @relation("BoutCreator")
-  auras            Aura[]
-  emailTokens      EmailToken[]
-  claimRequests    ClaimRequest[]
-  organizerRequest OrganizerRequest?
-  auditLogs        AuditLog[]
-  reports          Report[]
-  follows          Follow[]
-  events           Event[]           @relation("EventOrganizer")
-  trainer          Trainer?
+  profiles              Profile[]
+  sessions              Session[]
+  fighter               Fighter?
+  boutsCreated          Bout[]                 @relation("BoutCreator")
+  auras                 Aura[]
+  emailTokens           EmailToken[]
+  claimRequests         ClaimRequest[]
+  organizerRequest      OrganizerRequest?
+  auditLogs             AuditLog[]
+  reports               Report[]
+  follows               Follow[]
+  events                Event[]                @relation("EventOrganizer")
+  trainer               Trainer?
+  media                 MediaItem[]
   // Disciplinas que le interesan (registro de aficionado): ordenan su inicio.
-  interests        Discipline[]      @default([])
+  interests             Discipline[]           @default([])
   // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
-  onboarding       Json?
+  onboarding            Json?
 }
 
 model Session {
@@ -358,17 +371,17 @@ model EmailToken {
 
 // Un usuario FIGHTER pide que una ficha ya existente (sin dueño) pase a ser suya. Lo aprueba un moderador.
 model ClaimRequest {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fighterId String
-  fighter   Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
-  message   String?
-  status    RequestStatus @default(PENDING)
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fighterId  String
+  fighter    Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  message    String?
+  status     RequestStatus @default(PENDING)
   // Respuesta del moderador (motivo del rechazo o nota): la ve quien hizo la solicitud.
   reviewNote String?
   reviewedAt DateTime?
-  createdAt DateTime      @default(now())
+  createdAt  DateTime      @default(now())
 
   @@unique([userId, fighterId])
   @@index([status])
@@ -442,7 +455,7 @@ model Follow {
 // Disciplinas que practica un peleador: categoría de peso y récord de partida (declarado por él) en cada una.
 // Una sola ficha por persona; el récord registrado en la app se calcula aparte, a partir de los combates.
 model FighterDiscipline {
-  belt String?
+  belt        String?
   beltDegrees Int?
   fighterId   String
   fighter     Fighter    @relation(fields: [fighterId], references: [id], onDelete: Cascade)
@@ -475,24 +488,25 @@ model RateHit {
 
 // Identidad visual común. Las imágenes viven en PostgreSQL, no en el disco efímero de Render.
 model Profile {
-  id          String @id @default(cuid())
-  kind        String
-  entityId    String
-  ownerId     String?
-  owner       User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  name        String?
-  bio         String?
-  city        String?
-  website     String?
-  hasAvatar   Boolean @default(false)
-  hasBanner   Boolean @default(false)
-  avatar      Bytes?
-  banner      Bytes?
-  avatarX     Int @default(50)
-  avatarY     Int @default(50)
-  bannerX     Int @default(50)
-  bannerY     Int @default(50)
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  kind      String
+  entityId  String
+  ownerId   String?
+  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name      String?
+  bio       String?
+  city      String?
+  website   String?
+  hasAvatar Boolean  @default(false)
+  hasBanner Boolean  @default(false)
+  avatar    Bytes?
+  banner    Bytes?
+  avatarX   Int      @default(50)
+  avatarY   Int      @default(50)
+  bannerX   Int      @default(50)
+  bannerY   Int      @default(50)
+  updatedAt DateTime @updatedAt
+
   @@unique([kind, entityId])
   @@index([ownerId])
 }
@@ -562,4 +576,80 @@ model FighterAchievement {
   @@unique([fighterId, declarationKey])
   @@index([discipline, level, divisionId, weightClass])
   @@index([reviewRequestedAt])
+}
+
+// Vídeos y fotos que el público graba en una velada, para que los peleadores encuentren las imágenes de sus combates.
+enum MediaKind {
+  PHOTO
+  VIDEO
+}
+
+model MediaItem {
+  id         String    @id @default(cuid())
+  eventId    String
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  boutId     String?
+  bout       Bout?     @relation(fields: [boutId], references: [id], onDelete: SetNull)
+  // Al borrar la cuenta se borra también lo que subió (es suyo).
+  uploaderId String
+  uploader   User      @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  kind       MediaKind
+  caption    String?
+  image      Bytes?
+  videoKey   String?
+  videoType  String?
+  videoBytes Int?
+  videoUrl   String?
+  hiddenAt   DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([eventId, hiddenAt])
+  @@index([boutId])
+  @@index([uploaderId, createdAt])
+}
+
+// Noticias de la portada común: fuentes (canales de vídeo, prensa, federaciones y agregadores) y lo que publican.
+enum NewsSourceKind {
+  VIDEO
+  PRENSA
+  FEDERACION
+  AGREGADOR
+}
+
+model NewsSource {
+  id            String         @id @default(cuid())
+  name          String
+  url           String         @unique
+  kind          NewsSourceKind
+  // Disciplinas que cubre la fuente; vacío = todas (se deducen de cada titular).
+  disciplines   Discipline[]   @default([])
+  active        Boolean        @default(true)
+  lastAttemptAt DateTime?
+  lastOkAt      DateTime?
+  lastError     String?
+  lastCount     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  items         NewsItem[]
+
+  @@index([active, lastAttemptAt])
+}
+
+model NewsItem {
+  id          String       @id @default(cuid())
+  sourceId    String
+  source      NewsSource   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  guid        String
+  url         String
+  title       String
+  // Medio que firma la noticia cuando la fuente es un agregador (si no, el nombre de la fuente).
+  publisher   String?
+  summary     String?
+  imageUrl    String?
+  publishedAt DateTime
+  disciplines Discipline[] @default([])
+  hiddenAt    DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@unique([sourceId, guid])
+  @@index([hiddenAt, publishedAt])
 }

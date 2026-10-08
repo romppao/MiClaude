@@ -1,13 +1,13 @@
 import type { HighlightKind } from "@prisma/client";
 import { safeHttpUrl } from "../common/url";
 
-/** Lo mejor de un peleador, publicado por él mismo. Un vídeo es un enlace (YouTube, Instagram, TikTok…); una foto se sube y se guarda normalizada. */
+/** Lo mejor de un peleador, publicado por él mismo. Un vídeo se sube a la aplicación (videoKey) o es un enlace (YouTube, Instagram, TikTok…); una foto se sube y se guarda normalizada. */
 export const HIGHLIGHT_TITLE_MAX = 60;
 export const MAX_HIGHLIGHTS = 12;
 export const HIGHLIGHT_KIND_LABEL: Record<HighlightKind, string> = { VIDEO: "Vídeo", PHOTO: "Foto" };
 
-export type HighlightInput = { kind: string; title: string; videoUrl: string; hasImage: boolean };
-export type HighlightParsed = { ok: true; kind: HighlightKind; title: string; videoUrl: string | null } | { ok: false; problema: string };
+export type HighlightInput = { kind: string; title: string; videoUrl: string; hasImage: boolean; videoKey?: string };
+export type HighlightParsed = { ok: true; kind: HighlightKind; title: string; videoUrl: string | null; videoKey: string | null } | { ok: false; problema: string };
 
 /** Valida lo que llega del formulario «Publicar un highlight». Los códigos de problema tienen su texto en `messages.ts`. */
 export function parseHighlight(input: HighlightInput): HighlightParsed {
@@ -17,12 +17,13 @@ export function parseHighlight(input: HighlightInput): HighlightParsed {
   if (!title) return { ok: false, problema: "highlight_titulo" };
   if (title.length > HIGHLIGHT_TITLE_MAX) return { ok: false, problema: "highlight_titulo_largo" };
   if (kind === "VIDEO") {
+    if (input.videoKey) return { ok: true, kind, title, videoUrl: null, videoKey: input.videoKey };
     const url = safeHttpUrl(input.videoUrl);
     if (!url || !url.startsWith("https://")) return { ok: false, problema: "highlight_enlace" };
-    return { ok: true, kind, title, videoUrl: url };
+    return { ok: true, kind, title, videoUrl: url, videoKey: null };
   }
   if (!input.hasImage) return { ok: false, problema: "highlight_foto" };
-  return { ok: true, kind, title, videoUrl: null };
+  return { ok: true, kind, title, videoUrl: null, videoKey: null };
 }
 
 /** Orden en la ficha: el destacado primero y después del más reciente al más antiguo. */

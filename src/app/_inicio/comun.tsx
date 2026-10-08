@@ -12,11 +12,12 @@ import Foto from "../components/Foto";
 /** Piezas comunes de los inicios por papel (diseño v3). */
 
 /** Saludo con el avatar que lleva a «Mi cuenta». */
-export function Saludo({ nombre, sub, cuadrado = false, extra }: { nombre: string; sub: React.ReactNode; cuadrado?: boolean; extra?: React.ReactNode }) {
+export function Saludo({ nombre, sub, cuadrado = false, extra, kicker }: { nombre: string; sub: React.ReactNode; cuadrado?: boolean; extra?: React.ReactNode; kicker?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <Link href="/mi-cuenta" className={`avatar ${cuadrado ? "avatar-relleno" : "avatar-acc"}`} style={{ width: 52, height: 52, borderRadius: cuadrado ? 18 : "50%", textDecoration: "none" }} aria-label="Mi cuenta">{iniciales(nombre)}</Link>
       <div style={{ flex: 1, minWidth: 0 }}>
+        {kicker && <span className="kicker kicker-acc">{kicker}</span>}
         <h1 style={{ margin: 0, font: "800 22px/1.15 var(--font)", letterSpacing: "-.03em" }}>{cuadrado ? nombre : `Hola, ${nombreDePila(nombre)}`}</h1>
         <div className="meta" style={{ fontSize: 15 }}>{sub}</div>
       </div>

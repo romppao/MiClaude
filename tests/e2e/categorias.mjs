@@ -49,7 +49,7 @@ sql(`UPDATE "User" SET role='ORGANIZER' WHERE email='${org.email}';`);
 await org.p.goto(B+"/organizador");
 await org.p.locator('[name=name]').fill(`Divisiones cartel ${rnd}`); await org.p.locator('[name=date]').fill(enDias(-1));
 await datosDeAlta(org.p);
-await org.p.getByRole("button",{name:"Crear velada",exact:true}).click(); await org.p.waitForURL('**/organizador/*');
+await org.p.getByRole("button",{name:"Crear el evento",exact:true}).click(); await org.p.waitForURL('**/organizador/*');
 const cartel=formButton(org.p,"Añadir al cartel");
 const valor=async (name,text)=>cartel.locator(`[name=${name}]`).evaluate((el,text)=>[...el.options].find(o=>o.textContent.includes(text))?.value,text);
 const aid=await valor("fighterA",`JuniorCategorias Divisiones${rnd}`), bid=await valor("fighterB",`RivalCategorias Divisiones${rnd}`);

@@ -251,3 +251,13 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | El clon no pudo conectar al proxy aunque el entorno estaba conectado | La disponibilidad observada del entorno no garantiza cada comando de red | Usar conector disponible y fijar SHA para lecturas coherentes; no afirmar clon/pruebas que no se ejecutaron |
 | Dos parches documentales se rechazaron antes de aplicar y una referencia usaba un nombre de función inexistente | Contexto de línea abreviado y nombre supuesto | Leer contexto exacto y verificar exports/enlaces antes de publicar; un documento debe poder seguirse literalmente |
 | Contar archivos documentados puede parecer garantía de calidad o capacidad de escalado | Cobertura estructural no mide comprensión humana, exactitud semántica o carga | Separar cobertura automática, revisión de contratos, prueba de transferencia humana y rendimiento medido |
+
+## 8 de octubre de 2026 — Diseño v3, fase 2a (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Un estilo en línea `display: flex` volvió a anular la regla que oculta el bloque de vídeo al elegir «Foto» (ya estaba en esta tabla) | Escribí el contenedor nuevo con un `style` por costumbre | Antes de envolver campos que se muestran u ocultan con CSS, buscar su regla en `globals.css`; el `display` va en una clase (`.columna`) |
+| Una foto de la galería «no se veía» en la prueba aunque estaba en la página | `loading="lazy"` sin tamaño reservado: la imagen mide 0 px hasta que el navegador decide cargarla | Toda imagen diferida reserva su espacio (`aspect-ratio` o alto); además evita saltos de la página al cargar |
+| Mayús+Tab sacaba el foco del menú a la barra del navegador | El diálogo nativo (`showModal`) no da la vuelta al foco en Chromium | En los diálogos, atrapar Tab y Mayús+Tab en el primer y el último elemento |
+| El `id` de una sección estaba en su título y los selectores `#multimedia img` no encontraban nada | Copié el patrón de `aria-labelledby` poniendo el `id` del ancla en el `h2` | El ancla (`id` al que se enlaza) va en la sección; el título lleva su propio `titulo-…` |
+| No se pudo comprobar ninguna fuente de noticias desde el entorno de desarrollo (la red solo deja salir a unas pocas webs) | Limitación del entorno, no del código | No dar por buena una fuente externa sin verla funcionar: la aplicación anota el estado de cada una y se revisa en la demo antes de publicar |

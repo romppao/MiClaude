@@ -13,6 +13,8 @@
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/bienvenida` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/buscar` | Buscar | Pública | — | Event, Fighter, Gym, Trainer |
+| `/compartir` | Subir vídeos o fotos de una velada | Cuenta con sesión iniciada | `media.shareMedia` | Event |
+| `/disciplinas/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Aura, Fighter, Trainer |
 | `/entrar` | Entrar en tu cuenta | Pública | `accounts.login` | — |
 | `/entrenadores` | Entrenadores | Pública | — | Trainer |
 | `/entrenadores/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Trainer |
@@ -21,21 +23,27 @@
 | `/gimnasios` | Gimnasios | Pública | — | Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Gym |
 | `/highlights/:id/imagen` | Foto de un highlight. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. Revalida con ETag, como las fotos de perfil. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
+| `/highlights/:id/video` | Vídeo de un highlight subido a la aplicación. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
 | `/imagenes/:kind/:id/:slot` | Siempre se revalida (`no-cache`, `private`): quien ya tiene la imagen recibe un 304 sin bytes, y una ficha ocultada deja de verse al instante. | Pública (cambia lo que ve según la cuenta) | — | Profile |
+| `/medios/:id/imagen` | Foto que el público subió a una velada (guardada ya normalizada en WebP). ?descargar=1 la descarga. | Pública | — | MediaItem |
+| `/medios/:id/video` | Vídeo que el público subió a una velada. ?descargar=1 lo descarga (para que el peleador lo guarde). | Pública | — | MediaItem |
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
 | `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, Event, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
-| `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym, Highlight |
+| `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym, Highlight, MediaItem |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
 | `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
+| `/mi-panel` | (respuesta técnica, sin pantalla) | Cuenta con sesión iniciada | — | — |
 | `/mis-clases` | Tus clases | Cuenta con sesión iniciada | `trainers.createClass`, `trainers.toggleClass` | Trainer |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, OrganizerRequest, Report |
+| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, OrganizerRequest, Report |
 | `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
 | `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
+| `/moderacion/noticias` | Fuentes de noticias | Moderación | `news.addNewsSource`, `news.refreshNewsNow`, `news.toggleNewsItem`, `news.toggleNewsSource` | NewsItem, NewsSource |
+| `/noticias` | Noticias | Pública | — | — |
 | `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
 | `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent` | Event, Fighter |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
-| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, Profile |
+| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, MediaItem, Profile |
 | `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | User |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
 | `/promotores` | Promotores | Pública | — | User |
@@ -51,8 +59,10 @@
 | `/respaldar` | Respaldar resultados y títulos | Moderación o cuenta acreditada para la disciplina (correo verificado) | `trajectory.endorseBout`, `trajectory.reviewAchievement` | Bout, FighterAchievement |
 | `/salud` | Comprobación de salud para el alojamiento: responde 200 si la aplicación y la base de datos funcionan, y 503 si no. | Pública | — | — |
 | `/siguiendo` | Peleadores que sigo | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
+| `/subidas` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/subidas/:...clave` | Recibe un vídeo cuando el almacén es el disco del servidor (desarrollo, pruebas y demo). Con R2, el navegador sube directamente allí. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
-| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública | — | Event |
+| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.createReport` | Event, MediaItem |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
 «Quién puede entrar» se deduce del código de cada pantalla; las acciones comprueban sus permisos por su cuenta (siguiente tabla), nunca se fían de que la pantalla los haya comprobado.
@@ -117,7 +127,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `addCartelBout` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Fighter, FighterDiscipline | BOUT: CREATED_BY_ORGANIZER | Sí | cartel_anadido |
-| `createEvent` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: CREATED | — | velada_creada |
+| `createEvent` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: CREATED | — | — |
 | `removeCartelBout` | Organizador (o moderación) con correo verificado | AuditLog, Bout | BOUT: REMOVED_FROM_CARTEL | — | cartel_quitado |
 | `requestOrganizer` | Cuenta con correo verificado | OrganizerRequest | — | — | solicitud_enviada |
 | `setBoutResult` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event, Fighter | BOUT: RESULT_SET | — | resultado_guardado |
@@ -136,6 +146,13 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `setRecordPublic` | Cuenta con correo verificado | AuditLog, Fighter | FIGHTER: (varias) | — | — |
 | `updateMyFighter` | Cuenta con correo verificado | AuditLog, Fighter, Gym | FIGHTER: PROFILE_UPDATED | — | ficha_actualizada |
 
+### `media`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `deleteMyMedia` | Cuenta con correo verificado | AuditLog, MediaItem | MEDIA: DELETED | — | medio_borrado |
+| `shareMedia` | Cuenta con correo verificado | AuditLog, MediaItem | MEDIA: CREATED | — | medio_compartido |
+
 ### `moderation`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
@@ -143,8 +160,17 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `adminDecide` | Moderación | AuditLog, Bout, Fighter | BOUT: (varias) | — | moderacion_rechazado, moderacion_restaurado, moderacion_verificado |
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, Profile, User | ORGANIZER: (varias), PROFILE: FEDERATION_CREATED | Sí | — |
-| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, Report | REPORT: (varias) | — | — |
+| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, MediaItem, Profile, Report | REPORT: (varias) | — | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
+
+### `news`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `addNewsSource` | Moderación | AuditLog, NewsSource | NEWS_SOURCE: CREATED | — | fuente_anadida |
+| `refreshNewsNow` | Moderación | AuditLog, NewsItem, NewsSource | NEWS: REFRESHED | — | — |
+| `toggleNewsItem` | Moderación | AuditLog, NewsItem | NEWS_ITEM: (varias) | — | — |
+| `toggleNewsSource` | Moderación | AuditLog, NewsSource | NEWS_SOURCE: (varias) | — | — |
 
 ### `profiles`
 
@@ -190,7 +216,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation`, `trainers.createMyTrainer`, `trainers.createClass`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AuditLog | `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `trainers.createMyTrainer`, `trainers.createClass`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
 | Report | `bouts.respondBout`, `community.createReport`, `moderation.resolveReport` |
 | Follow | `accounts.saveInterests`, `community.toggleFollow`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `moderation.resolveReport` |
@@ -198,6 +224,9 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Profile | `accounts.deleteAccount`, `moderation.decideOrganizer`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 | SupportAccreditation | `accounts.deleteAccount`, `trajectory.setSupportAccreditation` |
 | FighterAchievement | `accounts.deleteAccount`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
+| MediaItem | `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport` |
+| NewsSource | `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource` |
+| NewsItem | `news.refreshNewsNow`, `news.toggleNewsItem` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -209,7 +238,8 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
 | `backing.ts` | `canEndorse`, `requireSupportActor` |
-| `landing.ts` | `PASOS_REGISTRO`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `landingFor`, `parseTipoDeCuenta`, `parseTipoDeEntidad` |
+| `landing.ts` | `PASOS_REGISTRO`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
+| `menu.ts` | `EXPLORAR`, `EnlaceMenu`, `ExtrasMenu`, `SeccionMenu`, `menuDe` |
 | `onboarding.ts` | `ClassDraft`, `FighterIntent`, `Onboarding`, `TrainerIntent`, `readOnboarding` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
 | `permissions.ts` | `requireAdmin`, `requireOrganizer` |
@@ -238,12 +268,12 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `apariencia.ts` | `COLOR_DISCIPLINA`, `conAlfa`, `iniciales`, `nombreDePila`, `tinteDe` |
 | `audit.ts` | `audit` |
 | `competition.ts` | `COMPETITION_DIVISIONS`, `CompetitionDivision`, `divisionAgeEligible`, `divisionById`, `divisionEligible`, `divisionLabel`, `divisionsFor`, `knownBoxingAgeEligible` |
-| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayAndMonth`, `dayKey`, `daysUntil`, `eventDayReached`, `madridDayStart`, `monthlySeries`, `parseBirthDate`, `parseDay`, `todayMadrid`, `whenLabel` |
+| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayAndMonth`, `dayKey`, `daysUntil`, `eventDayReached`, `haceTiempo`, `madridDayStart`, `monthlySeries`, `parseBirthDate`, `parseDay`, `todayMadrid`, `whenLabel` |
 | `db.ts` | `db` |
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
-| `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
+| `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `DISCIPLINE_SLUG`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `disciplineFromSlug`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
-| `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `resultWord`, `shortHash`, `slugName`, `slugify` |
+| `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
 | `names.ts` | `normalizeName`, `publicFighterName`, `publicUserName` |
@@ -273,6 +303,23 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `prior.ts` | `PriorError`, `PriorParse`, `parsePrior` |
 | `privacy.ts` | `recordHidden`, `shownRecord` |
 | `record.ts` | `BoutForRecord`, `Prior`, `Records`, `Tally`, `combinedRecord`, `computeRecords`, `emptyTally`, `formatRecord`, `priorIsDetailed` |
+
+### `lib/media`
+
+| Fichero | Exporta |
+|---|---|
+| `rules.ts` | `CONSENTIMIENTO`, `DIAS_PARA_COMPARTIR`, `MAX_MEDIOS_POR_DIA`, `MedioInput`, `MedioParsed`, `PIE_MAX`, `nombreDeDescarga`, `parseMedio`, `veladaAbiertaAlPublico` |
+| `s3.ts` | `Credenciales`, `codificar`, `presignar` |
+| `storage.ts` | `Almacen`, `CLAVE_VALIDA`, `MAX_VIDEO_DISCO`, `MAX_VIDEO_R2`, `TIPOS_DE_VIDEO`, `almacenDeVideos`, `carpetaEnDisco`, `claveDe`, `guardarEnDisco`, `lecturaR2`, `nuevaClave`, `responderVideo`, `rutaEnDisco`, `servirDesdeDisco`, `tipoDeClave` |
+
+### `lib/news`
+
+| Fichero | Exporta |
+|---|---|
+| `feed.ts` | `Noticia`, `ultimasNoticias` |
+| `parse.ts` | `EntradaNoticia`, `HOSTS_DE_IMAGEN`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `decodificar`, `detectarDisciplinas`, `disciplinasDe`, `parseFeed`, `textoPlano`, `variar` |
+| `refresh.ts` | `actualizarNoticias`, `actualizarSiToca`, `asegurarFuentesIniciales`, `noticiasActivas`, `noticiasPorActualizar` |
+| `sources.ts` | `CONSERVAR_DIAS`, `FUENTES_INICIALES`, `FuenteInicial`, `REFRESCO_MS`, `TIPO_DE_FUENTE_ETIQUETA`, `googleNoticias` |
 
 ### `lib/profiles`
 

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/** Papel con el que se elige la barra inferior (diseño v3: cada tipo de cuenta tiene sus cuatro pestañas). */
-export type PapelBarra = "visitante" | "usuario" | "peleador" | "entrenador" | "entidad";
+import type { Papel } from "../../lib/accounts/landing";
+
+/** Barra inferior por tipo de cuenta (diseño v3: cuatro pestañas). La portada es común; lo propio de cada cuenta está en «Mi panel». */
 
 const ICONO = {
   inicio: "M3 10 12 3l9 7v11h-6v-7H9v7H3Z",
@@ -23,19 +24,22 @@ const INICIO: Pestana = { href: "/", label: "Inicio", icon: ICONO.inicio };
 const PELEADORES: Pestana = { href: "/peleadores", label: "Peleadores", icon: ICONO.peleadores, tambien: ["/ranking"] };
 const VELADAS: Pestana = { href: "/veladas", label: "Veladas", icon: ICONO.veladas };
 
-const PESTANAS: Record<PapelBarra, Pestana[]> = {
+const PANEL: Pestana = { href: "/mi-panel", label: "Mi panel", icon: ICONO.panel, tambien: ["/siguiendo", "/compartir"] };
+const MIS_VELADAS: Pestana = { href: "/organizador", label: "Mis veladas", icon: ICONO.orgVeladas };
+
+const PESTANAS: Record<Papel, Pestana[]> = {
   visitante: [INICIO, PELEADORES, VELADAS, { href: "/gimnasios", label: "Gimnasios", icon: ICONO.gimnasios }],
-  usuario: [INICIO, PELEADORES, VELADAS, { href: "/siguiendo", label: "Siguiendo", icon: ICONO.siguiendo }],
-  peleador: [INICIO, VELADAS, PELEADORES, { href: "/mi-ficha", label: "Mi ficha", icon: ICONO.miFicha }],
-  entrenador: [{ ...INICIO, icon: ICONO.panel }, { href: "/mis-clases", label: "Mis clases", icon: ICONO.clases }, PELEADORES, VELADAS],
-  entidad: [{ ...INICIO, label: "Panel", icon: ICONO.panel }, { href: "/organizador", label: "Mis veladas", icon: ICONO.orgVeladas }, PELEADORES, VELADAS],
+  usuario: [INICIO, PELEADORES, VELADAS, PANEL],
+  peleador: [INICIO, VELADAS, PANEL, { href: "/mi-ficha", label: "Mi ficha", icon: ICONO.miFicha }],
+  entrenador: [INICIO, PANEL, { href: "/mis-clases", label: "Mis clases", icon: ICONO.clases }, MIS_VELADAS],
+  entidad: [INICIO, PANEL, MIS_VELADAS, VELADAS],
 };
 
 const SIN_BARRA = ["/bienvenida", "/entrar", "/registro"];
 
 const dentro = (pathname: string, href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/"));
 
-export default function MobileNav({ papel = "visitante" }: { papel?: PapelBarra }) {
+export default function MobileNav({ papel = "visitante" }: { papel?: Papel }) {
   const pathname = usePathname() ?? "";
   // Como en el diseño v3, la bienvenida, el acceso y el registro van sin barra inferior: la persona se centra en terminar ese paso.
   if (SIN_BARRA.some((r) => dentro(pathname, r))) return null;

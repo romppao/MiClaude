@@ -57,9 +57,11 @@ import * as comunidad from "../../src/app/actions/community";
 import * as trayectoria from "../../src/app/actions/trajectory";
 import * as demo from "../../src/app/actions/demo";
 import * as entrenadores from "../../src/app/actions/trainers";
+import * as noticias from "../../src/app/actions/news";
+import * as medios from "../../src/app/actions/media";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -76,9 +78,9 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
-const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation"] as const;
+const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia"] as const;
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
@@ -156,6 +158,31 @@ describe("una persona que no es organizadora", () => {
       });
     }
   }
+  it("un entrenador sí puede crear veladas e interclubs (decisión del fundador): pasa la guarda y llega a validar los datos", async () => {
+    iniciarSesion(persona("TRAINER"));
+    expect(await destino(acciones.createEvent, { name: "" })).toBe("/organizador?problema=velada_datos");
+    expect(await destino(acciones.createEvent, { name: "Interclub", date: "2026-11-10", kind: "OTRO" })).toBe("/organizador?problema=velada_tipo");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("nadie puede borrar el vídeo o la foto que subió otra persona", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["mediaItem.findFirst"] = (q: { where: { uploaderId: string } }) => (q.where.uploaderId === "u-FAN" ? null : { id: "m1" });
+    expect(await destino(acciones.deleteMyMedia, { mediaId: "m1" })).toBe("/mi-panel?seccion=mis-subidas&problema=no_existe");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("no se puede publicar como propio un vídeo subido por otra persona", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", date: new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`), status: "SCHEDULED" };
+    const ajeno = "videos/otrapersona1/0f8fad5b-d9cb-469f-a165-70867728950e.mp4";
+    expect(await destino(acciones.shareMedia, { eventId: "e1", videoKey: ajeno, consentimiento: "on" })).toBe("/compartir?velada=velada&problema=medio_subida");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un entrenador no puede tocar la velada de otro organizador", async () => {
+    iniciarSesion(persona("TRAINER"));
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada-ajena", organizerId: "otra-persona", date: new Date("2026-01-01T12:00:00Z"), discipline: "BOXEO" };
+    expect(await destino(acciones.addCartelBout, { eventId: "e1" })).toBe("/organizador?problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
   it("un organizador no puede tocar la velada de otro organizador", async () => {
     iniciarSesion(persona("ORGANIZER"));
     mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada-ajena", organizerId: "otra-persona", date: new Date("2026-01-01T12:00:00Z"), discipline: "BOXEO" };

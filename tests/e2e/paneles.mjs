@@ -110,8 +110,9 @@ async function entrarYVer(email, destino, texto) {
   await p.waitForURL((u) => !u.pathname.startsWith("/entrar"));
   check(texto, new URL(p.url()).pathname === destino);
 }
-await entrarYVer(correoPeleador, "/mi-ficha", "el peleador entra y llega a «Mi ficha»");
-await entrarYVer(correoFed, "/organizador", "la federación aprobada entra y llega a su panel de veladas");
+// Decisión del fundador (8 de octubre de 2026): después de entrar, todas las personas ven la misma portada; lo suyo está en «Mi panel».
+await entrarYVer(correoPeleador, "/", "el peleador entra y llega a la portada común");
+await entrarYVer(correoFed, "/", "la federación aprobada entra y llega a la portada común");
 await entrarYVer(mod.email, "/moderacion", "la moderación entra y llega a su panel");
 await terminarDiagnosticos();
 await browser.close();

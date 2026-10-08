@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { getUser } from "../../lib/accounts/auth";
 import { db } from "../../lib/common/db";
-import { PROVINCES, fmtDate } from "../../lib/common/labels";
+import { EVENT_KIND_AYUDA, EVENT_KIND_LABEL, PROVINCES, fmtDate } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { LIMITS, plural } from "../../lib/common/text";
 import { createEvent, requestOrganizer } from "../actions/events";
-import { TIPOS_DE_ENTIDAD, TIPO_DE_ENTIDAD_ETIQUETA } from "../../lib/accounts/landing";
+import { TIPOS_DE_ENTIDAD, TIPO_DE_ENTIDAD_ETIQUETA, puedeOrganizar } from "../../lib/accounts/landing";
 
 export const metadata = { title: "Organizadores" };
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function Organizer() {
     );
   }
 
-  if (user.role !== "ORGANIZER" && user.role !== "ADMIN") {
+  if (!puedeOrganizar(user.role)) {
     const req = await db.organizerRequest.findUnique({ where: { userId: user.id } });
     return (
       <>
@@ -52,13 +52,21 @@ export default async function Organizer() {
     );
   }
 
+  const entrenador = user.role === "TRAINER";
   const events = await db.event.findMany({ where: user.role === "ADMIN" ? {} : { organizerId: user.id }, orderBy: { date: "desc" }, take: 50, include: { _count: { select: { bouts: true } } } });
   return (
     <>
-      <h1>Mis veladas</h1>
-      <h2 id="crear">Crear una velada</h2>
+      <h1>{entrenador ? "Mis veladas e interclubs" : "Mis veladas"}</h1>
+      {entrenador && <p className="mut">Como entrenador puedes organizar veladas e interclubs con tu club: crea el evento, monta el cartel y publica los resultados.</p>}
+      {!user.emailVerifiedAt && <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Para crear veladas primero <Link href="/verificar">confirma tu correo electrónico</Link>.</div>}
+      <h2 id="crear">Crear una velada o un interclub</h2>
       <form className="search" action={createEvent}>
-        <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre de la velada</span><input name="name" required maxLength={LIMITS.eventName} /></label>
+        <fieldset className="field" style={{ flexBasis: "100%", border: 0, padding: 0, margin: 0 }}>
+          <legend className="leyenda">Tipo de evento</legend>
+          <div className="chips">{(["VELADA", "INTERCLUB"] as const).map((k) => <label key={k} className="chip"><input type="radio" name="kind" value={k} defaultChecked={k === "VELADA"} />{EVENT_KIND_LABEL[k]}</label>)}</div>
+          <span className="hint">Velada: {EVENT_KIND_AYUDA.VELADA.toLowerCase()} Interclub: {EVENT_KIND_AYUDA.INTERCLUB.toLowerCase()}</span>
+        </fieldset>
+        <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre del evento</span><input name="name" required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>
         <label className="field"><span>Disciplina</span><select name="discipline" defaultValue="" required><option value="">Elige una disciplina</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></label>
         <label className="field"><span>Nivel</span><select name="level" defaultValue="AMATEUR"><option value="AMATEUR">Amateur</option><option value="PRO">Profesional</option></select></label>
@@ -67,16 +75,16 @@ export default async function Organizer() {
         <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Organiza (opcional)</span><input name="promoter" maxLength={LIMITS.promoter} /><span className="hint">El nombre que verá el público.</span></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /><span className="hint">Debe empezar por https://</span></label>
-        <button>Crear velada</button>
+        <button>Crear el evento</button>
       </form>
       <h2>Tus veladas</h2>
       {events.length === 0 ? <p className="mut">Aún no has creado ninguna velada. Usa el formulario de arriba para crear la primera.</p> : (
         <div className="table-wrap">
           <table>
             <caption className="sr-only">Tus veladas, de la más reciente a la más antigua</caption>
-            <thead><tr><th scope="col">Velada</th><th scope="col">Fecha</th><th scope="col">Cartel</th></tr></thead>
+            <thead><tr><th scope="col">Evento</th><th scope="col">Tipo</th><th scope="col">Fecha</th><th scope="col">Cartel</th></tr></thead>
             <tbody>
-              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link></th><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td></tr>)}
+              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link></th><td>{EVENT_KIND_LABEL[e.kind]}</td><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td></tr>)}
             </tbody>
           </table>
         </div>

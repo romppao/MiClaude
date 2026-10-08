@@ -35,6 +35,9 @@ jobs:
       APP_URL: http://localhost:3111
       MAIL_TRANSPORT: log
       MAIL_LOG: ${{ github.workspace }}/server.log
+      # Sin salida a internet: las pruebas insertan sus noticias; los vídeos de prueba se guardan en una carpeta temporal.
+      NEWS_FETCH: "no"
+      MEDIA_DIR: /tmp/ring-subidas
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

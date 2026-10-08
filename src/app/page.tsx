@@ -1,21 +1,16 @@
 import { getUser } from "../lib/accounts/auth";
+import { actualizarSiToca } from "../lib/news/refresh";
 import InicioVisitante from "./_inicio/Visitante";
-import InicioAficionado from "./_inicio/Aficionado";
-import InicioPeleador from "./_inicio/Peleador";
-import InicioEntrenador from "./_inicio/Entrenador";
-import InicioEntidad from "./_inicio/Entidad";
+import InicioComun from "./_inicio/PortadaComun";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Inicio por tipo de cuenta (diseño v3): cada persona ve lo suyo. Visitante: la portada pública. Aficionado (y moderación, y una entidad
- * pendiente de aprobar): sus peleadores. Peleador: su ficha y su próximo combate. Entrenador: sus clases. Entidad aprobada: su panel de veladas.
+ * Portada. Sin cuenta: la portada pública. Con cuenta: la misma portada para todas las personas, con la actualidad y sus disciplinas
+ * (decisión del fundador, 8 de octubre de 2026). Lo propio de cada tipo de cuenta está en /mi-panel.
  */
 export default async function Home() {
+  actualizarSiToca();
   const user = await getUser();
-  if (!user) return <InicioVisitante />;
-  if (user.role === "ORGANIZER") return <InicioEntidad user={user} />;
-  if (user.role === "FIGHTER" || user.fighter) return <InicioPeleador user={user} />;
-  if (user.role === "TRAINER") return <InicioEntrenador user={user} />;
-  return <InicioAficionado user={user} />;
+  return user ? <InicioComun user={user} /> : <InicioVisitante />;
 }

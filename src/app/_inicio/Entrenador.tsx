@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
+import { calendarDayStart } from "../../lib/common/dates";
+import { EVENT_KIND_LABEL, fmtDate } from "../../lib/common/labels";
 import { readOnboarding } from "../../lib/accounts/onboarding";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
@@ -15,14 +17,28 @@ import { Saludo } from "./comun";
  * Con perfil: sus clases publicadas y el botón para crear otra. Las reservas y los ingresos llegarán con la gestión de reservas.
  */
 export default async function InicioEntrenador({ user }: { user: User }) {
-  const trainer = await db.trainer.findUnique({ where: { userId: user.id }, include: { gym: true, classes: { orderBy: [{ active: "desc" }, { createdAt: "asc" }] } } });
+  const [trainer, eventos, proximo] = await Promise.all([
+    db.trainer.findUnique({ where: { userId: user.id }, include: { gym: true, classes: { orderBy: [{ active: "desc" }, { createdAt: "asc" }] } } }),
+    db.event.count({ where: { organizerId: user.id } }),
+    db.event.findFirst({ where: { organizerId: user.id, date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }] }),
+  ]);
+  // El entrenador también organiza veladas e interclubs (decisión del fundador, 8 de octubre de 2026).
+  const veladas = (
+    <section aria-labelledby="titulo-veladas-entrenador" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="titulo-seccion"><h2 id="titulo-veladas-entrenador">Tus veladas e interclubs</h2>{eventos > 0 && <Link href="/organizador">Gestionar</Link>}</div>
+      {proximo ? (
+        <Link href={`/organizador/${proximo.slug}`} className="fila"><span className="cuerpo"><span className="nombre">{proximo.name}</span><span className="meta">{EVENT_KIND_LABEL[proximo.kind]} · {fmtDate(proximo.date)} · {proximo.city}</span></span><Icono nombre="siguiente" tam={18} /></Link>
+      ) : <p className="mut" style={{ margin: 0 }}>{eventos ? "No tienes eventos programados." : "Organiza una velada o un interclub con tu club: crea el evento, monta el cartel y publica los resultados."}</p>}
+      <Link href="/organizador#crear" className="btn secondary">Crear una velada o un interclub</Link>
+    </section>
+  );
   if (!trainer) {
     const borrador = readOnboarding(user.onboarding);
     const b = borrador?.kind === "entrenador" ? borrador : null;
     const clase = b?.clase ? parseClass(b.clase) : null;
     return (
       <div className="pantalla">
-        <Saludo nombre={user.name} sub="Entrenador" />
+        <Saludo kicker="Mi panel" nombre={user.name} sub="Entrenador" />
         {!user.emailVerifiedAt ? (
           <div className="tarjeta tarjeta-acc anillo" style={{ padding: 22 }}>
             <h2 style={{ font: "800 24px/1.1 var(--font)" }}>Publica tu perfil de entrenador</h2>
@@ -47,6 +63,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
             </form>
           </section>
         )}
+        {veladas}
       </div>
     );
   }
@@ -54,7 +71,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
   const desde = activas.length ? Math.min(...activas.map((c) => c.priceEuros)) : null;
   return (
     <div className="pantalla" style={{ gap: 22 }}>
-      <Saludo nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
+      <Saludo kicker="Mi panel" nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
       <section className="tarjeta tarjeta-acc anillo" style={{ padding: 22, gap: 6 }} aria-label="Tus clases publicadas">
         <span className="kicker">Clases publicadas</span>
         <span style={{ font: "800 64px/1 var(--font)", letterSpacing: "-.05em" }}>{activas.length}</span>
@@ -72,6 +89,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
         ))}</div> : <p className="mut" style={{ margin: 0 }}>Aún no tienes clases publicadas.</p>}
       </section>
       <Link href="/mis-clases#nueva" className="btn btn-grande"><Icono nombre="mas" />Crear una clase</Link>
+      {veladas}
     </div>
   );
 }

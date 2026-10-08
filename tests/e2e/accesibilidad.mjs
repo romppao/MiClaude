@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 // Medición automática de accesibilidad (WCAG 2.2 AA) con axe-core sobre el navegador real.
 // Recorre las pantallas públicas y las de usuario, moderador y organizador. Requiere el servidor en marcha (ver ayudas.mjs).
 // Sale con código 1 si hay incumplimientos de impacto «serious» o «critical».
@@ -40,7 +41,7 @@ for (const [ruta, etiqueta] of [
   ["/ranking", "Ránking"], ["/ayuda", "Ayuda"], ["/buscar", "Búsqueda (vacía)"], ["/buscar?q=accesible", "Búsqueda (con resultados)"], ["/buscar?q=zzzzqq", "Búsqueda (sin resultados)"],
   ["/bienvenida", "Bienvenida"], ["/registro", "Registro"], ["/registro?tipo=usuario", "Registro de aficionado"], ["/registro?tipo=peleador", "Registro de peleador"], ["/registro?tipo=entrenador", "Registro de entrenador"], ["/registro?tipo=entidad", "Registro de promotora, federación o club"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
   ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/organizador", "Organizadores (sin sesión)"],
-  ["/pagina-que-no-existe", "Página no encontrada"],
+  ["/pagina-que-no-existe", "Página no encontrada"], ["/noticias", "Noticias"], ["/noticias?disciplina=muay-thai", "Noticias de una disciplina"], ["/disciplinas/boxeo", "Portada de una disciplina"],
 ]) await analizar(anon, ruta, etiqueta);
 
 console.log("— Con sesión —");
@@ -51,25 +52,31 @@ const sinFicha = await newUser("Sinficha", "FIGHTER");
 await analizar(sinFicha.p, "/mi-ficha", "Mi ficha (sin crear todavía)");
 const sinVerificar = await newUser("Sinverificar", "FAN", false);
 await analizar(sinVerificar.p, "/verificar", "Verificar correo (con sesión)");
-await analizar(sinVerificar.p, "/", "Inicio del aficionado");
+await analizar(sinVerificar.p, "/", "Portada común (con sesión)");
+await analizar(sinVerificar.p, "/mi-panel", "Panel del aficionado");
+await analizar(sinVerificar.p, "/compartir", "Subir vídeos o fotos: elegir la velada");
 await analizar(sinVerificar.p, "/registro/intereses", "Registro: intereses del aficionado");
-await analizar(pepe.p, "/", "Inicio del peleador");
+await analizar(pepe.p, "/mi-panel", "Panel del peleador");
+// Una velada con vídeos y fotos del público (de la prueba fase2a, si se ejecutó antes) y su formulario para compartir.
+const conMedios = execSync(`psql "${process.env.DATABASE_URL}" -tAc "select e.slug from \\"Event\\" e join \\"MediaItem\\" m on m.\\"eventId\\"=e.id where m.\\"hiddenAt\\" is null and e.date <= now() order by m.\\"createdAt\\" desc limit 1"`).toString().trim();
+if (conMedios) { await analizar(pepe.p, `/veladas/${conMedios}`, "Velada con vídeos y fotos del público"); await analizar(pepe.p, `/compartir?velada=${conMedios}`, "Subir vídeos o fotos: formulario"); }
 await analizar(sinFicha.p, "/registro/ficha", "Registro: crea tu ficha");
 // Entrenador: pasos del registro, inicio y «Mis clases» (con perfil creado desde la web).
 const entrenador = await newUser("Entrenadora", "FAN"); sql(`update "User" set role='TRAINER' where email='${entrenador.email}';`);
 await analizar(entrenador.p, "/registro/perfil", "Registro: perfil de entrenador");
 await entrenador.p.goto(B + "/registro/perfil"); await entrenador.p.locator("label.chip", { hasText: "Boxeo" }).click(); await entrenador.p.selectOption("[name=province]", "Madrid"); await entrenador.p.getByRole("button", { name: "Siguiente" }).click(); await entrenador.p.waitForURL("**/registro/clase**");
 await analizar(entrenador.p, "/registro/clase", "Registro: primera clase");
-await analizar(entrenador.p, "/", "Inicio del entrenador (sin perfil)");
-await entrenador.p.goto(B + "/"); await entrenador.p.getByRole("button", { name: "Publicar mi perfil" }).click(); await entrenador.p.waitForURL("**/mis-clases**");
+await analizar(entrenador.p, "/mi-panel", "Panel del entrenador (sin perfil)");
+await entrenador.p.goto(B + "/mi-panel"); await entrenador.p.getByRole("button", { name: "Publicar mi perfil" }).click(); await entrenador.p.waitForURL("**/mis-clases**");
 await analizar(entrenador.p, "/mis-clases", "Mis clases");
-await analizar(entrenador.p, "/", "Inicio del entrenador");
+await analizar(entrenador.p, "/mi-panel", "Panel del entrenador");
+await analizar(entrenador.p, "/organizador", "Mis veladas e interclubs (entrenador)");
 
 console.log("— Moderación y organizador —");
 const admin = await newUser("Moderadora", "FAN"); hacerAdmin(admin.email);
-for (const [ruta, etiqueta] of [["/respaldar", "Respaldar hechos"], ["/moderacion/acreditaciones", "Acreditaciones"], ["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
+for (const [ruta, etiqueta] of [["/respaldar", "Respaldar hechos"], ["/moderacion/acreditaciones", "Acreditaciones"], ["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"], ["/moderacion/noticias", "Fuentes de noticias"]]) await analizar(admin.p, ruta, etiqueta);
 const organizadora = await newUser("Organizadora", "FAN"); sql(`update "User" set role='ORGANIZER' where email='${organizadora.email}';`);
-await analizar(organizadora.p, "/", "Panel de la entidad");
+await analizar(organizadora.p, "/mi-panel", "Panel de la entidad");
 
 await terminarDiagnosticos();
 await browser.close();

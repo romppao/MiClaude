@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { papelDe, puedeOrganizar } from "../../lib/accounts/landing";
 import { requireUser } from "../../lib/accounts/auth";
 import { db } from "../../lib/common/db";
 import { REPORT_REASONS } from "../../lib/community/reports";
@@ -15,14 +16,14 @@ export default async function Account() {
   const user = await requireUser("/mi-cuenta");
   const avisos = await db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 20 });
   const accreditation = await db.supportAccreditation.findUnique({where:{userId:user.id}});
-  const tieneFicha = !!user.fighter || user.role === "FIGHTER";
-  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario" } as const;
+  const papel = papelDe(user);
+  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario", MEDIA: "un vídeo o una foto" } as const;
   const estado = { OPEN: "En revisión", RESOLVED: "Cerrado: ya está corregido", DISMISSED: "Cerrado: no se ha encontrado ningún error" } as const;
   const managedProfiles = await db.profile.findMany({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } }, select: { id: true, kind: true, entityId: true, name: true } });
   return (
     <>
       {user.role === "ORGANIZER" && <p><Link className="btn" href={`/promotores/${user.id}`}>Mi perfil de promotor</Link></p>}
-      {managedProfiles.length > 0 && <section><h2>Perfiles que gestionas</h2>{managedProfiles.map(p => <p key={p.id}><Link href={`/perfiles/${p.kind}/${p.entityId}/editar`}>Personalizar {p.name ?? p.kind}</Link></p>)}</section>}
+      {managedProfiles.length > 0 && <section id="perfiles"><h2>Perfiles que gestionas</h2>{managedProfiles.map(p => <p key={p.id}><Link href={`/perfiles/${p.kind}/${p.entityId}/editar`}>Personalizar {p.name ?? p.kind}</Link></p>)}</section>}
 
       <h1>Mi cuenta</h1>
       <p className="mut">Aquí controlas tus datos, tu contraseña y los avisos que recibes.</p>
@@ -36,18 +37,29 @@ export default async function Account() {
               <button key={clave} name="papel" value={clave} className={clave === user.role ? undefined : "secondary"} aria-pressed={clave === user.role}>{clave === user.role ? `✓ ${nombre}` : `Probar como ${nombre.toLowerCase()}`}</button>
             ))}
           </form>
-          <p className="mut">Aficionado: ve y sigue peleadores y da aura. Peleador: crea su ficha y registra combates. Entrenador: publica sus clases. Organizador: publica veladas. Moderador: revisa avisos y aprueba solicitudes.</p>
+          <p className="mut">Aficionado: ve y sigue peleadores y da aura. Peleador: crea su ficha y registra combates. Entrenador: publica sus clases y organiza veladas e interclubs. Organizador: publica veladas. Moderador: revisa avisos y aprueba solicitudes.</p>
         </section>
       )}
 
       <h2>Accesos directos</h2>
       <ul>
-        {tieneFicha && <li><Link href="/mi-ficha">Mi ficha de peleador</Link>: tus combates, tu récord y los datos de tu ficha.</li>}
-        {!tieneFicha && <li><Link href="/mi-ficha">Crear o reclamar mi ficha de peleador</Link></li>}
+        <li><Link href="/mi-panel">Mi panel</Link>: lo tuyo de un vistazo.</li>
+        {papel === "peleador" && <li><Link href="/mi-ficha">Mi ficha de peleador</Link>: tus combates, tu récord y los datos de tu ficha.</li>}
+        {papel === "entrenador" && <li><Link href="/mis-clases">Mis clases</Link>: tu perfil de entrenador y tus clases.</li>}
+        {puedeOrganizar(user.role) && <li><Link href="/organizador">{papel === "entrenador" ? "Mis veladas e interclubs" : "Mis veladas"}</Link>: crear eventos y montar carteles.</li>}
+        {papel === "usuario" && <li><Link href="/compartir">Subir vídeos o fotos de una velada</Link>: para que los peleadores tengan las imágenes de sus combates.</li>}
         <li><Link href="/siguiendo">Peleadores que sigo</Link>: sus próximos combates.</li>
-        {(user.role === "ORGANIZER" || user.role === "ADMIN") ? <li><Link href="/organizador">Mis veladas</Link>: crear veladas y montar carteles.</li> : <li><Link href="/organizador">Organizar veladas</Link>: pedir acceso de organizador.</li>}
         {user.role === "ADMIN" && <li><Link href="/moderacion">Moderación</Link></li>}
       </ul>
+      {papel === "usuario" && user.role !== "ADMIN" && (
+        <section aria-labelledby="otro-tipo">
+          <h2 id="otro-tipo">¿Compites u organizas eventos?</h2>
+          <ul>
+            <li><Link href="/mi-ficha">Crear o reclamar mi ficha de peleador</Link></li>
+            <li><Link href="/organizador">Pedir acceso para organizar veladas</Link> (promotoras, clubes y federaciones).</li>
+          </ul>
+        </section>
+      )}
 
       {user.fighter&&<p><Link href="/mi-ficha/trayectoria">Mis títulos y mi aura</Link></p>}
       {(user.role==="ADMIN"||accreditation?.active)&&<p><Link href="/respaldar">Respaldar resultados y títulos</Link></p>}

@@ -26,7 +26,7 @@
   },
   {
     "path": "next.config.mjs",
-    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP; distingue desarrollo de producción.",
+    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (miniaturas de i.ytimg.com y vídeos de R2); distingue desarrollo de producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -72,6 +72,11 @@
   {
     "path": "prisma/migrations/20261008090000_diseno_movil_v3/migration.sql",
     "purpose": "Añade rol/perfil de entrenador y clases, highlights, intereses, intención de registro y privacidad amateur por defecto.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261008180000_noticias_multimedia/migration.sql",
+    "purpose": "Migración aditiva de la fase 2a: Event.kind (velada/interclub), NewsSource, NewsItem, MediaItem y vídeo subido de Highlight.",
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
@@ -131,32 +136,42 @@
   },
   {
     "path": "src/app/_inicio/Aficionado.tsx",
-    "purpose": "Inicio del aficionado con combates de seguidos, aura y resultados; prioriza información de su comunidad.",
+    "purpose": "Panel del aficionado en /mi-panel (también moderación y entidad pendiente): combates de seguidos, aura, resultados y sus disciplinas.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/_inicio/Entidad.tsx",
-    "purpose": "Inicio de entidad aprobada con sus veladas, cifras y resultados pendientes del cartel.",
+    "purpose": "Panel de la entidad aprobada en /mi-panel con sus veladas, cifras y resultados pendientes del cartel.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/_inicio/Entrenador.tsx",
-    "purpose": "Inicio del entrenador para crear perfil o gestionar clases propias usando intención guardada.",
+    "purpose": "Panel del entrenador en /mi-panel: crear perfil con la intención guardada o gestionar clases, y sus veladas e interclubs.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/MisSubidas.tsx",
+    "purpose": "«Mis vídeos y fotos» en /mi-panel: lo compartido por la persona, su estado (retirado por moderación) y borrado con confirmación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/_inicio/Peleador.tsx",
-    "purpose": "Inicio del peleador con ficha, próximo combate, declaraciones por responder, récord y aura del público.",
+    "purpose": "Panel del peleador en /mi-panel: ficha, próximo combate con cuenta atrás, declaraciones por responder, récord y aura del público.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/_inicio/PortadaComun.tsx",
+    "purpose": "Portada común con sesión: saludo, acceso a «Mi panel», disciplinas propias primero (ficha, intereses o clases), actualidad y próximas veladas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/_inicio/Visitante.tsx",
-    "purpose": "Portada pública con disciplinas, veladas e invitación por tipo de cuenta; no exige acceso para descubrir.",
+    "purpose": "Portada pública con actualidad, disciplinas (enlazan a su portada), veladas e invitación por tipo de cuenta; no exige acceso para descubrir.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/_inicio/comun.tsx",
-    "purpose": "Piezas reutilizables de los inicios: saludo, combate VS y presentación de resultados/privacidad.",
+    "purpose": "Piezas reutilizables de portada y paneles: saludo (con rótulo opcional «Mi panel»), combate VS y presentación de resultados/privacidad.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -166,7 +181,7 @@
   },
   {
     "path": "src/app/actions/accounts.ts",
-    "purpose": "Registro por tipo, borradores, acceso, recuperación, cuenta, correo y baja; orquesta guardas, transacciones y datos personales.",
+    "purpose": "Registro por tipo, borradores, acceso (todos a la portada salvo moderación), recuperación, cuenta, correo y baja; al eliminar la cuenta borra también sus vídeos del almacén.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -181,7 +196,7 @@
   },
   {
     "path": "src/app/actions/community.ts",
-    "purpose": "Guarda avisos de revisión y cambios de seguimiento; un aviso no suspende automáticamente un resultado.",
+    "purpose": "Guarda avisos de revisión (combate, ficha, comentario o vídeo/foto) y cambios de seguimiento; un aviso no suspende automáticamente nada.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -191,17 +206,27 @@
   },
   {
     "path": "src/app/actions/events.ts",
-    "purpose": "Solicitud de organizador, veladas, cartel, resultados y cancelación; autoriza la velada y programa avisos a seguidores al añadir combate.",
+    "purpose": "Solicitud de organizador, veladas e interclubs (Event.kind), cartel, resultados y cancelación; autoriza la velada y programa avisos a seguidores al añadir combate.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/actions/fighters.ts",
-    "purpose": "Crea/corrige ficha propia y disciplinas, solicita reclamación, regula récord público y gestiona highlights; exige publicación autorizada.",
+    "purpose": "Crea/corrige ficha propia y disciplinas, solicita reclamación, regula récord público y gestiona highlights (vídeo subido comprobado en el almacén o enlace); borra el archivo al retirar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/media.ts",
+    "purpose": "Compartir foto o vídeo de una velada (consentimiento, plazo, combate de esa velada, vídeo subido propio y existente, límite diario) y borrar lo propio con su archivo.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/actions/moderation.ts",
-    "purpose": "Resuelve solicitudes y avisos, verifica/suspende combates y gestiona entidades; registra motivo e historial de decisiones.",
+    "purpose": "Resuelve solicitudes y avisos (también retira vídeos y fotos del público), verifica/suspende combates y gestiona entidades; registra motivo e historial.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/news.ts",
+    "purpose": "Moderación de noticias: actualizar ahora, añadir fuente https, activar/desactivar y ocultar o mostrar un titular; todo auditado.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -242,6 +267,11 @@
   {
     "path": "src/app/buscar/page.tsx",
     "purpose": "Busca por grupos de entidades y limita muestras, enlazando listado completo con la misma consulta.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/compartir/page.tsx",
+    "purpose": "Subir vídeos o fotos: elegir la velada de los últimos cuatro meses y formulario con foto, vídeo subido o enlace, combate opcional y consentimiento.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -296,12 +326,22 @@
   },
   {
     "path": "src/app/components/MobileNav.tsx",
-    "purpose": "Elige destinos de barra móvil según papel y destaca ruta activa; los destinos mantienen sus guardas propias.",
+    "purpose": "Cuatro pestañas por papel (con «Mi panel» para toda cuenta) y ruta activa; oculta en bienvenida, acceso y registro. Los destinos mantienen sus guardas propias.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Multimedia.tsx",
+    "purpose": "Galería de vídeos y fotos del público con descarga y formulario de aviso (recibe la acción por props); SELECT_MEDIO define qué se consulta.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/components/NavigationMenu.tsx",
-    "purpose": "Menú por actividades en diálogo nativo, con foco/Escape y cierre al navegar; recibe el formulario de salida desde layout.",
+    "purpose": "Pinta las secciones ya filtradas por tipo de cuenta (lib/accounts/menu.ts) en un diálogo nativo con foco atrapado, Escape y cierre al navegar; recibe el formulario de salida desde layout.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Noticias.tsx",
+    "purpose": "Lista de noticias con medio, fecha y enlace a la web original en otra pestaña; mensaje cuando aún no hay noticias.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -350,6 +390,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/SubirVideo.tsx",
+    "purpose": "Componente de cliente que pide dónde subir (/subidas), sube con progreso, deja la clave en videoKey e impide enviar el formulario a medio subir.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/Tarjetas.tsx",
     "purpose": "Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -363,6 +408,11 @@
     "path": "src/app/components/VerificationTag.tsx",
     "purpose": "Etiqueta declaración, confirmación o verificación y respaldo efectivo del hecho; no avala toda una carrera.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/disciplinas/[slug]/page.tsx",
+    "purpose": "Portada de una disciplina: actualidad, próximas veladas, peleadores con aura y entrenadores que la enseñan; 404 si la disciplina no existe.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/entrar/page.tsx",
@@ -420,14 +470,29 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/highlights/[id]/video/route.ts",
+    "purpose": "Sirve el vídeo subido de un highlight si la ficha es pública o propia y no está retirado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/imagenes/[kind]/[id]/[slot]/route.ts",
     "purpose": "Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/layout.tsx",
-    "purpose": "Composición global de documento, fuente, navegación por cuenta, avisos y formularios compartidos; pasa acciones a componentes sin importarlas allí.",
+    "purpose": "Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/medios/[id]/imagen/route.ts",
+    "purpose": "Sirve la foto de un medio del público no retirado; ?descargar=1 la descarga con nombre limpio.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/medios/[id]/video/route.ts",
+    "purpose": "Sirve (con Range) o descarga el vídeo de un medio del público no retirado, desde R2 por redirección firmada o desde el disco.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/mi-cuenta/datos/route.ts",
@@ -441,12 +506,12 @@
   },
   {
     "path": "src/app/mi-cuenta/page.tsx",
-    "purpose": "Datos de cuenta, contraseña, preferencias de avisos, exportación y eliminación con sesión requerida.",
+    "purpose": "Datos de cuenta, accesos según el tipo de cuenta, contraseña, preferencias de avisos, exportación y eliminación con sesión requerida.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/mi-ficha/page.tsx",
-    "purpose": "Creación/reclamación y mantenimiento de ficha propia, disciplinas, combates, resultados y highlights con correo requerido para publicar.",
+    "purpose": "Creación/reclamación y mantenimiento de ficha propia, disciplinas, combates, resultados, highlights (con subida de vídeo) y vídeos y fotos de sus combates; correo requerido para publicar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -457,6 +522,11 @@
   {
     "path": "src/app/mi-ficha/trayectoria/page.tsx",
     "purpose": "Panel del deportista para declarar y gestionar títulos y ver aura por categoría, revisión y respaldo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mi-panel/page.tsx",
+    "purpose": "«Mi panel»: el panel propio de cada tipo de cuenta según papelDe() y «Mis vídeos y fotos»; exige sesión.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -475,8 +545,13 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/moderacion/noticias/page.tsx",
+    "purpose": "Moderación de fuentes de noticias: estado de lectura de cada una, alta de fuentes nuevas y últimos titulares para ocultar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/moderacion/page.tsx",
-    "purpose": "Colas moderadoras de combates, avisos, reclamaciones, organizadores y gimnasios; conserva filtros y contexto después de decidir.",
+    "purpose": "Colas moderadoras de combates, avisos (con vídeos y fotos), reclamaciones, organizadores y gimnasios; enlaza a fuentes de noticias; conserva filtros tras decidir.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -485,23 +560,28 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/noticias/page.tsx",
+    "purpose": "Todas las noticias con filtro por disciplina (sin filtro por defecto); lanza la actualización si toca.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/organizador/[slug]/page.tsx",
     "purpose": "Panel de una velada autorizada: cartel, resultados, datos y estado con permisos sobre ese objeto.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/organizador/page.tsx",
-    "purpose": "Solicitud o panel de organización según rol/estado; lista veladas propias y ofrece creación autorizada.",
+    "purpose": "Solicitud de acceso o panel de organización según puedeOrganizar(); el entrenador ve «Mis veladas e interclubs». Lista eventos propios y crea velada o interclub.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/page.tsx",
-    "purpose": "Selecciona inicio según sesión, rol y ficha vinculada; no confunde entidad pendiente con organizador aprobado.",
+    "purpose": "Portada: pública para visitantes y común para toda cuenta (decisión del fundador, 8 oct); lanza la actualización de noticias en segundo plano. Lo propio de cada tipo de cuenta está en /mi-panel.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/peleadores/[slug]/page.tsx",
-    "purpose": "Ficha pública con privacidad, récord, combates, títulos, highlights, seguimiento y aura; diferencia totales de comunidad y categoría.",
+    "purpose": "Ficha pública con privacidad, récord, combates, títulos, highlights (vídeo subido o enlace), vídeos y fotos del público de sus combates, seguimiento y aura.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -595,8 +675,18 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/subidas/[...clave]/route.ts",
+    "purpose": "Recibe un vídeo por PUT solo con el almacén en disco (desarrollo, pruebas, demo): sesión verificada, clave propia y tamaño máximo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/subidas/route.ts",
+    "purpose": "Pide permiso para subir un vídeo: sesión verificada, formato, tamaño, límite diario y almacén disponible; devuelve clave y dirección de subida.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/veladas/[slug]/page.tsx",
-    "purpose": "Detalle de velada, fecha/lugar, promotor, entradas y cartel/resultados con estado y respaldo; avisa si datos son no oficiales.",
+    "purpose": "Detalle de velada o interclub, fecha/lugar, organizador (o entrenador), entradas y cartel/resultados con respaldo; galería de vídeos y fotos del público y acceso a compartir cuando ya se celebró.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -626,7 +716,12 @@
   },
   {
     "path": "src/lib/accounts/landing.ts",
-    "purpose": "Define tipos de cuenta, rol inicial, pasos del registro y destino al entrar; separa solicitud de entidad de permiso concedido.",
+    "purpose": "Tipos de cuenta, rol inicial, pasos del registro y destino al entrar (portada común salvo moderación); papelDe() decide menú, barra y panel, y puedeOrganizar() quién crea veladas e interclubs (entidad aprobada, entrenador, moderación).",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/menu.ts",
+    "purpose": "Única fuente del menú por tipo de cuenta (decisión del fundador): Explorar común y bloques propios; el entrenador reúne entrenador, club y promotora; máximo cinco enlaces por bloque.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -641,7 +736,7 @@
   },
   {
     "path": "src/lib/accounts/permissions.ts",
-    "purpose": "Guardas compartidas de moderación y organización; una denegación devuelve a una pantalla con explicación.",
+    "purpose": "Guardas compartidas de moderación y organización (requireOrganizer usa puedeOrganizar: incluye entrenadores); una denegación devuelve a una pantalla con explicación.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -716,7 +811,7 @@
   },
   {
     "path": "src/lib/common/env.ts",
-    "purpose": "Valida variables imprescindibles al arrancar en producción y explica configuración incompleta de correo/contacto.",
+    "purpose": "Valida variables imprescindibles al arrancar en producción y explica configuración incompleta de correo, contacto y almacén de vídeos (R2 a medias no arranca).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -776,7 +871,7 @@
   },
   {
     "path": "src/lib/community/reports.ts",
-    "purpose": "Catálogo de motivos de aviso por entidad y límite diario; separa solicitud de revisión de decisión moderadora.",
+    "purpose": "Catálogo de motivos de aviso por entidad (incluida MEDIA con «Aparezco yo y no doy permiso») y límite diario; separa solicitud de revisión de decisión moderadora.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -801,7 +896,7 @@
   },
   {
     "path": "src/lib/fighters/highlights.ts",
-    "purpose": "Valida foto/vídeo destacado, título, enlace y orden de publicaciones del titular; define límites del escaparate.",
+    "purpose": "Valida foto o vídeo (subido, con videoKey, o por enlace https), título y orden de publicaciones del titular; define límites del escaparate.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -817,6 +912,41 @@
   {
     "path": "src/lib/fighters/record.ts",
     "purpose": "Calcula récord por disciplina/nivel y suma antecedentes detallados; excluye revisión/cancelación y mantiene total no detallado separado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/media/rules.ts",
+    "purpose": "Reglas puras de vídeos y fotos del público: consentimiento, una sola cosa por envío, enlace https, plazo tras la velada y nombre de descarga.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/media/s3.ts",
+    "purpose": "Firma de direcciones temporales S3 Signature V4 sin dependencias (R2, S3, B2); probada con el ejemplo oficial de AWS.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/media/storage.ts",
+    "purpose": "Almacén de vídeos: R2 (con jurisdicción UE opcional), disco o ninguno; claves por usuario, comprobación de tamaño, borrado y servicio con Range.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/feed.ts",
+    "purpose": "Consulta de noticias visibles (fuente activa, no ocultas, disciplina opcional) ordenadas y variadas por medio.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/parse.ts",
+    "purpose": "Lector RSS/Atom sin dependencias que descarta enlaces no http(s), imágenes no permitidas y fechas imposibles; detecta disciplinas y varía medios.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/refresh.ts",
+    "purpose": "Actualización de noticias en segundo plano con reserva por fuente, límites de tiempo y tamaño, estado de errores, poda a 45 días y NEWS_FETCH=no.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/sources.ts",
+    "purpose": "Fuentes iniciales (vídeo, Google Noticias por disciplina, federaciones) y tiempos de refresco y conservación; sin comprobar desde el entorno de desarrollo.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -891,7 +1021,7 @@
   },
   {
     "path": "tests/e2e/diseno.mjs",
-    "purpose": "Recorre funciones v3 por tipos de cuenta, perfil de entrenador, clases, privacidad y highlights con acciones reales.",
+    "purpose": "Recorre funciones v3 por tipos de cuenta y sus paneles (/mi-panel), barra móvil, perfil de entrenador, clases, privacidad y highlights.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -902,6 +1032,11 @@
   {
     "path": "tests/e2e/escenarios.mjs",
     "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/fase2a.mjs",
+    "purpose": "Recorre la fase 2a con datos reales: portada y noticias, portada por disciplina, menú por tipo, interclub del entrenador, subida y descarga de fotos y vídeos, avisos y moderación.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -926,7 +1061,7 @@
   },
   {
     "path": "tests/e2e/menu.mjs",
-    "purpose": "Recorre menú por actividades, destinos y navegación accesible según sesión/rol.",
+    "purpose": "Recorre el menú por tipo de cuenta (visitante, aficionado, moderación), destinos, foco con teclado y accesibilidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -936,7 +1071,7 @@
   },
   {
     "path": "tests/e2e/paneles.mjs",
-    "purpose": "Recorre paneles de organización/moderación, solicitudes y permisos al decidir/publicar.",
+    "purpose": "Recorre paneles de organización/moderación, solicitudes, permisos y el destino tras entrar (portada común).",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1035,6 +1170,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/menu.test.ts",
+    "purpose": "Comprueba que cada tipo de cuenta solo ve sus opciones, el entrenador sus tres bloques y el máximo de cinco enlaces por bloque.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/messages.test.ts",
     "purpose": "Detecta códigos usados sin traducción pública y mensajes vacíos en acciones/páginas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1042,6 +1182,16 @@
   {
     "path": "tests/unit/middleware.test.ts",
     "purpose": "Prueba limpieza de parámetros duplicados, claves peligrosas y caracteres no admitidos de URL.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/multimedia.test.ts",
+    "purpose": "Comprueba reglas de vídeos y fotos, claves por usuario, rutas sin salir de la carpeta, elección de almacén y configuración R2 incompleta.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/noticias.test.ts",
+    "purpose": "Comprueba el lector RSS/Atom, entidades, descartes, disciplinas por palabras clave, variedad de medios y fuentes iniciales.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1097,6 +1247,11 @@
   {
     "path": "tests/unit/rules.test.ts",
     "purpose": "Prueba resultado/método válido por disciplina y claves/versiones de enfrentamiento.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/s3.test.ts",
+    "purpose": "Comprueba la firma S3 con el ejemplo oficial de AWS y la codificación de parámetros añadidos.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

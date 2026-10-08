@@ -8,14 +8,18 @@ import { divisionLabel } from "../../../lib/common/competition";
 import { DISCIPLINE_LABEL, weightClassLabel } from "../../../lib/common/disciplines";
 import { publicFighterName } from "../../../lib/common/names";
 import VerificationTag from "../../components/VerificationTag";
-import { eventDayReached } from "../../../lib/common/dates";
+import { eventDayReached, todayMadrid } from "../../../lib/common/dates";
+import { getUser } from "../../../lib/accounts/auth";
+import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
+import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
+import { createReport } from "../../actions/community";
 
 export const dynamic = "force-dynamic";
 
 const getEvent = cache((slug: string) =>
   db.event.findUnique({
     where: { slug },
-    include: { organizer: { select: { organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { fighterA: true, fighterB: true, supportAccreditation: true } } },
+    include: { organizer: { select: { role: true, trainer: { select: { slug: true, name: true } }, organizerRequest: { select: { orgName: true, status: true } } } }, bouts: { orderBy: { order: "desc" }, include: { fighterA: true, fighterB: true, supportAccreditation: true } } },
   }),
 );
 
@@ -31,8 +35,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   if (!e) notFound();
   const org = e.organizer?.organizerRequest;
   const oficial = !!e.organizerId && org?.status === "APPROVED";
+  const entrenador = e.organizer?.role === "TRAINER" ? e.organizer.trainer : null;
+  const [user, medios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  const compartir = veladaAbiertaAlPublico(e, todayMadrid());
   return (
     <>
+      {e.kind === "INTERCLUB" && <span className="tag">Interclub</span>}
       <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       {e.status === "CANCELLED" && <span className="tag">velada cancelada</span>}
       {!e.organizerId && <span className="tag">no oficial</span>}
@@ -41,6 +49,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       <p className="mut">
         {fmtDate(e.date)} · {e.venue}, {e.city} ({e.province})
         {oficial && <> · Publicada por <strong>{org?.orgName}</strong> <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span></>}
+        {entrenador && <> · Organiza el entrenador <Link href={`/entrenadores/${entrenador.slug}`}>{entrenador.name}</Link></>}
         {e.promoter && <> · Promotor indicado por el organizador: {e.promoter}</>}
       </p>
       {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
@@ -76,6 +85,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       </table>
       </div>
       {e.bouts.length === 0 && <p className="mut">Cartel por anunciar.</p>}
+
+      <section id="multimedia" aria-labelledby="titulo-multimedia" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24, scrollMarginTop: 80 }}>
+        <h2 id="titulo-multimedia" style={{ margin: 0 }}>Vídeos y fotos del público</h2>
+        <p className="mut" style={{ margin: 0 }}>Lo que graba el público en la velada, para que los peleadores tengan las imágenes de sus combates.</p>
+        {compartir === "ok" ? <p className="acciones" style={{ margin: 0 }}><Link className="btn" href={user ? `/compartir?velada=${e.slug}` : `/entrar?next=${encodeURIComponent(`/compartir?velada=${e.slug}`)}`}>Subir vídeos o fotos de esta velada</Link></p>
+          : compartir === "futura" ? <p className="mut" style={{ margin: 0 }}>El día de la velada podrás compartir aquí lo que grabes.</p> : null}
+        {medios.length ? <GaleriaMedios medios={medios} back={`/veladas/${e.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} /> : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de esta velada.</p>}
+      </section>
     </>
   );
 }

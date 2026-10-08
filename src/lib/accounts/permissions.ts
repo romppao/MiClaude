@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUser, requireVerifiedUser } from "./auth";
 import { loginPath } from "../common/paths";
+import { puedeOrganizar } from "./landing";
 
 // Quién puede hacer qué: las guardas de permisos, en un solo sitio. Las usan por igual las acciones del servidor y las pantallas.
 // (requireUser y requireVerifiedUser, que solo dependen de la sesión, están en ./auth.)
@@ -14,9 +15,9 @@ export async function requireAdmin(next = "/moderacion") {
   return u;
 }
 
-/** Organizador (o moderación) con el correo electrónico verificado. */
+/** Quien puede organizar veladas e interclubs (entidad aprobada, entrenador o moderación) con el correo electrónico verificado. */
 export async function requireOrganizer() {
   const user = await requireVerifiedUser();
-  if (user.role !== "ORGANIZER" && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");
+  if (!puedeOrganizar(user.role)) redirect("/organizador?problema=sin_permiso");
   return user;
 }

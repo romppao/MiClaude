@@ -17,24 +17,16 @@ const open = () => p.getByRole("button", { name: "Menú", exact: true });
 const dialog = () =>
   p.getByRole("dialog", { name: "Explora Ring España", exact: true });
 await open().click();
+// Decisión del fundador (8 de octubre de 2026): el menú solo muestra las opciones del tipo de cuenta. El visitante: empezar, explorar y ayuda.
 check(
-  "el menú móvil se abre con cuatro bloques comprensibles",
-  (await seen(dialog())) && (await dialog().getByRole("heading").count()) === 4,
+  "el menú móvil del visitante se abre con tres bloques comprensibles",
+  (await seen(dialog())) && (await dialog().getByRole("heading").count()) === 3,
 );
 check(
-  "la distribución incluye deportistas, clubes y entrenadores, promotores y cuenta",
-  (await dialog()
-    .getByRole("heading", { name: "Para deportistas", exact: true })
-    .count()) === 1 &&
-    (await dialog()
-      .getByRole("heading", { name: "Para clubes y entrenadores", exact: true })
-      .count()) === 1 &&
-    (await dialog()
-      .getByRole("heading", { name: "Para promotores", exact: true })
-      .count()) === 1 &&
-    (await dialog()
-      .getByRole("heading", { name: "Tu cuenta y ayuda", exact: true })
-      .count()) === 1,
+  "la distribución del visitante: empezar, explorar y ayuda",
+  (await dialog().getByRole("heading", { name: "Empieza", exact: true }).count()) === 1 &&
+    (await dialog().getByRole("heading", { name: "Explorar", exact: true }).count()) === 1 &&
+    (await dialog().getByRole("heading", { name: "Ayuda", exact: true }).count()) === 1,
 );
 check(
   "ningún bloque reúne más de cinco enlaces",
@@ -71,7 +63,7 @@ check(
 );
 await open().click();
 await dialog()
-  .getByRole("link", { name: "Encontrar gimnasio", exact: true })
+  .getByRole("link", { name: "Gimnasios", exact: true })
   .click();
 await p.waitForURL("**/gimnasios");
 check(
@@ -112,6 +104,7 @@ check(
       })
       .count()) === 0,
 );
+check("el aficionado no ve opciones de otros tipos de cuenta", (await signed.getByRole("link", { name: /Mi ficha|Mis clases|Mis veladas|Crear una velada/ }).count()) === 0 && (await seen(signed.getByRole("link", { name: "Mi panel", exact: true }))));
 check("gestionar perfiles se ofrece solo a quien tiene una entidad asignada", await signed.getByRole("link", { name: "Gestionar mis perfiles", exact: true }).count()===0);
 await signed.getByRole("button", { name: "Salir", exact: true }).click();
 await user.p

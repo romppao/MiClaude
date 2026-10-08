@@ -15,6 +15,7 @@ import { audit } from "../../lib/common/audit";
 import { internalPath } from "../../lib/common/paths";
 import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
+import { almacenDeVideos } from "../../lib/media/storage";
 import { ROL_INICIAL, landingFor, parseTipoDeCuenta, parseTipoDeEntidad, type TipoDeCuenta, type TipoDeEntidad } from "../../lib/accounts/landing";
 import { readOnboarding, type FighterIntent, type TrainerIntent } from "../../lib/accounts/onboarding";
 import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
@@ -269,6 +270,11 @@ export async function deleteAccount(f: FormData) {
   const back = "/mi-cuenta/eliminar";
   if (f.get("confirm") !== "on") go(back, { problema: "eliminar_sin_confirmar" });
   await confirmOwnPassword(user, String(f.get("current") ?? ""), back);
+  // Vídeos subidos por la persona (a las veladas y a sus highlights): sus filas se borran con la cuenta y los archivos, después.
+  const videos = [
+    ...(await db.mediaItem.findMany({ where: { uploaderId: user.id, videoKey: { not: null } }, select: { videoKey: true } })),
+    ...(await db.highlight.findMany({ where: { fighter: { userId: user.id }, videoKey: { not: null } }, select: { videoKey: true } })),
+  ].flatMap((v) => (v.videoKey ? [v.videoKey] : []));
   await guard(back, () => db.$transaction(async (tx) => {
     if (user.role === "ADMIN" && (await tx.user.count({ where: { role: "ADMIN" } })) <= 1) throw new Rechazo("ultimo_moderador");
     const fighter = await tx.fighter.findUnique({ where: { userId: user.id }, include: { _count: { select: { boutsAsA: true, boutsAsB: true } } } });
@@ -302,6 +308,8 @@ export async function deleteAccount(f: FormData) {
     await audit({ userId: null, entity: "USER", entityId: user.id, action: "ACCOUNT_DELETED", after: { role: user.role, ficha } }, tx);
     await tx.user.delete({ where: { id: user.id } });
   }));
+  const almacen = almacenDeVideos();
+  if (almacen) await Promise.all(videos.map((v) => almacen.borrar(v).catch(() => undefined)));
   await destroySession();
   go("/", { aviso: "cuenta_eliminada" });
 }

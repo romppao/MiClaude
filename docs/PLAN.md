@@ -24,7 +24,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | **F0** | Base funcional, categorías de peso, perfiles, trayectoria y aura | (hecho; ver `DIARIO.md`) | ✔ |
 | **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y las dos pruebas de ingreso ([1](PRUEBA-DE-INGRESO.md) y [2, «la escalera»](PRUEBA-ESCALERA.md)) |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
-| **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
+| **F3** | PWA y camino a las tiendas | T-003 (y envoltorio con Capacitor: proceso y costes en `PUBLICACION.md`) | planificada |
 | **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
 | **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
 
@@ -64,12 +64,13 @@ Alojamiento y proveedor de base de datos, almacenamiento de imágenes, proveedor
 ## Diseño móvil v3 (decisión del fundador, 7 de octubre de 2026)
 
 Entrega de Claude Design «Ring España App v3». **Fase 1 (hecha por Claude el 8 de octubre):** tokens y tipografía, barra inferior por papel, bienvenida y acceso, registro por pasos de los cuatro tipos de cuenta, inicio por papel, ficha de peleador con highlights y récord amateur privado, perfil y clases del entrenador. Detalle en `DIARIO.md` y `DISENO.md`.
+**Fase 2a (hecha por Claude el 8 de octubre, a petición del fundador):** portada común con noticias de fuentes variadas y portada de cada disciplina; «Mi panel» con lo de cada tipo de cuenta; menú solo con las opciones de cada tipo (el entrenador reúne entrenador, club y promotora); el entrenador crea veladas e **interclubs**; vídeos y fotos del público en las veladas, subidos de verdad (R2) o por enlace, también en los highlights. Detalle en `DIARIO.md` y [`VIDEOS.md`](VIDEOS.md). Con ello, el punto 4 de abajo está hecho y el 7 en parte (falta pasar a la estética v3 las pantallas heredadas).
 **Fase 2 (por planificar en fichas):** cada punto necesita modelo, acciones con guardas, pantallas y pruebas, como en la fase 1.
 1. Propuestas de combate y sparring entre peleadores (recibidas y enviadas; aceptar, rechazar, cancelar).
 2. Reservas de clases (solicitud, aceptar o rechazar por el entrenador; sin pagos hasta que el fundador decida, `TRASLADO.md` §7.19).
 3. Inscripciones a veladas por categorías (abrir y cerrar, solicitar, aceptar o rechazar) y su panel en el inicio de la entidad.
-4. Multimedia del público por combate (pestaña «Multimedia» de la ficha y «¿Estuviste allí?» en la velada) con moderación y denuncia.
+4. ~~Multimedia del público por combate~~ — **hecho en la fase 2a** (8 oct).
 5. Aura a promotoras y clubes (una por persona) y perfil público de la entidad con su aura y comentarios.
 6. Plantilla del club (peleadores y entrenadores con confirmación de cada uno).
-7. Portada por disciplina con su color de acento, y pasar a la estética v3 las pantallas que aún usan el aspecto heredado (listados, velada, gimnasios, ránking, moderación).
+7. ~~Portada por disciplina~~ (hecha en la fase 2a), y pasar a la estética v3 las pantallas que aún usan el aspecto heredado (listados, velada, gimnasios, ránking, moderación).
 8. Escenarios por persona (`escenarios.mjs`) para entrenador y club.

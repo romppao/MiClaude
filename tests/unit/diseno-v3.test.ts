@@ -21,14 +21,14 @@ describe("récord amateur privado", () => {
 describe("highlights", () => {
   const base = { kind: "VIDEO", title: "El KO del tercer asalto", videoUrl: "https://www.youtube.com/watch?v=abc", hasImage: false };
   it("un vídeo necesita un enlace https", () => {
-    expect(parseHighlight(base)).toEqual({ ok: true, kind: "VIDEO", title: "El KO del tercer asalto", videoUrl: "https://www.youtube.com/watch?v=abc" });
+    expect(parseHighlight(base)).toEqual({ ok: true, kind: "VIDEO", title: "El KO del tercer asalto", videoUrl: "https://www.youtube.com/watch?v=abc", videoKey: null });
     expect(parseHighlight({ ...base, videoUrl: "" })).toEqual({ ok: false, problema: "highlight_enlace" });
     expect(parseHighlight({ ...base, videoUrl: "javascript:alert(1)" })).toEqual({ ok: false, problema: "highlight_enlace" });
     expect(parseHighlight({ ...base, videoUrl: "http://inseguro.es/v" })).toEqual({ ok: false, problema: "highlight_enlace" });
   });
   it("una foto necesita la imagen y no guarda enlace", () => {
     expect(parseHighlight({ ...base, kind: "PHOTO" })).toEqual({ ok: false, problema: "highlight_foto" });
-    expect(parseHighlight({ ...base, kind: "PHOTO", hasImage: true })).toEqual({ ok: true, kind: "PHOTO", title: "El KO del tercer asalto", videoUrl: null });
+    expect(parseHighlight({ ...base, kind: "PHOTO", hasImage: true })).toEqual({ ok: true, kind: "PHOTO", title: "El KO del tercer asalto", videoUrl: null, videoKey: null });
   });
   it("título obligatorio y corto; tipo conocido", () => {
     expect(parseHighlight({ ...base, title: "   " })).toEqual({ ok: false, problema: "highlight_titulo" });

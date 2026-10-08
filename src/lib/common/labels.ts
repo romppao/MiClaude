@@ -1,4 +1,8 @@
 export const LEVEL_LABEL = { PRO: "Profesional", AMATEUR: "Amateur" } as const;
+/** Velada (cartel abierto) o interclub (encuentro entre clubes). El texto de ayuda acompaña al formulario de creación. */
+export const EVENT_KIND_LABEL = { VELADA: "Velada", INTERCLUB: "Interclub" } as const;
+export const EVENT_KIND_AYUDA = { VELADA: "Cartel abierto al público, con peleadores de varios clubes.", INTERCLUB: "Encuentro entre clubes, normalmente amateur, para dar experiencia a sus peleadores." } as const;
+export const parseEventKind = (v: string): "VELADA" | "INTERCLUB" | null => (v === "VELADA" || v === "INTERCLUB" ? v : null);
 export const STANCE_LABEL = { ORTODOXO: "Ortodoxo", ZURDO: "Zurdo", AMBIDIESTRO: "Ambidiestro" } as const;
 export const METHOD_LABEL = {
   KO: "KO", TKO: "TKO", UD: "Decisión unánime", SD: "Decisión dividida",

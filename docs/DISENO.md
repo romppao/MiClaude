@@ -157,3 +157,11 @@ Petición del fundador y captura de referencia: «Me gusta como tiene distribuid
 - **Bienvenida** en `/bienvenida`: la portada `/` del visitante es la pública, para no esconder el contenido detrás de una pantalla de entrada.
 - No se aplica el sistema de diseño «Modernist» adjunto a la entrega: el fundador eligió la línea negro y lima.
 **Pendiente (fase 2):** portada por disciplina con el acento de su color, hojas inferiores para las acciones nuevas, Multimedia, propuestas, reservas, inscripciones, plantilla del club y aura a entidades.
+
+### Fase 2a — 8 de octubre de 2026
+
+- **Noticias:** lista de filas (no cuadrícula de tarjetas) con miniatura a la izquierda —la del vídeo si la hay; si no, un bloque con el color de la primera disciplina— y medio · hace cuánto encima del titular, como en los lectores de prensa. Sin imágenes de terceros salvo las miniaturas de vídeo, que se piden sin enviar la dirección de la página (`referrerPolicy="no-referrer"`).
+- **Filtros por disciplina** como pastillas de 44 px, la activa en lima (`.filtros-disciplina`), las mismas en `/noticias` y en las portadas de disciplina.
+- **Portada de disciplina:** cabecera con la raya de color de la disciplina (el mismo sistema que las tarjetas de la fase 1) y las secciones en el orden actualidad → veladas → aura → dónde entrenar.
+- **Galería del público:** una columna en el móvil y dos en escritorio; foto o vídeo con proporción 4:3 reservada (sin saltos al cargar) y los botones «Descargar» bajo cada elemento.
+- **«Mi panel»** reutiliza los inicios por papel de la fase 1 con el rótulo «Mi panel» en lima sobre el saludo.

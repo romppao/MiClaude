@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { calendarDayStart } from "../../lib/common/dates";
-import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
+import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { iniciales } from "../../lib/common/apariencia";
 import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
@@ -31,7 +31,7 @@ export default async function InicioAficionado({ user }: { user: User }) {
   const disciplinas = [...user.interests, ...DISCIPLINE_ORDER.filter((d) => !user.interests.includes(d))];
   return (
     <div className="pantalla" style={{ gap: 26 }}>
-      <Saludo nombre={user.name} sub={seguidos.length ? `Sigues a ${plural(seguidos.length, "peleador", "peleadores")}` : "Todavía no sigues a ningún peleador"} />
+      <Saludo kicker="Mi panel" nombre={user.name} sub={seguidos.length ? `Sigues a ${plural(seguidos.length, "peleador", "peleadores")}` : "Todavía no sigues a ningún peleador"} />
 
       {solicitud?.status === "PENDING" && (
         <div className="tarjeta tarjeta-discontinua">
@@ -75,8 +75,8 @@ export default async function InicioAficionado({ user }: { user: User }) {
       </section>
 
       <section aria-labelledby="titulo-tus-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div><h2 id="titulo-tus-disciplinas" style={{ fontSize: 24 }}>Tus disciplinas</h2><p className="lead">{user.interests.length ? "Primero las que elegiste." : "Elige una para ver sus peleadores."}</p></div>
-        <div className="desliza" role="region" tabIndex={0} aria-label="Tus disciplinas (desliza para ver más)">{disciplinas.map((d) => <TarjetaDisciplina key={d} d={d} href={`/peleadores?disciplina=${d}`} pequena />)}</div>
+        <div><h2 id="titulo-tus-disciplinas" style={{ fontSize: 24 }}>Tus disciplinas</h2><p className="lead">{user.interests.length ? "Primero las que elegiste." : "Elige una para ver su actualidad, sus veladas y sus peleadores."}</p></div>
+        <div className="desliza" role="region" tabIndex={0} aria-label="Tus disciplinas (desliza para ver más)">{disciplinas.map((d) => <TarjetaDisciplina key={d} d={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} pequena />)}</div>
       </section>
     </div>
   );

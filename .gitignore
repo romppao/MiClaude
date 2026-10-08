@@ -13,3 +13,4 @@ next-env.d.ts
 .vercel
 test-results
 docs/ingreso/.clave-temporal/
+.subidas/

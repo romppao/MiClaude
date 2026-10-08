@@ -238,7 +238,7 @@ Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que 
 2. **Cuarto registro: entrenadores**, que se promocionan y venden clases individuales y colectivas — **hecho en parte (8 oct):** cuenta de entrenador, perfil público y clases con precio. Pendiente: reservas y pagos (decisión del fundador: ¿cobro dentro de la aplicación?).
 3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — el club ya puede registrarse como entidad; las inscripciones quedan para la fase 2.
 4. **Récord amateur privado** (solo el número de combates, salvo que el peleador lo publique) — **hecho (8 oct).**
-5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — pendiente (fase 2).
+5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — vídeos y fotos **hechos (8 oct, fase 2a)**; el aura a promotoras y clubes sigue pendiente (fase 2).
 6. **Highlights del peleador en su ficha** («ya luego retocaré cosas de código con Claude Code») — **hecho (8 oct):** vídeo por enlace o foto, uno destacado.
 7. «Las formas de terminar deben encajar con la disciplina y la modalidad; en boxeo no tiene sentido la sumisión» — **hecho en parte (8 oct):** el formulario solo ofrece las de la disciplina; los nombres amateur propuestos por el diseño (RSC, RSC-I, W/O…) **no se aplican** hasta confirmarlos con las federaciones (decisión del fundador: mantener la lista del repositorio por ahora).
 
@@ -248,3 +248,29 @@ Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que 
 - **Transferencia completa a un programador humano** (fundador, 8 oct: «absolutamente todo el código […] esté bien explicado»): implementada como propuesta en rama `codex/documentacion-mantenibilidad-2026-10-08`; manual, contratos y explicación individual de cada archivo mantenido. Pendiente de revisión/integración y prueba de transferencia independiente.
 - **Detectar documentación omitida/desactualizada en CI** (Codex, derivado de esa petición): implementado catálogo explícito y generador sin dependencias; obliga a explicar archivos nuevos y regenerar salida, sin fingir que cobertura automática certifica calidad del texto.
 - **Verificar autonomía de un programador nuevo** (Codex, derivado de la petición): pendiente; arrancar en base local propia, seguir un flujo, localizar regla/permisos/prueba y hacer un cambio sin chats. Registrar atascos para mejorar las guías.
+
+## Fase 2a del diseño v3 (8 de octubre de 2026)
+
+Palabras del fundador: «después de iniciar sesión a todos los usuarios les aparece la misma pantalla de inicio […] noticias actuales de la escena de los deportes de contacto», de fuentes fiables y variadas («canales de YouTube, periódicos, federaciones»); «una subpantalla de inicio específica de cada disciplina»; «en el menú solo te pueden aparecer las opciones del usuario», salvo el entrenador (entrenador, club y promotora); «el entrenador podrá crear veladas e interclubs»; un espacio para que el aficionado suba lo grabado en la velada «para que los peleadores puedan obtener contenido de sus combates», «en la app de verdad y, si no es viable, mediante enlaces».
+- **Portada común con noticias** — **hecha (8 oct)**; fuentes por comprobar en la demo (`TRASLADO.md` §7.23).
+- **Portada de cada disciplina** — **hecha (8 oct).**
+- **Menú por tipo de cuenta** — **hecho (8 oct)**; lo propio de cada cuenta en «Mi panel».
+- **Entrenador organiza veladas e interclubs** — **hecho (8 oct).**
+- **Vídeos y fotos del público** — **hechos (8 oct)**; subida real con R2 cuando el fundador cree el cubo (`VIDEOS.md`).
+- **Highlights con vídeo subido** — **hecho (8 oct).**
+- Ideas derivadas (Claude, 8 oct), **pendientes**:
+  - Limpieza automática de vídeos subidos que nadie llegó a publicar, y miniaturas de los vídeos.
+  - «Añadir a mis highlights» desde un vídeo del público de su propio combate (con aviso a quien lo grabó).
+  - Avisar al peleador cuando alguien comparte un vídeo de su combate (correo opcional, como los avisos a seguidores).
+  - Que cada persona elija qué fuentes de noticias quiere ver, o silenciar una.
+  - Canales RSS propios de medios y federaciones españolas en lugar de Google Noticias, si el fundador lo prefiere por las condiciones de uso.
+
+## Publicación en las tiendas (8 de octubre de 2026)
+
+Palabras del fundador: «el proceso para publicar la aplicación oficialmente al mercado […] tanto a Apple Store como a Google Store» y «limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación». Guía completa: [`PUBLICACION.md`](PUBLICACION.md).
+- **App en las dos tiendas con Capacitor** (Claude, 8 oct) — **propuesta**; sustituye la recomendación abierta de `MOVIL.md`.
+- **Limitar la web para empujar a la app** (fundador, 8 oct) — **propuesta de Claude:** la consulta pública sigue abierta en la web; avisos y subida desde la cámara, solo en la app; **dar aura solo desde la app**, a decidir por el fundador (ventaja: comprobación de dispositivo contra cuentas falsas; contra: se pierde el voto desde enlaces compartidos).
+- **Bloquear a otro usuario** (Claude, 8 oct, requisito de Apple 1.2) — **pendiente**, necesario para publicar.
+- **Condiciones de uso aceptadas al registrarse y filtro de palabras** (Claude, 8 oct, Apple 1.2 y Reglamento de Servicios Digitales) — **pendiente**.
+- **Avisos en el teléfono** (combate de un peleador seguido, vídeo nuevo de tu combate, aura recibida) con Firebase (Claude, 8 oct) — **pendiente**; es lo que más justifica descargar la app.
+- **Banner «Abrir en la app» y QR en carteles de veladas** (Claude, 8 oct) — **pendiente**, después de publicar.

@@ -4,24 +4,16 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import type { SeccionMenu } from "../../lib/accounts/menu";
+
+/** Las secciones llegan ya filtradas por tipo de cuenta (src/lib/accounts/menu.ts). */
 type Props = {
-  signedIn: boolean;
-  hasFighter: boolean;
-  hasManagedProfiles: boolean;
-  admin: boolean;
-  canSupport: boolean;
+  secciones: SeccionMenu[];
   logoutForm?: ReactNode;
 };
 
 /** El diálogo nativo conserva el foco, admite Escape y mantiene el fondo fuera de la navegación por teclado. */
-export default function NavigationMenu({
-  signedIn,
-  hasFighter,
-  hasManagedProfiles,
-  admin,
-  canSupport,
-  logoutForm,
-}: Props) {
+export default function NavigationMenu({ secciones, logoutForm }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -72,6 +64,15 @@ export default function NavigationMenu({
             className="menu-dialog"
             aria-labelledby="menu-heading"
             onClose={() => setOpen(false)}
+            onKeyDown={(event) => {
+              // El foco no sale del menú con Tab ni con Mayús+Tab: da la vuelta dentro (el diálogo nativo deja salir a la barra del navegador).
+              if (event.key !== "Tab") return;
+              const focos = [...event.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])")];
+              if (!focos.length) return;
+              const [primero, ultimo] = [focos[0], focos[focos.length - 1]];
+              if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
+              else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
+            }}
             onClick={(event) => {
               if (event.target === event.currentTarget) close();
             }}
@@ -90,7 +91,7 @@ export default function NavigationMenu({
               <nav
                 className="menu-navigation"
                 onSubmit={close}
-                aria-label="Menú por actividades"
+                aria-label="Menú de tu cuenta"
                 onClick={(event) => {
                   if (
                     event.target instanceof Element &&
@@ -99,99 +100,19 @@ export default function NavigationMenu({
                     close();
                 }}
               >
-                <section>
-                  <h2>Para deportistas</h2>
-                  <ul>
-                    <li>
-                      <Link href="/peleadores">Peleadores</Link>
-                    </li>
-                    <li>
-                      <Link href="/veladas">Veladas y resultados</Link>
-                    </li>
-                    <li>
-                      <Link href="/ranking">Ránking de aura</Link>
-                    </li>
-                    <li>
-                      <Link href="/mi-ficha">
-                        {hasFighter
-                          ? "Mi ficha y trayectoria"
-                          : "Crear o reclamar mi ficha"}
-                      </Link>
-                    </li>
-                  </ul>
-                </section>
-                <section>
-                  <h2>Para clubes y entrenadores</h2>
-                  <ul>
-                    <li>
-                      <Link href="/gimnasios">Encontrar gimnasio</Link>
-                    </li>
-                    <li>
-                      <Link href="/entrenadores">Encontrar entrenador</Link>
-                    </li>
-                    <li>
-                      <Link href="/federaciones">Federaciones</Link>
-                    </li>
-                    {hasManagedProfiles && (
-                      <li>
-                        <Link href="/mi-cuenta">Gestionar mis perfiles</Link>
-                      </li>
-                    )}
-                  </ul>
-                </section>
-                <section>
-                  <h2>Para promotores</h2>
-                  <ul>
-                    <li>
-                      <Link href="/promotores">Promotores de veladas</Link>
-                    </li>
-                    <li>
-                      <Link href="/organizador">
-                        Publicar o gestionar una velada
-                      </Link>
-                    </li>
-                  </ul>
-                </section>
-                <section>
-                  <h2>Tu cuenta y ayuda</h2>
-                  <ul>
-                    <li>
-                      <Link href="/ayuda">¿Cómo funciona?</Link>
-                    </li>
-                    {signedIn ? (
-                      <>
-                        <li>
-                          <Link href="/mi-cuenta">Mi cuenta</Link>
+                {secciones.map((sec, i) => (
+                  <section key={sec.titulo}>
+                    <h2>{sec.titulo}</h2>
+                    <ul>
+                      {sec.enlaces.map((e) => (
+                        <li key={e.texto}>
+                          <Link href={e.href}>{e.texto}</Link>
                         </li>
-                        <li>
-                          <Link href="/siguiendo">Peleadores que sigo</Link>
-                        </li>
-                        {canSupport && (
-                          <li>
-                            <Link href="/respaldar">
-                              Respaldar resultados y títulos
-                            </Link>
-                          </li>
-                        )}
-                        {admin && (
-                          <li>
-                            <Link href="/moderacion">Moderación</Link>
-                          </li>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <li>
-                          <Link href="/entrar">Entrar</Link>
-                        </li>
-                        <li>
-                          <Link href="/registro">Crear una cuenta</Link>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                  {logoutForm}
-                </section>
+                      ))}
+                    </ul>
+                    {i === secciones.length - 1 && logoutForm}
+                  </section>
+                ))}
               </nav>
             </div>
           </dialog>,

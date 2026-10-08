@@ -23,7 +23,7 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
   if (!user.fighter) {
     return (
       <div className="pantalla">
-        <Saludo nombre={user.name} sub="Peleador" />
+        <Saludo kicker="Mi panel" nombre={user.name} sub="Peleador" />
         <div className="tarjeta tarjeta-acc anillo" style={{ padding: 22 }}>
           <h2 style={{ font: "800 24px/1.1 var(--font)" }}>Crea tu ficha</h2>
           <p style={{ margin: 0, fontWeight: 500 }}>{user.emailVerifiedAt ? "Revisa los datos que elegiste al registrarte y publica tu ficha para registrar tus combates." : "Primero confirma tu correo electrónico con el enlace que te enviamos; después podrás publicar tu ficha."}</p>

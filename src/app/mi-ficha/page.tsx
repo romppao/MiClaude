@@ -25,6 +25,9 @@ import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
 import { combinedRecord, emptyTally } from "../../lib/fighters/record";
 import { iniciales } from "../../lib/common/apariencia";
 import { LEVEL_LABEL } from "../../lib/common/labels";
+import { almacenDeVideos } from "../../lib/media/storage";
+import SubirVideo from "../components/SubirVideo";
+import { GaleriaMedios, SELECT_MEDIO } from "../components/Multimedia";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
@@ -113,6 +116,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const records = computeRecords(me.id, bouts);
   const gym = me.gymId ? await db.gym.findUnique({ where: { id: me.gymId } }) : null;
   const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
+  const almacen = almacenDeVideos();
+  const mediosDeMisCombates = await db.mediaItem.findMany({ where: { hiddenAt: null, bout: { OR: [{ fighterAId: me.id }, { fighterBId: me.id }] } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 40, select: SELECT_MEDIO });
   const misHighlights = orderHighlights(await db.highlight.findMany({ where: { fighterId: me.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }));
   const tieneAmateur = me.disciplines.some((d) => d.level === "AMATEUR") || bouts.some((b) => b.event.level === "AMATEUR");
   const principal = [...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline))[0];
@@ -162,7 +167,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
               <div className="segmentos"><label><input type="radio" name="kind" value="VIDEO" defaultChecked required />Vídeo</label><label><input type="radio" name="kind" value="PHOTO" />Foto</label></div>
             </fieldset>
             <label className="field"><span>Título</span><input name="title" required maxLength={HIGHLIGHT_TITLE_MAX} placeholder="El KO del tercer asalto" /></label>
-            <label className="field solo-video"><span>Enlace del vídeo</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" /><span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span></label>
+            <div className="solo-video columna">
+              <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} id="highlight-video" />
+              <label className="field"><span>{almacen ? "O pega el enlace si ya está en YouTube, Instagram o TikTok" : "Enlace del vídeo"}</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" />{!almacen && <span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span>}</label>
+            </div>
             <label className="field"><span>Foto (obligatoria si es una foto; opcional como portada del vídeo)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" /><span className="hint">JPG, PNG o WebP de hasta 4 MB.</span></label>
             <label className="field"><span>¿De qué combate es? (opcional)</span>
               <select name="boutId" defaultValue=""><option value="">Ninguno en concreto</option>{bouts.map((b) => <option key={b.id} value={b.id}>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</option>)}</select>
@@ -172,6 +180,11 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             <button className="btn-grande">Publicar en mi ficha</button>
           </form>
         </details>
+      </section>
+      <section id="multimedia" className="tarjeta" aria-labelledby="titulo-mi-multimedia" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
+        <div className="titulo-seccion"><h2 id="titulo-mi-multimedia" style={{ fontSize: 20 }}>Vídeos y fotos de mis combates</h2><span className="meta">Grabados por el público</span></div>
+        {mediosDeMisCombates.length ? <GaleriaMedios medios={mediosDeMisCombates} conVelada back="/mi-ficha#multimedia" />
+          : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de tus combates. Cuando alguien lo haga desde la página de la velada, aparecerán aquí para que puedas verlos y descargarlos.</p>}
       </section>
       <p><Link className="btn" href="/mi-ficha/trayectoria">Gestionar mis títulos y mi aura</Link></p>
       <nav aria-label="Ir a una parte de esta página" className="indice-pagina">

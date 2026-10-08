@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateEnv } from "../../src/lib/common/env";
 
-const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
+const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", ...extra }) as NodeJS.ProcessEnv;
 
 describe("comprobación del entorno", () => {
   it("en desarrollo no exige nada", () => {
@@ -24,6 +24,11 @@ describe("comprobación del entorno", () => {
   it("sin proveedor de correo avisa, salvo que se pida el modo de registro en el log", () => {
     expect(validateEnv(prod({ RESEND_API_KEY: "" })).warnings.join()).toContain("proveedor de correo");
     expect(validateEnv(prod({ RESEND_API_KEY: "", MAIL_TRANSPORT: "log" })).warnings).toEqual([]);
+  });
+  it("sin almacén de vídeos avisa de que solo habrá enlaces; a medias, no arranca", () => {
+    const sinR2 = prod({ R2_ACCOUNT_ID: "", R2_ACCESS_KEY_ID: "", R2_SECRET_ACCESS_KEY: "", R2_BUCKET: "" });
+    expect(validateEnv(sinR2).warnings.join()).toContain("almacén de vídeos");
+    expect(validateEnv(prod({ R2_BUCKET: "" })).errors.join()).toContain("almacén de vídeos");
   });
   it("avisa si no hay contacto de privacidad", () => {
     expect(validateEnv(prod({ CONTACT_EMAIL: "" })).warnings.join()).toContain("CONTACT_EMAIL");

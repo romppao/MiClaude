@@ -8,6 +8,7 @@ import { db } from "../../../lib/common/db";
 import { combinedRecord, computeRecords, emptyTally } from "../../../lib/fighters/record";
 import { recordHidden } from "../../../lib/fighters/privacy";
 import { HIGHLIGHT_KIND_LABEL, orderHighlights } from "../../../lib/fighters/highlights";
+import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { iniciales, tinteDe } from "../../../lib/common/apariencia";
 import { monthlySeries } from "../../../lib/common/dates";
 import Icono from "../../components/Icono";
@@ -105,12 +106,14 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   const age = publica && fighter.birthDate ? Math.floor((Date.now() - fighter.birthDate.getTime()) / 3.15576e10) : null;
   // Diseño v3: highlights del propio peleador, aura por combate y por mes, y récord amateur privado salvo para su titular.
   const propia = !!user?.fighter && user.fighter.id === fighter.id;
-  const [highlights, auraPorCombate, perfil, aurasRecientes, acceso] = await Promise.all([
-    publica || propia ? db.highlight.findMany({ where: { fighterId: fighter.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, hasImage: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }) : Promise.resolve([]),
+  const [highlights, auraPorCombate, perfil, aurasRecientes, acceso, medios] = await Promise.all([
+    publica || propia ? db.highlight.findMany({ where: { fighterId: fighter.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, videoKey: true, hasImage: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }) : Promise.resolve([]),
     db.aura.groupBy({ by: ["boutId"], where: { fighterId: fighter.id, bout: COUNTED }, _count: { _all: true } }),
     db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: fighter.id } }, select: { hasBanner: true, hasAvatar: true, updatedAt: true, bannerX: true, bannerY: true } }),
     db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED, createdAt: { gte: new Date(Date.now() - 220 * 864e5) } }, select: { createdAt: true } }),
     profileAccess("peleador", fighter.id, user),
+    // Vídeos y fotos que el público subió de sus combates (petición del fundador, 8 de octubre de 2026).
+    publica || propia ? db.mediaItem.findMany({ where: { hiddenAt: null, bout: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 40, select: SELECT_MEDIO }) : Promise.resolve([]),
   ]);
   const ordenados = orderHighlights(highlights);
   const auraDe = (boutId: string) => auraPorCombate.find((g) => g.boutId === boutId)?._count._all ?? 0;
@@ -175,7 +178,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           {(ordenados.length > 0 || propia) && <div className="desliza" role="region" tabIndex={0} aria-label="Highlights (desliza para ver más)">
             {propia && <Link href="/mi-ficha#publicar-highlight" className="highlight-nuevo"><span className="mas" aria-hidden="true"><Icono nombre="mas" tam={24} grosor={2.4} /></span>Publicar highlight</Link>}
             {ordenados.map((h) => {
-              const destino = h.kind === "VIDEO" ? h.videoUrl! : `/highlights/${h.id}/imagen`;
+              const destino = h.kind === "VIDEO" ? (h.videoKey ? `/highlights/${h.id}/video` : h.videoUrl!) : `/highlights/${h.id}/imagen`;
               return (
                 <a key={h.id} href={destino} target="_blank" rel="noopener noreferrer nofollow ugc" className="tarjeta-foto highlight" style={{ "--tinte": tinteDe(principal?.discipline) } as CSSProperties}>
                   {h.hasImage && <img src={`/highlights/${h.id}/imagen`} alt="" loading="lazy" />}
@@ -187,12 +190,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             })}
           </div>}
           {ordenados.length === 0 && !propia && <p className="mut" style={{ margin: 0 }}>Todavía no ha publicado highlights.</p>}
-          {ordenados.some((h) => h.kind === "VIDEO") && <p className="meta" style={{ margin: 0 }}>Los vídeos se abren en la web donde se publicaron.</p>}
+          {ordenados.some((h) => h.kind === "VIDEO" && !h.videoKey) && <p className="meta" style={{ margin: 0 }}>Los vídeos con enlace se abren en la web donde se publicaron.</p>}
         </section>
       )}
 
       <nav className="segmentos" aria-label="Ir a una parte de la ficha" style={{ marginTop: 22 }}>
-        <a href="#record">Récord</a><a href="#combates">Combates</a><a href="#publico">Público</a>
+        <a href="#record">Récord</a><a href="#combates">Combates</a>{medios.length > 0 && <a href="#multimedia">Vídeos</a>}<a href="#publico">Público</a>
       </nav>
 
       <section id="record" aria-labelledby="titulo-record" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16, scrollMarginTop: 80 }}>
@@ -287,6 +290,14 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         {bouts.length === 0 && <p className="mut" style={{ margin: 0 }}>Sin combates registrados.</p>}
         {bouts.some((b) => oculto(b.event.level)) && <p className="mut" style={{ margin: 0 }}>Los resultados de sus combates amateur no se muestran: el peleador mantiene privado su récord amateur.</p>}
       </section>
+
+      {medios.length > 0 && (
+        <section id="multimedia" aria-labelledby="titulo-multimedia" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 26, scrollMarginTop: 80 }}>
+          <h2 id="titulo-multimedia">Vídeos y fotos de sus combates</h2>
+          <p className="mut" style={{ margin: 0 }}>Grabados por el público en las veladas.</p>
+          <GaleriaMedios medios={medios} conVelada back={`/peleadores/${fighter.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} />
+        </section>
+      )}
 
       <section id="publico" aria-labelledby="titulo-publico" style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 26, scrollMarginTop: 80 }}>
         <h2 id="titulo-publico">Lo que dice el público</h2>

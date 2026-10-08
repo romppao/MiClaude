@@ -34,6 +34,14 @@ Cosas que conviene saber:
 - **Entrenador:** tras confirmar el correo, «Publicar mi perfil» en el inicio; después «Mis clases» para crear, pausar y activar clases. El perfil público está en «Entrenadores».
 - **Cambiar de tipo con la misma cuenta:** en «Mi cuenta», panel de demostración (ahora también «Entrenador»).
 
+### Qué probar de la fase 2a (8 de octubre de 2026)
+
+- **Misma portada para todos al entrar:** «Actualidad» (noticias de canales de vídeo, prensa y federaciones; se actualizan solas cada media hora, así que la primera visita puede verla vacía) y «Tus disciplinas» → la portada de cada disciplina (`/disciplinas/boxeo`…). Lo de cada tipo de cuenta está en **«Mi panel»**.
+- **Menú por tipo de cuenta:** cambia de papel en «Mi cuenta» y abre «Menú»: el aficionado solo ve lo suyo; el entrenador ve «Entrenador», «Club» y «Promotora».
+- **Entrenador:** «Mis veladas» → crea una **velada o un interclub** sin pedir permiso.
+- **Vídeos y fotos del público:** en una velada ya celebrada, «Subir vídeos o fotos de esta velada»; elige el combate para que aparezca en la ficha de los peleadores, con «Descargar». **En la demo los vídeos subidos se borran en cada despliegue** (hasta activar R2, ver `VIDEOS.md`); los enlaces y las fotos se conservan.
+- **Moderación:** «Fuentes de noticias» muestra qué fuentes funcionan; «Avisos» permite retirar una foto o un vídeo.
+
 ## B. En un ordenador
 
 Requisitos: Node 22 y PostgreSQL 16 (con Docker, el script lo arranca solo).
