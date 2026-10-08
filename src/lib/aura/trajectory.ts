@@ -62,8 +62,10 @@ export type CategoryChoice = {
   divisionId?: string | null;
   weightClass: string | null;
 };
+/** Identidad histórica disciplina/nivel/división/peso; no depende de la categoría actual de la ficha. */
 export const auraCategoryKey = (g: CategoryChoice) =>
   `${g.discipline}|${g.level}|${g.divisionId ?? ""}|${g.weightClass ?? ""}`;
+/** Orden de fuerza del respaldo; entrenador y organizador comparten rango. No es el número de puntos concedidos. */
 export function supportRank(kind: SupportKind) {
   return kind === "FEDERATION"
     ? 3
@@ -73,6 +75,7 @@ export function supportRank(kind: SupportKind) {
         ? 1
         : 0;
 }
+/** Si el respaldo vincula una acreditación revocada o sin titular, vuelve a DECLARED sin borrar el hecho histórico. */
 export function effectiveSupport(value: {
   supportKind: SupportKind | null;
   supportAccreditationId?: string | null;
@@ -85,6 +88,10 @@ export function effectiveSupport(value: {
     return "DECLARED";
   return value.supportKind ?? "DECLARED";
 }
+/**
+ * Desglosa puntos de un título válido en trayectoria y bonus de respaldo efectivo, redondeado hacia abajo.
+ * Retirados/excluidos aportan cero. No suma otros títulos: trajectoryByCategory escoge el mayor aporte.
+ */
 export function achievementPoints(value: SupportedAchievement) {
   if (value.withdrawnAt || value.rejectedAt)
     return { trajectory: 0, backing: 0, total: 0, declared: false };
@@ -126,6 +133,7 @@ export function trajectoryByCategory(values: SupportedAchievement[]) {
   }
   return groups;
 }
+/** Bonus de un combate según su respaldo efectivo; el ránking aplica posteriormente el tope por categoría. */
 export function boutBackingPoints(
   value: Parameters<typeof effectiveSupport>[0],
 ) {

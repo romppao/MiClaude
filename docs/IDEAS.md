@@ -238,9 +238,16 @@ Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que 
 2. **Cuarto registro: entrenadores**, que se promocionan y venden clases individuales y colectivas — **hecho en parte (8 oct):** cuenta de entrenador, perfil público y clases con precio. Pendiente: reservas y pagos (decisión del fundador: ¿cobro dentro de la aplicación?).
 3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — el club ya puede registrarse como entidad; las inscripciones quedan para la fase 2.
 4. **Récord amateur privado** (solo el número de combates, salvo que el peleador lo publique) — **hecho (8 oct).**
-5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — pendiente (fase 2).
+5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — vídeos y fotos **hechos (8 oct, fase 2a)**; el aura a promotoras y clubes sigue pendiente (fase 2).
 6. **Highlights del peleador en su ficha** («ya luego retocaré cosas de código con Claude Code») — **hecho (8 oct):** vídeo por enlace o foto, uno destacado.
 7. «Las formas de terminar deben encajar con la disciplina y la modalidad; en boxeo no tiene sentido la sumisión» — **hecho en parte (8 oct):** el formulario solo ofrece las de la disciplina; los nombres amateur propuestos por el diseño (RSC, RSC-I, W/O…) **no se aplican** hasta confirmarlos con las federaciones (decisión del fundador: mantener la lista del repositorio por ahora).
+
+
+## 8 de octubre de 2026 — Mantenibilidad sin asistentes de IA
+
+- **Transferencia completa a un programador humano** (fundador, 8 oct: «absolutamente todo el código […] esté bien explicado»): implementada como propuesta en rama `codex/documentacion-mantenibilidad-2026-10-08`; manual, contratos y explicación individual de cada archivo mantenido. Pendiente de revisión/integración y prueba de transferencia independiente.
+- **Detectar documentación omitida/desactualizada en CI** (Codex, derivado de esa petición): implementado catálogo explícito y generador sin dependencias; obliga a explicar archivos nuevos y regenerar salida, sin fingir que cobertura automática certifica calidad del texto.
+- **Verificar autonomía de un programador nuevo** (Codex, derivado de la petición): pendiente; arrancar en base local propia, seguir un flujo, localizar regla/permisos/prueba y hacer un cambio sin chats. Registrar atascos para mejorar las guías.
 
 ## Fase 2a del diseño v3 (8 de octubre de 2026)
 

@@ -5,6 +5,7 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 - ¿Primera vez? Lee antes [`TRASLADO.md`](TRASLADO.md) (puesta en marcha y estado) y las reglas de [`../CLAUDE.md`](../CLAUDE.md).
 - ¿Qué hace la aplicación y con qué reglas de negocio? [`ARQUITECTURA.md`](ARQUITECTURA.md).
 - ¿Qué pantalla lanza qué acción, quién puede y qué tabla toca? [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md) (se genera solo).
+- ¿Cómo hacerse cargo sin conocer los chats? [`mantenimiento/README.md`](mantenimiento/README.md): contratos, flujos, datos, decisiones y diagnóstico. [`mantenimiento/CATALOGO.md`](mantenimiento/CATALOGO.md) explica individualmente cada archivo mantenido; el CI exige cobertura y vigencia.
 
 ## 1. Quiero… → voy a…
 
@@ -47,6 +48,7 @@ src/
     aura/                 reglas para dar aura y ránking por categoría
     community/            avisos de error de usuarios y notificaciones a seguidores
     trainers/             clases de los entrenadores (validación, duración, precio, plazas)
+    profiles/             origen y permisos de perfiles visuales, normalización y encuadre de imágenes
     news/                 noticias de la portada: lector RSS/Atom, fuentes, actualización en segundo plano
     media/                vídeos y fotos del público: almacén de vídeos (R2 o disco), firma S3, reglas para compartir
 ```
@@ -63,6 +65,9 @@ src/
 | `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos | Moderación |
 | `community.ts` | Avisos de error, seguir a un peleador | Cuenta con sesión |
 | `trainers.ts` | Perfil propio del entrenador y sus clases (publicar, pausar) | Entrenador con correo verificado |
+| `profiles.ts` | Personalización y fotos; creación moderadora de federación | Titular autorizado o moderación con correo verificado |
+| `trajectory.ts` | Títulos, revisión, respaldos y acreditaciones | Peleador titular / cuenta acreditada / moderación, según acción |
+| `demo.ts` | Excepciones de confirmación y papel de la demo ficticia | Solo copia habilitada con `DEMO_MODE=si` |
 | `media.ts` | Compartir vídeos y fotos de una velada y borrar los propios | Cuenta con correo verificado |
 | `news.ts` | Fuentes de noticias: actualizar ahora, añadir, activar o desactivar, ocultar un titular | Moderación |
 | `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
@@ -77,7 +82,7 @@ app/pantallas ──▶ app/actions/<módulo> ──▶ app/actions/shared ─�
 lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura, lib/trainers, lib/news, lib/media
 ```
 
-- `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts` y `aura` solo dependen de `common`; `community` también de `accounts`.
+- `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts`, `aura`, `profiles`, `trainers`, `news` y `media` solo dependen de `common`; `community` también de `accounts`.
 - **`lib` nunca importa de `app`.** La lógica no sabe que existen las pantallas.
 - Un módulo de acciones **nunca importa de otro módulo de acciones**: lo compartido va a `shared.ts` (si es de interfaz) o a `lib` (si es lógica).
 - Los componentes de `app/components` no importan acciones.
@@ -94,7 +99,7 @@ lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bou
 - **Registro de cambios:** todo cambio que afecte a la fiabilidad (verificar, rechazar, aprobar, borrar…) llama a `audit()` dentro de la misma transacción.
 - **Reglas compartidas, en un solo sitio:** si el servidor y la interfaz necesitan la misma regla (por ejemplo «¿puede esta persona dar aura aquí?»), vive en `lib` y se usa desde los dos lados.
 - **Usabilidad:** las 11 comprobaciones del principio fundacional de `CLAUDE.md` se aplican a todo cambio de interfaz (una acción principal por pantalla, botones con verbos, lenguaje llano, etiquetas visibles, errores que explican cómo arreglarlos, respuesta visible a cada acción, accesibilidad, ayuda a mano…).
-- **Diseño visual:** pospuesto por petición del fundador. No se toca el aspecto (paleta, estilo) sin su permiso.
+- **Diseño visual:** se conserva el diseño v3 aprobado, negro/lima con violeta secundario (`DISENO.md`, decisión de 7 oct). Un cambio de identidad requiere decisión del fundador; no usar la antigua regla de aplazamiento para negar lo ya autorizado.
 - **Commits:** en español, con una primera línea que diga qué cambia para la persona o el sistema, y el cuerpo con el porqué.
 - **Datos de ejemplo:** el seed es ficticio; nunca se inventan récords de personas reales.
 
@@ -107,6 +112,7 @@ lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bou
 | `Verification`: `SELF_REPORTED` · `CONFIRMED` · `VERIFIED` · `DISPUTED` | «Declarado · confirmación opcional» · «Confirmado por el rival» · «Verificado» · «En revisión» |
 | `Aura` | aura (el reconocimiento del público; un clic por persona y combate) |
 | `Role`: `FAN` · `FIGHTER` · `ORGANIZER` · `ADMIN` | aficionado · peleador · organizador · moderación |
+| `Role`: `TRAINER` · `TrainingClass` · `Highlight` | entrenador · oferta de clase (sin reserva en esta base) · publicación destacada del peleador |
 | `ClaimRequest` | reclamación de una ficha existente |
 | `OrganizerRequest` | solicitud para organizar veladas |
 | `Report` | aviso de error de un usuario |
@@ -178,6 +184,7 @@ Un cambio no está terminado hasta que:
 4. Tiene prueba: una unitaria si hay regla, una de navegador si hay flujo; y la de autorización si es una acción.
 5. `npm run mapa` está ejecutado y `docs/MAPA-FUNCIONAL.md` sube con el cambio.
 6. La documentación está al día: entrada **al final** de `docs/DIARIO.md` (qué se pidió, qué se decidió y por qué, qué se hizo, qué salió mal, estado y próximos pasos), `docs/IDEAS.md`, `docs/LECCIONES.md` (cada error con su causa real y la regla resultante) y `docs/ARQUITECTURA.md` si cambia el estado técnico.
+7. El archivo nuevo tiene explicación individual en `docs/catalogo-codigo.json`, el contrato/flujo afectado está actualizado y `node scripts/generar-catalogo.mjs --comprobar` pasa. Un programador nuevo puede encontrar regla, permiso, efecto y prueba sin pedir un chat. Ver [manual](mantenimiento/README.md) y [revisión](REVISION.md).
 
 ## 7. Trabajo en equipo
 

@@ -1,5 +1,7 @@
 # Instrucciones para asistentes de código (Codex, Copilot, Open Code, Antigravity y otros)
 
+**Mantenibilidad y transferencia a programadores humanos (petición expresa del fundador, 8 oct 2026):** todo archivo mantenido debe tener responsabilidad explicada y contexto, y cada cambio debe conservar contratos, flujos y motivos de decisión. Lee [docs/mantenimiento/README.md](docs/mantenimiento/README.md). Actualiza `docs/catalogo-codigo.json`, las guías y comentarios necesarios; ejecuta `node scripts/generar-catalogo.mjs` y su comprobación antes del PR. La cobertura automática no sustituye revisión humana. No dar por documentado o escalable un comportamiento que no se ha comprobado.
+
 Este repositorio lo desarrolla un equipo de varios asistentes coordinados por el fundador. **Las reglas del proyecto y del fundador están en [`CLAUDE.md`](CLAUDE.md) y valen para todos**, aunque el fichero lleve ese nombre.
 
 Antes de cambiar nada, lee **[`docs/EQUIPO.md`](docs/EQUIPO.md)** (protocolo de colaboración, ramas, documentación obligatoria y plantilla de relevo) y los registros de los demás asistentes (`docs/APORTACIONES-*.md`). Registra tu trabajo en tu propio `docs/APORTACIONES-<NOMBRE>.md`.
