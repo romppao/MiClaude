@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { MasFiltros } from "../components/Filtros";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
 import { divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Ránking de aura" };
@@ -31,6 +32,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <p><Link href="/ayuda#aura">Escala de puntos y respaldos</Link>.</p>
       </details>
       <form className="search">
+        <MasFiltros activos={[discipline, level, province && province !== "all" ? province : null, recientes ? "90" : null].filter(Boolean).length}>
         <label className="field"><span>Disciplina</span>
           <select name="disciplina" defaultValue={discipline ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
         </label>
@@ -43,11 +45,12 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <label className="field"><span>Periodo</span>
           <select name="periodo" defaultValue={recientes ? "90" : "todo"}><option value="todo">Todo el tiempo</option><option value="90">Últimos 90 días</option></select>
         </label>
+        </MasFiltros>
         <button>Ver ránking</button>
       </form>
       {groups.map((g) => (
         <section key={`${g.discipline}-${g.level}-${g.divisionId ?? "sin-division"}-${g.weightClass ?? "sin"}`}>
-          <h2>{DISCIPLINE_LABEL[g.discipline]} · {levelName(g.level)} · {divisionLabel(g.divisionId)} · {g.weightClass ? weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId) : NO_CATEGORY}</h2>
+          <h2>{DISCIPLINE_LABEL[g.discipline]} · {levelName(g.level)} · {g.weightClass ? categoryLabel(g.discipline, g.level, g.divisionId, g.weightClass) : `${divisionLabel(g.divisionId)} · ${NO_CATEGORY}`}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th><th>Trayectoria</th><th>Respaldo</th><th>Comunidad</th></tr></thead>

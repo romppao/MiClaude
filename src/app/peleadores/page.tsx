@@ -7,11 +7,11 @@ import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
-import { BotonesFiltro, CampoFiltro, FiltrosActivos } from "../components/Filtros";
+import { BotonesFiltro, CampoFiltro, MasFiltros, FiltrosActivos } from "../components/Filtros";
 import SelectorCategoria from "../components/SelectorCategoria";
 import { PROVINCES } from "../../lib/common/labels";
 import { divisionById, divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor, categoryLabel } from "../../lib/common/disciplines";
 import { plural } from "../../lib/common/text";
 
 export const metadata = { title: "Peleadores" };
@@ -50,19 +50,22 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       <h1>Peleadores</h1>
       <form className="search" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <MasFiltros activos={activos.filter((x) => !x.claves.includes("q")).length}>
         <SelectorCategoria modo="filtro" nombres={{ discipline: "disciplina", level: "level", weightClass: "categoria" }} defaults={{ discipline: discipline ?? "", level: nivel ?? "", divisionId: divisionId ?? "", weightClass: categoria ?? "" }} />
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
+        </MasFiltros>
         <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
       </form>
       <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId }} activos={activos} />
       <p aria-live="polite" className="mut">{total === 0 ? "Ningún peleador coincide con estos filtros." : `${plural(total, "peleador encontrado", "peleadores encontrados")}.`}</p>
-      <div className="grid">
+      {/* Lista compacta: foto a la izquierda y datos a la derecha (revisión del 8 de octubre de 2026: cada tarjeta ocupaba media pantalla en el móvil). */}
+      <div className="grid lista-compacta">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
             <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong>
             <div className="mut">{b.alias ? `“${b.alias}”` : ""}{b.alias && (b.province || b.gym) ? " · " : ""}{[b.province, b.gym?.name].filter(Boolean).join(" · ")}</div>
             {[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => (
-              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {divisionLabel(d.divisionId)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""}</div>
+              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {categoryLabel(d.discipline, d.level, d.divisionId, d.weightClass)}</div>
             ))}
           </Link>
         ))}

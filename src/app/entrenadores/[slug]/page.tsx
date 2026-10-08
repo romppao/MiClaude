@@ -5,6 +5,7 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getUser } from "../../../lib/accounts/auth";
 import { db } from "../../../lib/common/db";
 import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { LEVEL_LABEL } from "../../../lib/common/labels";
@@ -24,6 +25,7 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const t = await getTrainer(slug);
   if (!t) notFound();
+  const user = await getUser();
   return (
     <>
       <ProfileHeader kind="entrenador" id={t.id} name={t.name} subtitle={t.gym?.name ?? "Entrenador"}/><ProfileDetails kind="entrenador" id={t.id}/>
@@ -38,10 +40,11 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
             <section key={c.id} className="tarjeta" aria-label={c.title}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span className={`pildora ${c.kind === "INDIVIDUAL" ? "pildora-acc" : "pildora-violeta"}`}>{CLASS_KIND_LABEL[c.kind]}</span><span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em" }}>{c.priceEuros} €</span></div>
               <div><h3 style={{ margin: 0 }}>{c.title}</h3><div className="meta">{classMeta(c)}{c.discipline ? ` · ${DISCIPLINE_LABEL[c.discipline]}` : ""}{c.capacity ? ` · ${c.capacity} plazas` : ""}</div></div>
+              {user?.id !== t.userId && <Link className="btn" href={`/clases/${c.id}/solicitar`} aria-label={`Solicitar la clase «${c.title}»`}>Solicitar esta clase</Link>}
             </section>
           ))}
         </div>
-        {t.classes.length > 0 && <p className="mut">Precio por persona y sesión. Para reservar, contacta con el entrenador{t.gym ? ` en ${t.gym.name}` : ""}: Ring España todavía no gestiona reservas ni pagos.</p>}
+        {t.classes.length > 0 && <p className="mut">Precio por persona y sesión. Pulsa «Solicitar esta clase», dile cuándo te viene bien y el entrenador te responderá. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>}
       </>}
       <h2>Peleadores</h2>
       {t.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este entrenador en Ring España.</p>}

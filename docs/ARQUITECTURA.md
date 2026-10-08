@@ -304,3 +304,9 @@ Peticiones del fundador: portada común con la actualidad («después de iniciar
 
 ### Subida de fotos (8 de octubre de 2026)
 El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/InputFoto.tsx`: 2000 px, JPEG, menos de 3 MB). El servidor mantiene su defensa en `normalizeImage` (4 MiB, 25 megapíxeles, formato real, sin animación) y el límite de cuerpo de las acciones es de 9 MB.
+
+### Solicitudes de clase, disciplinas y pestañas (8 de octubre de 2026)
+- `ClassRequest` (clase, persona, «cuándo le viene bien», mensaje y teléfono opcionales, estado PENDING/ACCEPTED/DECLINED/CANCELLED, respuesta). Acciones en `actions/trainers.ts` (`requestClass`, `answerClassRequest`, `cancelClassRequest`), reglas en `lib/trainers/requests.ts`. Máximo 10 solicitudes por persona y día y una pendiente por clase. Pantallas: `/clases/[id]/solicitar`, `/mis-reservas`, `/mis-clases#solicitudes`. Sin pagos.
+- `removeDiscipline` (`actions/fighters.ts`): titular sin combates en esa disciplina, o moderación; nunca la última. Acción `DISCIPLINE_REMOVED` en el historial.
+- `components/Pestanas.tsx`: secciones en un riel horizontal movido con `transform` (gesto del dedo, barra y flechas del teclado), siempre en el DOM; abre la pestaña de la «#ancla» o de `?seccion=` y la del foco. Las pruebas de navegador abren la pestaña antes de usar lo que contiene (`pestanaDeMiFicha` en `tests/e2e/ayudas.mjs`).
+- Highlights: portada = foto guardada → fotograma del vídeo subido (`<video #t=0.5>`) → miniatura de YouTube (`miniaturaDeEnlace`). `SubirVideo` con `portada` pone un fotograma como foto al subir.

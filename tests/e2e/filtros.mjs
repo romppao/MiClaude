@@ -66,6 +66,9 @@ check("una combinación que no existe (boxeo profesional con una categoría amat
 
 // 3) El panel: orden, dependencia y resumen de filtros aplicados
 await anon.goto(B + "/peleadores?q=Filtro");
+// Los filtros secundarios están plegados en «Más filtros» (components/Filtros.tsx): se despliegan como lo haría una persona.
+check("los filtros secundarios están plegados y se despliegan con «Más filtros»", !(await anon.locator("main details.mas-filtros").evaluate((d) => d.open)));
+await anon.locator("main details.mas-filtros > summary").click();
 const etiquetasPanel = (await anon.locator("main form.search label > span:first-child").allInnerTexts()).map((t) => t.trim());
 check("el panel sigue un orden lógico: nombre, disciplina, nivel, división, peso, provincia", ["Nombre o alias", "Disciplina", "Nivel", "División deportiva (edad y categoría)", "Categoría de peso", "Provincia"].every((t, i) => etiquetasPanel[i] === t));
 check("sin disciplina elegida, la categoría está desactivada y dice qué hacer", await anon.locator("main form select[name=categoria]").isDisabled() && (await etiquetas(anon, "main form select[name=categoria]"))[0].includes("Primero elige una disciplina"));

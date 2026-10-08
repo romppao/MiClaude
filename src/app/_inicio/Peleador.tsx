@@ -53,7 +53,7 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
         <span className="iniciales" aria-hidden="true">{iniciales(nombre)}</span>
         <Foto className="fondo" src={`/imagenes/peleador/${me.id}/banner`} />
         <div className="barra-superior">
-          <Link href="/mi-cuenta" className="avatar avatar-acc boton-cristal" style={{ width: 46, height: 46, textDecoration: "none" }} aria-label="Mi cuenta">{iniciales(nombre)}</Link>
+          <Link href="/mi-cuenta" className="avatar avatar-acc boton-cristal" style={{ width: 46, height: 46, textDecoration: "none", position: "relative", overflow: "hidden" }} aria-label="Mi cuenta">{iniciales(nombre)}<Foto className="avatar-foto" src={`/imagenes/peleador/${me.id}/avatar`} /></Link>
           <Link href={`/peleadores/${me.slug}`} className="btn boton-cristal" style={{ minHeight: 44, fontSize: 14 }}>Ver mi ficha pública</Link>
         </div>
         <div>

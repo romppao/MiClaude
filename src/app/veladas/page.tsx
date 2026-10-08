@@ -5,7 +5,7 @@ import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
-import { BotonesFiltro, CampoFiltro, FiltrosActivos } from "../components/Filtros";
+import { BotonesFiltro, CampoFiltro, FiltrosActivos, MasFiltros } from "../components/Filtros";
 import { calendarDayStart } from "../../lib/common/dates";
 import { plural } from "../../lib/common/text";
 import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/common/labels";
@@ -33,13 +33,15 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Calendario de veladas</h1>
-      <p className="mut">Consulta el cartel y los resultados desde cada velada. «Hoy y próximas» incluye todo el día de hoy según la hora peninsular (también usada para ordenar eventos de Canarias); «Ya celebradas» muestra las fechas anteriores a hoy. Las canceladas llevan un aviso.</p>
+      <p className="mut">Consulta el cartel y los resultados de cada velada. Las canceladas llevan un aviso.</p>
       <form className="search" role="search" aria-label="Filtrar veladas">
         <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <MasFiltros activos={[disciplina, level, province, period].filter(Boolean).length}>
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
-        <CampoFiltro etiqueta="Cuándo"><select name="past" defaultValue={period}><option value="">Hoy y próximas</option><option value="1">Ya celebradas</option><option value="todas">Todas</option></select></CampoFiltro>
+        <CampoFiltro etiqueta="Cuándo" ayuda="«Hoy y próximas» incluye todo el día de hoy, según la hora peninsular (también para los eventos de Canarias)."><select name="past" defaultValue={period}><option value="">Hoy y próximas</option><option value="1">Ya celebradas</option><option value="todas">Todas</option></select></CampoFiltro>
+        </MasFiltros>
         <BotonesFiltro ruta="/veladas" hayFiltros={!!(q || disciplina || level || province || period)} />
       </form>
       <FiltrosActivos ruta="/veladas" params={{ q, disciplina, level, province, past: period }} activos={[

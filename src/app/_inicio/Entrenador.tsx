@@ -69,6 +69,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
   }
   const activas = trainer.classes.filter((c) => c.active);
   const desde = activas.length ? Math.min(...activas.map((c) => c.priceEuros)) : null;
+  const pendientes = await db.classRequest.count({ where: { class: { trainerId: trainer.id }, status: "PENDING" } });
   return (
     <div className="pantalla" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
@@ -77,6 +78,10 @@ export default async function InicioEntrenador({ user }: { user: User }) {
         <span style={{ font: "800 64px/1 var(--font)", letterSpacing: "-.05em" }}>{activas.length}</span>
         <span style={{ fontWeight: 500 }}>{desde !== null ? `Desde ${desde} € por sesión · visibles en tu perfil público` : "Publica una clase para aparecer en «Entrenadores»."}</span>
       </section>
+      <Link href="/mis-clases#solicitudes" className="fila" aria-label={`Solicitudes de clase: ${pendientes} esperando respuesta`}>
+        <span className="cuerpo"><span className="nombre">Solicitudes de clase</span><span className="meta">{pendientes ? "Respóndelas para que la persona sepa si tiene clase." : "Cuando alguien solicite una clase, aparecerá aquí."}</span></span>
+        <strong className={pendientes ? "acc" : undefined} style={{ font: "800 26px var(--font)" }}>{pendientes}</strong>
+      </Link>
       <div className="rejilla-3">
         <div className="dato"><span className="clave">Activas</span><span className="valor">{activas.length}</span></div>
         <div className="dato"><span className="clave">En pausa</span><span className="valor">{trainer.classes.length - activas.length}</span></div>

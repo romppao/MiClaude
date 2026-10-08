@@ -1,5 +1,5 @@
 import type { Discipline, Level, Method } from "@prisma/client";
-import { divisionById } from "./competition";
+import { divisionById, divisionLabel } from "./competition";
 
 /** Orden alfabético de los nombres visibles, sin prioridad editorial. Para añadir una disciplina: enum en Prisma (+ migración) y entradas aquí. */
 export const DISCIPLINE_ORDER: Discipline[] = ["BOXEO", "JIUJITSU", "K1", "KICKBOXING", "MMA", "MUAYTHAI"];
@@ -126,6 +126,18 @@ export const isWeightClass = (discipline: Discipline, level: Level, valor: strin
  */
 export function weightClassLabel(discipline: Discipline, level: Level, valor: string, divisionId?: string | null): string {
   return weightClassesFor(discipline, level, divisionId).find((c) => c.valor === valor)?.etiqueta ?? valor;
+}
+
+/**
+ * Categoría completa: edad y sexo de la división más el peso, sin repetir el sexo («Élite (19–40 años) · Masculino · hasta 65 kg»,
+ * no «… · Masculino · Masculino · hasta 65 kg»). Sin peso, solo la división.
+ */
+export function categoryLabel(discipline: Discipline, level: Level, divisionId: string | null | undefined, weightClass: string | null | undefined): string {
+  const division = divisionLabel(divisionId);
+  if (!weightClass) return division;
+  let peso = weightClassLabel(discipline, level, weightClass, divisionId);
+  for (const sexo of ["Masculino", "Femenino"]) if (division.endsWith(sexo) && peso.startsWith(`${sexo} · `)) peso = peso.slice(sexo.length + 3);
+  return `${division} · ${peso}`;
 }
 
 /** «Profesional» / «Amateur». */

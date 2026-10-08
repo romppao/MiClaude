@@ -1173,3 +1173,81 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - Prueba de navegador (`perfiles.mjs`): una foto de 4000×3000 píxeles y más de 4 MB se reduce y se guarda.
 **Límite honesto:** probado con Chromium; en Safari de iPhone no lo he podido probar. Las fotos HEIC se convierten ya al elegirlas en iOS; en un navegador que no pueda decodificarlas saldrá el mensaje de ayuda.
 **Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Arreglos tras probar la demo en el móvil: pestañas que se deslizan, foto y banner, portadas, disciplinas y clases (Claude)
+
+**Qué se pidió**, con capturas del móvil y en palabras del fundador:
+- «La aplicación es muy densa y el orden de las cosas no está muy bien optimizado, tienes que scrollear mucho para llegar al final de la página; en lugar de ir hacia abajo pienso que sería mejor deslizar de manera horizontal y con las cosas bien agrupadas.»
+- «A la hora de agregar foto de perfil y banner, se colapsa, y si añades el banner, la foto de perfil no se ve y viceversa.»
+- «Los highlights del perfil se ven si le das play, pero carecen de portada.»
+- «En caso de que un peleador se equivoque y ponga disciplinas en las que no está familiarizado, no se puede eliminar […] o por lo menos que yo como administrador pueda configurar.»
+- «En el caso de los afiliados, poder reservar las clases privadas publicadas es misión imposible, ya que no hay opción ni un botón para hacerlo.» Y: «resuelve todo esto de urgencia».
+
+**Causas encontradas:**
+- La portada de la ficha (diseño v3) solo pintaba **una** imagen de fondo: el banner o, si no había, la foto estirada a toda la portada. Nunca las dos.
+- Los highlights solo tenían portada si se subía una foto aparte; nada la sugería.
+- No existía ninguna acción para quitar una disciplina.
+- Las clases decían «Ring España todavía no gestiona reservas»: no había forma de pedirlas en la aplicación.
+- Además, en la segunda captura salía «Masculino · Masculino»: la división ya incluye el sexo y la categoría de peso también.
+
+**Qué se hizo:**
+- **Pestañas que se deslizan** (`components/Pestanas.tsx`): carrusel horizontal nativo con barra de botones arriba. Se cambia de sección con el dedo, con la barra o con el teclado; la altura se ajusta a la sección visible.
+  - Ficha del peleador: portada, seguir, cifras y highlights arriba; debajo, **Combates · Récord · Vídeos · Público · Datos**. Los récords por disciplina van en una fila deslizable.
+  - «Mi ficha»: **Mi perfil · Combates · Récord · Mis datos · Vídeos**, con un aviso arriba si hay combates por confirmar.
+  - Portada: las noticias, salvo la destacada, en una fila deslizable en vez de una lista de doce.
+  - Los enlaces con «#ancla» y las vueltas de los formularios (`?seccion=`) abren la pestaña correcta.
+- **Foto y banner a la vez**: banner de fondo y foto en círculo junto al nombre; la cabecera de «Mi ficha» enseña la foto.
+- **Portadas de los highlights**: al subir un vídeo, el navegador saca un fotograma y lo pone de portada si no se elige otra foto; los ya publicados sin foto muestran un fotograma del propio vídeo; los de YouTube, su miniatura.
+- **Quitar una disciplina**: el peleador puede si no tiene combates en ella y no es la única; moderación y el creador pueden siempre desde la pestaña «Datos» de la ficha pública (los combates se conservan). Con casilla de confirmación y en el historial.
+- **Solicitar clases** (modelo `ClassRequest`, migración `20261008240000_solicitudes_de_clases`): botón «Solicitar esta clase» en cada clase → «¿Cuándo te viene bien?», mensaje y teléfono opcionales → el entrenador recibe un correo y la ve en «Mis clases» (con el número en su panel) → acepta o dice que no puede, con un mensaje → la persona lo ve en «Mis reservas de clases» (nuevo en el menú) y por correo; puede cancelar. Ring España no cobra: se dice en cada paso. Entra en la descarga de datos.
+- «Masculino · Masculino» corregido en todas las pantallas con `categoryLabel`.
+
+**Qué salió mal por el camino:** en «Mi ficha» la página se ensanchaba a 765 px: el título oculto de una tabla (posición absoluta) se escapaba de la pista de pestañas. Se arregló haciendo cada panel contenedor de posición. La barra de pestañas se partía en dos filas por una regla general de `nav`. Y la primera versión de las pestañas (desplazamiento nativo con «scroll-snap») se quedaba a medio camino cuando el navegador llevaba algo a la vista: se rehízo con un riel que se mueve con `transform` y el gesto del dedo gestionado por el propio componente (también con las flechas del teclado en la barra).
+
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (575), `npm run build`, la prueba nueva `arreglos.mjs` (33 comprobaciones, con capturas a 390 px, gesto del dedo y teclado) y la batería completa de navegador: 22 guiones, **601 comprobaciones, 0 fallos**; accesibilidad, 61 pantallas sin incumplimientos. Las pruebas abren la pestaña que contiene lo que pulsan, como una persona (`mostrar` en `tests/e2e/ayudas.mjs`). `escenarios.mjs` (revisión con capturas, fuera del CI) no se ejecutó.
+**CI:** la ejecución del PR #34 pasó; la del «push» del mismo código falló una vez en la prueba de extremo a extremo y pasó al relanzarla. Los registros del CI no se pueden leer desde este entorno (la red bloquea su almacenamiento), así que **no sé qué comprobación falló**; la réplica local exacta del CI (base vacía, `npm run test:e2e` completo) pasó entera (601). Hay que vigilar si se repite.
+**Límite honesto:** el fotograma automático y el deslizamiento solo se han probado en Chromium; hay que probarlos en Safari de iPhone. La miniatura de YouTube no se pudo cargar desde aquí (red bloqueada); se comprueba que la dirección es la correcta.
+**Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Revisión completa de estructura y diseño antes de actualizar la demo (Claude)
+
+**Qué se pidió:** «Vuelve a revisar que todas las funcionalidades estén correctamente estructuradas y diseñadas. Una vez termines actualiza el repositorio y la demo.»
+
+**Cómo se revisó:**
+1. **Revisión de código independiente** del PR #34 por un agente sin mis conclusiones. Encontró 13 defectos reales; todos corregidos.
+2. **Recorrido visual a 390 px** con cinco tipos de cuenta (visitante, aficionado, peleador, entrenador, moderador): 30 pantallas, capturas completas y medición de errores de JavaScript, respuestas 5xx y ancho de página.
+3. **Batería completa** de pruebas unitarias, de navegador y de accesibilidad.
+
+**Defectos de la revisión de código (corregidos):**
+- La portada sacada del vídeo no habría funcionado en la demo: la política de contenido bloqueaba `blob:` en imágenes y vídeo. Las pruebas no lo veían porque en local no se aplica.
+- «Mis reservas» prometía responder al correo para hablar con el entrenador, pero el correo no tenía dirección de respuesta. Ahora `sendMail` admite `replyTo` (la persona ↔ el entrenador) y, si la clase está aceptada, «Mis reservas» muestra el correo del entrenador.
+- Deslizar una fila interior (récords, highlights) también cambiaba de pestaña. Ahora el gesto se ignora dentro de lo que ya se desliza.
+- Un doble clic podía crear dos solicitudes iguales (ahora `withLock`), y una cancelación podía pisar la respuesta del entrenador (ahora `updateMany` condicionado).
+- Quitar una disciplina dejaba títulos huérfanos que seguían sumando aura:
+  - el titular debe retirar antes sus títulos;
+  - si la quita moderación, los títulos quedan excluidos con su motivo.
+- Los correos de las clases se enviaban antes de responder a la persona. Ahora van con `after()`.
+- El fotograma automático podía sustituir una foto elegida mientras se calculaba. Ahora se descartan los resultados viejos y se quita la portada automática al quitar el vídeo.
+- Los enlaces del menú con «#» (next/link) no cambiaban de pestaña, y un «#%E0» rompía la página.
+- Mensajes:
+  - límite diario de solicitudes con su propio texto;
+  - «como mucho 200»;
+  - lo escrito no se pierde al volver por un error;
+  - botón «Solicitar la clase»;
+  - «Mis reservas» en el menú de todos los tipos de cuenta.
+
+**Mejoras del recorrido visual:**
+- **Moderación** medía casi 40 000 px en el móvil. Ahora tiene siete pestañas (una por cola, con su número) y se abre en la primera con trabajo.
+- **Mi cuenta**: pestañas Mis datos · Contraseña · Accesos · Mis avisos · Privacidad.
+- **Filtros** de Peleadores, Veladas y Ránking: los secundarios, plegados en «Más filtros», que se abre solo si hay alguno aplicado. Antes ocupaban la primera pantalla entera.
+- **Portada del visitante**: las seis disciplinas en una fila deslizable.
+- **Campos de foto y vídeo** con botón propio en español («Elegir una foto», «Elegir un vídeo») y el nombre del archivo. El del navegador decía «Choose File» en algunos teléfonos.
+- Detalles:
+  - la foto del peleador en su panel;
+  - los botones de «Mis highlights» ya no aprietan el título;
+  - el botón «Crear el evento» ocupa su fila;
+  - acceso a «Mis reservas» en el panel del aficionado;
+  - listado de Peleadores compacto (foto a la izquierda, datos a la derecha);
+  - Veladas con una explicación corta (el detalle de «Hoy y próximas» va junto a su filtro).
+
+**Límite honesto:** el gesto del dedo y la portada automática siguen sin probarse en un iPhone real; el recorrido es con Chromium emulando un móvil.

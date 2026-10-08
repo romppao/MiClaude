@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { ultimasNoticias } from "../../lib/news/feed";
-import { ListaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
+import { FilaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
 import Icono from "../components/Icono";
 import { MiniPeleador, TarjetaCartel, TarjetaDisciplina } from "../components/Tarjetas";
 import { peleadoresConAura, proximasVeladas } from "./datos";
@@ -35,12 +35,13 @@ export default async function InicioVisitante() {
 
       <section aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad-visita">Actualidad</h2><Link href="/noticias">Todas las noticias</Link></div>
-        {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <ListaNoticias noticias={noticias.slice(1)} />}</> : <SinNoticias />}
+        {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <FilaNoticias noticias={noticias.slice(1)} etiqueta="Más noticias" />}</> : <SinNoticias />}
       </section>
 
       <section aria-labelledby="titulo-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div><h2 id="titulo-disciplinas" style={{ fontSize: 24 }}>Elige tu disciplina</h2><p className="lead" style={{ fontSize: 16 }}>Actualidad, peleadores, veladas y gimnasios de cada disciplina, con el mismo trato para todas.</p></div>
-        <div className="rejilla-2 disciplinas-portada">{DISCIPLINE_ORDER.map((d) => <TarjetaDisciplina key={d} d={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} />)}</div>
+        {/* En una fila que se desliza (revisión del 8 de octubre de 2026: seis tarjetas grandes alargaban mucho la portada en el móvil). */}
+        <div className="desliza disciplinas-portada" role="region" tabIndex={0} aria-label="Disciplinas (desliza para ver más)">{DISCIPLINE_ORDER.map((d) => <TarjetaDisciplina key={d} d={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} pequena />)}</div>
       </section>
 
       <section aria-labelledby="titulo-veladas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>

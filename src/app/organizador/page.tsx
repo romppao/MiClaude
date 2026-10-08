@@ -75,7 +75,7 @@ export default async function Organizer() {
         <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Organiza (opcional)</span><input name="promoter" maxLength={LIMITS.promoter} /><span className="hint">El nombre que verá el público.</span></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /><span className="hint">Debe empezar por https://</span></label>
-        <button>Crear el evento</button>
+        <button className="btn-grande" style={{ flexBasis: "100%" }}>Crear el evento</button>
       </form>
       <h2>Tus veladas</h2>
       {events.length === 0 ? <p className="mut">Aún no has creado ninguna velada. Usa el formulario de arriba para crear la primera.</p> : (

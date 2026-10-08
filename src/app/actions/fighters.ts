@@ -12,7 +12,7 @@ import { audit } from "../../lib/common/audit";
 import { parseBirthDate } from "../../lib/common/dates";
 import { parseGraduation } from "../../lib/fighters/graduation";
 import { divisionAgeEligible } from "../../lib/common/competition";
-import { parseCompetitionChoice } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parsePrior } from "../../lib/fighters/prior";
 import { LIMITS } from "../../lib/common/text";
 import { readOnboarding } from "../../lib/accounts/onboarding";
@@ -140,6 +140,42 @@ export async function saveDiscipline(f: FormData) {
   ]);
   revalidatePath("/", "layout");
   go("/mi-ficha", { aviso: "disciplina_guardada" });
+}
+
+/**
+ * Quita una disciplina de una ficha (petición del fundador, 8 de octubre de 2026: un peleador que se equivoca al elegir una disciplina
+ * no podía eliminarla). El titular puede quitarla si no tiene combates de esa disciplina; moderación (y el creador) puede quitarla
+ * siempre, y los combates se conservan porque forman parte del récord de sus rivales. La ficha conserva al menos una disciplina.
+ */
+export async function removeDiscipline(f: FormData) {
+  const user = await requireVerifiedUser();
+  const moderacion = user.role === "ADMIN";
+  const fighterId = moderacion && str(f, "fighterId") ? str(f, "fighterId") : user.fighter?.id;
+  if (!fighterId) go("/mi-ficha", { problema: "no_existe" });
+  const fighter = await db.fighter.findUnique({ where: { id: fighterId }, include: { disciplines: true } });
+  if (!fighter) go("/mi-ficha", { problema: "no_existe" });
+  const propia = fighter.id === user.fighter?.id;
+  const back = propia ? "/mi-ficha#mis-disciplinas" : `/peleadores/${fighter.slug}#datos`;
+  const discipline = DISCIPLINE_ORDER.find((d) => d === str(f, "discipline"));
+  const actual = fighter.disciplines.find((d) => d.discipline === discipline);
+  if (!discipline || !actual) go(back, { problema: "no_existe" });
+  if (fighter.disciplines.length <= 1) go(back, { problema: "disciplina_ultima" });
+  const [combates, titulos] = await Promise.all([
+    db.bout.count({ where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }], event: { discipline } } }),
+    // Títulos vigentes de esa disciplina: sin ella en la ficha ya no se podrían corregir y seguirían sumando aura.
+    db.fighterAchievement.count({ where: { fighterId: fighter.id, discipline, withdrawnAt: null, rejectedAt: null } }),
+  ]);
+  if (combates > 0 && !moderacion) go(back, { problema: "disciplina_con_combates" });
+  if (titulos > 0 && !moderacion) go(back, { problema: "disciplina_con_titulos" });
+  if (str(f, "confirmar") !== "on") go(back, { problema: "disciplina_confirmar" });
+  await db.$transaction([
+    db.fighterDiscipline.delete({ where: { fighterId_discipline: { fighterId: fighter.id, discipline } } }),
+    // Si moderación quita la disciplina, sus títulos vigentes quedan excluidos (visibles en el historial y restaurables desde «Respaldar»).
+    db.fighterAchievement.updateMany({ where: { fighterId: fighter.id, discipline, withdrawnAt: null, rejectedAt: null }, data: { rejectedAt: new Date(), rejectionReason: "Disciplina quitada de la ficha por moderación." } }),
+    audit({ userId: user.id, entity: "FIGHTER", entityId: fighter.id, action: "DISCIPLINE_REMOVED", before: actual, after: { discipline: DISCIPLINE_LABEL[discipline], combatesConservados: combates, titulosExcluidos: titulos, porModeracion: !propia } }, db),
+  ]);
+  revalidatePath("/", "layout");
+  go(back, { aviso: "disciplina_quitada" });
 }
 
 const MAX_OPEN_REQUESTS = 3;

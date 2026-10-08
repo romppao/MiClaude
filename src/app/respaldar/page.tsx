@@ -11,7 +11,7 @@ import Paginacion from "../components/Paginacion";
 import VerificationTag from "../components/VerificationTag";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import { divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, levelName, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, levelName, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
 import { calendarDayStart } from "../../lib/common/dates";
 import { fmtDate } from "../../lib/common/labels";
 import { endorseBout, reviewAchievement } from "../actions/trajectory";
@@ -173,7 +173,7 @@ export default async function Backing({
               ? "Excluido por moderación"
               : SUPPORT_LABEL[effectiveSupport(a)]}
           </p>
-          <p>{levelName(a.level)} · {divisionLabel(a.divisionId)}{a.weightClass ? ` · ${weightClassLabel(a.discipline, a.level, a.weightClass, a.divisionId)}` : " · Peso sin confirmar"}</p>
+          <p>{levelName(a.level)} · {categoryLabel(a.discipline, a.level, a.divisionId, a.weightClass)}{a.weightClass ? "" : " · Peso sin confirmar"}</p>
           {a.reviewRequestedAt && latest.get(a.id) && (
             <details>
               <summary>Fuente aportada en la solicitud de revisión</summary>
@@ -232,7 +232,7 @@ export default async function Backing({
                 ? "Sin decisión"
                 : `Gana ${b.result === "A_WIN" ? b.fighterA.firstName : b.fighterB.firstName}`}
           </p>
-          <p>{levelName(b.event.level)} · {divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(b.event.discipline, b.event.level, b.weightClass, b.divisionId)}` : " · Peso sin confirmar"}</p>
+          <p>{levelName(b.event.level)} · {categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}{b.weightClass ? "" : " · Peso sin confirmar"}</p>
           <VerificationTag verification={b.verification} backing={b} />
           <form action={endorseBout} className="search">
             <input type="hidden" name="boutId" value={b.id} />

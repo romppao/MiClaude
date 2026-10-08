@@ -295,3 +295,9 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 ### Fotos que se ajustan solas (8 de octubre de 2026)
 - Origen: el fundador, al rechazarse una foto de su móvil: «hay que ponérselo fácil a los usuarios». Estado: hecho (`InputFoto`).
 - Pendiente de probar en Safari de iPhone y Android reales. Posible mejora: recorte con vista previa antes de subir.
+
+### Arreglos del 8 de octubre de 2026 (fundador, probando la demo en el móvil)
+- **Deslizar en horizontal en vez de bajar** («con las cosas bien agrupadas»). Estado: hecho en la ficha, «Mi ficha» y las noticias de la portada (`Pestanas`). Pendiente de valorar con el fundador en otras pantallas largas (velada, gimnasio, moderación).
+- **Reservar clases privadas.** Estado: hecho como **solicitud** (el entrenador acepta o rechaza). Ideas siguientes, sin decidir: calendario con huecos del entrenador, recordatorio el día antes, valoración tras la clase y, más adelante, cobro dentro de la aplicación (es monetización: necesita la decisión del fundador y un proveedor de pagos aprobado).
+- **Quitar disciplinas.** Estado: hecho (peleador sin combates en ella; moderación siempre).
+- (8 oct, revisión) Pestañas también en Moderación y Mi cuenta; «Más filtros» plegado en Peleadores, Veladas y Ránking. Pendiente de valorar: velada (cartel largo) y gimnasio.

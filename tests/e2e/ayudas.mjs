@@ -31,6 +31,22 @@ async function volcarDiagnostico(motivo) {
 }
 process.on("uncaughtException", async (error) => { console.error(error); await volcarDiagnostico("excepcion"); process.exit(1); });
 
+// Pestañas que se deslizan (src/app/components/Pestanas.tsx): lo que está en una pestaña cerrada no se ve ni se puede pulsar, igual que
+// para una persona. Antes de pulsar, escribir o elegir algo, las pruebas abren con su botón la pestaña que lo contiene (`mostrar`).
+// Se hace aquí, una sola vez, para todos los guiones.
+{
+  const pagina = await (await crearContexto()).newPage();
+  const Locator = Object.getPrototypeOf(pagina.locator("body"));
+  const Page = Object.getPrototypeOf(pagina);
+  await pagina.context().close();
+  for (const m of ["click", "dblclick", "fill", "check", "uncheck", "selectOption", "setInputFiles", "press", "pressSequentially", "hover", "tap"]) {
+    const original = Locator[m];
+    if (original) Locator[m] = async function (...args) { await mostrar(this, true); return original.apply(this, args); };
+    const deLaPagina = Page[m];
+    if (deLaPagina && m !== "pressSequentially") Page[m] = async function (selector, ...args) { if (typeof selector === "string") await mostrar(this.locator(selector), true); return deLaPagina.call(this, selector, ...args); };
+  }
+}
+
 /** Espera a que algo sea visible; devuelve true/false en vez de lanzar error. */
 export const seen = (locator, timeout = 8000) => locator.waitFor({ timeout }).then(() => true, () => false);
 export const check = (label, cond) => {
@@ -55,7 +71,42 @@ export const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Eur
 export const enDias = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
 
 /** Rellena y envía el formulario «Registrar un combate» con un resultado (por defecto, victoria por decisión unánime). */
+/** «Mi ficha» va en pestañas que se deslizan (components/Pestanas.tsx): abre la indicada, como lo haría una persona. */
+export async function pestanaDeMiFicha(p, nombre) {
+  const enlace = p.getByRole("navigation", { name: "Secciones de mi ficha" }).getByRole("link", { name: nombre, exact: true });
+  if (!(await enlace.count())) return;
+  if ((await enlace.getAttribute("aria-current")) !== "true") await enlace.click();
+  // Espera a que el deslizamiento suave termine justo en la sección pedida.
+  await p.waitForFunction((n) => {
+    const barra = document.querySelector('nav[aria-label="Secciones de mi ficha"]');
+    const pista = barra?.parentElement?.querySelector(".pestanas-pista");
+    const i = [...(barra?.querySelectorAll("a") ?? [])].findIndex((a) => a.textContent === n);
+    const panel = pista?.querySelectorAll(".pestanas-panel")[i];
+    return panel && barra.querySelector("a[aria-current]")?.textContent === n && Math.abs(panel.getBoundingClientRect().left - pista.getBoundingClientRect().left) < 2;
+  }, nombre);
+}
+
+/** Si `loc` está dentro de una pestaña cerrada (components/Pestanas.tsx), la abre con su botón, como una persona, y espera a verla. */
+export async function mostrar(loc, silencioso = false) {
+  const p = loc.page();
+  // Si todavía no existe (por ejemplo, llega tras una navegación), se deja que la acción original espere como siempre.
+  if (!(await loc.first().waitFor({ state: "attached", timeout: silencioso ? 3000 : 30000 }).then(() => true, () => false))) return loc;
+  // Filtros plegados en «Más filtros» (components/Filtros.tsx): se despliegan como lo haría una persona.
+  // (Salvo que lo que se va a pulsar sea su propio «Más filtros»: entonces la pulsación ya lo abre.)
+  if (await loc.first().evaluate((el) => { const d = el.closest("details.mas-filtros:not([open])"); return !!d && el.closest("summary")?.parentElement !== d; }).catch(() => false)) {
+    await loc.first().evaluate((el) => el.closest("details.mas-filtros").querySelector(":scope > summary").click());
+  }
+  const id = await loc.first().evaluate((el) => el.closest(".pestanas-panel")?.id ?? "").catch(() => "");
+  if (!id) return loc;
+  const enlace = p.locator(`.pestanas-barra a[href="#${id}"]`);
+  if ((await enlace.getAttribute("aria-current")) === "true") return loc;
+  await enlace.click();
+  await p.waitForFunction((i) => { const panel = document.getElementById(i); const pista = panel?.closest(".pestanas-pista"); return panel && Math.abs(panel.getBoundingClientRect().left - pista.getBoundingClientRect().left) < 2; }, id);
+  return loc;
+}
+
 export const registrar = async (p, o) => {
+  await pestanaDeMiFicha(p, "Combates");
   // Disciplina, resultado, método y evidencia también existen en otros formularios de la ficha.
   const form = p.locator("main form").filter({ has: p.getByRole("button", { name: "Registrar este combate", exact: true }) });
   await form.locator("[name=eventName]").fill(o.evento); await form.locator("[name=date]").fill(o.fecha);

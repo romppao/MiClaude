@@ -8,11 +8,12 @@ const csp = [
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   // Miniaturas de los vídeos de las noticias (src/lib/news/parse.ts, HOSTS_DE_IMAGEN).
-  "img-src 'self' data: https://i.ytimg.com",
+  // blob: para la portada que el navegador saca del vídeo al subirlo (components/SubirVideo.tsx).
+  "img-src 'self' data: blob: https://i.ytimg.com",
   "font-src 'self'",
   // Vídeos subidos al almacén R2 (src/lib/media/storage.ts): el navegador los sube y los reproduce directamente desde allí.
   "connect-src 'self' https://*.r2.cloudflarestorage.com",
-  "media-src 'self' https://*.r2.cloudflarestorage.com",
+  "media-src 'self' blob: https://*.r2.cloudflarestorage.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
