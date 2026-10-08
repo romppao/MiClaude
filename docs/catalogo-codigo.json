@@ -1,0 +1,1132 @@
+[
+  {
+    "path": ".env.example",
+    "purpose": "Plantilla de nombres y significado de variables, sin credenciales reales; punto de partida para configuración local/producción.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": ".github/copilot-instructions.md",
+    "purpose": "Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": ".github/dependabot.yml",
+    "purpose": "Configura actualización de dependencias y evita saltos mayores automáticos no planificados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": ".github/workflows/ci.yml",
+    "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": ".gitignore",
+    "purpose": "Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "next.config.mjs",
+    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP; distingue desarrollo de producción.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "package-lock.json",
+    "purpose": "Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "package.json",
+    "purpose": "Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "prisma/migrations/20260930000000_inicial/migration.sql",
+    "purpose": "Crea esquema inicial, enums, tablas, restricciones e índices base; no editar después de integrado.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261002000000_muay_thai/migration.sql",
+    "purpose": "Añade Muay Thai al enum de disciplinas sin reclasificar hechos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261003090000_divisiones_deportivas/migration.sql",
+    "purpose": "Añade división deportiva a disciplina del peleador y combate e índice de categoría; conserva datos previos sin reclasificar.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261003140000_identidad_perfiles/migration.sql",
+    "purpose": "Añade perfiles visuales e información de cinturón/grados, con relaciones y unicidad de perfil por entidad.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261003160000_trayectoria_respaldo_aura/migration.sql",
+    "purpose": "Añade títulos, acreditaciones y campos de respaldo que permiten separar trayectoria, aval y comunidad.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261006120000_solicitud_entidad_tipo/migration.sql",
+    "purpose": "Añade tipo y web a solicitud de organizador; solicitudes anteriores conservan PROMOTORA por defecto.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261008090000_diseno_movil_v3/migration.sql",
+    "purpose": "Añade rol/perfil de entrenador y clases, highlights, intereses, intención de registro y privacidad amateur por defecto.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/migration_lock.toml",
+    "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/schema.prisma",
+    "purpose": "Fuente declarativa de modelos, relaciones, enums, restricciones e índices; evoluciona junto a migraciones y flujos de baja/exportación.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/seed.ts",
+    "purpose": "Carga datos ficticios de demo y comprueba protección frente a base con datos; no usar para migrar producción.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "render.yaml",
+    "purpose": "Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/arranque-demo.sh",
+    "purpose": "Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/corregir-escalera.sh",
+    "purpose": "Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/demo.sh",
+    "purpose": "Prepara/prueba una demostración local con base ficticia y comprobaciones de entorno.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/entorno-aislado.sh",
+    "purpose": "Gestiona base y servidor propios por nombre/puerto para que asistentes no compartan datos de pruebas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/generar-catalogo.mjs",
+    "purpose": "Contrasta cada archivo mantenido con explicación individual y guía, genera índice determinista con huellas y rechaza cobertura/salida desactualizada.",
+    "guide": "docs/mantenimiento/README.md"
+  },
+  {
+    "path": "scripts/generar-mapa.mjs",
+    "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/vitest.escalera.config.mts",
+    "purpose": "Configuración unitaria separada para retos de ingreso; no forma parte de la batería funcional de la aplicación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/app/_inicio/Aficionado.tsx",
+    "purpose": "Inicio del aficionado con combates de seguidos, aura y resultados; prioriza información de su comunidad.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/Entidad.tsx",
+    "purpose": "Inicio de entidad aprobada con sus veladas, cifras y resultados pendientes del cartel.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/Entrenador.tsx",
+    "purpose": "Inicio del entrenador para crear perfil o gestionar clases propias usando intención guardada.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/Peleador.tsx",
+    "purpose": "Inicio del peleador con ficha, próximo combate, declaraciones por responder, récord y aura del público.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/Visitante.tsx",
+    "purpose": "Portada pública con disciplinas, veladas e invitación por tipo de cuenta; no exige acceso para descubrir.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/comun.tsx",
+    "purpose": "Piezas reutilizables de los inicios: saludo, combate VS y presentación de resultados/privacidad.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/datos.ts",
+    "purpose": "Consultas compartidas de veladas futuras y peleadores con aura del público; acota resultados y excluye revisión/cancelación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/actions/accounts.ts",
+    "purpose": "Registro por tipo, borradores, acceso, recuperación, cuenta, correo y baja; orquesta guardas, transacciones y datos personales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/aura.ts",
+    "purpose": "Concede o retira el aura del usuario tras validar correo, regla deportiva, límite diario y unicidad de destinatario/combate.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/bouts.ts",
+    "purpose": "Registra combates y resultados propios, respuesta del rival, evidencia y retirada; condiciona escrituras a hechos/estado leídos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/community.ts",
+    "purpose": "Guarda avisos de revisión y cambios de seguimiento; un aviso no suspende automáticamente un resultado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/demo.ts",
+    "purpose": "Confirma correo y cambia papel solo en copia de demostración habilitada; no debe habilitarse para personas/datos reales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/events.ts",
+    "purpose": "Solicitud de organizador, veladas, cartel, resultados y cancelación; autoriza la velada y programa avisos a seguidores al añadir combate.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/fighters.ts",
+    "purpose": "Crea/corrige ficha propia y disciplinas, solicita reclamación, regula récord público y gestiona highlights; exige publicación autorizada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/moderation.ts",
+    "purpose": "Resuelve solicitudes y avisos, verifica/suspende combates y gestiona entidades; registra motivo e historial de decisiones.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/profiles.ts",
+    "purpose": "Guarda personalización e imágenes tras comprobar propiedad y crea perfiles de federación por moderación; normaliza archivos antes de escribir.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/shared.ts",
+    "purpose": "Ayudantes sin directiva use server: lectura, mensajes, errores previstos, bloqueo, propiedad de velada y publicación/slug de fichas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/trainers.ts",
+    "purpose": "Publica perfil propio y clases o cambia su estado; exige rol/correo y propiedad, y consume intención inicial en transacción.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/trajectory.ts",
+    "purpose": "Gestiona títulos, retirada/restauración/revisión, respaldo de combate y acreditaciones; separa derecho a declarar de permiso para avalar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/ayuda/page.tsx",
+    "purpose": "Explica cuenta, declaración, trayectoria, respaldo y aura en lenguaje público con enlaces a los flujos disponibles.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/baja/page.tsx",
+    "purpose": "Presenta confirmación de baja desde enlace; la modificación ocurre con POST para evitar consumirlo al abrir un GET.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/bienvenida/page.tsx",
+    "purpose": "Entrada v3 con empezar, acceso y exploración pública; muestra invitación sin exigir cuenta para consultar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/buscar/page.tsx",
+    "purpose": "Busca por grupos de entidades y limita muestras, enlazando listado completo con la misma consulta.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/components/AuraBreakdown.tsx",
+    "purpose": "Presenta desglose de trayectoria, respaldo y comunidad por categoría histórica con los datos calculados del ránking.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/CamposClase.tsx",
+    "purpose": "Campos reutilizables de una clase; muestra horario/plazas solo en colectiva y conserva reglas del validador.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/CuentaAtras.tsx",
+    "purpose": "Cuenta atrás de combate en cliente con actualización temporal; conserva representación inicial sin JavaScript.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/DisciplineFields.tsx",
+    "purpose": "Formulario de disciplina, nivel, categoría y antecedentes declarados; comparte catálogo con validación del servidor.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/EvitarDobleEnvio.tsx",
+    "purpose": "Evita envíos repetidos del formulario desde la interfaz; no sustituye unicidad ni control de concurrencia en servidor.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Filtros.tsx",
+    "purpose": "Campos etiquetados, botones aplicar/quitar y resumen de filtros activos para listados comprensibles.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/FlashNotice.tsx",
+    "purpose": "Traduce mensajes de URL, anuncia resultado accesible y ofrece retorno a sección/cola tras acción.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Foto.tsx",
+    "purpose": "Muestra foto opcional y retira imagen si falla para conservar iniciales/fondo; permite alt decorativo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Icono.tsx",
+    "purpose": "Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/MetodoSegunDisciplina.tsx",
+    "purpose": "Filtra métodos del combate según disciplina elegida en cliente; el servidor vuelve a validar resultado/método.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/MobileNav.tsx",
+    "purpose": "Elige destinos de barra móvil según papel y destaca ruta activa; los destinos mantienen sus guardas propias.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/NavigationMenu.tsx",
+    "purpose": "Menú por actividades en diálogo nativo, con foco/Escape y cierre al navegar; recibe el formulario de salida desde layout.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Paginacion.tsx",
+    "purpose": "Enlaces de página anterior/siguiente conservando filtros; zonas táctiles y texto para un listado acotado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/PasosRegistro.tsx",
+    "purpose": "Cabecera de alta con progreso y retorno según los pasos del tipo de cuenta; no publica datos por sí misma.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/ProfileDetails.tsx",
+    "purpose": "Carga y presenta datos públicos de personalización del perfil sin exponer almacenamiento de imágenes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/ProfileEditor.tsx",
+    "purpose": "Editor de metadatos, fotos y encuadre con acción recibida desde pantalla; no autoriza una edición por sí solo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/ProfileHeader.tsx",
+    "purpose": "Cabecera de entidad con nombre, foto/banner y acceso de edición si está autorizado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/ProfileThumbnail.tsx",
+    "purpose": "Miniatura de perfil en listados con alternativa visual cuando falta foto; evita llevar bytes de imagen a la consulta del listado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/RecordCards.tsx",
+    "purpose": "Presenta récord por disciplina/nivel y antecedentes separados; respeta ocultación amateur sin inventar detalle previo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/RecordarCampos.tsx",
+    "purpose": "Recuerda campos de formularios admitidos y restaura borrador tras volver; excluye secretos y distingue formularios por firma/orden.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/SelectorCategoria.tsx",
+    "purpose": "Selector de categoría para ficha o filtros con obligatoriedad diferente; comparte catálogo deportivo versionado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Tarjetas.tsx",
+    "purpose": "Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/TrajectoryList.tsx",
+    "purpose": "Presenta títulos y respaldo de trayectoria con datos de revisión/retirada; no recalcula el récord.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/VerificationTag.tsx",
+    "purpose": "Etiqueta declaración, confirmación o verificación y respaldo efectivo del hecho; no avala toda una carrera.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/entrar/page.tsx",
+    "purpose": "Formulario de acceso que conserva destino interno y explica por qué se necesita sesión.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/entrenadores/[slug]/page.tsx",
+    "purpose": "Ficha del entrenador, experiencia, gimnasio, clases activas y peleadores; indica que aún no hay reservas/pagos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/entrenadores/page.tsx",
+    "purpose": "Listado filtrado y paginado de entrenadores con perfiles y enlaces individuales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/error.tsx",
+    "purpose": "Frontera de error de la aplicación con mensaje y reintento accesible; no expone detalles internos de excepción.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/federaciones/[id]/page.tsx",
+    "purpose": "Perfil público visual de federación identificada por ID; no concede por sí solo permisos de respaldo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/federaciones/page.tsx",
+    "purpose": "Directorio público de perfiles de federación y acceso moderador de creación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/gimnasios/[slug]/page.tsx",
+    "purpose": "Ficha del gimnasio con personalización, entrenador y peleadores vinculados, diferenciando su sello.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/gimnasios/page.tsx",
+    "purpose": "Listado filtrado/paginado de gimnasios con ubicación y acceso a fichas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/global-error.tsx",
+    "purpose": "Frontera global que aporta documento HTML propio si falla layout; mantiene mensaje público y opción de recuperación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/globals.css",
+    "purpose": "Tokens, componentes y adaptación móvil del diseño v3 junto a clases heredadas; preservar accesibilidad y revisar todos los papeles al cambiarlo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/highlights/[id]/imagen/route.ts",
+    "purpose": "Sirve foto WebP de highlight tras comprobar existencia/visibilidad, con cabeceras de respuesta y caché propias.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/imagenes/[kind]/[id]/[slot]/route.ts",
+    "purpose": "Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/layout.tsx",
+    "purpose": "Composición global de documento, fuente, navegación por cuenta, avisos y formularios compartidos; pasa acciones a componentes sin importarlas allí.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/mi-cuenta/datos/route.ts",
+    "purpose": "Exporta JSON de datos propios con sesión y no-store; incluye nuevas entidades personales y evita compartir secretos de acceso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/mi-cuenta/eliminar/page.tsx",
+    "purpose": "Explica consecuencias y pide contraseña/confirmación para eliminar cuenta; la acción comprueba restricciones reales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mi-cuenta/page.tsx",
+    "purpose": "Datos de cuenta, contraseña, preferencias de avisos, exportación y eliminación con sesión requerida.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mi-ficha/page.tsx",
+    "purpose": "Creación/reclamación y mantenimiento de ficha propia, disciplinas, combates, resultados y highlights con correo requerido para publicar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mi-ficha/rival/page.tsx",
+    "purpose": "Paso de elección entre fichas con nombre coincidente; conserva borrador y permite indicar otra persona sin fusionar homónimos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mi-ficha/trayectoria/page.tsx",
+    "purpose": "Panel del deportista para declarar y gestionar títulos y ver aura por categoría, revisión y respaldo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mis-clases/page.tsx",
+    "purpose": "Panel privado de clases del entrenador, publicación y pausa/activación de ofertas propias.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/moderacion/acreditaciones/page.tsx",
+    "purpose": "Cola/gestión moderadora de cuentas autorizadas para respaldar hechos por disciplina.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/moderacion/historial/page.tsx",
+    "purpose": "Historial paginado de cambios con acceso restringido a moderación y textos de auditoría.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/moderacion/page.tsx",
+    "purpose": "Colas moderadoras de combates, avisos, reclamaciones, organizadores y gimnasios; conserva filtros y contexto después de decidir.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/not-found.tsx",
+    "purpose": "Pantalla en español para recurso no encontrado con destinos válidos de regreso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/page.tsx",
+    "purpose": "Panel de una velada autorizada: cartel, resultados, datos y estado con permisos sobre ese objeto.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/page.tsx",
+    "purpose": "Solicitud o panel de organización según rol/estado; lista veladas propias y ofrece creación autorizada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/page.tsx",
+    "purpose": "Selecciona inicio según sesión, rol y ficha vinculada; no confunde entidad pendiente con organizador aprobado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/peleadores/[slug]/page.tsx",
+    "purpose": "Ficha pública con privacidad, récord, combates, títulos, highlights, seguimiento y aura; diferencia totales de comunidad y categoría.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/peleadores/page.tsx",
+    "purpose": "Listado de fichas públicas con filtros, búsqueda y paginación; excluye provisionales/ocultadas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/perfiles/[kind]/[id]/editar/page.tsx",
+    "purpose": "Resuelve tipo/entidad y permiso de edición antes de presentar editor de metadatos, imagen y encuadre.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/privacidad/page.tsx",
+    "purpose": "Explica datos, derechos, contacto y plazos a partir del comportamiento implementado; requiere revisión jurídica antes del servicio real.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/promotores/[id]/page.tsx",
+    "purpose": "Perfil público de organizador/promotor, personalización y sus veladas; el perfil no sustituye acreditación de respaldo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/promotores/page.tsx",
+    "purpose": "Directorio público de promotores/organizadores con enlaces a perfiles y veladas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/ranking/page.tsx",
+    "purpose": "Filtros y presentación del ránking de aura por disciplina/nivel/categoría histórica; incluye explicación del reconocimiento.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/recuperar/nueva/page.tsx",
+    "purpose": "Comprueba si enlace de recuperación es usable antes de pedir nueva contraseña; consumirlo se hace en acción POST.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/recuperar/page.tsx",
+    "purpose": "Solicita correo para recuperación sin revelar si la cuenta existe; el servidor limita solicitudes.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/registro/clase/page.tsx",
+    "purpose": "Último paso opcional del entrenador: borrador de primera clase que se publica al crear perfil verificado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/registro/ficha/page.tsx",
+    "purpose": "Último paso del peleador: disciplina, nivel, categoría y provincia como intención previa a ficha verificada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/registro/intereses/page.tsx",
+    "purpose": "Disciplinas de interés y seguimiento inicial del aficionado; las preferencias ordenan su experiencia.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/registro/page.tsx",
+    "purpose": "Elección de cuatro tipos y alta de datos; cuenta de entidad comienza sin permiso de organización hasta aprobación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/registro/perfil/page.tsx",
+    "purpose": "Borrador de perfil de entrenador con disciplinas, gimnasio, experiencia y provincia previo a confirmación de correo.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/respaldar/page.tsx",
+    "purpose": "Panel de cuenta acreditada/moderación para revisar y respaldar títulos/combates en disciplinas autorizadas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/robots.ts",
+    "purpose": "Indica rutas indexables y privadas a buscadores; robots no reemplaza protección de acceso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/salud/route.ts",
+    "purpose": "Responde 200/503 según conexión de base mediante SELECT 1; no es prueba de todas las funciones del producto.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/siguiendo/page.tsx",
+    "purpose": "Listado de peleadores seguidos por la cuenta y retirada de seguimiento; explica preferencia de avisos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/sitemap.ts",
+    "purpose": "Genera direcciones públicas para buscadores excluyendo fichas no publicables; debe seguir privacidad del directorio.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/veladas/[slug]/page.tsx",
+    "purpose": "Detalle de velada, fecha/lugar, promotor, entradas y cartel/resultados con estado y respaldo; avisa si datos son no oficiales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/veladas/page.tsx",
+    "purpose": "Calendario/listado paginado con filtros de fecha, disciplina, provincia y nivel para descubrir veladas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/verificar/page.tsx",
+    "purpose": "Presenta estado y acciones de confirmación/reenvío de correo; GET no consume el token de verificación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/instrumentation.ts",
+    "purpose": "Ejecuta validación de entorno al iniciar runtime de servidor en producción para detectar configuración imprescindible ausente.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/auth.ts",
+    "purpose": "Crea y consulta sesiones, emite enlaces de correo y consume verificación/recuperación; protege el secreto con hash y mantiene redirecciones de acceso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/backing.ts",
+    "purpose": "Exige una acreditación vigente para respaldar hechos de las disciplinas autorizadas; un perfil visual o rol de organizador no basta.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/landing.ts",
+    "purpose": "Define tipos de cuenta, rol inicial, pasos del registro y destino al entrar; separa solicitud de entidad de permiso concedido.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/onboarding.ts",
+    "purpose": "Interpreta de forma defensiva el JSON de elecciones del registro antes de publicar ficha o perfil tras confirmar el correo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/password.ts",
+    "purpose": "Calcula y verifica scrypt, conserva parámetros en el hash, admite formatos previos y señala cuándo recalcular al entrar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/permissions.ts",
+    "purpose": "Guardas compartidas de moderación y organización; una denegación devuelve a una pantalla con explicación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/ratelimit.ts",
+    "purpose": "Cuenta y reserva intentos en PostgreSQL con claves por acción/correo/IP y proxy de confianza; evita carreras al iniciar sesión.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/retention.ts",
+    "purpose": "Limpia sesiones, enlaces, intentos y solicitudes caducadas; limita limpieza por proceso sin hacer fallar la petición que la dispara.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/aura/ranking.ts",
+    "purpose": "Calcula y ordena aura por categoría histórica combinando trayectoria, respaldo y comunidad; separa niveles y mantiene posiciones empatadas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/aura/rules.ts",
+    "purpose": "Regla compartida de elegibilidad para dar aura según participante, fecha, resultado y estados; límites comunes de comentario/votos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/aura/trajectory.ts",
+    "purpose": "Escala v1 de títulos y respaldo, clave histórica de categoría, acreditación efectiva y limpieza de respaldo al cambiar hechos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/bouts/form.ts",
+    "purpose": "Enumera campos admitidos al transportar un borrador de combate entre registro y elección del rival; no concede validez al borrador.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/bouts/rules.ts",
+    "purpose": "Valida resultado/método por disciplina, forma la clave de pareja y versiona hechos para detectar cambios antes de confirmar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/apariencia.ts",
+    "purpose": "Deriva tinte por disciplina, alfa e iniciales del diseño v3 desde datos; evita repetir estas reglas visuales en pantallas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/audit.ts",
+    "purpose": "Crea historial del cambio relevante y admite cliente transaccional para guardar auditoría junto al hecho.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/competition.ts",
+    "purpose": "Catálogo de divisiones versionadas y reglas de edad/sexo; preserva el significado de categorías deportivas históricas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/dates.ts",
+    "purpose": "Valida días reales y nacimiento, compara días en Madrid y genera cuenta atrás y series mensuales; no confunde fecha con hora anunciada.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/db.ts",
+    "purpose": "Comparte el cliente Prisma y lo conserva en global durante recargas de desarrollo para evitar múltiples instancias.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/demo.ts",
+    "purpose": "Activa excepciones y papeles de demostración solo mediante DEMO_MODE; exige una copia ficticia separada del servicio real.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/disciplines.ts",
+    "purpose": "Catálogos de disciplinas, niveles, pesos y métodos; valida elecciones y conserva orden sin prioridad editorial de ciudad/disciplina.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/env.ts",
+    "purpose": "Valida variables imprescindibles al arrancar en producción y explica configuración incompleta de correo/contacto.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/labels.ts",
+    "purpose": "Traduce enums y resultados, lista provincias y genera slugs/huellas para nombres; mantiene texto público en español.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/mail.ts",
+    "purpose": "Envía correo mediante Resend o transporte de log y declara resultado del envío; separa simulación local de entrega real.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/messages.ts",
+    "purpose": "Única traducción de códigos de éxito/problema de las acciones a mensajes públicos claros y accionables.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/names.ts",
+    "purpose": "Normaliza nombres para comparación y abrevia nombre público cuando la privacidad de la ficha lo exige.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/pagination.ts",
+    "purpose": "Valida número de página y calcula ventana acotada para consultas/listados; evita parámetros de paginación ilimitados.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/paths.ts",
+    "purpose": "Acepta destinos internos normalizados y construye retorno a acceso; evita redirecciones a dominios externos manipulados.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/safe.ts",
+    "purpose": "Consulta solo claves propias y normaliza parámetros de URL; evita aceptar propiedades heredadas o parámetros repetidos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/search.ts",
+    "purpose": "Busca palabras sin distinguir tildes/mayúsculas mediante SQL parametrizado y limita IDs de resultados; depende de PostgreSQL.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/text.ts",
+    "purpose": "Centraliza tamaños máximos, validación básica de correo, texto de una línea y plurales de interfaz/correos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/url.ts",
+    "purpose": "Normaliza enlaces HTTP(S) admitidos y rechaza esquemas peligrosos; admitir un enlace no verifica la evidencia que contiene.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/notify.ts",
+    "purpose": "Avisa a seguidores/rival/autor y responde a solicitudes; agrupa destinatarios, respeta preferencias y tolera fallos de envío individuales.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/reports.ts",
+    "purpose": "Catálogo de motivos de aviso por entidad y límite diario; separa solicitud de revisión de decisión moderadora.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/anonymize.ts",
+    "purpose": "Anonimiza fichas conservando combates compartidos y limpia datos personales copiados en el historial.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/coherence.ts",
+    "purpose": "Señala combates demasiado próximos para revisión humana y contempla torneos; una señal no rechaza automáticamente.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/fighters.ts",
+    "purpose": "Busca candidatos por nombre normalizado para que la persona identifique al rival; evita fusionar homónimos automáticamente.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/graduation.ts",
+    "purpose": "Valida cinturón y grados de jiu-jitsu y construye etiqueta declarada; no otorga acreditación deportiva.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/highlights.ts",
+    "purpose": "Valida foto/vídeo destacado, título, enlace y orden de publicaciones del titular; define límites del escaparate.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/prior.ts",
+    "purpose": "Valida total y detalle del récord previo declarado; un total sin victorias/derrotas no permite inferirlas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/privacy.ts",
+    "purpose": "Decide visibilidad del récord amateur según preferencia y titular, conservando número de combates para presentación pública.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/record.ts",
+    "purpose": "Calcula récord por disciplina/nivel y suma antecedentes detallados; excluye revisión/cancelación y mantiene total no detallado separado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/profiles/images.ts",
+    "purpose": "Decodifica imágenes estáticas admitidas con límites, orienta y reduce a WebP; valida porcentajes de encuadre.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/profiles/profiles.ts",
+    "purpose": "Resuelve entidad visual, visibilidad y titular natural/asignado; devuelve selección pública y permiso de edición sin bytes de foto.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/trainers/classes.ts",
+    "purpose": "Valida duración, precio por sesión/persona, horario y plazas de clases; interpreta experiencia y disciplinas del entrenador.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/middleware.ts",
+    "purpose": "Normaliza parámetros repetidos/peligrosos y entradas de URL antes de páginas; las acciones conservan validación y autorización propias.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/pages/_error.tsx",
+    "purpose": "Respuesta de error del Pages Router usada por Next.js, manteniendo mensaje y navegación en español aunque el producto use App Router.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "tests/documentacion/catalogo.test.mjs",
+    "purpose": "Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar.",
+    "guide": "docs/mantenimiento/README.md"
+  },
+  {
+    "path": "tests/e2e/accesibilidad.mjs",
+    "purpose": "Recorre pantallas por rol con axe y detecta incumplimientos de accesibilidad; no sustituye pruebas con lectores/personas reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/acceso.mjs",
+    "purpose": "Recorre guardas y rechazos por sesión/rol y destinos de retorno tras entrar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/ayudas.mjs",
+    "purpose": "Ayudantes del navegador para cuentas, fichas y estado visible; utiliza datos únicos para aislar cada ejecución.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/busqueda.mjs",
+    "purpose": "Recorre búsqueda global y por entidades, normalización y destinos de resultados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/calendario.mjs",
+    "purpose": "Comprueba filtros/fechas y presentación de veladas según día y estado.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/categorias.mjs",
+    "purpose": "Recorre divisiones por edad/sexo/nivel y pesos al publicar ficha/combate, preservando categorías históricas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/cuenta.mjs",
+    "purpose": "Recorre registro, acceso, correo, preferencias, cambio/recuperación, exportación y eliminación de cuenta.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/demo.mjs",
+    "purpose": "Comprueba excepciones del modo demo y límites de su activación con datos ficticios.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/diseno.mjs",
+    "purpose": "Recorre funciones v3 por tipos de cuenta, perfil de entrenador, clases, privacidad y highlights con acciones reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/enlaces.mjs",
+    "purpose": "Audita enlaces/botones por papel y detecta destinos inservibles; considera controles de diálogo.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/escenarios.mjs",
+    "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/filtros.mjs",
+    "purpose": "Comprueba aplicar/quitar filtros, mantener consulta y paginación en listados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/flujo.mjs",
+    "purpose": "Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/inclusiva.mjs",
+    "purpose": "Comprueba cobertura y vocabulario públicos sin priorizar una ciudad o disciplina.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/integridad.mjs",
+    "purpose": "Comprueba coherencia de datos y protección de acciones ante duplicados/operaciones indebidas en flujos reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/menu.mjs",
+    "purpose": "Recorre menú por actividades, destinos y navegación accesible según sesión/rol.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/movil.mjs",
+    "purpose": "Mide desbordes, tamaño de texto, zonas táctiles y navegación en emulaciones móviles; no acredita iOS/Android físicos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/paneles.mjs",
+    "purpose": "Recorre paneles de organización/moderación, solicitudes y permisos al decidir/publicar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/perfiles.mjs",
+    "purpose": "Recorre edición de foto/banner, propietarios y visibilidad de perfiles e imágenes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/pulido.mjs",
+    "purpose": "Recorre volumen/paginación de colas y escrituras condicionadas, contexto y opciones desconocidas para reproducir fallos de integridad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/respaldo.mjs",
+    "purpose": "Recorre resultado/evidencia/confirmación y presentación del respaldo de combates.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/trayectoria.mjs",
+    "purpose": "Recorre títulos, revisión, respaldo acreditado y ránking histórico, incluyendo baja/privacidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/usabilidad.mjs",
+    "purpose": "Comprueba mensajes, estados vacíos, retorno y respuestas visibles de acciones; complementa revisión humana de comprensión.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/acciones-ayudantes.test.ts",
+    "purpose": "Comprueba lectura y restricciones de ayudantes de acciones para no publicar utilidades como endpoints.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/arquitectura.test.ts",
+    "purpose": "Vigila dominios/importaciones, separación lib/app, directivas y exportaciones de acciones y ausencia de rutas antiguas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/aura.test.ts",
+    "purpose": "Prueba elegibilidad de aura, fechas, resultado, cancelación/revisión y rechazo del voto propio.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/autorizacion.test.ts",
+    "purpose": "Clasifica cada acción pública según guarda requerida y detecta exportaciones sin clasificación; complementa permisos reales en E2E.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/coherence.test.ts",
+    "purpose": "Prueba señales de proximidad deportiva y excepciones de torneos sin transformarlas en prohibición automática.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/competition.test.ts",
+    "purpose": "Prueba divisiones deportivas versionadas y elegibilidad por edad/sexo/nivel.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/dates.test.ts",
+    "purpose": "Prueba días reales, nacimiento y límites/formatos en zona de Madrid, incluidos casos de calendario.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/disciplines.test.ts",
+    "purpose": "Prueba catálogos de disciplina/nivel/peso/método y rechazo de elecciones no admitidas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/diseno-v3.test.ts",
+    "purpose": "Prueba reglas incorporadas por v3: tipos/pasos de cuenta, clases, privacidad, highlights y presentación derivada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/enlaces-correo.test.ts",
+    "purpose": "Comprueba rutas y configuración de enlaces generados para correos de acceso/avisos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/env.test.ts",
+    "purpose": "Prueba validación de entorno y requisitos al arrancar producción sin depender de secretos reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/labels.test.ts",
+    "purpose": "Prueba texto público de enums/resultados y generación de identificadores de nombres.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/landing.test.ts",
+    "purpose": "Prueba destino tras acceso por papel y mantenimiento de la regla centralizada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/mail.test.ts",
+    "purpose": "Prueba modos/resultado del transporte de correo y tratamiento de configuración/errores con simulación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/messages.test.ts",
+    "purpose": "Detecta códigos usados sin traducción pública y mensajes vacíos en acciones/páginas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/middleware.test.ts",
+    "purpose": "Prueba limpieza de parámetros duplicados, claves peligrosas y caracteres no admitidos de URL.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/notify.test.ts",
+    "purpose": "Prueba selección/agrupación de destinatarios, preferencias y tolerancia a errores de avisos mediante dobles de dependencias.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/pagination.test.ts",
+    "purpose": "Prueba número de página y ventanas acotadas ante valores vacíos, enormes o inválidos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/password.test.ts",
+    "purpose": "Prueba scrypt, hashes antiguos, comprobación y refuerzo de parámetros sin convertirlos en texto público.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/paths.test.ts",
+    "purpose": "Prueba retorno interno y rechaza URLs/variantes que redirigirían fuera de la aplicación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/prior.test.ts",
+    "purpose": "Prueba total/detalle del récord anterior, campos vacíos, sumas incoherentes y límites.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/profiles.test.ts",
+    "purpose": "Prueba tipos de perfil, permiso de edición y validación de posiciones/imágenes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/ranking-trayectoria.test.ts",
+    "purpose": "Prueba combinación histórica de trayectoria/respaldo/comunidad, categorías, filtros y empates del ránking.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/ratelimit.test.ts",
+    "purpose": "Prueba límites, reserva concurrente y selección de IP de proxy de confianza mediante dependencias simuladas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/record.test.ts",
+    "purpose": "Prueba cálculo de récord por disciplina/nivel, perspectiva de esquinas, exclusiones y antecedentes detallados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/recuperar.test.ts",
+    "purpose": "Prueba lógica de enlaces de recuperación, consumo y comportamiento de acceso asociado mediante simulación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/rules.test.ts",
+    "purpose": "Prueba resultado/método válido por disciplina y claves/versiones de enfrentamiento.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/safe.test.ts",
+    "purpose": "Prueba claves propias y parámetros únicos frente a propiedades heredadas y opciones desconocidas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/search.test.ts",
+    "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/trayectoria.test.ts",
+    "purpose": "Prueba escala de títulos/respaldo, acreditación efectiva, retirada/exclusión y mayor aporte por categoría.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/url.test.ts",
+    "purpose": "Prueba normalización de evidencia HTTP(S) y rechazo de esquemas peligrosos o enlaces malformados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tsconfig.json",
+    "purpose": "Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "vitest.config.mts",
+    "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  }
+]

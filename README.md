@@ -85,6 +85,8 @@ npm run test:e2e
 
 ## Documentación
 
+**Para hacerse cargo del proyecto sin conocer los chats:** empezar por el [manual de mantenimiento](docs/mantenimiento/README.md). Incluye contratos, flujos, datos, decisiones y diagnóstico. El [catálogo](docs/mantenimiento/CATALOGO.md) explica cada archivo mantenido; su cobertura y vigencia se comprueban en CI.
+
 | Documento | Para qué |
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Reglas del fundador y del proyecto (las lee Claude Code al empezar) |

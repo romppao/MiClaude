@@ -11,6 +11,10 @@ const COOKIE = "session";
 const SESSION_DAYS = 30;
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
+/**
+ * Crea una sesión de 30 días y escribe su token en cookie httpOnly; PostgreSQL solo guarda SHA-256.
+ * El llamante debe haber autenticado a userId. El token en claro no se devuelve ni se registra en logs.
+ */
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 864e5);
@@ -20,6 +24,7 @@ export async function createSession(userId: string) {
   });
 }
 
+/** Revoca la sesión de la cookie actual y borra la cookie; sin token es una operación vacía. */
 export async function destroySession() {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
@@ -27,6 +32,10 @@ export async function destroySession() {
   jar.delete(COOKIE);
 }
 
+/**
+ * Consulta la sesión actual y su ficha/disciplinas; devuelve null si falta o caducó.
+ * No cachear esta lectura con React cache(): tras cerrar sesión, una redirección debe leer la cookie nueva.
+ */
 export async function getUser() {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
