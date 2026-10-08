@@ -163,8 +163,12 @@ model ClassRequest {
   class      TrainingClass      @relation(fields: [classId], references: [id], onDelete: Cascade)
   userId     String
   user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // Cuándo le viene bien, con sus palabras («martes o jueves por la tarde»).
+  // Cuándo le viene bien, en texto (se compone a partir del día y la franja elegidos; las solicitudes antiguas lo traen escrito).
   preferred  String
+  // Día y franja horaria elegidos en el calendario y en la barra de horas (minutos desde las 00:00, hora peninsular).
+  day        DateTime?          @db.Date
+  fromMinute Int?
+  toMinute   Int?
   message    String?
   phone      String?
   status     ClassRequestStatus @default(PENDING)
@@ -174,6 +178,41 @@ model ClassRequest {
 
   @@index([classId, status])
   @@index([userId, createdAt])
+}
+
+enum ProposalKind {
+  FIGHT
+  SPARRING
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+// Reto a combate o propuesta de sparring de un peleador a otro (propuesta n.º 1 del diseño v3, 7 de octubre de 2026; pedida de nuevo
+// por el fundador el 8 de octubre). Aceptar no crea un combate: para que cuente en el récord se registra cuando se celebra.
+model FightProposal {
+  id         String         @id @default(cuid())
+  kind       ProposalKind
+  fromId     String
+  from       Fighter        @relation("PropuestasEnviadas", fields: [fromId], references: [id], onDelete: Cascade)
+  toId       String
+  to         Fighter        @relation("PropuestasRecibidas", fields: [toId], references: [id], onDelete: Cascade)
+  discipline Discipline
+  // Día propuesto (opcional) y lugar (gimnasio, ciudad…), con sus palabras.
+  day        DateTime?      @db.Date
+  place      String?
+  message    String?
+  status     ProposalStatus @default(PENDING)
+  reply      String?
+  createdAt  DateTime       @default(now())
+  answeredAt DateTime?
+
+  @@index([toId, status])
+  @@index([fromId, createdAt])
 }
 
 enum HighlightKind {
@@ -205,40 +244,42 @@ model Highlight {
 }
 
 model Fighter {
-  id            String               @id @default(cuid())
-  slug          String               @unique
-  firstName     String
-  lastName      String
-  alias         String?
-  birthDate     DateTime?
-  city          String?
-  province      String?
-  nationality   String               @default("España")
-  stance        Stance?
-  heightCm      Int?
-  reachCm       Int?
-  level         Level                @default(AMATEUR)
+  id                String               @id @default(cuid())
+  slug              String               @unique
+  firstName         String
+  lastName          String
+  alias             String?
+  birthDate         DateTime?
+  city              String?
+  province          String?
+  nationality       String               @default("España")
+  stance            Stance?
+  heightCm          Int?
+  reachCm           Int?
+  level             Level                @default(AMATEUR)
   // Récord amateur completo visible para el público. Por defecto solo se muestra el número de combates (decisión del fundador, 7 oct 2026).
-  recordPublic  Boolean              @default(false)
-  highlights    Highlight[]
+  recordPublic      Boolean              @default(false)
+  highlights        Highlight[]
   // false = ficha creada por un tercero (rival) que aún no ha sido reclamada ni confirmada: no sale en listados ni buscadores.
-  listed        Boolean              @default(true)
-  hiddenAt      DateTime?
-  bio           String?
-  gymId         String?
-  gym           Gym?                 @relation(fields: [gymId], references: [id])
-  trainerId     String?
-  trainer       Trainer?             @relation(fields: [trainerId], references: [id])
-  userId        String?              @unique
-  user          User?                @relation(fields: [userId], references: [id])
-  achievements  FighterAchievement[]
-  disciplines   FighterDiscipline[]
-  auras         Aura[]
-  followers     Follow[]
-  claimRequests ClaimRequest[]
-  boutsAsA      Bout[]               @relation("FighterA")
-  boutsAsB      Bout[]               @relation("FighterB")
-  createdAt     DateTime             @default(now())
+  listed            Boolean              @default(true)
+  hiddenAt          DateTime?
+  bio               String?
+  gymId             String?
+  gym               Gym?                 @relation(fields: [gymId], references: [id])
+  trainerId         String?
+  trainer           Trainer?             @relation(fields: [trainerId], references: [id])
+  userId            String?              @unique
+  user              User?                @relation(fields: [userId], references: [id])
+  achievements      FighterAchievement[]
+  disciplines       FighterDiscipline[]
+  auras             Aura[]
+  followers         Follow[]
+  claimRequests     ClaimRequest[]
+  boutsAsA          Bout[]               @relation("FighterA")
+  boutsAsB          Bout[]               @relation("FighterB")
+  createdAt         DateTime             @default(now())
+  proposalsSent     FightProposal[]      @relation("PropuestasEnviadas")
+  proposalsReceived FightProposal[]      @relation("PropuestasRecibidas")
 
   @@index([gymId])
   @@index([trainerId])

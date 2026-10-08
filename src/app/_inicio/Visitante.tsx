@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccionesPrincipales } from "./comun";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { ultimasNoticias } from "../../lib/news/feed";
 import { FilaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
@@ -26,6 +27,19 @@ export default async function InicioVisitante() {
             <button className="secondary">Buscar</button>
           </span>
         </form>
+      </section>
+
+      {/* Lo que se puede hacer, nada más entrar (petición del fundador, 8 de octubre de 2026: los servicios estaban muy abajo). */}
+      <section aria-labelledby="empezar" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h2 id="empezar" style={{ fontSize: 24 }}>¿Qué quieres hacer?</h2>
+        <AccionesPrincipales acciones={[
+          { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores de toda España", icono: "calendario" },
+          { href: "/peleadores", titulo: "Encontrar un peleador", detalle: "Récord y combates", icono: "buscar" },
+          { href: "/veladas", titulo: "Veladas y resultados", detalle: "Cartel de cada evento", icono: "trofeo" },
+          { href: "/gimnasios", titulo: "Dónde entrenar", detalle: "Gimnasios y clubes", icono: "gimnasio" },
+          { href: "/mi-ficha", titulo: "Crear mi ficha de peleador", detalle: "Lleva tu trayectoria", icono: "mas" },
+          { href: "/organizador", titulo: "Organizar una velada", detalle: "Promotoras y clubes", icono: "personas" },
+        ]} />
       </section>
 
       <div className="acciones" style={{ margin: 0 }}>
@@ -57,20 +71,6 @@ export default async function InicioVisitante() {
         <p className="mut" style={{ margin: 0 }}>El aura es el reconocimiento del público: <Link href="/ayuda#aura">cómo funciona</Link>.</p>
       </section>
 
-      <section aria-labelledby="empezar" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <h2 id="empezar" style={{ fontSize: 24 }}>¿Qué quieres hacer?</h2>
-        <nav className="lista" aria-label="¿Qué quieres hacer?">
-          {[
-            ["/peleadores", "Encontrar un peleador", "Su récord y los combates que lo respaldan."],
-            ["/gimnasios", "Encontrar dónde entrenar", "Gimnasios y sus entrenadores."],
-            ["/veladas", "Ver veladas y resultados", "El cartel y los combates de cada evento."],
-            ["/mi-ficha", "Crear o gestionar mi ficha de peleador", "Busca primero si ya existe y registra tus combates."],
-            ["/organizador", "Organizar una velada", "Solicita acceso para publicar carteles y resultados."],
-          ].map(([href, texto, ayuda]) => (
-            <Link key={href} href={href} className="fila"><span className="cuerpo"><span className="nombre">{texto}</span><span className="meta">{ayuda}</span></span><Icono nombre="siguiente" tam={18} /></Link>
-          ))}
-        </nav>
-      </section>
 
       <section className="tarjeta tarjeta-violeta anillo" aria-labelledby="titulo-compites" style={{ padding: 22, gap: 12 }}>
         <h2 id="titulo-compites" style={{ font: "800 26px/1.05 var(--font)", letterSpacing: "-.03em" }}>¿Compites?<br />Lleva tu trayectoria.</h2>

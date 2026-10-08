@@ -17,7 +17,7 @@ export const EXPLORAR: SeccionMenu = {
     { href: "/veladas", texto: "Veladas y resultados" },
     { href: "/ranking", texto: "Ránking de aura" },
     { href: "/gimnasios", texto: "Gimnasios" },
-    { href: "/entrenadores", texto: "Entrenadores" },
+    { href: "/clases", texto: "Clases y entrenadores" },
   ],
 };
 
@@ -35,7 +35,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
   } else if (papel === "peleador") {
     propias.push({
       titulo: "Tu carrera",
-      enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/mi-ficha#highlights", texto: "Mis highlights" }, RESERVAS, SIGUIENDO],
+      enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/propuestas", texto: "Retos y sparrings" }, RESERVAS, SIGUIENDO],
     });
   } else if (papel === "entrenador") {
     propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases y solicitudes" }, RESERVAS, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });

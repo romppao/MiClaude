@@ -30,6 +30,8 @@ export async function GET(request: Request) {
     db.classRequest.findMany({ where: { userId: user.id }, include: { class: { include: { trainer: true } } }, orderBy: { createdAt: "desc" } }),
   ]);
   // Solicitudes que otras personas han hecho a sus clases: también son datos que la cuenta trata (las ve el entrenador).
+  // Retos y sparrings enviados y recibidos por su ficha.
+  const propuestas = fighter ? await db.fightProposal.findMany({ where: { OR: [{ fromId: fighter.id }, { toId: fighter.id }] }, include: { from: true, to: true }, orderBy: { createdAt: "desc" } }) : [];
   const solicitudesRecibidas = entrenador ? await db.classRequest.findMany({ where: { class: { trainerId: entrenador.id } }, include: { class: true, user: { select: { name: true } } }, orderBy: { createdAt: "desc" } }) : [];
 
   const datos = {
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
     auraQueHeDado: auras.map((a) => ({ peleador: publicFighterName(a.fighter), velada: a.bout.event.name, comentario: a.comment, lovioEnDirecto: a.attended, fecha: a.createdAt })),
     clasesQueHeSolicitado: clasesSolicitadas.map((r) => ({ clase: r.class.title, entrenador: r.class.trainer.name, cuandoMeVieneBien: r.preferred, mensaje: r.message, telefono: r.phone, estado: r.status, respuesta: r.reply, fecha: r.createdAt, respondidaEl: r.answeredAt })),
     solicitudesRecibidasEnMisClases: solicitudesRecibidas.map((r) => ({ clase: r.class.title, persona: r.user.name, cuandoLeVieneBien: r.preferred, estado: r.status, fecha: r.createdAt })),
+    retosYSparrings: propuestas.map((p) => ({ tipo: p.kind, enviadaPorMi: p.fromId === fighter?.id, otroPeleador: publicFighterName(p.fromId === fighter?.id ? p.to : p.from), disciplina: p.discipline, fecha: p.day, lugar: p.place, mensaje: p.message, estado: p.status, respuesta: p.reply, creadaEl: p.createdAt })),
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),
     solicitudesParaReclamarUnaFicha: claims.map((c) => ({ ficha: publicFighterName(c.fighter), estado: c.status, fecha: c.createdAt })),
     solicitudDeOrganizador: organizer && { organizacion: organizer.orgName, estado: organizer.status, fecha: organizer.createdAt },

@@ -234,7 +234,7 @@ El retorno a respaldos se integra en #16; CI final #142 aprueba 406 unitarias, 3
 ## Diseño v3 — propuestas del fundador (7 de octubre de 2026, Claude Design)
 
 Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que ya estén, quisiera pulirlas».
-1. **Propuestas de combate y sparring entre peleadores** — pendiente (fase 2 del diseño v3).
+1. **Propuestas de combate y sparring entre peleadores** — **hecho (8 oct):** «Retar a combate» y «Proponer sparring» en la ficha, y «Retos y sparrings» (`/propuestas`).
 2. **Cuarto registro: entrenadores**, que se promocionan y venden clases individuales y colectivas — **hecho en parte (8 oct):** cuenta de entrenador, perfil público y clases con precio. Pendiente: reservas y pagos (decisión del fundador: ¿cobro dentro de la aplicación?).
 3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — el club ya puede registrarse como entidad; las inscripciones quedan para la fase 2.
 4. **Récord amateur privado** (solo el número de combates, salvo que el peleador lo publique) — **hecho (8 oct).**
@@ -301,3 +301,8 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Reservar clases privadas.** Estado: hecho como **solicitud** (el entrenador acepta o rechaza). Ideas siguientes, sin decidir: calendario con huecos del entrenador, recordatorio el día antes, valoración tras la clase y, más adelante, cobro dentro de la aplicación (es monetización: necesita la decisión del fundador y un proveedor de pagos aprobado).
 - **Quitar disciplinas.** Estado: hecho (peleador sin combates en ella; moderación siempre).
 - (8 oct, revisión) Pestañas también en Moderación y Mi cuenta; «Más filtros» plegado en Peleadores, Veladas y Ránking. Pendiente de valorar: velada (cartel largo) y gimnasio.
+
+### Panel con acciones, calendario de clases y retos (8 de octubre de 2026, fundador)
+- **Acciones principales arriba en cada panel**: hecho.
+- **Reservar clase con calendario y barra de horas**: hecho. Ideas siguientes, sin decidir: que el entrenador marque sus huecos disponibles y la barra solo ofrezca esos; recordatorio el día antes.
+- **Retos a combate y sparring** (propuesta n.º 1 del diseño v3): hecho. Siguientes posibles: que un reto aceptado pueda convertirse en combate de un cartel con el organizador; filtros «busco sparring» por peso y provincia.

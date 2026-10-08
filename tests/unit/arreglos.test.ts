@@ -38,19 +38,31 @@ describe("portada de los highlights enlazados", () => {
 });
 
 describe("solicitudes de clase", () => {
-  it("pide cuándo le viene bien", () => {
-    expect(parseClassRequest({ preferred: "  ", message: "", phone: "" })).toEqual({ ok: false, problema: "solicitud_cuando" });
-    expect(parseClassRequest({ preferred: "x".repeat(201), message: "", phone: "" })).toEqual({ ok: false, problema: "solicitud_cuando_largo" });
+  const base = { day: "2026-10-14", from: "1080", to: "1200", message: "", phone: "", kind: "INDIVIDUAL" as const, minutes: 60, today: "2026-10-08" };
+  it("compone lo que lee el entrenador a partir del día y la franja", () => {
+    expect(parseClassRequest(base)).toEqual({ ok: true, value: { preferred: "miércoles 14 de octubre, entre las 18:00 y las 20:00", day: new Date("2026-10-14T00:00:00Z"), fromMinute: 1080, toMinute: 1200, message: null, phone: null } });
   });
-  it("limpia espacios y deja vacíos como null", () => {
-    expect(parseClassRequest({ preferred: " martes   tarde ", message: " ", phone: "" })).toEqual({ ok: true, value: { preferred: "martes tarde", message: null, phone: null } });
+  it("una clase colectiva solo pide el día", () => {
+    expect(parseClassRequest({ ...base, kind: "GROUP", from: "", to: "" })).toMatchObject({ ok: true, value: { preferred: "miércoles 14 de octubre", fromMinute: null, toMinute: null } });
+  });
+  it("el día va de hoy a 90 días y debe ser una fecha", () => {
+    expect(parseClassRequest({ ...base, day: "" })).toEqual({ ok: false, problema: "solicitud_dia" });
+    expect(parseClassRequest({ ...base, day: "2026-10-07" })).toEqual({ ok: false, problema: "solicitud_dia" });
+    expect(parseClassRequest({ ...base, day: "2027-01-07" })).toEqual({ ok: false, problema: "solicitud_dia" });
+    expect(parseClassRequest({ ...base, day: "2026-10-08" }).ok).toBe(true);
+  });
+  it("la franja va de 07:00 a 23:00 en medias horas, en orden, y cabe la clase", () => {
+    expect(parseClassRequest({ ...base, from: "1200", to: "1080" })).toEqual({ ok: false, problema: "solicitud_horas" });
+    expect(parseClassRequest({ ...base, from: "360", to: "480" })).toEqual({ ok: false, problema: "solicitud_horas" });
+    expect(parseClassRequest({ ...base, from: "1085", to: "1200" })).toEqual({ ok: false, problema: "solicitud_horas" });
+    expect(parseClassRequest({ ...base, from: "1080", to: "1110", minutes: 60 })).toEqual({ ok: false, problema: "solicitud_horas_cortas" });
   });
   it("acepta teléfonos con espacios o prefijo y rechaza letras", () => {
-    expect(parseClassRequest({ preferred: "a", message: "", phone: "+34 600 12 34 56" })).toMatchObject({ ok: true, value: { phone: "+34600123456" } });
-    expect(parseClassRequest({ preferred: "a", message: "", phone: "llámame" })).toEqual({ ok: false, problema: "solicitud_telefono" });
+    expect(parseClassRequest({ ...base, phone: "+34 600 12 34 56" })).toMatchObject({ ok: true, value: { phone: "+34600123456" } });
+    expect(parseClassRequest({ ...base, phone: "llámame" })).toEqual({ ok: false, problema: "solicitud_telefono" });
   });
   it("limita el mensaje", () => {
-    expect(parseClassRequest({ preferred: "a", message: "m".repeat(501), phone: "" })).toEqual({ ok: false, problema: "solicitud_mensaje_largo" });
+    expect(parseClassRequest({ ...base, message: "m".repeat(501) })).toEqual({ ok: false, problema: "solicitud_mensaje_largo" });
   });
   it("solo se responde lo pendiente y se cancela lo pendiente o aceptado", () => {
     expect([puedeResponder("PENDING"), puedeResponder("ACCEPTED"), puedeResponder("CANCELLED")]).toEqual([true, false, false]);
@@ -63,5 +75,32 @@ describe("solicitudes de clase", () => {
       expect(propias.enlaces.some((e) => e.href === "/mis-reservas")).toBe(true);
       expect(propias.enlaces.length).toBeLessThanOrEqual(5);
     }
+  });
+});
+
+import { parseProposal, puedeCancelarPropuesta, puedeResponderPropuesta } from "../../src/lib/fighters/proposals";
+describe("retos y sparrings", () => {
+  const base = { kind: "FIGHT", discipline: "BOXEO", day: "", place: "", message: "", today: "2026-10-08", disciplinasDelRival: ["BOXEO", "MMA"] as ("BOXEO" | "MMA")[] };
+  it("una propuesta mínima: tipo y una disciplina del rival", () => {
+    expect(parseProposal(base)).toEqual({ ok: true, value: { kind: "FIGHT", discipline: "BOXEO", day: null, place: null, message: null } });
+    expect(parseProposal({ ...base, kind: "SPARRING", place: "  Club  Norte ", message: " a 3 asaltos " })).toEqual({ ok: true, value: { kind: "SPARRING", discipline: "BOXEO", day: null, place: "Club Norte", message: "a 3 asaltos" } });
+  });
+  it("rechaza tipos y disciplinas que no son del rival", () => {
+    expect(parseProposal({ ...base, kind: "PELEA" })).toEqual({ ok: false, problema: "propuesta_tipo" });
+    expect(parseProposal({ ...base, discipline: "K1" })).toEqual({ ok: false, problema: "propuesta_disciplina" });
+    expect(parseProposal({ ...base, discipline: "__proto__" })).toEqual({ ok: false, problema: "propuesta_disciplina" });
+  });
+  it("la fecha es opcional y va de hoy a un año", () => {
+    expect(parseProposal({ ...base, day: "2026-10-07" })).toEqual({ ok: false, problema: "propuesta_dia" });
+    expect(parseProposal({ ...base, day: "2027-10-09" })).toEqual({ ok: false, problema: "propuesta_dia" });
+    expect(parseProposal({ ...base, day: "2026-12-01" })).toMatchObject({ ok: true, value: { day: new Date("2026-12-01T00:00:00Z") } });
+  });
+  it("limita lugar y mensaje", () => {
+    expect(parseProposal({ ...base, place: "x".repeat(101) })).toEqual({ ok: false, problema: "propuesta_lugar_largo" });
+    expect(parseProposal({ ...base, message: "x".repeat(501) })).toEqual({ ok: false, problema: "propuesta_mensaje_largo" });
+  });
+  it("solo se responde lo pendiente y se cancela lo pendiente o aceptado", () => {
+    expect([puedeResponderPropuesta("PENDING"), puedeResponderPropuesta("ACCEPTED")]).toEqual([true, false]);
+    expect([puedeCancelarPropuesta("PENDING"), puedeCancelarPropuesta("ACCEPTED"), puedeCancelarPropuesta("DECLINED")]).toEqual([true, true, false]);
   });
 });

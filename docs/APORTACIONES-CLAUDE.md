@@ -94,3 +94,8 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 1. Probar en Safari de iPhone el deslizamiento de las pestañas y el fotograma automático de los vídeos.
 2. Si el fundador lo aprueba, llevar las pestañas a otras pantallas largas (velada, gimnasio).
 3. No añadir pagos a las clases sin decisión del fundador y proveedor aprobado (`CLAUDE.md`, presupuesto).
+
+## 8 de octubre de 2026 — Acciones en cada panel, buscar clases, reserva con calendario y retos o sparring
+**Pedido por el fundador:** reservar sin escribir (calendario y barra), recuperar «retar o pedir sparring» (nunca se había implementado: propuesta del diseño v3) y servicios visibles nada más entrar.
+**Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
+**Qué debe hacer el siguiente asistente:** probar en un iPhone real la barra de horas y la tira de días; no añadir pagos a clases ni convertir retos en combates de cartel sin decisión del fundador.

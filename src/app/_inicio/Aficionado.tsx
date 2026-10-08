@@ -8,7 +8,7 @@ import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
 import Icono from "../components/Icono";
 import { TarjetaDisciplina } from "../components/Tarjetas";
-import { CombateVS, Saludo, textoResultado } from "./comun";
+import { AccionesPrincipales, CombateVS, Saludo, textoResultado } from "./comun";
 import { CUENTA } from "./datos";
 
 const conRecord = { include: { disciplines: true, boutsAsA: { where: CUENTA, include: { event: true } }, boutsAsB: { where: CUENTA, include: { event: true } } } } as const;
@@ -34,6 +34,14 @@ export default async function InicioAficionado({ user }: { user: User }) {
   return (
     <div className="pantalla" style={{ gap: 26 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={seguidos.length ? `Sigues a ${plural(seguidos.length, "peleador", "peleadores")}` : "Todavía no sigues a ningún peleador"} />
+      <AccionesPrincipales acciones={[
+        { href: "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },
+        { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Síguelos y dales aura", icono: "buscar" },
+        { href: "/veladas", titulo: "Próximas veladas", detalle: "Cartel y resultados", icono: "trofeo" },
+        { href: "/mis-reservas", titulo: "Mis reservas", detalle: "Tus clases solicitadas", icono: "bandeja", aviso: reservas },
+        { href: "/compartir", titulo: "Subir vídeos o fotos", detalle: "De una velada a la que fuiste", icono: "camara" },
+        { href: "/siguiendo", titulo: "Peleadores que sigo", detalle: "Sus próximos combates", icono: "personas" },
+      ]} />
 
       {solicitud?.status === "PENDING" && (
         <div className="tarjeta tarjeta-discontinua">
@@ -54,16 +62,7 @@ export default async function InicioAficionado({ user }: { user: User }) {
         <div className="dato"><span className="clave">Vistas en directo</span><span className="valor-grande">{enDirecto}</span></div>
       </div>
 
-      <div className="rejilla-2">
-        <Link href="/peleadores" className="accion-grande tarjeta tarjeta-acc"><Icono nombre="buscar" tam={26} grosor={1.9} />Descubrir peleadores</Link>
-        <Link href="/entrenadores" className="accion-grande tarjeta"><Icono nombre="capas" tam={26} grosor={1.9} />Clases con entrenadores</Link>
-      </div>
-      {reservas > 0 && (
-        <Link href="/mis-reservas" className="fila" aria-label={`Mis reservas de clases: ${reservas} ${reservas === 1 ? "solicitud abierta" : "solicitudes abiertas"}`}>
-          <span className="cuerpo"><span className="nombre">Mis reservas de clases</span><span className="meta">Lo que te han respondido los entrenadores</span></span>
-          <strong className="acc" style={{ font: "800 26px var(--font)" }}>{reservas}</strong>
-        </Link>
-      )}
+
 
       <section aria-labelledby="titulo-resultados" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-resultados">Últimos resultados</h2>{seguidos.length > 0 && <Link href="/siguiendo">Siguiendo</Link>}</div>

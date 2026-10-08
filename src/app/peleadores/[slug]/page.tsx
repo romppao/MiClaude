@@ -171,6 +171,13 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         ) : <Link className="btn secondary" style={{ flex: 1, minHeight: 54 }} href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para seguir a este peleador</Link>)}
         <span className="pildora" style={{ minHeight: 54, padding: "0 18px", fontWeight: 500, background: "rgba(255,255,255,.06)" }}>{plural(followerCount, "seguidor", "seguidores")}</span>
       </div>
+      {/* Retar o proponer sparring (propuesta n.º 1 del diseño v3): solo entre peleadores, y a fichas con titular que pueda responder. */}
+      {publica && fighter.userId && user?.fighter && user.fighter.id !== fighter.id && (
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          <Link href={`/peleadores/${fighter.slug}/proponer?tipo=FIGHT`} className="btn" style={{ flex: 1 }}><Icono nombre="reto" tam={18} grosor={2} />Retar a combate</Link>
+          <Link href={`/peleadores/${fighter.slug}/proponer?tipo=SPARRING`} className="btn secondary" style={{ flex: 1 }}>Proponer sparring</Link>
+        </div>
+      )}
       {publica && fighter.gym && <Link href={`/gimnasios/${fighter.gym.slug}`} className="btn secondary" style={{ marginTop: 10 }}><Icono nombre="gimnasio" tam={18} grosor={1.9} />{fighter.gym.name}</Link>}
 
       <div className="rejilla-3" style={{ marginTop: 16 }}>

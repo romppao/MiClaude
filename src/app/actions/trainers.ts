@@ -4,6 +4,7 @@
 
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
+import { todayMadrid } from "../../lib/common/dates";
 import { Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
@@ -94,7 +95,7 @@ function avisar(correo: string, asunto: string, texto: string, responderA?: stri
 /** Vuelve al formulario con lo que había escrito la persona, para no perderlo (principio 9) y con el problema explicado. */
 function volverConLoEscrito(back: string, f: FormData, problema: string): never {
   const q = new URLSearchParams();
-  for (const k of ["preferred", "message", "phone"]) if (str(f, k)) q.set(k, str(f, k).slice(0, 500));
+  for (const k of ["day", "fromMinute", "toMinute", "message", "phone"]) if (str(f, k)) q.set(k, str(f, k).slice(0, 500));
   go(q.size ? `${back}?${q}` : back, { problema });
 }
 
@@ -110,8 +111,8 @@ export async function requestClass(f: FormData) {
   const clase = classId.length <= 40 ? await db.trainingClass.findFirst({ where: { id: classId, active: true, trainer: { userId: { not: null } } }, include: { trainer: { include: { user: true } } } }) : null;
   if (!clase?.trainer.user) go("/entrenadores", { problema: "clase_no_disponible" });
   if (clase.trainer.userId === user.id) go(back, { problema: "clase_propia" });
-  checkLengths(f, back, { preferred: 400, message: 1000, phone: 40 });
-  const datos = parseClassRequest({ preferred: str(f, "preferred"), message: str(f, "message"), phone: str(f, "phone") });
+  checkLengths(f, back, { day: 10, fromMinute: 4, toMinute: 4, message: 1000, phone: 40 });
+  const datos = parseClassRequest({ day: str(f, "day"), from: str(f, "fromMinute"), to: str(f, "toMinute"), message: str(f, "message"), phone: str(f, "phone"), kind: clase.kind, minutes: clase.minutes, today: todayMadrid() });
   if (!datos.ok) volverConLoEscrito(back, f, datos.problema);
   const r = await withLock(`clase:${clase.id}:${user.id}`, async (tx) => {
     if (await tx.classRequest.findFirst({ where: { classId: clase.id, userId: user.id, status: "PENDING" }, select: { id: true } })) go("/mis-reservas", { problema: "solicitud_repetida" });

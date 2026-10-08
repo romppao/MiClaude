@@ -8,6 +8,7 @@ import { publicFighterName } from "../../lib/common/names";
 import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
 import { combinedRecord, computeRecords, emptyTally } from "../../lib/fighters/record";
 import Foto from "../components/Foto";
+import Icono from "../components/Icono";
 
 /** Piezas comunes de los inicios por papel (diseño v3). */
 
@@ -77,3 +78,24 @@ export function textoResultado(b: Bout & { event: Event; fighterA: Fighter; figh
 }
 
 export type { FichaRecord };
+
+export type AccionPrincipal = { href: string; titulo: string; detalle: string; icono: Parameters<typeof Icono>[0]["nombre"]; aviso?: number };
+
+/**
+ * Lo que puede hacer cada tipo de cuenta, nada más entrar en «Mi panel» (petición del fundador, 8 de octubre de 2026: «el panel de
+ * cada usuario debería mostrar las principales acciones que puede realizar»). La primera es la principal (en lima). `aviso`: cuántas
+ * cosas esperan respuesta (solicitudes, propuestas…), en un círculo violeta.
+ */
+export function AccionesPrincipales({ acciones }: { acciones: AccionPrincipal[] }) {
+  return (
+    <nav aria-label="Acciones principales" className="acciones-principales">
+      {acciones.map((a, i) => (
+        <Link key={a.href + a.titulo} href={a.href} className={`accion-principal tarjeta${i === 0 ? " tarjeta-acc" : ""}`}>
+          <span className="icono-accion" aria-hidden="true"><Icono nombre={a.icono} tam={24} grosor={2} /></span>
+          <span className="texto-accion"><strong>{a.titulo}</strong><span className="meta">{a.detalle}</span></span>
+          {!!a.aviso && <span className="aviso-accion">{a.aviso}<span className="sr-only"> pendientes</span></span>}
+        </Link>
+      ))}
+    </nav>
+  );
+}

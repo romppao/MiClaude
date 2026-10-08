@@ -1251,3 +1251,39 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
   - Veladas con una explicación corta (el detalle de «Hoy y próximas» va junto a su filtro).
 
 **Límite honesto:** el gesto del dedo y la portada automática siguen sin probarse en un iPhone real; el recorrido es con Chromium emulando un móvil.
+
+## 8 de octubre de 2026 — Panel con las acciones de cada cuenta, buscar clases, reserva con calendario y retos o sparring (Claude)
+
+**Qué se pidió** (el fundador, probando la demo en el móvil, con captura de «Solicitar esta clase»):
+- «El proceso para reservar una clase no es cómodo para el usuario, le obliga a escribir mucho, es mucho mejor que pueda seleccionar la fecha y hora en un calendario directamente, seleccionar su rango de tiempo mediante una barra o algo similar y, si tiene que escribir algo, un espacio para decir cualquier cosa importante.»
+- «No encuentro la manera de retar a otros peleadores a combate o solicitar sparring, lo has quitado, ya no está; no puedes tocar cosas que antes iban bien o quitar cosas que no te he dicho que quitaras, ten mucho cuidado.»
+- «Es difícil para el usuario encontrar los posibles servicios que le ofrece la aplicación, por ejemplo buscar clases, está muy al fondo […], al igual que los entrenadores a la hora de crear veladas o interclubs. […] El panel de cada usuario debería mostrar las principales acciones que puede realizar cada tipo de usuario. Corrígelo y reorganiza la aplicación.»
+
+**Sobre retos y sparring (honestidad):** se buscó en todo el historial del repositorio y **nunca llegó a estar en el código**. Era la propuesta n.º 1 del diseño v3 (Claude Design, 7 de octubre) y figuraba como pendiente en `PLAN.md` (fase 2, punto 1) e `IDEAS.md`. No se quitó, pero debí avisar de que faltaba al pasar el diseño al código: lección anotada.
+
+**Qué se hizo:**
+- **Acciones principales en «Mi panel»** (`AccionesPrincipales` en `_inicio/comun.tsx`): una cuadrícula de 2 columnas arriba del todo, la primera en lima y con un número violeta cuando hay algo esperando respuesta.
+  - Aficionado: Buscar clases · Buscar peleadores · Próximas veladas · Mis reservas · Subir vídeos o fotos · Peleadores que sigo.
+  - Peleador: Registrar un combate · Retar o proponer sparring · Mis propuestas · Publicar un highlight · Buscar clases · Mis títulos y mi aura.
+  - Entrenador: **Crear una velada · Crear un interclub** (ya con el tipo elegido en el formulario) · Publicar una clase · Solicitudes de clase · Mis veladas e interclubs · Buscar peleadores. Sin perfil todavía, ya ve crear velada e interclub.
+  - Entidad: Crear una velada · Crear un interclub · Mis veladas · Buscar peleadores · Mi perfil público · Buscar clases.
+  - Visitante: «¿Qué quieres hacer?» sube justo bajo la cabecera, con «Buscar clases» primero.
+- **Buscar clases** (`/clases`): todas las clases publicadas, con búsqueda por clase, entrenador o ciudad, «Más filtros» (disciplina, provincia, tipo) y «Solicitar esta clase» en cada una. En el menú, «Clases y entrenadores».
+- **Reserva con calendario y barra** (`components/ElegirHorario.tsx`):
+  - el día se elige en una tira con los próximos 14 días (Hoy, Mañana, dom 11…) o en «Otra fecha», con el calendario del móvil;
+  - en las clases individuales, la franja se elige con una barra de dos tiradores (07:00–23:00, medias horas, nunca más corta que la clase), con los atajos Mañana, Tarde y Noche;
+  - queda un único campo opcional, «¿Algo importante que deba saber el entrenador?»;
+  - el entrenador lee «miércoles 14 de octubre, entre las 18:00 y las 20:00»;
+  - modelo: `ClassRequest.day`, `fromMinute` y `toMinute`.
+- **Retos a combate y sparring** (`FightProposal`, `lib/fighters/proposals.ts`, `actions/proposals.ts`):
+  - «Retar a combate» y «Proponer sparring» en la ficha de cada peleador con titular, solo para quien tiene ficha;
+  - formulario corto: tipo, disciplina (las del rival) y, opcionales, fecha, lugar y mensaje;
+  - «Retos y sparrings» (`/propuestas`): buscar a quién retar, Recibidas (aceptar o rechazar con mensaje) y Enviadas (cancelar);
+  - correos con dirección de respuesta al otro peleador; con la propuesta aceptada, cada uno ve el correo del otro;
+  - aceptar no crea un combate: se registra cuando se celebra;
+  - aviso de que Ring España no organiza ni supervisa los sparrings;
+  - una propuesta abierta por tipo y pareja, como mucho 10 al día, y todo queda en el historial y en la descarga de datos.
+- Migración `20261008260000_retos_y_horario_de_clases`, que solo añade.
+
+**Pruebas:** unitarias (590), `servicios.mjs` nueva (paneles, Buscar clases, retos de punta a punta, accesibilidad), `arreglos.mjs` con la reserva por calendario, y la réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **690 comprobaciones, 0 fallos**. En la base local acumulada, `filtros.mjs` fallaba porque las fichas de muchas ejecuciones empujan las de la prueba a la página 2: es la base, no el código (con base vacía pasa).
+**Límite honesto:** la barra de dos tiradores y la tira de días se han probado en Chromium emulando un móvil (también con el teclado); falta probarlas en un iPhone real.
