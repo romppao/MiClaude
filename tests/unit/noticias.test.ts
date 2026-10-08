@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { decodificar, detectarDisciplinas, disciplinasDe, parseFeed, textoPlano, variar } from "../../src/lib/news/parse";
-import { FUENTES_INICIALES, googleNoticias } from "../../src/lib/news/sources";
+import { clasificar, decodificar, detectarDisciplinas, enEspanol, parseFeed, textoPlano, variar } from "../../src/lib/news/parse";
+import { FUENTES_INICIALES, FUENTES_RETIRADAS, googleNoticias } from "../../src/lib/news/sources";
 import { haceTiempo } from "../../src/lib/common/dates";
 
 const AHORA = new Date("2026-10-08T12:00:00Z");
@@ -56,8 +56,46 @@ describe("disciplinas de cada noticia", () => {
     expect(detectarDisciplinas("Campeonato de boxeo tailandés")).toEqual(["MUAYTHAI"]);
     expect(detectarDisciplinas("Previa del partido de fútbol")).toEqual([]);
   });
-  it("suma las disciplinas de la fuente temática sin repetir", () => {
-    expect(disciplinasDe(["BOXEO"], { title: "Boxeo y MMA en la misma noche", summary: null })).toEqual(["BOXEO", "MMA"]);
+  it("«kick boxing» y «thai boxing» no cuentan como boxeo", () => {
+    expect(detectarDisciplinas("Velada de kick boxing en Alicante")).toEqual(["KICKBOXING"]);
+    expect(detectarDisciplinas("Thai boxing championship")).toEqual(["MUAYTHAI"]);
+    expect(detectarDisciplinas("Topuria defenderá su cinturón")).toEqual(["MMA"]);
+  });
+});
+
+describe("cada noticia, solo en su disciplina (petición del fundador)", () => {
+  const busqueda = { kind: "AGREGADOR", disciplines: ["BOXEO"] as const };
+  const medioDeBoxeo = { kind: "PRENSA", disciplines: ["BOXEO"] as const };
+  const general = { kind: "FEDERACION", disciplines: [] as const };
+  const n = (title: string, summary: string | null = null) => ({ title, summary });
+  it("una noticia de MMA que llega por la búsqueda de boxeo va a MMA, no a boxeo", () => {
+    expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("La UFC anuncia su gala en Madrid"))).toEqual(["MMA"]);
+  });
+  it("un titular que mezcla disciplinas no va a ninguna: solo a la portada común", () => {
+    expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("Noche de boxeo y MMA en Valencia"))).toEqual([]);
+  });
+  it("de una búsqueda, un titular que no nombra la disciplina no se asigna", () => {
+    expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio de los Deportes"))).toEqual([]);
+  });
+  it("de un medio dedicado a una disciplina, se asigna aunque el titular no la nombre, salvo que el resumen hable de otra", () => {
+    expect(clasificar({ ...medioDeBoxeo, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio de los Deportes"))).toEqual(["BOXEO"]);
+    expect(clasificar({ ...medioDeBoxeo, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio", "Habrá también combates de kickboxing"))).toEqual([]);
+  });
+  it("de una fuente general, lo que no es de deportes de contacto se descarta", () => {
+    expect(clasificar({ ...general, disciplines: [] }, n("La federación española de fútbol elige presidente"))).toBeNull();
+    expect(clasificar({ ...general, disciplines: [] }, n("La Federación Española de Boxeo presenta el campeonato"))).toEqual(["BOXEO"]);
+  });
+});
+
+describe("solo noticias en español", () => {
+  it("acepta titulares en español y rechaza los que están en inglés", () => {
+    expect(enEspanol("Sandra Fernández, campeona de Europa del peso pluma")).toBe(true);
+    expect(enEspanol("El boxeador vasco gana por KO en el sexto asalto")).toBe(true);
+    expect(enEspanol("Fighter wins the title after a five-round war")).toBe(false);
+    expect(enEspanol("Highlights: the best knockouts of the night")).toBe(false);
+  });
+  it("un titular solo con nombres propios se acepta (todas las fuentes son en español)", () => {
+    expect(enEspanol("Topuria - Holloway")).toBe(true);
   });
 });
 
@@ -70,11 +108,21 @@ describe("variedad de medios en la portada", () => {
 });
 
 describe("fuentes iniciales", () => {
-  it("son variadas (vídeo, varios medios y federaciones), cubren todas las disciplinas y no se repiten", () => {
-    expect(new Set(FUENTES_INICIALES.map((f) => f.kind))).toEqual(new Set(["AGREGADOR", "VIDEO", "FEDERACION"]));
+  it("son variadas (prensa, vídeo, varios medios y federaciones), cubren todas las disciplinas y no se repiten", () => {
+    expect(new Set(FUENTES_INICIALES.map((f) => f.kind))).toEqual(new Set(["AGREGADOR", "VIDEO", "FEDERACION", "PRENSA"]));
     expect(new Set(FUENTES_INICIALES.flatMap((f) => f.disciplines))).toEqual(new Set(["BOXEO", "JIUJITSU", "K1", "KICKBOXING", "MMA", "MUAYTHAI"]));
     expect(new Set(FUENTES_INICIALES.map((f) => f.url)).size).toBe(FUENTES_INICIALES.length);
     for (const f of FUENTES_INICIALES) expect(f.url.startsWith("https://")).toBe(true);
+  });
+  it("no vuelven las retiradas (canales en inglés y búsquedas que mezclaban disciplinas)", () => {
+    for (const f of FUENTES_INICIALES) expect(FUENTES_RETIRADAS).not.toContain(f.url);
+    expect(FUENTES_RETIRADAS.some((u) => u.includes("UCvgfXK4nTYKudb0rFR6noLA"))).toBe(true); // UFC en inglés
+  });
+  it("las búsquedas de cada disciplina excluyen las demás", () => {
+    const q = (n: string) => new URL(FUENTES_INICIALES.find((f) => f.name === n)!.url).searchParams.get("q")!;
+    expect(q("Prensa española: boxeo")).toContain("-MMA");
+    expect(q("Prensa española: boxeo")).toContain("-kickboxing");
+    expect(q("Prensa española: MMA")).toContain("-boxeo");
   });
   it("buscan en español de España en la última semana", () => {
     const u = new URL(googleNoticias('"muay thai"'));

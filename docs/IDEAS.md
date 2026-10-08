@@ -282,3 +282,9 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Borrar o suspender cuentas ajenas desde Administración** (Claude, 8 oct) — **propuesta**, a decidir por el fundador.
 - **Segundo paso también para los moderadores** (Claude, 8 oct) — **propuesta**.
 - **Avisar por correo al creador de cada entrada en su cuenta** (Claude, 8 oct) — **pendiente** de tener correo real (dominio).
+
+## Iconos y noticias por disciplina (8 de octubre de 2026)
+
+- **Imágenes o iconos de cada deporte en el panel de disciplinas** (fundador, 8 oct) — **hecho** con pictogramas propios; las fotografías reales quedan para la fase de diseño (derechos de imagen, fotógrafo).
+- **Noticias solo en español y solo de su disciplina** (fundador, 8 oct) — **hecho** (`clasificar`, `enEspanol`, fuentes españolas especializadas); falta comprobar en la demo qué fuentes leen bien.
+- **Buscar medios en español dedicados a K-1, kickboxing y Muay Thai** (Claude, 8 oct) — **pendiente**: no se encontró ninguno; quizá clubes o promotoras españolas con canal de noticias, o pedir al fundador sus referencias.

@@ -308,6 +308,7 @@ label.chip:has(input:focus-visible){outline:3px solid var(--acc);outline-offset:
 .tarjeta-foto .abajo{padding:14px;display:flex;flex-direction:column;gap:3px}
 .disciplina{height:190px;align-items:center;padding-bottom:16px}
 .disciplina .raya{width:28px;height:4px;border-radius:2px;background:var(--color)}
+.disciplina .disciplina-dibujo{flex:1;display:grid;place-items:center;color:var(--acc);opacity:.9}
 .disciplina strong{font:800 25px/1.1 var(--font);letter-spacing:-.035em}
 .cartel{flex:none;width:230px;height:300px;justify-content:space-between;padding:16px}
 .cartel::after{background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(0,0,0,.85))}
@@ -463,6 +464,10 @@ nav.lista>a{display:flex}
 .filtros-disciplina.desliza-fila{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .filtros-disciplina.desliza-fila::-webkit-scrollbar{display:none}
 .filtros-disciplina.desliza-fila a{flex:none}
+/* Con dibujo: cada deporte es una ficha con su pictograma encima del nombre. */
+main .filtros-disciplina.con-dibujo a{flex-direction:column;justify-content:center;gap:6px;min-width:88px;min-height:84px;padding:10px 12px;border-radius:22px;font-size:15px}
+main .filtros-disciplina.con-dibujo a svg{color:var(--acc)}
+main .filtros-disciplina.con-dibujo a[aria-current=page] svg{color:var(--acc-ink)}
 .noticia-destacada{min-height:250px}
 .noticia-destacada .abajo{padding:20px;gap:6px}
 .noticia-destacada .titular{font:800 22px/1.2 var(--font);letter-spacing:-.02em}

@@ -77,3 +77,12 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Qué solo valida el CI:** la misma batería en GitHub Actions, con `CREADOR_CORREO=creador@prueba.test`.
 **Qué debe hacer el siguiente asistente:** nada de la cuenta del creador sin el fundador (es seguridad); si pide borrar o suspender cuentas desde Administración, escribir antes la ficha.
 **Decisiones del fundador abiertas:** `TRASLADO.md` §7, punto 27.
+
+## 8 de octubre de 2026 — Iconos de cada deporte y noticias estrictamente por disciplina
+**Pedido por el fundador:** iconos o imágenes en el panel de disciplinas; noticias solo en español y «única y exclusivamente» de cada disciplina en su pantalla.
+**Base:** `claude/ring-espana-mvp` tras fusionar #31. **Rama:** `claude/iconos-y-noticias`.
+**Qué cambié y por qué:** entrada 7 del 8 de octubre en `DIARIO.md` y «Noticias por disciplina e iconos» en `ARQUITECTURA.md`.
+**Qué debe hacer el siguiente asistente:**
+1. Revisar en la demo `/moderacion/noticias`: qué fuentes nuevas leen bien.
+2. Si alguna falla, buscar su dirección real desde una red sin restricciones.
+3. Añadir medios de K-1, kickboxing y Muay Thai si el fundador da referencias.

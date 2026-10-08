@@ -5,6 +5,9 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/c
 import { ultimasNoticias } from "../../lib/news/feed";
 import { ListaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
 import { MiniPeleador, TarjetaCartel } from "../components/Tarjetas";
+import Icono from "../components/Icono";
+import IconoDisciplina from "../components/IconoDisciplina";
+import CentrarActivo from "../components/CentrarActivo";
 import { peleadoresConAura, proximasVeladas } from "./datos";
 
 /**
@@ -30,10 +33,11 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
     <div className="pantalla" style={{ gap: 26 }}>
       {cabecera}
 
-      <nav className="filtros-disciplina desliza-fila" aria-label="Elige un deporte">
-        <Link href="/" aria-current={!disciplina ? "page" : undefined}>Todos</Link>
-        {orden.map((d) => <Link key={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} aria-current={d === disciplina ? "page" : undefined}>{DISCIPLINE_LABEL[d]}</Link>)}
+      <nav className="filtros-disciplina desliza-fila con-dibujo" aria-label="Elige un deporte">
+        <Link href="/" aria-current={!disciplina ? "page" : undefined}><Icono nombre="capas" tam={28} grosor={1.6} />Todos</Link>
+        {orden.map((d) => <Link key={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} aria-current={d === disciplina ? "page" : undefined}><IconoDisciplina d={d} tam={30} grosor={1.6} />{DISCIPLINE_LABEL[d]}</Link>)}
       </nav>
+      {disciplina && <CentrarActivo fila="Elige un deporte" />}
 
       <section aria-labelledby="titulo-actualidad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad">{nombre ? `Actualidad${de}` : "Actualidad"}</h2><Link href={masNoticias}>Todas las noticias</Link></div>

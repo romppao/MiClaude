@@ -1110,3 +1110,30 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - Tres fallos de la propia prueba, anotados en `LECCIONES.md`.
 - Desde aquí no se puede abrir la demo, así que no he visto el despliegue de #30 en Render.
 **Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo, así que se pide permiso. Después, el fundador pone `CREADOR_CORREO` en Render y activa su cuenta siguiendo `CREADOR.md`. Decisiones en `TRASLADO.md` §7.27.
+
+## 8 de octubre de 2026 (7) — Iconos de cada deporte y noticias solo en español y de su disciplina
+
+**Pedido por el fundador** (tras revisar la demo, que ya tenía #30 y #31):
+- «El panel […] que indica qué disciplinas hay está muy soso […] intenta añadir imágenes o iconos que indiquen qué deporte es».
+- «Las noticias están en inglés la mayoría. No quiero noticias en inglés. Quiero noticias completamente en español para la gente de España.»
+- «He entrado en la pestaña de boxeo y me aparecían noticias sobre MMA y sobre kickboxing. No […] Única y exclusivamente contenido de cada disciplina especializada en su pantalla […] Infórmate, busca bien las fuentes de cada disciplina.»
+**Por qué pasaba:**
+- **Inglés:** las fuentes incluían los canales de vídeo de UFC, ONE y GLORY, que están en inglés.
+- **Disciplinas mezcladas:** cada noticia sumaba la disciplina de su fuente y las que se detectaban en el texto. Una noticia de MMA que llegaba por la búsqueda «boxeo» quedaba marcada como boxeo y como MMA, y salía en las dos portadas.
+**Qué se decidió y por qué:**
+- **Iconos propios** (`IconoDisciplina`): guante, kimono con cinturón, patada alta, patada con guantes, octógono y rodillazo. Son dibujos de trazo hechos aquí, sin imágenes de terceros (derechos) y con el mismo estilo que el resto de iconos. Aparecen en el selector de deporte (fichas con dibujo), en las tarjetas de disciplina y en la cabecera de cada deporte. En la portada de una disciplina, su ficha se centra sola en el selector.
+- **Regla estricta** (`clasificar`): una noticia solo va a una disciplina si su **titular** habla de esa y de ninguna otra.
+  - Si nombra varias, solo sale en «Todos».
+  - Si no nombra ninguna, solo se acepta si viene de un medio dedicado a esa disciplina.
+  - De una fuente general, lo que no nombra ningún deporte de contacto se descarta.
+  - «Kick boxing» y «boxeo tailandés» ya no cuentan como boxeo.
+- **Solo español** (`enEspanol`): se descartan los titulares en inglés. Se retiraron los canales en inglés y las búsquedas antiguas, que se desactivan y se borran solas al actualizar. Los titulares ya guardados se vuelven a clasificar una vez por arranque.
+- **Fuentes españolas especializadas** (investigadas por búsqueda):
+  - Boxeo: Espabox, AEBOX y RFEBox.
+  - MMA: MMA España y el canal UFC Español.
+  - Jiu-jitsu: Fighter Corner.
+  - Varias disciplinas, clasificadas titular a titular: FEKM, Jaula Magazine y Deporte de Contacto.
+  - Además, búsquedas de Google Noticias en español de España por disciplina que excluyen las demás.
+**Límite honesto:**
+- Desde el entorno de desarrollo no se pudo abrir **ningún** canal de noticias, porque la red lo bloquea. Las fuentes nuevas se eligieron por búsquedas y hay que comprobar en `/moderacion/noticias` de la demo cuáles leen bien.
+- No existe (o no se encontró) ningún medio en español dedicado solo a K-1, solo a kickboxing o solo a Muay Thai. Esas tres portadas tendrán menos noticias: las de la FEKM y las de Google Noticias cuyo titular nombre la disciplina.

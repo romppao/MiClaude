@@ -300,6 +300,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/CentrarActivo.tsx",
+    "purpose": "Componente de cliente que lleva a la vista la opción actual de una fila deslizable (el deporte marcado en el selector de las portadas).",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/CodigosEmergencia.tsx",
     "purpose": "Componente de cliente que pide un código de la aplicación y, si es correcto, enseña una sola vez los diez códigos de emergencia.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -338,6 +343,11 @@
     "path": "src/app/components/Icono.tsx",
     "purpose": "Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/IconoDisciplina.tsx",
+    "purpose": "Pictogramas propios de cada disciplina (guante, kimono, patada alta, patada con guantes, octógono, rodillazo), decorativos, para el selector, las tarjetas y la cabecera de cada deporte.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/components/MetodoSegunDisciplina.tsx",
