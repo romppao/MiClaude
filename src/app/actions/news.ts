@@ -36,8 +36,9 @@ export async function addNewsSource(f: FormData) {
   if (!url || !url.startsWith("https://")) go(BACK, { problema: "fuente_url" });
   if (!hasOwn(TIPO_DE_FUENTE_ETIQUETA, kind)) go(BACK, { problema: "fuente_tipo" });
   const disciplines = f.getAll("disciplina").map(String).filter(isDiscipline);
-  const fuente = await guard(BACK, () => db.newsSource.create({ data: { name, url, kind: kind as NewsSourceKind, disciplines } }), "fuente_repetida");
-  await audit({ userId: admin.id, entity: "NEWS_SOURCE", entityId: fuente.id, action: "CREATED", after: { name, url, kind, disciplines } });
+  const local = f.get("local") === "si";
+  const fuente = await guard(BACK, () => db.newsSource.create({ data: { name, url, kind: kind as NewsSourceKind, disciplines, local } }), "fuente_repetida");
+  await audit({ userId: admin.id, entity: "NEWS_SOURCE", entityId: fuente.id, action: "CREATED", after: { name, url, kind, disciplines, local } });
   go(BACK, { aviso: "fuente_anadida" });
 }
 

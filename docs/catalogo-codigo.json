@@ -85,6 +85,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261008220000_noticias_panorama_espanol/migration.sql",
+    "purpose": "Migración aditiva: NewsSource.local marca las fuentes que solo cubren el panorama español.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -977,6 +982,11 @@
   {
     "path": "src/lib/media/storage.ts",
     "purpose": "Almacén de vídeos: R2 (con jurisdicción UE opcional), disco o ninguno; claves por usuario, comprobación de tamaño, borrado y servicio con Range.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/espana.ts",
+    "purpose": "Panorama español de las noticias: señales de España (comunidades, provincias, federaciones, españoles de élite) y regla delPanoramaEspanol según la fuente.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

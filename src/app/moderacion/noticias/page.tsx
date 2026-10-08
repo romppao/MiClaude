@@ -28,7 +28,7 @@ export default async function FuentesDeNoticias() {
     <>
       <p><Link href="/moderacion">← Volver a moderación</Link></p>
       <h1>Fuentes de noticias</h1>
-      <p className="mut">La portada reúne titulares de estas fuentes. Se leen solas cada media hora cuando alguien abre la portada. Antes de publicar la aplicación, comprueba que todas tienen una lectura correcta reciente.</p>
+      <p className="mut">Solo se muestran titulares en español, del panorama español y, en cada disciplina, los que hablan solo de ella (guía: docs/NOTICIAS.md). La portada reúne titulares de estas fuentes. Se leen solas cada media hora cuando alguien abre la portada. Antes de publicar la aplicación, comprueba que todas tienen una lectura correcta reciente.</p>
       {!noticiasActivas() && <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>La lectura de noticias está desactivada en este servidor (NEWS_FETCH=no).</div>}
       <form action={refreshNewsNow}><button>Actualizar las noticias ahora</button></form>
 
@@ -40,7 +40,7 @@ export default async function FuentesDeNoticias() {
           <tbody>
             {fuentes.map((f) => (
               <tr key={f.id}>
-                <th scope="row" style={{ color: "var(--text)" }}>{f.name}<div className="mut" style={{ fontWeight: 400 }}>{TIPO_DE_FUENTE_ETIQUETA[f.kind]}{f.disciplines.length ? ` · ${f.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(", ")}` : " · Todas las disciplinas"}</div><div className="mut" style={{ fontWeight: 400, wordBreak: "break-all" }}>{f.url}</div></th>
+                <th scope="row" style={{ color: "var(--text)" }}>{f.name}<div className="mut" style={{ fontWeight: 400 }}>{TIPO_DE_FUENTE_ETIQUETA[f.kind]}{f.disciplines.length ? ` · ${f.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(", ")}` : " · Todas las disciplinas"}{f.local ? " · Solo panorama español" : " · Se comprueba que cada titular sea del panorama español"}</div><div className="mut" style={{ fontWeight: 400, wordBreak: "break-all" }}>{f.url}</div></th>
                 <td>
                   {!f.active ? "Desactivada"
                     : f.lastError ? <span><span aria-hidden="true">⚠ </span>Falla: {f.lastError}{f.lastOkAt ? ` (última lectura correcta: ${haceTiempo(f.lastOkAt, ahora).toLowerCase()})` : " (nunca se ha leído bien)"}</span>
@@ -65,6 +65,8 @@ export default async function FuentesDeNoticias() {
           <legend className="leyenda">Disciplinas que cubre (si no marcas ninguna, se deducen de cada titular)</legend>
           <div className="chips">{DISCIPLINE_ORDER.map((d) => <label key={d} className="chip"><input type="checkbox" name="disciplina" value={d} />{DISCIPLINE_LABEL[d]}</label>)}</div>
         </fieldset>
+        <label className="chip" style={{ alignSelf: "flex-start" }}><input type="checkbox" name="local" value="si" />Solo publica noticias del panorama español</label>
+        <p className="hint" style={{ margin: 0 }}>Márcalo en federaciones, clubes y medios que solo cubren España. Si no, solo se mostrarán los titulares que nombren España, una comunidad, una provincia o a un peleador español.</p>
         <button>Añadir la fuente</button>
       </form>
 

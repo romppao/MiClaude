@@ -1137,3 +1137,24 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Límite honesto:**
 - Desde el entorno de desarrollo no se pudo abrir **ningún** canal de noticias, porque la red lo bloquea. Las fuentes nuevas se eligieron por búsquedas y hay que comprobar en `/moderacion/noticias` de la demo cuáles leen bien.
 - No existe (o no se encontró) ningún medio en español dedicado solo a K-1, solo a kickboxing o solo a Muay Thai. Esas tres portadas tendrán menos noticias: las de la FEKM y las de Google Noticias cuyo titular nombre la disciplina.
+
+**Ampliación (misma tarde), con nuevas palabras del fundador:**
+- «Me encanta cómo has puesto los iconos […] dale un pelín más de forma […] en el Muay Thai la banda que tienen en la cabeza, en el jiu-jitsu el cinturón, el kimono».
+- «Las noticias tienen que ser del panorama español: deportistas españoles o con residencia en España […] fomentar que la gente apoye a los nuestros y crear comunidad en España, en cada comunidad autónoma, en cada municipio […] principalmente esos luchadores que todavía no tienen el apoyo suficiente».
+- Y sobre el equipo: cuando la aplicación esté publicada, **Antigravity** se encargará de las noticias; hasta entonces, todo lo sigue haciendo Claude.
+
+**Qué se hizo:**
+- **Iconos con más forma**, comprobados con capturas tras cada cambio:
+  - Muay Thai: mongkol con sus colas en la cabeza y prajied en el brazo.
+  - Jiu-jitsu: solapas cruzadas y cinturón con nudo y puntas.
+  - Boxeo: puño de cordones.
+  - K-1: guantes.
+  - Kickboxing: espinillera.
+  - MMA: guante de dedos abiertos dentro del octógono.
+- **Filtro del panorama español** (`lib/news/espana.ts`): una noticia entra si su fuente solo cubre España (marca nueva `NewsSource.local`, migración `20261008220000_noticias_panorama_espanol`) o si nombra España, una comunidad, una provincia o capital, una federación o competición española, o a un español de élite (lista corta y ampliable).
+  - Las búsquedas de Google Noticias piden además «España / español».
+  - En moderación, al añadir una fuente se puede marcar «Solo publica noticias del panorama español».
+- **Guía [`NOTICIAS.md`](NOTICIAS.md)** para quien mantenga las fuentes (Antigravity): reglas, tareas y fuentes de partida, con sus huecos. Anotado en `EQUIPO.md`.
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (555), `npm run build`, paridad de migraciones, los 22 guiones de navegador con base vacía (**565 comprobaciones, 0 fallos**) y `accesibilidad.mjs` (61 pantallas, 0 incumplimientos). Tras los últimos cambios (iconos con más forma, filtro español, moderación) volví a pasar `fase2a`, `creador`, `diseno`, `movil`, `enlaces` y `accesibilidad`, todos sin fallos. También `npm run mapa` y el catálogo (271 archivos, 9/9 pruebas), y capturas en iPhone emulado.
+**Límite honesto:** ninguna fuente real se pudo leer desde aquí; la lista de españoles de élite es corta a propósito (solo nombres de los que hay certeza) y se amplía según `NOTICIAS.md`.
+**Estado:** PR a `claude/ring-espana-mvp`; se fusiona en la demo en cuanto el CI esté en verde (el fundador pidió tener la demo completa para revisarla).

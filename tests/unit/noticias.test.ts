@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { delPanoramaEspanol, nombraEspana } from "../../src/lib/news/espana";
 import { clasificar, decodificar, detectarDisciplinas, enEspanol, parseFeed, textoPlano, variar } from "../../src/lib/news/parse";
 import { FUENTES_INICIALES, FUENTES_RETIRADAS, googleNoticias } from "../../src/lib/news/sources";
 import { haceTiempo } from "../../src/lib/common/dates";
@@ -138,5 +139,19 @@ describe("cuándo se publicó", () => {
     expect(haceTiempo(new Date("2026-10-08T07:00:00Z"), AHORA)).toBe("Hace 5 h");
     expect(haceTiempo(new Date("2026-10-07T07:00:00Z"), AHORA)).toBe("Ayer");
     expect(haceTiempo(new Date("2026-10-01T07:00:00Z"), AHORA)).toMatch(/^1 oct/);
+  });
+});
+
+describe("solo el panorama español (petición del fundador: «apoyar a los nuestros»)", () => {
+  it("reconoce España, comunidades, provincias, federaciones y españoles de élite", () => {
+    for (const t of ["El boxeador gaditano gana en Cádiz", "Velada en Bilbao este sábado", "Campeonato de España de kickboxing", "La RFEBox convoca a la selección", "Topuria defenderá su cinturón", "Un madrileño, campeón de Europa", "Gala en Santa Cruz de Tenerife"]) expect(nombraEspana(t), t).toBe(true);
+  });
+  it("no acepta noticias internacionales sin relación con España", () => {
+    for (const t of ["Canelo y Crawford firman la revancha en Las Vegas", "El campeón japonés retiene el título en Tokio", "Pereira noquea en el UFC 330"]) expect(nombraEspana(t), t).toBe(false);
+  });
+  it("las fuentes que solo cubren España no necesitan comprobar cada titular", () => {
+    expect(delPanoramaEspanol({ local: true }, { title: "Resultados del sábado", summary: null })).toBe(true);
+    expect(delPanoramaEspanol({ local: false }, { title: "Resultados del sábado", summary: null })).toBe(false);
+    expect(delPanoramaEspanol({ local: false }, { title: "Resultados del sábado", summary: "Velada en Zaragoza" })).toBe(true);
   });
 });

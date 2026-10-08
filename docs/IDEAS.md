@@ -288,3 +288,6 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Imágenes o iconos de cada deporte en el panel de disciplinas** (fundador, 8 oct) — **hecho** con pictogramas propios; las fotografías reales quedan para la fase de diseño (derechos de imagen, fotógrafo).
 - **Noticias solo en español y solo de su disciplina** (fundador, 8 oct) — **hecho** (`clasificar`, `enEspanol`, fuentes españolas especializadas); falta comprobar en la demo qué fuentes leen bien.
 - **Buscar medios en español dedicados a K-1, kickboxing y Muay Thai** (Claude, 8 oct) — **pendiente**: no se encontró ninguno; quizá clubes o promotoras españolas con canal de noticias, o pedir al fundador sus referencias.
+- **Noticias solo del panorama español**, para «apoyar a los nuestros» y crear comunidad en cada comunidad autónoma y municipio (fundador, 8 oct) — **hecho** (`espana.ts`, `NewsSource.local`).
+- **Antigravity mantendrá las fuentes de noticias tras el despliegue** (fundador, 8 oct) — **acordado**; guía en `NOTICIAS.md`.
+- **Sección «Talento local» o noticias por comunidad autónoma** (Claude, 8 oct, a partir de «en cada comunidad autónoma, en cada municipio») — **propuesta**: la detección de provincias ya existe y permitiría filtrar las noticias por la provincia de cada persona.

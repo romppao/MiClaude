@@ -3,6 +3,7 @@ import type { NewsSource } from "@prisma/client";
 import { db } from "../common/db";
 import { CONSERVAR_DIAS, FUENTES_INICIALES, FUENTES_RETIRADAS, REFRESCO_MS } from "./sources";
 import { clasificar, enEspanol, parseFeed } from "./parse";
+import { delPanoramaEspanol } from "./espana";
 
 /**
  * Actualización de las noticias. Se lanza en segundo plano (after()) cuando alguien abre la portada y alguna fuente lleva más de
@@ -20,6 +21,8 @@ const TIEMPO_MAX_MS = 10_000;
  */
 export async function asegurarFuentesIniciales() {
   await db.newsSource.createMany({ data: FUENTES_INICIALES, skipDuplicates: true });
+  // Las fuentes iniciales que solo cubren España quedan marcadas así aunque se crearan antes de existir la marca.
+  await db.newsSource.updateMany({ where: { url: { in: FUENTES_INICIALES.filter((f) => f.local).map((f) => f.url) }, local: false }, data: { local: true } });
   const retiradas = await db.newsSource.findMany({ where: { url: { in: FUENTES_RETIRADAS }, OR: [{ active: true }, { items: { some: {} } }] }, select: { id: true } });
   if (retiradas.length) {
     const ids = retiradas.map((r) => r.id);
@@ -29,21 +32,21 @@ export async function asegurarFuentesIniciales() {
 }
 const RETIRADA = "Retirada: en inglés o mezclaba disciplinas (8 de octubre de 2026)";
 
-/** Solo titulares en español y con su disciplina bien puesta; lo que no es de deportes de contacto se descarta. */
-function aceptar(f: Pick<NewsSource, "disciplines" | "kind">, e: { title: string; summary: string | null }): import("@prisma/client").Discipline[] | null {
-  if (!enEspanol(e.title)) return null;
+/** Solo titulares en español, del panorama español y con su disciplina bien puesta; lo demás se descarta. */
+function aceptar(f: Pick<NewsSource, "disciplines" | "kind" | "local">, e: { title: string; summary: string | null }): import("@prisma/client").Discipline[] | null {
+  if (!enEspanol(e.title) || !delPanoramaEspanol(f, e)) return null;
   return clasificar(f, e);
 }
 
 /**
- * Vuelve a clasificar los titulares ya guardados con las reglas actuales (una vez por arranque del servidor): así, al cambiar las reglas,
+ * Vuelve a revisar los titulares ya guardados con las reglas actuales (idioma, panorama español y disciplina) (una vez por arranque del servidor): así, al cambiar las reglas,
  * no quedan noticias en inglés ni en la disciplina equivocada hasta que caduquen.
  */
 let revisadas = false;
 async function revisarGuardadas() {
   if (revisadas) return;
   revisadas = true;
-  const todas = await db.newsItem.findMany({ select: { id: true, title: true, summary: true, disciplines: true, source: { select: { disciplines: true, kind: true } } } });
+  const todas = await db.newsItem.findMany({ select: { id: true, title: true, summary: true, disciplines: true, source: { select: { disciplines: true, kind: true, local: true } } } });
   const borrar: string[] = [];
   for (const n of todas) {
     const d = aceptar(n.source, n);

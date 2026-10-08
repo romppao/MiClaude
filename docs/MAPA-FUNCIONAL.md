@@ -330,6 +330,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `espana.ts` | `delPanoramaEspanol`, `nombraEspana` |
 | `feed.ts` | `Noticia`, `ultimasNoticias` |
 | `parse.ts` | `EntradaNoticia`, `HOSTS_DE_IMAGEN`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `parseFeed`, `textoPlano`, `variar` |
 | `refresh.ts` | `actualizarNoticias`, `actualizarSiToca`, `asegurarFuentesIniciales`, `noticiasActivas`, `noticiasPorActualizar` |
