@@ -66,8 +66,8 @@ Alojamiento y proveedor de base de datos, almacenamiento de imágenes, proveedor
 Entrega de Claude Design «Ring España App v3». **Fase 1 (hecha por Claude el 8 de octubre):** tokens y tipografía, barra inferior por papel, bienvenida y acceso, registro por pasos de los cuatro tipos de cuenta, inicio por papel, ficha de peleador con highlights y récord amateur privado, perfil y clases del entrenador. Detalle en `DIARIO.md` y `DISENO.md`.
 **Fase 2a (hecha por Claude el 8 de octubre, a petición del fundador):** portada común con noticias de fuentes variadas y portada de cada disciplina; «Mi panel» con lo de cada tipo de cuenta; menú solo con las opciones de cada tipo (el entrenador reúne entrenador, club y promotora); el entrenador crea veladas e **interclubs**; vídeos y fotos del público en las veladas, subidos de verdad (R2) o por enlace, también en los highlights. Detalle en `DIARIO.md` y [`VIDEOS.md`](VIDEOS.md). Con ello, el punto 4 de abajo está hecho y el 7 en parte (falta pasar a la estética v3 las pantallas heredadas).
 **Fase 2 (por planificar en fichas):** cada punto necesita modelo, acciones con guardas, pantallas y pruebas, como en la fase 1.
-1. Propuestas de combate y sparring entre peleadores (recibidas y enviadas; aceptar, rechazar, cancelar).
-2. Reservas de clases (solicitud, aceptar o rechazar por el entrenador; sin pagos hasta que el fundador decida, `TRASLADO.md` §7.19).
+1. ~~Propuestas de combate y sparring entre peleadores~~ — **hecho el 8 de octubre** (`/propuestas`, `FightProposal`).
+2. ~~Reservas de clases~~ — **hecho el 8 de octubre** como solicitud con calendario y barra de horas (`/clases`, `ClassRequest`); sin pagos hasta que el fundador decida (`TRASLADO.md` §7.19).
 3. Inscripciones a veladas por categorías (abrir y cerrar, solicitar, aceptar o rechazar) y su panel en el inicio de la entidad.
 4. ~~Multimedia del público por combate~~ — **hecho en la fase 2a** (8 oct).
 5. Aura a promotoras y clubes (una por persona) y perfil público de la entidad con su aura y comentarios.

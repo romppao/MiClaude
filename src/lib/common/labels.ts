@@ -60,7 +60,7 @@ export function resultWord(result: "A_WIN" | "B_WIN" | "DRAW" | "NO_CONTEST" | n
 export const AUDIT_ENTITY_LABEL: Record<string, string> = {
   ACHIEVEMENT: "título", ACCREDITATION: "acreditación",
   BOUT: "Combate", EVENT: "Velada", FIGHTER: "Ficha de peleador", GYM: "Gimnasio", CLAIM: "Reclamación de ficha",
-  ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta",
+  ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta", CLASS: "Clase", PROPOSAL: "Reto o sparring",
 };
 export const AUDIT_ACTION_LABEL: Record<string, string> = {
   UPDATED: "corregido", WITHDRAWN: "retirado", REVIEW_REQUESTED: "revisión solicitada", ENDORSE: "respaldado", REJECT: "excluido por moderación", RESTORE: "restaurado como declarado", GRANTED: "acreditación concedida", REVOKED: "acreditación retirada",
@@ -68,7 +68,7 @@ export const AUDIT_ACTION_LABEL: Record<string, string> = {
   RIVAL_REVIEW_REQUESTED: "revisión solicitada por el rival", ENDORSED: "respaldo del hecho comprobado", WITHDRAWAL_UNDONE: "retirada del título deshecha", EVIDENCE_SET: "enlace de evidencia cambiado", RIVAL_CONFIRMED: "confirmado por el rival", RIVAL_DISPUTED: "rechazado por el rival", ADMIN_VERIFIED: "verificado por un moderador",
   ADMIN_DISPUTED: "marcado como no correcto por un moderador", ADMIN_SELF_REPORTED: "restaurado como pendiente por un moderador",
   APPROVED: "aprobada", REJECTED: "rechazada", VERIFIED: "sello de verificado concedido", VERIFICATION_REVOKED: "sello de verificado retirado",
-  DISCIPLINE_ADDED: "disciplina añadida", DISCIPLINE_UPDATED: "disciplina modificada", DISCIPLINE_REMOVED: "disciplina quitada", REQUESTED: "clase solicitada", REQUEST_ACCEPTED: "solicitud de clase aceptada", REQUEST_DECLINED: "solicitud de clase rechazada", REQUEST_CANCELLED: "solicitud de clase cancelada", PROFILE_UPDATED: "datos de la ficha modificados",
+  DISCIPLINE_ADDED: "disciplina añadida", DISCIPLINE_UPDATED: "disciplina modificada", DISCIPLINE_REMOVED: "disciplina quitada", REQUESTED: "clase solicitada", REQUEST_ACCEPTED: "solicitud de clase aceptada", REQUEST_DECLINED: "solicitud de clase rechazada", REQUEST_CANCELLED: "solicitud de clase cancelada", PROPOSED: "propuesta enviada", PROPOSAL_ACCEPTED: "propuesta aceptada", PROPOSAL_DECLINED: "propuesta rechazada", PROPOSAL_CANCELLED: "propuesta cancelada", PROFILE_UPDATED: "datos de la ficha modificados",
   RESOLVED: "cerrado como corregido", DISMISSED: "cerrado sin error", RESOLVED_AND_HIDDEN: "cerrado y contenido ocultado",
   ACCOUNT_UPDATED: "datos de la cuenta modificados", ACCOUNT_DELETED: "cuenta eliminada",
 };

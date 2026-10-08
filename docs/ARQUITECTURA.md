@@ -310,3 +310,8 @@ El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/In
 - `removeDiscipline` (`actions/fighters.ts`): titular sin combates en esa disciplina, o moderación; nunca la última. Acción `DISCIPLINE_REMOVED` en el historial.
 - `components/Pestanas.tsx`: secciones en un riel horizontal movido con `transform` (gesto del dedo, barra y flechas del teclado), siempre en el DOM; abre la pestaña de la «#ancla» o de `?seccion=` y la del foco. Las pruebas de navegador abren la pestaña antes de usar lo que contiene (`pestanaDeMiFicha` en `tests/e2e/ayudas.mjs`).
 - Highlights: portada = foto guardada → fotograma del vídeo subido (`<video #t=0.5>`) → miniatura de YouTube (`miniaturaDeEnlace`). `SubirVideo` con `portada` pone un fotograma como foto al subir.
+
+### Retos y sparrings, horario de las clases y acciones del panel (8 de octubre de 2026)
+- `FightProposal` (de, a, tipo FIGHT/SPARRING, disciplina del rival, día/lugar/mensaje opcionales, estado, respuesta). Acciones `proposeFight`/`answerProposal`/`cancelProposal` en `actions/proposals.ts` (correo confirmado, ficha propia, rival con titular, una abierta por tipo y pareja con `withLock`, 10 al día, correos con `after()` y dirección de respuesta). Reglas en `lib/fighters/proposals.ts`. Pantallas `/peleadores/[slug]/proponer` y `/propuestas`.
+- `ClassRequest.day/fromMinute/toMinute`: el texto `preferred` se compone en el servidor (`textoDeHorario`). Componente `ElegirHorario`.
+- `AccionesPrincipales` (`_inicio/comun.tsx`): las acciones de cada tipo de cuenta, arriba de «Mi panel». `/clases`: búsqueda de clases publicadas.

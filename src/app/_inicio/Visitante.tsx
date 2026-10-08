@@ -37,7 +37,7 @@ export default async function InicioVisitante() {
           { href: "/peleadores", titulo: "Encontrar un peleador", detalle: "Récord y combates", icono: "buscar" },
           { href: "/veladas", titulo: "Veladas y resultados", detalle: "Cartel de cada evento", icono: "trofeo" },
           { href: "/gimnasios", titulo: "Dónde entrenar", detalle: "Gimnasios y clubes", icono: "gimnasio" },
-          { href: "/registro?tipo=peleador", titulo: "Crear mi ficha de peleador", detalle: "Lleva tu trayectoria", icono: "mas" },
+          { href: "/mi-ficha", titulo: "Crear mi ficha de peleador", detalle: "Lleva tu trayectoria", icono: "mas" },
           { href: "/organizador", titulo: "Organizar una velada", detalle: "Promotoras y clubes", icono: "personas" },
         ]} />
       </section>

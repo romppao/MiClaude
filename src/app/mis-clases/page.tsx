@@ -28,7 +28,7 @@ export default async function MisClases() {
         <div className="titulo-seccion"><h1 id="titulo-solicitudes" style={{ margin: 0 }}>Solicitudes</h1><span className="meta">{pendientes.length === 1 ? "1 esperando respuesta" : `${pendientes.length} esperando respuesta`}</span></div>
         {solicitudes.length === 0 && <p className="mut" style={{ margin: 0 }}>Cuando alguien solicite una de tus clases, aparecerá aquí y te llegará un correo.</p>}
         {solicitudes.map((r) => (
-          <article key={r.id} className={`tarjeta${r.status === "PENDING" ? " tarjeta-acc" : ""}`} aria-label={`Solicitud de ${r.user.name} para ${r.class.title}`}>
+          <article key={r.id} className="tarjeta" style={r.status === "PENDING" ? { borderColor: "var(--acc)" } : undefined} aria-label={`Solicitud de ${r.user.name} para ${r.class.title}`}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}><strong>{r.user.name}</strong><span className="meta">{REQUEST_STATUS_LABEL[r.status]} · {fmtDate(r.createdAt)}</span></div>
             <div className="meta">{r.class.title}</div>
             <div>Le viene bien: {r.preferred}</div>

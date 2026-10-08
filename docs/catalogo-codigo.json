@@ -95,6 +95,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261008260000_retos_y_horario_de_clases/migration.sql",
+    "purpose": "Migración que crea los retos y sparrings (FightProposal) y añade día y franja horaria a las solicitudes de clase; solo añade.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -260,6 +265,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/actions/proposals.ts",
+    "purpose": "Acciones de retos a combate y propuestas de sparring: proponer, aceptar o rechazar, y cancelar, con correos y bloqueo contra el doble clic.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/actions/shared.ts",
     "purpose": "Ayudantes sin directiva use server: lectura, mensajes, errores previstos, bloqueo, propiedad de velada y publicación/slug de fichas.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -300,6 +310,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/clases/page.tsx",
+    "purpose": "Pantalla «Buscar clases»: todas las clases publicadas con búsqueda, filtros plegados y el botón para solicitarlas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/compartir/page.tsx",
     "purpose": "Subir vídeos o fotos: elegir la velada de los últimos cuatro meses y formulario con foto, vídeo subido o enlace, combate opcional y consentimiento.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -333,6 +348,11 @@
     "path": "src/app/components/DisciplineFields.tsx",
     "purpose": "Formulario de disciplina, nivel, categoría y antecedentes declarados; comparte catálogo con validación del servidor.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/ElegirHorario.tsx",
+    "purpose": "Componente de cliente para elegir el día en una tira de fechas o calendario y la franja horaria con una barra de dos tiradores.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/components/EvitarDobleEnvio.tsx",
@@ -655,6 +675,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/peleadores/[slug]/proponer/page.tsx",
+    "purpose": "Pantalla para retar a combate o proponer un sparring a un peleador: tipo, disciplina y, opcionales, fecha, lugar y mensaje.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/peleadores/page.tsx",
     "purpose": "Listado de fichas públicas con filtros, búsqueda y paginación; excluye provisionales/ocultadas.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -677,6 +702,11 @@
   {
     "path": "src/app/promotores/page.tsx",
     "purpose": "Directorio público de promotores/organizadores con enlaces a perfiles y veladas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/propuestas/page.tsx",
+    "purpose": "Pantalla «Retos y sparrings»: buscar a quién retar y las propuestas recibidas (aceptar o rechazar) y enviadas (cancelar).",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -990,6 +1020,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/fighters/proposals.ts",
+    "purpose": "Reglas de los retos y sparrings: validación, límites, etiquetas de estado y qué se puede responder o cancelar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/fighters/record.ts",
     "purpose": "Calcula récord por disciplina/nivel y suma antecedentes detallados; excluye revisión/cancelación y mantiene total no detallado separado.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1187,6 +1222,11 @@
   {
     "path": "tests/e2e/respaldo.mjs",
     "purpose": "Recorre resultado/evidencia/confirmación y presentación del respaldo de combates.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/servicios.mjs",
+    "purpose": "Prueba de navegador de las acciones principales de cada panel, «Buscar clases» y los retos y sparrings de punta a punta.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

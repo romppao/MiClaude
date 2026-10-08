@@ -77,3 +77,30 @@ describe("solicitudes de clase", () => {
     }
   });
 });
+
+import { parseProposal, puedeCancelarPropuesta, puedeResponderPropuesta } from "../../src/lib/fighters/proposals";
+describe("retos y sparrings", () => {
+  const base = { kind: "FIGHT", discipline: "BOXEO", day: "", place: "", message: "", today: "2026-10-08", disciplinasDelRival: ["BOXEO", "MMA"] as ("BOXEO" | "MMA")[] };
+  it("una propuesta mínima: tipo y una disciplina del rival", () => {
+    expect(parseProposal(base)).toEqual({ ok: true, value: { kind: "FIGHT", discipline: "BOXEO", day: null, place: null, message: null } });
+    expect(parseProposal({ ...base, kind: "SPARRING", place: "  Club  Norte ", message: " a 3 asaltos " })).toEqual({ ok: true, value: { kind: "SPARRING", discipline: "BOXEO", day: null, place: "Club Norte", message: "a 3 asaltos" } });
+  });
+  it("rechaza tipos y disciplinas que no son del rival", () => {
+    expect(parseProposal({ ...base, kind: "PELEA" })).toEqual({ ok: false, problema: "propuesta_tipo" });
+    expect(parseProposal({ ...base, discipline: "K1" })).toEqual({ ok: false, problema: "propuesta_disciplina" });
+    expect(parseProposal({ ...base, discipline: "__proto__" })).toEqual({ ok: false, problema: "propuesta_disciplina" });
+  });
+  it("la fecha es opcional y va de hoy a un año", () => {
+    expect(parseProposal({ ...base, day: "2026-10-07" })).toEqual({ ok: false, problema: "propuesta_dia" });
+    expect(parseProposal({ ...base, day: "2027-10-09" })).toEqual({ ok: false, problema: "propuesta_dia" });
+    expect(parseProposal({ ...base, day: "2026-12-01" })).toMatchObject({ ok: true, value: { day: new Date("2026-12-01T00:00:00Z") } });
+  });
+  it("limita lugar y mensaje", () => {
+    expect(parseProposal({ ...base, place: "x".repeat(101) })).toEqual({ ok: false, problema: "propuesta_lugar_largo" });
+    expect(parseProposal({ ...base, message: "x".repeat(501) })).toEqual({ ok: false, problema: "propuesta_mensaje_largo" });
+  });
+  it("solo se responde lo pendiente y se cancela lo pendiente o aceptado", () => {
+    expect([puedeResponderPropuesta("PENDING"), puedeResponderPropuesta("ACCEPTED")]).toEqual([true, false]);
+    expect([puedeCancelarPropuesta("PENDING"), puedeCancelarPropuesta("ACCEPTED"), puedeCancelarPropuesta("DECLINED")]).toEqual([true, true, false]);
+  });
+});
