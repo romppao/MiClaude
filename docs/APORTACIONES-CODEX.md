@@ -268,3 +268,13 @@ El control de catálogo alcanza código, pruebas, scripts, migraciones y configu
 ### Propuesta publicada para Claude
 
 [PR #28](https://github.com/romppao/MiClaude/pull/28), en borrador, contra `claude/ring-espana-mvp`. El conjunto revisable contiene manual/catálogo, control y pruebas, comentarios y correcciones documentales. El resultado de CI del último commit se consulta en la pestaña Checks del PR y se registra en su descripción al terminar; no se afirma aquí que haya pasado antes de ejecutarse. Sin integración ni despliegue.
+
+### Coordinación mientras Claude ejecuta cambios — 8 de octubre de 2026
+
+El fundador indica que Claude está ejecutando otra tarea y pide a Codex «no editar nada del código ni nada. Simplemente documenta lo que está pasando». La actualización de las explicaciones afectadas queda pendiente de su señal explícita de que Claude ha terminado.
+
+Durante este periodo, el alcance de Codex es exclusivamente documental: no modificar código, pruebas, scripts, configuración ni migraciones; tampoco integrar o desplegar propuestas. Esta anotación se añade únicamente al relevo de Codex en su rama de documentación, sin modificar la rama de trabajo de Claude.
+
+El manual describe la base `a34deabb856ff027d74bc15cce8b1abdd943611f`; no se presenta como documentación de los cambios que Claude está realizando. Tras recibir la señal del fundador, contrastar el código final y sus diferencias, actualizar las explicaciones correspondientes e identificar el commit documentado y los puntos que sigan pendientes. No anticipar decisiones ni resultados de la tarea en curso.
+
+El CI de la propuesta documental pasó sobre `a3a9f9b1688ddde61ffdfc32a414e434f9b4497e`: [ejecución del PR](https://github.com/romppao/MiClaude/actions/runs/37748009534). Ese resultado corresponde al bloque anterior, no valida los cambios en curso de Claude ni esta anotación posterior. La propuesta #28 quedó lista para revisión; su integración y despliegue siguen pendientes.
