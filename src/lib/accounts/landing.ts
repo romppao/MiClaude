@@ -1,10 +1,23 @@
-/** A dónde lleva a cada papel el acceso y la confirmación del correo (una sola regla para toda la aplicación). */
+/**
+ * A dónde lleva el acceso y la confirmación del correo (una sola regla para toda la aplicación). Decisión del fundador (8 de octubre de 2026):
+ * después de entrar, todas las personas ven la misma portada con la actualidad; lo propio de cada cuenta está en «Mi panel». Moderación va a su cola.
+ */
 export function landingFor(role: string): string {
-  if (role === "ADMIN") return "/moderacion";
-  if (role === "ORGANIZER") return "/organizador";
-  if (role === "FIGHTER") return "/mi-ficha";
-  return "/";
+  return role === "ADMIN" ? "/moderacion" : "/";
 }
+
+/** Papel con el que se eligen el menú, la barra inferior y «Mi panel». Una entidad pendiente de aprobar funciona como un usuario. */
+export type Papel = "visitante" | "usuario" | "peleador" | "entrenador" | "entidad";
+export function papelDe(user: { role: string; fighter?: unknown } | null): Papel {
+  if (!user) return "visitante";
+  if (user.role === "ORGANIZER") return "entidad";
+  if (user.role === "TRAINER") return "entrenador";
+  if (user.role === "FIGHTER" || user.fighter) return "peleador";
+  return "usuario";
+}
+
+/** Quién puede crear veladas e interclubs: entidades aprobadas, entrenadores (decisión del fundador, 8 de octubre de 2026) y moderación. */
+export const puedeOrganizar = (role: string) => role === "ORGANIZER" || role === "TRAINER" || role === "ADMIN";
 
 /** Tipos de cuenta que se pueden crear desde el registro (un panel por tipo). */
 export const TIPOS_DE_CUENTA = ["usuario", "peleador", "entrenador", "entidad"] as const;

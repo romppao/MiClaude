@@ -42,7 +42,7 @@ export const terminarDiagnosticos = () => Promise.all(pendientes);
 export const btn = (p, t) => p.click(`main button:has-text("${t}")`);
 /** Elige explícitamente los datos ficticios de las altas antiguas; la aplicación ya no presupone Madrid ni boxeo. */
 export async function datosDeAlta(p) {
-  const form = p.locator("main form").filter({ has: p.getByRole("button", { name: /^(Crear mi ficha|Crear velada)$/ }) });
+  const form = p.locator("main form").filter({ has: p.getByRole("button", { name: /^(Crear mi ficha|Crear el evento)$/ }) });
   for (const [name, value] of [["discipline", "BOXEO"], ["province", "Madrid"]]) {
     const campo = form.locator(`select[name=${name}]`);
     if (!(await campo.inputValue())) await campo.selectOption(value);

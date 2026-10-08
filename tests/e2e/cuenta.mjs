@@ -81,7 +81,7 @@ check("con los avisos desactivados, «Peleadores que sigo» no promete correos y
 await seguidor.p.goto(B + "/siguiendo");
 check("con los avisos activados sí lo dice", await seen(seguidor.p.locator("main p", { hasText: "Recibirás un correo" })));
 await orga.goto(B + "/organizador");
-await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await datosDeAlta(orga); await btn(orga, "Crear velada");
+await orga.fill("[name=name]", `Velada Avisos ${rnd}`); await orga.fill("[name=date]", enDias(60)); await datosDeAlta(orga); await btn(orga, "Crear el evento");
 await orga.waitForURL(`**/organizador/velada-avisos-${rnd}-*`);
 await anadirAlCartel(orga, `Ana Corregida${rnd}`, `Rival Aviso${rnd}`);
 await bueno(orga, "se ha añadido al cartel").waitFor();

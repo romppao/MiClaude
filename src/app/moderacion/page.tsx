@@ -119,7 +119,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
   return (
     <>
       <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
-      <p><Link href="/moderacion/historial">Ver el historial de cambios</Link></p>
+      <p><Link href="/moderacion/historial">Ver el historial de cambios</Link> · <Link href="/moderacion/noticias">Fuentes de noticias</Link></p>
 
       <h2 id="avisos">Avisos de error de usuarios ({nReports})</h2>
       {paging("avisos", ["aviso", "avisos"], "avisos")}

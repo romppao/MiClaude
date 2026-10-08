@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
+import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
+import { ultimasNoticias } from "../../lib/news/feed";
+import { ListaNoticias } from "../components/Noticias";
 import Icono from "../components/Icono";
 import { MiniPeleador, TarjetaCartel, TarjetaDisciplina } from "../components/Tarjetas";
 import { peleadoresConAura, proximasVeladas } from "./datos";
 
 /** Inicio del visitante sin cuenta (diseño v3, «homeVisit»): portada pública, disciplinas, veladas y una invitación por tipo de cuenta. */
 export default async function InicioVisitante() {
-  const [veladas, conAura] = await Promise.all([proximasVeladas(6), peleadoresConAura(6)]);
+  const [veladas, conAura, noticias] = await Promise.all([proximasVeladas(6), peleadoresConAura(6), ultimasNoticias({ max: 4 })]);
   return (
     <div className="pantalla" style={{ gap: 30 }}>
       <section className="portada-visita a-sangre" aria-labelledby="titulo-portada" style={{ marginTop: -20 }}>
@@ -32,9 +34,16 @@ export default async function InicioVisitante() {
       </div>
 
       <section aria-labelledby="titulo-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div><h2 id="titulo-disciplinas" style={{ fontSize: 24 }}>Elige tu disciplina</h2><p className="lead" style={{ fontSize: 16 }}>Peleadores, veladas y gimnasios de cada disciplina, con el mismo trato para todas.</p></div>
-        <div className="rejilla-2 disciplinas-portada">{DISCIPLINE_ORDER.map((d) => <TarjetaDisciplina key={d} d={d} href={`/peleadores?disciplina=${d}`} />)}</div>
+        <div><h2 id="titulo-disciplinas" style={{ fontSize: 24 }}>Elige tu disciplina</h2><p className="lead" style={{ fontSize: 16 }}>Actualidad, peleadores, veladas y gimnasios de cada disciplina, con el mismo trato para todas.</p></div>
+        <div className="rejilla-2 disciplinas-portada">{DISCIPLINE_ORDER.map((d) => <TarjetaDisciplina key={d} d={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} />)}</div>
       </section>
+
+      {noticias.length > 0 && (
+        <section aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="titulo-seccion"><h2 id="titulo-actualidad-visita">Actualidad</h2><Link href="/noticias">Todas las noticias</Link></div>
+          <ListaNoticias noticias={noticias} />
+        </section>
+      )}
 
       <section aria-labelledby="titulo-veladas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="titulo-seccion"><h2 id="titulo-veladas">Próximas veladas</h2><Link href="/veladas">Calendario</Link></div>

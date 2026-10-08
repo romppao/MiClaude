@@ -68,3 +68,13 @@ export function madridDayStart(eventDate: Date): Date {
   const horaMadrid = Number(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", hourCycle: "h23" }).format(mediodia));
   return new Date(Date.parse(`${dayKey(eventDate)}T00:00:00Z`) - (horaMadrid - 12) * 36e5);
 }
+
+/** «Hace 5 min», «Hace 3 h», «Ayer» o la fecha corta: cuándo se publicó una noticia o un vídeo. */
+export function haceTiempo(d: Date, now: Date = new Date()): string {
+  const min = Math.max(0, Math.floor((now.getTime() - d.getTime()) / 60_000));
+  if (min < 1) return "Ahora";
+  if (min < 60) return `Hace ${min} min`;
+  if (min < 24 * 60) return `Hace ${Math.floor(min / 60)} h`;
+  if (min < 48 * 60) return "Ayer";
+  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", timeZone: "Europe/Madrid" });
+}

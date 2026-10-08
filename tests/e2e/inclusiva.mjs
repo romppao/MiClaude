@@ -54,7 +54,7 @@ const org = await newUser("InclusivaOrg"); sql(`update "User" set role='ORGANIZE
 await org.p.goto(B + "/organizador");
 check("una velada nueva también pide provincia y disciplina sin asumir ciudad", await org.p.inputValue("[name=city]") === "" && await org.p.inputValue("[name=province]") === "" && await org.p.inputValue("[name=discipline]") === "");
 await org.p.fill("[name=name]", `Inclusiva velada ${rnd}`); await org.p.fill("[name=date]", enDias(3)); await org.p.selectOption("[name=province]", "Asturias"); await org.p.selectOption("[name=discipline]", "KICKBOXING");
-await org.p.getByRole("button", { name: "Crear velada", exact: true }).click(); await org.p.waitForURL("**/organizador/*");
+await org.p.getByRole("button", { name: "Crear el evento", exact: true }).click(); await org.p.waitForURL("**/organizador/*");
 await org.p.getByRole("link", { name: "Ver la página pública", exact: true }).click();
 check("se guarda una velada de kickboxing fuera de Madrid", (await org.p.locator("main").innerText()).includes("Kickboxing") && (await org.p.locator("main").innerText()).includes("Asturias"));
 // Estos datos en bloque no deben cambiar los conjuntos de los siguientes guiones.

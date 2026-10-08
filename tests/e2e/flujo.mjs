@@ -173,7 +173,7 @@ const org = (await newUser("Orga")).p;
 await solicitarOrganizador(org, `Club Demo Madrid ${rnd}`);
 await aprobarOrganizador(admin.p, `Club Demo Madrid ${rnd}`);
 await org.goto(B + "/organizador");
-await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await datosDeAlta(org); await btn(org, "Crear velada");
+await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await datosDeAlta(org); await btn(org, "Crear el evento");
 await org.waitForURL(`**/organizador/gran-velada-org-${rnd}-2026-07-20?*`);
 await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator("[role=status]", { hasText: "se ha añadido al cartel" }).waitFor();
@@ -254,7 +254,7 @@ check("y excluye a quien no", await seen(anon.locator("main p", { hasText: "Ning
 
 // Avisos a seguidores: un organizador publica un combate futuro de un peleador seguido
 await org.goto(B + "/organizador");
-await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await datosDeAlta(org); await btn(org, "Crear velada");
+await org.fill("[name=name]", `Velada Futura ${rnd}`); await org.fill("[name=date]", futura); await datosDeAlta(org); await btn(org, "Crear el evento");
 await org.waitForURL(`**/organizador/velada-futura-${rnd}-${futura}?*`);
 await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator(".notice-ok", { hasText: "se ha añadido al cartel" }).waitFor();

@@ -15,6 +15,10 @@ export const DISCIPLINE_LABEL: Record<Discipline, string> = {
 
 export const isDiscipline = (v: string): v is Discipline => (DISCIPLINE_ORDER as string[]).includes(v);
 
+/** Dirección visible de la portada de cada disciplina (/disciplinas/boxeo…). */
+export const DISCIPLINE_SLUG: Record<Discipline, string> = { BOXEO: "boxeo", JIUJITSU: "jiu-jitsu", K1: "k-1", KICKBOXING: "kickboxing", MMA: "mma", MUAYTHAI: "muay-thai" };
+export const disciplineFromSlug = (slug: string): Discipline | null => DISCIPLINE_ORDER.find((d) => DISCIPLINE_SLUG[d] === slug) ?? null;
+
 export const LEVEL_ORDER: Level[] = ["PRO", "AMATEUR"];
 const LEVEL_NAME: Record<Level, string> = { PRO: "Profesional", AMATEUR: "Amateur" };
 export const isLevel = (v: string): v is Level => (LEVEL_ORDER as string[]).includes(v);

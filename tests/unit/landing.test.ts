@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { PASOS_REGISTRO, ROL_INICIAL, TIPOS_DE_CUENTA, TIPOS_DE_ENTIDAD, landingFor, parseTipoDeCuenta, parseTipoDeEntidad } from "../../src/lib/accounts/landing";
+import { PASOS_REGISTRO, ROL_INICIAL, TIPOS_DE_CUENTA, TIPOS_DE_ENTIDAD, landingFor, papelDe, puedeOrganizar, parseTipoDeCuenta, parseTipoDeEntidad } from "../../src/lib/accounts/landing";
 
 describe("aterrizaje por papel", () => {
   it("lleva a cada papel a su sitio", () => {
     expect(landingFor("FAN")).toBe("/");
-    expect(landingFor("FIGHTER")).toBe("/mi-ficha");
+    expect(landingFor("FIGHTER")).toBe("/");
     expect(landingFor("TRAINER")).toBe("/");
-    expect(landingFor("ORGANIZER")).toBe("/organizador");
+    expect(landingFor("ORGANIZER")).toBe("/");
     expect(landingFor("ADMIN")).toBe("/moderacion");
   });
   it("un papel desconocido va al inicio", () => {
@@ -46,5 +46,21 @@ describe("tipos de entidad", () => {
     expect(parseTipoDeEntidad("GIMNASIO")).toBeNull();
     expect(parseTipoDeEntidad("")).toBeNull();
     expect(parseTipoDeEntidad("toString")).toBeNull();
+  });
+});
+
+describe("papel de la cuenta y permiso para organizar", () => {
+  it("elige el papel por tipo de cuenta", () => {
+    expect(papelDe(null)).toBe("visitante");
+    expect(papelDe({ role: "FAN" })).toBe("usuario");
+    expect(papelDe({ role: "FAN", fighter: { id: "x" } })).toBe("peleador");
+    expect(papelDe({ role: "FIGHTER", fighter: null })).toBe("peleador");
+    expect(papelDe({ role: "TRAINER", fighter: { id: "x" } })).toBe("entrenador");
+    expect(papelDe({ role: "ORGANIZER" })).toBe("entidad");
+    expect(papelDe({ role: "ADMIN" })).toBe("usuario");
+  });
+  it("los entrenadores organizan veladas e interclubs sin aprobación previa; aficionados y peleadores no", () => {
+    expect(["ORGANIZER", "TRAINER", "ADMIN"].every(puedeOrganizar)).toBe(true);
+    expect(["FAN", "FIGHTER", "", "__proto__"].some(puedeOrganizar)).toBe(false);
   });
 });

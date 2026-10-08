@@ -5,13 +5,15 @@ import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
-import MobileNav, { type PapelBarra } from "./components/MobileNav";
+import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
 import { demoActiva } from "../lib/common/demo";
+import { papelDe, puedeOrganizar, type Papel } from "../lib/accounts/landing";
+import { menuDe } from "../lib/accounts/menu";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -23,13 +25,21 @@ export const viewport: Viewport = { themeColor: "#0A0A0C", colorScheme: "dark" }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
-  const [accreditation, managedProfileCount] = await Promise.all([
+  const [accreditation, managedProfileCount, trainer] = await Promise.all([
     user && user.role !== "ADMIN" ? db.supportAccreditation.findUnique({ where: { userId: user.id } }) : Promise.resolve(null),
     user ? db.profile.count({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } } }) : Promise.resolve(0),
+    user?.role === "TRAINER" ? db.trainer.findUnique({ where: { userId: user.id }, select: { slug: true, gym: { select: { slug: true } } } }) : Promise.resolve(null),
   ]);
-  const tieneFicha = !!user && (!!user.fighter || user.role === "FIGHTER");
-  // Barra inferior del móvil según el tipo de cuenta (diseño v3). Una entidad pendiente de aprobar funciona como un usuario.
-  const papel: PapelBarra = !user ? "visitante" : user.role === "ORGANIZER" ? "entidad" : tieneFicha ? "peleador" : user.role === "TRAINER" ? "entrenador" : "usuario";
+  // Menú, barra inferior del móvil y enlaces de la cabecera según el tipo de cuenta: cada persona ve solo lo suyo.
+  const papel: Papel = papelDe(user);
+  const secciones = menuDe(papel, {
+    admin: user?.role === "ADMIN",
+    canSupport: !!user?.emailVerifiedAt && (user.role === "ADMIN" || !!accreditation?.active),
+    perfilesGestionados: managedProfileCount > 0,
+    gimnasio: trainer?.gym?.slug ?? null,
+    entrenador: trainer?.slug ?? null,
+    promotorId: user?.role === "ORGANIZER" ? user.id : null,
+  });
   return (
     <html lang="es">
       <body>
@@ -44,14 +54,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/gimnasios">Gimnasios</Link>
               <Link href="/entrenadores">Entrenadores</Link>
             </nav>
-            <NavigationMenu signedIn={!!user} hasFighter={tieneFicha} hasManagedProfiles={managedProfileCount > 0} admin={user?.role === "ADMIN"} canSupport={!!user?.emailVerifiedAt && (user.role === "ADMIN" || !!accreditation?.active)} logoutForm={user ? <form action={logout}><button className="secondary">Salir</button></form> : undefined} />
+            <NavigationMenu secciones={secciones} logoutForm={user ? <form action={logout}><button className="secondary">Salir</button></form> : undefined} />
             <div className="cuenta">
               <Link href="/ayuda">¿Cómo funciona?</Link>
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
-                  {user.role === "ORGANIZER" && <Link href="/organizador">Mis veladas</Link>}
-                  {tieneFicha && <Link href="/mi-ficha">Mi ficha</Link>}
+                  <Link href="/mi-panel">Mi panel</Link>
+                  {papel === "entidad" && <Link href="/organizador">Mis veladas</Link>}
+                  {papel === "entrenador" && <Link href="/mis-clases">Mis clases</Link>}
+                  {papel === "peleador" && <Link href="/mi-ficha">Mi ficha</Link>}
                   <Link href="/mi-cuenta">Mi cuenta</Link>
                   <form action={logout}><button className="secondary">Salir</button></form>
                 </>
@@ -74,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense><EvitarDobleEnvio />{children}</main>
         <footer className="foot">
           <Link href="/ayuda">¿Cómo funciona?</Link>
-          <Link href="/organizador">Organizar una velada</Link>
+          {(!user || puedeOrganizar(user.role)) && <Link href="/organizador">Organizar una velada</Link>}
           {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
           <Link href="/federaciones">Federaciones</Link><Link href="/promotores">Promotores</Link>
           <Link href="/privacidad">Privacidad</Link>

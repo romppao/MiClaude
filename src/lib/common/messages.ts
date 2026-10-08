@@ -38,6 +38,7 @@ export const AVISOS: Record<string, string> = {
   evidencia_guardada: "El enlace de evidencia se ha guardado.",
   evidencia_quitada: "Has quitado el enlace de evidencia.",
   velada_creada: "La velada se ha creado. Ahora puedes añadir los combates del cartel.",
+  interclub_creado: "El interclub se ha creado. Ahora puedes añadir los combates entre los clubes.",
   cartel_anadido: "El combate se ha añadido al cartel.",
   resultado_guardado: "El resultado se ha guardado.",
   reporte_enviado: "Gracias. Hemos recibido tu aviso y un moderador lo revisará.",
@@ -73,6 +74,13 @@ export const AVISOS: Record<string, string> = {
   highlight_publicado: "Highlight publicado en tu ficha.",
   highlight_destacado: "Highlight destacado: ahora aparece el primero en tu ficha.",
   highlight_retirado: "Highlight retirado de tu ficha.",
+  noticias_actualizadas: "Noticias actualizadas.",
+  noticias_actualizadas_con_errores: "Noticias actualizadas, pero alguna fuente ha fallado: revisa su estado en la tabla.",
+  fuente_anadida: "Fuente añadida. Se leerá en la próxima actualización.",
+  fuente_desactivada: "Fuente desactivada: sus noticias ya no se muestran.",
+  fuente_activada: "Fuente activada.",
+  noticia_ocultada: "Noticia ocultada.",
+  noticia_mostrada: "La noticia vuelve a mostrarse.",
 };
 
 export const PROBLEMAS: Record<string, string> = {
@@ -180,6 +188,7 @@ export const PROBLEMAS: Record<string, string> = {
   cartel_peleadores: "Elige dos peleadores distintos de la lista.",
   resultado_futuro: "Solo puedes poner resultados cuando la velada ya se ha celebrado.",
   velada_datos: "Revisa el nombre y la fecha de la velada.",
+  velada_tipo: "Elige si es una velada o un interclub.",
   entidad_tipo: "Elige si tu entidad es una promotora, una federación o un club.",
   entrenador_disciplinas: "Elige al menos una disciplina que enseñes.",
   entrenador_anos: "Escribe los años que llevas entrenando con un número entre 0 y 60, o déjalo vacío.",
@@ -200,4 +209,9 @@ export const PROBLEMAS: Record<string, string> = {
   highlight_limite: "Ya tienes 12 highlights. Retira alguno antes de publicar otro.",
   highlight_combate: "Ese combate no está en tu ficha. Elige uno de tus combates o «Ninguno en concreto».",
   nombre_organizacion: "Indica el nombre de tu organización.",
+  noticias_desactivadas: "La lectura de noticias está desactivada en este servidor (NEWS_FETCH=no).",
+  fuente_nombre: "Escribe el nombre de la fuente.",
+  fuente_url: "La dirección del canal debe empezar por https://.",
+  fuente_tipo: "Elige el tipo de fuente.",
+  fuente_repetida: "Esa fuente ya está en la lista.",
 };

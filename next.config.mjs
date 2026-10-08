@@ -7,7 +7,8 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
+  // Miniaturas de los vídeos de las noticias (src/lib/news/parse.ts, HOSTS_DE_IMAGEN).
+  "img-src 'self' data: https://i.ytimg.com",
   "font-src 'self'",
   "connect-src 'self'",
   "object-src 'none'",

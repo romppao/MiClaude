@@ -12,7 +12,7 @@ import { LIMITS } from "../../../lib/common/text";
 import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
 import { addCartelBout, removeCartelBout, setBoutResult, setEventStatus, updateEvent } from "../../actions/events";
-import { PROVINCES } from "../../../lib/common/labels";
+import { EVENT_KIND_LABEL, PROVINCES } from "../../../lib/common/labels";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -43,6 +43,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
         <form className="search" action={updateEvent} style={{ marginTop: 8 }}>
           <input type="hidden" name="eventId" value={event.id} />
           <label className="field"><span>Nombre de la velada</span><input name="name" defaultValue={event.name} required maxLength={LIMITS.eventName} /></label>
+          <label className="field"><span>Tipo</span><select name="kind" defaultValue={event.kind}>{(["VELADA", "INTERCLUB"] as const).map((k) => <option key={k} value={k}>{EVENT_KIND_LABEL[k]}</option>)}</select></label>
           <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={event.date.toISOString().slice(0, 10)} required min="1980-01-01" /></label>
           <label className="field"><span>Disciplina</span>
             <select name="discipline" defaultValue={event.discipline}>{DISCIPLINE_ORDER.map(d => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
