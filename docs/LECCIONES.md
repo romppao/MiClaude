@@ -240,3 +240,14 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | Al pasar a un tema oscuro, botones con clase propia heredaron el color de los enlaces de texto y quedaron invisibles (lima sobre lima) | La regla de enlaces excluía clases una a una y faltaba la nueva | Los enlaces de texto son los que **no tienen clase** (`main a:not([class])`); los que la tienen son botones o tarjetas con su propio estilo |
 | axe marcó `aria-label` en un `div` sin papel | `aria-label` solo vale en elementos con papel o interactivos | Para dar contexto a un lector de pantalla en un bloque visual, texto `.sr-only` dentro del bloque |
 | Las tiras deslizables (veladas, highlights) «salían por la derecha» en `movil.mjs` | Un carrusel horizontal sin marcar parece un desbordamiento | Cada tira deslizable es una región con nombre y foco (`role="region" tabIndex={0} aria-label`), como pide también axe |
+
+
+## 8 de octubre de 2026 — Documentación y transferencia (Codex)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| La arquitectura todavía citaba acciones.ts y guardas en shared, y no describía entrenador/v3 | Los cambios de código y apartados nuevos no habían actualizado todas las explicaciones vigentes | Contrastar guías de estado con exports/implementación; conservar historia como historia y dar una entrada actual para personas nuevas |
+| Describir todos los enlaces de correo como de un solo uso era inexacto para UNSUB | Se generalizó la regla de verificación/recuperación a la baja, que solo desactiva la preferencia | Explicar contrato específico por token; repetir una baja válida no lo consume ni equivale a un token de acceso |
+| El clon no pudo conectar al proxy aunque el entorno estaba conectado | La disponibilidad observada del entorno no garantiza cada comando de red | Usar conector disponible y fijar SHA para lecturas coherentes; no afirmar clon/pruebas que no se ejecutaron |
+| Dos parches documentales se rechazaron antes de aplicar y una referencia usaba un nombre de función inexistente | Contexto de línea abreviado y nombre supuesto | Leer contexto exacto y verificar exports/enlaces antes de publicar; un documento debe poder seguirse literalmente |
+| Contar archivos documentados puede parecer garantía de calidad o capacidad de escalado | Cobertura estructural no mide comprensión humana, exactitud semántica o carga | Separar cobertura automática, revisión de contratos, prueba de transferencia humana y rendimiento medido |
