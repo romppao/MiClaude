@@ -56,7 +56,7 @@ export default async function Organizer() {
   return (
     <>
       <h1>Mis veladas</h1>
-      <h2>Crear una velada</h2>
+      <h2 id="crear">Crear una velada</h2>
       <form className="search" action={createEvent}>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre de la velada</span><input name="name" required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>

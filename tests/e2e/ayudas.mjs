@@ -107,7 +107,9 @@ export async function newUser(name, role = "FAN", verify = true) {
   const p = await (await browser.newContext()).newPage();
   await p.goto(B + `/registro?tipo=${role === "FIGHTER" ? "peleador" : "usuario"}`);
   await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
-  await btn(p, "Crear mi cuenta"); await p.waitForURL("**/verificar");
+  // Diseño v3: tras crear la cuenta viene el último paso del registro (opcional); el guion lo deja para después.
+  await btn(p, "Crear mi cuenta"); await p.waitForURL((u) => u.pathname.startsWith("/registro/"));
+  await p.getByRole("link", { name: "Lo haré después" }).click(); await p.waitForURL("**/verificar");
   if (verify) { await p.goto(B + link(email)); await btn(p, "Confirmar"); await p.waitForSelector("text=Correo electrónico verificado"); }
   return { p, email };
 }

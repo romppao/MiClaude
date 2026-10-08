@@ -12,6 +12,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
  *   lib/bouts       → common
  *   lib/aura        → common
  *   lib/community   → common, accounts
+ *   lib/trainers    → common
  *   app/actions/*   → lib y ./shared; nunca otra acción; solo funciones asíncronas exportadas
  *   app/components  → lib y otros componentes; nunca acciones
  */
@@ -24,6 +25,7 @@ const PERMITIDAS: Record<string, string[]> = {
   aura: ["common"],
   community: ["common", "accounts"],
   profiles: ["common"],
+  trainers: ["common"],
 };
 
 const ficheros = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? ficheros(join(dir, e.name)) : /\.tsx?$/.test(e.name) ? [join(dir, e.name)] : []));

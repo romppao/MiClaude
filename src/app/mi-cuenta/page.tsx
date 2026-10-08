@@ -36,7 +36,7 @@ export default async function Account() {
               <button key={clave} name="papel" value={clave} className={clave === user.role ? undefined : "secondary"} aria-pressed={clave === user.role}>{clave === user.role ? `✓ ${nombre}` : `Probar como ${nombre.toLowerCase()}`}</button>
             ))}
           </form>
-          <p className="mut">Aficionado: ve y sigue peleadores y da aura. Peleador: crea su ficha y registra combates. Organizador: publica veladas. Moderador: revisa avisos y aprueba solicitudes.</p>
+          <p className="mut">Aficionado: ve y sigue peleadores y da aura. Peleador: crea su ficha y registra combates. Entrenador: publica sus clases. Organizador: publica veladas. Moderador: revisa avisos y aprueba solicitudes.</p>
         </section>
       )}
 

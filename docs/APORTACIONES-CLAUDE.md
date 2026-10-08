@@ -47,3 +47,13 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 - **Correcciones de la revisión de Codex (6 oct, noche):** paneles A/B/C del registro (T-011, hecho por Claude a petición del fundador), PRs sobrantes cerrados (#1–#7, #9, #13 con lo útil portado), Dependabot sin saltos mayores, textos técnicos en lenguaje llano, `CLAUDE.md` sin contradicción, imágenes con ETag/304 y arreglo del fallo del CI en la auditoría móvil (paginación y enlaces de tabla a 44 px).
 - **Proveedores de la fase 0 (6 oct, noche):** cuatro investigaciones en paralelo y su síntesis en ADR-003 (Neon, R2, Resend, Sentry, UptimeRobot; política de menores en borrador); nueva ficha T-014 y fichas T-004/T-008/T-010/T-012 ajustadas. Límite: precios no verificados en la fuente.
 - **Prueba de ingreso rehecha (6 oct, noche):** T-005 (prueba común máxima) y T-013 (nivel 1) sustituyen a T-011 y T-002, que hizo Claude.
+
+
+## 8 de octubre de 2026 — Diseño móvil v3, fase 1
+**Pedido por el fundador:** implementar la entrega de Claude Design «Ring España App v3» (negro y lima) con backend completo, por fases, manteniendo la lista de formas de terminar del repositorio.
+**Base:** `claude/ring-espana-mvp` en `74e3f56`. **Rama de trabajo:** `claude/diseno-movil-v3-fase1`. **PR:** ver la rama.
+**Qué cambié y por qué:** tema v3 en `globals.css` (todas las clases anteriores conservadas), fuente Archivo alojada, barra inferior por papel, `/bienvenida`, registro por pasos para aficionado, peleador, entrenador y entidad (incluido club), inicio por papel (`src/app/_inicio/`), ficha de peleador y «Mi ficha» rehechas con highlights y récord amateur privado, perfil y clases del entrenador (`/mis-clases`, acciones `trainers.ts`), «Cómo terminó» según la disciplina, descarga y borrado de los datos nuevos. Migración aditiva `20261008090000_diseno_movil_v3`.
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (461), `npm run build`, paridad de migraciones, los 19 guiones de navegador con base vacía (486 comprobaciones, 0 fallos, incluido el nuevo `diseno.mjs`), `accesibilidad.mjs` (53 pantallas, 0 incumplimientos), `npm run mapa`; capturas de los cuatro tipos de cuenta en iPhone emulado. **Qué solo valida el CI:** la misma batería en GitHub Actions.
+**Qué salió mal / sin causa conocida:** nada sin causa; errores propios anotados en `LECCIONES.md` (pkill, estilo en línea, enlaces en tema oscuro, aria-label).
+**Qué debe hacer el siguiente asistente:** 1) revisar el PR y el CI; 2) planificar en fichas la fase 2 (`PLAN.md`, «Diseño móvil v3»); 3) no rehacer el tema sin el fundador.
+**Decisiones del fundador abiertas:** `TRASLADO.md` §7, puntos 18–22.

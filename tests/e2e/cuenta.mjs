@@ -142,7 +142,7 @@ await btn(vet.p, "Eliminar mi cuenta definitivamente");
 await seen(bueno(vet.p, "se han eliminado"));
 const antigua = await anon.goto(B + `/peleadores/retirada-apellido${rnd}`);
 check("la dirección antigua de la ficha ya no existe", antigua.status() === 404);
-check("el rival conserva su combate en su ficha", await (async () => { await anon.goto(B + `/peleadores/${slugDe(`Perdura${rnd}`)}`); return seen(anon.locator("tbody tr").first()); })());
+check("el rival conserva su combate en su ficha", await (async () => { await anon.goto(B + `/peleadores/${slugDe(`Perdura${rnd}`)}`); return seen(anon.locator("main #combates article").first()); })());
 const t = await cuerpo(anon);
 check("y su rival figura como «Peleador anónimo», sin nombre, alias ni ciudad", t.includes("Peleador anónimo") && !t.includes(`Apellido${rnd}`) && !t.includes(`Alias secreto ${rnd}`) && !t.includes(`Ciudad secreta ${rnd}`));
 

@@ -56,9 +56,10 @@ import * as moderacion from "../../src/app/actions/moderation";
 import * as comunidad from "../../src/app/actions/community";
 import * as trayectoria from "../../src/app/actions/trajectory";
 import * as demo from "../../src/app/actions/demo";
+import * as entrenadores from "../../src/app/actions/trainers";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -77,8 +78,8 @@ beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; i
 
 const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout"] as const;
-const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass"] as const;
+const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
 const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
@@ -503,5 +504,48 @@ describe("pulido: decisiones explícitas, resultados leídos y respaldos concurr
     mundo.estado.respuestas["bout.updateMany"] = (a: { where: unknown }) => { expect(a.where).toMatchObject({ verification: "SELF_REPORTED", evidenceUrl: bout.evidenceUrl, supportReviewedAt: null, result: "A_WIN" }); return { count: 0 }; };
     expect(await destino(acciones.setBoutEvidence, { boutId: "b1", evidenceUrl: "https://example.com/otra" })).toBe("/mi-ficha?problema=combate_cambiado");
     expect(mundo.estado.escrituras).not.toContain("auditLog.create");
+  });
+});
+
+describe("diseño v3: entrenadores, highlights y registro por pasos", () => {
+  it("una cuenta que no es de entrenador no puede crear un perfil de entrenador", async () => {
+    iniciarSesion(persona("FAN"));
+    expect(await destino(acciones.createMyTrainer, { disciplina: "BOXEO", province: "Madrid" })).toBe("/?problema=solo_entrenadores");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("sin perfil de entrenador no se publican clases", async () => {
+    iniciarSesion(persona("TRAINER"));
+    expect(await destino(acciones.createClass, { kind: "INDIVIDUAL", title: "Técnica", minutes: "60", price: "30" })).toBe("/?problema=entrenador_perfil_primero");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("una clase ajena no se puede pausar (se busca solo entre las propias)", async () => {
+    iniciarSesion(persona("TRAINER"));
+    mundo.estado.respuestas["trainingClass.findFirst"] = (a: { where: { trainer: { userId: string } } }) => { expect(a.where.trainer.userId).toBe("u-TRAINER"); return null; };
+    expect(await destino(acciones.toggleClass, { classId: "ajena", activar: "0" })).toBe("/mis-clases?problema=no_existe");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un highlight ajeno no se puede destacar ni retirar (se busca solo en la propia ficha)", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["highlight.findFirst"] = (a: { where: { fighterId: string } }) => { expect(a.where.fighterId).toBe("fa"); return null; };
+    for (const accion of ["destacar", "retirar"]) {
+      expect(await destino(acciones.manageHighlight, { highlightId: "ajeno", accion })).toBe("/mi-ficha?seccion=highlights&problema=no_existe");
+    }
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un highlight con un combate que no es suyo se rechaza", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "fa", disciplines: [] } }));
+    mundo.estado.respuestas["bout.findFirst"] = null;
+    expect(await destino(acciones.publishHighlight, { kind: "VIDEO", title: "KO", videoUrl: "https://example.com/v", boutId: "ajeno" })).toBe("/mi-ficha?seccion=highlights&problema=highlight_combate");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("el último paso del registro no da permisos ni crea fichas: solo guarda lo elegido", async () => {
+    iniciarSesion(persona("FIGHTER", { emailVerifiedAt: null }));
+    expect(await destino(acciones.saveFighterIntent, { discipline: "BOXEO", level: "AMATEUR", weightClass: "M65", divisionId: "", province: "Madrid" })).toBe("/verificar?aviso=registro_ficha_guardada");
+    expect(mundo.estado.escrituras).toEqual(["user.update"]);
+  });
+  it("seguir desde el registro solo admite fichas públicas que no sean la propia", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["fighter.findMany"] = (a: { where: Record<string, unknown> }) => { expect(a.where).toMatchObject({ listed: true, hiddenAt: null, NOT: { userId: "u-FAN" } }); return []; };
+    expect(await destino(acciones.saveInterests, { disciplina: "BOXEO", seguir: "f1" })).toBe("/?aviso=intereses_guardados");
   });
 });

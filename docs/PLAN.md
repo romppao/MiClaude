@@ -60,3 +60,16 @@ Ficha cumplida punto por punto + criterios de aceptación verificados + CI en ve
 **Proveedores y menores (6 oct 2026): hay una propuesta completa y de coste casi cero en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md); falta que el fundador la apruebe y que se verifiquen los precios.** Lo que sigue es la lista general:
 
 Alojamiento y proveedor de base de datos, almacenamiento de imágenes, proveedor de correo, herramienta de errores, dominio, política de menores, responsable del tratamiento de datos y correo de contacto, sexo/edad en la ficha, calibración del aura, camino hacia las tiendas. Lista viva en `TRASLADO.md` §7 y `PULIDO-FUNCIONAL.md`.
+
+## Diseño móvil v3 (decisión del fundador, 7 de octubre de 2026)
+
+Entrega de Claude Design «Ring España App v3». **Fase 1 (hecha por Claude el 8 de octubre):** tokens y tipografía, barra inferior por papel, bienvenida y acceso, registro por pasos de los cuatro tipos de cuenta, inicio por papel, ficha de peleador con highlights y récord amateur privado, perfil y clases del entrenador. Detalle en `DIARIO.md` y `DISENO.md`.
+**Fase 2 (por planificar en fichas):** cada punto necesita modelo, acciones con guardas, pantallas y pruebas, como en la fase 1.
+1. Propuestas de combate y sparring entre peleadores (recibidas y enviadas; aceptar, rechazar, cancelar).
+2. Reservas de clases (solicitud, aceptar o rechazar por el entrenador; sin pagos hasta que el fundador decida, `TRASLADO.md` §7.19).
+3. Inscripciones a veladas por categorías (abrir y cerrar, solicitar, aceptar o rechazar) y su panel en el inicio de la entidad.
+4. Multimedia del público por combate (pestaña «Multimedia» de la ficha y «¿Estuviste allí?» en la velada) con moderación y denuncia.
+5. Aura a promotoras y clubes (una por persona) y perfil público de la entidad con su aura y comentarios.
+6. Plantilla del club (peleadores y entrenadores con confirmación de cada uno).
+7. Portada por disciplina con su color de acento, y pasar a la estética v3 las pantallas que aún usan el aspecto heredado (listados, velada, gimnasios, ránking, moderación).
+8. Escenarios por persona (`escenarios.mjs`) para entrenador y club.

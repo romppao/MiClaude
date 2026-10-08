@@ -198,7 +198,7 @@ await persona("federacion", "Pedro, delegado de una federación autonómica: la 
     await p.goto(B + "/registro");
     await p.locator('a.panel-registro[href*="tipo=entidad"]').click();
     await p.fill("[name=name]", "Pedro"); await p.fill("[name=email]", emailPedro); await p.fill("[name=password]", "contraseña123");
-    await p.fill("[name=orgName]", nombreFed); await p.selectOption("[name=entityKind]", "FEDERACION"); await p.fill("[name=website]", "https://example.org"); await p.fill("[name=message]", "Web oficial de la federación");
+    await p.fill("[name=orgName]", nombreFed); await p.locator(".segmentos label", { hasText: "Federación" }).click(); await p.fill("[name=website]", "https://example.org"); await p.fill("[name=message]", "Web oficial de la federación");
     await p.getByRole("button", { name: /Enviar solicitud/ }).click(); await p.waitForURL("**/verificar*");
     if (!(await texto(p)).includes("un moderador la revisará")) throw new Error("no se le explica que un moderador revisará la solicitud");
     await confirmarCorreo(p, emailPedro);

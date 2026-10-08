@@ -24,15 +24,22 @@ export async function GET(request: Request) {
     fighter ? db.fighterAchievement.findMany({ where: { fighterId: fighter.id } }) : Promise.resolve([]),
     db.supportAccreditation.findUnique({ where: { userId: user.id } }),
   ]);
+  const [entrenador, highlights] = await Promise.all([
+    db.trainer.findUnique({ where: { userId: user.id }, include: { gym: true, classes: true } }),
+    fighter ? db.highlight.findMany({ where: { fighterId: fighter.id }, include: { bout: { include: { event: true } } }, orderBy: { createdAt: "desc" } }) : Promise.resolve([]),
+  ]);
 
   const datos = {
     generadoEl: new Date().toISOString(),
     nota: "Estos son los datos personales que Ring España guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
-    cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails },
+    cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
+    perfilDeEntrenador: entrenador && { nombre: entrenador.name, presentacion: entrenador.bio, disciplinas: entrenador.disciplines, anosEntrenando: entrenador.yearsCoaching, ciudad: entrenador.city, provincia: entrenador.province, gimnasio: entrenador.gym?.name ?? null, creadoEl: entrenador.createdAt,
+      clases: entrenador.classes.map((c) => ({ tipo: c.kind, titulo: c.title, disciplina: c.discipline, minutos: c.minutes, precioEuros: c.priceEuros, plazas: c.capacity, horario: c.schedule, publicada: c.active, creadaEl: c.createdAt })) },
+    misHighlights: highlights.map((h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, foto: h.image ? Buffer.from(h.image).toString("base64") : null, formatoImagen: h.image ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt })),
     perfilesPersonalizados: (await db.profile.findMany({where:{ownerId:user.id}})).map(p => ({ tipo:p.kind, nombre:p.name, presentacion:p.bio, zona:p.city, web:p.website, foto:p.avatar ? Buffer.from(p.avatar).toString("base64") : null, banner:p.banner ? Buffer.from(p.banner).toString("base64") : null, formatoImagen:"image/webp", encuadre:{fotoX:p.avatarX,fotoY:p.avatarY,bannerX:p.bannerX,bannerY:p.bannerY} })),
     fichaDePeleador: fighter && {
       nombre: fighter.firstName, apellidos: fighter.lastName, alias: fighter.alias, fechaDeNacimiento: fighter.birthDate, ciudad: fighter.city, provincia: fighter.province,
-      guardia: fighter.stance, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,
+      guardia: fighter.stance, recordAmateurPublico: fighter.recordPublic, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,
       disciplinas: fighter.disciplines.map((d) => ({ disciplina: d.discipline, nivel: d.level, categoria: d.weightClass, divisionDeportiva: d.divisionId, cinturon: d.belt, grados: d.beltDegrees, combatesAnterioresDeclarados: { total: d.priorTotal, victorias: d.priorWins, derrotas: d.priorLosses, empates: d.priorDraws } })),
     },
     titulosDeclarados: achievements.map(a=>({ campeonato:a.championship, entidad:a.organization, fecha:a.awardedOn, ambito:a.scope, disciplina:a.discipline, nivel:a.level, division:a.divisionId, peso:a.weightClass, respaldo:a.supportKind, autoridad:a.supportAuthority, fuente:a.evidenceUrl, comprobacion:a.supportNote, revisionSolicitadaEl:a.reviewRequestedAt, retiradoEl:a.withdrawnAt, excluidoEl:a.rejectedAt, motivo:a.rejectionReason })),

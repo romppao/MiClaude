@@ -364,14 +364,14 @@ await aura(
 await p.goto(B + "/mi-ficha");
 check("el deportista ve el tipo de respaldo de su combate en su gestión", await seen(p.locator("main tr", { hasText: event }).getByText("Verificado por federación acreditada", { exact: true })));
 await fed.p.goto(B + publicPath);
-const vote = fed.p.locator("main tr", { hasText: event });
+const vote = fed.p.locator("main #combates article", { hasText: event }); // diseño v3: cada combate es una tarjeta
 await vote.getByRole("button", { name: new RegExp("Dar aura a") }).click();
 await fed.p.getByRole("status").filter({ hasText: "Has dado aura" }).waitFor();
 await aura(
   54,
   "el reconocimiento de la comunidad sigue independiente del respaldo",
 );
-const eventPath = await visitor.locator("main tr", { hasText: event }).getByRole("link", { name: event, exact: true }).getAttribute("href");
+const eventPath = await visitor.locator("main #combates article", { hasText: event }).getByRole("link", { name: event, exact: true }).getAttribute("href");
 await mod.p.goto(B + eventPath.replace("/veladas/", "/organizador/"));
 const resultForm = mod.p.locator("main form").filter({ has: mod.p.getByRole("button", { name: /^Actualizar resultado de/ }) });
 await resultForm.locator("select[name=outcome]").selectOption("LOSS");

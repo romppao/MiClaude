@@ -91,7 +91,7 @@ await fan.p.goto(B+"/ranking?disciplina=BOXEO");
 const grupo=fan.p.locator('main section').filter({has:fan.p.getByRole('heading',{name:/Júnior.*hasta 66 kg/})});
 check("actualizar el peso de la ficha no mueve el aura histórica a otra categoría",await seen(grupo.getByRole('link',{name:`JuniorCategorias Divisiones${rnd}`,exact:true})));
 await fan.p.goto(B+a.publica);
-check("la ficha pública conserva la división del combate junto a su peso histórico",await seen(fan.p.locator('tbody tr',{hasText:/Júnior.*66 kg/})));
+check("la ficha pública conserva la división del combate junto a su peso histórico",await seen(fan.p.locator('#combates article',{hasText:/Júnior.*66 kg/})));
 const datos=await (await a.p.request.get(B+"/mi-cuenta/datos")).json();
 check("la descarga distingue la división actual y la de cada combate",datos.fichaDePeleador.disciplinas[0].divisionDeportiva===junior && datos.fichaDePeleador.disciplinas[0].categoria==="M60" && datos.combatesDeMiFicha.some(b=>b.divisionDeportiva===junior&&b.categoria==="M66"));
 const c=await create("FormacionCategorias",benjamin,null);

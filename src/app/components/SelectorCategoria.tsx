@@ -18,6 +18,8 @@ type Props = {
   defaults?: Valores;
   /** Nombres de los campos del formulario (por defecto, los de la ficha). */
   nombres?: { discipline: string; level: string; weightClass: string; divisionId?: string };
+  /** Diseño v3 (registro): disciplina, nivel y categoría como botones grandes en vez de desplegables. Solo en modo «ficha». */
+  chips?: boolean;
 };
 
 const mismasListas = (a: CategoriaPeso[], b: CategoriaPeso[]) => a.length === b.length && a.every((c, i) => c.valor === b[i].valor);
@@ -27,7 +29,7 @@ const mismasListas = (a: CategoriaPeso[], b: CategoriaPeso[]) => a.length === b.
  * de categorías se calcula con lo elegido arriba y cada una lleva su peso en kilos. Si no hay una lista confiable para esa combinación, se dice
  * con claridad en vez de enseñar categorías que no le corresponden.
  */
-export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, disciplinas = DISCIPLINE_ORDER, defaults = {}, nombres = { discipline: "discipline", level: "level", weightClass: "weightClass" } }: Props) {
+export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, disciplinas = DISCIPLINE_ORDER, defaults = {}, nombres = { discipline: "discipline", level: "level", weightClass: "weightClass" }, chips = false }: Props) {
   const id = useId();
   const esFiltro = modo === "filtro";
   const [disciplina, setDisciplina] = useState<Discipline | "">(fijas?.discipline ?? defaults.discipline ?? (modo === "combate" ? disciplinas[0] ?? "" : ""));
@@ -59,7 +61,17 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
 
   return (
     <>
-      {!fijas ? <><label className="field">
+      {chips && !fijas && !esFiltro ? <>
+        <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }}>
+          <legend className="leyenda">Disciplina</legend>
+          <div className="chips">{disciplinas.map((d) => <label key={d} className="chip"><input type="radio" name={nombres.discipline} value={d} checked={disciplina === d} onChange={() => cambiar(d, nivel)} required />{DISCIPLINE_LABEL[d]}</label>)}</div>
+        </fieldset>
+        <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }}>
+          <legend className="leyenda">Nivel</legend>
+          <div className="segmentos">{LEVEL_ORDER.map((n) => <label key={n}><input type="radio" name={nombres.level} value={n} checked={nivel === n} onChange={() => cambiar(disciplina, n)} required />{levelName(n)}</label>)}</div>
+          <span className="hint">Profesional si compites en veladas profesionales; amateur en las demás. Es lo que tú declaras.</span>
+        </fieldset>
+      </> : !fijas ? <><label className="field">
         <span>Disciplina</span>
         <select name={nombres.discipline} value={disciplina} onChange={(e) => cambiar(e.target.value as Discipline | "", nivel)} required={!esFiltro}>
           <option value="">{esFiltro ? "Todas las disciplinas" : "Elige una disciplina"}</option>
@@ -85,7 +97,18 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
           {division ? <>{division.note} <a href={division.source} target="_blank" rel="noreferrer">Consultar reglamento</a></> : "Elige la división de tu competición. Dejarla sin confirmar conserva una declaración incompleta; no te asigna a élite ni acredita tu edad. En un combate, indica la división de aquel día."}
         </span>
       </label>
-      <label className="field" style={{ minWidth: 240 }}>
+      {chips && !esFiltro ? <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }} aria-describedby={`${id}-nota`}>
+        <legend className="leyenda">Categoría de peso</legend>
+        {!disciplina ? <span className="hint">Primero elige una disciplina.</span> : <div className="chips">
+          <label className="chip chip-doble"><input type="radio" name={nombres.weightClass} value="" checked={!categoria} onChange={() => setCategoria("")} /><b>{vacioCategoria}</b></label>
+          {categoria && !disponibles.has(categoria) && <label className="chip chip-doble"><input type="radio" name={nombres.weightClass} value={categoria} checked onChange={() => setCategoria(categoria)} /><b>{categoria}</b></label>}
+          {listas.flatMap((l) => l.categorias).filter((c, i, todas) => todas.findIndex((x) => x.valor === c.valor) === i).map((c) => {
+            const [nombre, ...resto] = c.etiqueta.split(" · ");
+            return <label key={c.valor} className="chip chip-doble"><input type="radio" name={nombres.weightClass} value={c.valor} checked={categoria === c.valor} onChange={() => setCategoria(c.valor)} /><b>{resto.length ? resto.join(" · ") : nombre}</b>{resto.length > 0 && <small>{nombre}</small>}</label>;
+          })}
+        </div>}
+        <span className="hint" id={`${id}-nota`} aria-live="polite">{sinLista ? nota : nota ? `${nota} Los kilos son los límites del reglamento indicado. Confirma la convocatoria con la organización.` : ""}</span>
+      </fieldset> : <label className="field" style={{ minWidth: 240 }}>
         <span>Categoría de peso</span>
         <select name={nombres.weightClass} value={categoria} onChange={(e) => setCategoria(e.target.value)} disabled={!disciplina} aria-describedby={`${id}-nota`}>
           <option value="">{vacioCategoria}</option>
@@ -98,7 +121,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
         <span className="hint" id={`${id}-nota`} aria-live="polite">
           {sinLista ? nota : nota ? `${nota} Los kilos son los límites del reglamento indicado. Confirma la convocatoria con la organización.` : esFiltro ? "Elige una disciplina para ver sus categorías, con su peso en kilos." : ""}
         </span>
-      </label>
+      </label>}
       {!esFiltro && disciplina === "JIUJITSU" && <fieldset className="graduation-fields">
         <legend>Graduación de BJJ (opcional)</legend>
         <label className="field"><span>Cinturón</span><select name="belt" defaultValue={defaults.belt ?? ""}><option value="">Sin indicar</option>{Object.entries(BELTS).map(([k,v]) => <option key={k} value={k}>{v}</option>)}</select></label>

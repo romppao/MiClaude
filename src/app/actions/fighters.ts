@@ -15,6 +15,10 @@ import { divisionAgeEligible } from "../../lib/common/competition";
 import { parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parsePrior } from "../../lib/fighters/prior";
 import { LIMITS } from "../../lib/common/text";
+import { readOnboarding } from "../../lib/accounts/onboarding";
+import { MAX_HIGHLIGHTS, parseHighlight } from "../../lib/fighters/highlights";
+import { normalizeImage } from "../../lib/profiles/images";
+import { Prisma } from "@prisma/client";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
@@ -64,6 +68,8 @@ export async function createMyFighter(f: FormData) {
       },
     });
   });
+  // Lo elegido al registrarse ya se ha usado: no se vuelve a ofrecer.
+  if (readOnboarding(user.onboarding)?.kind === "peleador") await db.user.update({ where: { id: user.id }, data: { onboarding: Prisma.DbNull } });
   await audit({ userId: user.id, entity: "FIGHTER", entityId: created.id, action: "CREATED", after: { discipline: choice.discipline, level: choice.level, weightClass: choice.weightClass, divisionId: choice.divisionId, priorDeclared: prior.prior } });
   go(back, { aviso: "ficha_creada" });
 }
@@ -153,4 +159,70 @@ export async function requestClaim(f: FormData) {
     update: { message, status: "PENDING" },
   });
   go(back, { aviso: "solicitud_enviada" });
+}
+
+/**
+ * Récord amateur completo: público u oculto (por defecto solo se ve el número de combates). Decisión del fundador del 7 de octubre de 2026.
+ * En profesional el récord siempre es público, así que el ajuste solo afecta a las disciplinas amateur.
+ */
+export async function setRecordPublic(f: FormData) {
+  const user = await requireVerifiedUser("/mi-ficha");
+  const me = user.fighter;
+  if (!me) go("/mi-ficha");
+  const recordPublic = str(f, "publico") === "1";
+  await db.$transaction([
+    db.fighter.update({ where: { id: me.id }, data: { recordPublic } }),
+    audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: recordPublic ? "RECORD_PUBLISHED" : "RECORD_HIDDEN", before: { recordPublic: me.recordPublic }, after: { recordPublic } }, db),
+  ]);
+  revalidatePath("/", "layout");
+  go("/mi-ficha#privacidad", { aviso: recordPublic ? "record_publico" : "record_privado" });
+}
+
+/** Publica un highlight en la propia ficha: un enlace a un vídeo o una foto, con título y, si se quiere, el combate al que pertenece. */
+export async function publishHighlight(f: FormData) {
+  const user = await requireVerifiedUser("/mi-ficha");
+  const me = user.fighter;
+  const back = "/mi-ficha#highlights";
+  if (!me) go("/mi-ficha");
+  const foto = f.get("image");
+  const hayFoto = foto instanceof File && foto.size > 0;
+  const datos = parseHighlight({ kind: str(f, "kind"), title: str(f, "title"), videoUrl: str(f, "videoUrl"), hasImage: hayFoto });
+  if (!datos.ok) go(back, { problema: datos.problema });
+  if ((await db.highlight.count({ where: { fighterId: me.id, hiddenAt: null } })) >= MAX_HIGHLIGHTS) go(back, { problema: "highlight_limite" });
+  // El combate, si se indica, tiene que ser uno de los suyos.
+  const boutId = str(f, "boutId") || null;
+  if (boutId && !(await db.bout.findFirst({ where: { id: boutId, OR: [{ fighterAId: me.id }, { fighterBId: me.id }] }, select: { id: true } }))) go(back, { problema: "highlight_combate" });
+  let image: Uint8Array<ArrayBuffer> | null = null;
+  if (hayFoto) {
+    try { image = await normalizeImage(foto, "banner"); } catch { go(back, { problema: "imagen_invalida" }); }
+  }
+  const pinned = str(f, "pinned") === "on";
+  await db.$transaction(async (tx) => {
+    if (pinned) await tx.highlight.updateMany({ where: { fighterId: me.id, pinned: true }, data: { pinned: false } });
+    const h = await tx.highlight.create({ data: { fighterId: me.id, kind: datos.kind, title: datos.title, videoUrl: datos.videoUrl, image, hasImage: !!image, boutId, pinned } });
+    await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: "CREATED", after: { kind: h.kind, title: h.title, videoUrl: h.videoUrl, boutId, pinned } }, tx);
+  });
+  revalidatePath("/", "layout");
+  go(back, { aviso: "highlight_publicado" });
+}
+
+/** Destaca uno de los propios highlights (solo uno puede estar destacado) o lo retira de la ficha. */
+export async function manageHighlight(f: FormData) {
+  const user = await requireVerifiedUser("/mi-ficha");
+  const me = user.fighter;
+  const back = "/mi-ficha#highlights";
+  if (!me) go("/mi-ficha");
+  const h = await db.highlight.findFirst({ where: { id: str(f, "highlightId"), fighterId: me.id, hiddenAt: null } });
+  if (!h) go(back, { problema: "no_existe" });
+  const accion = str(f, "accion");
+  if (accion !== "destacar" && accion !== "retirar") go(back, { problema: "decision_no_valida" });
+  await db.$transaction(async (tx) => {
+    if (accion === "destacar") {
+      await tx.highlight.updateMany({ where: { fighterId: me.id, pinned: true }, data: { pinned: false } });
+      await tx.highlight.update({ where: { id: h.id }, data: { pinned: true } });
+    } else await tx.highlight.delete({ where: { id: h.id } });
+    await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: accion === "destacar" ? "PINNED" : "DELETED", before: { title: h.title } }, tx);
+  });
+  revalidatePath("/", "layout");
+  go(back, { aviso: accion === "destacar" ? "highlight_destacado" : "highlight_retirado" });
 }

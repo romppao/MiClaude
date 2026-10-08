@@ -131,7 +131,7 @@ check("el ránking de boxeo lista al peleador con su aura dentro de su categorí
 // 4a) un usuario avisa de un error; solo puede hacerlo una vez mientras siga abierto; el moderador lo resuelve
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
 const report = async () => {
-  const det = fan.locator("main table details").first();
+  const det = fan.locator("main #combates article details").first(); // diseño v3: cada combate es una tarjeta
   await det.locator("summary").click();
   await det.locator("select[name=reason]").selectOption("RESULTADO");
   await det.locator("input[name=message]").fill(`Aviso ${rnd}`);
@@ -221,6 +221,10 @@ check("el récord de partida detallado se muestra como declarado", await seen(ve
 await registrar(vet, { evento: `Velada Vet ${rnd}`, fecha: "2026-06-01", rivalNombre: "Vet", rivalApellidos: `Rival${rnd}` });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await seen(vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first()));
+// Petición del fundador: en boxeo no se ofrece la sumisión. El servidor también la rechaza si alguien fuerza el formulario.
+const formCombate = vet.locator("main form").filter({ has: vet.getByRole("button", { name: "Registrar este combate", exact: true }) });
+check("en boxeo, «Cómo terminó» no ofrece sumisión, puntos ni ventajas", await formCombate.locator("select[name=method] option").evaluateAll((os) => os.length > 3 && !os.some((o) => ["SUBMISSION", "POINTS", "ADVANTAGE"].includes(o.value))));
+await formCombate.locator("select[name=method]").evaluate((s) => { const o = document.createElement("option"); o.value = "SUBMISSION"; o.textContent = "Sumisión"; s.appendChild(o); });
 await registrar(vet, { evento: `Velada Vet dos ${rnd}`, fecha: "2026-04-01", rivalNombre: "Vet", rivalApellidos: `Otro${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).waitFor();
 check("una sumisión no se acepta en boxeo", await vet.locator(".notice-bad", { hasText: "no existe en la disciplina" }).count() === 1);
@@ -232,6 +236,14 @@ await addDisc.locator("button:has-text('Añadir disciplina')").click();
 await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor();
 await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
+await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
+// Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
+const privada = await anon.locator("body").innerText();
+check("por defecto, el récord amateur no se muestra al público: solo el número de combates", privada.includes("el peleador mantiene privado su récord amateur completo") && !privada.includes("1 sumisión") && !privada.includes("Victoria ante"));
+await vet.goto(B + "/mi-ficha");
+await vet.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await vet.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
+check("el peleador lo publica desde «Mi ficha» y ve cómo lo verán los demás", await seen(vet.getByRole("switch", { name: "Ocultar mi récord amateur completo" })));
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 const pub = await anon.locator("body").innerText();
 check("la ficha pública separa el récord por disciplina", pub.includes("MMA") && pub.includes("1 sumisión") && pub.includes("3 combates anteriores sin detallar") && pub.includes("Boxeo"));

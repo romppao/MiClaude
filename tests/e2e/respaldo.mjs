@@ -31,6 +31,13 @@ async function categoria(nivel, peso) {
 }
 
 await combate("Amateur", -90);
+// Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el visitante solo ve cuántos combates lleva hasta que el deportista lo publica.
+const visitantePrevio = await (await browser.newContext()).newPage();
+await visitantePrevio.goto(B + publica);
+check("antes de publicarlo, el visitante ve el número de combates amateur y no el resultado", await seen(visitantePrevio.locator("main .card", { hasText: "el peleador mantiene privado su récord amateur completo" })) && await visitantePrevio.locator("main .card .rec", { hasText: "1-0-0" }).count() === 0);
+await p.goto(B + "/mi-ficha");
+await p.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await p.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
 await categoria("PRO", "Wélter");
 await combate("Profesional", -30);
 await combate("SinDecision", -10, "NC");
