@@ -11,4 +11,6 @@ Claude revisa cada PR antes de que el fundador lo integre. Los demás asistentes
 **7. Documentación:** `DIARIO`, `LECCIONES`, `IDEAS`, `ARQUITECTURA`, mapa funcional y el registro del asistente; la ficha pasa a «hecha» con enlace al PR.
 **8. Mirar la pantalla:** si cambia la interfaz, capturas en móvil (390 px) y se han mirado.
 
+**9. Transferencia a una persona nueva:** [manual de mantenimiento](mantenimiento/README.md) y catálogo actualizados. Cada archivo añadido tiene responsabilidad individual; las funciones públicas no evidentes explican entradas, salida, rechazos/efectos y restricciones. El recorrido afectado enlaza pantalla, acción, guarda, datos y prueba; las decisiones nuevas registran alternativas y motivo con evidencia. Contrastar explicaciones con el código, no aprobar solo por porcentaje de cobertura. `node scripts/generar-catalogo.mjs --comprobar` y las pruebas de la herramienta pasan en el último commit. No exigir comentarios que repitan cada línea, ni inventar razones históricas.
+
 Resultado de la revisión: **aprobado**, **cambios pedidos** (lista numerada y concreta) o **RFC** (el PR revela un problema de plan). Claude lo escribe como comentario del PR con el pie de atribución.
