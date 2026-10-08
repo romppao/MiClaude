@@ -1,11 +1,11 @@
 import "./globals.css";
 import Link from "next/link";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
-import MobileNav from "./components/MobileNav";
+import MobileNav, { type PapelBarra } from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
 };
 
+export const viewport: Viewport = { themeColor: "#0A0A0C", colorScheme: "dark" };
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
   const [accreditation, managedProfileCount] = await Promise.all([
@@ -26,6 +28,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     user ? db.profile.count({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } } }) : Promise.resolve(0),
   ]);
   const tieneFicha = !!user && (!!user.fighter || user.role === "FIGHTER");
+  // Barra inferior del móvil según el tipo de cuenta (diseño v3). Una entidad pendiente de aprobar funciona como un usuario.
+  const papel: PapelBarra = !user ? "visitante" : user.role === "ORGANIZER" ? "entidad" : tieneFicha ? "peleador" : user.role === "TRAINER" ? "entrenador" : "usuario";
   return (
     <html lang="es">
       <body>
@@ -42,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
             <NavigationMenu signedIn={!!user} hasFighter={tieneFicha} hasManagedProfiles={managedProfileCount > 0} admin={user?.role === "ADMIN"} canSupport={!!user?.emailVerifiedAt && (user.role === "ADMIN" || !!accreditation?.active)} logoutForm={user ? <form action={logout}><button className="secondary">Salir</button></form> : undefined} />
             <div className="cuenta">
-              <Link href="/ayuda" style={{ fontWeight: 700 }}>¿Cómo funciona?</Link>
+              <Link href="/ayuda">¿Cómo funciona?</Link>
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
@@ -76,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Link href="/privacidad">Privacidad</Link>
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
-        <MobileNav />
+        <MobileNav papel={papel} />
       </body>
     </html>
   );

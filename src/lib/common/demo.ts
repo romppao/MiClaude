@@ -6,4 +6,4 @@
 export const demoActiva = (env: NodeJS.ProcessEnv = process.env): boolean => env.DEMO_MODE === "si";
 
 /** Papeles entre los que se puede cambiar en la demostración, con su nombre en lenguaje llano. */
-export const DEMO_PAPELES = { FAN: "Aficionado", FIGHTER: "Peleador", ORGANIZER: "Organizador", ADMIN: "Moderador" } as const;
+export const DEMO_PAPELES = { FAN: "Aficionado", FIGHTER: "Peleador", TRAINER: "Entrenador", ORGANIZER: "Organizador", ADMIN: "Moderador" } as const;

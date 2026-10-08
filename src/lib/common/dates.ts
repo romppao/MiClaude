@@ -33,3 +33,38 @@ export function parseBirthDate(raw: string, now: Date = new Date()): Date | null
   const d = new Date(`${raw}T12:00:00Z`);
   return Number.isNaN(d.getTime()) || dayKey(d) !== raw ? null : d;
 }
+
+/** Días que faltan hasta una velada, contados por el día de Madrid (0 = hoy). Negativo si ya pasó. */
+export function daysUntil(eventDate: Date, now: Date = new Date()): number {
+  return Math.round((Date.parse(`${dayKey(eventDate)}T00:00:00Z`) - Date.parse(`${todayMadrid(now)}T00:00:00Z`)) / 864e5);
+}
+
+/** «Hoy», «Mañana» o «En 17 días» (para una velada próxima). */
+export const whenLabel = (days: number): string => (days <= 0 ? "Hoy" : days === 1 ? "Mañana" : `En ${days} días`);
+
+const MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+/** Día y mes corto de una velada: { dia: "24", mes: "oct" } (por el día guardado, que es el de Madrid). */
+export const dayAndMonth = (d: Date) => ({ dia: String(d.getUTCDate()), mes: MESES_CORTOS[d.getUTCMonth()] });
+
+/**
+ * Serie mensual para un gráfico: cuántas fechas caen en cada uno de los últimos `meses` meses (el actual el último), con su etiqueta corta.
+ * Los meses se cuentan en la hora de Madrid.
+ */
+export function monthlySeries(dates: Date[], meses: number, now: Date = new Date()): { mes: string; total: number }[] {
+  const [y, m] = todayMadrid(now).split("-").map(Number);
+  const claves = Array.from({ length: meses }, (_, i) => { const t = (y * 12 + (m - 1)) - (meses - 1 - i); return { y: Math.floor(t / 12), m: t % 12 }; });
+  const cuenta = new Map(claves.map((k) => [`${k.y}-${k.m}`, 0]));
+  for (const d of dates) {
+    const [dy, dm] = todayMadrid(d).split("-").map(Number);
+    const k = `${dy}-${dm - 1}`;
+    if (cuenta.has(k)) cuenta.set(k, cuenta.get(k)! + 1);
+  }
+  return claves.map((k) => ({ mes: MESES_CORTOS[k.m], total: cuenta.get(`${k.y}-${k.m}`)! }));
+}
+
+/** Las 00:00 en Madrid del día de una velada (para la cuenta atrás: aún no guardamos la hora de inicio). */
+export function madridDayStart(eventDate: Date): Date {
+  const mediodia = new Date(`${dayKey(eventDate)}T12:00:00Z`);
+  const horaMadrid = Number(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", hourCycle: "h23" }).format(mediodia));
+  return new Date(Date.parse(`${dayKey(eventDate)}T00:00:00Z`) - (horaMadrid - 12) * 36e5);
+}

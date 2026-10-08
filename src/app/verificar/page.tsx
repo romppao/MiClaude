@@ -48,7 +48,7 @@ export default async function Verify({ searchParams }: { searchParams: Promise<{
         <h1>Tu correo electrónico está verificado</h1>
         <p>El correo <strong>{user.email}</strong> ya está confirmado. Ya puedes dar aura, registrar combates y reclamar tu ficha.</p>
         {volver && <Ir a={volver}>Volver a lo que estabas haciendo</Ir>}
-        {solicitud ? <Ir a="/organizador" secundario={!!volver}>Ver el estado de mi solicitud</Ir> : user.role === "FIGHTER" || user.fighter ? <Ir a="/mi-ficha" secundario={!!volver}>Ir a mi ficha de peleador</Ir> : <Ir a="/peleadores" secundario={!!volver}>Ver los peleadores</Ir>}
+        {solicitud ? <Ir a="/organizador" secundario={!!volver}>Ver el estado de mi solicitud</Ir> : user.role === "FIGHTER" || user.fighter ? <Ir a="/mi-ficha" secundario={!!volver}>Ir a mi ficha de peleador</Ir> : user.role === "TRAINER" ? <Ir a="/" secundario={!!volver}>Publicar mi perfil de entrenador</Ir> : <Ir a="/peleadores" secundario={!!volver}>Ver los peleadores</Ir>}
         <Ir a="/" secundario>Ir al inicio</Ir>
       </>
     );

@@ -29,6 +29,8 @@ export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: 
     },
   });
   await tx.profile.deleteMany({ where: { kind: "peleador", entityId: fighterId } });
+  await tx.highlight.deleteMany({ where: { fighterId } }); // sus vídeos y fotos son datos personales: no se conservan
+  await tx.auditLog.updateMany({ where: { entity: "HIGHLIGHT", userId: (await tx.fighter.findUnique({ where: { id: fighterId }, select: { userId: true } }))?.userId ?? "-" }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
   await tx.fighterDiscipline.updateMany({ where: { fighterId }, data: { belt: null, beltDegrees: null } });
   await scrubFighterHistory(tx, fighterId);
 }

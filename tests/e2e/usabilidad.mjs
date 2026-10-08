@@ -54,7 +54,7 @@ await repetido.waitForTimeout(3000); // la acción termina, se vacía el formula
 check("y si el mismo error se repite (la dirección no cambia), el correo sigue en su sitio", await repetido.inputValue("[name=email]") === `nadie${rnd}@test.es` && await repetido.inputValue("[name=password]") === "");
 await visitante.fill("[name=password]", "contraseña-larga-1");
 await btn(visitante, "Crear mi cuenta");
-await visitante.waitForURL("**/verificar");
+await visitante.waitForURL("**/registro/intereses**"); // diseño v3: tras crear la cuenta llega el último paso (opcional)
 await visitante.goto(B + "/registro?tipo=usuario");
 check("una pantalla nueva no hereda lo escrito de otro envío", await visitante.inputValue("[name=name]") === "");
 
@@ -127,7 +127,7 @@ const doble = await nueva();
 await doble.goto(B + "/registro?tipo=usuario");
 await doble.fill("[name=name]", "Doble Clic"); await doble.fill("[name=email]", `dobleclic${rnd}@test.es`); await doble.fill("[name=password]", "contraseña-larga-1");
 await doble.dblclick('main button:has-text("Crear mi cuenta")');
-check("un doble clic en «Crear mi cuenta» lleva a «Confirma tu correo», sin un error de «ya hay una cuenta»", await doble.waitForURL("**/verificar", { timeout: 8000 }).then(() => true, () => false));
+check("un doble clic en «Crear mi cuenta» lleva al paso siguiente del registro, sin un error de «ya hay una cuenta»", await doble.waitForURL("**/registro/intereses**", { timeout: 8000 }).then(() => true, () => false) && await doble.locator("[role=alert] .notice-bad").count() === 0);
 const peleadorDoble = await newUser("Dobleficha", "FIGHTER");
 await peleadorDoble.p.goto(B + "/mi-ficha");
 await peleadorDoble.p.fill("[name=firstName]", "Doble"); await peleadorDoble.p.fill("[name=lastName]", `Ficha${rnd}`);
@@ -145,12 +145,13 @@ await nuevoVisitante.locator("a", { hasText: "Entra para seguir a este peleador"
 check("«Entra para seguir» lleva a «Entrar» explicando por qué y a dónde se volverá", await seen(nuevoVisitante.locator("[role=note]", { hasText: "Al terminar volverás a la página donde estabas" })));
 await nuevoVisitante.locator("main a.btn", { hasText: "Crear mi cuenta" }).click();
 check("junto al formulario de acceso hay un botón claro para crear la cuenta, y conserva el destino", await seen(nuevoVisitante.locator("[role=note]", { hasText: "podrás volver a la página donde estabas" })) && nuevoVisitante.url().includes("next="));
-check("el registro ofrece tres paneles claros, sin el desplegable antiguo", await nuevoVisitante.locator("a.panel-registro").count() === 3 && await nuevoVisitante.locator("select[name=role]").count() === 0);
-await nuevoVisitante.locator("a.panel-registro", { hasText: "Usuario" }).click();
-check("el panel «Usuario» conserva el destino y pide solo nombre, correo y contraseña", await seen(nuevoVisitante.locator("[name=password]")) && nuevoVisitante.url().includes("next=") && await nuevoVisitante.locator("main form input:not([type=hidden])").count() === 3);
+check("el registro ofrece cuatro paneles claros, sin el desplegable antiguo", await nuevoVisitante.locator("a.panel-registro").count() === 4 && await nuevoVisitante.locator("select[name=role]").count() === 0);
+await nuevoVisitante.locator("a.panel-registro", { hasText: "Aficionado" }).click();
+check("el panel «Aficionado» conserva el destino y pide solo nombre, correo y contraseña", await seen(nuevoVisitante.locator("[name=password]")) && nuevoVisitante.url().includes("next=") && await nuevoVisitante.locator("main form input:not([type=hidden])").count() === 3);
 const correoVolver = `volver${rnd}@test.es`;
 await nuevoVisitante.fill("[name=name]", "Persona Volver"); await nuevoVisitante.fill("[name=email]", correoVolver); await nuevoVisitante.fill("[name=password]", "contraseña123");
-await btn(nuevoVisitante, "Crear mi cuenta"); await nuevoVisitante.waitForURL("**/verificar");
+await btn(nuevoVisitante, "Crear mi cuenta"); await nuevoVisitante.waitForURL("**/registro/intereses**");
+await nuevoVisitante.getByRole("link", { name: "Lo haré después" }).click(); await nuevoVisitante.waitForURL("**/verificar");
 const enlaceVolver = link(correoVolver);
 const otroAparato = await nueva(); // el enlace se abre en otro aparato, sin sesión
 await otroAparato.goto(B + enlaceVolver); await btn(otroAparato, "Confirmar mi correo");

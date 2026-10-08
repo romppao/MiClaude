@@ -141,3 +141,19 @@ Render está configurado en `render.yaml` para la rama `claude/ring-espana-mvp`;
 ## Distribución del menú — 3 de octubre de 2026
 
 Petición del fundador y captura de referencia: «Me gusta como tiene distribuido el menú raunder lo debemos coger y mejorarlo». Se conserva la distribución por actividades, con identidad propia #BE33F5: deportistas, clubes y entrenadores, promotores, cuenta y ayuda. Panel lateral con botón de cierre, Escape, foco nativo y enlaces disponibles según permisos. Máximo cinco enlaces por grupo. No se copian logotipo, fotografías ni se anuncian las funciones de la captura que nuestra aplicación aún no implementa. Este cambio de navegación preserva portada y perfiles aprobados en ChatGPT Work.
+
+## Diseño v3: negro y lima — aprobado por el fundador el 7 de octubre de 2026
+
+**Origen:** Claude Design («Ring España App v3»). El fundador eligió la segunda referencia («negro lima, vamos a desarrollarlo más») y pidió llevarla al código. Sustituye el aspecto provisional anterior; el violeta oficial `#BE33F5` se conserva como **segundo color** (acento secundario), y el lima `#D4F67C` pasa a ser el color de acción.
+**Tokens (en `src/app/globals.css`, sección 2):** fondo `#0A0A0C`; tarjetas `#141417` con borde `rgba(255,255,255,.07)`; hojas `#151518`; acento `--acc #D4F67C` con texto `#0E1008`; segundo color `--acc2 #BE33F5`; colores por disciplina en `src/lib/common/apariencia.ts` (Boxeo lima, Jiu-jitsu `#86C8FF`, K-1 `#FFA552`, Kickboxing `#FFE066`, MMA `#FF6B5B`, Muay Thai `#FF8AD0`). Tipografía **Archivo** (títulos 800 con −0,03 em). Botones en píldora; principal de 58 px con brillo; tarjetas de 24–30 px; portadas a sangre con esquinas inferiores de 40 px.
+**Diferencias deliberadas con la maqueta (y por qué):**
+- **Tamaños de texto:** la maqueta usa 12–14 px en ayudas y etiquetas; aquí las etiquetas de campo, las ayudas y el texto corrido miden **16 px** (regla de accesibilidad del fundador y `movil.mjs`). Solo los datos breves (`.meta`) bajan a 14 px.
+- **Cabecera:** se mantiene una cabecera fina con el logotipo y el menú en todas las pantallas (la maqueta no la tiene): el menú por actividades da acceso a funciones que no caben en cuatro pestañas (moderación, respaldar, federaciones…).
+- **Dar aura:** en la maqueta es una hoja inferior; aquí el formulario está dentro de la tarjeta de cada combate, visible y sin JavaScript.
+- **Pestañas de la ficha** (Récord · Combates · Público): son anclas a secciones de la misma página, no pestañas que ocultan contenido. La pestaña «Multimedia» llegará con la multimedia del público (fase 2).
+- **Disciplina, nivel y categoría** del registro son botones grandes como en la maqueta, pero las categorías salen del catálogo oficial del repositorio (`disciplines.ts`, `competition.ts`) y se conserva la «división deportiva» (edad), que la maqueta simplificaba.
+- **Inicio del visitante:** además de lo de la maqueta conserva «Crear mi cuenta / Ver cómo funciona», el buscador con etiqueta visible y «¿Qué quieres hacer?» (usabilidad para todas las edades).
+- **Entrenador:** sin ingresos ni reservas hasta que existan de verdad (la maqueta mostraba cifras ficticias).
+- **Bienvenida** en `/bienvenida`: la portada `/` del visitante es la pública, para no esconder el contenido detrás de una pantalla de entrada.
+- No se aplica el sistema de diseño «Modernist» adjunto a la entrega: el fundador eligió la línea negro y lima.
+**Pendiente (fase 2):** portada por disciplina con el acento de su color, hojas inferiores para las acciones nuevas, Multimedia, propuestas, reservas, inscripciones, plantilla del club y aura a entidades.

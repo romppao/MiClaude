@@ -21,11 +21,14 @@ sql(`insert into "Bout" (id,"eventId","fighterAId","fighterBId",result,verificat
 const p = await (await browser.newContext()).newPage();
 await p.goto(B);
 check("la portada se presenta como comunidad de toda España", await seen(p.getByRole("heading", { name: /Tu deporte\.\s*Tu gente\./ })) && (await p.locator("main").innerText()).includes("Tu comunidad de deportes de contacto en toda España"));
-const enlaces = p.locator(".community-discovery a.card");
-check("las seis disciplinas tienen igual énfasis y orden alfabético", JSON.stringify(await enlaces.allInnerTexts()) === JSON.stringify(disciplinas.map(d => d[1])) && (await enlaces.evaluateAll(xs => xs.map(x => getComputedStyle(x).fontWeight))).every(x => x === "500"));
-const eventos = await p.locator("main .grid").nth(1).innerText();
-check("la portada incluye veladas de seis disciplinas, varias provincias y ambos niveles", disciplinas.every(([,label]) => eventos.includes(`${prefix} ${label}`)) && eventos.includes("Valencia") && eventos.includes("Profesional") && eventos.includes("Amateur"));
-check("las fichas recientes incluyen las seis altas de toda España", (await p.locator("main .grid").nth(2).innerText()).split(prefix).length - 1 === 6);
+// Diseño v3: seis tarjetas de disciplina iguales (mismo tamaño y tipografía), en orden alfabético.
+const enlaces = p.locator(".disciplinas-portada a");
+const medidas = await enlaces.evaluateAll(xs => xs.map(x => `${getComputedStyle(x.querySelector("strong")).fontWeight}|${Math.round(x.getBoundingClientRect().height)}`));
+check("las seis disciplinas tienen igual énfasis y orden alfabético", JSON.stringify((await enlaces.allInnerTexts()).map(t => t.trim())) === JSON.stringify(disciplinas.map(d => d[1])) && new Set(medidas).size === 1);
+const eventos = await p.locator(".veladas-portada").innerText();
+const lugares = await p.locator(".veladas-portada a").evaluateAll(xs => xs.map(x => x.textContent));
+check("la portada incluye veladas de seis disciplinas, varias provincias y ambos niveles", disciplinas.every(([,label]) => eventos.includes(`${prefix} ${label}`)) && lugares.join(" ").includes("Valencia") && lugares.join(" ").includes("Profesional") && lugares.join(" ").includes("Amateur"));
+check("la portada invita a ver el ránking de aura de todas las disciplinas", await seen(p.locator("main").getByRole("link", { name: "Ránking", exact: true })));
 await p.goto(B + "/ranking");
 check("el ránking comienza en todas las disciplinas, niveles y España", await p.inputValue("[name=disciplina]") === "" && await p.inputValue("[name=nivel]") === "" && await p.inputValue("[name=provincia]") === "all");
 for (const [, label,, nivel] of disciplinas) {

@@ -38,7 +38,7 @@ for (const [ruta, etiqueta] of [
   ...(fichaVelada ? [[fichaVelada, "Ficha de velada"]] : []), ["/gimnasios", "Gimnasios"],
   ...(fichaGimnasio ? [[fichaGimnasio, "Ficha de gimnasio"]] : []), ["/entrenadores", "Entrenadores"], [fichaEntrenador, "Ficha de entrenador"],
   ["/ranking", "Ránking"], ["/ayuda", "Ayuda"], ["/buscar", "Búsqueda (vacía)"], ["/buscar?q=accesible", "Búsqueda (con resultados)"], ["/buscar?q=zzzzqq", "Búsqueda (sin resultados)"],
-  ["/registro", "Registro"], ["/registro?tipo=usuario", "Registro de usuario"], ["/registro?tipo=peleador", "Registro de peleador"], ["/registro?tipo=entidad", "Registro de promotora o federación"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
+  ["/bienvenida", "Bienvenida"], ["/registro", "Registro"], ["/registro?tipo=usuario", "Registro de aficionado"], ["/registro?tipo=peleador", "Registro de peleador"], ["/registro?tipo=entrenador", "Registro de entrenador"], ["/registro?tipo=entidad", "Registro de promotora, federación o club"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
   ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/organizador", "Organizadores (sin sesión)"],
   ["/pagina-que-no-existe", "Página no encontrada"],
 ]) await analizar(anon, ruta, etiqueta);
@@ -51,10 +51,25 @@ const sinFicha = await newUser("Sinficha", "FIGHTER");
 await analizar(sinFicha.p, "/mi-ficha", "Mi ficha (sin crear todavía)");
 const sinVerificar = await newUser("Sinverificar", "FAN", false);
 await analizar(sinVerificar.p, "/verificar", "Verificar correo (con sesión)");
+await analizar(sinVerificar.p, "/", "Inicio del aficionado");
+await analizar(sinVerificar.p, "/registro/intereses", "Registro: intereses del aficionado");
+await analizar(pepe.p, "/", "Inicio del peleador");
+await analizar(sinFicha.p, "/registro/ficha", "Registro: crea tu ficha");
+// Entrenador: pasos del registro, inicio y «Mis clases» (con perfil creado desde la web).
+const entrenador = await newUser("Entrenadora", "FAN"); sql(`update "User" set role='TRAINER' where email='${entrenador.email}';`);
+await analizar(entrenador.p, "/registro/perfil", "Registro: perfil de entrenador");
+await entrenador.p.goto(B + "/registro/perfil"); await entrenador.p.locator("label.chip", { hasText: "Boxeo" }).click(); await entrenador.p.selectOption("[name=province]", "Madrid"); await entrenador.p.getByRole("button", { name: "Siguiente" }).click(); await entrenador.p.waitForURL("**/registro/clase**");
+await analizar(entrenador.p, "/registro/clase", "Registro: primera clase");
+await analizar(entrenador.p, "/", "Inicio del entrenador (sin perfil)");
+await entrenador.p.goto(B + "/"); await entrenador.p.getByRole("button", { name: "Publicar mi perfil" }).click(); await entrenador.p.waitForURL("**/mis-clases**");
+await analizar(entrenador.p, "/mis-clases", "Mis clases");
+await analizar(entrenador.p, "/", "Inicio del entrenador");
 
 console.log("— Moderación y organizador —");
 const admin = await newUser("Moderadora", "FAN"); hacerAdmin(admin.email);
 for (const [ruta, etiqueta] of [["/respaldar", "Respaldar hechos"], ["/moderacion/acreditaciones", "Acreditaciones"], ["/moderacion", "Moderación"], ["/moderacion/historial", "Historial de cambios"], ["/organizador", "Organizadores (moderador)"]]) await analizar(admin.p, ruta, etiqueta);
+const organizadora = await newUser("Organizadora", "FAN"); sql(`update "User" set role='ORGANIZER' where email='${organizadora.email}';`);
+await analizar(organizadora.p, "/", "Panel de la entidad");
 
 await terminarDiagnosticos();
 await browser.close();

@@ -15,9 +15,16 @@ import SelectorCategoria from "../components/SelectorCategoria";
 import { divisionLabel } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
+import MetodoSegunDisciplina from "../components/MetodoSegunDisciplina";
 import RecordCards from "../components/RecordCards";
 import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
-import { createMyFighter, requestClaim, saveDiscipline, updateMyFighter } from "../actions/fighters";
+import { createMyFighter, manageHighlight, publishHighlight, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
+import { readOnboarding } from "../../lib/accounts/onboarding";
+import { HIGHLIGHT_KIND_LABEL, HIGHLIGHT_TITLE_MAX, orderHighlights } from "../../lib/fighters/highlights";
+import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
+import { combinedRecord, emptyTally } from "../../lib/fighters/record";
+import { iniciales } from "../../lib/common/apariencia";
+import { LEVEL_LABEL } from "../../lib/common/labels";
 
 export const metadata = { title: "Mi ficha" };
 export const dynamic = "force-dynamic";
@@ -38,6 +45,9 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       db.claimRequest.findMany({ where: { userId: user.id }, include: { fighter: true }, orderBy: { createdAt: "desc" } }),
     ]);
     const pendiente = myClaims.filter((c) => c.status === "PENDING");
+    // Lo que eligió al registrarse (diseño v3): el formulario llega rellenado y solo tiene que revisarlo.
+    const borrador = readOnboarding(user.onboarding);
+    const intento = borrador?.kind === "peleador" ? borrador : null;
     const confirmarNueva = oneParam(sp.problema) === "ficha_con_tu_nombre"; // ya se le avisó de que existe una ficha con su nombre
     return (
       <>
@@ -77,14 +87,15 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         ) : (
         <>
         <h2>Si no apareces, crea tu ficha</h2>
+        {intento && <p className="notice notice-info" role="note">Hemos rellenado tu disciplina, tu categoría y tu provincia con lo que elegiste al registrarte. Revísalo, escribe tu nombre y apellidos y pulsa «Crear mi ficha».</p>}
         <form className="search" action={createMyFighter} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 560 }}>
           <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" maxLength={LIMITS.gym} /></label>
           <label className="field"><span>Ciudad</span><input name="city" maxLength={LIMITS.city} /></label>
-          <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
-          <DisciplineFields />
+          <label className="field"><span>Provincia</span><select name="province" defaultValue={intento?.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <DisciplineFields defaults={intento?.discipline ? { discipline: intento.discipline, level: intento.level, divisionId: intento.divisionId, weightClass: intento.weightClass } : undefined} />
           {confirmarNueva && <input type="hidden" name="confirmarNueva" value="1" />}
           <button>Crear mi ficha</button>
         </form>
@@ -102,11 +113,66 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const records = computeRecords(me.id, bouts);
   const gym = me.gymId ? await db.gym.findUnique({ where: { id: me.gymId } }) : null;
   const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
+  const misHighlights = orderHighlights(await db.highlight.findMany({ where: { fighterId: me.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }));
+  const tieneAmateur = me.disciplines.some((d) => d.level === "AMATEUR") || bouts.some((b) => b.event.level === "AMATEUR");
+  const principal = [...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline))[0];
+  const tallyP = principal ? records[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
+  const recP = combinedRecord(tallyP, principal ? { total: principal.priorTotal, wins: principal.priorWins, losses: principal.priorLosses, draws: principal.priorDraws } : null);
+  const vistoPorOtros = principal ? shownRecord(recP, recordHidden(principal.level, me.recordPublic, false)) : "";
 
   return (
     <>
-      <h1>{me.firstName} {me.lastName}</h1><p><Link className="btn" href={`/perfiles/peleador/${me.id}/editar`}>Editar foto y banner</Link></p>
-      <p><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></p>
+      <div className="cabecera-pantalla" style={{ justifyContent: "center" }}><span className="titulo" aria-hidden="true">Mi ficha</span></div>
+      <div className="fila" style={{ padding: 16, borderRadius: 26, marginBottom: 12 }}>
+        <span className="avatar avatar-relleno" aria-hidden="true" style={{ width: 62, height: 62, fontSize: 20 }}>{iniciales(`${me.firstName} ${me.lastName}`)}</span>
+        <span className="cuerpo"><h1 style={{ margin: 0, font: "700 18px/1.2 var(--font)" }}>{me.firstName} {me.lastName}</h1><span className="meta">{principal ? `${DISCIPLINE_LABEL[principal.discipline]} · ${LEVEL_LABEL[principal.level]}${principal.weightClass ? ` · ${weightClassLabel(principal.discipline, principal.level, principal.weightClass, principal.divisionId)}` : ""}` : ""}</span><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></span>
+        {principal && <span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em", color: "var(--acc)" }}>{recP.w}-{recP.l}-{recP.d}</span>}
+      </div>
+      <p><Link className="btn" href={`/perfiles/peleador/${me.id}/editar`}>Editar foto y banner</Link></p>
+
+      {tieneAmateur && (
+        <section id="privacidad" className="tarjeta" aria-labelledby="titulo-privacidad" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
+          <form action={setRecordPublic} className="interruptor">
+            <input type="hidden" name="publico" value={me.recordPublic ? "0" : "1"} />
+            <span className="texto"><h2 id="titulo-privacidad" style={{ margin: 0, font: "700 16px var(--font)" }}>Mostrar mi récord amateur completo</h2><span className="meta" style={{ display: "block" }}>{me.recordPublic ? "Ahora el público ve tus victorias, derrotas y empates." : "Ahora el público solo ve cuántos combates llevas."}</span></span>
+            <button role="switch" aria-checked={me.recordPublic} aria-label={me.recordPublic ? "Ocultar mi récord amateur completo" : "Mostrar mi récord amateur completo"}><span aria-hidden="true" /></button>
+          </form>
+          <div className="fila" style={{ minHeight: 48, padding: "10px 14px", borderRadius: 16, background: "rgba(255,255,255,.05)", border: 0 }}><span className="cuerpo">Así te ven los demás</span><strong className="acc">{vistoPorOtros}</strong></div>
+          <p className="mut" style={{ margin: 0 }}>Solo para el nivel amateur. En profesional el récord siempre es público.</p>
+        </section>
+      )}
+
+      <section id="highlights" className="tarjeta" aria-labelledby="titulo-mis-highlights" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
+        <div className="titulo-seccion"><h2 id="titulo-mis-highlights" style={{ fontSize: 20 }}>Mis highlights</h2><span className="meta">{misHighlights.length} · aparecen en tu ficha pública</span></div>
+        {misHighlights.map((h) => (
+          <div key={h.id} className="fila" style={{ background: "rgba(255,255,255,.04)" }}>
+            <span className="cuerpo"><span className="nombre">{h.title}{h.pinned && <span className="pildora pildora-acc" style={{ marginLeft: 8, fontSize: 13 }}>Destacado</span>}</span><span className="meta">{HIGHLIGHT_KIND_LABEL[h.kind]}{h.bout ? ` · ${h.bout.event.name}` : ""}</span></span>
+            <form action={manageHighlight} style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <input type="hidden" name="highlightId" value={h.id} />
+              {!h.pinned && <button name="accion" value="destacar" className="secondary" aria-label={`Destacar «${h.title}»`}>Destacar</button>}
+              <button name="accion" value="retirar" className="secondary" aria-label={`Retirar «${h.title}» de mi ficha`}>Retirar</button>
+            </form>
+          </div>
+        ))}
+        <details id="publicar-highlight" className="opcionales" open={misHighlights.length === 0} style={{ scrollMarginTop: 80 }}>
+          <summary>Publicar un highlight</summary>
+          <form action={publishHighlight} encType="multipart/form-data" style={{ display: "flex", flexDirection: "column", gap: 14, paddingBottom: 12 }}>
+            <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend className="leyenda">Tipo</legend>
+              <div className="segmentos"><label><input type="radio" name="kind" value="VIDEO" defaultChecked required />Vídeo</label><label><input type="radio" name="kind" value="PHOTO" />Foto</label></div>
+            </fieldset>
+            <label className="field"><span>Título</span><input name="title" required maxLength={HIGHLIGHT_TITLE_MAX} placeholder="El KO del tercer asalto" /></label>
+            <label className="field solo-video"><span>Enlace del vídeo</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" /><span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span></label>
+            <label className="field"><span>Foto (obligatoria si es una foto; opcional como portada del vídeo)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" /><span className="hint">JPG, PNG o WebP de hasta 4 MB.</span></label>
+            <label className="field"><span>¿De qué combate es? (opcional)</span>
+              <select name="boutId" defaultValue=""><option value="">Ninguno en concreto</option>{bouts.map((b) => <option key={b.id} value={b.id}>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</option>)}</select>
+            </label>
+            <label className="chip" style={{ alignSelf: "flex-start" }}><input type="checkbox" name="pinned" />Destacar en mi ficha</label>
+            <p className="mut" style={{ margin: 0 }}>Solo publica contenido tuyo o con permiso de quien lo grabó. Puedes retirarlo cuando quieras.</p>
+            <button className="btn-grande">Publicar en mi ficha</button>
+          </form>
+        </details>
+      </section>
       <p><Link className="btn" href="/mi-ficha/trayectoria">Gestionar mis títulos y mi aura</Link></p>
       <nav aria-label="Ir a una parte de esta página" className="indice-pagina">
         <span className="mut">Ir a:</span>
@@ -160,7 +226,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
 
       {toConfirm.length > 0 && (
         <>
-          <h2>Combates que puedes confirmar o pedir que se revisen</h2>
+          <h2 id="por-confirmar">Combates que puedes confirmar o pedir que se revisen</h2>
           <p className="mut">Tu rival ha declarado estos resultados. Confirmarlos es opcional. Si hay un error, explica el motivo para que moderación lo revise; el aviso no suspende el resultado automáticamente.</p>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {toConfirm.map((b) => {
@@ -202,13 +268,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <span className="hint">Si el combate es hoy y todavía no se ha celebrado, o es futuro, déjalo sin elegir: podrás añadirlo después. Los combates de días anteriores necesitan resultado.</span>
         </label>
         <label className="field"><span>Cómo terminó</span>
-          <select name="method" defaultValue={previo("method")}>
-            <option value="">Elige cómo terminó…</option>
-            <option value="UD">Decisión unánime</option><option value="SD">Decisión dividida</option><option value="MD">Decisión mayoritaria</option>
-            <option value="KO">KO</option><option value="TKO">TKO</option><option value="SUBMISSION">Sumisión</option><option value="POINTS">Puntos</option><option value="ADVANTAGE">Ventajas</option>
-            <option value="RTD">Abandono</option><option value="DQ">Descalificación</option>
-          </select>
-          <span className="hint">Elige la que corresponda a tu disciplina (la sumisión, los puntos y las ventajas solo existen en MMA y jiu-jitsu). En empates no hace falta.</span>
+          <MetodoSegunDisciplina inicial={(previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"]} defaultValue={previo("method")} />
+          <span className="hint">Solo aparecen las formas de terminar de la disciplina elegida. En empates no hace falta.</span>
         </label>
         <details className="opcionales" style={{ flex: "1 1 100%" }}>
           <summary>Más datos del combate (opcional): recinto, asaltos y enlace que lo demuestre</summary>

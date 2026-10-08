@@ -13,7 +13,7 @@ export async function profileSource(kind: ProfileKind, id: string) {
     return f ? { name: `${f.firstName} ${f.lastName}`, href: `/peleadores/${f.slug}`, ownerId: f.userId, visible: f.listed && !f.hiddenAt } : null;
   }
   if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: null, visible: true } : null; }
-  if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: null, visible: true } : null; }
+  if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: t.userId, visible: true } : null; }
   if (kind === "promotor") {
     const u = await db.user.findUnique({ where: { id }, include: { organizerRequest: true } });
     return u?.role === "ORGANIZER" ? { name: u.organizerRequest?.orgName ?? publicUserName(u.name), href: `/promotores/${u.id}`, ownerId: u.id, visible: true } : null;

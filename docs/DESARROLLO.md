@@ -46,6 +46,7 @@ src/
     bouts/                reglas de los combates (validar el resultado, clave del enfrentamiento)
     aura/                 reglas para dar aura y ránking por categoría
     community/            avisos de error de usuarios y notificaciones a seguidores
+    trainers/             clases de los entrenadores (validación, duración, precio, plazas)
 ```
 
 ### Módulos de acciones (`src/app/actions/`)
@@ -59,6 +60,7 @@ src/
 | `events.ts` | Pedir ser organizador, crear veladas, montar el cartel, poner resultados | Organizador |
 | `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos | Moderación |
 | `community.ts` | Avisos de error, seguir a un peleador | Cuenta con sesión |
+| `trainers.ts` | Perfil propio del entrenador y sus clases (publicar, pausar) | Entrenador con correo verificado |
 | `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
 
 ### Quién puede depender de quién (lo vigila `tests/unit/arquitectura.test.ts`)
@@ -68,7 +70,7 @@ app/pantallas ──▶ app/actions/<módulo> ──▶ app/actions/shared ─�
       │                                                              ▲
       └──────────▶ app/components ───────────────────────────────────┤
                                                                      │
-lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura
+lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura, lib/trainers
 ```
 
 - `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts` y `aura` solo dependen de `common`; `community` también de `accounts`.

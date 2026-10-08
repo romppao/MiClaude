@@ -230,3 +230,14 @@ El retorno a respaldos se integra en #16; CI final #142 aprueba 406 unitarias, 3
 - **Prueba de ingreso objetiva «La escalera»** (6 de octubre de 2026, el fundador: «algo para medir bien el nivel de nuestros ayudantes»): **hecha** ([PRUEBA-ESCALERA.md](PRUEBA-ESCALERA.md)). Ideas derivadas: repetirla cada vez que cambie un modelo («examen de reválida»), con retos nuevos para que no se memoricen; añadir un reto de nivel 5 cuando alguien saque todo.
 - **Límites para menores al final de la fase básica** (6 de octubre de 2026, el fundador: «no quiero impedir a los más pequeños que puedan utilizar esta app […] limitaremos alguna cosilla, será el último punto, después del diseño»): decidida la política de **no pedir edad al crear la cuenta**; fecha de nacimiento solo en la ficha. Pendiente: T-014 (límites de comentarios, fotos e imágenes delicadas) y decidir si la fecha de nacimiento es obligatoria en la ficha.
 - **Brevo como recambio de Resend** (6 de octubre de 2026, segunda verificación): 300 correos al día gratis y empresa europea; se activa si se superan los 100 diarios antes de querer pagar.
+
+## Diseño v3 — propuestas del fundador (7 de octubre de 2026, Claude Design)
+
+Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que ya estén, quisiera pulirlas».
+1. **Propuestas de combate y sparring entre peleadores** — pendiente (fase 2 del diseño v3).
+2. **Cuarto registro: entrenadores**, que se promocionan y venden clases individuales y colectivas — **hecho en parte (8 oct):** cuenta de entrenador, perfil público y clases con precio. Pendiente: reservas y pagos (decisión del fundador: ¿cobro dentro de la aplicación?).
+3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — el club ya puede registrarse como entidad; las inscripciones quedan para la fase 2.
+4. **Récord amateur privado** (solo el número de combates, salvo que el peleador lo publique) — **hecho (8 oct).**
+5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — pendiente (fase 2).
+6. **Highlights del peleador en su ficha** («ya luego retocaré cosas de código con Claude Code») — **hecho (8 oct):** vídeo por enlace o foto, uno destacado.
+7. «Las formas de terminar deben encajar con la disciplina y la modalidad; en boxeo no tiene sentido la sumisión» — **hecho en parte (8 oct):** el formulario solo ofrece las de la disciplina; los nombres amateur propuestos por el diseño (RSC, RSC-I, W/O…) **no se aplican** hasta confirmarlos con las federaciones (decisión del fundador: mantener la lista del repositorio por ahora).

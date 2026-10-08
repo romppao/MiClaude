@@ -129,3 +129,9 @@ El análisis revisado y sus fuentes comprobadas están en [COMPETENCIA.md](COMPE
 Al terminar cada bloque de trabajo: entrada nueva **al final** de `docs/DIARIO.md` (antes de la plantilla; sin reescribir las anteriores), actualizar `docs/IDEAS.md` (con el origen de cada idea), añadir a `docs/LECCIONES.md` cada error con su causa real y su regla, y actualizar `docs/ARQUITECTURA.md` si cambia el estado técnico. Sé honesto con lo que salió mal: el valor de esos documentos es que sean fiables.
 
 17. **Principio de coste (6 de octubre de 2026):** «quiero utilizar el mínimo capital posible y que me funcione la aplicación […] herramientas gratuitas o de mínimo coste, muy top, fiables, escalables y **fáciles de modificar en un futuro**». Toda elección de proveedor se justifica por coste inicial, escalado y facilidad de cambio, y se registra en un ADR. Ver [ADR-003](decisiones/ADR-003-proveedores-fase-0.md).
+18. **Nombres de los resultados amateur** (RSC, RSC-I, W/O…, propuestos por el diseño v3): decidido el 8 oct mantener por ahora la lista del repositorio y ocultar solo lo que no corresponde a cada disciplina. Falta confirmarlos con cada federación antes de ampliar el enum `Method`.
+19. **Clases de entrenadores:** ¿reservas y cobro dentro de la aplicación? Hoy solo se muestran clase y precio (sin pagos). Afecta a costes, comisiones y obligaciones legales.
+20. **Vídeos de highlights:** hoy son enlaces a otras webs; subir vídeos propios exige almacenamiento (decisión ligada a T-004).
+21. **Plantilla del club:** al aprobar un club, ¿se crea su gimnasio en el directorio y quién confirma a los peleadores que lo integran?
+22. **Récord amateur privado** se aplicó también a las fichas que ya existían. Si el fundador prefiere respetar lo publicado antes, basta con una migración que marque `recordPublic` en las fichas anteriores al 8 de octubre.
+

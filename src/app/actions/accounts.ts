@@ -15,9 +15,12 @@ import { audit } from "../../lib/common/audit";
 import { internalPath } from "../../lib/common/paths";
 import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
-import { landingFor, parseTipoDeCuenta, parseTipoDeEntidad } from "../../lib/accounts/landing";
+import { ROL_INICIAL, landingFor, parseTipoDeCuenta, parseTipoDeEntidad, type TipoDeCuenta, type TipoDeEntidad } from "../../lib/accounts/landing";
+import { readOnboarding, type FighterIntent, type TrainerIntent } from "../../lib/accounts/onboarding";
+import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
+import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
 import { safeHttpUrl } from "../../lib/common/url";
-import { checkLengths, go, guard, Rechazo, str } from "./shared";
+import { checkLengths, go, guard, readProvince, Rechazo, str } from "./shared";
 
 const MIN_PASSWORD = 8;
 
@@ -27,7 +30,13 @@ function checkNewPassword(password: string, back: string) {
   if (password.length > LIMITS.password) go(back, { problema: "contrasena_larga" });
 }
 
-/** Alta de cuenta desde uno de los tres paneles del registro: «usuario», «peleador» o «entidad» (promotora o federación, con su solicitud). */
+/** Siguiente paso del registro tras crear la cuenta: cada tipo tiene el suyo (diseño v3); la entidad ya ha terminado. */
+const PASO_TRAS_DATOS: Record<TipoDeCuenta, string> = { usuario: "/registro/intereses", peleador: "/registro/ficha", entrenador: "/registro/perfil", entidad: "/verificar" };
+
+/**
+ * Alta de cuenta (paso «datos» del registro) para los cuatro tipos: aficionado («usuario»), peleador, entrenador y entidad
+ * (promotora, federación o club, con su solicitud). La cuenta se crea aquí; el paso siguiente es opcional y se puede dejar para después.
+ */
 export async function register(f: FormData) {
   const next = internalPath(str(f, "next"), "");
   const tipo = parseTipoDeCuenta(str(f, "tipo"), str(f, "role")); // un formulario antiguo con «role» sigue funcionando
@@ -35,13 +44,13 @@ export async function register(f: FormData) {
   const email = str(f, "email").toLowerCase();
   const name = oneLine(str(f, "name"));
   const password = String(f.get("password") ?? "");
-  const role = tipo === "peleador" ? "FIGHTER" : "FAN"; // la entidad empieza como persona normal: el permiso de organizadora lo concede un moderador
+  const role = ROL_INICIAL[tipo]; // la entidad empieza como persona normal: el permiso de organizadora lo concede un moderador
   const ip = await clientIp();
   if (ip && !(await allow(`registro:ip:${ip}`, 10, HORA))) go(back, { problema: "demasiados_intentos" });
   if (!name || name.length > LIMITS.name || !isEmail(email)) go(back, { problema: "registro_datos" });
   checkNewPassword(password, back);
-  // Panel C: los datos de la entidad se comprueban ANTES de crear nada, para no dejar una cuenta sin su solicitud.
-  let entidad: { orgName: string; kind: "PROMOTORA" | "FEDERACION"; website: string | null; message: string } | null = null;
+  // Entidad: sus datos se comprueban ANTES de crear nada, para no dejar una cuenta sin su solicitud.
+  let entidad: { orgName: string; kind: TipoDeEntidad; website: string | null; message: string } | null = null;
   if (tipo === "entidad") {
     checkLengths(f, back, { orgName: LIMITS.orgName, message: LIMITS.message, website: LIMITS.url });
     const orgName = oneLine(str(f, "orgName"));
@@ -54,9 +63,10 @@ export async function register(f: FormData) {
     if (!message) go(back, { problema: "organizador_sin_datos" });
     entidad = { orgName, kind, website, message };
   }
+  const siguiente = PASO_TRAS_DATOS[tipo];
   if (await db.user.findUnique({ where: { email }, select: { id: true } })) {
-    // Un doble clic en «Crear mi cuenta» envía dos veces: la segunda ve la cuenta que acaba de crear la primera. Quien ya tiene esa sesión sigue a «Confirma tu correo».
-    if ((await getUser())?.email === email) go("/verificar");
+    // Un doble clic en «Crear mi cuenta» envía dos veces: la segunda ve la cuenta que acaba de crear la primera. Quien ya tiene esa sesión sigue adelante.
+    if ((await getUser())?.email === email) go(siguiente);
     go(back, { problema: "registro_email_existe" });
   }
   await maybePurge();
@@ -70,7 +80,68 @@ export async function register(f: FormData) {
   const enviado = await sendVerificationEmail(user);
   await createSession(user.id);
   if (next) await rememberReturnPath(next); // al confirmar el correo se le ofrecerá volver a lo que estaba haciendo
-  go("/verificar", enviado ? (entidad ? { aviso: "registro_entidad" } : undefined) : { problema: "correo_no_enviado" });
+  if (!enviado) go("/verificar", { problema: "correo_no_enviado" });
+  go(siguiente, entidad ? { aviso: "registro_entidad" } : { aviso: "cuenta_creada" });
+}
+
+/** Registro del aficionado, último paso: disciplinas que le interesan y peleadores que quiere seguir (todo opcional). */
+export async function saveInterests(f: FormData) {
+  const user = await requireUser("/registro/intereses");
+  const disciplinas = DISCIPLINE_ORDER.filter((d) => f.getAll("disciplina").includes(d));
+  const ids = [...new Set(f.getAll("seguir").map(String))].filter((id) => id.length <= 40).slice(0, 30);
+  // Solo fichas públicas y nunca la propia (igual que «Seguir» en la ficha).
+  const fichas = ids.length ? await db.fighter.findMany({ where: { id: { in: ids }, listed: true, hiddenAt: null, NOT: { userId: user.id } }, select: { id: true } }) : [];
+  await db.$transaction([
+    db.user.update({ where: { id: user.id }, data: { interests: disciplinas } }),
+    db.follow.createMany({ data: fichas.map((x) => ({ userId: user.id, fighterId: x.id })), skipDuplicates: true }),
+  ]);
+  revalidatePath("/", "layout");
+  go(user.emailVerifiedAt ? "/" : "/verificar", { aviso: fichas.length ? "intereses_y_seguidos" : "intereses_guardados" });
+}
+
+/**
+ * Registro del peleador, último paso: disciplina, nivel, división, categoría y provincia. La ficha pública exige el correo confirmado,
+ * así que aquí solo se guarda lo elegido; «Mi ficha» lo trae ya rellenado y la persona solo tiene que revisarlo y crearla.
+ */
+export async function saveFighterIntent(f: FormData) {
+  const user = await requireUser("/registro/ficha");
+  const back = "/registro/ficha";
+  if (user.fighter) go("/mi-ficha");
+  const choice = parseCompetitionChoice(str(f, "discipline"), str(f, "level"), str(f, "weightClass"), str(f, "divisionId"));
+  if (!choice) go(back, { problema: "disciplina_no_valida" });
+  const province = readProvince(f, "province", back);
+  const intento: FighterIntent = { kind: "peleador", discipline: choice.discipline, level: choice.level, divisionId: choice.divisionId, weightClass: choice.weightClass, province };
+  await db.user.update({ where: { id: user.id }, data: { onboarding: intento } });
+  go(user.emailVerifiedAt ? "/mi-ficha" : "/verificar", { aviso: "registro_ficha_guardada" });
+}
+
+/** Registro del entrenador, tercer paso: disciplinas que enseña, dónde entrena, años de experiencia y provincia. */
+export async function saveTrainerIntent(f: FormData) {
+  const user = await requireUser("/registro/perfil");
+  const back = "/registro/perfil";
+  checkLengths(f, back, { gym: LIMITS.gym });
+  const disciplines = pickDisciplines(f.getAll("disciplina").map(String), DISCIPLINE_ORDER);
+  if (disciplines.length === 0) go(back, { problema: "entrenador_disciplinas" });
+  const years = parseYears(str(f, "years"));
+  if (years === undefined) go(back, { problema: "entrenador_anos" });
+  const province = readProvince(f, "province", back);
+  const previo = readOnboarding(user.onboarding);
+  const intento: TrainerIntent = { kind: "entrenador", disciplines, gym: oneLine(str(f, "gym")), years, province, clase: previo?.kind === "entrenador" ? previo.clase : null };
+  await db.user.update({ where: { id: user.id }, data: { onboarding: intento } });
+  go("/registro/clase");
+}
+
+/** Registro del entrenador, último paso: su primera clase (opcional). Se publica junto con el perfil, tras confirmar el correo. */
+export async function saveTrainerClassIntent(f: FormData) {
+  const user = await requireUser("/registro/clase");
+  const back = "/registro/clase";
+  const previo = readOnboarding(user.onboarding);
+  if (previo?.kind !== "entrenador") go("/registro/perfil", { problema: "entrenador_perfil_primero" });
+  const borrador = { kind: str(f, "kind"), title: str(f, "title"), minutes: str(f, "minutes"), price: str(f, "price"), capacity: str(f, "capacity"), schedule: str(f, "schedule") };
+  const clase = parseClass(borrador);
+  if (!clase.ok) go(back, { problema: clase.problema });
+  await db.user.update({ where: { id: user.id }, data: { onboarding: { ...previo, clase: borrador } } });
+  go(user.emailVerifiedAt ? "/" : "/verificar", { aviso: "registro_clase_guardada" });
 }
 
 // Límites del inicio de sesión: intentos fallidos en 15 minutos por correo y por dirección IP (si el proxy la facilita).
@@ -205,6 +276,14 @@ export async function deleteAccount(f: FormData) {
     if (fighter) {
       if (fighter._count.boutsAsA + fighter._count.boutsAsB === 0) { await scrubFighterHistory(tx, fighter.id); await tx.fighter.delete({ where: { id: fighter.id } }); ficha = "borrada"; }
       else { await anonymizeFighter(tx, fighter.id); ficha = "anonimizada"; }
+    }
+    // Perfil de entrenador (diseño v3): es suyo y lleva su nombre, así que se borra con sus clases; sus peleadores dejan de tenerlo como entrenador.
+    const entrenador = await tx.trainer.findUnique({ where: { userId: user.id }, select: { id: true } });
+    if (entrenador) {
+      await tx.fighter.updateMany({ where: { trainerId: entrenador.id }, data: { trainerId: null } });
+      await tx.profile.deleteMany({ where: { kind: "entrenador", entityId: entrenador.id } });
+      await tx.trainer.delete({ where: { id: entrenador.id } });
+      await tx.auditLog.updateMany({ where: { entity: { in: ["TRAINER", "CLASS"] }, userId: user.id }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
     }
     // El historial guardaba su nombre real «antes» y «después» de cada cambio: se vacían esos datos (queda constancia de qué pasó y cuándo).
     await tx.auditLog.updateMany({ where: { entity: "USER", entityId: user.id }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });

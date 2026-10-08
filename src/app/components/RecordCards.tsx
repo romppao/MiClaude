@@ -11,7 +11,7 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
  * Un cuadro de récord por disciplina y nivel. La cifra principal suma el récord de partida **solo si se declaró con detalle**;
  * el desglose deja siempre claro qué está registrado en la app y qué lo declara el propio deportista.
  */
-export default function RecordCards({ records, disciplines }: { records: Records; disciplines: FighterDiscipline[] }) {
+export default function RecordCards({ records, disciplines, ocultarAmateur = false }: { records: Records; disciplines: FighterDiscipline[]; ocultarAmateur?: boolean }) {
   const byDiscipline = new Map(disciplines.map((d) => [d.discipline, d]));
   const shown = DISCIPLINE_ORDER.filter((d) => byDiscipline.has(d) || records[d]);
   const cards: { discipline: Discipline; level: Level }[] = [];
@@ -31,6 +31,17 @@ export default function RecordCards({ records, disciplines }: { records: Records
         const tally = records[discipline]?.[level] ?? emptyTally();
         const prior = fd && fd.level === level ? { total: fd.priorTotal, wins: fd.priorWins, losses: fd.priorLosses, draws: fd.priorDraws } : null;
         const c = combinedRecord(tally, prior);
+        // Récord amateur privado (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
+        if (ocultarAmateur && level === "AMATEUR") {
+          const total = c.w + c.l + c.d + tally.nc + (c.priorDetailed ? 0 : c.priorTotal);
+          return (
+            <div key={`${discipline}-${level}`} className="card">
+              <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}</div>
+              <div className="rec">{total}</div>
+              <div className="mut">{total === 1 ? "combate disputado" : "combates disputados"} · el peleador mantiene privado su récord amateur completo</div>
+            </div>
+          );
+        }
         return (
           <div key={`${discipline}-${level}`} className="card">
             <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}</div>

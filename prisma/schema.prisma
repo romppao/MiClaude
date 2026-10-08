@@ -43,6 +43,7 @@ enum Method {
 enum Role {
   FAN
   FIGHTER
+  TRAINER
   ORGANIZER
   ADMIN
 }
@@ -109,8 +110,66 @@ model Trainer {
   gymId    String?
   gym      Gym?      @relation(fields: [gymId], references: [id])
   fighters Fighter[]
+  // Cuenta del propio entrenador (registro «Entrenador»). Null en los perfiles creados por moderación.
+  userId        String?         @unique
+  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  disciplines   Discipline[]    @default([])
+  yearsCoaching Int?
+  city          String?
+  province      String?
+  classes       TrainingClass[]
+  createdAt     DateTime        @default(now())
 
   @@index([gymId])
+}
+
+enum ClassKind {
+  INDIVIDUAL
+  GROUP
+}
+
+// Clase que ofrece un entrenador. Precio por persona y sesión en euros enteros. Pausada (active = false) no se muestra en su perfil.
+model TrainingClass {
+  id         String      @id @default(cuid())
+  trainerId  String
+  trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  kind       ClassKind
+  title      String
+  discipline Discipline?
+  minutes    Int
+  priceEuros Int
+  capacity   Int?
+  schedule   String?
+  active     Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([trainerId, active])
+}
+
+enum HighlightKind {
+  VIDEO
+  PHOTO
+}
+
+// Lo mejor de un peleador, publicado por él mismo en su ficha. Un vídeo es un enlace (los archivos de vídeo no se guardan en la base de datos);
+// una foto se guarda normalizada (webp). Solo uno puede estar destacado por ficha.
+model Highlight {
+  id        String        @id @default(cuid())
+  fighterId String
+  fighter   Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  kind      HighlightKind
+  title     String
+  videoUrl  String?
+  image     Bytes?
+  hasImage  Boolean       @default(false)
+  boutId    String?
+  bout      Bout?         @relation(fields: [boutId], references: [id], onDelete: SetNull)
+  pinned    Boolean       @default(false)
+  hiddenAt  DateTime?
+  createdAt DateTime      @default(now())
+
+  @@index([fighterId, hiddenAt])
 }
 
 model Fighter {
@@ -127,6 +186,9 @@ model Fighter {
   heightCm      Int?
   reachCm       Int?
   level         Level               @default(AMATEUR)
+  // Récord amateur completo visible para el público. Por defecto solo se muestra el número de combates (decisión del fundador, 7 oct 2026).
+  recordPublic  Boolean             @default(false)
+  highlights    Highlight[]
   // false = ficha creada por un tercero (rival) que aún no ha sido reclamada ni confirmada: no sale en listados ni buscadores.
   listed        Boolean             @default(true)
   hiddenAt      DateTime?
@@ -210,6 +272,7 @@ model Bout {
   evidenceUrl  String?
   // Pareja canónica (ids ordenados): impide registrar dos veces el mismo enfrentamiento en una velada, en cualquier esquina.
   pairKey      String?
+  highlights   Highlight[]
 
   @@unique([eventId, pairKey])
   @@index([createdById])
@@ -243,6 +306,11 @@ model User {
   reports          Report[]
   follows          Follow[]
   events           Event[]           @relation("EventOrganizer")
+  trainer          Trainer?
+  // Disciplinas que le interesan (registro de aficionado): ordenan su inicio.
+  interests        Discipline[]      @default([])
+  // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
+  onboarding       Json?
 }
 
 model Session {
