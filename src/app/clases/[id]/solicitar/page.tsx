@@ -5,7 +5,9 @@ import { db } from "../../../../lib/common/db";
 import { getUser } from "../../../../lib/accounts/auth";
 import { DISCIPLINE_LABEL } from "../../../../lib/common/disciplines";
 import { CLASS_KIND_LABEL, classMeta } from "../../../../lib/trainers/classes";
-import { REQUEST_MESSAGE_MAX, REQUEST_PHONE_MAX, REQUEST_PREFERRED_MAX } from "../../../../lib/trainers/requests";
+import { REQUEST_MESSAGE_MAX, REQUEST_PHONE_MAX } from "../../../../lib/trainers/requests";
+import { todayMadrid } from "../../../../lib/common/dates";
+import ElegirHorario from "../../../components/ElegirHorario";
 import { requestClass } from "../../../actions/trainers";
 
 export const metadata: Metadata = { title: "Solicitar una clase", robots: { index: false, follow: false } };
@@ -45,8 +47,10 @@ export default async function SolicitarClase({ params, searchParams }: { params:
       ) : (
         <form action={requestClass} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <input type="hidden" name="classId" value={c.id} />
-          <label className="field"><span>¿Cuándo te viene bien?</span><textarea name="preferred" defaultValue={previo("preferred")} required maxLength={REQUEST_PREFERRED_MAX} rows={2} placeholder="Por ejemplo: martes o jueves por la tarde, a partir de las 18:00" /><span className="hint">{c.kind === "GROUP" ? `Horario de la clase: ${c.schedule}. Dinos qué día quieres empezar.` : "El horario se acuerda con el entrenador."}</span></label>
-          <label className="field"><span>Mensaje para el entrenador (opcional)</span><textarea name="message" defaultValue={previo("message")} maxLength={REQUEST_MESSAGE_MAX} rows={3} placeholder="Tu nivel, qué quieres trabajar, si es tu primera clase…" /></label>
+          {/* Día en un calendario y franja con una barra (petición del fundador, 8 de octubre de 2026: «le obliga a escribir mucho»). */}
+          <ElegirHorario hoy={todayMadrid()} individual={c.kind === "INDIVIDUAL"} minutos={c.minutes} inicial={{ day: previo("day"), from: Number(previo("fromMinute")) || undefined, to: Number(previo("toMinute")) || undefined }} />
+          {c.kind === "GROUP" && <p className="hint" style={{ margin: 0 }}>Horario de la clase: {c.schedule}. Elige el día en que quieres empezar.</p>}
+          <label className="field"><span>¿Algo importante que deba saber el entrenador? (opcional)</span><textarea name="message" defaultValue={previo("message")} maxLength={REQUEST_MESSAGE_MAX} rows={2} placeholder="Tu nivel, una lesión, si es tu primera clase…" /></label>
           <label className="field"><span>Teléfono (opcional)</span><input name="phone" defaultValue={previo("phone")} type="tel" inputMode="tel" autoComplete="tel" maxLength={REQUEST_PHONE_MAX} /><span className="hint">Solo si prefieres que te llame o te escriba por teléfono.</span></label>
           <p className="mut" style={{ margin: 0 }}>{c.trainer.name} verá tu nombre, tu correo electrónico y lo que escribas aquí, y te responderá aquí y por correo. Si acepta, podréis escribiros por correo. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>
           <button className="btn-grande">Solicitar la clase</button>

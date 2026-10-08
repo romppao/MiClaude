@@ -10,7 +10,9 @@ import { TIPOS_DE_ENTIDAD, TIPO_DE_ENTIDAD_ETIQUETA, puedeOrganizar } from "../.
 export const metadata = { title: "Organizadores" };
 export const dynamic = "force-dynamic";
 
-export default async function Organizer() {
+export default async function Organizer({ searchParams }: { searchParams: Promise<{ tipo?: string | string[] }> }) {
+  // «Crear un interclub» desde el panel llega con ?tipo=interclub y el formulario ya lo trae elegido.
+  const tipoPedido = (await searchParams).tipo === "interclub" ? "INTERCLUB" : "VELADA";
   const user = await getUser();
   if (!user) {
     return (
@@ -63,7 +65,7 @@ export default async function Organizer() {
       <form className="search" action={createEvent}>
         <fieldset className="field" style={{ flexBasis: "100%", border: 0, padding: 0, margin: 0 }}>
           <legend className="leyenda">Tipo de evento</legend>
-          <div className="chips">{(["VELADA", "INTERCLUB"] as const).map((k) => <label key={k} className="chip"><input type="radio" name="kind" value={k} defaultChecked={k === "VELADA"} />{EVENT_KIND_LABEL[k]}</label>)}</div>
+          <div className="chips">{(["VELADA", "INTERCLUB"] as const).map((k) => <label key={k} className="chip"><input type="radio" name="kind" value={k} defaultChecked={k === tipoPedido} />{EVENT_KIND_LABEL[k]}</label>)}</div>
           <span className="hint">Velada: {EVENT_KIND_AYUDA.VELADA.toLowerCase()} Interclub: {EVENT_KIND_AYUDA.INTERCLUB.toLowerCase()}</span>
         </fieldset>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre del evento</span><input name="name" required maxLength={LIMITS.eventName} /></label>

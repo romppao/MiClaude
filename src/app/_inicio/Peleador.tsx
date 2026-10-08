@@ -12,7 +12,7 @@ import CuentaAtras from "../components/CuentaAtras";
 import Foto from "../components/Foto";
 import Icono from "../components/Icono";
 import { GraficoAura } from "../components/Tarjetas";
-import { Saludo } from "./comun";
+import { AccionesPrincipales, Saludo } from "./comun";
 import { CUENTA } from "./datos";
 
 /**
@@ -40,6 +40,8 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
     db.bout.findMany({ where: { fighterBId: me.id, verification: "SELF_REPORTED", result: { not: null } }, include: { event: true, fighterA: true }, orderBy: { event: { date: "desc" } }, take: 3 }),
     db.aura.findMany({ where: { fighterId: me.id, bout: CUENTA }, select: { createdAt: true } }),
   ]);
+  // Retos y sparrings recibidos que esperan respuesta.
+  const propuestas = await db.fightProposal.count({ where: { toId: me.id, status: "PENDING" } });
   const principal = me.disciplines[0];
   const tally = principal ? computeRecords(me.id, bouts)[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
   const rec = combinedRecord(tally, principal ? { total: principal.priorTotal, wins: principal.priorWins, losses: principal.priorLosses, draws: principal.priorDraws } : null);
@@ -68,6 +70,14 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
           <span style={{ marginLeft: "auto", textAlign: "right" }} aria-hidden="true"><span style={{ font: "800 30px/1 var(--font)", color: "var(--acc2)" }}>{auras.length}</span><span className="meta" style={{ display: "block", color: "rgba(255,255,255,.75)" }}>de aura</span></span>
         </div>
       </section>
+      <AccionesPrincipales acciones={[
+        { href: "/mi-ficha#registrar-combate", titulo: "Registrar un combate", detalle: "Suma a tu récord", icono: "mas" },
+        { href: "/propuestas#proponer", titulo: "Retar o proponer sparring", detalle: "A otro peleador", icono: "reto" },
+        { href: "/propuestas", titulo: "Mis propuestas", detalle: "Retos y sparrings", icono: "bandeja", aviso: propuestas },
+        { href: "/mi-ficha#publicar-highlight", titulo: "Publicar un highlight", detalle: "Tu mejor vídeo o foto", icono: "camara" },
+        { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "calendario" },
+        { href: "/mi-ficha/trayectoria", titulo: "Mis títulos y mi aura", detalle: "Tu trayectoria", icono: "trofeo" },
+      ]} />
       {principal?.level === "AMATEUR" && !me.recordPublic && <p className="mut" style={{ margin: 0 }}>Tu récord amateur es privado: el público solo ve cuántos combates llevas. <Link href="/mi-ficha#privacidad">Cambiarlo</Link></p>}
 
       <section className="tarjeta" aria-labelledby="titulo-mi-proximo" style={{ gap: 14 }}>
@@ -100,10 +110,6 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
         <GraficoAura serie={serie} etiqueta={`Aura recibida en los últimos 7 meses: ${serie.map((x) => `${x.mes} ${x.total}`).join(", ")}`} />
       </section>
 
-      <div className="rejilla-2">
-        <Link href="/mi-ficha#registrar-combate" className="accion-grande tarjeta tarjeta-acc"><Icono nombre="mas" tam={26} grosor={2.2} />Registrar un combate</Link>
-        <Link href="/mi-ficha/trayectoria" className="accion-grande tarjeta"><Icono nombre="trofeo" tam={26} grosor={1.8} />Mis títulos y mi aura</Link>
-      </div>
     </div>
   );
 }

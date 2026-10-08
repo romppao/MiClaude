@@ -10,7 +10,7 @@ import { LIMITS } from "../../lib/common/text";
 import { CLASS_KIND_LABEL, TRAINER_YEARS_MAX, classMeta, parseClass } from "../../lib/trainers/classes";
 import { createMyTrainer } from "../actions/trainers";
 import Icono from "../components/Icono";
-import { Saludo } from "./comun";
+import { AccionesPrincipales, Saludo } from "./comun";
 
 /**
  * Inicio del entrenador (diseño v3, «homeCoach»). Sin perfil todavía: el formulario para publicarlo, con lo que eligió al registrarse.
@@ -39,6 +39,10 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     return (
       <div className="pantalla">
         <Saludo kicker="Mi panel" nombre={user.name} sub="Entrenador" />
+        {user.emailVerifiedAt && <AccionesPrincipales acciones={[
+          { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
+          { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
+        ]} />}
         {!user.emailVerifiedAt ? (
           <div className="tarjeta tarjeta-acc anillo" style={{ padding: 22 }}>
             <h2 style={{ font: "800 24px/1.1 var(--font)" }}>Publica tu perfil de entrenador</h2>
@@ -73,15 +77,19 @@ export default async function InicioEntrenador({ user }: { user: User }) {
   return (
     <div className="pantalla" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
+      <AccionesPrincipales acciones={[
+        { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
+        { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
+        { href: "/mis-clases#nueva", titulo: "Publicar una clase", detalle: "Individual o colectiva", icono: "mas" },
+        { href: "/mis-clases#solicitudes", titulo: "Solicitudes de clase", detalle: "Acepta o responde", icono: "bandeja", aviso: pendientes },
+        { href: "/organizador", titulo: "Mis veladas e interclubs", detalle: "Cartel y resultados", icono: "calendario" },
+        { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
+      ]} />
       <section className="tarjeta tarjeta-acc anillo" style={{ padding: 22, gap: 6 }} aria-label="Tus clases publicadas">
         <span className="kicker">Clases publicadas</span>
         <span style={{ font: "800 64px/1 var(--font)", letterSpacing: "-.05em" }}>{activas.length}</span>
         <span style={{ fontWeight: 500 }}>{desde !== null ? `Desde ${desde} € por sesión · visibles en tu perfil público` : "Publica una clase para aparecer en «Entrenadores»."}</span>
       </section>
-      <Link href="/mis-clases#solicitudes" className="fila" aria-label={`Solicitudes de clase: ${pendientes} esperando respuesta`}>
-        <span className="cuerpo"><span className="nombre">Solicitudes de clase</span><span className="meta">{pendientes ? "Respóndelas para que la persona sepa si tiene clase." : "Cuando alguien solicite una clase, aparecerá aquí."}</span></span>
-        <strong className={pendientes ? "acc" : undefined} style={{ font: "800 26px var(--font)" }}>{pendientes}</strong>
-      </Link>
       <div className="rejilla-3">
         <div className="dato"><span className="clave">Activas</span><span className="valor">{activas.length}</span></div>
         <div className="dato"><span className="clave">En pausa</span><span className="valor">{trainer.classes.length - activas.length}</span></div>
@@ -93,7 +101,6 @@ export default async function InicioEntrenador({ user }: { user: User }) {
           <div key={c.id} className="fila"><span className="cuerpo"><span className="nombre">{c.title}</span><span className="meta">{classMeta(c)}</span></span><span className={`pildora ${c.kind === "INDIVIDUAL" ? "pildora-acc" : "pildora-violeta"}`}>{CLASS_KIND_LABEL[c.kind]}</span><strong className="acc">{c.priceEuros} €</strong></div>
         ))}</div> : <p className="mut" style={{ margin: 0 }}>Aún no tienes clases publicadas.</p>}
       </section>
-      <Link href="/mis-clases#nueva" className="btn btn-grande"><Icono nombre="mas" />Crear una clase</Link>
       {veladas}
     </div>
   );

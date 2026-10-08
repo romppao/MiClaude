@@ -9,7 +9,7 @@ import { tinteDe } from "../../lib/common/apariencia";
 import { TIPO_DE_ENTIDAD_ETIQUETA, parseTipoDeEntidad } from "../../lib/accounts/landing";
 import { plural } from "../../lib/common/text";
 import Icono from "../components/Icono";
-import { Saludo } from "./comun";
+import { AccionesPrincipales, Saludo } from "./comun";
 
 /**
  * Panel de la promotora, federación o club aprobado (diseño v3, «homeOrg»): cifras, resultados pendientes de veladas ya celebradas,
@@ -31,6 +31,14 @@ export default async function InicioEntidad({ user }: { user: User }) {
   return (
     <div className="pantalla" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
+      <AccionesPrincipales acciones={[
+        { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
+        { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
+        { href: "/organizador", titulo: "Mis veladas", detalle: "Cartel y resultados", icono: "calendario" },
+        { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
+        { href: `/promotores/${user.id}`, titulo: "Mi perfil público", detalle: "Cómo te ve la gente", icono: "escudo" },
+        { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "capas" },
+      ]} />
       <div className="rejilla-3">
         <div className="dato"><span className="clave">Veladas</span><span className="valor" style={{ fontSize: 34 }}>{veladas}</span></div>
         <div className="dato"><span className="clave">Combates</span><span className="valor" style={{ fontSize: 34 }}>{combates}</span></div>
@@ -59,7 +67,6 @@ export default async function InicioEntidad({ user }: { user: User }) {
           </div>
         ) : <p className="mut" style={{ margin: 0 }}>No tienes veladas programadas.</p>}
       </section>
-      <Link href="/organizador#crear" className="btn btn-grande"><Icono nombre="mas" />Crear una velada</Link>
     </div>
   );
 }
