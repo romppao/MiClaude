@@ -8,11 +8,11 @@ Fomentar la afición a los deportes de contacto de toda España: boxeo, jiu-jits
 El peleador amateur gestiona su ficha y su récord; el público da aura a lo que ve; el calendario descubre veladas.
 Cada decisión técnica se toma para que esto escale a otras provincias sin rehacer nada.
 
-Identidad visual vigente: violeta #BE33F5 y perfiles personalizables, integrados en #12. El menú se organiza por actividades por petición del fundador; se conserva el diseño aprobado.
+Identidad visual vigente: diseño móvil v3 aprobado el 7 de octubre, negro/lima con violeta #BE33F5 secundario y perfiles personalizables. La fase 1 se implementó el 8 de octubre; parte de las pantallas conserva clases heredadas. Fuente de decisiones: `DISENO.md` y `CLAUDE.md`.
 
 ## Stack
 
-Next.js 15 (App Router, Server Components y Server Actions) · TypeScript 5 · PostgreSQL 16 · Prisma 6. Sin API REST separada: las páginas leen de la base de datos en el servidor y los formularios llaman a Server Actions (`src/app/actions.ts`).
+Next.js 15 (App Router, Server Components y Server Actions) · TypeScript 5 · PostgreSQL 16 · Prisma 6, con sharp para normalización de imágenes. Sin API REST separada: las páginas leen de la base de datos en el servidor y los formularios llaman a módulos de Server Actions (`src/app/actions/`).
 Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibilidad). CI: GitHub Actions con PostgreSQL de servicio.
 
 ## Estructura del código
@@ -20,9 +20,9 @@ Pruebas: vitest (unitarias) y playwright-core + axe-core (navegador y accesibili
 El código se organiza **por dominios** y con reglas de dependencia que vigila una prueba. La guía completa (dónde está cada cosa, recetas para añadir pantallas o acciones, convenciones y definición de «terminado») es [`DESARROLLO.md`](DESARROLLO.md); el mapa de pantallas → acciones → permisos → tablas se genera solo en [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md).
 
 - `src/app/` — la interfaz: una carpeta por pantalla, con direcciones en español (`/peleadores`, `/veladas`, `/mi-cuenta`, `/moderacion`…).
-  - `src/app/actions/` — las acciones del servidor, **un módulo por dominio** (`accounts`, `fighters`, `bouts`, `aura`, `events`, `moderation`, `community`, `trajectory`) y `shared.ts` con los ayudantes comunes y las guardas de permisos (`requireAdmin`, `requireOrganizer`).
+  - `src/app/actions/` — las acciones del servidor, **un módulo por dominio** (`accounts`, `fighters`, `bouts`, `aura`, `events`, `moderation`, `community`, `trajectory`, `profiles`, `trainers`, `demo`) y `shared.ts` con ayudantes comunes. Las guardas `requireAdmin` y `requireOrganizer` viven en `src/lib/accounts/permissions.ts`; sesión/correo en `auth.ts` y acreditación en `backing.ts`.
   - `src/app/components/` — componentes compartidos entre pantallas (avisos, filtros, paginación, etiquetas de verificación…).
-- `src/lib/` — la lógica, sin interfaz y agrupada por dominio: `common` (base de datos, textos, fechas, disciplinas, mensajes, correo, búsqueda sin tildes, entrada del usuario), `accounts` (sesiones, contraseñas, enlaces de un solo uso, límites de intentos, retención), `fighters` (récord, declaración previa, coherencia, anonimización), `bouts` (reglas de resultados), `aura` (reglas y ránking) y `community` (avisos de error y notificaciones).
+- `src/lib/` — la lógica, sin interfaz y agrupada por dominio: `common` (base de datos, textos, fechas, disciplinas, mensajes, correo, búsqueda sin tildes, entrada del usuario), `accounts` (sesiones, contraseñas, enlaces de correo, límites de intentos, retención), `fighters` (récord, declaración previa, coherencia, anonimización, privacidad y highlights), `bouts` (reglas de resultados), `aura` (reglas y ránking), `community` (avisos de error y notificaciones), `profiles` (entidad visual, permisos e imágenes) y `trainers` (validación de ofertas de clases).
 - `src/instrumentation.ts` — comprueba la configuración al arrancar en producción (sin `APP_URL` el servidor no arranca).
 - `prisma/schema.prisma`, `prisma/migrations/` y `prisma/seed.ts` (datos ficticios; se niega a borrar una base real).
 - Reglas de las acciones del servidor: todo lo exportado de un módulo de `src/app/actions/` es un punto de entrada público (los ayudantes van sin exportar o en `shared.ts`); un módulo no importa de otro. Patrones: `go()` (redirigir con mensaje), `guard()` (traduce errores previsibles de Prisma), `withLock()` (bloqueo consultivo de PostgreSQL para límites diarios) y `audit()` (historial, dentro de la misma transacción).
@@ -34,7 +34,8 @@ El código se organiza **por dominios** y con reglas de dependencia que vigila u
 | Visitante | Navegar, buscar, ver fichas, veladas y ránking (las declaraciones se muestran identificadas por su respaldo) |
 | `FAN` | Lo anterior + dar aura a peleadores (con el correo verificado) y seguirlos |
 | `FIGHTER` | Lo anterior + una ficha propia (una o varias disciplinas) y registrar sus combates |
-| *Alta por paneles* | **6 oct 2026:** `/registro` ofrece tres paneles (usuario, peleador, promotora o federación); el tercero crea la cuenta (rol `FAN`) y una `OrganizerRequest` con `kind` (`PROMOTORA`\|`FEDERACION`) y `website` en la misma transacción. Al aprobar una federación se crea su `Profile kind="federacion"` con la solicitante como `ownerId`. El aterrizaje tras entrar sale de `src/lib/accounts/landing.ts`. |
+| `TRAINER` | Perfil propio y clases individuales/colectivas con precio, publicación y pausa; en esta base no hay reservas ni pagos |
+| *Alta por paneles* | **8 oct 2026:** usuario, peleador, entrenador y entidad. La entidad comienza como `FAN` con solicitud de tipo `PROMOTORA`, `FEDERACION` o `CLUB`; necesita aprobación para organizar. `User.onboarding` conserva elecciones de ficha/perfil/clase antes de publicarlas tras confirmar correo. Tipos, pasos y destino: `src/lib/accounts/landing.ts`. |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita (con una comprobación obligatoria); lo aprueba un `ADMIN` anotando la evidencia comprobada. Puede ascender cualquier usuario que no sea administrador |
 | `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Se asigna a mano en la base de datos |
 
@@ -47,7 +48,7 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 - **Contraseñas:** scrypt asíncrono (N=2^16, r=8, p=2, parámetros de OWASP) con los parámetros **guardados en el propio hash** (`scrypt$N$r$p$sal$hash`); los hashes del formato antiguo se verifican y se recalculan al entrar (`lib/accounts/password.ts`).
 - **Sesión:** token aleatorio de 256 bits en cookie `httpOnly`/`sameSite=lax` (`secure` en producción); en la base solo el `sha256`. 30 días.
 - **Límites de intentos** (`lib/accounts/ratelimit.ts`, tabla `RateHit`): acceso (8 fallos/15 min por correo y 40 por IP), registro (10/hora por IP), recuperación (3/hora por correo) y reenvío de verificación (3/hora). La IP solo se usa si el proxy la facilita (`X-Forwarded-For`): **en producción la aplicación debe ir detrás de un proxy que sustituya esa cabecera**. El acceso tarda lo mismo exista o no el correo. **El intento se reserva antes de calcular el hash** (`reservar()`, que lo anota primero y lo devuelve si la contraseña era correcta): si se anotara al terminar, peticiones simultáneas se saltarían el límite. La IP es la que añade el proxy de confianza al final de `X-Forwarded-For` (`TRUSTED_PROXY_HOPS`, por defecto 1), no la primera de la lista, que escribe el cliente.
-- **Enlaces de un solo uso** (`EmailToken`, tipos `VERIFY` 48 h, `RESET` 1 h y `UNSUB` 1 año; se guarda el `sha256`; el consumo es atómico y solo se gasta con un `POST`, para que los escáneres de enlaces no lo consuman). Recuperar la contraseña cierra todas las sesiones y verifica el correo (así quien registró un correo ajeno no lo retiene).
+- **Enlaces de correo** (`EmailToken`, se guarda `sha256`): `VERIFY` 48 h y `RESET` 1 h se consumen atómicamente con POST; abrir un GET no los gasta ante escáneres de enlaces. `UNSUB` vale un año y desactiva avisos sin eliminar el token: repetir el enlace válido conserva la misma preferencia. Recuperar contraseña cierra sesiones y verifica correo.
 - **Correo** (`lib/common/mail.ts`): Resend por HTTP con `RESEND_API_KEY` y `MAIL_FROM`; `MAIL_TRANSPORT=log` escribe los mensajes en el log (desarrollo y pruebas); en producción sin proveedor no se envía nada y las pantallas lo dicen. Los textos de usuario que entran en un mensaje se reducen a una línea. Los avisos a seguidores se envían tras responder (`after()`), respetan la preferencia `notifyEmails` y llevan enlace de baja.
 
 ## Privacidad y retención
@@ -59,6 +60,8 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 ## Modelo de datos (`prisma/schema.prisma`)
 
 `User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con división deportiva versionada, peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`.
+
+También `Profile` (personalización por tipo/entidad), `Highlight`, `FighterAchievement`, `SupportAccreditation` y `TrainingClass`. Contratos, relaciones y efectos de bajas/migraciones: [mantenimiento/DATOS.md](mantenimiento/DATOS.md); flujos desde pantalla a escritura: [mantenimiento/FLUJOS.md](mantenimiento/FLUJOS.md).
 
 Decisiones clave:
 
