@@ -1321,7 +1321,7 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 
 **Qué salió mal:** la prueba nueva falló una vez porque buscaba «Kickboxing» y aparecía dos veces en la página (problema de la prueba, no de la aplicación). La prueba de arquitectura avisó del dominio nuevo sin declarar: se declaró y documentó.
 
-**Pruebas:** unitarias (625, 19 nuevas en `inscripciones.test.ts`, y las guardas de las cuatro acciones en `autorizacion.test.ts`); `inscripciones.mjs` nueva (34 comprobaciones de punta a punta, con accesibilidad); réplica del CI con base vacía (resultado en la sección siguiente del PR).
+**Pruebas:** unitarias (625, 19 nuevas en `inscripciones.test.ts`, y las guardas de las cuatro acciones en `autorizacion.test.ts`); `inscripciones.mjs` nueva (34 comprobaciones de punta a punta, con accesibilidad); réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **724 comprobaciones, 0 fallos**; el CI de GitHub, en verde.
 **Límite honesto:** probado con Chromium emulando un móvil; falta un recorrido en un iPhone real y con un organizador de verdad que tenga decenas de solicitudes.
 
 **Próximos pasos:** preguntar al fundador si quiere cupos por categoría (por ejemplo, «8 plazas en -71 kg») y lista de espera; aura a promotoras y clubes (fase 2, punto 5).
