@@ -85,6 +85,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261008220000_noticias_panorama_espanol/migration.sql",
+    "purpose": "Migración aditiva: NewsSource.local marca las fuentes que solo cubren el panorama español.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -300,6 +305,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/CentrarActivo.tsx",
+    "purpose": "Componente de cliente que lleva a la vista la opción actual de una fila deslizable (el deporte marcado en el selector de las portadas).",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/CodigosEmergencia.tsx",
     "purpose": "Componente de cliente que pide un código de la aplicación y, si es correcto, enseña una sola vez los diez códigos de emergencia.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -338,6 +348,11 @@
     "path": "src/app/components/Icono.tsx",
     "purpose": "Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/IconoDisciplina.tsx",
+    "purpose": "Pictogramas propios de cada disciplina (guante, kimono, patada alta, patada con guantes, octógono, rodillazo), decorativos, para el selector, las tarjetas y la cabecera de cada deporte.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/components/MetodoSegunDisciplina.tsx",
@@ -967,6 +982,11 @@
   {
     "path": "src/lib/media/storage.ts",
     "purpose": "Almacén de vídeos: R2 (con jurisdicción UE opcional), disco o ninguno; claves por usuario, comprobación de tamaño, borrado y servicio con Range.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/espana.ts",
+    "purpose": "Panorama español de las noticias: señales de España (comunidades, provincias, federaciones, españoles de élite) y regla delPanoramaEspanol según la fuente.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

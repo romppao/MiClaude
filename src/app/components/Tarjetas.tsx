@@ -6,6 +6,7 @@ import { COLOR_DISCIPLINA, iniciales, tinteDe } from "../../lib/common/aparienci
 import { LEVEL_LABEL } from "../../lib/common/labels";
 import { dayAndMonth } from "../../lib/common/dates";
 import Foto from "./Foto";
+import IconoDisciplina from "./IconoDisciplina";
 
 /** Tarjetas del diseño v3 que se repiten en varias pantallas (inicio, portadas y listados). Solo muestran datos; no leen la base de datos. */
 
@@ -29,6 +30,7 @@ export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Da
 export function TarjetaDisciplina({ d, href, pequena = false }: { d: Discipline; href: string; pequena?: boolean }) {
   return (
     <Link href={href} className="tarjeta-foto disciplina" style={{ ...tinte(d), "--color": COLOR_DISCIPLINA[d], ...(pequena ? { flex: "none", width: 140, height: 170 } : {}) } as CSSProperties}>
+      <span className="disciplina-dibujo" aria-hidden="true"><IconoDisciplina d={d} tam={pequena ? 64 : 84} grosor={1.5} /></span>
       <span className="raya" aria-hidden="true" />
       <strong style={pequena ? { fontSize: 19 } : undefined}>{DISCIPLINE_LABEL[d]}</strong>
     </Link>

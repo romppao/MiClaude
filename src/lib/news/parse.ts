@@ -103,28 +103,68 @@ export function parseFeed(xml: string, ahora: Date = new Date()): EntradaNoticia
 const sinTildes = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 const PALABRAS: [Discipline, RegExp][] = [
-  ["MUAYTHAI", /\bmuay ?thai\b|\bboxeo tailandes\b|\bthai boxing\b/],
-  ["KICKBOXING", /\bkick ?boxing\b/],
+  ["MUAYTHAI", /\bmuay ?thai\b|\bboxeo tailandes\b|\bthai ?boxing\b|\bnak ?muay\b/],
+  ["KICKBOXING", /\bkick ?boxing\b|\bkick-boxing\b|\bkickboxer\b/],
   ["K1", /\bk-?1\b/],
-  ["MMA", /\bmma\b|\bufc\b|artes marciales mixtas|\bpfl\b|\bbellator\b/],
-  ["JIUJITSU", /\bjiu[ -]?jitsu\b|\bbjj\b|\bgrappling\b|\badcc\b/],
-  ["BOXEO", /\bboxeo\b|\bboxeador(a|es|as)?\b|\bpugil(es)?\b|\bboxing\b|\b(wbc|wba|ibf|wbo|cmb|fib|omb)\b/],
+  ["MMA", /\bmma\b|\bufc\b|artes marciales mixtas|\bpfl\b|\bbellator\b|\bcage warriors\b|\boctogono\b|\btopuria\b/],
+  ["JIUJITSU", /\bjiu[ -]?jitsu\b|\bjiujitsu\b|\bbjj\b|\bgrappling\b|\badcc\b/],
+  ["BOXEO", /\bboxeo\b|\bboxeador(a|es|as)?\b|\bpugil(es|ista|istas)?\b|\bboxing\b|\b(wbc|wba|ibf|wbo|cmb|fib|omb|ebu)\b/],
 ];
+// Expresiones que contienen la palabra de otra disciplina: se quitan antes de seguir buscando («boxeo tailandés» no es boxeo,
+// «kick boxing» no es boxeo).
+const QUITAR_TRAS: Partial<Record<Discipline, RegExp>> = {
+  MUAYTHAI: /\bboxeo tailandes\b|\bthai ?boxing\b/g,
+  KICKBOXING: /\bkick ?boxing\b|\bkick-boxing\b/g,
+};
 
-/** Disciplinas de un titular por palabras clave. «Boxeo tailandés» es Muay Thai, no boxeo. */
+/** Disciplinas que nombra un texto, por palabras clave. «Boxeo tailandés» es Muay Thai y «kick boxing» es kickboxing, no boxeo. */
 export function detectarDisciplinas(texto: string): Discipline[] {
   let t = sinTildes(texto);
   const salida: Discipline[] = [];
   for (const [d, re] of PALABRAS) {
     if (re.test(t)) salida.push(d);
-    if (d === "MUAYTHAI") t = t.replace(/\bboxeo tailandes\b|\bthai boxing\b/g, " ");
+    const quitar = QUITAR_TRAS[d];
+    if (quitar) t = t.replace(quitar, " ");
   }
   return salida;
 }
 
-/** Disciplinas de una noticia: las que cubre la fuente (si es temática) más las que se detectan en el titular y el resumen. */
-export function disciplinasDe(fuente: Discipline[], e: Pick<EntradaNoticia, "title" | "summary">): Discipline[] {
-  return [...new Set([...fuente, ...detectarDisciplinas(`${e.title} ${e.summary ?? ""}`)])];
+/**
+ * Disciplina de una noticia (petición del fundador, 8 de octubre de 2026: «única y exclusivamente contenido de cada disciplina en su
+ * pantalla»). Una noticia solo va a la portada de una disciplina si su **titular** habla de esa y de ninguna otra:
+ * - el titular nombra una sola disciplina → esa;
+ * - nombra varias (por ejemplo, «velada de boxeo y MMA») → ninguna: solo sale en la portada común («Todos»);
+ * - no nombra ninguna → la de la fuente, pero solo si es un medio dedicado a una sola disciplina (no una búsqueda en Google Noticias,
+ *   que trae noticias que solo la mencionan de pasada) y el resumen no habla de otra.
+ * Devuelve null si la noticia no es de deportes de contacto (una fuente general cuyo titular no nombra ninguna): se descarta.
+ */
+export function clasificar(fuente: { disciplines: Discipline[]; kind: string }, e: Pick<EntradaNoticia, "title" | "summary">): Discipline[] | null {
+  const titular = detectarDisciplinas(e.title);
+  if (titular.length === 1) return titular;
+  if (titular.length > 1) return [];
+  const dedicada = fuente.disciplines.length === 1 && fuente.kind !== "AGREGADOR";
+  if (dedicada) {
+    const resumen = detectarDisciplinas(e.summary ?? "");
+    return resumen.every((d) => d === fuente.disciplines[0]) ? fuente.disciplines : [];
+  }
+  return fuente.disciplines.length > 0 ? [] : null;
+}
+
+// ---------- Idioma: solo noticias en español (petición del fundador: «no quiero noticias en inglés») ----------
+
+const PALABRAS_ES = new Set("el la los las de del que en y por con para una un su sus al se tras ante contra sobre como pero mas este esta gana pierde campeon campeona combate pelea velada noche nuevo nueva espanol espanola titulo".split(" "));
+const PALABRAS_EN = new Set("the and of to in for with on at after his her is are from by wins win beats fight fighter night new title who how what will".split(" "));
+
+/**
+ * ¿Está el titular en español? Cuenta palabras frecuentes de cada idioma (y las letras propias del español). Un titular que solo tiene
+ * nombres propios («Topuria - Holloway») no se puede saber y se acepta, porque todas las fuentes son en español.
+ */
+export function enEspanol(titular: string): boolean {
+  const letrasEs = /[ñáéíóú¿¡]/i.test(titular);
+  const palabras = sinTildes(titular).split(/[^a-z0-9]+/).filter(Boolean);
+  const es = palabras.filter((p) => PALABRAS_ES.has(p)).length + (letrasEs ? 2 : 0);
+  const en = palabras.filter((p) => PALABRAS_EN.has(p)).length;
+  return es >= en;
 }
 
 /**

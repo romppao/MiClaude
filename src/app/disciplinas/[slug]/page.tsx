@@ -5,6 +5,7 @@ import { DISCIPLINE_LABEL, disciplineFromSlug } from "../../../lib/common/discip
 import { COLOR_DISCIPLINA, tinteDe } from "../../../lib/common/apariencia";
 import { actualizarSiToca } from "../../../lib/news/refresh";
 import Portada from "../../_inicio/Portada";
+import IconoDisciplina from "../../components/IconoDisciplina";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,13 @@ export default async function Disciplina({ params }: { params: Promise<{ slug: s
       disciplina={d}
       cabecera={
         <section className="tarjeta-foto" style={{ minHeight: 150, padding: 22, gap: 8, "--tinte": tinteDe(d) } as CSSProperties} aria-labelledby="titulo-disciplina">
-          <span className="raya" aria-hidden="true" style={{ display: "block", width: 46, height: 6, borderRadius: 3, background: COLOR_DISCIPLINA[d] }} />
-          <h1 id="titulo-disciplina" style={{ margin: 0 }}>{nombre}</h1>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <span className="raya" aria-hidden="true" style={{ display: "block", width: 46, height: 6, borderRadius: 3, background: COLOR_DISCIPLINA[d] }} />
+              <h1 id="titulo-disciplina" style={{ margin: 0 }}>{nombre}</h1>
+            </div>
+            <span aria-hidden="true" style={{ color: "var(--acc)" }}><IconoDisciplina d={d} tam={72} grosor={1.4} /></span>
+          </div>
           <p className="meta" style={{ margin: 0, color: "rgba(255,255,255,.85)" }}>Noticias, veladas, peleadores y dónde entrenar, solo de {nombre}.</p>
         </section>
       }

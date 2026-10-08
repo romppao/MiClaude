@@ -273,3 +273,11 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | Un código de la aplicación no se puede usar dos veces y la ventana es de ±30 s: la prueba no podía crear códigos nuevos justo después de entrar | Es la protección contra reutilizar códigos, no un fallo | En las pruebas se simula que pasa el tiempo (`totpLastStep = null`) en lugar de esperar 30 segundos |
 | La prueba de móvil marcó el selector de deporte como «sale por la derecha» | Es una fila que se desliza a propósito, y la prueba solo excluía los carruseles `[role=region]` | Las filas deslizables a propósito llevan la clase `.desliza-fila` (excluida en `movil.mjs`) y enlaces alcanzables con el tabulador |
 | El CI falló en «documentación del código» tras corregir la prueba de móvil | El catálogo de Codex guarda una huella de cada archivo: cualquier cambio, aunque sea un comentario, lo deja desactualizado | Regenerar el catálogo (`node scripts/generar-catalogo.mjs`) **justo antes de cada commit** que toque código, no solo al principio |
+
+## 8 de octubre de 2026 — Noticias mezcladas y en inglés (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| En la portada de boxeo salían noticias de MMA y de kickboxing | La disciplina de la noticia era la **suma** de la de su fuente y las detectadas en el texto: una búsqueda «boxeo» trae noticias que solo lo mencionan | Clasificar por el **titular** y de forma **exclusiva**: una sola disciplina nombrada, o ninguna; la disciplina de la fuente solo cuenta si es un medio dedicado |
+| La mayoría de noticias estaban en inglés | Elegí canales de vídeo internacionales (UFC, ONE, GLORY) por fiables, sin tener en cuenta el público | El público es España: toda fuente debe ser en español y, además, cada titular se comprueba (`enEspanol`) |
+| «Kick boxing» contaba como boxeo | La expresión contiene «boxing» | Quitar del texto las expresiones de una disciplina que contienen la palabra de otra antes de seguir buscando |

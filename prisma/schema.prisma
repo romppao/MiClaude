@@ -333,13 +333,13 @@ model User {
 }
 
 model Session {
-  id                  String   @id // sha256 del token de la cookie
-  userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt           DateTime
+  id             String    @id // sha256 del token de la cookie
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt      DateTime
   // Cuándo se completó el segundo paso en esta sesión. Una sesión de la cuenta del creador sin él no cuenta como iniciada
   // (getUser), aunque se abriera antes de serlo: así nadie hereda sus poderes sin pasar por el segundo paso.
-  secondFactorAt      DateTime?
+  secondFactorAt DateTime?
 
   @@index([userId])
   @@index([expiresAt])
@@ -632,6 +632,8 @@ model NewsSource {
   kind          NewsSourceKind
   // Disciplinas que cubre la fuente; vacío = todas (se deducen de cada titular).
   disciplines   Discipline[]   @default([])
+  // Solo publica noticias del panorama español (federaciones y medios nacionales): no hace falta comprobar cada titular (lib/news/espana.ts).
+  local         Boolean        @default(false)
   active        Boolean        @default(true)
   lastAttemptAt DateTime?
   lastOkAt      DateTime?

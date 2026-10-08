@@ -45,10 +45,11 @@ check("el visitante ve la actualidad con la noticia más reciente en grande", aw
 const fan = await newUser("Portadacr");
 await fan.p.goto(B + "/");
 const selector = fan.p.getByRole("navigation", { name: "Elige un deporte" });
-check("la portada común abre con el selector de deporte en «Todos»", await seen(selector) && await selector.locator("a[aria-current=page]").innerText() === "Todos");
+check("la portada común abre con el selector de deporte en «Todos»", await seen(selector) && (await selector.locator("a[aria-current=page]").innerText()).trim() === "Todos");
+check("cada deporte del selector lleva su dibujo", await selector.locator("a svg").count() === 7);
 check("y la noticia más reciente destacada en grande", await seen(fan.p.locator("a.noticia-destacada", { hasText: `Destacada de K-1 ${rnd}` })));
 await selector.getByRole("link", { name: "K-1" }).click(); await fan.p.waitForURL("**/disciplinas/k-1");
-check("al elegir un deporte se abre su portada, con el mismo selector marcando ese deporte", await seen(fan.p.getByRole("heading", { name: "K-1", level: 1 })) && await fan.p.getByRole("navigation", { name: "Elige un deporte" }).locator("a[aria-current=page]").innerText() === "K-1");
+check("al elegir un deporte se abre su portada, con el mismo selector marcando ese deporte", await seen(fan.p.getByRole("heading", { name: "K-1", level: 1 })) && (await fan.p.getByRole("navigation", { name: "Elige un deporte" }).locator("a[aria-current=page]").innerText()).trim() === "K-1");
 check("con la actualidad solo de ese deporte", await seen(fan.p.getByRole("heading", { name: "Actualidad de K-1" })) && await seen(fan.p.locator("a.noticia-destacada", { hasText: `Destacada de K-1 ${rnd}` })));
 await fan.p.goto(B + "/disciplinas/mma");
 check("y otra disciplina no muestra esa noticia", !(await fan.p.getByText(`Destacada de K-1 ${rnd}`).count()));

@@ -16,6 +16,8 @@ Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen p
 
 1 **Claude** (líder técnico) · 2 **Codex** (ejecutor principal, con evidencia) · **Antigravity, GitHub Copilot y Open Code (Ollama/Qwen): en periodo de prueba, sin ordenar** hasta que Claude tenga una primera toma de contacto con su trabajo (decisión del fundador). Las tareas se reparten por nivel N1–N4 según el rango y los resultados; el orden se revisa tras cada PR.
 
+**Noticias, cuando la aplicación esté publicada (decisión del fundador, 8 de octubre de 2026):** las llevará **Antigravity** (buscar y mantener las fuentes), porque no tiene límite de uso y es una tarea de búsqueda más que de código. Guía: [`NOTICIAS.md`](NOTICIAS.md). Hasta el despliegue lo sigue haciendo Claude, como todo lo demás («por ahora quiero que lo sigas haciendo tú todo»).
+
 ## Gobierno del equipo (decisión del fundador, 6 de octubre de 2026)
 
 > «Te pongo a ti como el líder del equipo […] quiero que idealices el plan, la arquitectura y los métodos a seguir […] dando también la posibilidad de que las otras herramientas, a su propio criterio, debatan y puedan sacar una mejor opinión de la que has podido hacer tú, porque a lo mejor tú no eres perfecto […] las demás son las que ejecutan las instrucciones. Así podemos ahorrar tokens y delegar funciones.»

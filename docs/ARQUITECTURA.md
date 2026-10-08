@@ -288,3 +288,16 @@ Peticiones del fundador: portada común con la actualidad («después de iniciar
   - En la demo cualquiera puede confirmar un correo con un botón, así que el fundador debe crear su cuenta en cuanto ponga la variable.
   - Si se pierden el móvil y los códigos, solo se recupera desde la base de datos (`CREADOR.md`).
 - **Migración:** `20261008200000_cuenta_creador`, solo añade columnas.
+
+## Noticias por disciplina e iconos — 8 de octubre de 2026
+
+- **Clasificación** (`lib/news/parse.ts`):
+  - `clasificar(fuente, entrada)` decide la disciplina por el titular, de forma exclusiva: una sola disciplina nombrada, o ninguna (entonces solo sale en la portada común).
+  - Cuando el titular no nombra ninguna, la disciplina de la fuente solo cuenta si es un medio o federación dedicado a una sola disciplina; en las búsquedas de Google Noticias no cuenta.
+  - Si la fuente es general y el titular no nombra ningún deporte de contacto, se devuelve `null` y se descarta.
+- **Idioma:** `enEspanol(titular)` descarta los titulares en inglés.
+- **Fuentes** (`lib/news/sources.ts`):
+  - `FUENTES_RETIRADAS` lista los canales en inglés y las búsquedas antiguas: `asegurarFuentesIniciales` los desactiva y borra sus titulares.
+  - `revisarGuardadas` vuelve a clasificar lo ya guardado una vez por arranque del servidor.
+- **Iconos:** `components/IconoDisciplina.tsx` contiene pictogramas propios de trazo, sin imágenes de terceros. Se usan en el selector de deporte (`.filtros-disciplina.con-dibujo`), en `TarjetaDisciplina` y en la cabecera de cada disciplina. `CentrarActivo` lleva a la vista la ficha del deporte actual.
+- **Panorama español:** `lib/news/espana.ts` (`delPanoramaEspanol`) descarta los titulares que no son del panorama español, salvo los de fuentes `NewsSource.local`. Migración `20261008220000_noticias_panorama_espanol`. Reglas y mantenimiento: [`NOTICIAS.md`](NOTICIAS.md).
