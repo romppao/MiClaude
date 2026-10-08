@@ -69,6 +69,8 @@ src/
 | `trajectory.ts` | Títulos, revisión, respaldos y acreditaciones | Peleador titular / cuenta acreditada / moderación, según acción |
 | `demo.ts` | Excepciones de confirmación y papel de la demo ficticia | Solo copia habilitada con `DEMO_MODE=si` |
 | `media.ts` | Compartir vídeos y fotos de una velada y borrar los propios | Cuenta con correo verificado |
+| `proposals.ts` | Retos a combate y propuestas de sparring entre peleadores | Peleador con correo verificado |
+| `registrations.ts` | Inscripción en veladas e interclubs: abrir o cerrar, pedir participar, retirarse, aceptar o rechazar (una o varias) | Peleador con correo verificado / organizador del evento |
 | `news.ts` | Fuentes de noticias: actualizar ahora, añadir, activar o desactivar, ocultar un titular | Moderación |
 | `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
 
@@ -80,9 +82,10 @@ app/pantallas ──▶ app/actions/<módulo> ──▶ app/actions/shared ─�
       └──────────▶ app/components ───────────────────────────────────┤
                                                                      │
 lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura, lib/trainers, lib/news, lib/media
+lib/events ─▶ lib/fighters, lib/common
 ```
 
-- `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts`, `aura`, `profiles`, `trainers`, `news` y `media` solo dependen de `common`; `community` también de `accounts`.
+- `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts`, `aura`, `profiles`, `trainers`, `news` y `media` solo dependen de `common`; `community` también de `accounts`; `events` (inscripciones) también de `fighters`, porque la lista del organizador calcula el récord de cada peleador.
 - **`lib` nunca importa de `app`.** La lógica no sabe que existen las pantallas.
 - Un módulo de acciones **nunca importa de otro módulo de acciones**: lo compartido va a `shared.ts` (si es de interfaz) o a `lib` (si es lógica).
 - Los componentes de `app/components` no importan acciones.

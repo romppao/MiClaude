@@ -15,6 +15,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
  *   lib/trainers    → common
  *   lib/news        → common
  *   lib/media       → common
+ *   lib/events      → common, fighters (inscripciones: el récord de cada peleador para elegir)
  *   app/actions/*   → lib y ./shared; nunca otra acción; solo funciones asíncronas exportadas
  *   app/components  → lib y otros componentes; nunca acciones
  */
@@ -30,6 +31,7 @@ const PERMITIDAS: Record<string, string[]> = {
   trainers: ["common"],
   news: ["common"],
   media: ["common"],
+  events: ["common", "fighters"],
 };
 
 const ficheros = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? ficheros(join(dir, e.name)) : /\.tsx?$/.test(e.name) ? [join(dir, e.name)] : []));

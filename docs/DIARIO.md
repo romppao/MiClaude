@@ -1287,3 +1287,41 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 
 **Pruebas:** unitarias (590), `servicios.mjs` nueva (paneles, Buscar clases, retos de punta a punta, accesibilidad), `arreglos.mjs` con la reserva por calendario, y la réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **690 comprobaciones, 0 fallos**. En la base local acumulada, `filtros.mjs` fallaba porque las fichas de muchas ejecuciones empujan las de la prueba a la página 2: es la base, no el código (con base vacía pasa).
 **Límite honesto:** la barra de dos tiradores y la tira de días se han probado en Chromium emulando un móvil (también con el teclado); falta probarlas en un iPhone real.
+
+## 9 de octubre de 2026 — Inscripción de peleadores en veladas e interclubs, y gestión para el organizador (Claude)
+
+**Qué se pidió** (el fundador): «No sé si habrás quitado lo de solicitar participación en una velada o interclub. Y por parte de los organizadores de las veladas, que puedan tener facilidad para gestionar todas esas solicitudes, pudiendo filtrar las listas con x parámetros, listarlo por un orden…, todo para facilitar la selección de los peleadores».
+
+**Sobre si se quitó (honestidad):** se buscó en todo el historial y **nunca estuvo en el código**. Era la propuesta n.º 3 del diseño v3 y figuraba como pendiente en `PLAN.md` (fase 2, punto 3) e `IDEAS.md`. No se quitó; igual que con los retos, debí avisar de que faltaba.
+
+**Qué se decidió y por qué:**
+- La inscripción la **abre y cierra el organizador** de cada evento (velada o interclub), con requisitos y fecha límite opcionales. Así nadie recibe solicitudes que no quiere.
+- **Aceptar no pone al peleador en el cartel**: el organizador sigue emparejando a mano (los emparejamientos dependen de peso, nivel y experiencia, y no deben automatizarse sin el fundador). Los aceptados salen primero en las listas de «Añadir un combate al cartel».
+- Una solicitud por peleador y evento. Si la retira, puede volver a pedirla; si el organizador la rechaza, no (la decisión es del organizador, que sí puede cambiarla).
+- Para elegir, cada solicitud enseña el **récord en la disciplina y el nivel del evento** (combates registrados más los anteriores declarados), los combates en total, el aura, la edad el día del evento, el peso declarado, el gimnasio, la provincia y el mensaje.
+- El correo del peleador solo se muestra al organizador cuando lo acepta (para concretar pesaje y horarios).
+
+**Qué se hizo:**
+- Modelo: `Event.registrationOpen/registrationNote/registrationUntil` y `EventRegistration` (estado Pendiente, Aceptada, Rechazada o Retirada). Migración `20261009090000_inscripciones_en_veladas`, que solo añade.
+- **Peleador:**
+  - «Inscribirme en una velada» y «Mis inscripciones» en su panel;
+  - filtro «Con inscripción abierta» y etiqueta en el calendario de veladas;
+  - sección «Inscripción abierta» en la página de cada evento, con requisitos y fecha límite;
+  - formulario corto (`/veladas/[slug]/inscribirme`): categoría ya rellenada con la de su ficha, peso y mensaje opcionales;
+  - `/mis-inscripciones`, con la respuesta del organizador y «Retirar mi solicitud».
+- **Organizador:**
+  - sección «Inscripción de peleadores» en la gestión de cada evento (abrir, guardar requisitos, cerrar, y «Gestionar las solicitudes (N pendientes)»);
+  - lista `/organizador/[slug]/inscripciones`: pestañas por estado con su número; búsqueda por nombre o gimnasio; «Más filtros» con categoría de peso, división, provincia, combates (mínimo y máximo), edad y peso declarado; siete órdenes (llegada, aura, victorias, más combates, menos combates, peso, edad, nombre);
+  - aceptar o rechazar una a una, o **marcar varias** («Marcar todas») y responderlas a la vez con un mensaje común; vuelve a la misma lista filtrada;
+  - **descarga CSV** de la lista con los mismos filtros (separador «;» para Excel en español, protegido contra fórmulas);
+  - columna de pendientes en «Mis veladas» y una casilla «Solicitudes para participar» en el panel del entrenador y de la entidad.
+- Correos con `after()` y dirección de respuesta: al organizador con cada solicitud y retirada; al peleador con la respuesta.
+- Historial (`REGISTRATION_*`) y descarga de datos personales.
+- Nuevo dominio `lib/events` (depende de `common` y `fighters`), declarado en `arquitectura.test.ts` y `DESARROLLO.md`.
+
+**Qué salió mal:** la prueba nueva falló una vez porque buscaba «Kickboxing» y aparecía dos veces en la página (problema de la prueba, no de la aplicación). La prueba de arquitectura avisó del dominio nuevo sin declarar: se declaró y documentó.
+
+**Pruebas:** unitarias (625, 19 nuevas en `inscripciones.test.ts`, y las guardas de las cuatro acciones en `autorizacion.test.ts`); `inscripciones.mjs` nueva (34 comprobaciones de punta a punta, con accesibilidad); réplica del CI con base vacía (resultado en la sección siguiente del PR).
+**Límite honesto:** probado con Chromium emulando un móvil; falta un recorrido en un iPhone real y con un organizador de verdad que tenga decenas de solicitudes.
+
+**Próximos pasos:** preguntar al fundador si quiere cupos por categoría (por ejemplo, «8 plazas en -71 kg») y lista de espera; aura a promotoras y clubes (fase 2, punto 5).

@@ -99,3 +99,8 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Pedido por el fundador:** reservar sin escribir (calendario y barra), recuperar «retar o pedir sparring» (nunca se había implementado: propuesta del diseño v3) y servicios visibles nada más entrar.
 **Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
 **Qué debe hacer el siguiente asistente:** probar en un iPhone real la barra de horas y la tira de días; no añadir pagos a clases ni convertir retos en combates de cartel sin decisión del fundador.
+
+## 9 de octubre de 2026 — Inscripción en veladas e interclubs y gestión para el organizador
+**Pedido por el fundador:** pedir participar en una velada o interclub (nunca se había implementado: propuesta n.º 3 del diseño v3) y que el organizador filtre, ordene y elija con facilidad.
+**Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
+**Qué debe hacer el siguiente asistente:** no poner a los aceptados en el cartel de forma automática ni añadir cupos sin decisión del fundador; probar la lista con un organizador real y muchas solicitudes.

@@ -236,7 +236,7 @@ El retorno a respaldos se integra en #16; CI final #142 aprueba 406 unitarias, 3
 Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que ya estén, quisiera pulirlas».
 1. **Propuestas de combate y sparring entre peleadores** — **hecho (8 oct):** «Retar a combate» y «Proponer sparring» en la ficha, y «Retos y sparrings» (`/propuestas`).
 2. **Cuarto registro: entrenadores**, que se promocionan y venden clases individuales y colectivas — **hecho en parte (8 oct):** cuenta de entrenador, perfil público y clases con precio. Pendiente: reservas y pagos (decisión del fundador: ¿cobro dentro de la aplicación?).
-3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — el club ya puede registrarse como entidad; las inscripciones quedan para la fase 2.
+3. **Veladas creadas por clubs o promotoras con inscripción de peleadores** — **hecho (9 oct):** el organizador abre la inscripción; los peleadores piden participar; el organizador filtra, ordena, acepta o rechaza (también varias a la vez) y descarga la lista.
 4. **Récord amateur privado** (solo el número de combates, salvo que el peleador lo publique) — **hecho (8 oct).**
 5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — vídeos y fotos **hechos (8 oct, fase 2a)**; el aura a promotoras y clubes sigue pendiente (fase 2).
 6. **Highlights del peleador en su ficha** («ya luego retocaré cosas de código con Claude Code») — **hecho (8 oct):** vídeo por enlace o foto, uno destacado.
@@ -306,3 +306,8 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Acciones principales arriba en cada panel**: hecho.
 - **Reservar clase con calendario y barra de horas**: hecho. Ideas siguientes, sin decidir: que el entrenador marque sus huecos disponibles y la barra solo ofrezca esos; recordatorio el día antes.
 - **Retos a combate y sparring** (propuesta n.º 1 del diseño v3): hecho. Siguientes posibles: que un reto aceptado pueda convertirse en combate de un cartel con el organizador; filtros «busco sparring» por peso y provincia.
+
+## Inscripciones — ideas derivadas (9 de octubre de 2026)
+
+- **Cupos por categoría y lista de espera** (Claude, 9 oct, al implementar las inscripciones): «8 plazas en -71 kg»; al llenarse, las siguientes quedan en espera. Pendiente de que el fundador lo quiera.
+- **Sugerir emparejamientos entre los aceptados** (Claude, 9 oct): parejas de la misma categoría con récord parecido, como ayuda y nunca automático. Pendiente de decisión del fundador.
