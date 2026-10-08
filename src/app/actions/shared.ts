@@ -13,6 +13,7 @@ import { internalPath } from "../../lib/common/paths";
 /** Texto de un campo de formulario, sin espacios en los extremos y sin caracteres nulos (PostgreSQL no los admite y darían un error 500). */
 export const str = (f: FormData, k: string) => String(f.get(k) ?? "").replace(/\u0000/g, "").trim();
 
+/** Entero de hasta tres cifras; vacío o formato no admitido devuelve null, no cero. El dominio valida después su rango. */
 export const intOrNull = (f: FormData, k: string) => {
   const s = str(f, k);
   return /^\d{1,3}$/.test(s) ? parseInt(s, 10) : null;
@@ -103,6 +104,10 @@ export async function ensureDiscipline(client: Client, fighterId: string, discip
   await client.fighterDiscipline.upsert({ where: { fighterId_discipline: { fighterId, discipline } }, create: { fighterId, discipline }, update: {} });
 }
 
+/**
+ * Busca base, base-2, base-3… según el lector recibido. No reserva el slug: la restricción única
+ * de PostgreSQL y guard() siguen siendo necesarias si dos peticiones eligen el mismo candidato.
+ */
 export async function uniqueSlug(base: string, exists: (slug: string) => Promise<boolean>, fallback = "sin-nombre") {
   const root = base || fallback;
   let slug = root;
@@ -110,6 +115,7 @@ export async function uniqueSlug(base: string, exists: (slug: string) => Promise
   return slug;
 }
 
+/** Resuelve velada y exige su organizador o ADMIN; redirige con motivo si falta o no pertenece. La acción valida antes la sesión. */
 export async function ownEvent(eventId: string, user: { id: string; role: string }) {
   const event = await db.event.findUnique({ where: { id: eventId } });
   if (!event) go("/organizador", { problema: "no_existe" });
