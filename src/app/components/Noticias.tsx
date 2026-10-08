@@ -31,6 +31,21 @@ export function ListaNoticias({ noticias, ahora = new Date() }: { noticias: Noti
   );
 }
 
+/** La noticia más reciente, en grande y con su imagen, al principio de la portada (común o de una disciplina). */
+export function NoticiaDestacada({ n, ahora = new Date() }: { n: Noticia; ahora?: Date }) {
+  const medio = n.publisher ?? n.source.name;
+  return (
+    <a href={n.url} target="_blank" rel="noopener noreferrer" className="tarjeta-foto noticia-destacada" style={{ "--tinte": tinteDe(n.disciplines[0]) } as CSSProperties}>
+      {n.imageUrl && <img src={n.imageUrl} alt="" referrerPolicy="no-referrer" />}
+      <span className="abajo">
+        <span className="kicker kicker-acc">{n.disciplines.length ? n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ") : "Deportes de contacto"}</span>
+        <span className="titular">{n.title}<span className="sr-only"> (se abre en otra pestaña)</span></span>
+        <span className="meta">{medio} · {haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span>
+      </span>
+    </a>
+  );
+}
+
 export function SinNoticias({ disciplina }: { disciplina?: string }) {
   return (
     <div className="tarjeta">

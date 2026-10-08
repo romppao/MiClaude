@@ -3,6 +3,10 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  creador_dentro: "Has entrado con la cuenta del creador.",
+  creador_ultimo_codigo: "Has entrado con un código de emergencia. Te quedan pocos: crea otros nuevos en «Administración».",
+  tipo_cambiado: "Tipo de cuenta cambiado. La persona ya tiene los permisos nuevos.",
+  sesiones_cerradas: "Se han cerrado todas las sesiones de esa cuenta: tendrá que volver a entrar.",
   logro_guardado: "Título guardado como declarado. Su aporte al aura ya se ha calculado; el respaldo es opcional.",
   logro_retirado: "Título retirado del aura. Puedes volver a mostrarlo desde su gestión.",
   logro_restaurado: "Se ha deshecho la retirada del título. Las decisiones de moderación se conservan.",
@@ -160,6 +164,12 @@ export const PROBLEMAS: Record<string, string> = {
   demo_papel_invalido: "No conocemos ese papel. Elige uno de los botones de la lista.",
   sin_sesion: "Entra en tu cuenta para continuar.",
   solo_moderadores: "Esta sección es solo para moderadores.",
+  solo_creador: "Esta sección es solo para la cuenta del creador de la aplicación.",
+  codigo_incorrecto: "Ese código no es válido. Escribe las 6 cifras que muestra ahora tu aplicación de códigos (cambian cada 30 segundos) o uno de tus códigos de emergencia.",
+  codigo_app_incorrecto: "Ese código no es válido. Escribe las 6 cifras que muestra ahora tu aplicación de códigos: cambian cada 30 segundos.",
+  segundo_paso_caducado: "Para continuar, vuelve a escribir tu correo electrónico y tu contraseña.",
+  no_tu_propia_cuenta: "No puedes cambiar el tipo de tu propia cuenta ni cerrar tus sesiones desde aquí. Para cerrar las tuyas, usa «Mi cuenta».",
+  tipo_no_valido: "Elige uno de los tipos de cuenta de la lista.",
   combate_datos: "Revisa los datos del combate: hacen falta el nombre de la velada, la fecha y el nombre y los apellidos de tu rival.",
   combate_duplicado: "Este combate ya está registrado en esa velada. Si lo registró tu rival, respóndele desde «Mi ficha».",
   cartel_duplicado: "Ese combate ya está en el cartel de esta velada.",

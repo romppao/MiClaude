@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateEnv } from "../../src/lib/common/env";
 
-const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", ...extra }) as NodeJS.ProcessEnv;
+const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
 
 describe("comprobación del entorno", () => {
   it("en desarrollo no exige nada", () => {
@@ -32,6 +32,7 @@ describe("comprobación del entorno", () => {
   });
   it("avisa si no hay contacto de privacidad", () => {
     expect(validateEnv(prod({ CONTACT_EMAIL: "" })).warnings.join()).toContain("CONTACT_EMAIL");
+    expect(validateEnv(prod({ CREADOR_CORREO: " " })).warnings.join()).toContain("CREADOR_CORREO");
   });
   it("avisa si APP_URL no usa https", () => {
     expect(validateEnv(prod({ APP_URL: "http://ringespana.es" })).warnings.join()).toContain("https");

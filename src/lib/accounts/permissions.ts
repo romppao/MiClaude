@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getUser, requireVerifiedUser } from "./auth";
 import { loginPath } from "../common/paths";
 import { puedeOrganizar } from "./landing";
+import { esCreador } from "./creador";
 
 // Quién puede hacer qué: las guardas de permisos, en un solo sitio. Las usan por igual las acciones del servidor y las pantallas.
 // (requireUser y requireVerifiedUser, que solo dependen de la sesión, están en ./auth.)
@@ -20,4 +21,12 @@ export async function requireOrganizer() {
   const user = await requireVerifiedUser();
   if (!puedeOrganizar(user.role)) redirect("/organizador?problema=sin_permiso");
   return user;
+}
+
+/** Solo la cuenta del creador (lib/accounts/creador.ts), con el segundo paso hecho: getUser no da por iniciada su sesión sin él. */
+export async function requireCreador(next = "/moderacion/usuarios") {
+  const u = await getUser();
+  if (!u) redirect(loginPath(next));
+  if (!esCreador(u)) redirect("/?problema=solo_creador");
+  return u;
 }

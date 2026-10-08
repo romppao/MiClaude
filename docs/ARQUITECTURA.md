@@ -37,7 +37,8 @@ El código se organiza **por dominios** y con reglas de dependencia que vigila u
 | `TRAINER` | Perfil propio y clases individuales/colectivas con precio, publicación y pausa; en esta base no hay reservas ni pagos |
 | *Alta por paneles* | **8 oct 2026:** usuario, peleador, entrenador y entidad. La entidad comienza como `FAN` con solicitud de tipo `PROMOTORA`, `FEDERACION` o `CLUB`; necesita aprobación para organizar. `User.onboarding` conserva elecciones de ficha/perfil/clase antes de publicarlas tras confirmar correo. Tipos, pasos y destino: `src/lib/accounts/landing.ts`. |
 | `ORGANIZER` | Crear veladas, montar el cartel y poner resultados (nacen `VERIFIED`). Se solicita (con una comprobación obligatoria); lo aprueba un `ADMIN` anotando la evidencia comprobada. Puede ascender cualquier usuario que no sea administrador |
-| `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Se asigna a mano en la base de datos |
+| `ADMIN` | Moderación: combates, avisos, reclamaciones, organizadores y sello de gimnasios. Lo asigna la cuenta del creador desde Administración (o a mano en la base de datos) |
+| Creador | No es un rol: es la cuenta `ADMIN` cuyo correo verificado está en `CREADOR_CORREO`. Además gestiona cuentas y moderadores (`/moderacion/usuarios`) y entra con segundo paso ([CREADOR.md](CREADOR.md)) |
 
 **Solicitudes:** las reclamaciones de ficha y las solicitudes de organizador las decide un `ADMIN`; rechazar exige un **motivo**, que ve la persona en la aplicación y recibe por correo (también la aprobación). El motivo de las reclamaciones se guarda en `ClaimRequest.reviewNote` (el texto con el que se justificó se borra al decidir).
 
@@ -270,3 +271,20 @@ Peticiones del fundador: portada común con la actualidad («después de iniciar
 - **Avisos:** nueva entidad `MEDIA` con el motivo «Aparezco yo y no doy permiso»; resolver «y retirar» la oculta.
 - **Seguridad:** la política de contenido admite imágenes de `i.ytimg.com` y conexiones/medios de `*.r2.cloudflarestorage.com`. El arranque falla si la configuración de R2 está a medias y avisa si no hay almacén.
 - **Riesgos:** condiciones de Google Noticias; derecho de imagen y menores en lo que sube el público; subidas abandonadas en R2 sin limpiar; disco efímero en la demo (`TRASLADO.md` §7.23–25, `VIDEOS.md`).
+
+## Portada con selector y cuenta del creador — 8 de octubre de 2026
+
+- **Portada:** `/` (con o sin sesión, salvo la bienvenida del visitante) y `/disciplinas/<disciplina>` son el mismo componente `src/app/_inicio/Portada.tsx`, con o sin disciplina: selector «Todos / cada deporte» (las disciplinas propias primero), noticia destacada, lista de noticias, próximas veladas, peleadores con aura y, en cada disciplina, dónde entrenar. `peleadoresConAura(take, discipline?)` cuenta solo el aura de combates de esa disciplina.
+- **Cuenta del creador:**
+  - `lib/accounts/creador.ts` (`esCreador`: `CREADOR_CORREO` + correo verificado).
+  - `getUser()` no da por iniciada una sesión del creador sin `Session.secondFactorAt`. Esto cubre también las sesiones abiertas antes de serlo.
+  - La guarda es `requireCreador` (`permissions.ts`).
+  - Al entrar con la contraseña correcta, va a `/entrar/segundo-paso`. La primera vez se guarda una clave RFC 6238 (`User.totpSecret`) y se activa con el primer código bueno, que entrega diez códigos de emergencia: solo se guarda su SHA-256 en `User.recoveryCodes`.
+  - Un código de la aplicación no vale dos veces (`User.totpLastStep`, actualizado de forma condicional).
+  - Límite: 6 intentos por cuenta y 30 por dirección cada 15 minutos.
+  - Cada entrada, cambio de tipo y cierre de sesiones queda en `AuditLog` (`entity = USER`).
+- **Riesgos aceptados:**
+  - `totpSecret` se guarda sin cifrar (quien lea la base también tendría los hashes).
+  - En la demo cualquiera puede confirmar un correo con un botón, así que el fundador debe crear su cuenta en cuanto ponga la variable.
+  - Si se pierden el móvil y los códigos, solo se recupera desde la base de datos (`CREADOR.md`).
+- **Migración:** `20261008200000_cuenta_creador`, solo añade columnas.

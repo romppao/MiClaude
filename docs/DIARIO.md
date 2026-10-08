@@ -1083,3 +1083,30 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué se hizo:** fusionadas #28 y #30 en `claude/ring-espana-mvp`, lo que actualiza la demo de Render.
 **Qué salió mal / límite honesto:** nada nuevo. Siguen sin probar en real la subida a R2 (falta el cubo), las fuentes de noticias (no se pudieron abrir desde el entorno de desarrollo) y los aparatos físicos.
 **Estado y próximos pasos:** el fundador revisa la demo y anota qué falla y qué cambiaría; revisa el estudio de monetización de Codex (#29, abierta como documento de trabajo) y la guía `PUBLICACION.md`. Pendiente suyo: crear el cubo de R2 (`VIDEOS.md`), mirar `/moderacion/noticias` en la demo y decidir `TRASLADO.md` §7.23–26. Con sus notas, Claude prioriza y escribe fichas en `docs/tareas/` para escalar por partes.
+
+## 8 de octubre de 2026 (6) — Portada con selector de deporte y cuenta del creador
+
+**Pedido por el fundador:** «No veo lo que te he dicho sobre la pantalla inicial […] la primera pantalla que le sale a todo el mundo […] con todas las noticias, todo generalizado […] de los distintos periódicos, el canal de YouTube o federaciones oficiales, sobre todos los deportes. Después, al seleccionar el deporte que tú quieres, tiene que haber otra pantalla como la inicial, pero exclusivamente de esa disciplina.» Y: «tener un usuario especial, yo como creador de la aplicación, en caso de que no tenga a mi disposición mi ordenador o mi móvil, poder entrar desde cualquier sitio con esa clave, con ese usuario, para poder modificar cualquier aspecto y gestionar cualquier aspecto dentro de la aplicación».
+**Qué se decidió y por qué:**
+- **Portada.** No la veía porque la fase 2a estaba en un PR sin fusionar. Se fusionaron #28 y #30 en cuanto el CI estuvo en verde. Además, para que se parezca más a lo que describe, la portada común y la de cada disciplina pasan a ser **la misma pantalla** (`_inicio/Portada.tsx`):
+  - un selector «Todos / Boxeo / Jiu-jitsu…» en una fila que se desliza;
+  - la **noticia más reciente en grande**, el resto en lista;
+  - después, veladas y aura de ese deporte.
+  - El visitante también ve la actualidad nada más entrar, con la noticia destacada.
+- **Cuenta del creador.** Se reconoce por su correo (`CREADOR_CORREO`, que se pone en el panel de Render y nunca en el código) **con el correo verificado**. Tiene todos los permisos de moderación y, solo ella, «Administración»: buscar cualquier cuenta, cambiar su tipo, nombrar o quitar moderadores y cerrar sesiones.
+  - **Segundo paso obligatorio (decisión de Claude, revisable por el fundador):** es la cuenta que más interesa robar. Para que funcione «sin el ordenador ni el móvil», el segundo paso admite un código de la aplicación de códigos **o uno de diez códigos de emergencia en papel**.
+  - Sin dependencias nuevas: los códigos siguen la RFC 6238, probada con sus vectores oficiales.
+**Qué se hizo:**
+- Migración aditiva `20261008200000_cuenta_creador`.
+- `lib/accounts/totp.ts` y `creador.ts`, `requireCreador`.
+- Pantallas `/entrar/segundo-paso` y `/moderacion/usuarios`; acciones `creador.ts`.
+- «Administración» en el menú.
+- Aviso de arranque si falta `CREADOR_CORREO`.
+- Guía para el fundador [`CREADOR.md`](CREADOR.md).
+- Pruebas `tests/unit/creador.test.ts` y `tests/e2e/creador.mjs`, esta última con accesibilidad de las pantallas nuevas.
+**Qué ejecuté yo:** RESULTADOS
+**Qué salió mal / límite honesto:**
+- Mi primer diseño dejaba un hueco: una sesión abierta **antes** de confirmar el correo habría heredado los poderes del creador sin el segundo paso. Lo encontré al escribir la prueba y lo corregí: ahora se comprueba en cada petición que esa sesión hizo el segundo paso.
+- Tres fallos de la propia prueba, anotados en `LECCIONES.md`.
+- Desde aquí no se puede abrir la demo, así que no he visto el despliegue de #30 en Render.
+**Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo, así que se pide permiso. Después, el fundador pone `CREADOR_CORREO` en Render y activa su cuenta siguiendo `CREADOR.md`. Decisiones en `TRASLADO.md` §7.27.

@@ -93,6 +93,8 @@ a.card:hover{border-color:var(--line-strong);color:var(--text)}
 .notice-info{background:var(--info-bg);color:#d6ebff;border-color:rgba(169,212,255,.35)}
 .notice-bad{background:var(--bad-bg);color:var(--bad);border-color:rgba(255,154,154,.4)}
 .notice a{color:inherit}
+.codigos-emergencia{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;margin:0;padding-left:28px;font:700 18px/1.6 ui-monospace,Menlo,Consolas,monospace}
+.clave-app{font:700 18px/1.5 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-all;background:rgba(255,255,255,.06);border-radius:14px;padding:12px 14px;margin:0}
 .acciones{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .barra-aviso{max-width:1240px;margin:12px auto 0;padding:0 24px}
@@ -457,6 +459,16 @@ nav.lista>a{display:flex}
 .noticia .titular{font:700 17px/1.3 var(--font);letter-spacing:-.01em}
 .noticia-imagen{flex:none;width:96px;height:72px;border-radius:16px;object-fit:cover;background:linear-gradient(160deg,var(--tinte,rgba(212,246,124,.38)),var(--card) 80%)}
 @media (min-width:760px){.noticia-imagen{width:150px;height:96px}}
+/* Selector de deporte de las portadas: una sola fila que se desliza en el móvil (siete botones en tres filas saturaban la pantalla). */
+.filtros-disciplina.desliza-fila{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filtros-disciplina.desliza-fila::-webkit-scrollbar{display:none}
+.filtros-disciplina.desliza-fila a{flex:none}
+.noticia-destacada{min-height:250px}
+.noticia-destacada .abajo{padding:20px;gap:6px}
+.noticia-destacada .titular{font:800 22px/1.2 var(--font);letter-spacing:-.02em}
+.noticia-destacada .meta{color:rgba(255,255,255,.85)}
+.noticia-destacada:hover,.noticia-destacada:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (min-width:760px){.noticia-destacada{min-height:340px}.noticia-destacada .titular{font-size:28px}}
 .filtros-disciplina{display:flex;gap:8px;flex-wrap:wrap}
 main .filtros-disciplina a,.filtros-disciplina a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font:600 16px var(--font)}
 main .filtros-disciplina a[aria-current=page]{background:var(--acc);color:var(--acc-ink)}

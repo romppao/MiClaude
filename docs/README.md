@@ -21,6 +21,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Retomar el proyecto desde el portátil** (crear cuentas, migrar la demo, lanzar las pruebas) | [`RELEVO-PORTATIL.md`](RELEVO-PORTATIL.md) |
 | **Elegir proveedores y saber cuánto cuesta** (base de datos, imágenes, correo, errores, menores) | [`decisiones/ADR-003-proveedores-fase-0.md`](decisiones/ADR-003-proveedores-fase-0.md) |
 | **Colaborar con el resto de asistentes** (reglas, ramas, plantilla de relevo) | [`EQUIPO.md`](EQUIPO.md) |
+| **Entrar como creador desde cualquier sitio** y gestionar cuentas y moderadores | [`CREADOR.md`](CREADOR.md) |
 | **Móvil primero y camino a App Store / Google Play** | [`MOVIL.md`](MOVIL.md) · proceso de publicación y costes: [`PUBLICACION.md`](PUBLICACION.md) |
 | **Ver qué pantalla lanza qué acción**, quién puede ejecutarla y en qué tablas escribe | [`MAPA-FUNCIONAL.md`](MAPA-FUNCIONAL.md) (se genera solo con `npm run mapa`) |
 | **Entender las decisiones técnicas**: modelo de datos, roles, flujos, seguridad, riesgos y hoja de ruta | [`ARQUITECTURA.md`](ARQUITECTURA.md) |

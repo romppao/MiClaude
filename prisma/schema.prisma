@@ -324,13 +324,22 @@ model User {
   interests             Discipline[]           @default([])
   // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
   onboarding            Json?
+  // Segundo paso al entrar (cuenta del creador, lib/accounts/creador.ts): clave de la aplicación de códigos (RFC 6238),
+  // cuándo se activó, el último intervalo aceptado (un código no vale dos veces) y los códigos de emergencia (solo su SHA-256).
+  totpSecret            String?
+  totpConfirmedAt       DateTime?
+  totpLastStep          Int?
+  recoveryCodes         String[]               @default([])
 }
 
 model Session {
-  id        String   @id // sha256 del token de la cookie
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
+  id                  String   @id // sha256 del token de la cookie
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt           DateTime
+  // Cuándo se completó el segundo paso en esta sesión. Una sesión de la cuenta del creador sin él no cuenta como iniciada
+  // (getUser), aunque se abriera antes de serlo: así nadie hereda sus poderes sin pasar por el segundo paso.
+  secondFactorAt      DateTime?
 
   @@index([userId])
   @@index([expiresAt])

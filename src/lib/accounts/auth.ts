@@ -6,6 +6,7 @@ export { hashPassword, verifyPassword } from "./password";
 import { APP_URL, sendMail } from "../common/mail";
 import { oneLine } from "../common/text";
 import { internalPath, loginPath } from "../common/paths";
+import { esCreador } from "./creador";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
@@ -14,6 +15,7 @@ const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 /**
  * Crea una sesión de 30 días y escribe su token en cookie httpOnly; PostgreSQL solo guarda SHA-256.
  * El llamante debe haber autenticado a userId. El token en claro no se devuelve ni se registra en logs.
+ * Si es la cuenta del creador, la sesión no cuenta como iniciada hasta completar el segundo paso (getUser).
  */
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString("hex");
@@ -41,7 +43,23 @@ export async function getUser() {
   if (!token) return null;
   const s = await db.session.findUnique({ where: { id: sha256(token) }, include: { user: { include: { fighter: { include: { disciplines: true } } } } } });
   if (!s || s.expiresAt < new Date()) return null;
+  if (esCreador(s.user) && !s.secondFactorAt) return null; // la cuenta del creador, sin el segundo paso, no está dentro
   return s.user;
+}
+
+/** La persona que ha puesto bien la contraseña y está en el segundo paso (solo lo usa la pantalla del segundo paso). */
+export async function getUserPendingSecondFactor() {
+  const token = (await cookies()).get(COOKIE)?.value;
+  if (!token) return null;
+  const s = await db.session.findUnique({ where: { id: sha256(token) }, include: { user: true } });
+  if (!s || s.expiresAt < new Date() || !esCreador(s.user) || s.secondFactorAt) return null;
+  return s.user;
+}
+
+/** Da por completado el segundo paso de la sesión actual: desde ahora cuenta como iniciada. */
+export async function completeSecondFactor() {
+  const token = (await cookies()).get(COOKIE)?.value;
+  if (token) await db.session.updateMany({ where: { id: sha256(token) }, data: { secondFactorAt: new Date() } });
 }
 
 /** Exige una sesión iniciada. Si falta, lleva a «Entrar» explicando por qué y, si se indica `next`, con la ruta a la que volver. */
