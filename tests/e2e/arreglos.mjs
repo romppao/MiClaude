@@ -46,13 +46,30 @@ await foto(pel.p, "1-ficha-peleador");
 // 3) Pestañas que se deslizan: la ficha agrupa sus secciones y se cambia de una a otra sin bajar.
 const barra = pel.p.getByRole("navigation", { name: "Secciones de la ficha" });
 check("la ficha agrupa Combates, Récord, Público y Datos en pestañas", JSON.stringify(await barra.locator("a").allInnerTexts()) === JSON.stringify(["Combates", "Récord", "Público", "Datos"]));
-const pista = pel.p.locator(".pestanas-pista").first();
+const enSeccion = (n) => pel.p.waitForFunction((nombre) => {
+  const barra = document.querySelector('nav[aria-label="Secciones de la ficha"]');
+  const pista = barra.parentElement.querySelector(".pestanas-pista");
+  const i = [...barra.querySelectorAll("a")].findIndex((a) => a.textContent === nombre);
+  return barra.querySelector("a[aria-current]")?.textContent === nombre && Math.abs(pista.querySelectorAll(".pestanas-panel")[i].getBoundingClientRect().left - pista.getBoundingClientRect().left) < 2;
+}, n);
 await barra.getByRole("link", { name: "Datos" }).click();
-await pel.p.waitForFunction(() => { const p = document.querySelector(".pestanas-pista"); return p && p.scrollLeft > p.clientWidth * 2.5; });
+await enSeccion("Datos");
 check("pulsar una pestaña desliza a su sección y la marca", await barra.getByRole("link", { name: "Datos" }).getAttribute("aria-current") === "true");
-await pista.evaluate((p) => p.scrollTo({ left: p.clientWidth, behavior: "auto" }));
-await pel.p.waitForFunction(() => document.querySelector('nav[aria-label="Secciones de la ficha"] a[aria-current]')?.textContent === "Récord");
-check("deslizar a un lado cambia la pestaña marcada", true);
+// Gesto del dedo: deslizar hacia la izquierda pasa a la sección siguiente.
+await barra.getByRole("link", { name: "Combates" }).click(); await enSeccion("Combates");
+const zonaToque = await pel.p.locator(".pestanas-pista").first().boundingBox();
+const y = zonaToque.y + 40;
+const cdp = await pel.p.context().newCDPSession(pel.p);
+const dedo = (type, x) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x, y }] });
+await dedo("touchStart", 320); for (const x of [300, 260, 200, 140, 90]) await dedo("touchMove", x); await dedo("touchEnd");
+await enSeccion("Récord");
+check("deslizar con el dedo pasa a la sección siguiente", true);
+await barra.getByRole("link", { name: "Récord" }).press("ArrowRight"); await enSeccion("Público");
+check("las flechas del teclado en la barra cambian de sección", true);
+// Un enlace a una sección («#record») abre esa pestaña y enseña su contenido, no el de la de al lado.
+await pel.p.goto(B + `/peleadores/${f.slug}#record`);
+await enSeccion("Récord");
+check("un enlace con #ancla abre su pestaña y muestra su contenido", await pel.p.locator("#record").getByText("Aura recibida").isVisible());
 check("la página no se desplaza a los lados (solo las pestañas)", await pel.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
 await axe(pel.p, "Ficha del peleador con pestañas");
 

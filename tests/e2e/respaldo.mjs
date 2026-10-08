@@ -1,6 +1,6 @@
 // Recorrido de una ficha con historial amateur y profesional: categoría por nivel y explicación del récord.
 // Solo contra el servidor y la base de pruebas; datos ficticios únicos creados mediante la interfaz.
-import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos, mostrar } from "./ayudas.mjs";
 
 const { p } = await newUser("Trayectoria", "FIGHTER");
 await p.goto(B + "/mi-ficha");
@@ -22,7 +22,7 @@ async function combate(sufijo, dias, resultado = "WIN") {
 
 async function categoria(nivel, peso) {
   const editar = p.locator("main details").filter({ has: p.locator("summary strong", { hasText: /^Boxeo$/ }) });
-  await editar.locator("summary").click();
+  await mostrar(editar); await editar.locator("summary").click();
   await editar.locator("select[name=level]").selectOption(nivel);
   await editar.locator("select[name=weightClass]").selectOption(peso);
   await editar.getByRole("button", { name: "Guardar cambios", exact: true }).click();
@@ -44,7 +44,7 @@ await combate("SinDecision", -10, "NC");
 
 const visitante = await (await browser.newContext()).newPage();
 async function comprobar(page, contexto, nivelActual) {
-  const cards = page.locator("main .grid > .card").filter({ has: page.locator(".rec") });
+  const cards = page.locator("main :is(.grid, .fila-tarjetas) > .card").filter({ has: page.locator(".rec") });
   const pro = cards.filter({ hasText: "Boxeo · Profesional" });
   const amateur = cards.filter({ hasText: "Boxeo · Amateur" });
   check(`${contexto}: se conservan los dos niveles de boxeo`, await seen(pro) && await seen(amateur) && await cards.count() === 2);
@@ -67,7 +67,9 @@ await categoria("AMATEUR", "M70");
 await comprobar(p, "Mi ficha, categoría amateur", "AMATEUR");
 await visitante.goto(B + publica);
 await comprobar(visitante, "Ficha pública, categoría amateur", "AMATEUR");
-await visitante.locator('main .grid a[href="/ayuda#respaldo"]').first().click();
+// El récord está en su pestaña de la ficha (components/Pestanas.tsx): se abre como lo haría una persona.
+await visitante.getByRole("navigation", { name: "Secciones de la ficha" }).getByRole("link", { name: "Récord", exact: true }).click();
+await visitante.locator('main :is(.grid, .fila-tarjetas) a[href="/ayuda#respaldo"]').first().click();
 check("el enlace de respaldo abre la explicación pública", await seen(visitante.getByRole("heading", { name: "Qué significan las etiquetas de un combate", exact: true })) && new URL(visitante.url()).hash === "#respaldo");
 
 await terminarDiagnosticos();

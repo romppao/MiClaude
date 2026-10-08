@@ -1173,3 +1173,37 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - Prueba de navegador (`perfiles.mjs`): una foto de 4000×3000 píxeles y más de 4 MB se reduce y se guarda.
 **Límite honesto:** probado con Chromium; en Safari de iPhone no lo he podido probar. Las fotos HEIC se convierten ya al elegirlas en iOS; en un navegador que no pueda decodificarlas saldrá el mensaje de ayuda.
 **Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Arreglos tras probar la demo en el móvil: pestañas que se deslizan, foto y banner, portadas, disciplinas y clases (Claude)
+
+**Qué se pidió**, con capturas del móvil y en palabras del fundador:
+- «La aplicación es muy densa y el orden de las cosas no está muy bien optimizado, tienes que scrollear mucho para llegar al final de la página; en lugar de ir hacia abajo pienso que sería mejor deslizar de manera horizontal y con las cosas bien agrupadas.»
+- «A la hora de agregar foto de perfil y banner, se colapsa, y si añades el banner, la foto de perfil no se ve y viceversa.»
+- «Los highlights del perfil se ven si le das play, pero carecen de portada.»
+- «En caso de que un peleador se equivoque y ponga disciplinas en las que no está familiarizado, no se puede eliminar […] o por lo menos que yo como administrador pueda configurar.»
+- «En el caso de los afiliados, poder reservar las clases privadas publicadas es misión imposible, ya que no hay opción ni un botón para hacerlo.» Y: «resuelve todo esto de urgencia».
+
+**Causas encontradas:**
+- La portada de la ficha (diseño v3) solo pintaba **una** imagen de fondo: el banner o, si no había, la foto estirada a toda la portada. Nunca las dos.
+- Los highlights solo tenían portada si se subía una foto aparte; nada la sugería.
+- No existía ninguna acción para quitar una disciplina.
+- Las clases decían «Ring España todavía no gestiona reservas»: no había forma de pedirlas en la aplicación.
+- Además, en la segunda captura salía «Masculino · Masculino»: la división ya incluye el sexo y la categoría de peso también.
+
+**Qué se hizo:**
+- **Pestañas que se deslizan** (`components/Pestanas.tsx`): carrusel horizontal nativo con barra de botones arriba. Se cambia de sección con el dedo, con la barra o con el teclado; la altura se ajusta a la sección visible.
+  - Ficha del peleador: portada, seguir, cifras y highlights arriba; debajo, **Combates · Récord · Vídeos · Público · Datos**. Los récords por disciplina van en una fila deslizable.
+  - «Mi ficha»: **Mi perfil · Combates · Récord · Mis datos · Vídeos**, con un aviso arriba si hay combates por confirmar.
+  - Portada: las noticias, salvo la destacada, en una fila deslizable en vez de una lista de doce.
+  - Los enlaces con «#ancla» y las vueltas de los formularios (`?seccion=`) abren la pestaña correcta.
+- **Foto y banner a la vez**: banner de fondo y foto en círculo junto al nombre; la cabecera de «Mi ficha» enseña la foto.
+- **Portadas de los highlights**: al subir un vídeo, el navegador saca un fotograma y lo pone de portada si no se elige otra foto; los ya publicados sin foto muestran un fotograma del propio vídeo; los de YouTube, su miniatura.
+- **Quitar una disciplina**: el peleador puede si no tiene combates en ella y no es la única; moderación y el creador pueden siempre desde la pestaña «Datos» de la ficha pública (los combates se conservan). Con casilla de confirmación y en el historial.
+- **Solicitar clases** (modelo `ClassRequest`, migración `20261008240000_solicitudes_de_clases`): botón «Solicitar esta clase» en cada clase → «¿Cuándo te viene bien?», mensaje y teléfono opcionales → el entrenador recibe un correo y la ve en «Mis clases» (con el número en su panel) → acepta o dice que no puede, con un mensaje → la persona lo ve en «Mis reservas de clases» (nuevo en el menú) y por correo; puede cancelar. Ring España no cobra: se dice en cada paso. Entra en la descarga de datos.
+- «Masculino · Masculino» corregido en todas las pantallas con `categoryLabel`.
+
+**Qué salió mal por el camino:** en «Mi ficha» la página se ensanchaba a 765 px: el título oculto de una tabla (posición absoluta) se escapaba de la pista de pestañas. Se arregló haciendo cada panel contenedor de posición. La barra de pestañas se partía en dos filas por una regla general de `nav`. Y la primera versión de las pestañas (desplazamiento nativo con «scroll-snap») se quedaba a medio camino cuando el navegador llevaba algo a la vista: se rehízo con un riel que se mueve con `transform` y el gesto del dedo gestionado por el propio componente (también con las flechas del teclado en la barra).
+
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (575), `npm run build`, la prueba nueva `arreglos.mjs` (33 comprobaciones, con capturas a 390 px, gesto del dedo y teclado) y la batería completa de navegador: 22 guiones, **601 comprobaciones, 0 fallos**; accesibilidad, 61 pantallas sin incumplimientos. Las pruebas abren la pestaña que contiene lo que pulsan, como una persona (`mostrar` en `tests/e2e/ayudas.mjs`). `escenarios.mjs` (revisión con capturas, fuera del CI) no se ejecutó.
+**Límite honesto:** el fotograma automático y el deslizamiento solo se han probado en Chromium; hay que probarlos en Safari de iPhone. La miniatura de YouTube no se pudo cargar desde aquí (red bloqueada); se comprueba que la dirección es la correcta.
+**Estado:** PR a `claude/ring-espana-mvp`.

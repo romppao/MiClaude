@@ -52,7 +52,8 @@ export function NoticiaDestacada({ n, ahora = new Date() }: { n: Noticia; ahora?
  */
 export function FilaNoticias({ noticias, etiqueta, ahora = new Date() }: { noticias: Noticia[]; etiqueta: string; ahora?: Date }) {
   return (
-    <ul className="desliza fila-noticias" role="region" tabIndex={0} aria-label={`${etiqueta} (desliza para ver más)`}>
+    <div role="region" tabIndex={0} aria-label={`${etiqueta} (desliza para ver más)`}>
+    <ul className="desliza fila-noticias">
       {noticias.map((n) => {
         const medio = n.publisher ?? n.source.name;
         return (
@@ -69,6 +70,7 @@ export function FilaNoticias({ noticias, etiqueta, ahora = new Date() }: { notic
         );
       })}
     </ul>
+    </div>
   );
 }
 

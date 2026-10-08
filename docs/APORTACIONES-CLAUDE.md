@@ -86,3 +86,11 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 1. Revisar en la demo `/moderacion/noticias`: qué fuentes nuevas leen bien.
 2. Si alguna falla, buscar su dirección real desde una red sin restricciones.
 3. Añadir medios de K-1, kickboxing y Muay Thai si el fundador da referencias.
+
+## 8 de octubre de 2026 — Arreglos tras probar la demo en el móvil
+**Pedido por el fundador:** menos desplazamiento hacia abajo (deslizar a los lados), foto y banner a la vez, portada de los highlights, quitar disciplinas y poder reservar clases.
+**Rama:** `claude/ring-espana-siguiente`. **Qué cambié y por qué:** entrada del 8 de octubre «Arreglos tras probar la demo en el móvil» en `DIARIO.md` y la sección del mismo día en `ARQUITECTURA.md`.
+**Qué debe hacer el siguiente asistente:**
+1. Probar en Safari de iPhone el deslizamiento de las pestañas y el fotograma automático de los vídeos.
+2. Si el fundador lo aprueba, llevar las pestañas a otras pantallas largas (velada, gimnasio).
+3. No añadir pagos a las clases sin decisión del fundador y proveedor aprobado (`CLAUDE.md`, presupuesto).

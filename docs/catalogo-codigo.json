@@ -90,6 +90,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261008240000_solicitudes_de_clases/migration.sql",
+    "purpose": "Migración que crea las solicitudes de clase (ClassRequest) y su estado; no toca datos existentes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -290,6 +295,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/clases/[id]/solicitar/page.tsx",
+    "purpose": "Pantalla para solicitar una clase publicada: resumen de la clase, cuándo le viene bien, mensaje y teléfono opcionales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/compartir/page.tsx",
     "purpose": "Subir vídeos o fotos: elegir la velada de los últimos cuatro meses y formulario con foto, vídeo subido o enlace, combate opcional y consentimiento.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -393,6 +403,11 @@
     "path": "src/app/components/PasosRegistro.tsx",
     "purpose": "Cabecera de alta con progreso y retorno según los pasos del tipo de cuenta; no publica datos por sí misma.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Pestanas.tsx",
+    "purpose": "Componente de cliente que agrupa secciones en pestañas que se deslizan a los lados (carrusel horizontal con barra de botones).",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/components/ProfileDetails.tsx",
@@ -577,6 +592,11 @@
   {
     "path": "src/app/mis-clases/page.tsx",
     "purpose": "Panel privado de clases del entrenador, publicación y pausa/activación de ofertas propias.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/mis-reservas/page.tsx",
+    "purpose": "Pantalla «Mis reservas de clases»: las solicitudes de la persona, la respuesta del entrenador y el botón para cancelar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1030,6 +1050,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/trainers/requests.ts",
+    "purpose": "Reglas de las solicitudes de clase: validación de lo que se escribe, límites, etiquetas de estado y qué se puede responder o cancelar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/middleware.ts",
     "purpose": "Normaliza parámetros repetidos/peligrosos y entradas de URL antes de páginas; las acciones conservan validación y autorización propias.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1052,6 +1077,11 @@
   {
     "path": "tests/e2e/acceso.mjs",
     "purpose": "Recorre guardas y rechazos por sesión/rol y destinos de retorno tras entrar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/arreglos.mjs",
+    "purpose": "Prueba de navegador de los arreglos del 8 de octubre: foto y banner, portadas de highlights, pestañas, quitar disciplinas y solicitar clases.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1177,6 +1207,11 @@
   {
     "path": "tests/unit/arquitectura.test.ts",
     "purpose": "Vigila dominios/importaciones, separación lib/app, directivas y exportaciones de acciones y ausencia de rutas antiguas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/arreglos.test.ts",
+    "purpose": "Pruebas unitarias de la categoría sin repetir el sexo, las portadas de vídeos enlazados, las solicitudes de clase y el menú.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
