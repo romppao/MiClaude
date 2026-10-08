@@ -436,3 +436,15 @@ dialog.hoja h2{margin:0;font-size:28px}
 .solo-grupo{display:flex;flex-direction:column;gap:18px}
 form:has(input[name=kind][value=INDIVIDUAL]:checked) .solo-grupo{display:none}
 form:has(input[name=kind][value=PHOTO]:checked) .solo-video{display:none}
+
+/* Ajustes de escritorio y de pestañas (revisión del 8 de octubre). */
+main .segmentos>a{color:rgba(255,255,255,.75);text-decoration:none}
+main .segmentos>a:hover{color:#fff}
+nav.lista{display:block;flex:none}
+nav.lista>a{display:flex}
+.grafico-aura svg path{vector-effect:non-scaling-stroke}
+@media(min-width:651px){.solo-movil{display:none!important}}
+@media(min-width:1024px){
+  .pantalla{max-width:720px}
+  .rejilla-2.disciplinas-portada{grid-template-columns:repeat(3,1fr)}
+}

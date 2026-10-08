@@ -59,13 +59,13 @@ export function GraficoAura({ serie, etiqueta }: { serie: { mes: string; total: 
   const area = acumulado.map((v, i) => `${i ? "L" : "M"}${punto(i, v, maxAc)}`).join(" ");
   const ultimo = punto(serie.length - 1, serie[serie.length - 1]?.total ?? 0, max).split(" ");
   return (
-    <figure className="grafico-aura" style={{ margin: 0 }}>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={etiqueta}>
+    <figure className="grafico-aura" style={{ margin: 0, position: "relative" }}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={etiqueta}>
         <path d={`${area} L${W} ${H} L0 ${H}Z`} style={{ fill: "var(--acc2)", opacity: 0.28 }} />
         <path d={area} style={{ fill: "none", stroke: "var(--acc2)", strokeWidth: 2 }} />
         <path d={linea} style={{ fill: "none", stroke: "var(--acc)", strokeWidth: 2.6, strokeLinejoin: "round" }} />
-        <circle cx={ultimo[0]} cy={ultimo[1]} r="5.5" style={{ fill: "var(--acc)" }} />
       </svg>
+      <span aria-hidden="true" style={{ position: "absolute", left: `calc(${(Number(ultimo[0]) / W) * 100}% - 5.5px)`, top: `${Number(ultimo[1]) - 5.5}px`, width: 11, height: 11, borderRadius: "50%", background: "var(--acc)" }} />
       <figcaption className="meses" aria-hidden="true">{serie.map((x, i) => <span key={i}>{x.mes}</span>)}</figcaption>
     </figure>
   );

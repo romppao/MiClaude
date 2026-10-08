@@ -10,7 +10,7 @@ export default async function InicioVisitante() {
   return (
     <div className="pantalla" style={{ gap: 30 }}>
       <section className="portada-visita a-sangre" aria-labelledby="titulo-portada" style={{ marginTop: -20 }}>
-        <div style={{ position: "absolute", top: 18, right: 24 }}>
+        <div className="solo-movil" style={{ position: "absolute", top: 18, right: 24 }}>
           <Link href="/entrar" className="btn" style={{ minHeight: 44 }}>Entrar</Link>
         </div>
         <h1 id="titulo-portada">Tu deporte.<br /><span className="acc">Tu gente.</span></h1>

@@ -25,6 +25,15 @@ Cosas que conviene saber:
 2. En la pantalla «Confirma tu correo electrónico» pulsa **«Confirmar mi correo ahora (solo demostración)»**.
 3. Entra en **Mi cuenta**: arriba hay un panel «Versión de demostración» con cuatro botones para **probar como otra persona** con la misma cuenta: aficionado, peleador, organizador o moderador.
 
+### Qué probar del diseño v3 (8 de octubre de 2026)
+
+- **Bienvenida:** `/bienvenida` (Empezar, Entrar, Explorar sin cuenta).
+- **Registro por tipo de cuenta:** «Crear una cuenta» ofrece cuatro tipos. Cada uno tiene su último paso: aficionado (disciplinas y peleadores para seguir), peleador (disciplina, nivel, categoría y provincia), entrenador (perfil y primera clase) y promotora, federación o club (la solicitud). En la demo, confirma el correo con el botón «Confirmar mi correo ahora (solo demostración)».
+- **Inicio distinto para cada tipo** y barra inferior de cuatro pestañas en el móvil.
+- **Peleador:** en «Mi ficha», «Mostrar mi récord amateur completo» (por defecto el público solo ve cuántos combates llevas) y «Publicar un highlight» (enlace de vídeo o foto). Al registrar un combate, «Cómo terminó» solo ofrece las formas de terminar de su disciplina.
+- **Entrenador:** tras confirmar el correo, «Publicar mi perfil» en el inicio; después «Mis clases» para crear, pausar y activar clases. El perfil público está en «Entrenadores».
+- **Cambiar de tipo con la misma cuenta:** en «Mi cuenta», panel de demostración (ahora también «Entrenador»).
+
 ## B. En un ordenador
 
 Requisitos: Node 22 y PostgreSQL 16 (con Docker, el script lo arranca solo).
