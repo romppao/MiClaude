@@ -13,6 +13,9 @@ import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
 import { addCartelBout, removeCartelBout, setBoutResult, setEventStatus, updateEvent } from "../../actions/events";
 import { EVENT_KIND_LABEL, PROVINCES } from "../../../lib/common/labels";
+import { setRegistration } from "../../actions/registrations";
+import { REG_NOTE_MAX, inscripcionAbierta } from "../../../lib/events/registrations";
+import { todayMadrid } from "../../../lib/common/dates";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -27,6 +30,27 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");
   const fighters = await db.fighter.findMany({ where: { hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }], take: MAX_LISTA + 1, include: { gym: true } });
   const past = eventDayReached(event.date);
+  // Inscripción: cuántas solicitudes esperan respuesta y quiénes están aceptados (salen primero al formar el cartel).
+  const [porEstado, aceptados] = await Promise.all([
+    db.eventRegistration.groupBy({ by: ["status"], where: { eventId: event.id }, _count: { _all: true } }),
+    db.eventRegistration.findMany({ where: { eventId: event.id, status: "ACCEPTED" }, select: { fighterId: true } }),
+  ]);
+  const nEstado = (s: string) => porEstado.find((x) => x.status === s)?._count._all ?? 0;
+  const idsAceptados = new Set(aceptados.map((a) => a.fighterId));
+  const hoy = todayMadrid();
+  const abierta = inscripcionAbierta(event, hoy);
+  const diaEvento = event.date.toISOString().slice(0, 10);
+  // Un aceptado que quede fuera de los primeros 500 de la lista también tiene que poder elegirse.
+  const visiblesIds = new Set(fighters.slice(0, MAX_LISTA).map((b) => b.id));
+  const faltan = [...idsAceptados].filter((id) => !visiblesIds.has(id));
+  const extra = faltan.length ? await db.fighter.findMany({ where: { id: { in: faltan }, hiddenAt: null }, include: { gym: true } }) : [];
+  const opciones = (lista: typeof fighters) => {
+    const visibles = [...extra, ...lista.slice(0, MAX_LISTA)];
+    const ac = visibles.filter((b) => idsAceptados.has(b.id));
+    const resto = visibles.filter((b) => !idsAceptados.has(b.id));
+    const op = (b: (typeof fighters)[number]) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>;
+    return ac.length ? <><optgroup label="Aceptados en la inscripción">{ac.map(op)}</optgroup><optgroup label="Todos los peleadores de la disciplina">{resto.map(op)}</optgroup></> : resto.map(op);
+  };
   const nombre = (b: { firstName: string; lastName: string; listed?: boolean; hiddenAt?: Date | null }) => publicFighterName(b); // como lo ve el público: una ficha provisional solo enseña la inicial del apellido
   // En la lista se distinguen los homónimos con el alias, la ciudad y el gimnasio.
   const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
@@ -66,14 +90,38 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
         </form>
       </details>
 
-      <h2>Añadir un combate al cartel</h2>
+      <section id="inscripcion" aria-labelledby="titulo-inscripcion" className="tarjeta" style={{ marginTop: 16, scrollMarginTop: 80 }}>
+        <h2 id="titulo-inscripcion" style={{ margin: 0 }}>Inscripción de peleadores</h2>
+        <p style={{ margin: 0 }}><span className={`pildora ${abierta ? "pildora-acc" : ""}`}>{abierta ? "Abierta" : "Cerrada"}</span> {abierta ? "Los peleadores de la disciplina pueden pedir participar desde la página pública." : "Ábrela para que los peleadores pidan participar desde la página pública. Tú eliges a quién aceptas."}</p>
+        {(nEstado("PENDING") + nEstado("ACCEPTED") + nEstado("DECLINED") + nEstado("WITHDRAWN")) > 0 && (
+          <Link className="btn" href={`/organizador/${event.slug}/inscripciones`} style={{ alignSelf: "flex-start" }}>
+            Gestionar las solicitudes{nEstado("PENDING") ? ` (${nEstado("PENDING")} ${nEstado("PENDING") === 1 ? "pendiente" : "pendientes"})` : ""}
+          </Link>
+        )}
+        {nEstado("ACCEPTED") > 0 && <p className="meta" style={{ margin: 0 }}>{nEstado("ACCEPTED") === 1 ? "1 peleador aceptado" : `${nEstado("ACCEPTED")} peleadores aceptados`}: salen primero en las listas de «Añadir un combate al cartel».</p>}
+        {event.status === "SCHEDULED" && diaEvento >= hoy ? (
+          <form action={setRegistration} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <input type="hidden" name="eventId" value={event.id} />
+            <label className="field"><span>Requisitos para participar (opcional)</span><textarea name="note" rows={2} maxLength={REG_NOTE_MAX} defaultValue={event.registrationNote ?? ""} placeholder="Experiencia mínima, licencia federativa, pesaje, revisión médica…" /><span className="hint">Los ve el peleador antes de pedir participar.</span></label>
+            <label className="field"><span>Fecha límite para pedir participar (opcional)</span><input name="until" type="date" min={hoy} max={diaEvento} defaultValue={event.registrationUntil?.toISOString().slice(0, 10) ?? ""} /><span className="hint">Si la dejas vacía, se puede pedir hasta el día del evento.</span></label>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {event.registrationOpen ? <>
+                <button name="abrir" value="1">Guardar los requisitos</button>
+                <button name="abrir" value="0" className="secondary">Cerrar la inscripción</button>
+              </> : <button name="abrir" value="1">Abrir la inscripción</button>}
+            </div>
+          </form>
+        ) : <p className="mut" style={{ margin: 0 }}>{event.status === "CANCELLED" ? "La velada está cancelada: no se puede abrir la inscripción." : "La fecha del evento ya ha pasado: no se puede abrir la inscripción."}</p>}
+      </section>
+
+      <h2 id="anadir-combate" style={{ scrollMarginTop: 80 }}>Añadir un combate al cartel</h2>
       <form className="search" action={addCartelBout}>
         <input type="hidden" name="eventId" value={event.id} />
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Esquina roja</span>
-          <select name="fighterA" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{fighters.slice(0, MAX_LISTA).map((b) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>)}</select>
+          <select name="fighterA" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fighters)}</select>
         </label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Esquina azul</span>
-          <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{fighters.slice(0, MAX_LISTA).map((b) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>)}</select>
+          <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fighters)}</select>
         </label>
         <SelectorCategoria modo="combate" fijas={{ discipline: event.discipline, level: event.level }} />
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>

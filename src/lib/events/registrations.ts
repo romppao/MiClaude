@@ -50,7 +50,7 @@ export function parseRegistrationSettings(input: { note: string; until: string; 
 /** Una fila de la lista del organizador, con lo que hace falta para filtrar y ordenar. */
 export type FilaInscripcion = {
   id: string; status: RegistrationStatus; createdAt: Date; nombre: string; gimnasio: string | null; provincia: string | null;
-  divisionId: string | null; weightClass: string | null; weightKg: number | null; combates: number; victorias: number; aura: number;
+  divisionId: string | null; weightClass: string | null; weightKg: number | null; combates: number; victorias: number; aura: number; edad: number | null;
 };
 
 export const ORDENES = {
@@ -60,12 +60,22 @@ export const ORDENES = {
   combates: "Más combates primero",
   experiencia: "Menos combates primero",
   peso: "Peso declarado (de menos a más)",
+  edad: "Edad (de menos a más)",
   nombre: "Nombre (A-Z)",
 } as const;
 export type Orden = keyof typeof ORDENES;
 export const parseOrden = (v: string | undefined): Orden => (v && Object.prototype.hasOwnProperty.call(ORDENES, v) ? (v as Orden) : "fecha");
 
-export type FiltrosInscripcion = { estado?: RegistrationStatus | "TODAS"; weightClass?: string; divisionId?: string; provincia?: string; minCombates?: number; maxCombates?: number; texto?: string; orden?: Orden };
+export type FiltrosInscripcion = {
+  estado?: RegistrationStatus | "TODAS"; weightClass?: string; divisionId?: string; provincia?: string; texto?: string; orden?: Orden;
+  minCombates?: number; maxCombates?: number; minEdad?: number; maxEdad?: number; minPeso?: number; maxPeso?: number;
+};
+
+/** Un número de un filtro de la dirección (entero o con un decimal), o nada si está vacío o no es válido. */
+export const numeroDeFiltro = (v: string | undefined): number | undefined => {
+  const t = v?.trim().replace(",", ".");
+  return t && /^\d{1,3}(\.\d)?$/.test(t) ? Number(t) : undefined;
+};
 
 const sinTildes = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -83,6 +93,11 @@ export function filtrarYOrdenar<T extends FilaInscripcion>(filas: T[], f: Filtro
     (!f.provincia || r.provincia === f.provincia) &&
     (f.minCombates === undefined || r.combates >= f.minCombates) &&
     (f.maxCombates === undefined || r.combates <= f.maxCombates) &&
+    // Con edad o peso pedidos, quien no los ha indicado queda fuera: no se puede saber si cumple.
+    (f.minEdad === undefined || (r.edad !== null && r.edad >= f.minEdad)) &&
+    (f.maxEdad === undefined || (r.edad !== null && r.edad <= f.maxEdad)) &&
+    (f.minPeso === undefined || (r.weightKg !== null && r.weightKg >= f.minPeso)) &&
+    (f.maxPeso === undefined || (r.weightKg !== null && r.weightKg <= f.maxPeso)) &&
     (!texto || sinTildes(`${r.nombre} ${r.gimnasio ?? ""}`).includes(texto)));
   const porNombre = (a: T, b: T) => a.nombre.localeCompare(b.nombre, "es") || a.id.localeCompare(b.id);
   const orden = f.orden ?? "fecha";
@@ -93,6 +108,7 @@ export function filtrarYOrdenar<T extends FilaInscripcion>(filas: T[], f: Filtro
     combates: (a, b) => b.combates - a.combates,
     experiencia: (a, b) => a.combates - b.combates,
     peso: (a, b) => (a.weightKg ?? Infinity) - (b.weightKg ?? Infinity),
+    edad: (a, b) => (a.edad ?? Infinity) - (b.edad ?? Infinity),
     nombre: () => 0,
   };
   return [...quedan].sort((a, b) => comparar[orden](a, b) || porNombre(a, b));
@@ -100,3 +116,8 @@ export function filtrarYOrdenar<T extends FilaInscripcion>(filas: T[], f: Filtro
 
 export const puedeResponderInscripcion = (s: RegistrationStatus) => s === "PENDING" || s === "ACCEPTED" || s === "DECLINED";
 export const puedeRetirarInscripcion = (s: RegistrationStatus) => s === "PENDING" || s === "ACCEPTED";
+
+/** Estados en la dirección de la lista del organizador (en español) y su equivalente. */
+export const ESTADOS_LISTA = { pendientes: "PENDING", aceptadas: "ACCEPTED", rechazadas: "DECLINED", retiradas: "WITHDRAWN", todas: "TODAS" } as const;
+export type EstadoLista = keyof typeof ESTADOS_LISTA;
+export const parseEstadoLista = (v: string | undefined): EstadoLista => (v && Object.prototype.hasOwnProperty.call(ESTADOS_LISTA, v) ? (v as EstadoLista) : "pendientes");

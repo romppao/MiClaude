@@ -22,6 +22,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     db.event.count({ where: { organizerId: user.id } }),
     db.event.findFirst({ where: { organizerId: user.id, date: { gte: calendarDayStart() }, status: "SCHEDULED" }, orderBy: [{ date: "asc" }, { id: "asc" }] }),
   ]);
+  const inscripciones = eventos ? await db.eventRegistration.count({ where: { status: "PENDING", event: { organizerId: user.id } } }) : 0;
   // El entrenador también organiza veladas e interclubs (decisión del fundador, 8 de octubre de 2026).
   const veladas = (
     <section aria-labelledby="titulo-veladas-entrenador" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -83,6 +84,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
         { href: "/mis-clases#nueva", titulo: "Publicar una clase", detalle: "Individual o colectiva", icono: "mas" },
         { href: "/mis-clases#solicitudes", titulo: "Solicitudes de clase", detalle: "Acepta o responde", icono: "bandeja", aviso: pendientes },
         { href: "/organizador", titulo: "Mis veladas e interclubs", detalle: "Cartel y resultados", icono: "calendario" },
+        { href: "/organizador#mis-eventos", titulo: "Solicitudes para participar", detalle: "Peleadores que quieren entrar", icono: "check", aviso: inscripciones },
         { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
       ]} />
       <section className="tarjeta tarjeta-acc anillo" style={{ padding: 22, gap: 6 }} aria-label="Tus clases publicadas">

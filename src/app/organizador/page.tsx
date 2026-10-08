@@ -55,7 +55,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
   }
 
   const entrenador = user.role === "TRAINER";
-  const events = await db.event.findMany({ where: user.role === "ADMIN" ? {} : { organizerId: user.id }, orderBy: { date: "desc" }, take: 50, include: { _count: { select: { bouts: true } } } });
+  const events = await db.event.findMany({ where: user.role === "ADMIN" ? {} : { organizerId: user.id }, orderBy: { date: "desc" }, take: 50, include: { _count: { select: { bouts: true, registrations: { where: { status: "PENDING" } } } } } });
   return (
     <>
       <h1>{entrenador ? "Mis veladas e interclubs" : "Mis veladas"}</h1>
@@ -79,14 +79,14 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /><span className="hint">Debe empezar por https://</span></label>
         <button className="btn-grande" style={{ flexBasis: "100%" }}>Crear el evento</button>
       </form>
-      <h2>Tus veladas</h2>
+      <h2 id="mis-eventos" style={{ scrollMarginTop: 80 }}>Tus veladas</h2>
       {events.length === 0 ? <p className="mut">Aún no has creado ninguna velada. Usa el formulario de arriba para crear la primera.</p> : (
         <div className="table-wrap">
           <table>
             <caption className="sr-only">Tus veladas, de la más reciente a la más antigua</caption>
-            <thead><tr><th scope="col">Evento</th><th scope="col">Tipo</th><th scope="col">Fecha</th><th scope="col">Cartel</th></tr></thead>
+            <thead><tr><th scope="col">Evento</th><th scope="col">Tipo</th><th scope="col">Fecha</th><th scope="col">Cartel</th><th scope="col">Solicitudes para participar</th></tr></thead>
             <tbody>
-              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link></th><td>{EVENT_KIND_LABEL[e.kind]}</td><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td></tr>)}
+              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link></th><td>{EVENT_KIND_LABEL[e.kind]}</td><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td><td>{e._count.registrations ? <Link href={`/organizador/${e.slug}/inscripciones`}>{plural(e._count.registrations, "pendiente", "pendientes")}</Link> : e.registrationOpen ? <span className="mut">Abierta, sin pendientes</span> : <span className="mut">Cerrada</span>}</td></tr>)}
             </tbody>
           </table>
         </div>

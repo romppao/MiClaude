@@ -109,9 +109,11 @@ export async function answerRegistrations(f: FormData) {
   const base = `/organizador/${event.slug}/inscripciones`;
   const pedida = str(f, "back");
   const back = pedida.startsWith(`${base}?`) || pedida === base ? pedida : base;
-  const ids = [...new Set(f.getAll("ids").map(String).filter((x) => x && x.length <= 40))].slice(0, 200);
+  // Botón de una sola tarjeta: `solo` = «id:aceptar» o «id:rechazar». Si no, las marcadas en la lista con la decisión del lote.
+  const [soloId, soloDecision] = str(f, "solo").split(":");
+  const ids = soloId ? [soloId].filter((x) => x.length <= 40) : [...new Set(f.getAll("ids").map(String).filter((x) => x && x.length <= 40))].slice(0, 200);
   if (!ids.length) go(back, { problema: "inscripcion_ninguna_marcada" });
-  const decision = str(f, "decision");
+  const decision = soloId ? soloDecision ?? "" : str(f, "decision");
   if (decision !== "aceptar" && decision !== "rechazar") go(back, { problema: "decision_no_valida" });
   const reply = str(f, "reply").replace(/\s+/g, " ") || null;
   if (reply && reply.length > REG_REPLY_MAX) go(back, { problema: "solicitud_respuesta_larga" });

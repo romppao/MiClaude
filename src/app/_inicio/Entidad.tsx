@@ -24,6 +24,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
     db.event.findFirst({ where: { organizerId: user.id, date: { gte: hoy }, status: "SCHEDULED" }, include: { _count: { select: { bouts: true } } }, orderBy: [{ date: "asc" }, { id: "asc" }] }),
   ]);
   const combates = await db.bout.count({ where: { event: { organizerId: user.id } } });
+  const inscripciones = veladas ? await db.eventRegistration.count({ where: { status: "PENDING", event: { organizerId: user.id } } }) : 0;
   const kind = parseTipoDeEntidad(solicitud?.kind ?? "") ?? "PROMOTORA";
   const nombre = solicitud?.status === "APPROVED" ? solicitud.orgName : user.name;
   const atencion = pendientes[0];
@@ -35,6 +36,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
         { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
         { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
         { href: "/organizador", titulo: "Mis veladas", detalle: "Cartel y resultados", icono: "calendario" },
+        { href: "/organizador#mis-eventos", titulo: "Solicitudes para participar", detalle: "Peleadores que quieren entrar", icono: "check", aviso: inscripciones },
         { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
         { href: `/promotores/${user.id}`, titulo: "Mi perfil público", detalle: "Cómo te ve la gente", icono: "escudo" },
         { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "capas" },
