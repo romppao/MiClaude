@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { ultimasNoticias } from "../../lib/news/feed";
-import { ListaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
+import { FilaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
 import Icono from "../components/Icono";
 import { MiniPeleador, TarjetaCartel, TarjetaDisciplina } from "../components/Tarjetas";
 import { peleadoresConAura, proximasVeladas } from "./datos";
@@ -35,7 +35,7 @@ export default async function InicioVisitante() {
 
       <section aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad-visita">Actualidad</h2><Link href="/noticias">Todas las noticias</Link></div>
-        {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <ListaNoticias noticias={noticias.slice(1)} />}</> : <SinNoticias />}
+        {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <FilaNoticias noticias={noticias.slice(1)} etiqueta="Más noticias" />}</> : <SinNoticias />}
       </section>
 
       <section aria-labelledby="titulo-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>

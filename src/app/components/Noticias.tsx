@@ -46,6 +46,32 @@ export function NoticiaDestacada({ n, ahora = new Date() }: { n: Noticia; ahora?
   );
 }
 
+/**
+ * Las demás noticias de la portada, en una fila que se desliza a los lados (petición del fundador, 8 de octubre de 2026: menos
+ * desplazamiento hacia abajo). La lista completa, una debajo de otra, sigue en «Todas las noticias».
+ */
+export function FilaNoticias({ noticias, etiqueta, ahora = new Date() }: { noticias: Noticia[]; etiqueta: string; ahora?: Date }) {
+  return (
+    <ul className="desliza fila-noticias" role="region" tabIndex={0} aria-label={`${etiqueta} (desliza para ver más)`}>
+      {noticias.map((n) => {
+        const medio = n.publisher ?? n.source.name;
+        return (
+          <li key={n.id}>
+            <a href={n.url} target="_blank" rel="noopener noreferrer" className="tarjeta-foto noticia-mini" style={{ "--tinte": tinteDe(n.disciplines[0]) } as CSSProperties}>
+              {n.imageUrl && <img src={n.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" />}
+              <span className="abajo">
+                {n.disciplines.length > 0 && <span className="kicker kicker-acc">{n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ")}</span>}
+                <span className="titular">{n.title}<span className="sr-only"> (se abre en otra pestaña)</span></span>
+                <span className="meta">{medio} · {haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span>
+              </span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function SinNoticias({ disciplina }: { disciplina?: string }) {
   return (
     <div className="tarjeta">

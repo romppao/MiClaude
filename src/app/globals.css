@@ -495,3 +495,24 @@ main .filtros-disciplina a[aria-current=page]{background:var(--acc);color:var(--
 .portada-elegida{display:flex;gap:12px;align-items:center}
 .portada-elegida img{width:72px;height:120px;object-fit:cover;border-radius:14px;flex:none;border:1px solid var(--line)}
 .zona-peligro{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+/* Pestañas deslizables (src/app/components/Pestanas.tsx): barra como «segmentos» y secciones una al lado de otra. */
+.pestanas{display:flex;flex-direction:column;gap:14px;min-width:0}
+nav.pestanas-barra{flex:none;flex-wrap:nowrap;display:flex;padding:4px;border-radius:28px;background:var(--soft);gap:2px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+.pestanas-barra::-webkit-scrollbar{display:none}
+.pestanas-barra>a{flex:1 0 auto;min-height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:24px;color:rgba(255,255,255,.75);font:600 15px var(--font);text-decoration:none;padding:0 14px;white-space:nowrap;scroll-snap-align:center}
+.pestanas-barra>a:hover{color:#fff}
+.pestanas-barra>a[aria-current]{background:#fff;color:#141317}
+.pestanas-pista{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;transition:height .25s ease}
+.pestanas-pista::-webkit-scrollbar{display:none}
+.pestanas-panel{position:relative;flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;gap:12px;padding:2px}
+@media (prefers-reduced-motion:reduce){.pestanas-pista{transition:none;scroll-behavior:auto}}
+.pestanas{scroll-margin-top:84px}
+.fila-tarjetas>.card{flex:0 0 min(320px,86%);margin:0}
+.pestanas-panel .desliza{margin:0;padding:0 0 4px}
+.fila-noticias{list-style:none;padding-top:0;padding-bottom:4px}
+.fila-noticias>li{flex:0 0 min(260px,78%);display:flex}
+.noticia-mini{flex:1;min-height:230px;border-radius:24px}
+.noticia-mini .abajo{gap:5px}
+.noticia-mini .titular{font:700 17px/1.25 var(--font);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.noticia-mini .meta{color:rgba(255,255,255,.8);font-size:14px}
+.noticia-mini:focus-visible{outline:2px solid var(--acc);outline-offset:2px}

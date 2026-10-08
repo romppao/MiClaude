@@ -3,7 +3,7 @@ import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { ultimasNoticias } from "../../lib/news/feed";
-import { ListaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
+import { FilaNoticias, NoticiaDestacada, SinNoticias } from "../components/Noticias";
 import { MiniPeleador, TarjetaCartel } from "../components/Tarjetas";
 import Icono from "../components/Icono";
 import IconoDisciplina from "../components/IconoDisciplina";
@@ -41,7 +41,7 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
 
       <section aria-labelledby="titulo-actualidad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad">{nombre ? `Actualidad${de}` : "Actualidad"}</h2><Link href={masNoticias}>Todas las noticias</Link></div>
-        {destacada ? <><NoticiaDestacada n={destacada} />{resto.length > 0 && <ListaNoticias noticias={resto} />}</> : <SinNoticias disciplina={nombre ?? undefined} />}
+        {destacada ? <><NoticiaDestacada n={destacada} />{resto.length > 0 && <FilaNoticias noticias={resto} etiqueta={`Más noticias${de}`} />}</> : <SinNoticias disciplina={nombre ?? undefined} />}
       </section>
 
       {despuesDeNoticias}

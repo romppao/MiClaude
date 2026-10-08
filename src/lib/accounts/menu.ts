@@ -23,6 +23,7 @@ export const EXPLORAR: SeccionMenu = {
 
 const PANEL: EnlaceMenu = { href: "/mi-panel", texto: "Mi panel" };
 const SIGUIENDO: EnlaceMenu = { href: "/siguiendo", texto: "Peleadores que sigo" };
+const RESERVAS: EnlaceMenu = { href: "/mis-reservas", texto: "Mis reservas de clases" };
 const COMPARTIR: EnlaceMenu = { href: "/compartir", texto: "Subir vídeos o fotos de una velada" };
 
 export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
@@ -30,14 +31,14 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
   if (papel === "visitante") {
     propias.push({ titulo: "Empieza", enlaces: [{ href: "/registro", texto: "Crear una cuenta" }, { href: "/entrar", texto: "Entrar" }] });
   } else if (papel === "usuario") {
-    propias.push({ titulo: "Tu espacio de aficionado", enlaces: [PANEL, SIGUIENDO, COMPARTIR, { href: "/mi-panel#mis-subidas", texto: "Mis vídeos y fotos" }] });
+    propias.push({ titulo: "Tu espacio de aficionado", enlaces: [PANEL, SIGUIENDO, RESERVAS, COMPARTIR, { href: "/mi-panel#mis-subidas", texto: "Mis vídeos y fotos" }] });
   } else if (papel === "peleador") {
     propias.push({
       titulo: "Tu carrera",
-      enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/mi-ficha#highlights", texto: "Mis highlights" }, { href: "/mi-ficha#multimedia", texto: "Vídeos de mis combates" }, SIGUIENDO],
+      enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/mi-ficha#highlights", texto: "Mis highlights" }, RESERVAS, SIGUIENDO],
     });
   } else if (papel === "entrenador") {
-    propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases" }, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });
+    propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases y solicitudes" }, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });
     propias.push({
       titulo: "Club",
       enlaces: [

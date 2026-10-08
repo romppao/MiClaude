@@ -11,7 +11,7 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
  * Un cuadro de récord por disciplina y nivel. La cifra principal suma el récord de partida **solo si se declaró con detalle**;
  * el desglose deja siempre claro qué está registrado en la app y qué lo declara el propio deportista.
  */
-export default function RecordCards({ records, disciplines, ocultarAmateur = false }: { records: Records; disciplines: FighterDiscipline[]; ocultarAmateur?: boolean }) {
+export default function RecordCards({ records, disciplines, ocultarAmateur = false, fila = false }: { records: Records; disciplines: FighterDiscipline[]; ocultarAmateur?: boolean; fila?: boolean }) {
   const byDiscipline = new Map(disciplines.map((d) => [d.discipline, d]));
   const shown = DISCIPLINE_ORDER.filter((d) => byDiscipline.has(d) || records[d]);
   const cards: { discipline: Discipline; level: Level }[] = [];
@@ -25,7 +25,8 @@ export default function RecordCards({ records, disciplines, ocultarAmateur = fal
     for (const level of levels) cards.push({ discipline: d, level });
   }
   return (
-    <div className="grid">
+    // `fila`: en una fila que se desliza a los lados (ficha del peleador), en vez de una debajo de otra.
+    <div className={fila ? "desliza fila-tarjetas" : "grid"} {...(fila && cards.length > 1 ? { role: "region", tabIndex: 0, "aria-label": "Récord por disciplina (desliza para ver más)" } : {})}>
       {cards.map(({ discipline, level }) => {
         const fd = byDiscipline.get(discipline);
         const tally = records[discipline]?.[level] ?? emptyTally();
