@@ -27,6 +27,7 @@ import { iniciales } from "../../lib/common/apariencia";
 import { LEVEL_LABEL } from "../../lib/common/labels";
 import { almacenDeVideos } from "../../lib/media/storage";
 import SubirVideo from "../components/SubirVideo";
+import InputFoto from "../components/InputFoto";
 import { GaleriaMedios, SELECT_MEDIO } from "../components/Multimedia";
 
 export const metadata = { title: "Mi ficha" };
@@ -171,7 +172,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
               <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} id="highlight-video" />
               <label className="field"><span>{almacen ? "O pega el enlace si ya está en YouTube, Instagram o TikTok" : "Enlace del vídeo"}</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" />{!almacen && <span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span>}</label>
             </div>
-            <label className="field"><span>Foto (obligatoria si es una foto; opcional como portada del vídeo)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" /><span className="hint">JPG, PNG o WebP de hasta 4 MB.</span></label>
+            <label className="field"><span>Foto (obligatoria si es una foto; opcional como portada del vídeo)</span><InputFoto name="image" /></label>
             <label className="field"><span>¿De qué combate es? (opcional)</span>
               <select name="boutId" defaultValue=""><option value="">Ninguno en concreto</option>{bouts.map((b) => <option key={b.id} value={b.id}>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</option>)}</select>
             </label>

@@ -5,7 +5,7 @@ Petición del fundador (8 de octubre de 2026): «un espacio para que los aficion
 ## Qué hay hecho
 
 - **Quién comparte:** cualquier cuenta con el correo confirmado, desde la página de una velada («Subir vídeos o fotos de esta velada») o desde el menú («Subir vídeos o fotos de una velada» → `/compartir`).
-- **Qué se comparte:** una foto (se guarda normalizada en WebP, hasta 4 MB) **o** un vídeo, que puede ser:
+- **Qué se comparte:** una foto (se guarda normalizada en WebP; el navegador reduce solo las fotos grandes del móvil) **o** un vídeo, que puede ser:
   - **subido a la aplicación** (MP4, MOV o WebM; 500 MB en R2, 100 MB en el disco de pruebas), con barra de progreso;
   - o **un enlace** (YouTube, Instagram, TikTok…), siempre disponible como alternativa.
 - **Cuándo:** desde el mismo día de la velada hasta 4 meses después; nunca en veladas futuras o canceladas.

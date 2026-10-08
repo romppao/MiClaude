@@ -8,7 +8,7 @@ import { calendarDayStart, todayMadrid } from "../../lib/common/dates";
 import { publicFighterName } from "../../lib/common/names";
 import { CONSENTIMIENTO, DIAS_PARA_COMPARTIR, PIE_MAX, veladaAbiertaAlPublico } from "../../lib/media/rules";
 import { almacenDeVideos } from "../../lib/media/storage";
-import { MAX_IMAGE_BYTES } from "../../lib/profiles/images";
+import InputFoto from "../components/InputFoto";
 import { shareMedia } from "../actions/media";
 import SubirVideo from "../components/SubirVideo";
 
@@ -70,7 +70,7 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
             )}
             <fieldset className="tarjeta" style={{ margin: 0 }}>
               <legend className="leyenda">Una foto</legend>
-              <label className="field"><span>Foto (JPG, PNG o WebP, hasta {MAX_IMAGE_BYTES / 1024 / 1024} MB)</span><input type="file" name="image" accept="image/jpeg,image/png,image/webp" /></label>
+              <label className="field"><span>Elige una foto de tu móvil o de tu ordenador</span><InputFoto name="image" /></label>
             </fieldset>
             <fieldset className="tarjeta" style={{ margin: 0 }}>
               <legend className="leyenda">O un vídeo</legend>

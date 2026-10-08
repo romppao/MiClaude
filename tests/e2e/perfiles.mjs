@@ -27,6 +27,20 @@ await btn(own.p, 'Guardar perfil');
 check('La personalización confirma el guardado', await seen(own.p.locator('.notice-ok')));
 const saved = await db.profile.findUniqueOrThrow({where:{kind_entityId:{kind:'peleador',entityId:f.id}}});
 check('Foto y banner se almacenan optimizados con su encuadre', saved.hasAvatar && saved.hasBanner && saved.avatarX === 1 && saved.avatar.length > 0);
+// Una foto de móvil (más de 4 MB y 4000 píxeles) se reduce sola en el navegador y se guarda sin errores (petición del fundador, 8 de octubre de 2026).
+{
+  const ruido = Buffer.alloc(4000 * 3000 * 3); for (let n = 0; n < ruido.length; n++) ruido[n] = (n * 2654435761 >>> 24) & 255;
+  const grande = await sharp(ruido, { raw: { width: 4000, height: 3000, channels: 3 } }).jpeg({ quality: 95 }).toBuffer();
+  check('La foto de prueba pesa más de 4 MB', grande.length > 4 * 1024 * 1024);
+  await own.p.goto(B + edit);
+  await own.p.setInputFiles('[name=avatar]', { name: 'IMG_0001.jpg', mimeType: 'image/jpeg', buffer: grande });
+  await seen(own.p.getByText(/Foto lista/));
+  const enviada = await own.p.locator('[name=avatar]').evaluate((e) => ({ peso: e.files[0].size, tipo: e.files[0].type }));
+  check('El navegador reduce la foto grande antes de enviarla', enviada.peso < 3.2 * 1024 * 1024 && enviada.tipo === 'image/jpeg');
+  await btn(own.p, 'Guardar perfil'); await own.p.locator('.notice-ok').waitFor();
+  const guardada = await db.profile.findUniqueOrThrow({ where: { kind_entityId: { kind: 'peleador', entityId: f.id } }, select: { avatar: true } });
+  check('La foto grande se guarda en el perfil', !!guardada?.avatar?.length);
+}
 const anon = await (await browser.newContext()).newPage();
 await anon.goto(B + `/peleadores/${f.slug}`);
 check('La ficha muestra el cinturón declarado', (await anon.locator('main').innerText()).includes('Cinturón morado · 2 grados'));

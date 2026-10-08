@@ -301,3 +301,6 @@ Peticiones del fundador: portada común con la actualidad («después de iniciar
   - `revisarGuardadas` vuelve a clasificar lo ya guardado una vez por arranque del servidor.
 - **Iconos:** `components/IconoDisciplina.tsx` contiene pictogramas propios de trazo, sin imágenes de terceros. Se usan en el selector de deporte (`.filtros-disciplina.con-dibujo`), en `TarjetaDisciplina` y en la cabecera de cada disciplina. `CentrarActivo` lleva a la vista la ficha del deporte actual.
 - **Panorama español:** `lib/news/espana.ts` (`delPanoramaEspanol`) descarta los titulares que no son del panorama español, salvo los de fuentes `NewsSource.local`. Migración `20261008220000_noticias_panorama_espanol`. Reglas y mantenimiento: [`NOTICIAS.md`](NOTICIAS.md).
+
+### Subida de fotos (8 de octubre de 2026)
+El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/InputFoto.tsx`: 2000 px, JPEG, menos de 3 MB). El servidor mantiene su defensa en `normalizeImage` (4 MiB, 25 megapíxeles, formato real, sin animación) y el límite de cuerpo de las acciones es de 9 MB.
