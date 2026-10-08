@@ -10,6 +10,7 @@ import { consumeVerificationToken, createSession, destroyOtherSessions, destroyS
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../lib/accounts/password";
 import { HORA, MINUTO, allow, clearHits, clientIp, reservar } from "../../lib/accounts/ratelimit";
 import { maybePurge } from "../../lib/accounts/retention";
+import { esCreador } from "../../lib/accounts/creador";
 import { sendMail } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
 import { internalPath } from "../../lib/common/paths";
@@ -169,6 +170,15 @@ export async function login(f: FormData) {
   await Promise.all(reservas.map((r) => r.devolver()));
   await clearHits(`acceso:correo:${email}`);
   if (needsRehash(user.passwordHash)) await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
+  if (esCreador(user)) {
+    // La cuenta del creador siempre tiene los permisos de moderación, y no cuenta como iniciada hasta el segundo paso.
+    if (user.role !== "ADMIN") {
+      await db.user.update({ where: { id: user.id }, data: { role: "ADMIN" } });
+      await audit({ userId: user.id, entity: "USER", entityId: user.id, action: "CREADOR_PERMISOS", before: { role: user.role }, after: { role: "ADMIN" } });
+    }
+    await createSession(user.id);
+    go(`/entrar/segundo-paso${next ? `?next=${encodeURIComponent(next)}` : ""}`);
+  }
   await createSession(user.id);
   go(next || landingFor(user.role));
 }

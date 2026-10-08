@@ -261,3 +261,15 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | Mayús+Tab sacaba el foco del menú a la barra del navegador | El diálogo nativo (`showModal`) no da la vuelta al foco en Chromium | En los diálogos, atrapar Tab y Mayús+Tab en el primer y el último elemento |
 | El `id` de una sección estaba en su título y los selectores `#multimedia img` no encontraban nada | Copié el patrón de `aria-labelledby` poniendo el `id` del ancla en el `h2` | El ancla (`id` al que se enlaza) va en la sección; el título lleva su propio `titulo-…` |
 | No se pudo comprobar ninguna fuente de noticias desde el entorno de desarrollo (la red solo deja salir a unas pocas webs) | Limitación del entorno, no del código | No dar por buena una fuente externa sin verla funcionar: la aplicación anota el estado de cada una y se revisa en la demo antes de publicar |
+
+## 8 de octubre de 2026 — Portada con selector y cuenta del creador (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| El fundador no veía en la demo la portada que había pedido y pensó que no estaba hecha | Estaba en un PR sin fusionar: la demo solo cambia al fusionar en `claude/ring-espana-mvp` | Al terminar algo visible, decir claramente «aún no está en la demo hasta que fusionemos» y, si lo aprueba, fusionar en cuanto el CI esté en verde |
+| Primer diseño de la cuenta del creador: una sesión abierta **antes** de confirmar el correo habría heredado todos sus poderes sin pasar por el segundo paso | Se marcaba como «pendiente» solo la sesión creada al entrar; las ya abiertas no | Para un permiso que exige un paso extra, comprobar en cada petición que **esa sesión** lo completó (`Session.secondFactorAt`), no marcar las sesiones nuevas |
+| La prueba buscaba cuentas en el buscador de la cabecera en vez de en el de Administración | Dos campos con `name=q` en la misma página | En las pruebas, localizar los campos por su etiqueta visible (`getByLabel`), no por su `name` |
+| La prueba esperaba `/disciplinas/k1` y la dirección es `/disciplinas/k-1` | Supuse la dirección en vez de leer `DISCIPLINE_SLUG` | Las direcciones salen de su tabla (`DISCIPLINE_SLUG`); no escribirlas de memoria |
+| Un código de la aplicación no se puede usar dos veces y la ventana es de ±30 s: la prueba no podía crear códigos nuevos justo después de entrar | Es la protección contra reutilizar códigos, no un fallo | En las pruebas se simula que pasa el tiempo (`totpLastStep = null`) en lugar de esperar 30 segundos |
+| La prueba de móvil marcó el selector de deporte como «sale por la derecha» | Es una fila que se desliza a propósito, y la prueba solo excluía los carruseles `[role=region]` | Las filas deslizables a propósito llevan la clase `.desliza-fila` (excluida en `movil.mjs`) y enlaces alcanzables con el tabulador |
+| El CI falló en «documentación del código» tras corregir la prueba de móvil | El catálogo de Codex guarda una huella de cada archivo: cualquier cambio, aunque sea un comentario, lo deja desactualizado | Regenerar el catálogo (`node scripts/generar-catalogo.mjs`) **justo antes de cada commit** que toque código, no solo al principio |

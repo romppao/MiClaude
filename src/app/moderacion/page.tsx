@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "../../lib/accounts/permissions";
+import { esCreador } from "../../lib/accounts/creador";
 import { db } from "../../lib/common/db";
 import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
 import { adminDecide, decideClaim, decideOrganizer, resolveReport, setGymVerified } from "../actions/moderation";
@@ -65,7 +66,7 @@ const nombreCombate = (b: { fighterA: { firstName: string; lastName: string }; f
   `${b.fighterA.firstName} ${b.fighterA.lastName} contra ${b.fighterB.firstName} ${b.fighterB.lastName} en ${b.event.name}`;
 
 export default async function Moderation({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await requireAdmin("/moderacion");
+  const user = await requireAdmin("/moderacion");
   const raw = flatParams(await searchParams);
   const keys = ["avisos", "reclamaciones", "organizadores", "gimnasios", "senales", "combates", "revision"] as const;
   const porVerificar = { verification: { in: ["SELF_REPORTED", "CONFIRMED"] as ("SELF_REPORTED" | "CONFIRMED")[] } };
@@ -120,7 +121,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
   return (
     <>
       <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
-      <p><Link href="/moderacion/historial">Ver el historial de cambios</Link> · <Link href="/moderacion/noticias">Fuentes de noticias</Link></p>
+      <p><Link href="/moderacion/historial">Ver el historial de cambios</Link> · <Link href="/moderacion/noticias">Fuentes de noticias</Link>{esCreador(user) && <> · <Link href="/moderacion/usuarios">Administración: cuentas y moderadores</Link></>}</p>
 
       <h2 id="avisos">Avisos de error de usuarios ({nReports})</h2>
       {paging("avisos", ["aviso", "avisos"], "avisos")}

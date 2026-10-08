@@ -80,6 +80,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261008200000_cuenta_creador/migration.sql",
+    "purpose": "Migración aditiva de la cuenta del creador: clave y estado del segundo paso y códigos de emergencia en User, y momento del segundo paso en Session.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -160,8 +165,13 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/_inicio/Portada.tsx",
+    "purpose": "Portada de actualidad compartida: sin disciplina es la portada común y con ella la de cada disciplina; selector de deporte, noticia destacada, veladas, aura y dónde entrenar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/_inicio/PortadaComun.tsx",
-    "purpose": "Portada común con sesión: saludo, acceso a «Mi panel», disciplinas propias primero (ficha, intereses o clases), actualidad y próximas veladas.",
+    "purpose": "Portada común con sesión: usa la portada de actualidad con el saludo, «Mi panel» y las disciplinas propias primero en el selector.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -197,6 +207,11 @@
   {
     "path": "src/app/actions/community.ts",
     "purpose": "Guarda avisos de revisión (combate, ficha, comentario o vídeo/foto) y cambios de seguimiento; un aviso no suspende automáticamente nada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/creador.ts",
+    "purpose": "Acciones de la cuenta del creador: segundo paso al entrar (código de la aplicación o de emergencia), activarlo, códigos nuevos, cambiar el tipo de una cuenta y cerrar sus sesiones; todo limitado y auditado.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -283,6 +298,11 @@
     "path": "src/app/components/CamposClase.tsx",
     "purpose": "Campos reutilizables de una clase; muestra horario/plazas solo en colectiva y conserva reglas del validador.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/CodigosEmergencia.tsx",
+    "purpose": "Componente de cliente que pide un código de la aplicación y, si es correcto, enseña una sola vez los diez códigos de emergencia.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/components/CuentaAtras.tsx",
@@ -420,6 +440,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/entrar/segundo-paso/page.tsx",
+    "purpose": "Segundo paso al entrar con la cuenta del creador: la primera vez prepara la aplicación de códigos; después pide un código o uno de emergencia.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/entrenadores/[slug]/page.tsx",
     "purpose": "Ficha del entrenador, experiencia, gimnasio, clases activas y peleadores; indica que aún no hay reservas/pagos.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -552,6 +577,11 @@
   {
     "path": "src/app/moderacion/page.tsx",
     "purpose": "Colas moderadoras de combates, avisos (con vídeos y fotos), reclamaciones, organizadores y gimnasios; enlaza a fuentes de noticias; conserva filtros tras decidir.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/moderacion/usuarios/page.tsx",
+    "purpose": "Administración (solo el creador): buscar cuentas, cambiar su tipo o nombrar moderadores, cerrar sesiones, sus códigos de emergencia y sus últimas entradas.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -706,12 +736,17 @@
   },
   {
     "path": "src/lib/accounts/auth.ts",
-    "purpose": "Crea y consulta sesiones, emite enlaces de correo y consume verificación/recuperación; protege el secreto con hash y mantiene redirecciones de acceso.",
+    "purpose": "Crea y consulta sesiones (la del creador solo cuenta con el segundo paso hecho), emite enlaces de correo y consume verificación/recuperación; protege el secreto con hash.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/lib/accounts/backing.ts",
     "purpose": "Exige una acreditación vigente para respaldar hechos de las disciplinas autorizadas; un perfil visual o rol de organizador no basta.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/creador.ts",
+    "purpose": "Qué cuenta es la del creador (CREADOR_CORREO con el correo verificado) y el tipo de respuesta de los códigos de emergencia.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -747,6 +782,11 @@
   {
     "path": "src/lib/accounts/retention.ts",
     "purpose": "Limpia sesiones, enlaces, intentos y solicitudes caducadas; limita limpieza por proceso sin hacer fallar la petición que la dispara.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/totp.ts",
+    "purpose": "Códigos de la aplicación (RFC 6238, sin dependencias, sin reutilizar un intervalo) y códigos de emergencia de un solo uso guardados como SHA-256.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1010,6 +1050,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/creador.mjs",
+    "purpose": "Recorre la portada con selector de deporte y la cuenta del creador: activación, códigos de emergencia, entrar desde otro aparato, gestión de cuentas y accesibilidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/cuenta.mjs",
     "purpose": "Recorre registro, acceso, correo, preferencias, cambio/recuperación, exportación y eliminación de cuenta.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1127,6 +1172,11 @@
   {
     "path": "tests/unit/competition.test.ts",
     "purpose": "Prueba divisiones deportivas versionadas y elegibilidad por edad/sexo/nivel.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/creador.test.ts",
+    "purpose": "Comprueba los códigos con los vectores de la RFC 6238, los códigos de emergencia, quién es el creador y su enlace en el menú.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

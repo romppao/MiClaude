@@ -8,7 +8,7 @@ import type { Papel } from "./landing";
  */
 export type EnlaceMenu = { href: string; texto: string };
 export type SeccionMenu = { titulo: string; enlaces: EnlaceMenu[] };
-export type ExtrasMenu = { admin?: boolean; canSupport?: boolean; perfilesGestionados?: boolean; gimnasio?: string | null; promotorId?: string | null; entrenador?: string | null };
+export type ExtrasMenu = { admin?: boolean; creador?: boolean; canSupport?: boolean; perfilesGestionados?: boolean; gimnasio?: string | null; promotorId?: string | null; entrenador?: string | null };
 
 export const EXPLORAR: SeccionMenu = {
   titulo: "Explorar",
@@ -64,6 +64,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
     cuenta.push({ href: "/mi-cuenta", texto: "Mi cuenta" });
     if (x.canSupport) cuenta.push({ href: "/respaldar", texto: "Respaldar resultados y títulos" });
     if (x.admin) cuenta.push({ href: "/moderacion", texto: "Moderación" });
+    if (x.creador) cuenta.push({ href: "/moderacion/usuarios", texto: "Administración" });
   }
   return [...propias, EXPLORAR, { titulo: papel === "visitante" ? "Ayuda" : "Tu cuenta y ayuda", enlaces: cuenta }];
 }

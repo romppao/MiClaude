@@ -153,7 +153,7 @@ await fan.getByRole("button", { name: "Seguir a este peleador" }).click(); await
 await confirmar(fan, correoF);
 await fan.goto(B + "/");
 check("el aficionado tiene Inicio, Peleadores, Veladas y Mi panel", JSON.stringify(await pestanas(fan)) === JSON.stringify(["Inicio", "Peleadores", "Veladas", "Mi panel"]));
-check("la portada común ordena primero las disciplinas que eligió", JSON.stringify((await fan.locator("main section", { hasText: "Tus disciplinas" }).locator("a.disciplina").allInnerTexts()).map((t) => t.trim())) === JSON.stringify(["Boxeo", "Muay Thai"]));
+check("la portada común pone en el selector primero «Todos» y las disciplinas que eligió", JSON.stringify((await fan.getByRole("navigation", { name: "Elige un deporte" }).getByRole("link").allInnerTexts()).slice(0, 3).map((t) => t.trim())) === JSON.stringify(["Todos", "Boxeo", "Muay Thai"]));
 await fan.goto(B + "/mi-panel");
 check("su panel le saluda y muestra el próximo combate de quien sigue en formato «VS»", await seen(fan.getByRole("heading", { name: "Hola, Laura" })) && await seen(fan.locator("a.vs", { hasText: `Velada Futura ${rnd}` })));
 check("y sus disciplinas, primero las que eligió (en el orden del catálogo)", JSON.stringify((await fan.locator("main section", { hasText: "Tus disciplinas" }).locator("a.disciplina").allInnerTexts()).slice(0, 2).map((t) => t.trim())) === JSON.stringify(["Boxeo", "Muay Thai"]));

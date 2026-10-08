@@ -61,7 +61,8 @@ async function auditar(p, perfil, papel, ruta) {
     for (const el of document.querySelectorAll("main *, header *, footer *")) {
       if (!visible(el)) continue;
       const b = el.getBoundingClientRect();
-      if (b.right > ancho + 1 && !el.closest(".table-wrap, [role=region][tabindex], pre, code, dialog")) { out.push(`sale por la derecha de la pantalla (${Math.round(b.right)} px): ${desc(el)}`); break; }
+      // .desliza-fila: el selector de deporte de las portadas se desliza a propósito (sus enlaces se alcanzan con el tabulador).
+      if (b.right > ancho + 1 && !el.closest(".table-wrap, [role=region][tabindex], .desliza-fila, pre, code, dialog")) { out.push(`sale por la derecha de la pantalla (${Math.round(b.right)} px): ${desc(el)}`); break; }
     }
     // Barra fija inferior que tape el final.
     const barra = document.querySelector(".mobile-nav");

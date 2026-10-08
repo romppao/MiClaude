@@ -68,3 +68,12 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Qué salió mal / sin causa conocida:** nada sin causa; errores propios en `LECCIONES.md`. Las fuentes de noticias reales no se pudieron abrir desde aquí.
 **Qué debe hacer el siguiente asistente:** 1) revisar en la demo `/moderacion/noticias` (qué fuentes funcionan); 2) con el cubo de R2 creado, probar una subida real desde un móvil; 3) planificar en fichas el resto de la fase 2 (`PLAN.md`).
 **Decisiones del fundador abiertas:** `TRASLADO.md` §7, puntos 23–25.
+
+## 8 de octubre de 2026 — Portada con selector de deporte y cuenta del creador
+**Pedido por el fundador:** «la primera pantalla […] con todas las noticias, todo generalizado […] al seleccionar el deporte, otra pantalla como la inicial pero exclusivamente de esa disciplina»; y «un usuario especial, yo como creador, para entrar desde cualquier sitio […] y gestionar cualquier aspecto».
+**Base:** `claude/ring-espana-mvp` tras fusionar #28 y #30. **Rama:** `claude/portada-y-creador`. **PR:** ver la rama (sin fusionar: actualiza la demo).
+**Qué cambié y por qué:** ver `DIARIO.md` (entrada 6 del 8 de octubre), `ARQUITECTURA.md` («Cuenta del creador») y `CREADOR.md`.
+**Qué ejecuté yo:** ver la entrada del diario (typecheck, pruebas unitarias, compilación, paridad de migraciones, todos los guiones de navegador con base vacía, accesibilidad, mapa y catálogo).
+**Qué solo valida el CI:** la misma batería en GitHub Actions, con `CREADOR_CORREO=creador@prueba.test`.
+**Qué debe hacer el siguiente asistente:** nada de la cuenta del creador sin el fundador (es seguridad); si pide borrar o suspender cuentas desde Administración, escribir antes la ficha.
+**Decisiones del fundador abiertas:** `TRASLADO.md` §7, punto 27.

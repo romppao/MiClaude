@@ -12,6 +12,7 @@ import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
 import { APP_URL } from "../lib/common/mail";
 import { demoActiva } from "../lib/common/demo";
+import { esCreador } from "../lib/accounts/creador";
 import { papelDe, puedeOrganizar, type Papel } from "../lib/accounts/landing";
 import { menuDe } from "../lib/accounts/menu";
 
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const papel: Papel = papelDe(user);
   const secciones = menuDe(papel, {
     admin: user?.role === "ADMIN",
+    creador: esCreador(user),
     canSupport: !!user?.emailVerifiedAt && (user.role === "ADMIN" || !!accreditation?.active),
     perfilesGestionados: managedProfileCount > 0,
     gimnasio: trainer?.gym?.slug ?? null,

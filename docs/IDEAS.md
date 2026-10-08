@@ -274,3 +274,11 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Condiciones de uso aceptadas al registrarse y filtro de palabras** (Claude, 8 oct, Apple 1.2 y Reglamento de Servicios Digitales) — **pendiente**.
 - **Avisos en el teléfono** (combate de un peleador seguido, vídeo nuevo de tu combate, aura recibida) con Firebase (Claude, 8 oct) — **pendiente**; es lo que más justifica descargar la app.
 - **Banner «Abrir en la app» y QR en carteles de veladas** (Claude, 8 oct) — **pendiente**, después de publicar.
+
+## Portada y cuenta del creador (8 de octubre de 2026)
+
+- **La portada inicial reúne la actualidad de todos los deportes y, al elegir uno, se abre «otra pantalla como la inicial, pero exclusivamente de esa disciplina»** (fundador, 8 oct) — **hecho**: una sola portada (`_inicio/Portada.tsx`) con selector «Todos / cada deporte» y noticia destacada; la del visitante también abre con la actualidad.
+- **Usuario especial del creador para entrar desde cualquier sitio y gestionar cualquier aspecto** (fundador, 8 oct) — **hecho** ([`CREADOR.md`](CREADOR.md)): permisos de moderación + Administración (cuentas, moderadores, sesiones). Claude añadió un segundo paso obligatorio (aplicación de códigos o códigos de emergencia en papel) porque es la cuenta que más interesa robar.
+- **Borrar o suspender cuentas ajenas desde Administración** (Claude, 8 oct) — **propuesta**, a decidir por el fundador.
+- **Segundo paso también para los moderadores** (Claude, 8 oct) — **propuesta**.
+- **Avisar por correo al creador de cada entrada en su cuenta** (Claude, 8 oct) — **pendiente** de tener correo real (dominio).

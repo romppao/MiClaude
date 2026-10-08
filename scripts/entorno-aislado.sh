@@ -33,7 +33,7 @@ case "$accion" in
     if [[ "${4:-}" == "--semilla" ]]; then (cd "$RAIZ" && DATABASE_URL="$URL_BD" npm run db:seed >/dev/null 2>&1); fi
     cd "$RAIZ"
     # El servidor se lanza con sus salidas redirigidas y sin entrada, para que no retenga la terminal ni el «$( … )» de quien nos llama.
-    DATABASE_URL="$URL_BD" APP_URL="http://localhost:${puerto}" MAIL_TRANSPORT=log \
+    DATABASE_URL="$URL_BD" APP_URL="http://localhost:${puerto}" MAIL_TRANSPORT=log CREADOR_CORREO="${CREADOR_CORREO:-creador@prueba.test}" \
       setsid nohup node node_modules/next/dist/bin/next start -p "$puerto" >"$LOG" 2>&1 </dev/null &
     echo $! >"$PID"
     for _ in $(seq 1 40); do
