@@ -35,6 +35,10 @@ describe("menú por tipo de cuenta (decisión del fundador, 8 de octubre de 2026
     for (const p of ["visitante", "usuario", "peleador", "entrenador", "entidad"] as const) expect(menuDe(p)).toContainEqual(EXPLORAR);
     expect(enlaces("usuario", { admin: true, canSupport: true })).toEqual(expect.arrayContaining(["/moderacion", "/respaldar"]));
   });
+  it("ningún bloque tiene más de cinco enlaces (navegación corta)", () => {
+    for (const p of ["visitante", "usuario", "peleador", "entrenador", "entidad"] as const)
+      for (const s of menuDe(p, { gimnasio: "g", entrenador: "e", promotorId: "u", perfilesGestionados: true, admin: true, canSupport: true })) expect(s.enlaces.length, `${p}: ${s.titulo}`).toBeLessThanOrEqual(5);
+  });
   it("ninguna sección tiene enlaces repetidos con el mismo texto", () => {
     for (const p of ["visitante", "usuario", "peleador", "entrenador", "entidad"] as const)
       for (const s of menuDe(p, { gimnasio: "g", entrenador: "e", promotorId: "u", perfilesGestionados: true, admin: true, canSupport: true }))

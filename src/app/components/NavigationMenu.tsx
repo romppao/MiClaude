@@ -64,6 +64,15 @@ export default function NavigationMenu({ secciones, logoutForm }: Props) {
             className="menu-dialog"
             aria-labelledby="menu-heading"
             onClose={() => setOpen(false)}
+            onKeyDown={(event) => {
+              // El foco no sale del menú con Tab ni con Mayús+Tab: da la vuelta dentro (el diálogo nativo deja salir a la barra del navegador).
+              if (event.key !== "Tab") return;
+              const focos = [...event.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])")];
+              if (!focos.length) return;
+              const [primero, ultimo] = [focos[0], focos[focos.length - 1]];
+              if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
+              else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
+            }}
             onClick={(event) => {
               if (event.target === event.currentTarget) close();
             }}

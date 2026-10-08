@@ -52,6 +52,7 @@ describe("almacén de vídeos", () => {
     const a = almacenDeVideos(r2)!;
     expect(a.tipo).toBe("r2");
     expect(a.subida("videos/u/x.mp4", "video/mp4").url).toMatch(/^https:\/\/c\.r2\.cloudflarestorage\.com\/b\/videos\/u\/x\.mp4\?X-Amz-Algorithm=AWS4-HMAC-SHA256/);
+    expect(almacenDeVideos({ ...r2, R2_JURISDICCION: "eu" } as NodeJS.ProcessEnv)!.subida("videos/u/x.mp4", "video/mp4").url).toMatch(/^https:\/\/c\.eu\.r2\.cloudflarestorage\.com\/b\//);
     expect(almacenDeVideos({ NODE_ENV: "development" } as NodeJS.ProcessEnv)?.tipo).toBe("disco");
     expect(almacenDeVideos({ NODE_ENV: "production", DEMO_MODE: "si" } as unknown as NodeJS.ProcessEnv)?.tipo).toBe("disco");
     expect(almacenDeVideos({ NODE_ENV: "production" } as NodeJS.ProcessEnv)).toBeNull();

@@ -241,3 +241,19 @@ Palabras del fundador: «Me gustaría incluir estas propuestas y en caso de que 
 5. **El aficionado da aura también a promotoras y clubes, y comparte vídeos y fotos de una velada** — pendiente (fase 2).
 6. **Highlights del peleador en su ficha** («ya luego retocaré cosas de código con Claude Code») — **hecho (8 oct):** vídeo por enlace o foto, uno destacado.
 7. «Las formas de terminar deben encajar con la disciplina y la modalidad; en boxeo no tiene sentido la sumisión» — **hecho en parte (8 oct):** el formulario solo ofrece las de la disciplina; los nombres amateur propuestos por el diseño (RSC, RSC-I, W/O…) **no se aplican** hasta confirmarlos con las federaciones (decisión del fundador: mantener la lista del repositorio por ahora).
+
+## Fase 2a del diseño v3 (8 de octubre de 2026)
+
+Palabras del fundador: «después de iniciar sesión a todos los usuarios les aparece la misma pantalla de inicio […] noticias actuales de la escena de los deportes de contacto», de fuentes fiables y variadas («canales de YouTube, periódicos, federaciones»); «una subpantalla de inicio específica de cada disciplina»; «en el menú solo te pueden aparecer las opciones del usuario», salvo el entrenador (entrenador, club y promotora); «el entrenador podrá crear veladas e interclubs»; un espacio para que el aficionado suba lo grabado en la velada «para que los peleadores puedan obtener contenido de sus combates», «en la app de verdad y, si no es viable, mediante enlaces».
+- **Portada común con noticias** — **hecha (8 oct)**; fuentes por comprobar en la demo (`TRASLADO.md` §7.23).
+- **Portada de cada disciplina** — **hecha (8 oct).**
+- **Menú por tipo de cuenta** — **hecho (8 oct)**; lo propio de cada cuenta en «Mi panel».
+- **Entrenador organiza veladas e interclubs** — **hecho (8 oct).**
+- **Vídeos y fotos del público** — **hechos (8 oct)**; subida real con R2 cuando el fundador cree el cubo (`VIDEOS.md`).
+- **Highlights con vídeo subido** — **hecho (8 oct).**
+- Ideas derivadas (Claude, 8 oct), **pendientes**:
+  - Limpieza automática de vídeos subidos que nadie llegó a publicar, y miniaturas de los vídeos.
+  - «Añadir a mis highlights» desde un vídeo del público de su propio combate (con aviso a quien lo grabó).
+  - Avisar al peleador cuando alguien comparte un vídeo de su combate (correo opcional, como los avisos a seguidores).
+  - Que cada persona elija qué fuentes de noticias quiere ver, o silenciar una.
+  - Canales RSS propios de medios y federaciones españolas en lugar de Google Noticias, si el fundador lo prefiere por las condiciones de uso.

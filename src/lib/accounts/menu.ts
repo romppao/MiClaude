@@ -3,7 +3,8 @@ import type { Papel } from "./landing";
 /**
  * Contenido del menú por tipo de cuenta. Decisión del fundador (8 de octubre de 2026): «en el menú solo te pueden aparecer las opciones
  * del usuario»; la excepción es el entrenador, que reúne las funciones de entrenador, de club y de promotora (crea veladas e interclubs).
- * «Explorar» (consultar lo público) es igual para todos. Una sola fuente para el diálogo del menú y para las pruebas.
+ * «Explorar» (consultar lo público) es igual para todos; las noticias están en «Inicio». Como mucho cinco enlaces por bloque.
+ * Una sola fuente para el diálogo del menú y para las pruebas.
  */
 export type EnlaceMenu = { href: string; texto: string };
 export type SeccionMenu = { titulo: string; enlaces: EnlaceMenu[] };
@@ -12,7 +13,6 @@ export type ExtrasMenu = { admin?: boolean; canSupport?: boolean; perfilesGestio
 export const EXPLORAR: SeccionMenu = {
   titulo: "Explorar",
   enlaces: [
-    { href: "/noticias", texto: "Noticias y actualidad" },
     { href: "/peleadores", texto: "Peleadores" },
     { href: "/veladas", texto: "Veladas y resultados" },
     { href: "/ranking", texto: "Ránking de aura" },

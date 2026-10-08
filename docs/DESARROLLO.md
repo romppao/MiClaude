@@ -47,6 +47,8 @@ src/
     aura/                 reglas para dar aura y ránking por categoría
     community/            avisos de error de usuarios y notificaciones a seguidores
     trainers/             clases de los entrenadores (validación, duración, precio, plazas)
+    news/                 noticias de la portada: lector RSS/Atom, fuentes, actualización en segundo plano
+    media/                vídeos y fotos del público: almacén de vídeos (R2 o disco), firma S3, reglas para compartir
 ```
 
 ### Módulos de acciones (`src/app/actions/`)
@@ -61,6 +63,8 @@ src/
 | `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos | Moderación |
 | `community.ts` | Avisos de error, seguir a un peleador | Cuenta con sesión |
 | `trainers.ts` | Perfil propio del entrenador y sus clases (publicar, pausar) | Entrenador con correo verificado |
+| `media.ts` | Compartir vídeos y fotos de una velada y borrar los propios | Cuenta con correo verificado |
+| `news.ts` | Fuentes de noticias: actualizar ahora, añadir, activar o desactivar, ocultar un titular | Moderación |
 | `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
 
 ### Quién puede depender de quién (lo vigila `tests/unit/arquitectura.test.ts`)
@@ -70,7 +74,7 @@ app/pantallas ──▶ app/actions/<módulo> ──▶ app/actions/shared ─�
       │                                                              ▲
       └──────────▶ app/components ───────────────────────────────────┤
                                                                      │
-lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura, lib/trainers
+lib/community ─▶ lib/accounts ─▶ lib/common ◀─ lib/fighters, lib/bouts, lib/aura, lib/trainers, lib/news, lib/media
 ```
 
 - `lib/common` no depende de ningún otro dominio. `accounts`, `fighters`, `bouts` y `aura` solo dependen de `common`; `community` también de `accounts`.
@@ -222,3 +226,10 @@ Formularios pasan `back` con filtros, página y sección. `returnTo` solo admite
 Decisiones deben validar su opción y escribir con el estado y los hechos leídos. Avisos se reservan con `updateMany` antes de actuar sobre el dato, dentro de la transacción. Evidencias incluyen estado, resultado y fecha de respaldo en la condición. La última solicitud de un título se consulta por título (DISTINCT ON parametrizado), sin un límite global que permita desplazar a otros. Recorrido de volumen y pantallas antiguas: `tests/e2e/pulido.mjs`.
 
 En una página que usa `requireVerifiedUser` o `requireSupportActor`, pasar su ruta como `next` para devolver a la persona después de iniciar sesión. Probar el enlace de acceso y el regreso completo con un rol autorizado; recordar el destino no concede permiso para entrar.
+
+### Recetas de la fase 2a (8 de octubre de 2026)
+
+- **Cambiar lo que ve cada tipo de cuenta en el menú:** solo en `src/lib/accounts/menu.ts` (y su prueba `tests/unit/menu.test.ts`); la barra inferior, en `PESTANAS` de `MobileNav.tsx`. Máximo cinco enlaces por bloque.
+- **Añadir una fuente de noticias:** desde `/moderacion/noticias` (sin tocar el código). Para que venga de serie, añádela a `FUENTES_INICIALES` en `src/lib/news/sources.ts`. Si trae miniaturas de otro dominio, añádelo a `HOSTS_DE_IMAGEN` y a `img-src` en `next.config.mjs`.
+- **Probar con noticias sin internet:** arranca el servidor con `NEWS_FETCH=no` e inserta filas en `NewsSource`/`NewsItem` (como hace `tests/e2e/fase2a.mjs`).
+- **Subidas de vídeo en local:** sin variables `R2_*` se guardan en `MEDIA_DIR` (o `.subidas/`, que está en `.gitignore`). Activar R2: [`VIDEOS.md`](VIDEOS.md).

@@ -167,7 +167,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
               <div className="segmentos"><label><input type="radio" name="kind" value="VIDEO" defaultChecked required />Vídeo</label><label><input type="radio" name="kind" value="PHOTO" />Foto</label></div>
             </fieldset>
             <label className="field"><span>Título</span><input name="title" required maxLength={HIGHLIGHT_TITLE_MAX} placeholder="El KO del tercer asalto" /></label>
-            <div className="solo-video" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="solo-video columna">
               <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} id="highlight-video" />
               <label className="field"><span>{almacen ? "O pega el enlace si ya está en YouTube, Instagram o TikTok" : "Enlace del vídeo"}</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" />{!almacen && <span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span>}</label>
             </div>

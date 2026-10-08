@@ -49,12 +49,12 @@ check("las plazas fuera de rango se explican", await seen(avisoMalo(e, "entre 2 
 await e.locator(".segmentos label", { hasText: "Colectiva" }).click(); await e.fill("[name=title]", "Grupo de competición"); await e.locator("label.chip", { hasText: "90 min" }).click(); await e.fill("[name=price]", "12"); await e.fill("[name=capacity]", "10"); await e.fill("[name=schedule]", "Martes y jueves · 19:30");
 await btn(e, "Terminar"); await e.waitForURL("**/verificar**");
 check("antes de confirmar el correo no se publica ningún perfil", consulta(`select count(*) from "Trainer" t join "User" u on u.id=t."userId" where u.email='${correoE}'`) === "0");
-await e.goto(B + "/");
-check("su inicio le pide confirmar el correo para publicar", await seen(e.getByRole("link", { name: "Confirmar mi correo" })));
-check("el entrenador tiene Inicio, Mis clases, Peleadores y Veladas", JSON.stringify(await pestanas(e)) === JSON.stringify(["Inicio", "Mis clases", "Peleadores", "Veladas"]));
+await e.goto(B + "/mi-panel");
+check("su panel le pide confirmar el correo para publicar", await seen(e.getByRole("link", { name: "Confirmar mi correo" })));
+check("el entrenador tiene Inicio, Mi panel, Mis clases y Mis veladas", JSON.stringify(await pestanas(e)) === JSON.stringify(["Inicio", "Mi panel", "Mis clases", "Mis veladas"]));
 await confirmar(e, correoE);
 check("tras confirmar, se le ofrece publicar su perfil", await seen(e.locator("main button", { hasText: "Publicar mi perfil de entrenador" })));
-await e.goto(B + "/");
+await e.goto(B + "/mi-panel");
 const formPerfil = e.locator("main form").filter({ has: e.getByRole("button", { name: "Publicar mi perfil", exact: true }) });
 check("el formulario llega rellenado con lo elegido al registrarse", await formPerfil.locator("input[name=disciplina][value=BOXEO]").isChecked() && await formPerfil.locator("input[name=disciplina][value=MMA]").isChecked() && await formPerfil.locator("[name=gym]").inputValue() === `Club Entrena ${rnd}` && await formPerfil.locator("[name=years]").inputValue() === "14" && await formPerfil.locator("[name=province]").inputValue() === "Zaragoza");
 check("y ofrece publicar también la primera clase", await formPerfil.locator("input[name=publicarClase]").isChecked() && (await formPerfil.innerText()).includes("Grupo de competición"));
@@ -73,8 +73,8 @@ const perfilPublico = await v.locator("main").innerText();
 check("el perfil público muestra sus disciplinas, años y clases activas con precio, no las pausadas", perfilPublico.includes("14 años entrenando") && perfilPublico.includes("Grupo de competición") && perfilPublico.includes("12 €") && !perfilPublico.includes("Técnica y defensa"));
 await v.goto(`${B}/entrenadores?q=${encodeURIComponent(`Rosa Entrena${rnd}`)}`);
 check("y el listado de entrenadores cuenta sus clases", await seen(v.locator("main .card", { hasText: `Rosa Entrena${rnd}` }).filter({ hasText: "1 clase" })));
-await e.goto(B + "/");
-check("su inicio muestra sus clases publicadas", await seen(e.getByText("Clases publicadas")) && await seen(e.locator("main .fila", { hasText: "Grupo de competición" })));
+await e.goto(B + "/mi-panel");
+check("su panel muestra sus clases publicadas", await seen(e.getByText("Clases publicadas")) && await seen(e.locator("main .fila", { hasText: "Grupo de competición" })));
 
 // 3) Peleador: ficha rellenada desde el registro, inicio propio, highlights y récord amateur privado
 const pel = await newUser("Diseno", "FIGHTER");
@@ -82,13 +82,13 @@ await pel.p.goto(B + "/mi-ficha");
 await pel.p.fill("main [name=firstName]", "Diseño"); await pel.p.fill("main [name=lastName]", `Highlights${rnd}`);
 await datosDeAlta(pel.p); await btn(pel.p, "Crear mi ficha");
 await pel.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
-check("el peleador tiene Inicio, Veladas, Peleadores y Mi ficha", JSON.stringify(await (async () => { const m = await movil(); await m.context().addCookies(await pel.p.context().cookies()); await m.goto(B + "/"); const t = await pestanas(m); await m.context().close(); return t; })()) === JSON.stringify(["Inicio", "Veladas", "Peleadores", "Mi ficha"]));
+check("el peleador tiene Inicio, Veladas, Mi panel y Mi ficha", JSON.stringify(await (async () => { const m = await movil(); await m.context().addCookies(await pel.p.context().cookies()); await m.goto(B + "/"); const t = await pestanas(m); await m.context().close(); return t; })()) === JSON.stringify(["Inicio", "Veladas", "Mi panel", "Mi ficha"]));
 await registrar(pel.p, { evento: `Velada Diseño ${rnd}`, fecha: enDias(-20), rivalNombre: "Rival", rivalApellidos: `Diseño${rnd}` });
 await pel.p.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 await registrar(pel.p, { evento: `Velada Futura ${rnd}`, fecha: enDias(12), rivalNombre: "Futuro", rivalApellidos: `Rival${rnd}`, resultado: null });
 await pel.p.locator(".notice-ok", { hasText: "todavía no se ha celebrado" }).waitFor(); // el aviso propio del combate futuro (no el del anterior)
-await pel.p.goto(B + "/");
-check("su inicio muestra su récord y la cuenta atrás de su próximo combate", await seen(pel.p.getByRole("heading", { name: `Diseño Highlights${rnd}` })) && await seen(pel.p.getByRole("timer")) && (await pel.p.locator("main").innerText()).includes(`Futuro R.`) );
+await pel.p.goto(B + "/mi-panel");
+check("su panel muestra su récord y la cuenta atrás de su próximo combate", await seen(pel.p.getByRole("heading", { name: `Diseño Highlights${rnd}` })) && await seen(pel.p.getByRole("timer")) && (await pel.p.locator("main").innerText()).includes(`Futuro R.`) );
 // Highlights
 await pel.p.goto(B + "/mi-ficha#highlights");
 const hl = pel.p.locator("#publicar-highlight form");
@@ -152,8 +152,10 @@ await fan.goto(B + publica);
 await fan.getByRole("button", { name: "Seguir a este peleador" }).click(); await seen(fan.getByRole("button", { name: "Dejar de seguir" }));
 await confirmar(fan, correoF);
 await fan.goto(B + "/");
-check("el aficionado tiene Inicio, Peleadores, Veladas y Siguiendo", JSON.stringify(await pestanas(fan)) === JSON.stringify(["Inicio", "Peleadores", "Veladas", "Siguiendo"]));
-check("su inicio le saluda y muestra el próximo combate de quien sigue en formato «VS»", await seen(fan.getByRole("heading", { name: "Hola, Laura" })) && await seen(fan.locator("a.vs", { hasText: `Velada Futura ${rnd}` })));
+check("el aficionado tiene Inicio, Peleadores, Veladas y Mi panel", JSON.stringify(await pestanas(fan)) === JSON.stringify(["Inicio", "Peleadores", "Veladas", "Mi panel"]));
+check("la portada común ordena primero las disciplinas que eligió", JSON.stringify((await fan.locator("main section", { hasText: "Tus disciplinas" }).locator("a.disciplina").allInnerTexts()).map((t) => t.trim())) === JSON.stringify(["Boxeo", "Muay Thai"]));
+await fan.goto(B + "/mi-panel");
+check("su panel le saluda y muestra el próximo combate de quien sigue en formato «VS»", await seen(fan.getByRole("heading", { name: "Hola, Laura" })) && await seen(fan.locator("a.vs", { hasText: `Velada Futura ${rnd}` })));
 check("y sus disciplinas, primero las que eligió (en el orden del catálogo)", JSON.stringify((await fan.locator("main section", { hasText: "Tus disciplinas" }).locator("a.disciplina").allInnerTexts()).slice(0, 2).map((t) => t.trim())) === JSON.stringify(["Boxeo", "Muay Thai"]));
 check("los resultados privados de un amateur no se desvelan en el inicio", !(await fan.locator("main").innerText()).includes(`Gana Diseño Highlights${rnd}`));
 
@@ -166,12 +168,12 @@ await org.fill("[name=orgName]", club); await org.locator(".segmentos label", { 
 await btn(org, "Enviar solicitud"); await org.waitForURL("**/verificar**");
 check("un club se registra como solicitud de tipo «CLUB», con papel de aficionado", consulta(`select u.role||'|'||r.kind from "OrganizerRequest" r join "User" u on u.id=r."userId" where u.email='${correoO}'`) === "FAN|CLUB");
 await confirmar(org, correoO);
-await org.goto(B + "/");
-check("mientras está pendiente, su inicio lo dice y funciona como el de un aficionado", await seen(org.locator("main", { hasText: `Solicitud de «${club}» en revisión` })) && JSON.stringify(await pestanas(org)) === JSON.stringify(["Inicio", "Peleadores", "Veladas", "Siguiendo"]));
+await org.goto(B + "/mi-panel");
+check("mientras está pendiente, su panel lo dice y funciona como el de un aficionado", await seen(org.locator("main", { hasText: `Solicitud de «${club}» en revisión` })) && JSON.stringify(await pestanas(org)) === JSON.stringify(["Inicio", "Peleadores", "Veladas", "Mi panel"]));
 const mod = await newUser("Modediseno", "FAN"); hacerAdmin(mod.email);
 await aprobarOrganizador(mod.p, club);
-await org.goto(B + "/");
-check("aprobado, ve su panel con su nombre y el botón de crear velada", await seen(org.getByRole("heading", { name: club })) && await seen(org.getByRole("link", { name: "Crear una velada" })) && JSON.stringify(await pestanas(org)) === JSON.stringify(["Panel", "Mis veladas", "Peleadores", "Veladas"]));
+await org.goto(B + "/mi-panel");
+check("aprobado, ve su panel con su nombre y el botón de crear velada", await seen(org.getByRole("heading", { name: club })) && await seen(org.getByRole("link", { name: "Crear una velada" })) && JSON.stringify(await pestanas(org)) === JSON.stringify(["Inicio", "Mi panel", "Mis veladas", "Veladas"]));
 await org.getByRole("link", { name: "Crear una velada" }).click();
 check("y «Crear una velada» lleva al formulario", await seen(org.locator("#crear")));
 

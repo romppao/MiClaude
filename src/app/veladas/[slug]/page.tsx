@@ -86,8 +86,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       </div>
       {e.bouts.length === 0 && <p className="mut">Cartel por anunciar.</p>}
 
-      <section aria-labelledby="multimedia" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
-        <h2 id="multimedia" style={{ margin: 0 }}>Vídeos y fotos del público</h2>
+      <section id="multimedia" aria-labelledby="titulo-multimedia" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24, scrollMarginTop: 80 }}>
+        <h2 id="titulo-multimedia" style={{ margin: 0 }}>Vídeos y fotos del público</h2>
         <p className="mut" style={{ margin: 0 }}>Lo que graba el público en la velada, para que los peleadores tengan las imágenes de sus combates.</p>
         {compartir === "ok" ? <p className="acciones" style={{ margin: 0 }}><Link className="btn" href={user ? `/compartir?velada=${e.slug}` : `/entrar?next=${encodeURIComponent(`/compartir?velada=${e.slug}`)}`}>Subir vídeos o fotos de esta velada</Link></p>
           : compartir === "futura" ? <p className="mut" style={{ margin: 0 }}>El día de la velada podrás compartir aquí lo que grabes.</p> : null}

@@ -10,7 +10,7 @@ import { presignar, type Credenciales } from "./s3";
  * Almacén de vídeos subidos a la aplicación (petición del fundador, 8 de octubre de 2026: «subir los vídeos en la app de verdad y, si no es
  * viable, mediante enlaces»). Los vídeos no van a la base de datos: pesan demasiado.
  *
- *  - «r2»: Cloudflare R2 u otro almacén compatible con S3 (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET). El navegador
+ *  - «r2»: Cloudflare R2 (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET y, para un cubo de la UE, R2_JURISDICCION=eu). El navegador
  *    sube el vídeo directamente al almacén con una dirección temporal firmada, sin pasar por nuestro servidor. Ver docs/VIDEOS.md.
  *  - «disco»: una carpeta del servidor (MEDIA_DIR). Para desarrollo, pruebas y la demo. En la demo de Render el disco se borra al
  *    reiniciar, así que los vídeos subidos allí son temporales.
@@ -40,7 +40,9 @@ export const tipoDeClave = (clave: string) => Object.keys(TIPOS_DE_VIDEO).find((
 function configuracionR2(env: NodeJS.ProcessEnv) {
   const { R2_ACCOUNT_ID: cuenta, R2_ACCESS_KEY_ID: id, R2_SECRET_ACCESS_KEY: secreto, R2_BUCKET: cubo } = env;
   if (!cuenta || !id || !secreto || !cubo) return null;
-  return { base: `https://${cuenta}.r2.cloudflarestorage.com/${cubo}`, credenciales: { accessKeyId: id, secretAccessKey: secreto, region: "auto" } satisfies Credenciales };
+  // Cubo con jurisdicción de la Unión Europea (ADR-003): su dirección lleva «.eu». Se elige al crear el cubo y no se puede cambiar.
+  const eu = env.R2_JURISDICCION === "eu" ? ".eu" : "";
+  return { base: `https://${cuenta}${eu}.r2.cloudflarestorage.com/${cubo}`, credenciales: { accessKeyId: id, secretAccessKey: secreto, region: "auto" } satisfies Credenciales };
 }
 
 /** Carpeta del almacén en disco: MEDIA_DIR, o una por defecto fuera de producción (o en la demo). */
