@@ -180,6 +180,36 @@ model ClassRequest {
   @@index([userId, createdAt])
 }
 
+enum RegistrationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+}
+
+// Solicitud de un peleador para participar en una velada o un interclub. Aceptarla no crea un combate: el organizador empareja después
+// a los aceptados en su cartel. Una por peleador y evento.
+model EventRegistration {
+  id          String             @id @default(cuid())
+  eventId     String
+  event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  fighterId   String
+  fighter     Fighter            @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  // Categoría con la que se apunta (división de edad y peso del catálogo) y su peso actual declarado, en kilos.
+  divisionId  String?
+  weightClass String?
+  weightKg    Float?
+  message     String?
+  status      RegistrationStatus @default(PENDING)
+  reply       String?
+  createdAt   DateTime           @default(now())
+  answeredAt  DateTime?
+
+  @@unique([eventId, fighterId])
+  @@index([eventId, status])
+  @@index([fighterId, createdAt])
+}
+
 enum ProposalKind {
   FIGHT
   SPARRING
@@ -280,6 +310,7 @@ model Fighter {
   createdAt         DateTime             @default(now())
   proposalsSent     FightProposal[]      @relation("PropuestasEnviadas")
   proposalsReceived FightProposal[]      @relation("PropuestasRecibidas")
+  registrations     EventRegistration[]
 
   @@index([gymId])
   @@index([trainerId])
@@ -295,24 +326,30 @@ enum EventKind {
 }
 
 model Event {
-  id          String      @id @default(cuid())
-  slug        String      @unique
-  name        String
-  kind        EventKind   @default(VELADA)
-  date        DateTime
-  discipline  Discipline  @default(BOXEO)
-  level       Level
-  venue       String
-  city        String
-  province    String
-  promoter    String?
-  ticketUrl   String?
-  status      EventStatus @default(SCHEDULED)
-  createdById String?
-  organizerId String?
-  organizer   User?       @relation("EventOrganizer", fields: [organizerId], references: [id])
-  bouts       Bout[]
-  media       MediaItem[]
+  id                String              @id @default(cuid())
+  slug              String              @unique
+  name              String
+  kind              EventKind           @default(VELADA)
+  date              DateTime
+  discipline        Discipline          @default(BOXEO)
+  level             Level
+  venue             String
+  city              String
+  province          String
+  promoter          String?
+  ticketUrl         String?
+  status            EventStatus         @default(SCHEDULED)
+  createdById       String?
+  organizerId       String?
+  organizer         User?               @relation("EventOrganizer", fields: [organizerId], references: [id])
+  bouts             Bout[]
+  media             MediaItem[]
+  // Inscripción de peleadores (propuesta n.º 3 del diseño v3; pedida por el fundador el 8 de octubre de 2026): el organizador la abre o
+  // la cierra, con requisitos y una fecha límite opcionales.
+  registrationOpen  Boolean             @default(false)
+  registrationNote  String?
+  registrationUntil DateTime?           @db.Date
+  registrations     EventRegistration[]
 
   @@index([discipline, date])
   @@index([organizerId])

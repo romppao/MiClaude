@@ -15,7 +15,9 @@ export const metadata = { title: "Calendario de veladas" };
 export const dynamic = "force-dynamic";
 
 export default async function Events({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { level, province, past, q, disciplina, pagina } = flatParams(await searchParams);
+  const { level, province, past, q, disciplina, pagina, inscripcion } = flatParams(await searchParams);
+  // «Con inscripción abierta»: eventos futuros que admiten solicitudes de participación ahora mismo.
+  const conInscripcion = inscripcion === "abierta";
   const ids = await searchIds("event", q);
   const dayStart = calendarDayStart();
   const period = past === "1" ? "1" : past === "todas" ? "todas" : "";
@@ -26,6 +28,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
     ...(province && { province }),
     ...(disciplina && isDiscipline(disciplina) ? { discipline: disciplina } : {}),
     ...(ids && { id: { in: ids } }),
+    ...(conInscripcion && { registrationOpen: true, status: "SCHEDULED" as const, OR: [{ registrationUntil: null }, { registrationUntil: { gte: dayStart } }] }),
   };
   const total = await db.event.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
@@ -36,20 +39,22 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
       <p className="mut">Consulta el cartel y los resultados de cada velada. Las canceladas llevan un aviso.</p>
       <form className="search" role="search" aria-label="Filtrar veladas">
         <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
-        <MasFiltros activos={[disciplina, level, province, period].filter(Boolean).length}>
+        <MasFiltros activos={[disciplina, level, province, period, conInscripcion ? "1" : ""].filter(Boolean).length}>
+        <CampoFiltro etiqueta="Inscripción de peleadores"><select name="inscripcion" defaultValue={conInscripcion ? "abierta" : ""}><option value="">Todas</option><option value="abierta">Con inscripción abierta</option></select></CampoFiltro>
         <CampoFiltro etiqueta="Disciplina"><select name="disciplina" defaultValue={disciplina ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Nivel"><select name="level" defaultValue={level ?? ""}><option value="">Profesional y amateur</option>{Object.entries(LEVEL_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Toda España</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <CampoFiltro etiqueta="Cuándo" ayuda="«Hoy y próximas» incluye todo el día de hoy, según la hora peninsular (también para los eventos de Canarias)."><select name="past" defaultValue={period}><option value="">Hoy y próximas</option><option value="1">Ya celebradas</option><option value="todas">Todas</option></select></CampoFiltro>
         </MasFiltros>
-        <BotonesFiltro ruta="/veladas" hayFiltros={!!(q || disciplina || level || province || period)} />
+        <BotonesFiltro ruta="/veladas" hayFiltros={!!(q || disciplina || level || province || period || conInscripcion)} />
       </form>
-      <FiltrosActivos ruta="/veladas" params={{ q, disciplina, level, province, past: period }} activos={[
+      <FiltrosActivos ruta="/veladas" params={{ q, disciplina, level, province, past: period, inscripcion: conInscripcion ? "abierta" : undefined }} activos={[
         ...(q ? [{ texto: `Búsqueda: ${q}`, claves: ["q"] }] : []),
         ...(disciplina && isDiscipline(disciplina) ? [{ texto: DISCIPLINE_LABEL[disciplina], claves: ["disciplina"] }] : []),
         ...(level === "PRO" || level === "AMATEUR" ? [{ texto: LEVEL_LABEL[level], claves: ["level"] }] : []),
         ...(province ? [{ texto: province, claves: ["province"] }] : []),
         ...(period ? [{ texto: period === "1" ? "Ya celebradas" : "Todas las fechas", claves: ["past"] }] : []),
+        ...(conInscripcion ? [{ texto: "Con inscripción abierta", claves: ["inscripcion"] }] : []),
       ]} />
       <div className="grid">
         {events.map((e) => (
@@ -57,6 +62,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
             <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
             {!e.organizerId && <span className="tag">no oficial</span>}
+            {e.registrationOpen && e.status === "SCHEDULED" && <span className="tag" style={{ background: "var(--acc)", color: "var(--acc-ink)" }}>Inscripción abierta</span>}
             <strong>{e.name}</strong>
             <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
           </Link>
@@ -64,7 +70,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
       </div>
       {events.some((e) => !e.organizerId) && <p className="mut">«No oficial»: la velada no la ha publicado un organizador, la indicó un peleador al registrar su combate y sus datos pueden estar incompletos.</p>}
       {events.length === 0 && <p className="mut">No hay veladas con esos filtros. Puedes quitar un filtro en «Estás viendo» o <Link href="/veladas?past=todas">consultar todas las fechas sin filtros</Link>.</p>}
-      <Paginacion ruta="/veladas" params={{ q, disciplina, level, province, past: period }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["velada", "veladas"]} />
+      <Paginacion ruta="/veladas" params={{ q, disciplina, level, province, past: period, inscripcion: conInscripcion ? "abierta" : undefined }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["velada", "veladas"]} />
     </>
   );
 }
