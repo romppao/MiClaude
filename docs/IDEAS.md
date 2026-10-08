@@ -291,3 +291,7 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Noticias solo del panorama español**, para «apoyar a los nuestros» y crear comunidad en cada comunidad autónoma y municipio (fundador, 8 oct) — **hecho** (`espana.ts`, `NewsSource.local`).
 - **Antigravity mantendrá las fuentes de noticias tras el despliegue** (fundador, 8 oct) — **acordado**; guía en `NOTICIAS.md`.
 - **Sección «Talento local» o noticias por comunidad autónoma** (Claude, 8 oct, a partir de «en cada comunidad autónoma, en cada municipio») — **propuesta**: la detección de provincias ya existe y permitiría filtrar las noticias por la provincia de cada persona.
+
+### Fotos que se ajustan solas (8 de octubre de 2026)
+- Origen: el fundador, al rechazarse una foto de su móvil: «hay que ponérselo fácil a los usuarios». Estado: hecho (`InputFoto`).
+- Pendiente de probar en Safari de iPhone y Android reales. Posible mejora: recorte con vista previa antes de subir.

@@ -355,6 +355,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/components/InputFoto.tsx",
+    "purpose": "Componente de cliente para elegir una foto: si es muy grande la reduce en el navegador antes de enviarla y avisa de que se ha ajustado sola.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/MetodoSegunDisciplina.tsx",
     "purpose": "Filtra métodos del combate según disciplina elegida en cliente; el servidor vuelve a validar resultado/método.",
     "guide": "docs/mantenimiento/MODULOS.md"

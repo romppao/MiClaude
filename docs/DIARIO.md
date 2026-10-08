@@ -1158,3 +1158,18 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qué ejecuté yo:** `npm run typecheck`, `npm test` (555), `npm run build`, paridad de migraciones, los 22 guiones de navegador con base vacía (**565 comprobaciones, 0 fallos**) y `accesibilidad.mjs` (61 pantallas, 0 incumplimientos). Tras los últimos cambios (iconos con más forma, filtro español, moderación) volví a pasar `fase2a`, `creador`, `diseno`, `movil`, `enlaces` y `accesibilidad`, todos sin fallos. También `npm run mapa` y el catálogo (271 archivos, 9/9 pruebas), y capturas en iPhone emulado.
 **Límite honesto:** ninguna fuente real se pudo leer desde aquí; la lista de españoles de élite es corta a propósito (solo nombres de los que hay certeza) y se amplía según `NOTICIAS.md`.
 **Estado:** PR a `claude/ring-espana-mvp`; se fusiona en la demo en cuanto el CI esté en verde (el fundador pidió tener la demo completa para revisarla).
+
+## 8 de octubre de 2026 — Fotos del móvil rechazadas por pesar demasiado (Claude)
+
+**Qué se pidió:** el fundador, al personalizar su perfil desde el móvil, recibió «No se ha guardado nada. Elige imágenes JPG, PNG o WebP de hasta 4 MB y 25 megapíxeles…». Su reacción: «Esto es un gran problema, hay que ponérselo fácil a los usuarios».
+**Causa:** las fotos del móvil pesan 3–10 MB y miden 12–48 megapíxeles; el límite de 4 MB estaba solo en el servidor, y el mensaje obligaba a la persona a saber de pesos y píxeles. Lo mismo pasaba al subir una foto de una velada o de un vídeo destacado.
+**Qué se decidió:** la persona elige **cualquier foto** y el navegador la prepara; el servidor sigue comprobándolo todo (formato real, píxeles, animación) como defensa.
+**Qué se hizo:**
+- Componente `InputFoto` (`src/app/components/InputFoto.tsx`), usado en los cuatro sitios donde se suben fotos (foto y banner del perfil, vídeo destacado de «Mi ficha» y «Compartir» de una velada).
+  - Si la foto pesa más de 3 MB o mide más de 5000 px, la gira según su orientación, la deja en 2000 px como máximo y la guarda como JPEG de calidad alta.
+  - Dice «Foto lista (1,2 MB). Se ha ajustado sola para que se suba rápido.» Si el navegador no puede leerla, lo explica y propone una captura de pantalla.
+  - Una foto ligera y de medidas razonables se envía tal cual, sin perder calidad.
+- Mensajes sin cifras técnicas («No hemos podido usar esa imagen. Prueba con otra foto…»).
+- Prueba de navegador (`perfiles.mjs`): una foto de 4000×3000 píxeles y más de 4 MB se reduce y se guarda.
+**Límite honesto:** probado con Chromium; en Safari de iPhone no lo he podido probar. Las fotos HEIC se convierten ya al elegirlas en iOS; en un navegador que no pueda decodificarlas saldrá el mensaje de ayuda.
+**Estado:** PR a `claude/ring-espana-mvp`.
