@@ -15,7 +15,7 @@ const PILDORA = { PENDING: "pildora-violeta", ACCEPTED: "pildora-acc", DECLINED:
 /** Las clases que ha solicitado la persona, con la respuesta del entrenador y la opción de cancelar. */
 export default async function MisReservas() {
   const user = await requireUser("/mis-reservas");
-  const solicitudes = await db.classRequest.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50, include: { class: { include: { trainer: { include: { gym: true } } } } } });
+  const solicitudes = await db.classRequest.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50, include: { class: { include: { trainer: { include: { gym: true, user: { select: { email: true } } } } } } } });
   return (
     <div className="pantalla" style={{ gap: 14 }}>
       <div><h1>Mis reservas de clases</h1><p className="lead" style={{ fontSize: 16 }}>Las clases que has solicitado y lo que te ha respondido cada entrenador.</p></div>
@@ -28,7 +28,8 @@ export default async function MisReservas() {
           <div><h2 style={{ margin: 0, font: "700 18px/1.2 var(--font)" }}>{r.class.title}</h2><div className="meta">{CLASS_KIND_LABEL[r.class.kind]} · {classMeta(r.class)} · {r.class.priceEuros} € · con <Link href={`/entrenadores/${r.class.trainer.slug}`}>{r.class.trainer.name}</Link>{r.class.trainer.gym ? ` (${r.class.trainer.gym.name})` : ""}</div></div>
           <div className="meta">Propusiste: {r.preferred}</div>
           {r.reply && <p style={{ margin: 0 }}><strong>Respuesta de {r.class.trainer.name}:</strong> {r.reply}</p>}
-          {r.status === "ACCEPTED" && <p className="mut" style={{ margin: 0 }}>La clase se paga directamente al entrenador. Si necesitas hablar con él, respóndele al correo que te enviamos.</p>}
+          {/* Aceptada: ya se pueden escribir. El correo del entrenador solo se enseña a quien tiene una clase aceptada con él o ella. */}
+          {r.status === "ACCEPTED" && <p className="mut" style={{ margin: 0 }}>Para hablar con {r.class.trainer.name}{r.class.trainer.user ? <>, escribe a <a href={`mailto:${r.class.trainer.user.email}`}>{r.class.trainer.user.email}</a> o</> : ","} responde al correo de la respuesta. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>}
           {r.status === "DECLINED" && <p className="mut" style={{ margin: 0 }}>Puedes <Link href={`/clases/${r.classId}/solicitar`}>solicitarla otra vez con otras fechas</Link> o buscar otro entrenador.</p>}
           {puedeCancelar(r.status) && (
             <form action={cancelClassRequest} style={{ paddingTop: 10, borderTop: "1px solid var(--line)" }}>

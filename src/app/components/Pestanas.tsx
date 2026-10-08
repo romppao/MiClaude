@@ -25,6 +25,8 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
   const toque = useRef<{ x: number; y: number; t: number; horizontal: boolean | null } | null>(null);
   const ultima = pestanas.length - 1;
 
+  // El texto de la «#ancla», tolerando una dirección mal formada (decodeURIComponent lanza un error con «%E0» y similares).
+  const ancla = (texto: string) => { try { return decodeURIComponent(texto); } catch { return texto; } };
   const panel = (i: number) => riel.current?.children[i] as HTMLElement | undefined;
   const indiceDe = (nodo: Node | null) => (nodo && riel.current ? [...riel.current.children].findIndex((c) => c.contains(nodo)) : -1);
 
@@ -42,7 +44,7 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
 
   // Al cargar: la sección de la «#ancla» (o de «?seccion=», tras guardar un formulario), si está dentro; si no, la inicial.
   useEffect(() => {
-    const id = decodeURIComponent(location.hash.slice(1)) || new URLSearchParams(location.search).get("seccion") || "";
+    const id = ancla(location.hash.slice(1)) || new URLSearchParams(location.search).get("seccion") || "";
     const destino = id ? document.getElementById(id) : null;
     const i = indiceDe(destino);
     if (i >= 0) {
@@ -50,11 +52,21 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
       requestAnimationFrame(() => requestAnimationFrame(() => destino?.scrollIntoView({ block: "start" })));
     }
     const alCambiarHash = () => {
-      const j = indiceDe(document.getElementById(decodeURIComponent(location.hash.slice(1))));
+      const j = indiceDe(document.getElementById(ancla(location.hash.slice(1))));
+      if (j >= 0) setActiva(j);
+    };
+    // Los enlaces de la aplicación (next/link, como los del menú) cambian la «#ancla» sin el evento «hashchange»: se atienden sus clics.
+    const alPulsarEnlace = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.("a[href*='#']") as HTMLAnchorElement | null;
+      if (!a || a.closest(".pestanas-barra")) return;
+      const url = new URL(a.href, location.href);
+      if (url.pathname !== location.pathname || !url.hash) return;
+      const j = indiceDe(document.getElementById(ancla(url.hash.slice(1))));
       if (j >= 0) setActiva(j);
     };
     window.addEventListener("hashchange", alCambiarHash);
-    return () => window.removeEventListener("hashchange", alCambiarHash);
+    document.addEventListener("click", alPulsarEnlace, true);
+    return () => { window.removeEventListener("hashchange", alCambiarHash); document.removeEventListener("click", alPulsarEnlace, true); };
   }, []);
 
   // El foco que entra en otra sección la activa; y la pista nunca se desplaza por su cuenta (lo que se mueve es el riel).
@@ -86,7 +98,14 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
   }, [activa, ajustarAltura]);
 
   // Gesto con el dedo: solo cuenta si es claramente horizontal; el desplazamiento vertical sigue siendo el de la página.
-  const alTocar = (e: React.TouchEvent) => { const t = e.touches[0]; toque.current = { x: t.clientX, y: t.clientY, t: Date.now(), horizontal: null }; };
+  const alTocar = (e: React.TouchEvent) => {
+    // Dentro de una fila que ya se desliza a los lados (récords, highlights, galería…), el gesto es de esa fila, no de las pestañas.
+    for (let el = e.target as HTMLElement | null; el && el !== pista.current; el = el.parentElement) {
+      if (el.scrollWidth > el.clientWidth + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) { toque.current = null; return; }
+    }
+    const t = e.touches[0];
+    toque.current = { x: t.clientX, y: t.clientY, t: Date.now(), horizontal: null };
+  };
   const alMover = (e: React.TouchEvent) => {
     const t0 = toque.current;
     if (!t0) return;
@@ -115,6 +134,7 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
     e.preventDefault();
     const i = Math.min(ultima, Math.max(0, activa + (e.key === "ArrowRight" ? 1 : -1)));
     ir(i);
+    history.replaceState(null, "", `#${pestanas[i].id}`);
     (barra.current?.children[i] as HTMLElement | undefined)?.focus();
   };
 

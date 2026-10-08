@@ -15,8 +15,11 @@ export const dynamic = "force-dynamic";
  * Solicitar una clase publicada (petición del fundador, 8 de octubre de 2026). Una sola pantalla: la clase, cuándo te viene bien y el botón.
  * El entrenador la recibe por correo y en «Mis clases»; la respuesta llega a «Mis reservas» y por correo.
  */
-export default async function SolicitarClase({ params }: { params: Promise<{ id: string }> }) {
+export default async function SolicitarClase({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { id } = await params;
+  // Lo que la persona había escrito, si vuelve aquí por un problema (no se pierde: principio 9).
+  const sp = await searchParams;
+  const previo = (k: string) => { const v = sp[k]; return (Array.isArray(v) ? v[0] : v ?? "").slice(0, 500); };
   if (id.length > 40) notFound();
   const c = await db.trainingClass.findFirst({ where: { id, active: true, trainer: { userId: { not: null } } }, include: { trainer: { include: { gym: true } } } });
   if (!c) notFound();
@@ -42,11 +45,11 @@ export default async function SolicitarClase({ params }: { params: Promise<{ id:
       ) : (
         <form action={requestClass} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <input type="hidden" name="classId" value={c.id} />
-          <label className="field"><span>¿Cuándo te viene bien?</span><textarea name="preferred" required maxLength={REQUEST_PREFERRED_MAX} rows={2} placeholder="Por ejemplo: martes o jueves por la tarde, a partir de las 18:00" /><span className="hint">{c.kind === "GROUP" ? `Horario de la clase: ${c.schedule}. Dinos qué día quieres empezar.` : "El horario se acuerda con el entrenador."}</span></label>
-          <label className="field"><span>Mensaje para el entrenador (opcional)</span><textarea name="message" maxLength={REQUEST_MESSAGE_MAX} rows={3} placeholder="Tu nivel, qué quieres trabajar, si es tu primera clase…" /></label>
-          <label className="field"><span>Teléfono (opcional)</span><input name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={REQUEST_PHONE_MAX} /><span className="hint">Solo si prefieres que te llame o te escriba por teléfono.</span></label>
-          <p className="mut" style={{ margin: 0 }}>{c.trainer.name} verá tu nombre, tu correo electrónico y lo que escribas aquí. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>
-          <button className="btn-grande">Enviar la solicitud</button>
+          <label className="field"><span>¿Cuándo te viene bien?</span><textarea name="preferred" defaultValue={previo("preferred")} required maxLength={REQUEST_PREFERRED_MAX} rows={2} placeholder="Por ejemplo: martes o jueves por la tarde, a partir de las 18:00" /><span className="hint">{c.kind === "GROUP" ? `Horario de la clase: ${c.schedule}. Dinos qué día quieres empezar.` : "El horario se acuerda con el entrenador."}</span></label>
+          <label className="field"><span>Mensaje para el entrenador (opcional)</span><textarea name="message" defaultValue={previo("message")} maxLength={REQUEST_MESSAGE_MAX} rows={3} placeholder="Tu nivel, qué quieres trabajar, si es tu primera clase…" /></label>
+          <label className="field"><span>Teléfono (opcional)</span><input name="phone" defaultValue={previo("phone")} type="tel" inputMode="tel" autoComplete="tel" maxLength={REQUEST_PHONE_MAX} /><span className="hint">Solo si prefieres que te llame o te escriba por teléfono.</span></label>
+          <p className="mut" style={{ margin: 0 }}>{c.trainer.name} verá tu nombre, tu correo electrónico y lo que escribas aquí, y te responderá aquí y por correo. Si acepta, podréis escribiros por correo. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>
+          <button className="btn-grande">Solicitar la clase</button>
         </form>
       )}
     </div>

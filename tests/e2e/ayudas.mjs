@@ -91,6 +91,11 @@ export async function mostrar(loc, silencioso = false) {
   const p = loc.page();
   // Si todavía no existe (por ejemplo, llega tras una navegación), se deja que la acción original espere como siempre.
   if (!(await loc.first().waitFor({ state: "attached", timeout: silencioso ? 3000 : 30000 }).then(() => true, () => false))) return loc;
+  // Filtros plegados en «Más filtros» (components/Filtros.tsx): se despliegan como lo haría una persona.
+  // (Salvo que lo que se va a pulsar sea su propio «Más filtros»: entonces la pulsación ya lo abre.)
+  if (await loc.first().evaluate((el) => { const d = el.closest("details.mas-filtros:not([open])"); return !!d && el.closest("summary")?.parentElement !== d; }).catch(() => false)) {
+    await loc.first().evaluate((el) => el.closest("details.mas-filtros").querySelector(":scope > summary").click());
+  }
   const id = await loc.first().evaluate((el) => el.closest(".pestanas-panel")?.id ?? "").catch(() => "");
   if (!id) return loc;
   const enlace = p.locator(`.pestanas-barra a[href="#${id}"]`);

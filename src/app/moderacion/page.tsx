@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Pestanas from "../components/Pestanas";
 import { requireAdmin } from "../../lib/accounts/permissions";
 import { esCreador } from "../../lib/accounts/creador";
 import { db } from "../../lib/common/db";
@@ -123,146 +124,157 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
       <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
       <p><Link href="/moderacion/historial">Ver el historial de cambios</Link> · <Link href="/moderacion/noticias">Fuentes de noticias</Link>{esCreador(user) && <> · <Link href="/moderacion/usuarios">Administración: cuentas y moderadores</Link></>}</p>
 
-      <h2 id="avisos">Avisos de error de usuarios ({nReports})</h2>
-      {paging("avisos", ["aviso", "avisos"], "avisos")}
-      {reports.length === 0 ? <p className="mut">No hay avisos pendientes.</p> : (
-        <div className="table-wrap"><table>
-          <thead><tr><th scope="col">Motivo</th><th scope="col">Sobre qué</th><th scope="col">Acción</th></tr></thead>
-          <tbody>
-            {reports.map((r) => {
-              const bout = reportedBouts.find((b) => b.id === r.entityId);
-              const fighter = reportedFighters.find((b) => b.id === r.entityId);
-              const aura = reportedAuras.find((b) => b.id === r.entityId);
-              const medio = reportedMedia.find((m) => m.id === r.entityId);
-              return (
-                <tr key={r.id}>
-                  <th scope="row" className="celda-fila">
-                    <strong>{lookup(REPORT_REASONS, r.reason) ?? "Motivo no reconocido"}</strong>
-                    <div className="mut">{publicUserName(r.user.name)} · {r.user.email}</div>
-                    {r.message && <div>{r.message}</div>}
-                  </th>
+      {/* Cada cola en su pestaña, que se cambia deslizando (revisión del 8 de octubre de 2026: la página medía casi 40 000 px en el móvil). */}
+      <Pestanas etiqueta="Colas de moderación" inicial={Math.max(0, [nReports, nClaims, nOrganizers, nSinSello, nFlags, nUnflagged, nRevision].findIndex((n) => n > 0))} pestanas={[
+        { id: "pestana-avisos", titulo: `Avisos (${nReports})`, contenido: <>
+          <h2 id="avisos">Avisos de error de usuarios ({nReports})</h2>
+          {paging("avisos", ["aviso", "avisos"], "avisos")}
+          {reports.length === 0 ? <p className="mut">No hay avisos pendientes.</p> : (
+            <div className="table-wrap"><table>
+              <thead><tr><th scope="col">Motivo</th><th scope="col">Sobre qué</th><th scope="col">Acción</th></tr></thead>
+              <tbody>
+                {reports.map((r) => {
+                  const bout = reportedBouts.find((b) => b.id === r.entityId);
+                  const fighter = reportedFighters.find((b) => b.id === r.entityId);
+                  const aura = reportedAuras.find((b) => b.id === r.entityId);
+                  const medio = reportedMedia.find((m) => m.id === r.entityId);
+                  return (
+                    <tr key={r.id}>
+                      <th scope="row" className="celda-fila">
+                        <strong>{lookup(REPORT_REASONS, r.reason) ?? "Motivo no reconocido"}</strong>
+                        <div className="mut">{publicUserName(r.user.name)} · {r.user.email}</div>
+                        {r.message && <div>{r.message}</div>}
+                      </th>
+                      <td>
+                        {bout && <><span className="mut">Combate: </span><Link href={`/veladas/${bout.event.slug}`}>{bout.fighterA.firstName} {bout.fighterA.lastName} contra {bout.fighterB.firstName} {bout.fighterB.lastName} ({bout.event.name})</Link></>}
+                        {fighter && <><span className="mut">Ficha: </span><Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link></>}
+                        {aura && <><span className="mut">Comentario de {publicUserName(aura.user.name)} en </span><Link href={`/peleadores/${aura.fighter.slug}`}>{aura.fighter.firstName} {aura.fighter.lastName}</Link>: «{aura.comment}»</>}
+                        {medio && <><span className="mut">{medio.kind === "PHOTO" ? "Foto" : "Vídeo"} de {publicUserName(medio.uploader.name)} en </span><Link href={`/veladas/${medio.event.slug}#medio-${medio.id}`}>{medio.event.name}</Link>{medio.caption ? <>: «{medio.caption}»</> : null}{medio.kind === "PHOTO" ? <> · <a href={`/medios/${medio.id}/imagen`} target="_blank" rel="noopener noreferrer">Ver la foto</a></> : medio.videoUrl ? <> · <a href={medio.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></> : <> · <a href={`/medios/${medio.id}/video`} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></>}{medio.hiddenAt ? " (ya retirado)" : ""}</>}
+                        {!bout && !fighter && !aura && !medio && <span className="mut">El elemento ya no existe.</span>}
+                      </td>
+                      <td>
+                        <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          <input type="hidden" name="reportId" value={r.id} />
+                          <input type="hidden" name="back" value={back("avisos")} />
+                          <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar)" : "Nota (opcional)"} aria-label="Nota de resolución" maxLength={500} />
+                          <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${publicUserName(r.user.name)})`}>Cerrar: ya está corregido</button>
+                          <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : medio ? "Deja de mostrarse en la velada y en las fichas" : "Retira el comentario"}>
+                            {bout ? "Resolver y rechazar el combate" : fighter ? "Resolver y ocultar la ficha" : medio ? (medio.kind === "PHOTO" ? "Resolver y retirar la foto" : "Resolver y retirar el vídeo") : "Resolver y retirar el comentario"}
+                          </button>
+                          <button name="decision" value="dismiss" className="secondary" aria-label={`Cerrar: no hay error (aviso de ${publicUserName(r.user.name)})`}>Cerrar: no hay error</button>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table></div>
+          )}
+        </> },
+        { id: "pestana-reclamaciones", titulo: `Fichas (${nClaims})`, contenido: <>
+          <h2 id="reclamaciones">Reclamaciones de ficha ({nClaims})</h2>
+          {paging("reclamaciones", ["reclamación", "reclamaciones"], "reclamaciones")}
+          {claims.length === 0 ? <p className="mut">No hay reclamaciones pendientes.</p> : (
+            <div className="table-wrap"><table>
+              <thead><tr><th scope="col">Quién reclama</th><th scope="col">Qué ficha</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
+              <tbody>
+                {claims.map((c) => (
+                  <tr key={c.id}>
+                    <th scope="row" className="celda-fila"><strong>{publicUserName(c.user.name)}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " (correo verificado)" : ""}</span></th>
+                    <td><Link href={`/peleadores/${c.fighter.slug}`}>{c.fighter.firstName} {c.fighter.lastName}</Link></td>
+                    <td className="mut">{c.message}</td>
+                    <td>{aprobarRechazar(decideClaim, "claimId", c.id, `${publicUserName(c.user.name)} sobre la ficha de ${c.fighter.firstName} ${c.fighter.lastName}`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table></div>
+          )}
+        </> },
+        { id: "pestana-organizadores", titulo: `Organizadores (${nOrganizers})`, contenido: <>
+          <h2 id="organizadores">Solicitudes de organizador ({nOrganizers})</h2>
+          {paging("organizadores", ["solicitud", "solicitudes"], "solicitudes de organizador")}
+          {organizers.length === 0 ? <p className="mut">No hay solicitudes pendientes.</p> : (
+            <div className="table-wrap"><table>
+              <thead><tr><th scope="col">Organización</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
+              <tbody>
+                {organizers.map((o) => (
+                  <tr key={o.id}>
+                    <th scope="row" className="celda-fila"><strong>{o.orgName}</strong> <span className="tag">{TIPO_DE_ENTIDAD_ETIQUETA[parseTipoDeEntidad(o.kind) ?? "PROMOTORA"]}</span> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></th>
+                    <td className="mut">{o.message}{o.website && <> · <a href={o.website} target="_blank" rel="noopener noreferrer nofollow ugc">web o redes<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a></>}</td>
+                    <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, `${o.orgName}`, true)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table></div>
+          )}
+        </> },
+        { id: "pestana-gimnasios", titulo: `Gimnasios (${nSinSello})`, contenido: <>
+          <h2 id="gimnasios">Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
+          {paging("gimnasios", ["gimnasio", "gimnasios"], "gimnasios")}
+          <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.</p>
+          <div className="table-wrap"><table>
+            <thead><tr><th scope="col">Gimnasio</th><th scope="col">Evidencia anotada</th><th scope="col">Acción</th></tr></thead>
+            <tbody>
+              {gyms.map((g) => (
+                <tr key={g.id}>
+                  <th scope="row" className="celda-fila"><strong>{g.name}</strong> <span className="mut">{g.city}</span> {g.verifiedAt && <span className="tag PRO">✓ verificado</span>}</th>
+                  <td className="mut">{g.verifiedNote}{g.website && <> · <a href={g.website} rel="noopener noreferrer nofollow">sitio web de {g.name}</a></>}</td>
                   <td>
-                    {bout && <><span className="mut">Combate: </span><Link href={`/veladas/${bout.event.slug}`}>{bout.fighterA.firstName} {bout.fighterA.lastName} contra {bout.fighterB.firstName} {bout.fighterB.lastName} ({bout.event.name})</Link></>}
-                    {fighter && <><span className="mut">Ficha: </span><Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link></>}
-                    {aura && <><span className="mut">Comentario de {publicUserName(aura.user.name)} en </span><Link href={`/peleadores/${aura.fighter.slug}`}>{aura.fighter.firstName} {aura.fighter.lastName}</Link>: «{aura.comment}»</>}
-                    {medio && <><span className="mut">{medio.kind === "PHOTO" ? "Foto" : "Vídeo"} de {publicUserName(medio.uploader.name)} en </span><Link href={`/veladas/${medio.event.slug}#medio-${medio.id}`}>{medio.event.name}</Link>{medio.caption ? <>: «{medio.caption}»</> : null}{medio.kind === "PHOTO" ? <> · <a href={`/medios/${medio.id}/imagen`} target="_blank" rel="noopener noreferrer">Ver la foto</a></> : medio.videoUrl ? <> · <a href={medio.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></> : <> · <a href={`/medios/${medio.id}/video`} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></>}{medio.hiddenAt ? " (ya retirado)" : ""}</>}
-                    {!bout && !fighter && !aura && !medio && <span className="mut">El elemento ya no existe.</span>}
-                  </td>
-                  <td>
-                    <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      <input type="hidden" name="reportId" value={r.id} />
-                      <input type="hidden" name="back" value={back("avisos")} />
-                      <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar)" : "Nota (opcional)"} aria-label="Nota de resolución" maxLength={500} />
-                      <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${publicUserName(r.user.name)})`}>Cerrar: ya está corregido</button>
-                      <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : medio ? "Deja de mostrarse en la velada y en las fichas" : "Retira el comentario"}>
-                        {bout ? "Resolver y rechazar el combate" : fighter ? "Resolver y ocultar la ficha" : medio ? (medio.kind === "PHOTO" ? "Resolver y retirar la foto" : "Resolver y retirar el vídeo") : "Resolver y retirar el comentario"}
-                      </button>
-                      <button name="decision" value="dismiss" className="secondary" aria-label={`Cerrar: no hay error (aviso de ${publicUserName(r.user.name)})`}>Cerrar: no hay error</button>
+                    <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <input type="hidden" name="gymId" value={g.id} />
+                      <input type="hidden" name="back" value={back("gimnasios")} />
+                      {!g.verifiedAt && <input name="note" aria-label={`Evidencia comprobada de ${g.name}`} placeholder="Evidencia comprobada (web, redes, llamada…)" maxLength={500} />}
+                      {g.verifiedAt ? <button name="decision" value="revoke" className="secondary" aria-label={`Retirar sello de ${g.name}`}>Retirar sello</button> : <button name="decision" value="verify" aria-label={`Verificar el gimnasio ${g.name}`}>Verificar</button>}
                     </form>
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table></div>
-      )}
-
-      <h2 id="reclamaciones">Reclamaciones de ficha ({nClaims})</h2>
-      {paging("reclamaciones", ["reclamación", "reclamaciones"], "reclamaciones")}
-      {claims.length === 0 ? <p className="mut">No hay reclamaciones pendientes.</p> : (
-        <div className="table-wrap"><table>
-          <thead><tr><th scope="col">Quién reclama</th><th scope="col">Qué ficha</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
-          <tbody>
-            {claims.map((c) => (
-              <tr key={c.id}>
-                <th scope="row" className="celda-fila"><strong>{publicUserName(c.user.name)}</strong> <span className="mut">{c.user.email}{c.user.emailVerifiedAt ? " (correo verificado)" : ""}</span></th>
-                <td><Link href={`/peleadores/${c.fighter.slug}`}>{c.fighter.firstName} {c.fighter.lastName}</Link></td>
-                <td className="mut">{c.message}</td>
-                <td>{aprobarRechazar(decideClaim, "claimId", c.id, `${publicUserName(c.user.name)} sobre la ficha de ${c.fighter.firstName} ${c.fighter.lastName}`)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table></div>
-      )}
-
-      <h2 id="organizadores">Solicitudes de organizador ({nOrganizers})</h2>
-      {paging("organizadores", ["solicitud", "solicitudes"], "solicitudes de organizador")}
-      {organizers.length === 0 ? <p className="mut">No hay solicitudes pendientes.</p> : (
-        <div className="table-wrap"><table>
-          <thead><tr><th scope="col">Organización</th><th scope="col">Cómo lo justifica</th><th scope="col">Acción</th></tr></thead>
-          <tbody>
-            {organizers.map((o) => (
-              <tr key={o.id}>
-                <th scope="row" className="celda-fila"><strong>{o.orgName}</strong> <span className="tag">{TIPO_DE_ENTIDAD_ETIQUETA[parseTipoDeEntidad(o.kind) ?? "PROMOTORA"]}</span> <span className="mut">{publicUserName(o.user.name)} · {o.user.email}</span></th>
-                <td className="mut">{o.message}{o.website && <> · <a href={o.website} target="_blank" rel="noopener noreferrer nofollow ugc">web o redes<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a></>}</td>
-                <td>{aprobarRechazar(decideOrganizer, "requestId", o.id, `${o.orgName}`, true)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table></div>
-      )}
-
-      <h2 id="gimnasios">Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
-      {paging("gimnasios", ["gimnasio", "gimnasios"], "gimnasios")}
-      <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.</p>
-      <div className="table-wrap"><table>
-        <thead><tr><th scope="col">Gimnasio</th><th scope="col">Evidencia anotada</th><th scope="col">Acción</th></tr></thead>
-        <tbody>
-          {gyms.map((g) => (
-            <tr key={g.id}>
-              <th scope="row" className="celda-fila"><strong>{g.name}</strong> <span className="mut">{g.city}</span> {g.verifiedAt && <span className="tag PRO">✓ verificado</span>}</th>
-              <td className="mut">{g.verifiedNote}{g.website && <> · <a href={g.website} rel="noopener noreferrer nofollow">sitio web de {g.name}</a></>}</td>
-              <td>
-                <form action={setGymVerified} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <input type="hidden" name="gymId" value={g.id} />
-                  <input type="hidden" name="back" value={back("gimnasios")} />
-                  {!g.verifiedAt && <input name="note" aria-label={`Evidencia comprobada de ${g.name}`} placeholder="Evidencia comprobada (web, redes, llamada…)" maxLength={500} />}
-                  {g.verifiedAt ? <button name="decision" value="revoke" className="secondary" aria-label={`Retirar sello de ${g.name}`}>Retirar sello</button> : <button name="decision" value="verify" aria-label={`Verificar el gimnasio ${g.name}`}>Verificar</button>}
-                </form>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table></div>
-
-      <h2 id="senales">Combates con señales de coherencia ({nFlags})</h2>
-      {paging("senales", ["combate", "combates"], "combates con señales")}
-      <p className="mut"><strong>Verificar</strong>: moderación comprueba el registro; este paso no concede bonificación de respaldo. Para concederla, utiliza «Respaldar resultados y títulos». <strong>Marcar como no correcto</strong>: deja de contar en el récord y en el ránking y de mostrarse como hecho hasta que se aclare; puede restaurarse desde «Combates en revisión».</p>
-      <BoutTable rows={conSenales} vacio="No hay combates con señales." acciones={(b) => (
-        <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <input type="hidden" name="boutId" value={b.id} />
-          <input type="hidden" name="back" value={back("senales")} />
-          <input type="hidden" name="version" value={boutVersion(b)} />
-          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
-          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
-        </form>
-      )} />
-
-      <h2 id="combates">Combates por verificar sin señales ({nUnflagged})</h2>
-      {paging("combates", ["combate", "combates"], "combates sin señales")}
-      <BoutTable rows={sinSenales} vacio="No hay combates pendientes." acciones={(b) => (
-        <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <input type="hidden" name="boutId" value={b.id} />
-          <input type="hidden" name="back" value={back("combates")} />
-          <input type="hidden" name="version" value={boutVersion(b)} />
-          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
-          <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
-        </form>
-      )} />
-
-      <h2 id="revision">Combates en revisión ({nRevision})</h2>
-      {paging("revision", ["combate", "combates"], "combates en revisión")}
-      <p className="mut">Son resultados suspendidos hasta aclararlos: no cuentan en el récord ni en el ránking. Un aviso del rival solicita revisión; por sí solo no suspende el resultado.</p>
-      <BoutTable rows={enRevision} vacio="No hay combates en revisión." acciones={(b) => (
-        <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <input type="hidden" name="boutId" value={b.id} />
-          <input type="hidden" name="back" value={back("revision")} />
-          <input type="hidden" name="version" value={boutVersion(b)} />
-          {motivoDe.get(b.id) && <div className="mut" style={{ flexBasis: "100%" }}>Motivo del rival: {motivoDe.get(b.id)}</div>}
-          <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
-          <button name="decision" value="restore" className="secondary" aria-label={`Restaurar como pendiente el combate: ${nombreCombate(b)}`}>Restaurar como pendiente</button>
-        </form>
-      )} />
+              ))}
+            </tbody>
+          </table></div>
+        </> },
+        { id: "pestana-senales", titulo: `Señales (${nFlags})`, contenido: <>
+          <h2 id="senales">Combates con señales de coherencia ({nFlags})</h2>
+          {paging("senales", ["combate", "combates"], "combates con señales")}
+          <p className="mut"><strong>Verificar</strong>: moderación comprueba el registro; este paso no concede bonificación de respaldo. Para concederla, utiliza «Respaldar resultados y títulos». <strong>Marcar como no correcto</strong>: deja de contar en el récord y en el ránking y de mostrarse como hecho hasta que se aclare; puede restaurarse desde «Combates en revisión».</p>
+          <BoutTable rows={conSenales} vacio="No hay combates con señales." acciones={(b) => (
+            <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <input type="hidden" name="boutId" value={b.id} />
+              <input type="hidden" name="back" value={back("senales")} />
+              <input type="hidden" name="version" value={boutVersion(b)} />
+              <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+              <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
+            </form>
+          )} />
+        </> },
+        { id: "pestana-combates", titulo: `Por verificar (${nUnflagged})`, contenido: <>
+          <h2 id="combates">Combates por verificar sin señales ({nUnflagged})</h2>
+          {paging("combates", ["combate", "combates"], "combates sin señales")}
+          <BoutTable rows={sinSenales} vacio="No hay combates pendientes." acciones={(b) => (
+            <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <input type="hidden" name="boutId" value={b.id} />
+              <input type="hidden" name="back" value={back("combates")} />
+              <input type="hidden" name="version" value={boutVersion(b)} />
+              <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+              <button name="decision" value="dispute" className="secondary" title="Deja de contar y de mostrarse como hecho hasta que se aclare" aria-label={`Marcar como no correcto el combate: ${nombreCombate(b)}`}>Marcar como no correcto</button>
+            </form>
+          )} />
+        </> },
+        { id: "pestana-revision", titulo: `En revisión (${nRevision})`, contenido: <>
+          <h2 id="revision">Combates en revisión ({nRevision})</h2>
+          {paging("revision", ["combate", "combates"], "combates en revisión")}
+          <p className="mut">Son resultados suspendidos hasta aclararlos: no cuentan en el récord ni en el ránking. Un aviso del rival solicita revisión; por sí solo no suspende el resultado.</p>
+          <BoutTable rows={enRevision} vacio="No hay combates en revisión." acciones={(b) => (
+            <form action={adminDecide} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <input type="hidden" name="boutId" value={b.id} />
+              <input type="hidden" name="back" value={back("revision")} />
+              <input type="hidden" name="version" value={boutVersion(b)} />
+              {motivoDe.get(b.id) && <div className="mut" style={{ flexBasis: "100%" }}>Motivo del rival: {motivoDe.get(b.id)}</div>}
+              <button name="decision" value="verify" aria-label={`Verificar combate: ${nombreCombate(b)}`}>Verificar</button>
+              <button name="decision" value="restore" className="secondary" aria-label={`Restaurar como pendiente el combate: ${nombreCombate(b)}`}>Restaurar como pendiente</button>
+            </form>
+          )} />
+        </> },
+      ]} />
     </>
   );
 }

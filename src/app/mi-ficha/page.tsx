@@ -125,6 +125,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const principal = [...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline))[0];
   const tallyP = principal ? records[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
   const recP = combinedRecord(tallyP, principal ? { total: principal.priorTotal, wins: principal.priorWins, losses: principal.priorLosses, draws: principal.priorDraws } : null);
+  const titulosVigentes = await db.fighterAchievement.findMany({ where: { fighterId: me.id, withdrawnAt: null, rejectedAt: null }, select: { discipline: true } });
   const perfil = await db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: me.id } }, select: { hasAvatar: true, updatedAt: true, avatarX: true, avatarY: true } });
   const vistoPorOtros = principal ? shownRecord(recP, recordHidden(principal.level, me.recordPublic, false)) : "";
 
@@ -158,8 +159,8 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <section id="highlights" className="tarjeta" aria-labelledby="titulo-mis-highlights" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
             <div className="titulo-seccion"><h2 id="titulo-mis-highlights" style={{ fontSize: 20 }}>Mis highlights</h2><span className="meta">{misHighlights.length} · aparecen en tu ficha pública</span></div>
             {misHighlights.map((h) => (
-              <div key={h.id} className="fila" style={{ background: "rgba(255,255,255,.04)" }}>
-                <span className="cuerpo"><span className="nombre">{h.title}{h.pinned && <span className="pildora pildora-acc" style={{ marginLeft: 8, fontSize: 13 }}>Destacado</span>}</span><span className="meta">{HIGHLIGHT_KIND_LABEL[h.kind]}{h.bout ? ` · ${h.bout.event.name}` : ""}</span></span>
+              <div key={h.id} className="fila" style={{ background: "rgba(255,255,255,.04)", flexWrap: "wrap" }}>
+                <span className="cuerpo" style={{ flex: "1 1 60%" }}><span className="nombre">{h.title}{h.pinned && <span className="pildora pildora-acc" style={{ marginLeft: 8, fontSize: 13 }}>Destacado</span>}</span><span className="meta">{HIGHLIGHT_KIND_LABEL[h.kind]}{h.bout ? ` · ${h.bout.event.name}` : ""}</span></span>
                 <form action={manageHighlight} style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                   <input type="hidden" name="highlightId" value={h.id} />
                   {!h.pinned && <button name="accion" value="destacar" className="secondary" aria-label={`Destacar «${h.title}»`}>Destacar</button>}
@@ -352,6 +353,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                 const combates = bouts.filter((b) => b.event.discipline === d.discipline).length;
                 if (me.disciplines.length <= 1) return <p className="mut">Es tu única disciplina. Si te equivocaste, añade primero la correcta y después podrás quitar esta.</p>;
                 if (combates > 0) return <p className="mut">Tienes {combates === 1 ? "1 combate" : `${combates} combates`} de {DISCIPLINE_LABEL[d.discipline]}, así que no puedes quitarla tú. Si son un error, pide que se revisen desde cada combate.</p>;
+            if (titulosVigentes.some((t) => t.discipline === d.discipline)) return <p className="mut">Tienes títulos declarados de {DISCIPLINE_LABEL[d.discipline]}. Para quitar la disciplina, retíralos antes en <Link href="/mi-ficha/trayectoria">Mis títulos y mi aura</Link>.</p>;
                 return (
                   <form action={removeDiscipline} className="zona-peligro">
                     <input type="hidden" name="discipline" value={d.discipline} />

@@ -46,10 +46,12 @@ async function ladoMayor(archivo: File): Promise<number> {
 export default function InputFoto({ name, id, accept = "image/jpeg,image/png,image/webp", alElegir }: { name: string; id?: string; accept?: string; alElegir?: (archivo: File | null) => void }) {
   const propio = useId();
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
+  const [elegida, setElegida] = useState<string | null>(null);
 
   async function elegir(e: React.ChangeEvent<HTMLInputElement>) {
     const campo = e.currentTarget;
     const archivo = campo.files?.[0];
+    setElegida(archivo?.name ?? null);
     if (!archivo) { setAviso(null); alElegir?.(null); return; }
     // Una foto ligera, de medidas razonables y ya en un formato válido se envía tal cual: así no se pierde calidad sin necesidad.
     if (archivo.size <= LIMITE && /^image\/(jpeg|png|webp)$/.test(archivo.type) && (await ladoMayor(archivo)) <= 5000) { setAviso(null); alElegir?.(archivo); return; }
@@ -63,6 +65,7 @@ export default function InputFoto({ name, id, accept = "image/jpeg,image/png,ima
       alElegir?.(reducida);
     } catch {
       campo.value = "";
+      setElegida(null);
       setAviso({ tipo: "error", texto: "No hemos podido leer esa foto. Prueba con otra, o haz una captura de pantalla de ella y elige la captura." });
       alElegir?.(null);
     }
@@ -70,7 +73,13 @@ export default function InputFoto({ name, id, accept = "image/jpeg,image/png,ima
 
   return (
     <>
-      <input id={id} type="file" name={name} accept={accept} onChange={elegir} aria-describedby={`${propio}-estado`} />
+      {/* Botón propio en español: el del navegador dice «Choose File / No file chosen» en algunos teléfonos. Va dentro de la etiqueta
+          del campo (quien usa este componente lo envuelve en <label>), así que pulsar el botón abre el selector de fotos. */}
+      <span className="archivo">
+        <input id={id} className="archivo-input" type="file" name={name} accept={accept} onChange={elegir} aria-describedby={`${propio}-estado`} />
+        <span className="btn secondary archivo-boton" aria-hidden="true">{elegida ? "Cambiar la foto" : "Elegir una foto"}</span>
+        <span className="archivo-nombre" aria-hidden="true">{elegida ?? "Ninguna elegida"}</span>
+      </span>
       <span id={`${propio}-estado`} className={aviso?.tipo === "error" ? "hint hint-error" : "hint"} role="status" aria-live="polite">{aviso?.texto}</span>
     </>
   );

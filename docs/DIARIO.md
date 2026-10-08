@@ -1208,3 +1208,46 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **CI:** la ejecución del PR #34 pasó; la del «push» del mismo código falló una vez en la prueba de extremo a extremo y pasó al relanzarla. Los registros del CI no se pueden leer desde este entorno (la red bloquea su almacenamiento), así que **no sé qué comprobación falló**; la réplica local exacta del CI (base vacía, `npm run test:e2e` completo) pasó entera (601). Hay que vigilar si se repite.
 **Límite honesto:** el fotograma automático y el deslizamiento solo se han probado en Chromium; hay que probarlos en Safari de iPhone. La miniatura de YouTube no se pudo cargar desde aquí (red bloqueada); se comprueba que la dirección es la correcta.
 **Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Revisión completa de estructura y diseño antes de actualizar la demo (Claude)
+
+**Qué se pidió:** «Vuelve a revisar que todas las funcionalidades estén correctamente estructuradas y diseñadas. Una vez termines actualiza el repositorio y la demo.»
+
+**Cómo se revisó:**
+1. **Revisión de código independiente** del PR #34 por un agente sin mis conclusiones. Encontró 13 defectos reales; todos corregidos.
+2. **Recorrido visual a 390 px** con cinco tipos de cuenta (visitante, aficionado, peleador, entrenador, moderador): 30 pantallas, capturas completas y medición de errores de JavaScript, respuestas 5xx y ancho de página.
+3. **Batería completa** de pruebas unitarias, de navegador y de accesibilidad.
+
+**Defectos de la revisión de código (corregidos):**
+- La portada sacada del vídeo no habría funcionado en la demo: la política de contenido bloqueaba `blob:` en imágenes y vídeo. Las pruebas no lo veían porque en local no se aplica.
+- «Mis reservas» prometía responder al correo para hablar con el entrenador, pero el correo no tenía dirección de respuesta. Ahora `sendMail` admite `replyTo` (la persona ↔ el entrenador) y, si la clase está aceptada, «Mis reservas» muestra el correo del entrenador.
+- Deslizar una fila interior (récords, highlights) también cambiaba de pestaña. Ahora el gesto se ignora dentro de lo que ya se desliza.
+- Un doble clic podía crear dos solicitudes iguales (ahora `withLock`), y una cancelación podía pisar la respuesta del entrenador (ahora `updateMany` condicionado).
+- Quitar una disciplina dejaba títulos huérfanos que seguían sumando aura:
+  - el titular debe retirar antes sus títulos;
+  - si la quita moderación, los títulos quedan excluidos con su motivo.
+- Los correos de las clases se enviaban antes de responder a la persona. Ahora van con `after()`.
+- El fotograma automático podía sustituir una foto elegida mientras se calculaba. Ahora se descartan los resultados viejos y se quita la portada automática al quitar el vídeo.
+- Los enlaces del menú con «#» (next/link) no cambiaban de pestaña, y un «#%E0» rompía la página.
+- Mensajes:
+  - límite diario de solicitudes con su propio texto;
+  - «como mucho 200»;
+  - lo escrito no se pierde al volver por un error;
+  - botón «Solicitar la clase»;
+  - «Mis reservas» en el menú de todos los tipos de cuenta.
+
+**Mejoras del recorrido visual:**
+- **Moderación** medía casi 40 000 px en el móvil. Ahora tiene siete pestañas (una por cola, con su número) y se abre en la primera con trabajo.
+- **Mi cuenta**: pestañas Mis datos · Contraseña · Accesos · Mis avisos · Privacidad.
+- **Filtros** de Peleadores, Veladas y Ránking: los secundarios, plegados en «Más filtros», que se abre solo si hay alguno aplicado. Antes ocupaban la primera pantalla entera.
+- **Portada del visitante**: las seis disciplinas en una fila deslizable.
+- **Campos de foto y vídeo** con botón propio en español («Elegir una foto», «Elegir un vídeo») y el nombre del archivo. El del navegador decía «Choose File» en algunos teléfonos.
+- Detalles:
+  - la foto del peleador en su panel;
+  - los botones de «Mis highlights» ya no aprietan el título;
+  - el botón «Crear el evento» ocupa su fila;
+  - acceso a «Mis reservas» en el panel del aficionado;
+  - listado de Peleadores compacto (foto a la izquierda, datos a la derecha);
+  - Veladas con una explicación corta (el detalle de «Hoy y próximas» va junto a su filtro).
+
+**Límite honesto:** el gesto del dedo y la portada automática siguen sin probarse en un iPhone real; el recorrido es con Chromium emulando un móvil.

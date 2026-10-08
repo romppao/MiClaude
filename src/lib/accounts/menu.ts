@@ -38,7 +38,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
       enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/mi-ficha#highlights", texto: "Mis highlights" }, RESERVAS, SIGUIENDO],
     });
   } else if (papel === "entrenador") {
-    propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases y solicitudes" }, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });
+    propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases y solicitudes" }, RESERVAS, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });
     propias.push({
       titulo: "Club",
       enlaces: [
@@ -66,6 +66,8 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
     if (x.canSupport) cuenta.push({ href: "/respaldar", texto: "Respaldar resultados y títulos" });
     if (x.admin) cuenta.push({ href: "/moderacion", texto: "Moderación" });
     if (x.creador) cuenta.push({ href: "/moderacion/usuarios", texto: "Administración" });
+    // Las entidades también pueden solicitar clases: su acceso va aquí si cabe (como mucho cinco enlaces por bloque).
+    if (papel === "entidad" && cuenta.length < 5) cuenta.push(RESERVAS);
   }
   return [...propias, EXPLORAR, { titulo: papel === "visitante" ? "Ayuda" : "Tu cuenta y ayuda", enlaces: cuenta }];
 }

@@ -32,7 +32,7 @@
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
 | `/mi-cuenta/datos` | Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, ClassRequest, Event, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
-| `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.removeDiscipline`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, Gym, Highlight, MediaItem, Profile |
+| `/mi-ficha` | ¿Ya apareces en Ring España? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.removeDiscipline`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, FighterAchievement, Gym, Highlight, MediaItem, Profile |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
 | `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
 | `/mi-panel` | (respuesta técnica, sin pantalla) | Cuenta con sesión iniciada | — | — |
@@ -155,7 +155,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `createMyFighter` | Cuenta con correo verificado | AuditLog, Fighter, Gym, User | FIGHTER: CREATED | — | ficha_creada |
 | `manageHighlight` | Cuenta con correo verificado | AuditLog, Highlight | HIGHLIGHT: (varias) | — | — |
 | `publishHighlight` | Cuenta con correo verificado | AuditLog, Highlight | HIGHLIGHT: CREATED | — | highlight_publicado |
-| `removeDiscipline` | Cuenta con correo verificado | AuditLog, FighterDiscipline | FIGHTER: DISCIPLINE_REMOVED | — | disciplina_quitada |
+| `removeDiscipline` | Cuenta con correo verificado | AuditLog, FighterAchievement, FighterDiscipline | FIGHTER: DISCIPLINE_REMOVED | — | disciplina_quitada |
 | `requestClaim` | Cuenta con correo verificado | ClaimRequest | — | — | solicitud_enviada |
 | `saveDiscipline` | Cuenta con correo verificado | AuditLog, FighterDiscipline | FIGHTER: (varias) | — | disciplina_guardada |
 | `setRecordPublic` | Cuenta con correo verificado | AuditLog, Fighter | FIGHTER: (varias) | — | — |
@@ -242,7 +242,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `trainers.requestClass` |
 | Profile | `accounts.deleteAccount`, `moderation.decideOrganizer`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 | SupportAccreditation | `accounts.deleteAccount`, `trajectory.setSupportAccreditation` |
-| FighterAchievement | `accounts.deleteAccount`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
+| FighterAchievement | `accounts.deleteAccount`, `fighters.removeDiscipline`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
 | MediaItem | `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport` |
 | NewsSource | `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource` |
 | NewsItem | `news.refreshNewsNow`, `news.toggleNewsItem` |

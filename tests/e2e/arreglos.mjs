@@ -64,6 +64,16 @@ const dedo = (type, x) => cdp.send("Input.dispatchTouchEvent", { type, touchPoin
 await dedo("touchStart", 320); for (const x of [300, 260, 200, 140, 90]) await dedo("touchMove", x); await dedo("touchEnd");
 await enSeccion("Récord");
 check("deslizar con el dedo pasa a la sección siguiente", true);
+// Deslizar dentro de una fila que ya se desliza (los récords) mueve esa fila, no las pestañas.
+sql(`insert into "FighterDiscipline" ("fighterId", discipline, level) values ('${f.id}', 'MUAYTHAI', 'AMATEUR'), ('${f.id}', 'K1', 'AMATEUR') on conflict do nothing;`);
+await pel.p.reload(); await barra.getByRole("link", { name: "Récord" }).click(); await enSeccion("Récord");
+const fila = await pel.p.locator("#record .fila-tarjetas").boundingBox();
+const yFila = fila.y + 30;
+const dedoFila = (type, x) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x, y: yFila }] });
+await dedoFila("touchStart", 320); for (const x of [300, 260, 200, 140, 90]) await dedoFila("touchMove", x); await dedoFila("touchEnd");
+await pel.p.waitForTimeout(500);
+check("deslizar la fila de récords no cambia de pestaña", await barra.getByRole("link", { name: "Récord" }).getAttribute("aria-current") === "true");
+sql(`delete from "FighterDiscipline" where "fighterId"='${f.id}' and discipline in ('MUAYTHAI','K1');`);
 await barra.getByRole("link", { name: "Récord" }).press("ArrowRight"); await enSeccion("Público");
 check("las flechas del teclado en la barra cambian de sección", true);
 // Un enlace a una sección («#record») abre esa pestaña y enseña su contenido, no el de la de al lado.
@@ -119,13 +129,18 @@ check("cada clase tiene su botón «Solicitar esta clase»", await seen(boton));
 await foto(fan.p, "3-entrenador");
 await boton.click(); await fan.p.waitForURL(`**/clases/${clase.id}/solicitar`);
 await axe(fan.p, "Solicitar una clase");
-await btn(fan.p, "Enviar la solicitud");
+await btn(fan.p, "Solicitar la clase");
 check("sin decir cuándo le viene bien, el navegador lo pide", fan.p.url().endsWith("/solicitar"));
 await fan.p.fill("[name=preferred]", "Martes por la tarde");
+await fan.p.fill("[name=message]", "Es mi primera clase");
+await fan.p.fill("[name=phone]", "llámame");
+await btn(fan.p, "Solicitar la clase");
+check("un teléfono no válido se explica y no se pierde lo escrito", await seen(fan.p.locator(".notice-bad", { hasText: "Escribe el teléfono solo con números" })) && await fan.p.locator("[name=preferred]").inputValue() === "Martes por la tarde" && await fan.p.locator("[name=message]").inputValue() === "Es mi primera clase");
 await fan.p.fill("[name=phone]", "600 12 34 56");
-await btn(fan.p, "Enviar la solicitud"); await fan.p.waitForURL("**/mis-reservas**");
+await btn(fan.p, "Solicitar la clase"); await fan.p.waitForURL("**/mis-reservas**");
 check("la solicitud se envía y aparece en «Mis reservas» como pendiente", await seen(fan.p.locator(".notice-ok", { hasText: "Solicitud enviada" })) && await seen(fan.p.locator("main section", { hasText: clase.title }).getByText("Esperando respuesta")));
-check("el entrenador recibe un correo con la solicitud", await esperarCorreo(ent.email, "Martes por la tarde"));
+const correoSolicitud = await esperarCorreo(ent.email, "Martes por la tarde");
+check("el entrenador recibe un correo con la solicitud, y al responderlo le llega a la persona", !!correoSolicitud && correoSolicitud.includes(`reply_to=${fan.email}`));
 await fan.p.goto(B + `/clases/${clase.id}/solicitar`);
 check("no deja pedir dos veces la misma clase mientras espera", await seen(fan.p.getByText("Ya has solicitado esta clase")));
 await ent.p.goto(B + "/mi-panel");
@@ -139,7 +154,7 @@ check("el entrenador la acepta", await seen(ent.p.locator(".notice-ok", { hasTex
 await axe(ent.p, "Mis clases con solicitudes");
 check("la persona recibe la respuesta por correo", await esperarCorreo(fan.email, "Te espero el martes"));
 await fan.p.goto(B + "/mis-reservas");
-check("y la ve en «Mis reservas»", await seen(fan.p.getByText("Aceptada")) && await seen(fan.p.getByText("Te espero el martes a las 18:00")));
+check("y la ve en «Mis reservas», con el correo del entrenador para hablar con él o ella", await seen(fan.p.getByText("Aceptada")) && await seen(fan.p.getByText("Te espero el martes a las 18:00")) && await fan.p.locator(`main a[href="mailto:${ent.email}"]`).count() === 1);
 await axe(fan.p, "Mis reservas");
 await foto(fan.p, "4-mis-reservas");
 await fan.p.getByRole("button", { name: `Cancelar la solicitud de «${clase.title}»` }).click();

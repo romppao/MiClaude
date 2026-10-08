@@ -85,23 +85,40 @@ export default function SubirVideo({ disponible, maxBytes, id = "video-archivo",
   }, [estado.fase]);
 
   /** Pone el fotograma en el campo de foto, salvo que la persona haya elegido una foto suya. */
+  // Cada vídeo elegido tiene su número: si la persona cambia de vídeo mientras se saca el fotograma del anterior, ese resultado se descarta.
+  const peticion = useRef(0);
+  const campoPortada = () => (portada ? raiz.current?.closest("form")?.querySelector<HTMLInputElement>(`input[type=file][name="${portada}"]`) ?? null : null);
+  const esFotoPropia = (c: HTMLInputElement) => !!c.files?.length && c.dataset.automatica !== "1";
+  const quitarMiniatura = () => setMiniatura((anterior) => { if (anterior) URL.revokeObjectURL(anterior); return null; });
+  useEffect(() => () => { setMiniatura((anterior) => { if (anterior) URL.revokeObjectURL(anterior); return null; }); }, []);
+
+  /** Quita la portada automática (si la había) del campo de foto: al quitar el vídeo no debe publicarse un fotograma suyo. */
+  function quitarPortadaAutomatica() {
+    const campo = campoPortada();
+    if (campo?.dataset.automatica === "1") { campo.value = ""; campo.dataset.automatica = ""; }
+    quitarMiniatura();
+  }
+
   async function ponerPortada(archivo: File) {
-    const campo = portada ? raiz.current?.closest("form")?.querySelector<HTMLInputElement>(`input[type=file][name="${portada}"]`) : null;
-    if (!campo || (campo.files?.length && campo.dataset.automatica !== "1")) return;
+    const n = ++peticion.current;
+    const campo = campoPortada();
+    if (!campo || esFotoPropia(campo)) return;
     const imagen = await fotograma(archivo);
-    if (!imagen) return;
+    // Se vuelve a comprobar tras la espera: la persona pudo elegir su propia foto, u otro vídeo, mientras tanto.
+    if (!imagen || n !== peticion.current || esFotoPropia(campo)) return;
     const lista = new DataTransfer();
     lista.items.add(imagen);
     campo.files = lista.files;
     campo.dataset.automatica = "1";
     // Si después la persona elige otra foto, deja de ser la automática.
-    campo.addEventListener("change", () => { campo.dataset.automatica = ""; setMiniatura(null); }, { once: true });
+    campo.addEventListener("change", () => { campo.dataset.automatica = ""; quitarMiniatura(); }, { once: true });
     setMiniatura((anterior) => { if (anterior) URL.revokeObjectURL(anterior); return URL.createObjectURL(imagen); });
   }
 
   async function elegir(archivo: File | undefined) {
     xhr.current?.abort();
-    if (!archivo) return setEstado({ fase: "nada" });
+    peticion.current++;
+    if (!archivo) { quitarPortadaAutomatica(); return setEstado({ fase: "nada" }); }
     if (!TIPOS.includes(archivo.type)) return setEstado({ fase: "error", mensaje: "Formato no admitido: elige un vídeo MP4, MOV o WebM." });
     if (archivo.size > maxBytes) return setEstado({ fase: "error", mensaje: `Este vídeo pesa ${mb(archivo.size)} y el máximo es ${mb(maxBytes)}. Recórtalo en el móvil o pega un enlace.` });
     void ponerPortada(archivo);
@@ -126,8 +143,13 @@ export default function SubirVideo({ disponible, maxBytes, id = "video-archivo",
   if (!disponible) return <p className="mut" style={{ margin: 0 }}>Ahora mismo no se pueden subir vídeos a la aplicación: pega abajo un enlace de YouTube, Instagram o TikTok.</p>;
   return (
     <div ref={raiz} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <label className="field" htmlFor={id}><span>Vídeo desde tu móvil u ordenador</span></label>
-      <input id={id} type="file" accept="video/mp4,video/quicktime,video/webm" disabled={!listoParaUsar} onChange={(e) => elegir(e.currentTarget.files?.[0])} aria-describedby={`${id}-ayuda`} />
+      <label className="field" htmlFor={id}><span>Vídeo desde tu móvil u ordenador</span>
+        <span className="archivo">
+          <input id={id} className="archivo-input" type="file" accept="video/mp4,video/quicktime,video/webm" disabled={!listoParaUsar} onChange={(e) => elegir(e.currentTarget.files?.[0])} aria-describedby={`${id}-ayuda`} />
+          <span className="btn secondary archivo-boton" aria-hidden="true">{estado.fase === "nada" || estado.fase === "error" ? "Elegir un vídeo" : "Cambiar el vídeo"}</span>
+          <span className="archivo-nombre" aria-hidden="true">{estado.fase === "subiendo" || estado.fase === "listo" ? estado.nombre : "Ninguno elegido"}</span>
+        </span>
+      </label>
       <span id={`${id}-ayuda`} className="hint">MP4, MOV o WebM, hasta {mb(maxBytes)}. Se sube mientras rellenas el resto.</span>
       <input type="hidden" name="videoKey" value={estado.fase === "listo" ? estado.clave : ""} />
       <div role="status" aria-live="polite" data-aviso-subida tabIndex={-1}>

@@ -7,7 +7,7 @@ import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
 import { pageNumber, pageWindow } from "../../lib/common/pagination";
 import Paginacion from "../components/Paginacion";
-import { BotonesFiltro, CampoFiltro, FiltrosActivos } from "../components/Filtros";
+import { BotonesFiltro, CampoFiltro, MasFiltros, FiltrosActivos } from "../components/Filtros";
 import SelectorCategoria from "../components/SelectorCategoria";
 import { PROVINCES } from "../../lib/common/labels";
 import { divisionById, divisionLabel } from "../../lib/common/competition";
@@ -50,13 +50,16 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       <h1>Peleadores</h1>
       <form className="search" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <MasFiltros activos={activos.filter((x) => !x.claves.includes("q")).length}>
         <SelectorCategoria modo="filtro" nombres={{ discipline: "disciplina", level: "level", weightClass: "categoria" }} defaults={{ discipline: discipline ?? "", level: nivel ?? "", divisionId: divisionId ?? "", weightClass: categoria ?? "" }} />
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
+        </MasFiltros>
         <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
       </form>
       <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId }} activos={activos} />
       <p aria-live="polite" className="mut">{total === 0 ? "Ningún peleador coincide con estos filtros." : `${plural(total, "peleador encontrado", "peleadores encontrados")}.`}</p>
-      <div className="grid">
+      {/* Lista compacta: foto a la izquierda y datos a la derecha (revisión del 8 de octubre de 2026: cada tarjeta ocupaba media pantalla en el móvil). */}
+      <div className="grid lista-compacta">
         {fighters.map((b) => (
           <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
             <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong>

@@ -25,7 +25,7 @@ check("un periodo desconocido usa hoy y próximas sin error", await seen(page.lo
 await page.goto(B);
 check("la portada ofrece un recorrido por objetivo", await seen(page.getByRole("heading", { name: "¿Qué quieres hacer?", exact: true })) && await seen(page.getByRole("link", { name: /^Encontrar dónde entrenar/ })));
 await page.goto(`${B}/ranking`);
-await page.locator("main details summary").click();
+await page.locator("main details summary", { hasText: "¿Cómo se calcula el ránking?" }).click();
 check("el ránking explica periodo, empates y clasificación", await seen(page.getByText("El total no se divide por el número de combates:", { exact: false })) && (await page.locator("main").innerText()).includes("No es una clasificación deportiva oficial") && (await page.locator("main").innerText()).includes("la trayectoria y sus respaldos se mantienen"));
 await page.goto(`${B}/ayuda#respaldo`);
 check("la ayuda explica el resultado declarado en ambas fichas y la confirmación opcional", await seen(page.getByRole("heading", { name: "Qué significan las etiquetas de un combate" })) && (await page.locator("main").innerText()).includes("se muestra como declarado en ambas fichas") && (await page.locator("main").innerText()).includes("El aviso por sí solo no lo suspende"));

@@ -151,7 +151,7 @@ export async function removeDiscipline(f: FormData) {
   const user = await requireVerifiedUser();
   const moderacion = user.role === "ADMIN";
   const fighterId = moderacion && str(f, "fighterId") ? str(f, "fighterId") : user.fighter?.id;
-  if (!fighterId) redirect("/mi-ficha");
+  if (!fighterId) go("/mi-ficha", { problema: "no_existe" });
   const fighter = await db.fighter.findUnique({ where: { id: fighterId }, include: { disciplines: true } });
   if (!fighter) go("/mi-ficha", { problema: "no_existe" });
   const propia = fighter.id === user.fighter?.id;
@@ -160,12 +160,19 @@ export async function removeDiscipline(f: FormData) {
   const actual = fighter.disciplines.find((d) => d.discipline === discipline);
   if (!discipline || !actual) go(back, { problema: "no_existe" });
   if (fighter.disciplines.length <= 1) go(back, { problema: "disciplina_ultima" });
-  const combates = await db.bout.count({ where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }], event: { discipline } } });
+  const [combates, titulos] = await Promise.all([
+    db.bout.count({ where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }], event: { discipline } } }),
+    // Títulos vigentes de esa disciplina: sin ella en la ficha ya no se podrían corregir y seguirían sumando aura.
+    db.fighterAchievement.count({ where: { fighterId: fighter.id, discipline, withdrawnAt: null, rejectedAt: null } }),
+  ]);
   if (combates > 0 && !moderacion) go(back, { problema: "disciplina_con_combates" });
+  if (titulos > 0 && !moderacion) go(back, { problema: "disciplina_con_titulos" });
   if (str(f, "confirmar") !== "on") go(back, { problema: "disciplina_confirmar" });
   await db.$transaction([
     db.fighterDiscipline.delete({ where: { fighterId_discipline: { fighterId: fighter.id, discipline } } }),
-    audit({ userId: user.id, entity: "FIGHTER", entityId: fighter.id, action: "DISCIPLINE_REMOVED", before: actual, after: { discipline: DISCIPLINE_LABEL[discipline], combatesConservados: combates, porModeracion: !propia } }, db),
+    // Si moderación quita la disciplina, sus títulos vigentes quedan excluidos (visibles en el historial y restaurables desde «Respaldar»).
+    db.fighterAchievement.updateMany({ where: { fighterId: fighter.id, discipline, withdrawnAt: null, rejectedAt: null }, data: { rejectedAt: new Date(), rejectionReason: "Disciplina quitada de la ficha por moderación." } }),
+    audit({ userId: user.id, entity: "FIGHTER", entityId: fighter.id, action: "DISCIPLINE_REMOVED", before: actual, after: { discipline: DISCIPLINE_LABEL[discipline], combatesConservados: combates, titulosExcluidos: titulos, porModeracion: !propia } }, db),
   ]);
   revalidatePath("/", "layout");
   go(back, { aviso: "disciplina_quitada" });

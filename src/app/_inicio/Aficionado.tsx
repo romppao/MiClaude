@@ -20,6 +20,8 @@ const conRecord = { include: { disciplines: true, boutsAsA: { where: CUENTA, inc
 export default async function InicioAficionado({ user }: { user: User }) {
   const seguidos = (await db.follow.findMany({ where: { userId: user.id }, select: { fighterId: true } })).map((x) => x.fighterId);
   const deSeguidos = { OR: [{ fighterAId: { in: seguidos } }, { fighterBId: { in: seguidos } }] };
+  // Solicitudes de clase abiertas (esperando respuesta o ya aceptadas): acceso directo a «Mis reservas».
+  const reservas = await db.classRequest.count({ where: { userId: user.id, status: { in: ["PENDING", "ACCEPTED"] } } });
   const [proximo, auras, enDirecto, resultados, solicitud] = await Promise.all([
     seguidos.length ? db.bout.findFirst({ where: { ...deSeguidos, event: { date: { gte: calendarDayStart() }, status: "SCHEDULED" } }, include: { event: true, fighterA: conRecord, fighterB: conRecord }, orderBy: [{ event: { date: "asc" } }, { order: "asc" }] }) : null,
     db.aura.count({ where: { userId: user.id } }),
@@ -56,6 +58,12 @@ export default async function InicioAficionado({ user }: { user: User }) {
         <Link href="/peleadores" className="accion-grande tarjeta tarjeta-acc"><Icono nombre="buscar" tam={26} grosor={1.9} />Descubrir peleadores</Link>
         <Link href="/entrenadores" className="accion-grande tarjeta"><Icono nombre="capas" tam={26} grosor={1.9} />Clases con entrenadores</Link>
       </div>
+      {reservas > 0 && (
+        <Link href="/mis-reservas" className="fila" aria-label={`Mis reservas de clases: ${reservas} ${reservas === 1 ? "solicitud abierta" : "solicitudes abiertas"}`}>
+          <span className="cuerpo"><span className="nombre">Mis reservas de clases</span><span className="meta">Lo que te han respondido los entrenadores</span></span>
+          <strong className="acc" style={{ font: "800 26px var(--font)" }}>{reservas}</strong>
+        </Link>
+      )}
 
       <section aria-labelledby="titulo-resultados" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-resultados">Últimos resultados</h2>{seguidos.length > 0 && <Link href="/siguiendo">Siguiendo</Link>}</div>

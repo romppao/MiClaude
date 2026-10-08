@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MasFiltros } from "../components/Filtros";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
 import { divisionLabel } from "../../lib/common/competition";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
@@ -31,6 +32,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <p><Link href="/ayuda#aura">Escala de puntos y respaldos</Link>.</p>
       </details>
       <form className="search">
+        <MasFiltros activos={[discipline, level, province && province !== "all" ? province : null, recientes ? "90" : null].filter(Boolean).length}>
         <label className="field"><span>Disciplina</span>
           <select name="disciplina" defaultValue={discipline ?? ""}><option value="">Todas las disciplinas</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
         </label>
@@ -43,6 +45,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
         <label className="field"><span>Periodo</span>
           <select name="periodo" defaultValue={recientes ? "90" : "todo"}><option value="todo">Todo el tiempo</option><option value="90">Últimos 90 días</option></select>
         </label>
+        </MasFiltros>
         <button>Ver ránking</button>
       </form>
       {groups.map((g) => (

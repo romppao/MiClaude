@@ -3,6 +3,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
@@ -15,7 +16,7 @@ import { CLASS_KIND_LABEL, classMeta, parseClass, parseYears, pickDisciplines } 
 import { REQUEST_REPLY_MAX, REQUESTS_PER_DAY, parseClassRequest, puedeCancelar, puedeResponder } from "../../lib/trainers/requests";
 import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
-import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
+import { checkLengths, go, guard, readProvince, str, uniqueSlug, withLock } from "./shared";
 
 /** Cuántas clases puede tener publicadas o en pausa un entrenador (evita abusos; se puede ampliar). */
 const MAX_CLASES = 20;
@@ -80,14 +81,27 @@ export async function toggleClass(f: FormData) {
   go(back, { aviso: active ? "clase_activada" : "clase_pausada" });
 }
 
-/** Envía un correo sin que un fallo del proveedor deshaga la solicitud (ya está guardada y se ve en la aplicación). */
-async function avisar(correo: string, asunto: string, texto: string) {
-  try { await sendMail(correo, asunto, texto); } catch (e) { console.error(`[clases] no se pudo enviar «${asunto}»: ${e instanceof Error ? e.message : String(e)}`); }
+/**
+ * Envía un correo después de responder a la persona (`after`, docs/DESARROLLO.md §4.2): un proveedor lento no deja el botón colgado, y un
+ * fallo no deshace la solicitud (ya está guardada y se ve en la aplicación). `responderA`: a quién llega la respuesta si se contesta al correo.
+ */
+function avisar(correo: string, asunto: string, texto: string, responderA?: string) {
+  after(async () => {
+    try { await sendMail(correo, asunto, texto, { replyTo: responderA }); } catch (e) { console.error(`[clases] no se pudo enviar «${asunto}»: ${e instanceof Error ? e.message : String(e)}`); }
+  });
+}
+
+/** Vuelve al formulario con lo que había escrito la persona, para no perderlo (principio 9) y con el problema explicado. */
+function volverConLoEscrito(back: string, f: FormData, problema: string): never {
+  const q = new URLSearchParams();
+  for (const k of ["preferred", "message", "phone"]) if (str(f, k)) q.set(k, str(f, k).slice(0, 500));
+  go(q.size ? `${back}?${q}` : back, { problema });
 }
 
 /**
  * Solicita una clase publicada (petición del fundador, 8 de octubre de 2026). Cualquier cuenta con el correo confirmado, salvo el propio
- * entrenador. Una sola solicitud abierta por clase y persona. El entrenador recibe un correo y la ve en «Mis clases».
+ * entrenador. Una sola solicitud abierta por clase y persona (con bloqueo: un doble clic no crea dos). El entrenador recibe un correo
+ * (si lo responde, le llega a la persona) y la ve en «Mis clases».
  */
 export async function requestClass(f: FormData) {
   const classId = str(f, "classId");
@@ -98,16 +112,17 @@ export async function requestClass(f: FormData) {
   if (clase.trainer.userId === user.id) go(back, { problema: "clase_propia" });
   checkLengths(f, back, { preferred: 400, message: 1000, phone: 40 });
   const datos = parseClassRequest({ preferred: str(f, "preferred"), message: str(f, "message"), phone: str(f, "phone") });
-  if (!datos.ok) go(back, { problema: datos.problema });
-  if (await db.classRequest.findFirst({ where: { classId: clase.id, userId: user.id, status: "PENDING" }, select: { id: true } })) go("/mis-reservas", { problema: "solicitud_repetida" });
-  if (!(await allow(`clase:solicitud:${user.id}`, REQUESTS_PER_DAY, 24 * HORA))) go(back, { problema: "demasiados_intentos" });
-  const r = await db.$transaction(async (tx) => {
+  if (!datos.ok) volverConLoEscrito(back, f, datos.problema);
+  const r = await withLock(`clase:${clase.id}:${user.id}`, async (tx) => {
+    if (await tx.classRequest.findFirst({ where: { classId: clase.id, userId: user.id, status: "PENDING" }, select: { id: true } })) go("/mis-reservas", { problema: "solicitud_repetida" });
+    if (!(await allow(`clase:solicitud:${user.id}`, REQUESTS_PER_DAY, 24 * HORA))) volverConLoEscrito(back, f, "solicitudes_diarias");
     const creada = await tx.classRequest.create({ data: { classId: clase.id, userId: user.id, ...datos.value } });
     await audit({ userId: user.id, entity: "CLASS", entityId: clase.id, action: "REQUESTED", after: { solicitud: creada.id } }, tx);
     return creada;
   });
-  await avisar(clase.trainer.user.email, `Nueva solicitud para tu clase «${oneLine(clase.title)}»`,
-    `Hola ${oneLine(clase.trainer.name)},\n\n${oneLine(user.name)} quiere hacer tu clase «${oneLine(clase.title)}» (${CLASS_KIND_LABEL[clase.kind]}, ${classMeta(clase)}, ${clase.priceEuros} €).\n\nCuándo le viene bien: ${r.preferred}\n${r.message ? `Mensaje: ${r.message}\n` : ""}${r.phone ? `Teléfono: ${r.phone}\n` : ""}Correo electrónico: ${user.email}\n\nAcéptala o dile que no puedes desde «Mis clases»: ${APP_URL}/mis-clases#solicitudes\n`);
+  avisar(clase.trainer.user.email, `Nueva solicitud para tu clase «${oneLine(clase.title)}»`,
+    `Hola ${oneLine(clase.trainer.name)},\n\n${oneLine(user.name)} quiere hacer tu clase «${oneLine(clase.title)}» (${CLASS_KIND_LABEL[clase.kind]}, ${classMeta(clase)}, ${clase.priceEuros} €).\n\nCuándo le viene bien: ${r.preferred}\n${r.message ? `Mensaje: ${r.message}\n` : ""}${r.phone ? `Teléfono: ${r.phone}\n` : ""}Correo electrónico: ${user.email} (si respondes a este correo, le llega a esta persona)\n\nAcéptala o dile que no puedes desde «Mis clases»: ${APP_URL}/mis-clases#solicitudes\n`,
+    user.email);
   revalidatePath("/", "layout");
   go("/mis-reservas", { aviso: "clase_solicitada" });
 }
@@ -128,8 +143,10 @@ export async function answerClassRequest(f: FormData) {
   const cambio = await db.classRequest.updateMany({ where: { id: r.id, status: "PENDING" }, data: { status, reply, answeredAt: new Date() } });
   if (!cambio.count) go(back, { problema: "solicitud_ya_respondida" });
   await audit({ userId: user.id, entity: "CLASS", entityId: r.classId, action: decision === "aceptar" ? "REQUEST_ACCEPTED" : "REQUEST_DECLINED", after: { solicitud: r.id } });
-  await avisar(r.user.email, decision === "aceptar" ? `${oneLine(r.class.trainer.name)} ha aceptado tu clase` : `${oneLine(r.class.trainer.name)} no puede darte la clase`,
-    `Hola ${oneLine(r.user.name)},\n\n${decision === "aceptar" ? `${oneLine(r.class.trainer.name)} ha aceptado tu solicitud para «${oneLine(r.class.title)}».` : `${oneLine(r.class.trainer.name)} no puede darte la clase «${oneLine(r.class.title)}» en las fechas que propusiste.`}\n${reply ? `\nSu mensaje: ${reply}\n` : ""}\nPuedes verla en ${APP_URL}/mis-reservas\n${decision === "aceptar" ? "La clase se paga directamente al entrenador: Ring España no cobra nada.\n" : "Puedes solicitarla de nuevo con otras fechas o buscar otro entrenador.\n"}`);
+  const entrenador = oneLine(r.class.trainer.name);
+  avisar(r.user.email, decision === "aceptar" ? `${entrenador} ha aceptado tu clase` : `${entrenador} no puede darte la clase`,
+    `Hola ${oneLine(r.user.name)},\n\n${decision === "aceptar" ? `${entrenador} ha aceptado tu solicitud para «${oneLine(r.class.title)}».` : `${entrenador} no puede darte la clase «${oneLine(r.class.title)}» en las fechas que propusiste.`}\n${reply ? `\nSu mensaje: ${reply}\n` : ""}${decision === "aceptar" ? `\nPara hablar con ${entrenador}, responde a este correo (le llega directamente) o escribe a ${user.email}.\nLa clase se paga directamente al entrenador: Ring España no cobra nada.\n` : "\nPuedes solicitarla de nuevo con otras fechas o buscar otro entrenador.\n"}\nTus reservas: ${APP_URL}/mis-reservas\n`,
+    user.email);
   revalidatePath("/", "layout");
   go(back, { aviso: decision === "aceptar" ? "solicitud_aceptada" : "solicitud_rechazada" });
 }
@@ -141,9 +158,11 @@ export async function cancelClassRequest(f: FormData) {
   const r = await db.classRequest.findFirst({ where: { id: str(f, "requestId"), userId: user.id }, include: { class: { include: { trainer: { include: { user: true } } } } } });
   if (!r) go(back, { problema: "no_existe" });
   if (!puedeCancelar(r.status)) go(back, { problema: "solicitud_no_cancelable" });
-  await db.classRequest.update({ where: { id: r.id }, data: { status: "CANCELLED" } });
+  // Solo si sigue pendiente o aceptada: si el entrenador la rechazó a la vez, no se pisa su respuesta.
+  const cambio = await db.classRequest.updateMany({ where: { id: r.id, status: { in: ["PENDING", "ACCEPTED"] } }, data: { status: "CANCELLED" } });
+  if (!cambio.count) go(back, { problema: "solicitud_no_cancelable" });
   await audit({ userId: user.id, entity: "CLASS", entityId: r.classId, action: "REQUEST_CANCELLED", after: { solicitud: r.id } });
-  if (r.class.trainer.user) await avisar(r.class.trainer.user.email, `${oneLine(user.name)} ha cancelado su clase`, `Hola ${oneLine(r.class.trainer.name)},\n\n${oneLine(user.name)} ha cancelado su solicitud para «${oneLine(r.class.title)}» (${r.preferred}).\n\nTus solicitudes: ${APP_URL}/mis-clases#solicitudes\n`);
+  if (r.class.trainer.user) avisar(r.class.trainer.user.email, `${oneLine(user.name)} ha cancelado su clase`, `Hola ${oneLine(r.class.trainer.name)},\n\n${oneLine(user.name)} ha cancelado su solicitud para «${oneLine(r.class.title)}» (${r.preferred}).\n\nTus solicitudes: ${APP_URL}/mis-clases#solicitudes\n`, user.email);
   revalidatePath("/", "layout");
   go(back, { aviso: "solicitud_cancelada" });
 }

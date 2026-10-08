@@ -5,6 +5,19 @@ export function CampoFiltro({ etiqueta, ayuda, children }: { etiqueta: string; a
   return <label className="field"><span>{etiqueta}</span>{children}{ayuda && <span className="hint">{ayuda}</span>}</label>;
 }
 
+/**
+ * Filtros secundarios plegados (revisión del 8 de octubre de 2026: en el móvil, los filtros ocupaban la primera pantalla entera antes de
+ * ver un solo resultado). Se abren solos si alguno está aplicado, y dicen cuántos hay.
+ */
+export function MasFiltros({ activos, children }: { activos: number; children: React.ReactNode }) {
+  return (
+    <details className="mas-filtros" open={activos > 0}>
+      <summary>Más filtros{activos > 0 ? ` (${activos} ${activos === 1 ? "aplicado" : "aplicados"})` : ""}</summary>
+      <div className="mas-filtros-campos">{children}</div>
+    </details>
+  );
+}
+
 /** Botón principal de un formulario de filtros y enlace para quitarlos todos. */
 export function BotonesFiltro({ ruta, hayFiltros }: { ruta: string; hayFiltros: boolean }) {
   return (
