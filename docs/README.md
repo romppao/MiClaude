@@ -1,5 +1,7 @@
 # Documentación de Ring España
 
+> **Entrada para un programador nuevo (8 oct 2026):** [manual de mantenimiento](mantenimiento/README.md), con contratos por módulo, flujos completos, modelo de datos, motivos técnicos, diagnóstico y [catálogo de cada archivo mantenido](mantenimiento/CATALOGO.md). Las actualizaciones vigentes de diseño se consultan en [DISENO.md](DISENO.md); el relevo de abajo conserva contexto histórico.
+
 > **Relevo de Codex (3 de octubre de 2026):** antes de continuar, lee [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md) para conocer los cambios, las pruebas y los pendientes de integración. El violeta y los perfiles aprobados están integrados en #12. La continuación incorpora trayectoria, respaldo opcional y navegación por actividades, conservando ese diseño. Consulta [DISENO.md](DISENO.md).
 
 Una página para saber **qué documento abrir según lo que quieras hacer**. Todo lo que está aquí se mantiene al día como parte del trabajo (regla del fundador: se documenta cada bloque de trabajo, para poder contarlo y retomarlo).
@@ -8,6 +10,8 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 
 | Quiero… | Abro |
 |---|---|
+| **Entender el proyecto sin conversaciones previas y mantenerlo como programador nuevo** | [Manual de mantenimiento](mantenimiento/README.md) |
+| **Localizar la responsabilidad de cualquier archivo, sus exportaciones directas y su contexto** | [Catálogo del código](mantenimiento/CATALOGO.md) |
 | **Retomar el proyecto** en otro ordenador o con Claude Code: ponerlo en marcha y saber en qué punto está | [`TRASLADO.md`](TRASLADO.md) |
 | **Saber dónde está cada cosa en el código** y por qué ruta ir para hacer algo (añadir una pantalla, una acción, un mensaje, cambiar la base de datos…) | [`DESARROLLO.md`](DESARROLLO.md) |
 | **Probar la aplicación en el navegador** con datos ficticios | [`DEMO.md`](DEMO.md) |
