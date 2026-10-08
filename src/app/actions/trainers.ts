@@ -11,7 +11,10 @@ import { slugName, slugify } from "../../lib/common/labels";
 import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { LIMITS, oneLine } from "../../lib/common/text";
 import { readOnboarding } from "../../lib/accounts/onboarding";
-import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
+import { CLASS_KIND_LABEL, classMeta, parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
+import { REQUEST_REPLY_MAX, REQUESTS_PER_DAY, parseClassRequest, puedeCancelar, puedeResponder } from "../../lib/trainers/requests";
+import { allow, HORA } from "../../lib/accounts/ratelimit";
+import { APP_URL, sendMail } from "../../lib/common/mail";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
 
 /** Cuántas clases puede tener publicadas o en pausa un entrenador (evita abusos; se puede ampliar). */
@@ -75,4 +78,72 @@ export async function toggleClass(f: FormData) {
   await db.trainingClass.updateMany({ where: { id: c.id, active: !active }, data: { active } });
   revalidatePath("/", "layout");
   go(back, { aviso: active ? "clase_activada" : "clase_pausada" });
+}
+
+/** Envía un correo sin que un fallo del proveedor deshaga la solicitud (ya está guardada y se ve en la aplicación). */
+async function avisar(correo: string, asunto: string, texto: string) {
+  try { await sendMail(correo, asunto, texto); } catch (e) { console.error(`[clases] no se pudo enviar «${asunto}»: ${e instanceof Error ? e.message : String(e)}`); }
+}
+
+/**
+ * Solicita una clase publicada (petición del fundador, 8 de octubre de 2026). Cualquier cuenta con el correo confirmado, salvo el propio
+ * entrenador. Una sola solicitud abierta por clase y persona. El entrenador recibe un correo y la ve en «Mis clases».
+ */
+export async function requestClass(f: FormData) {
+  const classId = str(f, "classId");
+  const back = `/clases/${encodeURIComponent(classId)}/solicitar`;
+  const user = await requireVerifiedUser(back);
+  const clase = classId.length <= 40 ? await db.trainingClass.findFirst({ where: { id: classId, active: true, trainer: { userId: { not: null } } }, include: { trainer: { include: { user: true } } } }) : null;
+  if (!clase?.trainer.user) go("/entrenadores", { problema: "clase_no_disponible" });
+  if (clase.trainer.userId === user.id) go(back, { problema: "clase_propia" });
+  checkLengths(f, back, { preferred: 400, message: 1000, phone: 40 });
+  const datos = parseClassRequest({ preferred: str(f, "preferred"), message: str(f, "message"), phone: str(f, "phone") });
+  if (!datos.ok) go(back, { problema: datos.problema });
+  if (await db.classRequest.findFirst({ where: { classId: clase.id, userId: user.id, status: "PENDING" }, select: { id: true } })) go("/mis-reservas", { problema: "solicitud_repetida" });
+  if (!(await allow(`clase:solicitud:${user.id}`, REQUESTS_PER_DAY, 24 * HORA))) go(back, { problema: "demasiados_intentos" });
+  const r = await db.$transaction(async (tx) => {
+    const creada = await tx.classRequest.create({ data: { classId: clase.id, userId: user.id, ...datos.value } });
+    await audit({ userId: user.id, entity: "CLASS", entityId: clase.id, action: "REQUESTED", after: { solicitud: creada.id } }, tx);
+    return creada;
+  });
+  await avisar(clase.trainer.user.email, `Nueva solicitud para tu clase «${oneLine(clase.title)}»`,
+    `Hola ${oneLine(clase.trainer.name)},\n\n${oneLine(user.name)} quiere hacer tu clase «${oneLine(clase.title)}» (${CLASS_KIND_LABEL[clase.kind]}, ${classMeta(clase)}, ${clase.priceEuros} €).\n\nCuándo le viene bien: ${r.preferred}\n${r.message ? `Mensaje: ${r.message}\n` : ""}${r.phone ? `Teléfono: ${r.phone}\n` : ""}Correo electrónico: ${user.email}\n\nAcéptala o dile que no puedes desde «Mis clases»: ${APP_URL}/mis-clases#solicitudes\n`);
+  revalidatePath("/", "layout");
+  go("/mis-reservas", { aviso: "clase_solicitada" });
+}
+
+/** El entrenador acepta o rechaza una solicitud de sus clases, con un mensaje para la persona (lugar, hora, qué traer…). */
+export async function answerClassRequest(f: FormData) {
+  const user = await requireVerifiedUser("/mis-clases");
+  const back = "/mis-clases#solicitudes";
+  const r = await db.classRequest.findFirst({ where: { id: str(f, "requestId"), class: { trainer: { userId: user.id } } }, include: { class: { include: { trainer: true } }, user: true } });
+  if (!r) go(back, { problema: "no_existe" });
+  if (!puedeResponder(r.status)) go(back, { problema: "solicitud_ya_respondida" });
+  const decision = str(f, "decision");
+  if (decision !== "aceptar" && decision !== "rechazar") go(back, { problema: "decision_no_valida" });
+  const reply = str(f, "reply").replace(/\s+/g, " ") || null;
+  if (reply && reply.length > REQUEST_REPLY_MAX) go(back, { problema: "solicitud_respuesta_larga" });
+  const status = decision === "aceptar" ? "ACCEPTED" : "DECLINED";
+  // Solo cambia si sigue pendiente: si la persona la canceló mientras tanto, no se pisa.
+  const cambio = await db.classRequest.updateMany({ where: { id: r.id, status: "PENDING" }, data: { status, reply, answeredAt: new Date() } });
+  if (!cambio.count) go(back, { problema: "solicitud_ya_respondida" });
+  await audit({ userId: user.id, entity: "CLASS", entityId: r.classId, action: decision === "aceptar" ? "REQUEST_ACCEPTED" : "REQUEST_DECLINED", after: { solicitud: r.id } });
+  await avisar(r.user.email, decision === "aceptar" ? `${oneLine(r.class.trainer.name)} ha aceptado tu clase` : `${oneLine(r.class.trainer.name)} no puede darte la clase`,
+    `Hola ${oneLine(r.user.name)},\n\n${decision === "aceptar" ? `${oneLine(r.class.trainer.name)} ha aceptado tu solicitud para «${oneLine(r.class.title)}».` : `${oneLine(r.class.trainer.name)} no puede darte la clase «${oneLine(r.class.title)}» en las fechas que propusiste.`}\n${reply ? `\nSu mensaje: ${reply}\n` : ""}\nPuedes verla en ${APP_URL}/mis-reservas\n${decision === "aceptar" ? "La clase se paga directamente al entrenador: Ring España no cobra nada.\n" : "Puedes solicitarla de nuevo con otras fechas o buscar otro entrenador.\n"}`);
+  revalidatePath("/", "layout");
+  go(back, { aviso: decision === "aceptar" ? "solicitud_aceptada" : "solicitud_rechazada" });
+}
+
+/** Quien solicitó una clase la cancela (pendiente o ya aceptada). Se avisa al entrenador. */
+export async function cancelClassRequest(f: FormData) {
+  const user = await requireVerifiedUser("/mis-reservas");
+  const back = "/mis-reservas";
+  const r = await db.classRequest.findFirst({ where: { id: str(f, "requestId"), userId: user.id }, include: { class: { include: { trainer: { include: { user: true } } } } } });
+  if (!r) go(back, { problema: "no_existe" });
+  if (!puedeCancelar(r.status)) go(back, { problema: "solicitud_no_cancelable" });
+  await db.classRequest.update({ where: { id: r.id }, data: { status: "CANCELLED" } });
+  await audit({ userId: user.id, entity: "CLASS", entityId: r.classId, action: "REQUEST_CANCELLED", after: { solicitud: r.id } });
+  if (r.class.trainer.user) await avisar(r.class.trainer.user.email, `${oneLine(user.name)} ha cancelado su clase`, `Hola ${oneLine(r.class.trainer.name)},\n\n${oneLine(user.name)} ha cancelado su solicitud para «${oneLine(r.class.title)}» (${r.preferred}).\n\nTus solicitudes: ${APP_URL}/mis-clases#solicitudes\n`);
+  revalidatePath("/", "layout");
+  go(back, { aviso: "solicitud_cancelada" });
 }

@@ -1,6 +1,6 @@
 import type { Discipline, FighterDiscipline, Level } from "@prisma/client";
 import Link from "next/link";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
 import { divisionLabel } from "../../lib/common/competition";
 import { LEVEL_LABEL } from "../../lib/common/labels";
 import { combinedRecord, emptyTally, formatRecord, type Records } from "../../lib/fighters/record";
@@ -45,7 +45,7 @@ export default function RecordCards({ records, disciplines, ocultarAmateur = fal
         return (
           <div key={`${discipline}-${level}`} className="card">
             <div className="mut">{DISCIPLINE_LABEL[discipline]} · {LEVEL_LABEL[level]}</div>
-            {fd?.level === level && <div className="mut">Categoría actual: {divisionLabel(fd.divisionId)}{fd.weightClass ? ` · ${weightClassLabel(discipline, level, fd.weightClass, fd.divisionId)}` : ""}. El récord reúne los combates de este nivel, también los de categorías anteriores.</div>}
+            {fd?.level === level && <div className="mut">Categoría actual: {categoryLabel(discipline, level, fd.divisionId, fd.weightClass)}. El récord reúne los combates de este nivel, también los de categorías anteriores.</div>}
             <div className="rec">{formatRecord({ ...c, nc: tally.nc })}</div>
             <div className="mut">victorias – derrotas – empates{tally.nc > 0 && " · NC: sin decisión"}</div>
             <div className="mut">

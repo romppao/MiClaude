@@ -13,12 +13,12 @@ import { OUTCOME_TO_RESULT, boutVersion } from "../../lib/bouts/rules";
 import { computeRecords } from "../../lib/fighters/record";
 import SelectorCategoria from "../components/SelectorCategoria";
 import { divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
 import DisciplineFields from "../components/DisciplineFields";
 import MetodoSegunDisciplina from "../components/MetodoSegunDisciplina";
 import RecordCards from "../components/RecordCards";
 import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
-import { createMyFighter, manageHighlight, publishHighlight, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
+import { createMyFighter, manageHighlight, publishHighlight, removeDiscipline, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
 import { readOnboarding } from "../../lib/accounts/onboarding";
 import { HIGHLIGHT_KIND_LABEL, HIGHLIGHT_TITLE_MAX, orderHighlights } from "../../lib/fighters/highlights";
 import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
@@ -169,10 +169,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             </fieldset>
             <label className="field"><span>Título</span><input name="title" required maxLength={HIGHLIGHT_TITLE_MAX} placeholder="El KO del tercer asalto" /></label>
             <div className="solo-video columna">
-              <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} id="highlight-video" />
+              <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} id="highlight-video" portada="image" />
               <label className="field"><span>{almacen ? "O pega el enlace si ya está en YouTube, Instagram o TikTok" : "Enlace del vídeo"}</span><input name="videoUrl" type="url" inputMode="url" maxLength={LIMITS.url} placeholder="https://" />{!almacen && <span className="hint">Súbelo a YouTube, Instagram o TikTok y pega aquí su enlace.</span>}</label>
             </div>
-            <label className="field"><span>Foto (obligatoria si es una foto; opcional como portada del vídeo)</span><InputFoto name="image" /></label>
+            <label className="field"><span>Foto (obligatoria si es una foto; en un vídeo, su portada: si no eliges ninguna, se saca del propio vídeo)</span><InputFoto name="image" /></label>
             <label className="field"><span>¿De qué combate es? (opcional)</span>
               <select name="boutId" defaultValue=""><option value="">Ninguno en concreto</option>{bouts.map((b) => <option key={b.id} value={b.id}>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</option>)}</select>
             </label>
@@ -222,11 +222,24 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       <h2 id="mis-disciplinas">Mis disciplinas</h2>
       {[...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline)).map((d) => (
         <details key={d.discipline} className="card" style={{ marginBottom: 8 }}>
-          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong> · {divisionLabel(d.divisionId)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
+          <summary><strong>{DISCIPLINE_LABEL[d.discipline]}</strong> · {categoryLabel(d.discipline, d.level, d.divisionId, d.weightClass)} <span className="mut">— cambiar categoría o combates anteriores</span></summary>
           <form className="search" action={saveDiscipline}>
             <DisciplineFields defaults={d} />
             <button>Guardar cambios</button>
           </form>
+          {/* Quitar una disciplina elegida por error (petición del fundador, 8 de octubre de 2026). */}
+          {(() => {
+            const combates = bouts.filter((b) => b.event.discipline === d.discipline).length;
+            if (me.disciplines.length <= 1) return <p className="mut">Es tu única disciplina. Si te equivocaste, añade primero la correcta y después podrás quitar esta.</p>;
+            if (combates > 0) return <p className="mut">Tienes {combates === 1 ? "1 combate" : `${combates} combates`} de {DISCIPLINE_LABEL[d.discipline]}, así que no puedes quitarla tú. Si son un error, pide que se revisen desde cada combate.</p>;
+            return (
+              <form action={removeDiscipline} className="zona-peligro">
+                <input type="hidden" name="discipline" value={d.discipline} />
+                <label className="chip"><input type="checkbox" name="confirmar" required />Sí, quiero quitar {DISCIPLINE_LABEL[d.discipline]} de mi ficha</label>
+                <button className="secondary">Quitar {DISCIPLINE_LABEL[d.discipline]} de mi ficha</button>
+              </form>
+            );
+          })()}
         </details>
       ))}
       <details className="card" style={{ marginBottom: 8 }}>

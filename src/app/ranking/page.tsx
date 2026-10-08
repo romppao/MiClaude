@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auraRanking, NO_CATEGORY } from "../../lib/aura/ranking";
 import { divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, LEVEL_ORDER, levelName, weightClassLabel, categoryLabel } from "../../lib/common/disciplines";
 import { PROVINCES } from "../../lib/common/labels";
 
 export const metadata = { title: "Ránking de aura" };
@@ -47,7 +47,7 @@ export default async function Ranking({ searchParams }: { searchParams: Promise<
       </form>
       {groups.map((g) => (
         <section key={`${g.discipline}-${g.level}-${g.divisionId ?? "sin-division"}-${g.weightClass ?? "sin"}`}>
-          <h2>{DISCIPLINE_LABEL[g.discipline]} · {levelName(g.level)} · {divisionLabel(g.divisionId)} · {g.weightClass ? weightClassLabel(g.discipline, g.level, g.weightClass, g.divisionId) : NO_CATEGORY}</h2>
+          <h2>{DISCIPLINE_LABEL[g.discipline]} · {levelName(g.level)} · {g.weightClass ? categoryLabel(g.discipline, g.level, g.divisionId, g.weightClass) : `${divisionLabel(g.divisionId)} · ${NO_CATEGORY}`}</h2>
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Ránking de aura">
 <table>
             <thead><tr><th>Puesto</th><th>Peleador</th><th>Aura</th><th>Trayectoria</th><th>Respaldo</th><th>Comunidad</th></tr></thead>

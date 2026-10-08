@@ -281,6 +281,10 @@ label.chip:has(input:focus-visible){outline:3px solid var(--acc);outline-offset:
 .portada .barra-superior{position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .portada .nombre{font:800 46px/.95 var(--font);letter-spacing:-.045em;margin:0;overflow-wrap:anywhere}
 .portada .apodo{font:500 16px var(--font);color:var(--acc)}
+.portada-ficha{min-height:340px;padding-top:84px}
+.portada .identidad{display:flex;align-items:flex-end;gap:14px}
+.portada .foto-perfil{flex:none;width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--acc);background:#1d1e22;box-shadow:0 8px 30px rgba(0,0,0,.45);display:grid;place-items:center;font:800 32px var(--font);letter-spacing:-.03em;color:#fff}
+.portada.portada-ficha .nombre{font-size:36px}
 .portada .cifras{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
 .portada .cifra{font:800 54px/.9 var(--font);letter-spacing:-.04em}
 .portada .cifra small{font:600 14px var(--font);margin-left:4px;color:rgba(255,255,255,.75);letter-spacing:0}
@@ -303,7 +307,7 @@ label.chip:has(input:focus-visible){outline:3px solid var(--acc);outline-offset:
 .tarjeta-foto{position:relative;overflow:hidden;border-radius:28px;color:#fff;text-decoration:none;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate;background:linear-gradient(160deg,var(--tinte,rgba(212,246,124,.38)),var(--card) 72%)}
 .tarjeta-foto:hover{color:#fff}
 .tarjeta-foto::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.82))}
-.tarjeta-foto>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.tarjeta-foto>img,.tarjeta-foto>video.portada-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;pointer-events:none}
 .tarjeta-foto .iniciales{position:absolute;inset:0;display:grid;place-items:center;font:800 60px var(--font);letter-spacing:-.05em;color:rgba(255,255,255,.12);z-index:-1}
 .tarjeta-foto .arriba{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:6px}
 .tarjeta-foto .abajo{padding:14px;display:flex;flex-direction:column;gap:3px}
@@ -487,3 +491,7 @@ main .filtros-disciplina a[aria-current=page]{background:var(--acc);color:var(--
 .medio>video{object-fit:contain}
 .medio .cuerpo{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px}
 .columna{display:flex;flex-direction:column;gap:10px}
+
+.portada-elegida{display:flex;gap:12px;align-items:center}
+.portada-elegida img{width:72px;height:120px;object-fit:cover;border-radius:14px;flex:none;border:1px solid var(--line)}
+.zona-peligro{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}

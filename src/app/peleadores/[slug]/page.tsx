@@ -7,14 +7,14 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
 import { combinedRecord, computeRecords, emptyTally } from "../../../lib/fighters/record";
 import { recordHidden } from "../../../lib/fighters/privacy";
-import { HIGHLIGHT_KIND_LABEL, orderHighlights } from "../../../lib/fighters/highlights";
+import { HIGHLIGHT_KIND_LABEL, miniaturaDeEnlace, orderHighlights, webDeEnlace } from "../../../lib/fighters/highlights";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { iniciales, tinteDe } from "../../../lib/common/apariencia";
 import { monthlySeries } from "../../../lib/common/dates";
 import Icono from "../../components/Icono";
 import { GraficoAura } from "../../components/Tarjetas";
 import { divisionLabel } from "../../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel } from "../../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, weightClassLabel, categoryLabel } from "../../../lib/common/disciplines";
 import { auraRanking } from "../../../lib/aura/ranking";
 import TrajectoryList from "../../components/TrajectoryList";
 import AuraBreakdown from "../../components/AuraBreakdown";
@@ -109,7 +109,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   const [highlights, auraPorCombate, perfil, aurasRecientes, acceso, medios] = await Promise.all([
     publica || propia ? db.highlight.findMany({ where: { fighterId: fighter.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, videoKey: true, hasImage: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }) : Promise.resolve([]),
     db.aura.groupBy({ by: ["boutId"], where: { fighterId: fighter.id, bout: COUNTED }, _count: { _all: true } }),
-    db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: fighter.id } }, select: { hasBanner: true, hasAvatar: true, updatedAt: true, bannerX: true, bannerY: true } }),
+    db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: fighter.id } }, select: { hasBanner: true, hasAvatar: true, updatedAt: true, bannerX: true, bannerY: true, avatarX: true, avatarY: true } }),
     db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED, createdAt: { gte: new Date(Date.now() - 220 * 864e5) } }, select: { createdAt: true } }),
     profileAccess("peleador", fighter.id, user),
     // Vídeos y fotos que el público subió de sus combates (petición del fundador, 8 de octubre de 2026).
@@ -128,17 +128,22 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="pantalla" style={{ gap: 0 }}>
-      <section className="portada a-sangre" style={{ marginTop: -20, minHeight: 500, "--tinte": tinteDe(principal?.discipline) } as CSSProperties} aria-labelledby="nombre-peleador">
-        <span className="iniciales" aria-hidden="true">{iniciales(nombre)}</span>
+      {/* Banner de fondo y foto en círculo, las dos a la vez (el fundador vio que, al poner el banner, la foto desaparecía y al revés). */}
+      <section className="portada portada-ficha a-sangre" style={{ marginTop: -20, "--tinte": tinteDe(principal?.discipline) } as CSSProperties} aria-labelledby="nombre-peleador">
+        {!(publica && perfil?.hasBanner) && <span className="iniciales" aria-hidden="true">{iniciales(nombre)}</span>}
         {publica && perfil?.hasBanner && <img className="fondo" src={`/imagenes/peleador/${fighter.id}/banner${version}`} alt="" style={{ objectPosition: `${perfil.bannerX}% ${perfil.bannerY}%` }} />}
-        {publica && !perfil?.hasBanner && perfil?.hasAvatar && <img className="fondo" src={`/imagenes/peleador/${fighter.id}/avatar${version}`} alt={`Foto de ${nombre}`} />}
         <div className="barra-superior">
           <Link href="/peleadores" className="boton-icono boton-cristal" aria-label="Volver a los peleadores"><Icono nombre="atras" /></Link>
           {principal && <span className={`pildora ${principal.level === "PRO" ? "pildora-blanca" : "pildora-acc"}`}>{LEVEL_LABEL[principal.level]}</span>}
         </div>
-        <div>
-          {publica && <div className="apodo">{[fighter.alias && `«${fighter.alias}»`, fighter.city].filter(Boolean).join(" · ")}</div>}
-          <h1 id="nombre-peleador" className="nombre">{nombre}</h1>
+        <div className="identidad">
+          {publica && perfil?.hasAvatar
+            ? <img className="foto-perfil" src={`/imagenes/peleador/${fighter.id}/avatar${version}`} alt={`Foto de ${nombre}`} style={{ objectPosition: `${perfil.avatarX}% ${perfil.avatarY}%` }} />
+            : <span className="foto-perfil" aria-hidden="true">{iniciales(nombre)}</span>}
+          <div style={{ minWidth: 0 }}>
+            {publica && <div className="apodo">{[fighter.alias && `«${fighter.alias}»`, fighter.city].filter(Boolean).join(" · ")}</div>}
+            <h1 id="nombre-peleador" className="nombre">{nombre}</h1>
+          </div>
         </div>
         <div className="discipline-tags" style={{ margin: 0 }}>
           {fighter.disciplines.map((d) => <span key={d.discipline} className="pildora pildora-cristal">{DISCIPLINE_LABEL[d.discipline]}{d.level !== principal?.level ? ` · ${LEVEL_LABEL[d.level]}` : ""}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""}{publica && graduationLabel(d.belt, d.beltDegrees) ? ` · ${graduationLabel(d.belt, d.beltDegrees)} (declarado por el deportista)` : ""}</span>)}
@@ -181,10 +186,13 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
               const destino = h.kind === "VIDEO" ? (h.videoKey ? `/highlights/${h.id}/video` : h.videoUrl!) : `/highlights/${h.id}/imagen`;
               return (
                 <a key={h.id} href={destino} target="_blank" rel="noopener noreferrer nofollow ugc" className="tarjeta-foto highlight" style={{ "--tinte": tinteDe(principal?.discipline) } as CSSProperties}>
-                  {h.hasImage && <img src={`/highlights/${h.id}/imagen`} alt="" loading="lazy" />}
+                  {/* Portada: la foto elegida o sacada del vídeo al subirlo; si no hay, un fotograma del propio vídeo o la miniatura de YouTube. */}
+                  {h.hasImage ? <img src={`/highlights/${h.id}/imagen`} alt="" loading="lazy" />
+                    : h.videoKey ? <video className="portada-video" src={`/highlights/${h.id}/video#t=0.5`} preload="metadata" muted playsInline aria-hidden="true" tabIndex={-1} />
+                    : miniaturaDeEnlace(h.videoUrl) && <img src={miniaturaDeEnlace(h.videoUrl)!} alt="" loading="lazy" />}
                   <span className="arriba"><span className="pildora" style={{ background: "rgba(0,0,0,.6)", fontSize: 13 }}>{HIGHLIGHT_KIND_LABEL[h.kind]}</span>{h.pinned && <span className="pildora pildora-acc" style={{ fontSize: 13 }}>Destacado</span>}</span>
                   {h.kind === "VIDEO" && <span className="play" aria-hidden="true"><Icono nombre="play" /></span>}
-                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(255,255,255,.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "VIDEO" ? "Vídeo" : "Foto")}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
+                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(255,255,255,.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "PHOTO" ? "Foto" : h.videoKey ? "Vídeo" : `Vídeo de ${webDeEnlace(h.videoUrl)}`)}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
                 </a>
               );
             })}
@@ -258,7 +266,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                 <VerificationTag verification={b.verification} backing={b} />
                 {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
               </div>
-              {(b.divisionId || b.weightClass) && <div className="meta">{divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(b.event.discipline, b.event.level, b.weightClass, b.divisionId)}` : ""}</div>}
+              {(b.divisionId || b.weightClass) && <div className="meta">{categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}</div>}
               <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
                 <span className="meta-acc" style={{ fontSize: 15 }}>{n} de aura</span>
                 {aura.ok && (user?.emailVerifiedAt ? (

@@ -7,7 +7,7 @@ import { db } from "../../../lib/common/db";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import SelectorCategoria from "../../components/SelectorCategoria";
 import { divisionLabel } from "../../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, weightClassLabel } from "../../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, METHODS_BY_DISCIPLINE, weightClassLabel, categoryLabel } from "../../../lib/common/disciplines";
 import { LIMITS } from "../../../lib/common/text";
 import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
@@ -94,7 +94,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
                 return (
                   <tr key={b.id}>
                     <th scope="row" style={{ color: "var(--text)" }}>{nombre(b.fighterA)} <span className="mut">contra</span> {nombre(b.fighterB)}</th>
-                    <td className="mut">{divisionLabel(b.divisionId)}{b.weightClass ? ` · ${weightClassLabel(event.discipline, event.level, b.weightClass, b.divisionId)}` : ""}</td>
+                    <td className="mut">{categoryLabel(event.discipline, event.level, b.divisionId, b.weightClass)}</td>
                     <td>
                       <form action={setBoutEvidence} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                         <input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="back" value={`/organizador/${event.slug}`} />

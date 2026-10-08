@@ -26,6 +26,27 @@ export function parseHighlight(input: HighlightInput): HighlightParsed {
   return { ok: true, kind, title, videoUrl: null, videoKey: null };
 }
 
+/**
+ * Portada de un vídeo enlazado, cuando la web la publica en una dirección conocida: hoy solo YouTube (su miniatura en i.ytimg.com,
+ * permitida en la política de contenido). Instagram y TikTok no la ofrecen sin su API: esos vídeos muestran el nombre de la web.
+ */
+export function miniaturaDeEnlace(url: string | null | undefined): string | null {
+  if (!url) return null;
+  let u: URL;
+  try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.replace(/^(www\.|m\.)/, "");
+  let id: string | null = null;
+  if (host === "youtu.be") id = u.pathname.slice(1).split("/")[0];
+  else if (host === "youtube.com" || host === "music.youtube.com") id = u.searchParams.get("v") ?? u.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1] ?? null;
+  return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+}
+
+/** Nombre de la web de un vídeo enlazado, para la tarjeta sin portada. */
+export function webDeEnlace(url: string | null | undefined): string {
+  const host = (() => { try { return new URL(url ?? "").hostname.replace(/^www\./, ""); } catch { return ""; } })();
+  return host.includes("instagram") ? "Instagram" : host.includes("tiktok") ? "TikTok" : host.includes("youtu") ? "YouTube" : host.includes("facebook") || host === "fb.watch" ? "Facebook" : "otra web";
+}
+
 /** Orden en la ficha: el destacado primero y después del más reciente al más antiguo. */
 export function orderHighlights<T extends { pinned: boolean; createdAt: Date; id: string }>(list: T[]): T[] {
   return [...list].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.createdAt.getTime() - a.createdAt.getTime() || a.id.localeCompare(b.id));

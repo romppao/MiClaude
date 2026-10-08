@@ -11,7 +11,7 @@ import { BotonesFiltro, CampoFiltro, FiltrosActivos } from "../components/Filtro
 import SelectorCategoria from "../components/SelectorCategoria";
 import { PROVINCES } from "../../lib/common/labels";
 import { divisionById, divisionLabel } from "../../lib/common/competition";
-import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor } from "../../lib/common/disciplines";
+import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline, isLevel, levelName, weightClassLabel, weightClassesFor, categoryLabel } from "../../lib/common/disciplines";
 import { plural } from "../../lib/common/text";
 
 export const metadata = { title: "Peleadores" };
@@ -62,7 +62,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
             <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong>
             <div className="mut">{b.alias ? `“${b.alias}”` : ""}{b.alias && (b.province || b.gym) ? " · " : ""}{[b.province, b.gym?.name].filter(Boolean).join(" · ")}</div>
             {[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => (
-              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {divisionLabel(d.divisionId)}{d.weightClass ? ` · ${weightClassLabel(d.discipline, d.level, d.weightClass, d.divisionId)}` : ""}</div>
+              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {categoryLabel(d.discipline, d.level, d.divisionId, d.weightClass)}</div>
             ))}
           </Link>
         ))}

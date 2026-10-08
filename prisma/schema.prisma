@@ -130,9 +130,9 @@ enum ClassKind {
 
 // Clase que ofrece un entrenador. Precio por persona y sesión en euros enteros. Pausada (active = false) no se muestra en su perfil.
 model TrainingClass {
-  id         String      @id @default(cuid())
+  id         String         @id @default(cuid())
   trainerId  String
-  trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  trainer    Trainer        @relation(fields: [trainerId], references: [id], onDelete: Cascade)
   kind       ClassKind
   title      String
   discipline Discipline?
@@ -140,11 +140,40 @@ model TrainingClass {
   priceEuros Int
   capacity   Int?
   schedule   String?
-  active     Boolean     @default(true)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  active     Boolean        @default(true)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  requests   ClassRequest[]
 
   @@index([trainerId, active])
+}
+
+enum ClassRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+// Solicitud de una clase publicada (petición del fundador, 8 de octubre de 2026: «poder reservar las clases privadas publicadas es misión
+// imposible»). La persona dice cuándo le viene bien; el entrenador acepta o rechaza con un mensaje. Ring España no cobra: se paga al entrenador.
+model ClassRequest {
+  id         String             @id @default(cuid())
+  classId    String
+  class      TrainingClass      @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Cuándo le viene bien, con sus palabras («martes o jueves por la tarde»).
+  preferred  String
+  message    String?
+  phone      String?
+  status     ClassRequestStatus @default(PENDING)
+  reply      String?
+  createdAt  DateTime           @default(now())
+  answeredAt DateTime?
+
+  @@index([classId, status])
+  @@index([userId, createdAt])
 }
 
 enum HighlightKind {
@@ -320,6 +349,7 @@ model User {
   events                Event[]                @relation("EventOrganizer")
   trainer               Trainer?
   media                 MediaItem[]
+  classRequests         ClassRequest[]
   // Disciplinas que le interesan (registro de aficionado): ordenan su inicio.
   interests             Discipline[]           @default([])
   // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
