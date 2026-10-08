@@ -1104,7 +1104,7 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - Aviso de arranque si falta `CREADOR_CORREO`.
 - Guía para el fundador [`CREADOR.md`](CREADOR.md).
 - Pruebas `tests/unit/creador.test.ts` y `tests/e2e/creador.mjs`, esta última con accesibilidad de las pantallas nuevas.
-**Qué ejecuté yo:** RESULTADOS
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (542), `npm run build`, paridad de migraciones, los 21 guiones de navegador con base vacía (**564 comprobaciones, 0 fallos**, incluido el nuevo `creador.mjs` con 44), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos) y las 4 pantallas nuevas analizadas dentro de `creador.mjs`, `npm run mapa` y el catálogo (267 archivos, 9/9 pruebas); captura en iPhone emulado.
 **Qué salió mal / límite honesto:**
 - Mi primer diseño dejaba un hueco: una sesión abierta **antes** de confirmar el correo habría heredado los poderes del creador sin el segundo paso. Lo encontré al escribir la prueba y lo corregí: ahora se comprueba en cada petición que esa sesión hizo el segundo paso.
 - Tres fallos de la propia prueba, anotados en `LECCIONES.md`.
