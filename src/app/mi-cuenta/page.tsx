@@ -17,7 +17,7 @@ export default async function Account() {
   const avisos = await db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 20 });
   const accreditation = await db.supportAccreditation.findUnique({where:{userId:user.id}});
   const papel = papelDe(user);
-  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario" } as const;
+  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario", MEDIA: "un vídeo o una foto" } as const;
   const estado = { OPEN: "En revisión", RESOLVED: "Cerrado: ya está corregido", DISMISSED: "Cerrado: no se ha encontrado ningún error" } as const;
   const managedProfiles = await db.profile.findMany({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } }, select: { id: true, kind: true, entityId: true, name: true } });
   return (

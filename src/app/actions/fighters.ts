@@ -18,6 +18,7 @@ import { LIMITS } from "../../lib/common/text";
 import { readOnboarding } from "../../lib/accounts/onboarding";
 import { MAX_HIGHLIGHTS, parseHighlight } from "../../lib/fighters/highlights";
 import { normalizeImage } from "../../lib/profiles/images";
+import { almacenDeVideos, claveDe, tipoDeClave } from "../../lib/media/storage";
 import { Prisma } from "@prisma/client";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
 
@@ -186,8 +187,14 @@ export async function publishHighlight(f: FormData) {
   if (!me) go("/mi-ficha");
   const foto = f.get("image");
   const hayFoto = foto instanceof File && foto.size > 0;
-  const datos = parseHighlight({ kind: str(f, "kind"), title: str(f, "title"), videoUrl: str(f, "videoUrl"), hasImage: hayFoto });
+  const datos = parseHighlight({ kind: str(f, "kind"), title: str(f, "title"), videoUrl: str(f, "videoUrl"), hasImage: hayFoto, videoKey: str(f, "videoKey") });
   if (!datos.ok) go(back, { problema: datos.problema });
+  // Un vídeo subido tiene que existir, ser de esta persona y no superar el máximo del almacén.
+  if (datos.videoKey) {
+    const almacen = almacenDeVideos();
+    const bytes = almacen && claveDe(datos.videoKey, user.id) ? await almacen.tamano(datos.videoKey).catch(() => null) : null;
+    if (!almacen || !bytes || bytes > almacen.maxBytes || (await db.highlight.findFirst({ where: { videoKey: datos.videoKey }, select: { id: true } }))) go(back, { problema: "medio_subida" });
+  }
   if ((await db.highlight.count({ where: { fighterId: me.id, hiddenAt: null } })) >= MAX_HIGHLIGHTS) go(back, { problema: "highlight_limite" });
   // El combate, si se indica, tiene que ser uno de los suyos.
   const boutId = str(f, "boutId") || null;
@@ -199,8 +206,8 @@ export async function publishHighlight(f: FormData) {
   const pinned = str(f, "pinned") === "on";
   await db.$transaction(async (tx) => {
     if (pinned) await tx.highlight.updateMany({ where: { fighterId: me.id, pinned: true }, data: { pinned: false } });
-    const h = await tx.highlight.create({ data: { fighterId: me.id, kind: datos.kind, title: datos.title, videoUrl: datos.videoUrl, image, hasImage: !!image, boutId, pinned } });
-    await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: "CREATED", after: { kind: h.kind, title: h.title, videoUrl: h.videoUrl, boutId, pinned } }, tx);
+    const h = await tx.highlight.create({ data: { fighterId: me.id, kind: datos.kind, title: datos.title, videoUrl: datos.videoUrl, videoKey: datos.videoKey, videoType: datos.videoKey ? tipoDeClave(datos.videoKey) : null, image, hasImage: !!image, boutId, pinned } });
+    await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: "CREATED", after: { kind: h.kind, title: h.title, videoUrl: h.videoUrl, subido: !!h.videoKey, boutId, pinned } }, tx);
   });
   revalidatePath("/", "layout");
   go(back, { aviso: "highlight_publicado" });
@@ -223,6 +230,7 @@ export async function manageHighlight(f: FormData) {
     } else await tx.highlight.delete({ where: { id: h.id } });
     await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: accion === "destacar" ? "PINNED" : "DELETED", before: { title: h.title } }, tx);
   });
+  if (accion === "retirar" && h.videoKey) await almacenDeVideos()?.borrar(h.videoKey);
   revalidatePath("/", "layout");
   go(back, { aviso: accion === "destacar" ? "highlight_destacado" : "highlight_retirado" });
 }

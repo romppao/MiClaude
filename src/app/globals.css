@@ -458,5 +458,13 @@ nav.lista>a{display:flex}
 .noticia-imagen{flex:none;width:96px;height:72px;border-radius:16px;object-fit:cover;background:linear-gradient(160deg,var(--tinte,rgba(212,246,124,.38)),var(--card) 80%)}
 @media (min-width:760px){.noticia-imagen{width:150px;height:96px}}
 .filtros-disciplina{display:flex;gap:8px;flex-wrap:wrap}
-.filtros-disciplina a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font:600 16px var(--font)}
-.filtros-disciplina a[aria-current=page]{background:var(--acc);color:var(--acc-ink)}
+main .filtros-disciplina a,.filtros-disciplina a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font:600 16px var(--font)}
+main .filtros-disciplina a[aria-current=page]{background:var(--acc);color:var(--acc-ink)}
+
+/* Vídeos y fotos del público (fase 2a) */
+.galeria{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:760px){.galeria{grid-template-columns:1fr 1fr}}
+.medio{padding:0;overflow:hidden;gap:0}
+.medio>img,.medio>video{display:block;width:100%;max-height:420px;object-fit:cover;background:#000}
+.medio>video{object-fit:contain}
+.medio .cuerpo{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px}

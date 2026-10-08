@@ -155,6 +155,7 @@ export async function resolveReport(f: FormData) {
         await anonymizeFighter(tx, report.entityId);
       }
       else if (report.entity === "AURA") await tx.aura.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
+      else if (report.entity === "MEDIA") await tx.mediaItem.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
     }
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);
   }));

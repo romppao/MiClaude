@@ -5,6 +5,7 @@ import InicioAficionado from "../_inicio/Aficionado";
 import InicioPeleador from "../_inicio/Peleador";
 import InicioEntrenador from "../_inicio/Entrenador";
 import InicioEntidad from "../_inicio/Entidad";
+import MisSubidas from "../_inicio/MisSubidas";
 
 export const metadata: Metadata = { title: "Mi panel", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -16,8 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function MiPanel() {
   const user = await requireUser("/mi-panel");
   const papel = papelDe(user);
-  if (papel === "entidad") return <InicioEntidad user={user} />;
-  if (papel === "entrenador") return <InicioEntrenador user={user} />;
-  if (papel === "peleador") return <InicioPeleador user={user} />;
-  return <InicioAficionado user={user} />;
+  const panel = papel === "entidad" ? <InicioEntidad user={user} /> : papel === "entrenador" ? <InicioEntrenador user={user} /> : papel === "peleador" ? <InicioPeleador user={user} /> : <InicioAficionado user={user} />;
+  // «Mis vídeos y fotos»: siempre en el panel del aficionado; en los demás, solo si han compartido algo.
+  return <>{panel}<MisSubidas userId={user.id} siempre={papel === "usuario"} /></>;
 }

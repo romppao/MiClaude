@@ -17,6 +17,9 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): { errors: str
   } else if (env.MAIL_TRANSPORT !== "log") {
     warnings.push("No hay proveedor de correo (RESEND_API_KEY): no se enviará ningún correo de verificación ni de recuperación de contraseña. Para pruebas, use MAIL_TRANSPORT=log.");
   }
+  const r2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET"].filter((k) => !!env[k]);
+  if (r2.length > 0 && r2.length < 4) errors.push("La configuración del almacén de vídeos está incompleta: hacen falta R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY y R2_BUCKET (ver docs/VIDEOS.md).");
+  if (r2.length === 0 && !env.MEDIA_DIR && env.DEMO_MODE !== "si") warnings.push("No hay almacén de vídeos (R2_*): los vídeos solo se podrán compartir con un enlace (ver docs/VIDEOS.md).");
   if (!env.CONTACT_EMAIL) warnings.push("Falta CONTACT_EMAIL: la página de privacidad no indica ningún contacto para ejercer los derechos sobre los datos (y RESPONSABLE_NOMBRE, el responsable del tratamiento).");
   return { errors, warnings };
 }

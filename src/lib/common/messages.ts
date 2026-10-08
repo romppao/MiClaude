@@ -81,6 +81,8 @@ export const AVISOS: Record<string, string> = {
   fuente_activada: "Fuente activada.",
   noticia_ocultada: "Noticia ocultada.",
   noticia_mostrada: "La noticia vuelve a mostrarse.",
+  medio_compartido: "Gracias: tu vídeo o tu foto ya se ve en la velada. Los peleadores del combate lo verán en su ficha.",
+  medio_borrado: "Se ha borrado tu vídeo o tu foto.",
 };
 
 export const PROBLEMAS: Record<string, string> = {
@@ -214,4 +216,16 @@ export const PROBLEMAS: Record<string, string> = {
   fuente_url: "La dirección del canal debe empezar por https://.",
   fuente_tipo: "Elige el tipo de fuente.",
   fuente_repetida: "Esa fuente ya está en la lista.",
+  medio_velada: "Elige la velada en la que lo grabaste.",
+  medio_velada_futura: "Esa velada todavía no se ha celebrado: podrás compartir tus vídeos y fotos a partir del mismo día.",
+  medio_velada_cancelada: "Esa velada se canceló, así que no admite vídeos ni fotos.",
+  medio_velada_antigua: "Esa velada es de hace más de cuatro meses y ya no admite vídeos ni fotos nuevos.",
+  medio_combate: "Ese combate no es de esta velada. Elige uno de la lista o déjalo sin combate.",
+  medio_consentimiento: "Marca la casilla para confirmar que lo grabaste tú y que puedes compartirlo.",
+  medio_pie_largo: "La descripción es demasiado larga: como mucho 120 caracteres.",
+  medio_uno_solo: "Comparte una sola cosa cada vez: o una foto o un vídeo.",
+  medio_vacio: "Elige una foto o un vídeo, o pega el enlace del vídeo.",
+  medio_enlace: "El enlace del vídeo no es válido: debe empezar por https://.",
+  medio_subida: "No encontramos el vídeo subido. Vuelve a elegirlo y espera a que la barra llegue al 100 % antes de publicarlo.",
+  medio_limite: "Has compartido muchos vídeos y fotos hoy. Vuelve a intentarlo mañana.",
 };
