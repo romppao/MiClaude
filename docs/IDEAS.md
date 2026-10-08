@@ -264,3 +264,13 @@ Palabras del fundador: «después de iniciar sesión a todos los usuarios les ap
   - Avisar al peleador cuando alguien comparte un vídeo de su combate (correo opcional, como los avisos a seguidores).
   - Que cada persona elija qué fuentes de noticias quiere ver, o silenciar una.
   - Canales RSS propios de medios y federaciones españolas en lugar de Google Noticias, si el fundador lo prefiere por las condiciones de uso.
+
+## Publicación en las tiendas (8 de octubre de 2026)
+
+Palabras del fundador: «el proceso para publicar la aplicación oficialmente al mercado […] tanto a Apple Store como a Google Store» y «limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación». Guía completa: [`PUBLICACION.md`](PUBLICACION.md).
+- **App en las dos tiendas con Capacitor** (Claude, 8 oct) — **propuesta**; sustituye la recomendación abierta de `MOVIL.md`.
+- **Limitar la web para empujar a la app** (fundador, 8 oct) — **propuesta de Claude:** la consulta pública sigue abierta en la web; avisos y subida desde la cámara, solo en la app; **dar aura solo desde la app**, a decidir por el fundador (ventaja: comprobación de dispositivo contra cuentas falsas; contra: se pierde el voto desde enlaces compartidos).
+- **Bloquear a otro usuario** (Claude, 8 oct, requisito de Apple 1.2) — **pendiente**, necesario para publicar.
+- **Condiciones de uso aceptadas al registrarse y filtro de palabras** (Claude, 8 oct, Apple 1.2 y Reglamento de Servicios Digitales) — **pendiente**.
+- **Avisos en el teléfono** (combate de un peleador seguido, vídeo nuevo de tu combate, aura recibida) con Firebase (Claude, 8 oct) — **pendiente**; es lo que más justifica descargar la app.
+- **Banner «Abrir en la app» y QR en carteles de veladas** (Claude, 8 oct) — **pendiente**, después de publicar.

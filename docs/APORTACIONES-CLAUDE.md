@@ -63,7 +63,7 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Pedido por el fundador:** misma portada para todos con noticias de fuentes variadas y portada por disciplina; menú solo con las opciones de cada tipo de cuenta (el entrenador: entrenador, club y promotora); el entrenador crea veladas e interclubs; vídeos y fotos del público en las veladas, «en la app de verdad y, si no es viable, mediante enlaces».
 **Base:** `claude/ring-espana-mvp` en `a34deab`. **Rama de trabajo:** `claude/diseno-v3-fase2a`. **PR:** ver la rama (sin fusionar: actualiza la demo).
 **Qué cambié y por qué:** ver la entrada del mismo día en `DIARIO.md`, `ARQUITECTURA.md` («Diseño v3, fase 2a») y `VIDEOS.md`.
-**Qué ejecuté yo:** RESULTADOS
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (527), `npm run build`, paridad de migraciones, los 20 guiones de navegador con base vacía (**520 comprobaciones, 0 fallos**, incluido el nuevo `fase2a.mjs`), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos), `npm run mapa` y la comprobación del catálogo de Codex (257 archivos, 9/9 pruebas); capturas en iPhone emulado.
 **Qué solo valida el CI:** la misma batería en GitHub Actions (con `NEWS_FETCH=no` y `MEDIA_DIR`).
 **Qué salió mal / sin causa conocida:** nada sin causa; errores propios en `LECCIONES.md`. Las fuentes de noticias reales no se pudieron abrir desde aquí.
 **Qué debe hacer el siguiente asistente:** 1) revisar en la demo `/moderacion/noticias` (qué fuentes funcionan); 2) con el cubo de R2 creado, probar una subida real desde un móvil; 3) planificar en fichas el resto de la fase 2 (`PLAN.md`).

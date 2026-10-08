@@ -24,7 +24,7 @@ La comunidad española de deportes de contacto (boxeo, MMA, Muay Thai, kickboxin
 | **F0** | Base funcional, categorías de peso, perfiles, trayectoria y aura | (hecho; ver `DIARIO.md`) | ✔ |
 | **F1** | **Móvil y pulido funcional** | T-001 ✔, T-002 ✔, T-011 ✔ (hechas por Claude el 6 oct), T-009, T-013 | casi completa: queda T-009 y las dos pruebas de ingreso ([1](PRUEBA-DE-INGRESO.md) y [2, «la escalera»](PRUEBA-ESCALERA.md)) |
 | **F2** | **Escalabilidad** (un paso antes del diseño) | T-004, T-005, T-006, T-007, T-008, T-010, T-012 | planificada |
-| **F3** | PWA y camino a las tiendas | T-003 (y envoltorio, ver `MOVIL.md`) | planificada |
+| **F3** | PWA y camino a las tiendas | T-003 (y envoltorio con Capacitor: proceso y costes en `PUBLICACION.md`) | planificada |
 | **F4** | Diseño visual con identidad propia | briefing con el fundador (no antes) | aplazada |
 | **F5** | Preparación del lanzamiento | decisiones del fundador (menores, privacidad, correo, dominio); pruebas con personas reales; dispositivos reales | pendiente de decisiones |
 
