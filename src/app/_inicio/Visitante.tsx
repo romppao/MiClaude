@@ -17,13 +17,14 @@ export default async function InicioVisitante() {
           <Link href="/entrar" className="btn" style={{ minHeight: 44 }}>Entrar</Link>
         </div>
         <h1 id="titulo-portada">Tu deporte.<br /><span className="acc">Tu gente.</span></h1>
-        <p className="lead" style={{ color: "rgba(255,255,255,.85)" }}>Tu comunidad de deportes de contacto en toda España: fichas con récord, veladas y gimnasios de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai.</p>
+        {/* Debajo del lema, una sola frase (petición del fundador, 9 de octubre de 2026: el texto de debajo se veía «muy cargado»). */}
+        <p className="lema-portada">Tu comunidad de deportes de contacto en toda España.</p>
         <p className="sr-only">Imagen ilustrativa con personas ficticias.</p>
         <form action="/buscar" role="search" aria-label="Buscar en Ring España" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <label htmlFor="buscar-portada" className="kicker" style={{ color: "rgba(255,255,255,.8)" }}>Busca un peleador, un gimnasio, un entrenador o una velada</label>
+          <label htmlFor="buscar-portada" className="etiqueta-portada">Busca peleadores, gimnasios o veladas</label>
           <span className="buscador-cristal">
             <Icono nombre="buscar" tam={20} grosor={1.8} />
-            <input id="buscar-portada" name="q" maxLength={80} placeholder="Nombre, apodo o ciudad" />
+            <input id="buscar-portada" name="q" maxLength={80} placeholder="Nombre o ciudad" />
             <button className="secondary">Buscar</button>
           </span>
         </form>

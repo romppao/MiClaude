@@ -17,7 +17,7 @@ const visitante = await nueva();
 await visitante.goto(B + "/");
 check("la navegación principal tiene 5 elementos como máximo", await visitante.locator("nav[aria-label=Principal] a").count() <= 5);
 check("la portada ofrece un botón claro para crear la cuenta y otro para ver cómo funciona", await visitante.locator("main a.btn", { hasText: "Crear mi cuenta" }).count() === 1 && await visitante.locator("main a.btn", { hasText: "Ver cómo funciona" }).count() === 1);
-check("el buscador de la portada tiene etiqueta visible", await visitante.locator("main label", { hasText: "Busca un peleador" }).count() === 1);
+check("el buscador de la portada tiene etiqueta visible", await visitante.locator("main label", { hasText: "Busca peleadores" }).count() === 1);
 check("el buscador de la cabecera tiene su botón visible", await visitante.locator("header form[role=search] button", { hasText: "Buscar" }).count() === 1);
 const aficionada = await newUser("Usabilidad", "FAN");
 await aficionada.p.goto(B + "/");
