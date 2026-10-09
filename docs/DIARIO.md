@@ -1381,3 +1381,16 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 
 **Qué se hizo:** `comparaEdad` y la opción `edad` en `lib/events/pairing.ts`; comprobación de edad por categoría (`divisionEligible`) en `/organizador/[slug]/emparejar`; prueba unitaria nueva. Sin cambios en la base de datos.
 **Pruebas:** 643 unitarias; `plazas`, `inscripciones` y `categorias` en el navegador, sin fallos.
+
+## 9 de octubre de 2026 — Portada: menos texto bajo el lema (Claude)
+
+**Qué se pidió** (el fundador, con captura de la portada en el móvil): le encantó el lema «Tu deporte. Tu gente.» («representa la idea de la aplicación»). De lo que viene debajo dijo que es «un cúmulo de palabras mal metidas, con una fuente poco llamativa y muy cargado […] quiero que intentes aliviar eso».
+
+**Qué se hizo** (solo en la portada del visitante):
+- Bajo el lema queda **una sola frase**: «Tu comunidad de deportes de contacto en toda España.», en letra algo mayor.
+- Se quitó la lista de seis disciplinas. Ya están, con su icono, más abajo en la portada, así que no se pierde la comunicación inclusiva.
+- La etiqueta del buscador deja de ir en mayúsculas espaciadas y pasa a una línea discreta en letra normal: «Busca peleadores, gimnasios o veladas».
+- El texto de ejemplo del campo pasa a ser «Nombre o ciudad».
+- La etiqueta sigue siendo visible, como exige la regla de accesibilidad del proyecto.
+
+**Pruebas:** `inclusiva`, `usabilidad` (con el texto nuevo de la etiqueta), `diseno`, `movil`, `servicios` y `accesibilidad`, sin fallos; captura a 390 px revisada.

@@ -576,3 +576,6 @@ nav.pestanas-barra{flex:none;flex-wrap:nowrap;display:flex;padding:4px;border-ra
 .datos-solicitud dt{color:rgba(255,255,255,.7)}
 .datos-solicitud dd{margin:0;font-weight:700}
 .lote-inscripciones{display:flex;flex-direction:column;gap:10px;background:var(--bg);border:1px solid var(--acc);border-radius:20px;padding:12px}
+/* Portada: una frase corta bajo el lema y una etiqueta discreta del buscador (9 de octubre de 2026: «muy cargado»). */
+.lema-portada{margin:0;max-width:30ch;font:500 18px/1.4 var(--font);color:rgba(255,255,255,.85)}
+.etiqueta-portada{font:500 16px/1.3 var(--font);color:rgba(255,255,255,.75)}
