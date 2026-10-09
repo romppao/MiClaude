@@ -346,7 +346,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `pairing.ts` | `DatosPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
+| `pairing.ts` | `DatosPareja`, `OpcionesPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `comparaEdad`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
 | `registrations-data.ts` | `SolicitudConDatos`, `solicitudesDeEvento` |
 | `registrations.ts` | `CATEGORIAS_MAX`, `ESTADOS_LISTA`, `EstadoLista`, `FilaInscripcion`, `FiltrosInscripcion`, `ORDENES`, `Ocupacion`, `Orden`, `PESO_MAX`, `PESO_MIN`, `PLAZAS_MAX`, `Plaza`, `REGISTRATIONS_PER_DAY`, `REG_MESSAGE_MAX`, `REG_NOTE_MAX`, `REG_REPLY_MAX`, `REG_STATUS_LABEL`, `RegistrationParsed`, `categoriaSinSitio`, `claveCategoria`, `enListaDeEspera`, `filtrarYOrdenar`, `inscripcionAbierta`, `numeroDeFiltro`, `ocupacion`, `parseEstadoLista`, `parseOrden`, `parsePlazas`, `parseRegistration`, `parseRegistrationSettings`, `puedeResponderInscripcion`, `puedeRetirarInscripcion` |
 
