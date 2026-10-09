@@ -6,7 +6,7 @@ import type { FilaInscripcion } from "./registrations";
 
 /** Una solicitud con todo lo que ve el organizador al elegir: récord en la disciplina y el nivel del evento, aura, edad, gimnasio… */
 export type SolicitudConDatos = FilaInscripcion & {
-  fighterId: string; slug: string; message: string | null; reply: string | null;
+  fighterId: string; slug: string; nacimiento: Date | null; message: string | null; reply: string | null;
   /** Correo del peleador, solo cuando su solicitud está aceptada (para concretar los detalles). */
   correo: string | null;
   derrotas: number; empates: number; status: RegistrationStatus;
@@ -39,7 +39,7 @@ export async function solicitudesDeEvento(event: Pick<Event, "id" | "discipline"
     return {
       id: r.id, status: r.status, createdAt: r.createdAt, nombre: publicFighterName(f), gimnasio: f.gym?.name ?? null, provincia: f.province,
       divisionId: r.divisionId, weightClass: r.weightClass, weightKg: r.weightKg, combates, victorias: rec.w, derrotas: rec.l, empates: rec.d,
-      aura: auraDe.get(f.id) ?? 0, fighterId: f.id, slug: f.slug, edad, message: r.message, reply: r.reply, correo: r.status === "ACCEPTED" ? f.user?.email ?? null : null,
+      aura: auraDe.get(f.id) ?? 0, fighterId: f.id, slug: f.slug, nacimiento: f.birthDate, edad, message: r.message, reply: r.reply, correo: r.status === "ACCEPTED" ? f.user?.email ?? null : null,
     };
   });
 }

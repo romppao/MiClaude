@@ -1367,3 +1367,17 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - Se volvieron a pasar `inscripciones`, `categorias`, `enlaces`, `movil` y `paneles`.
 
 **Próximos pasos:** ver con el fundador si la escala de parecido le convence con datos reales.
+
+## 9 de octubre de 2026 — La edad al emparejar (Claude)
+
+**Qué se pidió** (el fundador): «En el tema de la edad, ten en cuenta que en la categoría élite, tanto masculino como femenino, la edad da igual. Puede enfrentarse una persona de 20 años con una de 27, da igual. Solo en el élite da igual. En las demás categorías, obviamente, en las edades que engloba dicha categoría».
+
+**Qué se decidió:** cuando el combate tiene categoría de edad (división), la ayuda para emparejar **ya no compara la edad** ni avisa de diferencias de edad.
+- Basta con que cada peleador encaje en la edad de su categoría el día del evento.
+- Quien no encaja sale con un aviso y no se propone como rival, porque el cartel tampoco admitiría ese combate.
+- En élite, la página dice expresamente que la edad no cuenta.
+- Solo cuando no hay categoría de edad se sigue teniendo en cuenta la diferencia de edad, porque entonces no se sabe en qué categoría está cada uno.
+- No se ha cambiado qué edades forman cada categoría: las del catálogo de la RFEBoxeo; élite, de 19 a 40 años.
+
+**Qué se hizo:** `comparaEdad` y la opción `edad` en `lib/events/pairing.ts`; comprobación de edad por categoría (`divisionEligible`) en `/organizador/[slug]/emparejar`; prueba unitaria nueva. Sin cambios en la base de datos.
+**Pruebas:** 643 unitarias; `plazas`, `inscripciones` y `categorias` en el navegador, sin fallos.
