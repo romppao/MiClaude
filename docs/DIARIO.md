@@ -1363,7 +1363,7 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Pruebas:**
 - 642 unitarias (8 nuevas en `plazas-y-emparejar.test.ts`).
 - `plazas.mjs` nueva, con 23 comprobaciones de punta a punta y de accesibilidad.
-- Réplica del CI con base vacía.
+- Réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **747 comprobaciones, 0 fallos**.
 - Se volvieron a pasar `inscripciones`, `categorias`, `enlaces`, `movil` y `paneles`.
 
 **Próximos pasos:** ver con el fundador si la escala de parecido le convence con datos reales.
