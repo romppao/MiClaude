@@ -10,7 +10,7 @@ import { publicFighterName } from "../../../lib/common/names";
 import VerificationTag from "../../components/VerificationTag";
 import { eventDayReached, todayMadrid } from "../../../lib/common/dates";
 import { getUser } from "../../../lib/accounts/auth";
-import { REG_STATUS_LABEL, inscripcionAbierta } from "../../../lib/events/registrations";
+import { REG_STATUS_LABEL, claveCategoria, inscripcionAbierta, ocupacion } from "../../../lib/events/registrations";
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { createReport } from "../../actions/community";
@@ -38,6 +38,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const oficial = !!e.organizerId && org?.status === "APPROVED";
   const entrenador = e.organizer?.role === "TRAINER" ? e.organizer.trainer : null;
   const [user, medios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  // Plazas por categoría que ofrece el organizador, con las que quedan libres.
+  const plazas = e.registrationOpen ? await db.eventSlot.findMany({ where: { eventId: e.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] }) : [];
+  const ocupPlazas = plazas.length ? ocupacion(plazas, await db.eventRegistration.findMany({ where: { eventId: e.id }, select: { status: true, divisionId: true, weightClass: true } })) : new Map();
   const miInscripcion = user?.fighter ? await db.eventRegistration.findUnique({ where: { eventId_fighterId: { eventId: e.id, fighterId: user.fighter.id } }, select: { status: true } }) : null;
   const compartir = veladaAbiertaAlPublico(e, todayMadrid());
   return (
@@ -61,6 +64,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           <h2 id="titulo-inscripcion" style={{ margin: 0, font: "800 20px var(--font)" }}>Inscripción abierta</h2>
           <p style={{ margin: 0 }}>Los peleadores de {DISCIPLINE_LABEL[e.discipline]} pueden pedir participar. El organizador elige a quién empareja en el cartel.{e.registrationUntil ? ` Hasta el ${fmtDate(e.registrationUntil)}.` : ""}</p>
           {e.registrationNote && <p className="mut" style={{ margin: 0 }}><strong>Requisitos:</strong> {e.registrationNote}</p>}
+          {plazas.length > 0 && (
+            <div>
+              <strong>Categorías que busca el organizador</strong>
+              <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
+                {plazas.map((pl) => { const o = ocupPlazas.get(claveCategoria(pl.divisionId, pl.weightClass)); return <li key={pl.id}>{categoryLabel(e.discipline, e.level, pl.divisionId || null, pl.weightClass)}: {o?.llena ? "completa (lista de espera)" : o?.libres === 1 ? "queda 1 plaza" : `quedan ${o?.libres ?? pl.places} plazas`}</li>; })}
+              </ul>
+            </div>
+          )}
           {miInscripcion
             ? <p style={{ margin: 0 }}>Tu solicitud: <strong>{REG_STATUS_LABEL[miInscripcion.status]}</strong>. <Link href={`/veladas/${e.slug}/inscribirme`}>Ver mi solicitud</Link></p>
             : <Link className="btn" href={`/veladas/${e.slug}/inscribirme`}>Solicitar participar</Link>}

@@ -81,7 +81,7 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
 const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem"] as const;
-const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations"] as const;
+const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
 const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
 const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 

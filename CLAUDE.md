@@ -6,7 +6,7 @@
 
 > **Panel y servicios — 8 de octubre de 2026:** cada «Mi panel» empieza por las acciones principales de su tipo de cuenta (`AccionesPrincipales`); las clases se buscan en `/clases` y se piden con calendario y barra de horas; los peleadores se retan o proponen sparring (`/propuestas`). El fundador avisó: **no quitar ni tocar lo que funciona sin que lo pida**, y avisarle de lo que un diseño aprobado trae y aún no está hecho.
 
-> **Inscripciones — 9 de octubre de 2026:** los peleadores piden participar en veladas e interclubs y el organizador abre o cierra la inscripción, filtra, ordena, acepta o rechaza (también en bloque) y descarga la lista (`/organizador/[slug]/inscripciones`). Aceptar no pone a nadie en el cartel. Ver [docs/DIARIO.md](docs/DIARIO.md).
+> **Inscripciones — 9 de octubre de 2026:** los peleadores piden participar en veladas e interclubs y el organizador abre o cierra la inscripción, filtra, ordena, acepta o rechaza (también en bloque) y descarga la lista (`/organizador/[slug]/inscripciones`). Aceptar no pone a nadie en el cartel. Desde el 9 de octubre, el organizador puede fijar **plazas por categoría** (con lista de espera) y tiene una **ayuda para emparejar** (`/organizador/[slug]/emparejar`) que propone rivales parecidos, **nunca automática**. Ver [docs/DIARIO.md](docs/DIARIO.md).
 
 > **Cuenta del creador — 8 de octubre de 2026:** el fundador entra desde cualquier sitio con una cuenta especial (correo en `CREADOR_CORREO`) que tiene todos los permisos de moderación y gestiona cuentas y moderadores, con un segundo paso obligatorio (aplicación de códigos o códigos de emergencia): [docs/CREADOR.md](docs/CREADOR.md). No debilitar ese segundo paso sin que el fundador lo pida.
 

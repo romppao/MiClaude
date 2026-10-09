@@ -121,3 +121,50 @@ export const puedeRetirarInscripcion = (s: RegistrationStatus) => s === "PENDING
 export const ESTADOS_LISTA = { pendientes: "PENDING", aceptadas: "ACCEPTED", rechazadas: "DECLINED", retiradas: "WITHDRAWN", todas: "TODAS" } as const;
 export type EstadoLista = keyof typeof ESTADOS_LISTA;
 export const parseEstadoLista = (v: string | undefined): EstadoLista => (v && Object.prototype.hasOwnProperty.call(ESTADOS_LISTA, v) ? (v as EstadoLista) : "pendientes");
+
+/*
+ * Plazas por categoría (decisión del fundador, 9 de octubre de 2026: «me parece bien que se especifiquen los pesos para los combates, las
+ * plazas por categoría»). El organizador puede ofrecer solo ciertas categorías, cada una con un número de plazas. Con plazas, el peleador
+ * elige entre ellas; cuando una se llena, las solicitudes nuevas o pendientes quedan «en lista de espera» y no se pueden aceptar más
+ * de las plazas que hay (el organizador puede ampliarlas). Sin plazas, cualquier categoría vale, como antes.
+ */
+export const PLAZAS_MAX = 64;
+export const CATEGORIAS_MAX = 30;
+export type Plaza = { id?: string; divisionId: string; weightClass: string; places: number };
+
+/** Clave de una categoría (división y peso); la división vacía es "". */
+export const claveCategoria = (divisionId: string | null | undefined, weightClass: string | null | undefined) => `${divisionId ?? ""}|${weightClass ?? ""}`;
+
+/** Número de plazas de un formulario: entero de 1 a 64. */
+export const parsePlazas = (v: string): number | null => (/^\d{1,2}$/.test(v.trim()) && Number(v) >= 1 && Number(v) <= PLAZAS_MAX ? Number(v) : null);
+
+export type Ocupacion = { places: number; aceptadas: number; pendientes: number; libres: number; llena: boolean };
+
+/** Cuántas plazas quedan en cada categoría ofrecida, contando las aceptadas, y cuántas solicitudes esperan. */
+export function ocupacion(plazas: Plaza[], filas: { status: RegistrationStatus; divisionId: string | null; weightClass: string | null }[]): Map<string, Ocupacion> {
+  const m = new Map<string, Ocupacion>();
+  for (const p of plazas) m.set(claveCategoria(p.divisionId, p.weightClass), { places: p.places, aceptadas: 0, pendientes: 0, libres: p.places, llena: false });
+  for (const r of filas) {
+    const o = m.get(claveCategoria(r.divisionId, r.weightClass));
+    if (!o) continue;
+    if (r.status === "ACCEPTED") o.aceptadas++;
+    else if (r.status === "PENDING") o.pendientes++;
+  }
+  for (const o of m.values()) { o.libres = Math.max(0, o.places - o.aceptadas); o.llena = o.libres === 0; }
+  return m;
+}
+
+/** Una solicitud pendiente en una categoría sin plazas libres está en lista de espera. */
+export const enListaDeEspera = (r: { status: RegistrationStatus; divisionId: string | null; weightClass: string | null }, ocup: Map<string, Ocupacion>) =>
+  r.status === "PENDING" && !!ocup.get(claveCategoria(r.divisionId, r.weightClass))?.llena;
+
+/**
+ * ¿Caben estas aceptaciones nuevas? Devuelve la clave de la primera categoría que se pasaría de sus plazas, o null si caben todas.
+ * Las categorías sin plazas definidas no tienen límite.
+ */
+export function categoriaSinSitio(ocup: Map<string, Ocupacion>, nuevas: { divisionId: string | null; weightClass: string | null }[]): string | null {
+  const suma = new Map<string, number>();
+  for (const r of nuevas) { const k = claveCategoria(r.divisionId, r.weightClass); suma.set(k, (suma.get(k) ?? 0) + 1); }
+  for (const [k, n] of suma) { const o = ocup.get(k); if (o && o.aceptadas + n > o.places) return k; }
+  return null;
+}

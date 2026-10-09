@@ -15,7 +15,7 @@ import { categoryLabel, parseCompetitionChoice } from "../../lib/common/discipli
 import { publicFighterName } from "../../lib/common/names";
 import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
-import { REG_REPLY_MAX, REGISTRATIONS_PER_DAY, inscripcionAbierta, parseRegistration, parseRegistrationSettings, puedeResponderInscripcion, puedeRetirarInscripcion } from "../../lib/events/registrations";
+import { CATEGORIAS_MAX, REG_REPLY_MAX, REGISTRATIONS_PER_DAY, categoriaSinSitio, claveCategoria, inscripcionAbierta, ocupacion, parsePlazas, parseRegistration, parseRegistrationSettings, puedeResponderInscripcion, puedeRetirarInscripcion } from "../../lib/events/registrations";
 import { checkLengths, go, ownEvent, str, withLock } from "./shared";
 
 /** Correo después de responder (`after`): un proveedor lento no deja el botón colgado. Al contestarlo, le llega a `responderA`. */
@@ -42,6 +42,45 @@ export async function setRegistration(f: FormData) {
 }
 
 /**
+ * El organizador ofrece una categoría (división y peso) con un número de plazas, o cambia las plazas de una que ya ofrece.
+ * No puede dejar menos plazas que peleadores aceptados en ella.
+ */
+export async function setSlot(f: FormData) {
+  const user = await requireOrganizer();
+  const event = await ownEvent(str(f, "eventId"), user);
+  const back = `/organizador/${event.slug}#plazas`;
+  const categoria = parseCompetitionChoice(event.discipline, event.level, str(f, "weightClass"), str(f, "divisionId"));
+  if (!categoria || !categoria.weightClass) go(back, { problema: "plazas_categoria" });
+  const places = parsePlazas(str(f, "places"));
+  if (!places) go(back, { problema: "plazas_numero" });
+  const divisionId = categoria.divisionId ?? "";
+  const weightClass = categoria.weightClass;
+  await withLock(`inscripciones:${event.id}`, async (tx) => {
+    const existentes = await tx.eventSlot.findMany({ where: { eventId: event.id } });
+    const misma = existentes.find((x) => x.divisionId === divisionId && x.weightClass === weightClass);
+    if (!misma && existentes.length >= CATEGORIAS_MAX) go(back, { problema: "plazas_demasiadas" });
+    const aceptadas = await tx.eventRegistration.count({ where: { eventId: event.id, status: "ACCEPTED", divisionId: divisionId || null, weightClass } });
+    if (places < aceptadas) go(back, { problema: "plazas_menos_que_aceptados" });
+    await tx.eventSlot.upsert({ where: { eventId_divisionId_weightClass: { eventId: event.id, divisionId, weightClass } }, create: { eventId: event.id, divisionId, weightClass, places }, update: { places } });
+    await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "REGISTRATION_SLOT_SET", after: { divisionId, weightClass, places } }, tx);
+  });
+  revalidatePath("/", "layout");
+  go(back, { aviso: "plazas_guardadas" });
+}
+
+/** El organizador deja de ofrecer una categoría. Las solicitudes que ya tiene en ella siguen en su lista. */
+export async function removeSlot(f: FormData) {
+  const user = await requireOrganizer();
+  const event = await ownEvent(str(f, "eventId"), user);
+  const back = `/organizador/${event.slug}#plazas`;
+  const quitada = await db.eventSlot.deleteMany({ where: { id: str(f, "slotId"), eventId: event.id } });
+  if (!quitada.count) go(back, { problema: "no_existe" });
+  await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "REGISTRATION_SLOT_REMOVED", after: { plaza: str(f, "slotId") } });
+  revalidatePath("/", "layout");
+  go(back, { aviso: "plazas_quitadas" });
+}
+
+/**
  * Un peleador pide participar. Hace falta su ficha (con la disciplina del evento) y el correo confirmado, y que la inscripción esté abierta.
  * Una solicitud por evento: si la retiró, puede volver a pedirla; si el organizador la rechazó, no (lo decide el organizador).
  */
@@ -56,9 +95,15 @@ export async function requestRegistration(f: FormData) {
   if (!inscripcionAbierta(event, todayMadrid())) go(`/veladas/${event.slug}`, { problema: "inscripcion_cerrada_ya" });
   const ficha = await db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: event.discipline } } });
   if (!ficha) go(back, { problema: "inscripcion_disciplina" });
-  checkLengths(f, back, { weightKg: 6, message: 1000 });
-  const categoria = parseCompetitionChoice(event.discipline, event.level, str(f, "weightClass"), str(f, "divisionId"));
+  checkLengths(f, back, { weightKg: 6, message: 1000, categoria: 120 });
+  // Con plazas por categoría, el formulario envía «categoria» = «división|peso»; si no, los dos campos sueltos.
+  const elegida = str(f, "categoria");
+  const [divisionElegida, pesoElegido] = elegida ? [elegida.split("|")[0] ?? "", elegida.split("|")[1] ?? ""] : [str(f, "divisionId"), str(f, "weightClass")];
+  const categoria = parseCompetitionChoice(event.discipline, event.level, pesoElegido, divisionElegida);
   if (!categoria) go(back, { problema: "cartel_categoria" });
+  // Con plazas por categoría, solo se puede pedir una de las ofrecidas.
+  const plazas = await db.eventSlot.findMany({ where: { eventId: event.id } });
+  if (plazas.length && !plazas.some((p) => claveCategoria(p.divisionId, p.weightClass) === claveCategoria(categoria.divisionId, categoria.weightClass))) go(back, { problema: "inscripcion_categoria_no_ofrecida" });
   const datos = parseRegistration({ weightKg: str(f, "weightKg"), message: str(f, "message") });
   if (!datos.ok) go(back, { problema: datos.problema });
   const valores = { divisionId: categoria.divisionId, weightClass: categoria.weightClass, ...datos.value };
@@ -79,7 +124,8 @@ export async function requestRegistration(f: FormData) {
       user.email);
   }
   revalidatePath("/", "layout");
-  go(`/veladas/${event.slug}/inscribirme`, { aviso: "inscripcion_enviada" });
+  const llena = plazas.length ? ocupacion(plazas, await db.eventRegistration.findMany({ where: { eventId: event.id }, select: { status: true, divisionId: true, weightClass: true } })).get(claveCategoria(r.divisionId, r.weightClass))?.llena : false;
+  go(`/veladas/${event.slug}/inscribirme`, { aviso: llena ? "inscripcion_en_espera" : "inscripcion_enviada" });
 }
 
 /** El peleador retira su solicitud (pendiente o ya aceptada). Se avisa al organizador. */
@@ -118,11 +164,22 @@ export async function answerRegistrations(f: FormData) {
   const reply = str(f, "reply").replace(/\s+/g, " ") || null;
   if (reply && reply.length > REG_REPLY_MAX) go(back, { problema: "solicitud_respuesta_larga" });
   const status = decision === "aceptar" ? "ACCEPTED" : "DECLINED";
-  const filas = await db.eventRegistration.findMany({ where: { id: { in: ids }, eventId: event.id }, include: { fighter: { include: { user: true } } } });
-  const cambian = filas.filter((r) => puedeResponderInscripcion(r.status) && r.status !== status);
-  if (!cambian.length) go(back, { problema: "inscripcion_sin_cambios" });
-  // Solo las que siguen en un estado que se puede responder: si un peleador la retiró mientras tanto, no se pisa.
-  await db.eventRegistration.updateMany({ where: { id: { in: cambian.map((r) => r.id) }, status: { in: ["PENDING", "ACCEPTED", "DECLINED"] } }, data: { status, reply, answeredAt: new Date() } });
+  // Bajo un bloqueo por evento: dos respuestas a la vez no pueden pasarse de las plazas de una categoría.
+  const cambian = await withLock(`inscripciones:${event.id}`, async (tx) => {
+    const filas = await tx.eventRegistration.findMany({ where: { id: { in: ids }, eventId: event.id }, include: { fighter: { include: { user: true } } } });
+    const elegidas = filas.filter((r) => puedeResponderInscripcion(r.status) && r.status !== status);
+    if (!elegidas.length) go(back, { problema: "inscripcion_sin_cambios" });
+    if (status === "ACCEPTED") {
+      const plazas = await tx.eventSlot.findMany({ where: { eventId: event.id } });
+      if (plazas.length) {
+        const todas = await tx.eventRegistration.findMany({ where: { eventId: event.id }, select: { status: true, divisionId: true, weightClass: true } });
+        if (categoriaSinSitio(ocupacion(plazas, todas), elegidas)) go(back, { problema: "inscripcion_sin_plazas" });
+      }
+    }
+    // Solo las que siguen en un estado que se puede responder: si un peleador la retiró mientras tanto, no se pisa.
+    await tx.eventRegistration.updateMany({ where: { id: { in: elegidas.map((r) => r.id) }, status: { in: ["PENDING", "ACCEPTED", "DECLINED"] } }, data: { status, reply, answeredAt: new Date() } });
+    return elegidas;
+  });
   await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: decision === "aceptar" ? "REGISTRATIONS_ACCEPTED" : "REGISTRATIONS_DECLINED", after: { inscripciones: cambian.map((r) => r.id) } });
   for (const r of cambian) {
     if (!r.fighter.user) continue;

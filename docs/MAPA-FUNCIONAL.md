@@ -38,7 +38,7 @@
 | `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
 | `/mi-panel` | (respuesta técnica, sin pantalla) | Cuenta con sesión iniciada | — | — |
 | `/mis-clases` | Solicitudes | Cuenta con sesión iniciada | `trainers.answerClassRequest`, `trainers.createClass`, `trainers.toggleClass` | ClassRequest, Trainer |
-| `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration |
+| `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration, EventSlot |
 | `/mis-reservas` | Mis reservas de clases | Cuenta con sesión iniciada | `trainers.cancelClassRequest` | ClassRequest |
 | `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, OrganizerRequest, Report |
 | `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
@@ -47,8 +47,9 @@
 | `/moderacion/usuarios` | Administración | Pública | `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `creador.regenerarCodigos` | AuditLog, User |
 | `/noticias` | Noticias | Pública | — | — |
 | `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
-| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent`, `registrations.setRegistration` | Event, EventRegistration, Fighter |
-| `/organizador/:slug/inscripciones` | Solicitudes para participar | Moderación | `registrations.answerRegistrations` | Event |
+| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent`, `registrations.removeSlot`, `registrations.setRegistration`, `registrations.setSlot` | Event, EventRegistration, EventSlot, Fighter |
+| `/organizador/:slug/emparejar` | Ayuda para emparejar | Moderación | `events.addCartelBout` | Event |
+| `/organizador/:slug/inscripciones` | Solicitudes para participar | Moderación | `registrations.answerRegistrations` | Event, EventSlot |
 | `/organizador/:slug/inscripciones/csv` | Una celda de CSV: entre comillas, y sin que una hoja de cálculo la tome por una fórmula (empieza por =, +, - o @). | Cuenta con sesión iniciada | — | Event |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
 | `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow`, `fighters.removeDiscipline` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, MediaItem, Profile |
@@ -72,8 +73,8 @@
 | `/subidas` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/subidas/:...clave` | Recibe un vídeo cuando el almacén es el disco del servidor (desarrollo, pruebas y demo). Con R2, el navegador sube directamente allí. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
-| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.createReport` | Event, EventRegistration, MediaItem |
-| `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Event, EventRegistration, FighterDiscipline |
+| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.createReport` | Event, EventRegistration, EventSlot, MediaItem |
+| `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Event, EventRegistration, EventSlot, FighterDiscipline |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
 «Quién puede entrar» se deduce del código de cada pantalla; las acciones comprueban sus permisos por su cuenta (siguiente tabla), nunca se fían de que la pantalla los haya comprobado.
@@ -214,8 +215,10 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `answerRegistrations` | Organizador (o moderación) con correo verificado | AuditLog, EventRegistration | EVENT: (varias) | Sí | — |
-| `requestRegistration` | Cuenta con correo verificado | AuditLog, EventRegistration, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | inscripcion_enviada |
+| `removeSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_REMOVED | — | plazas_quitadas |
+| `requestRegistration` | Cuenta con correo verificado | AuditLog, EventRegistration, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | — |
 | `setRegistration` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
+| `setSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_SET | — | plazas_guardadas |
 | `withdrawRegistration` | Cuenta con correo verificado | AuditLog, EventRegistration | EVENT: REGISTRATION_WITHDRAWN | Sí | inscripcion_retirada |
 
 ### `trainers`
@@ -249,6 +252,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Trainer | `accounts.deleteAccount`, `trainers.createMyTrainer` |
 | TrainingClass | `trainers.createMyTrainer`, `trainers.createClass`, `trainers.toggleClass` |
 | ClassRequest | `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| EventSlot | `registrations.setSlot`, `registrations.removeSlot` |
 | EventRegistration | `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations` |
 | FightProposal | `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal` |
 | Highlight | `accounts.deleteAccount`, `fighters.publishHighlight`, `fighters.manageHighlight`, `moderation.resolveReport` |
@@ -261,7 +265,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.login`, `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AuditLog | `accounts.login`, `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
 | Report | `bouts.respondBout`, `community.createReport`, `moderation.resolveReport` |
 | Follow | `accounts.saveInterests`, `community.toggleFollow`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `moderation.resolveReport` |
@@ -342,8 +346,9 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `pairing.ts` | `DatosPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
 | `registrations-data.ts` | `SolicitudConDatos`, `solicitudesDeEvento` |
-| `registrations.ts` | `ESTADOS_LISTA`, `EstadoLista`, `FilaInscripcion`, `FiltrosInscripcion`, `ORDENES`, `Orden`, `PESO_MAX`, `PESO_MIN`, `REGISTRATIONS_PER_DAY`, `REG_MESSAGE_MAX`, `REG_NOTE_MAX`, `REG_REPLY_MAX`, `REG_STATUS_LABEL`, `RegistrationParsed`, `filtrarYOrdenar`, `inscripcionAbierta`, `numeroDeFiltro`, `parseEstadoLista`, `parseOrden`, `parseRegistration`, `parseRegistrationSettings`, `puedeResponderInscripcion`, `puedeRetirarInscripcion` |
+| `registrations.ts` | `CATEGORIAS_MAX`, `ESTADOS_LISTA`, `EstadoLista`, `FilaInscripcion`, `FiltrosInscripcion`, `ORDENES`, `Ocupacion`, `Orden`, `PESO_MAX`, `PESO_MIN`, `PLAZAS_MAX`, `Plaza`, `REGISTRATIONS_PER_DAY`, `REG_MESSAGE_MAX`, `REG_NOTE_MAX`, `REG_REPLY_MAX`, `REG_STATUS_LABEL`, `RegistrationParsed`, `categoriaSinSitio`, `claveCategoria`, `enListaDeEspera`, `filtrarYOrdenar`, `inscripcionAbierta`, `numeroDeFiltro`, `ocupacion`, `parseEstadoLista`, `parseOrden`, `parsePlazas`, `parseRegistration`, `parseRegistrationSettings`, `puedeResponderInscripcion`, `puedeRetirarInscripcion` |
 
 ### `lib/fighters`
 

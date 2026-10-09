@@ -1325,3 +1325,45 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Límite honesto:** probado con Chromium emulando un móvil; falta un recorrido en un iPhone real y con un organizador de verdad que tenga decenas de solicitudes.
 
 **Próximos pasos:** preguntar al fundador si quiere cupos por categoría (por ejemplo, «8 plazas en -71 kg») y lista de espera; aura a promotoras y clubes (fase 2, punto 5).
+
+## 9 de octubre de 2026 — Plazas por categoría y ayuda para emparejar (Claude)
+
+**Qué se pidió** (el fundador, respondiendo a las dos ideas propuestas tras las inscripciones): «Me parece bien que se especifiquen los pesos para los combates, las plazas por categoría, está muy bien. Luego, en cuanto a los emparejamientos entre sí, que no es automático, claro. Sí, siempre con ayuda, sí, obviamente. Con ayuda que se vea el nivel o el nivel de popularidad de la aplicación, el número de combates, etcétera».
+
+**Qué se decidió y por qué:**
+- Las plazas son **opcionales**: sin ellas, la inscripción funciona como antes (cualquier categoría). Así no se rompe nada de lo que ya iba.
+- Con plazas, el peleador **solo puede pedir las categorías ofrecidas** y ve cuántas plazas quedan.
+- Cuando una categoría se llena, las solicitudes pendientes en ella pasan a **«En lista de espera»**. No es un estado guardado aparte: se deduce de las plazas. Así, si el organizador amplía las plazas, la lista de espera se vuelve «pendiente» sola.
+- No se puede **aceptar a más peleadores que plazas**, tampoco aceptando varios a la vez ni con dos respuestas simultáneas (bloqueo por evento). Tampoco se pueden dejar menos plazas que aceptados.
+- **Emparejar nunca es automático:** la página propone, para cada aceptado, los tres rivales más parecidos de su misma categoría y explica las diferencias. El organizador decide y pulsa «Añadir este combate al cartel».
+- **«Nivel»** se muestra con datos que ya existen: récord en la disciplina y el nivel del evento, número de combates, porcentaje de victorias, **aura (la popularidad dentro de la aplicación)**, edad y peso declarado.
+  - Para ordenar a los rivales, lo que más pesa es la experiencia (35 %), después el peso y el porcentaje de victorias (20 % cada uno), el aura (15 %) y la edad (10 %).
+  - El parecido se resume en «Muy igualados», «Igualados» o «Con diferencias».
+  - Los avisos se dan en palabras: «6 kg de diferencia de peso», «20 combates de diferencia de experiencia», «15 años de diferencia de edad».
+  - Es una escala inicial y se puede ajustar en `lib/events/pairing.ts`.
+
+**Qué se hizo:**
+- Modelo `EventSlot` (evento, división, peso, plazas). Migración `20261009120000_plazas_por_categoria`, que solo añade una tabla.
+- Acciones `setSlot` y `removeSlot`; comprobaciones nuevas en `requestRegistration` (categoría ofrecida) y `answerRegistrations` (plazas).
+- **Organizador:**
+  - sección «Plazas por categoría (opcional)» en la gestión del evento: ofrecer, cambiar plazas y quitar categorías, con «N de M plazas cubiertas · X en lista de espera»;
+  - resumen de plazas en la lista de solicitudes, con enlace que filtra cada categoría;
+  - etiqueta «En lista de espera» en las tarjetas;
+  - página nueva **«Ayuda para emparejar»** (`/organizador/[slug]/emparejar`), enlazada desde la lista y desde la gestión del evento.
+- **Peleador:**
+  - elige su categoría entre las ofrecidas, con las plazas que quedan;
+  - ve «En lista de espera» en su solicitud y en «Mis inscripciones»;
+  - recibe un aviso al pedir en una categoría llena.
+- **Página pública del evento:** «Categorías que busca el organizador» y las plazas que quedan.
+
+**Qué salió mal:**
+- La migración volvió a salir vacía. Esta vez Postgres estaba arrancado: la carpeta de la migración ya existía sin `migration.sql` mientras se generaba, y Prisma falló en silencio. Se borró el registro en las dos bases locales y se regeneró. Lección anotada.
+- La prueba nueva falló al principio por esperar a un aviso que ya estaba en pantalla. Elegía la categoría antes de que la página nueva estuviera lista, y el formulario llegaba sin peso. Ahora la prueba espera a que la plaza esté guardada y la página cargada. **No era un fallo de la aplicación**, aunque en un móvil muy lento podría pasarle algo parecido a una persona si elige antes de que la página termine de cargar; queda anotado.
+
+**Pruebas:**
+- 642 unitarias (8 nuevas en `plazas-y-emparejar.test.ts`).
+- `plazas.mjs` nueva, con 23 comprobaciones de punta a punta y de accesibilidad.
+- Réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **747 comprobaciones, 0 fallos**.
+- Se volvieron a pasar `inscripciones`, `categorias`, `enlaces`, `movil` y `paneles`.
+
+**Próximos pasos:** ver con el fundador si la escala de parecido le convence con datos reales.

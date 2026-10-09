@@ -311,3 +311,5 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 
 - **Cupos por categoría y lista de espera** (Claude, 9 oct, al implementar las inscripciones): «8 plazas en -71 kg»; al llenarse, las siguientes quedan en espera. Pendiente de que el fundador lo quiera.
 - **Sugerir emparejamientos entre los aceptados** (Claude, 9 oct): parejas de la misma categoría con récord parecido, como ayuda y nunca automático. Pendiente de decisión del fundador.
+- **Cupos por categoría y lista de espera** — **hecho (9 oct):** el fundador lo aprobó («me parece bien que se especifiquen los pesos para los combates, las plazas por categoría»).
+- **Sugerir emparejamientos entre los aceptados** — **hecho (9 oct)** como ayuda, nunca automática («siempre con ayuda […] que se vea el nivel, la popularidad, el número de combates»). Idea derivada (Claude, 9 oct): permitir al organizador ajustar qué pesa más en el parecido (experiencia, peso, aura) si la escala inicial no le convence.

@@ -9,7 +9,7 @@ import { EVENT_KIND_LABEL, PROVINCES, fmtDate } from "../../../../lib/common/lab
 import { DISCIPLINE_LABEL, categoryLabel, weightClassesFor } from "../../../../lib/common/disciplines";
 import { divisionsFor } from "../../../../lib/common/competition";
 import { todayMadrid } from "../../../../lib/common/dates";
-import { ESTADOS_LISTA, ORDENES, REG_REPLY_MAX, REG_STATUS_LABEL, filtrarYOrdenar, inscripcionAbierta, numeroDeFiltro, parseEstadoLista, parseOrden, type EstadoLista } from "../../../../lib/events/registrations";
+import { ESTADOS_LISTA, ORDENES, REG_REPLY_MAX, REG_STATUS_LABEL, claveCategoria, enListaDeEspera, ocupacion, filtrarYOrdenar, inscripcionAbierta, numeroDeFiltro, parseEstadoLista, parseOrden, type EstadoLista } from "../../../../lib/events/registrations";
 import { solicitudesDeEvento } from "../../../../lib/events/registrations-data";
 import { answerRegistrations } from "../../../actions/registrations";
 import { BotonesFiltro, CampoFiltro, FiltrosActivos, MasFiltros } from "../../../components/Filtros";
@@ -55,6 +55,8 @@ export default async function Inscripciones({ params, searchParams }: { params: 
   const conFiltros = filtrarYOrdenar(todas, { ...filtros, estado: "TODAS" });
   const cuenta = (e: EstadoLista) => (e === "todas" ? conFiltros.length : conFiltros.filter((r) => r.status === ESTADOS_LISTA[e]).length);
   const aceptadas = todas.filter((r) => r.status === "ACCEPTED").length;
+  const plazas = await db.eventSlot.findMany({ where: { eventId: event.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] });
+  const ocup = ocupacion(plazas, todas);
 
   // Los parámetros tal y como están, para volver a la misma lista después de responder y para quitar filtros sueltos.
   const p: Record<string, string | undefined> = { q: filtros.texto, estado: estado === "pendientes" ? undefined : estado, peso: filtros.weightClass, division: filtros.divisionId, provincia: filtros.provincia, mincomb: filtros.minCombates?.toString(), maxcomb: filtros.maxCombates?.toString(), minedad: filtros.minEdad?.toString(), maxedad: filtros.maxEdad?.toString(), minpeso: filtros.minPeso?.toString(), maxpeso: filtros.maxPeso?.toString(), orden: orden === "fecha" ? undefined : orden };
@@ -76,7 +78,25 @@ export default async function Inscripciones({ params, searchParams }: { params: 
         <p className="lead" style={{ fontSize: 16, margin: 0 }}>{event.name} · {EVENT_KIND_LABEL[event.kind]} de {DISCIPLINE_LABEL[event.discipline]} · {fmtDate(event.date)}</p>
         <p className="meta" style={{ margin: "6px 0 0" }}>{abierta ? "La inscripción está abierta." : "La inscripción está cerrada: no llegan solicitudes nuevas, pero puedes responder las que tienes."} Aceptar a un peleador no lo pone en el cartel: después lo emparejas tú.</p>
       </div>
-      {aceptadas > 0 && <Link className="btn" href={`/organizador/${event.slug}#anadir-combate`} style={{ alignSelf: "flex-start" }}>Emparejar a los aceptados en el cartel ({aceptadas})</Link>}
+      {aceptadas > 0 && <Link className="btn" href={`/organizador/${event.slug}/emparejar`} style={{ alignSelf: "flex-start" }}>Emparejar a los aceptados ({aceptadas})</Link>}
+
+      {plazas.length > 0 && (
+        <section className="tarjeta" aria-labelledby="titulo-plazas-lista" style={{ gap: 8 }}>
+          <h2 id="titulo-plazas-lista" style={{ margin: 0, font: "700 18px var(--font)" }}>Plazas por categoría</h2>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+            {plazas.map((pl) => {
+              const o = ocup.get(claveCategoria(pl.divisionId, pl.weightClass));
+              return (
+                <li key={pl.id}>
+                  <Link href={con({ peso: pl.weightClass, division: pl.divisionId || undefined, estado: "todas" })}>{categoryLabel(event.discipline, event.level, pl.divisionId || null, pl.weightClass)}</Link>
+                  <span className="meta"> · {o?.aceptadas ?? 0} de {pl.places} cubiertas{o?.llena ? " (completa)" : ""}{o?.pendientes ? ` · ${o.pendientes} ${o.llena ? "en lista de espera" : o.pendientes === 1 ? "pendiente" : "pendientes"}` : ""}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <Link href={`/organizador/${event.slug}#plazas`}>Cambiar las plazas</Link>
+        </section>
+      )}
 
       <nav aria-label="Estado de las solicitudes" className="estados-lista">
         {(Object.keys(NOMBRE_ESTADO) as EstadoLista[]).map((e) => (
@@ -142,7 +162,7 @@ export default async function Inscripciones({ params, searchParams }: { params: 
             {r.status !== "WITHDRAWN" ? (
               <label className="marcar"><input type="checkbox" name="ids" value={r.id} form="lote" aria-label={`Marcar a ${r.nombre}`} /><strong>{r.nombre}</strong></label>
             ) : <strong>{r.nombre}</strong>}
-            <span className={`pildora ${PILDORA[r.status]}`}>{REG_STATUS_LABEL[r.status]}</span>
+            <span className={`pildora ${PILDORA[r.status]}`}>{enListaDeEspera(r, ocup) ? "En lista de espera" : REG_STATUS_LABEL[r.status]}</span>
           </div>
           <div className="meta">{[r.gimnasio, r.provincia].filter(Boolean).join(" · ") || "Sin gimnasio ni provincia indicados"} · <Link href={`/peleadores/${r.slug}`}>Ver su ficha</Link></div>
           <dl className="datos-solicitud">
