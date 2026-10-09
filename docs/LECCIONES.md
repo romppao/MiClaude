@@ -300,3 +300,10 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 | El fundador preguntó si se había quitado «solicitar participar en una velada» | Era otra propuesta del diseño v3 que nunca se implementó, y no se le había avisado (la misma causa que con los retos) | Antes de cerrar cada entrega, repasar la lista de propuestas del diseño aprobado y decir al fundador cuáles faltan |
 | La primera migración de inscripciones salió vacía y quedó marcada como aplicada | Se generó con Postgres todavía arrancando tras reiniciar el contenedor | Comprobar que Postgres responde antes de generar una migración y leer el SQL generado antes de aplicarlo |
 | Una comprobación falló porque «Kickboxing» aparecía dos veces en la página | `getByText` sin acotar choca con el modo estricto de Playwright | En las pruebas, acotar el texto al bloque que se comprueba (aviso, tarjeta), no a toda la página |
+
+## 9 de octubre de 2026 — Plazas y emparejar (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| La migración de plazas salió vacía (solo el comentario) y quedó aplicada en las bases locales | Se creó la carpeta de la migración **antes** de generar el SQL; Prisma se negó a leer las migraciones (falta `migration.sql`) y el error quedó oculto al redirigir la salida | Generar el SQL a una variable **sin** la carpeta creada, comprobar que no está vacío (`wc -l`) y solo entonces escribir el archivo |
+| La prueba elegía la categoría y el formulario llegaba sin peso | Esperaba un aviso que ya estaba en pantalla del paso anterior y seguía antes de que cargara la página nueva | Tras enviar un formulario, esperar a un cambio que solo puede producir ese envío (dato guardado, dirección nueva) y a que la página esté lista |

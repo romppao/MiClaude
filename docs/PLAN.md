@@ -68,7 +68,7 @@ Entrega de Claude Design «Ring España App v3». **Fase 1 (hecha por Claude el 
 **Fase 2 (por planificar en fichas):** cada punto necesita modelo, acciones con guardas, pantallas y pruebas, como en la fase 1.
 1. ~~Propuestas de combate y sparring entre peleadores~~ — **hecho el 8 de octubre** (`/propuestas`, `FightProposal`).
 2. ~~Reservas de clases~~ — **hecho el 8 de octubre** como solicitud con calendario y barra de horas (`/clases`, `ClassRequest`); sin pagos hasta que el fundador decida (`TRASLADO.md` §7.19).
-3. ~~Inscripciones a veladas por categorías~~ — **hecho el 9 de octubre** (`EventRegistration`, `/veladas/[slug]/inscribirme`, `/mis-inscripciones`, `/organizador/[slug]/inscripciones` con filtros, órdenes, respuesta en bloque y CSV).
+3. ~~Inscripciones a veladas por categorías~~ — **hecho el 9 de octubre** (`EventRegistration`, `/veladas/[slug]/inscribirme`, `/mis-inscripciones`, `/organizador/[slug]/inscripciones` con filtros, órdenes, respuesta en bloque y CSV); el 9 de octubre, también plazas por categoría con lista de espera y ayuda para emparejar (`/organizador/[slug]/emparejar`).
 4. ~~Multimedia del público por combate~~ — **hecho en la fase 2a** (8 oct).
 5. Aura a promotoras y clubes (una por persona) y perfil público de la entidad con su aura y comentarios.
 6. Plantilla del club (peleadores y entrenadores con confirmación de cada uno).

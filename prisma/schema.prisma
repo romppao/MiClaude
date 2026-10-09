@@ -189,6 +189,19 @@ enum RegistrationStatus {
 
 // Solicitud de un peleador para participar en una velada o un interclub. Aceptarla no crea un combate: el organizador empareja después
 // a los aceptados en su cartel. Una por peleador y evento.
+// Plazas por categoría que ofrece el organizador al abrir la inscripción (9 de octubre de 2026). Sin plazas, cualquier categoría vale.
+// divisionId vacío se guarda como "" para que la clave única funcione (en Postgres, dos NULL no chocan).
+model EventSlot {
+  id          String @id @default(cuid())
+  eventId     String
+  event       Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  divisionId  String @default("")
+  weightClass String
+  places      Int
+
+  @@unique([eventId, divisionId, weightClass])
+}
+
 model EventRegistration {
   id          String             @id @default(cuid())
   eventId     String
@@ -350,6 +363,7 @@ model Event {
   registrationNote  String?
   registrationUntil DateTime?           @db.Date
   registrations     EventRegistration[]
+  slots             EventSlot[]
 
   @@index([discipline, date])
   @@index([organizerId])

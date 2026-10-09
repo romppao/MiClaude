@@ -79,7 +79,8 @@ export async function createEvent(f: FormData) {
 export async function addCartelBout(f: FormData) {
   const user = await requireOrganizer();
   const event = await ownEvent(str(f, "eventId"), user);
-  const back = `/organizador/${event.slug}`;
+  // Desde la ayuda para emparejar se vuelve a ella; desde la gestión del evento, a la gestión.
+  const back = str(f, "back") === `/organizador/${event.slug}/emparejar` ? `/organizador/${event.slug}/emparejar` : `/organizador/${event.slug}`;
   checkLengths(f, back, { evidenceUrl: LIMITS.url });
   // Cada esquina se elige de una lista que lleva el identificador de la ficha (no un texto que haya que escribir igual).
   const [a, b] = await Promise.all([

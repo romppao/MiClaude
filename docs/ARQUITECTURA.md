@@ -321,3 +321,9 @@ El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/In
 - Acciones en `actions/registrations.ts`: `setRegistration` (organizador del evento: abrir, cerrar, requisitos), `requestRegistration` (correo confirmado, ficha con la disciplina del evento, inscripción abierta, `withLock`, 10 al día), `withdrawRegistration` (el propio peleador), `answerRegistrations` (organizador: una con `solo=id:decisión` o varias con `ids`, hasta 200; no pisa una solicitud retirada mientras tanto).
 - Dominio nuevo `lib/events` (→ `common`, `fighters`): reglas y filtros en `registrations.ts`; `registrations-data.ts` calcula récord en la disciplina y nivel del evento, aura y edad para la lista y el CSV.
 - Aceptar no crea combates: los aceptados salen primero en las listas del cartel. El correo del peleador solo lo ve el organizador si está aceptado.
+
+### Plazas por categoría y ayuda para emparejar (9 de octubre de 2026)
+- `EventSlot` (evento, `divisionId` —"" si no hay—, `weightClass`, `places`), única por evento y categoría. Acciones `setSlot`/`removeSlot` (organizador del evento, como mucho 30 categorías y 64 plazas, nunca menos plazas que aceptados).
+- Con plazas, `requestRegistration` solo admite categorías ofrecidas (campo `categoria` = «división|peso»); `answerRegistrations` no acepta por encima de las plazas, bajo `withLock("inscripciones:<evento>")`.
+- «Lista de espera» no es un estado guardado: pendiente en una categoría sin plazas libres (`ocupacion`, `enListaDeEspera` en `lib/events/registrations.ts`).
+- `lib/events/pairing.ts`: distancia entre dos peleadores (experiencia 35 %, peso 20 %, % de victorias 20 %, aura 15 %, edad 10 %), etiqueta de parecido y avisos; `/organizador/[slug]/emparejar` propone los tres más parecidos de la misma categoría y añade el combate con `addCartelBout` (que admite volver a esa página con `back`).

@@ -105,6 +105,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261009120000_plazas_por_categoria/migration.sql",
+    "purpose": "Migración: plazas por categoría (EventSlot) en la inscripción de veladas e interclubs.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -675,6 +680,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/organizador/[slug]/emparejar/page.tsx",
+    "purpose": "Ayuda para emparejar: nivel de cada aceptado y los rivales más parecidos de su categoría, con botón para añadir el combate al cartel.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/organizador/[slug]/inscripciones/csv/route.ts",
     "purpose": "Descarga en CSV de las solicitudes de un evento con los mismos filtros y orden que la pantalla; solo su organizador o la administración.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1020,6 +1030,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/events/pairing.ts",
+    "purpose": "Distancia y parecido entre dos peleadores (experiencia, peso, victorias, aura, edad) y avisos de diferencias para la ayuda a emparejar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/events/registrations-data.ts",
     "purpose": "Carga las solicitudes de un evento con el récord de cada peleador en la disciplina y el nivel del evento, su aura y su edad.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1265,6 +1280,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/plazas.mjs",
+    "purpose": "Prueba de navegador de las plazas por categoría, la lista de espera y la ayuda para emparejar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/pulido.mjs",
     "purpose": "Recorre volumen/paginación de colas y escrituras condicionadas, contexto y opciones desconocidas para reproducir fallos de integridad.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1417,6 +1437,11 @@
   {
     "path": "tests/unit/paths.test.ts",
     "purpose": "Prueba retorno interno y rechaza URLs/variantes que redirigirían fuera de la aplicación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/plazas-y-emparejar.test.ts",
+    "purpose": "Pruebas unitarias de las plazas por categoría y de la ayuda para emparejar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

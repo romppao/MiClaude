@@ -104,3 +104,8 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Pedido por el fundador:** pedir participar en una velada o interclub (nunca se había implementado: propuesta n.º 3 del diseño v3) y que el organizador filtre, ordene y elija con facilidad.
 **Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
 **Qué debe hacer el siguiente asistente:** no poner a los aceptados en el cartel de forma automática ni añadir cupos sin decisión del fundador; probar la lista con un organizador real y muchas solicitudes.
+
+## 9 de octubre de 2026 — Plazas por categoría y ayuda para emparejar
+**Pedido por el fundador:** plazas por categoría (aprobado) y emparejamientos con ayuda, nunca automáticos, viendo nivel, popularidad y combates.
+**Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
+**Qué debe hacer el siguiente asistente:** no convertir la ayuda en emparejamiento automático; si se ajusta la escala de parecido, hacerlo en `lib/events/pairing.ts` con sus pruebas.

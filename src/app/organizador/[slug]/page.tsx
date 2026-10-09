@@ -13,8 +13,8 @@ import { publicFighterName } from "../../../lib/common/names";
 import { setBoutEvidence } from "../../actions/bouts";
 import { addCartelBout, removeCartelBout, setBoutResult, setEventStatus, updateEvent } from "../../actions/events";
 import { EVENT_KIND_LABEL, PROVINCES } from "../../../lib/common/labels";
-import { setRegistration } from "../../actions/registrations";
-import { REG_NOTE_MAX, inscripcionAbierta } from "../../../lib/events/registrations";
+import { removeSlot, setRegistration, setSlot } from "../../actions/registrations";
+import { PLAZAS_MAX, REG_NOTE_MAX, claveCategoria, inscripcionAbierta, ocupacion } from "../../../lib/events/registrations";
 import { todayMadrid } from "../../../lib/common/dates";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
@@ -31,10 +31,13 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
   const fighters = await db.fighter.findMany({ where: { hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }], take: MAX_LISTA + 1, include: { gym: true } });
   const past = eventDayReached(event.date);
   // Inscripción: cuántas solicitudes esperan respuesta y quiénes están aceptados (salen primero al formar el cartel).
-  const [porEstado, aceptados] = await Promise.all([
+  const [porEstado, aceptados, plazas, filasCategoria] = await Promise.all([
     db.eventRegistration.groupBy({ by: ["status"], where: { eventId: event.id }, _count: { _all: true } }),
     db.eventRegistration.findMany({ where: { eventId: event.id, status: "ACCEPTED" }, select: { fighterId: true } }),
+    db.eventSlot.findMany({ where: { eventId: event.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] }),
+    db.eventRegistration.findMany({ where: { eventId: event.id }, select: { status: true, divisionId: true, weightClass: true } }),
   ]);
+  const ocup = ocupacion(plazas, filasCategoria);
   const nEstado = (s: string) => porEstado.find((x) => x.status === s)?._count._all ?? 0;
   const idsAceptados = new Set(aceptados.map((a) => a.fighterId));
   const hoy = todayMadrid();
@@ -98,7 +101,10 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
             Gestionar las solicitudes{nEstado("PENDING") ? ` (${nEstado("PENDING")} ${nEstado("PENDING") === 1 ? "pendiente" : "pendientes"})` : ""}
           </Link>
         )}
-        {nEstado("ACCEPTED") > 0 && <p className="meta" style={{ margin: 0 }}>{nEstado("ACCEPTED") === 1 ? "1 peleador aceptado" : `${nEstado("ACCEPTED")} peleadores aceptados`}: salen primero en las listas de «Añadir un combate al cartel».</p>}
+        {nEstado("ACCEPTED") > 0 && <>
+          <p className="meta" style={{ margin: 0 }}>{nEstado("ACCEPTED") === 1 ? "1 peleador aceptado" : `${nEstado("ACCEPTED")} peleadores aceptados`}: salen primero en las listas de «Añadir un combate al cartel».</p>
+          <Link className="btn secondary" href={`/organizador/${event.slug}/emparejar`} style={{ alignSelf: "flex-start" }}>Ayuda para emparejar a los aceptados</Link>
+        </>}
         {event.status === "SCHEDULED" && diaEvento >= hoy ? (
           <form action={setRegistration} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input type="hidden" name="eventId" value={event.id} />
@@ -112,6 +118,43 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
             </div>
           </form>
         ) : <p className="mut" style={{ margin: 0 }}>{event.status === "CANCELLED" ? "La velada está cancelada: no se puede abrir la inscripción." : "La fecha del evento ya ha pasado: no se puede abrir la inscripción."}</p>}
+      </section>
+
+      {/* Plazas por categoría (decisión del fundador, 9 de octubre de 2026). Opcionales: sin ellas, cualquier categoría vale. */}
+      <section id="plazas" aria-labelledby="titulo-plazas" className="tarjeta" style={{ marginTop: 16, scrollMarginTop: 80 }}>
+        <h2 id="titulo-plazas" style={{ margin: 0 }}>Plazas por categoría (opcional)</h2>
+        <p className="mut" style={{ margin: 0 }}>{plazas.length ? "Los peleadores solo pueden pedir estas categorías. Cuando una se llena, las solicitudes nuevas quedan en lista de espera y no puedes aceptar más de las plazas que indicas." : "Si indicas las categorías de peso que buscas y cuántas plazas tiene cada una, los peleadores solo podrán pedir esas y verán cuántas plazas quedan. Si no indicas ninguna, se admite cualquier categoría."}</p>
+        {plazas.length > 0 && (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            {plazas.map((pl) => {
+              const o = ocup.get(claveCategoria(pl.divisionId, pl.weightClass));
+              const nombreCat = categoryLabel(event.discipline, event.level, pl.divisionId || null, pl.weightClass);
+              return (
+                <li key={pl.id} style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+                  <strong>{nombreCat}</strong>
+                  <span className="meta">{o?.aceptadas ?? 0} de {pl.places} plazas cubiertas{o?.llena ? " · completa" : ""}{o?.pendientes ? ` · ${o.pendientes} ${o.llena ? "en lista de espera" : o.pendientes === 1 ? "pendiente" : "pendientes"}` : ""}</span>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+                    <form action={setSlot} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+                      <input type="hidden" name="eventId" value={event.id} /><input type="hidden" name="divisionId" value={pl.divisionId} /><input type="hidden" name="weightClass" value={pl.weightClass} />
+                      <label className="field"><span>Plazas</span><input name="places" type="number" inputMode="numeric" min={1} max={PLAZAS_MAX} defaultValue={pl.places} required style={{ width: 96 }} aria-label={`Plazas en ${nombreCat}`} /></label>
+                      <button className="secondary" aria-label={`Guardar las plazas de ${nombreCat}`}>Guardar las plazas</button>
+                    </form>
+                    <form action={removeSlot}>
+                      <input type="hidden" name="eventId" value={event.id} /><input type="hidden" name="slotId" value={pl.id} />
+                      <button className="secondary" aria-label={`Dejar de ofrecer ${nombreCat}`}>Quitar esta categoría</button>
+                    </form>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <form action={setSlot} className="search" aria-label="Ofrecer plazas en una categoría" style={{ paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+          <input type="hidden" name="eventId" value={event.id} />
+          <SelectorCategoria modo="combate" fijas={{ discipline: event.discipline, level: event.level }} />
+          <label className="field"><span>Número de plazas</span><input name="places" type="number" inputMode="numeric" min={1} max={PLAZAS_MAX} required style={{ width: 120 }} /><span className="hint">Peleadores que puedes aceptar en esta categoría.</span></label>
+          <button>Ofrecer plazas en esta categoría</button>
+        </form>
       </section>
 
       <h2 id="anadir-combate" style={{ scrollMarginTop: 80 }}>Añadir un combate al cartel</h2>
