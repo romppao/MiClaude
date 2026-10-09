@@ -109,3 +109,8 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Pedido por el fundador:** plazas por categoría (aprobado) y emparejamientos con ayuda, nunca automáticos, viendo nivel, popularidad y combates.
 **Qué cambié y por qué:** entrada del mismo día en `DIARIO.md` y sección en `ARQUITECTURA.md`.
 **Qué debe hacer el siguiente asistente:** no convertir la ayuda en emparejamiento automático; si se ajusta la escala de parecido, hacerlo en `lib/events/pairing.ts` con sus pruebas.
+
+## 9 de octubre de 2026 — Buscar rival con filtros e inscripción visible
+**Pedido por el fundador:** filtros para retar o buscar sparring (gimnasio, combates, guardia…) y que el peleador encuentre cómo inscribirse.
+**Qué cambié y por qué:** entrada del mismo día en `DIARIO.md`.
+**Qué debe hacer el siguiente asistente:** no abrir solos los eventos antiguos; si se añaden filtros, van en `lib/fighters/rivals.ts` con sus pruebas.

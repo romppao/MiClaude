@@ -58,7 +58,7 @@
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
 | `/promotores` | Promotores | Pública | — | User |
 | `/promotores/:id` | (ficha individual: el título depende del elemento) | Pública | — | Event, User |
-| `/propuestas` | Retos y sparrings | Cuenta con sesión iniciada | `proposals.answerProposal`, `proposals.cancelProposal` | FightProposal, Fighter |
+| `/propuestas` | Retos y sparrings | Cuenta con sesión iniciada | `proposals.answerProposal`, `proposals.cancelProposal` | Aura, Bout, FightProposal, Fighter |
 | `/ranking` | Ránking de aura | Pública | — | — |
 | `/recuperar` | ¿Has olvidado tu contraseña? | Pública | `accounts.requestPasswordReset` | — |
 | `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
@@ -363,6 +363,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `privacy.ts` | `recordHidden`, `shownRecord` |
 | `proposals.ts` | `PROPOSALS_PER_DAY`, `PROPOSAL_DAYS_AHEAD`, `PROPOSAL_KIND_LABEL`, `PROPOSAL_MESSAGE_MAX`, `PROPOSAL_PLACE_MAX`, `PROPOSAL_REPLY_MAX`, `PROPOSAL_STATUS_LABEL`, `ProposalInput`, `ProposalParsed`, `parseProposal`, `parseProposalKind`, `puedeCancelarPropuesta`, `puedeResponderPropuesta` |
 | `record.ts` | `BoutForRecord`, `Prior`, `Records`, `Tally`, `combinedRecord`, `computeRecords`, `emptyTally`, `formatRecord`, `priorIsDetailed` |
+| `rivals.ts` | `Candidato`, `FiltrosRival`, `ORDENES_RIVAL`, `OrdenRival`, `filtrarYOrdenarRivales`, `hayFiltrosRival`, `parseFiltrosRival` |
 
 ### `lib/media`
 

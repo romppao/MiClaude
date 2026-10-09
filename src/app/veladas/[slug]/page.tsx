@@ -59,6 +59,15 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       </p>
       {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
       {/* Inscripción de peleadores (propuesta n.º 3 del diseño v3): visible mientras el organizador la tenga abierta. */}
+      {/* Cerrada en un evento futuro de un organizador: se dice, para que el peleador no busque un botón que no está (9 de octubre de 2026). */}
+      {!inscripcionAbierta(e, todayMadrid()) && e.organizerId && e.status === "SCHEDULED" && e.date.toISOString().slice(0, 10) >= todayMadrid() && (
+        <section className="tarjeta" aria-labelledby="titulo-inscripcion" style={{ gap: 8, margin: "12px 0" }}>
+          <h2 id="titulo-inscripcion" style={{ margin: 0, font: "800 20px var(--font)" }}>Inscripción de peleadores: cerrada</h2>
+          {user?.id === e.organizerId
+            ? <><p style={{ margin: 0 }}>Ábrela para que los peleadores de {DISCIPLINE_LABEL[e.discipline]} puedan pedir participar.</p><Link className="btn" href={`/organizador/${e.slug}#inscripcion`}>Abrir la inscripción</Link></>
+            : <p className="mut" style={{ margin: 0 }}>El organizador no está buscando peleadores para este evento ahora mismo. Si abre la inscripción, aquí aparecerá el botón «Solicitar participar». <Link href="/veladas?inscripcion=abierta">Ver eventos con inscripción abierta</Link></p>}
+        </section>
+      )}
       {inscripcionAbierta(e, todayMadrid()) && (
         <section className="tarjeta" aria-labelledby="titulo-inscripcion" style={{ borderColor: "var(--acc)", gap: 10, margin: "12px 0" }}>
           <h2 id="titulo-inscripcion" style={{ margin: 0, font: "800 20px var(--font)" }}>Inscripción abierta</h2>

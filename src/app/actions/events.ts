@@ -11,7 +11,7 @@ import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { parseEventKind, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl } from "../../lib/common/url";
-import { dayKey, eventDayReached, parseDay } from "../../lib/common/dates";
+import { dayKey, eventDayReached, parseDay, todayMadrid } from "../../lib/common/dates";
 import { divisionById, divisionEligible, knownBoxingAgeEligible } from "../../lib/common/competition";
 import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { notifyFollowersOfBout } from "../../lib/community/notify";
@@ -67,6 +67,8 @@ export async function createEvent(f: FormData) {
       data: {
         slug, name, kind, date, discipline, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province,
         promoter: str(f, "promoter") || null, ticketUrl, organizerId: user.id, createdById: user.id,
+        // Inscripción de peleadores abierta desde el principio si el organizador lo deja marcado (y el evento aún no se ha celebrado).
+        registrationOpen: str(f, "inscripcion") === "1" && dayKey(date) >= todayMadrid(),
       },
     });
   });

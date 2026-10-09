@@ -77,6 +77,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
         <label className="field"><span>Provincia</span><select name="province" defaultValue="" required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field"><span>Organiza (opcional)</span><input name="promoter" maxLength={LIMITS.promoter} /><span className="hint">El nombre que verá el público.</span></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace para comprar entradas (opcional)</span><input name="ticketUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /><span className="hint">Debe empezar por https://</span></label>
+        <label className="marcar" style={{ flexBasis: "100%" }}><input type="checkbox" name="inscripcion" value="1" defaultChecked /><span>Abrir la inscripción de peleadores: podrán pedir participar desde la página del evento y tú eliges a quién aceptas. Puedes cerrarla cuando quieras.</span></label>
         <button className="btn-grande" style={{ flexBasis: "100%" }}>Crear el evento</button>
       </form>
       <h2 id="mis-eventos" style={{ scrollMarginTop: 80 }}>Tus veladas</h2>

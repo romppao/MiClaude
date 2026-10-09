@@ -307,3 +307,10 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 |---|---|---|
 | La migración de plazas salió vacía (solo el comentario) y quedó aplicada en las bases locales | Se creó la carpeta de la migración **antes** de generar el SQL; Prisma se negó a leer las migraciones (falta `migration.sql`) y el error quedó oculto al redirigir la salida | Generar el SQL a una variable **sin** la carpeta creada, comprobar que no está vacío (`wc -l`) y solo entonces escribir el archivo |
 | La prueba elegía la categoría y el formulario llegaba sin peso | Esperaba un aviso que ya estaba en pantalla del paso anterior y seguía antes de que cargara la página nueva | Tras enviar un formulario, esperar a un cambio que solo puede producir ese envío (dato guardado, dirección nueva) y a que la página esté lista |
+
+## 9 de octubre de 2026 — «No me sale la opción de solicitar participación» (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| El peleador no encontraba cómo inscribirse en una velada | La inscripción quedaba cerrada al crear el evento y, cerrada, la página no decía nada: ni botón ni motivo | Cuando una función depende de que otra persona la active, la pantalla de quien la usa dice siempre en qué estado está y por qué; y por defecto, lo más útil para ambos (aquí, inscripción abierta al crear) |
+| El buscador de retos solo buscaba por nombre | Se pensó para alguien que ya sabe a quién retar | Toda búsqueda de personas se diseña también para quien no sabe el nombre: por lugar (gimnasio, provincia) y por características (peso, guardia, experiencia, edad) |

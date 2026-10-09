@@ -1394,3 +1394,36 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - La etiqueta sigue siendo visible, como exige la regla de accesibilidad del proyecto.
 
 **Pruebas:** `inclusiva`, `usabilidad` (con el texto nuevo de la etiqueta), `diseno`, `movil`, `servicios` y `accesibilidad`, sin fallos; captura a 390 px revisada.
+
+## 9 de octubre de 2026 — Buscar rival o sparring con filtros, e inscripción visible para el peleador (Claude)
+
+**Qué se pidió** (el fundador, probando como peleador en el móvil, con capturas de «Retos y sparrings» y del calendario de veladas):
+- «A la hora de querer retar a un peleador no me aparecen opciones ni filtros de búsqueda. Por ejemplo, quiero pelear contra un contrincante que sé que está en tal gimnasio, pero no me sé su nombre […] o estoy buscando un sparring con un par de filtros: que tenga X peleas, que sea zurdo… Eso debería arreglarse.»
+- «A la hora de intentar inscribirse a un torneo, a una velada o lo que sea, no me sale la opción de solicitar participación […] revísalo muy bien y arréglalo a buen criterio.»
+
+**Causa de lo segundo (honestidad):**
+- La opción existía, pero solo aparecía si el organizador había abierto la inscripción. Al crear un evento quedaba **cerrada** y nada se lo decía al peleador.
+- En la demo, los eventos ya creados (como «Mandanga») tienen la inscripción cerrada, así que el peleador no veía ningún botón ni ningún motivo.
+- Diseñé el «cerrado por defecto» sin pensar en lo que vería el peleador. Lección anotada.
+
+**Qué se hizo:**
+- **Buscador de rivales en «Retos y sparrings»** (`/propuestas`):
+  - **campos principales:** nombre o alias, **gimnasio** (sin saber el nombre del peleador) y orden;
+  - **«Más filtros»:** disciplina (por defecto, la tuya), nivel, categoría de peso, provincia, **guardia** (zurdo, ortodoxo, ambidiestro), **número de combates** (mínimo y máximo) y edad;
+  - **órdenes:** más parecidos a ti (misma categoría de peso y experiencia cercana), más combates, menos combates, más aura y nombre;
+  - **sin filtros**, sugiere «Peleadores parecidos a ti»; los filtros aplicados se ven en «Estás viendo» y se quitan uno a uno;
+  - **cada resultado muestra:** gimnasio, provincia, categoría, combates, guardia, edad y aura, con «Retar» y «Proponer sparring»;
+  - se respeta el récord amateur privado: si el peleador no lo ha hecho público, se ve solo su número de combates.
+  - Reglas en `lib/fighters/rivals.ts`.
+- **Inscripción:**
+  - al crear un evento, la casilla «Abrir la inscripción de peleadores» viene **marcada** (se puede desmarcar);
+  - en un evento futuro con la inscripción cerrada, la página pública lo dice: «Inscripción de peleadores: cerrada», con el motivo y un enlace a los eventos con inscripción abierta;
+  - si quien la mira es el organizador, ve el botón «Abrir la inscripción».
+  - **Los eventos que ya existían siguen cerrados:** su organizador tiene que abrirlos (un botón en la página del evento). No se abren solos, para no cambiar sin permiso algo que ya decidieron.
+
+**Pruebas:**
+- 649 unitarias (6 nuevas en `rivales.test.ts`).
+- `rivales.mjs` nueva, con 12 comprobaciones: gimnasio, guardia, combates, edad, orden, sparring desde el resultado e inscripción cerrada y abierta.
+- `inscripciones` y `plazas` adaptadas a la casilla nueva.
+- Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
+- Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
