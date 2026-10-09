@@ -31,8 +31,9 @@ await org.p.fill("[name=name]", `Velada Plazas ${rnd}`); await org.p.fill("[name
 await org.p.selectOption("select[name=discipline]", "KICKBOXING"); await org.p.fill("[name=city]", "Valencia"); await org.p.selectOption("select[name=province]", "Valencia");
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();
-await org.p.locator("#inscripcion").getByRole("button", { name: "Abrir la inscripción" }).click();
-await org.p.locator(".notice-ok", { hasText: "Inscripción abierta" }).first().waitFor(); await org.p.waitForLoadState("networkidle");
+// La inscripción se abre al crear el evento (casilla marcada por defecto).
+await org.p.waitForLoadState("networkidle");
+check("el evento se crea con la inscripción ya abierta", await seen(org.p.locator("#inscripcion").getByText("Abierta", { exact: true })));
 const evento = await db.event.findUniqueOrThrow({ where: { slug } });
 // Espera a que la plaza esté guardada (el aviso de la anterior sigue en pantalla) y a que la página nueva esté lista.
 const esperarPlaza = async (peso, n) => {

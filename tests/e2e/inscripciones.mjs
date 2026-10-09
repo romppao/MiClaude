@@ -29,9 +29,12 @@ await org.p.goto(B + "/organizador?tipo=interclub");
 const nombreEvento = `Interclub Inscripciones ${rnd}`;
 await org.p.fill("[name=name]", nombreEvento); await org.p.fill("[name=date]", enDias(40));
 await org.p.selectOption("select[name=discipline]", "KICKBOXING"); await org.p.fill("[name=city]", "Valencia"); await org.p.selectOption("select[name=province]", "Valencia");
+check("al crear un evento, la inscripción viene marcada para abrirse", await org.p.locator("input[name=inscripcion]").isChecked());
+// Aquí se desmarca para probar también cómo se abre después.
+await org.p.locator("input[name=inscripcion]").uncheck();
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();
-check("el evento recién creado tiene la inscripción cerrada", await seen(org.p.locator("#inscripcion").getByText("Cerrada", { exact: true })));
+check("sin marcarla, el evento recién creado tiene la inscripción cerrada", await seen(org.p.locator("#inscripcion").getByText("Cerrada", { exact: true })));
 await org.p.locator("#inscripcion [name=note]").fill("Mínimo un combate amateur y licencia en vigor");
 await org.p.locator("#inscripcion [name=until]").fill(enDias(30));
 await org.p.locator("#inscripcion").getByRole("button", { name: "Abrir la inscripción" }).click();
@@ -128,7 +131,7 @@ check("al añadir un combate, los aceptados salen primero en su propio grupo", g
 await org.p.locator("#inscripcion").getByRole("button", { name: "Cerrar la inscripción" }).click();
 await org.p.locator(".notice-ok").waitFor();
 await visita.goto(B + `/veladas/${slug}`);
-check("al cerrarla, la página pública deja de ofrecer «Solicitar participar»", await visita.getByRole("link", { name: "Solicitar participar" }).count() === 0);
+check("al cerrarla, la página pública deja de ofrecer «Solicitar participar» y explica por qué", await visita.getByRole("link", { name: "Solicitar participar" }).count() === 0 && await seen(visita.getByRole("heading", { name: "Inscripción de peleadores: cerrada" })));
 check("todo queda en el historial", (await db.auditLog.count({ where: { entity: "EVENT", action: { in: ["REGISTRATION_OPENED", "REGISTRATION_REQUESTED", "REGISTRATIONS_ACCEPTED", "REGISTRATIONS_DECLINED", "REGISTRATION_WITHDRAWN", "REGISTRATION_CLOSED"] }, entityId: (await db.event.findUniqueOrThrow({ where: { slug } })).id } })) === 8);
 
 await terminarDiagnosticos();

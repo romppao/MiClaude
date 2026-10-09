@@ -1090,6 +1090,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/fighters/rivals.ts",
+    "purpose": "Filtros y orden para buscar a quién retar o con quién hacer sparring (gimnasio, guardia, combates, edad, peso…).",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/media/rules.ts",
     "purpose": "Reglas puras de vídeos y fotos del público: consentimiento, una sola cosa por envío, enlace https, plazo tras la velada y nombre de descarga.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1295,6 +1300,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/rivales.mjs",
+    "purpose": "Prueba de navegador del buscador de rivales con filtros y de la inscripción cerrada o abierta vista por el peleador.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/servicios.mjs",
     "purpose": "Prueba de navegador de las acciones principales de cada panel, «Buscar clases» y los retos y sparrings de punta a punta.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1472,6 +1482,11 @@
   {
     "path": "tests/unit/recuperar.test.ts",
     "purpose": "Prueba lógica de enlaces de recuperación, consumo y comportamiento de acceso asociado mediante simulación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/rivales.test.ts",
+    "purpose": "Pruebas unitarias de los filtros y el orden del buscador de rivales.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
