@@ -1426,4 +1426,4 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - `rivales.mjs` nueva, con 12 comprobaciones: gimnasio, guardia, combates, edad, orden, sparring desde el resultado e inscripción cerrada y abierta.
 - `inscripciones` y `plazas` adaptadas a la casilla nueva.
 - Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
-- Réplica completa del CI con base vacía.
+- Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
