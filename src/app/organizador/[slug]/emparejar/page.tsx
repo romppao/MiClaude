@@ -8,7 +8,8 @@ import { EVENT_KIND_LABEL, fmtDate } from "../../../../lib/common/labels";
 import { DISCIPLINE_LABEL, categoryLabel } from "../../../../lib/common/disciplines";
 import { claveCategoria } from "../../../../lib/events/registrations";
 import { solicitudesDeEvento, type SolicitudConDatos } from "../../../../lib/events/registrations-data";
-import { PARECIDO_LABEL, porcentajeVictorias, sugerirRivales } from "../../../../lib/events/pairing";
+import { PARECIDO_LABEL, comparaEdad, porcentajeVictorias, sugerirRivales } from "../../../../lib/events/pairing";
+import { divisionById, divisionEligible } from "../../../../lib/common/competition";
 import { addCartelBout } from "../../../actions/events";
 
 export const metadata: Metadata = { title: "Ayuda para emparejar", robots: { index: false, follow: false } };
@@ -58,7 +59,7 @@ export default async function Emparejar({ params }: { params: Promise<{ slug: st
       <div>
         <h1>Ayuda para emparejar</h1>
         <p className="lead" style={{ fontSize: 16, margin: 0 }}>{event.name} · {EVENT_KIND_LABEL[event.kind]} de {DISCIPLINE_LABEL[event.discipline]} · {fmtDate(event.date)}</p>
-        <p className="meta" style={{ margin: "6px 0 0" }}>Para cada peleador aceptado te proponemos los rivales más parecidos de su misma categoría, según sus combates, su porcentaje de victorias, su peso, su aura y su edad. Es solo una ayuda: tú decides y añades el combate al cartel.</p>
+        <p className="meta" style={{ margin: "6px 0 0" }}>Para cada peleador aceptado te proponemos los rivales más parecidos de su misma categoría, según sus combates, su porcentaje de victorias, su peso y su aura. La edad no se compara cuando el combate tiene categoría de edad: basta con que los dos encajen en ella (en élite, la edad da igual). Es solo una ayuda: tú decides y añades el combate al cartel.</p>
       </div>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Link className="btn secondary" href={`/organizador/${event.slug}/inscripciones?estado=aceptadas`}>Ver las solicitudes aceptadas</Link>
@@ -71,12 +72,17 @@ export default async function Emparejar({ params }: { params: Promise<{ slug: st
       {[...grupos.entries()].map(([clave, miembros]) => {
         const [div, peso] = clave.split("|");
         const nombreCat = categoryLabel(event.discipline, event.level, div || null, peso || null);
-        const disponibles = miembros.filter((m) => !enCartel.has(m.fighterId));
+        // Con categoría de edad, cada uno debe encajar en ella el día del evento (si no, el cartel no admitiría el combate).
+        const encaja = (m: SolicitudConDatos) => !div || divisionEligible(div, m.nacimiento, event.date);
+        const disponibles = miembros.filter((m) => !enCartel.has(m.fighterId) && encaja(m));
+        const op = { edad: comparaEdad(div) };
+        const elite = divisionById(div)?.ageGroup === "Élite";
         return (
           <section key={clave} aria-label={`Categoría ${nombreCat}`} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <h2 style={{ margin: "8px 0 0" }}>{nombreCat} <span className="meta">({miembros.length})</span></h2>
+            {div && <p className="meta" style={{ margin: 0 }}>{elite ? "Élite: la edad no cuenta para emparejar." : "La edad no se compara: todos los de esta categoría pueden enfrentarse entre sí si encajan en su edad."}</p>}
             {miembros.map((yo) => {
-              const sugerencias = enCartel.has(yo.fighterId) ? [] : sugerirRivales({ ...yo, id: yo.fighterId }, disponibles.map((d) => ({ ...d, id: d.fighterId })));
+              const sugerencias = enCartel.has(yo.fighterId) || !encaja(yo) ? [] : sugerirRivales({ ...yo, id: yo.fighterId }, disponibles.map((d) => ({ ...d, id: d.fighterId })), 3, op);
               return (
                 <article key={yo.id} className="tarjeta" aria-label={yo.nombre}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
@@ -85,7 +91,8 @@ export default async function Emparejar({ params }: { params: Promise<{ slug: st
                   </div>
                   <div className="meta">{[yo.gimnasio, yo.provincia].filter(Boolean).join(" · ") || "Sin gimnasio ni provincia indicados"}</div>
                   <Nivel p={yo} />
-                  {!enCartel.has(yo.fighterId) && (sugerencias.length === 0 ? (
+                  {!encaja(yo) && <p className="notice notice-bad" style={{ margin: 0 }}><span aria-hidden="true">⚠ </span>Por su fecha de nacimiento no encaja en la edad de esta categoría el día del evento. Revisa su solicitud o empareja a mano en otra categoría.</p>}
+                  {!enCartel.has(yo.fighterId) && encaja(yo) && (sugerencias.length === 0 ? (
                     <p className="mut" style={{ margin: 0 }}>No hay otro aceptado libre en su categoría. Acepta a más peleadores de esta categoría o empareja a mano.</p>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>

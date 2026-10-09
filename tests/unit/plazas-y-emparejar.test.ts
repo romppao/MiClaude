@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { categoriaSinSitio, claveCategoria, enListaDeEspera, ocupacion, parsePlazas } from "../../src/lib/events/registrations";
-import { avisos, distancia, parecido, porcentajeVictorias, sugerirRivales, type DatosPareja } from "../../src/lib/events/pairing";
+import { avisos, comparaEdad, distancia, parecido, porcentajeVictorias, sugerirRivales, type DatosPareja } from "../../src/lib/events/pairing";
 
 describe("plazas por categoría", () => {
   const plazas = [{ divisionId: "", weightClass: "M71", places: 2 }, { divisionId: "D1", weightClass: "M60", places: 1 }];
@@ -66,5 +66,17 @@ describe("ayuda para emparejar", () => {
   it("porcentaje de victorias", () => {
     expect(porcentajeVictorias(ana)).toBeCloseTo(4 / 6);
     expect(porcentajeVictorias(cris)).toBeNull();
+  });
+  it("con categoría de edad (élite incluida) la edad no se compara ni se avisa; sin categoría, sí", () => {
+    expect(comparaEdad("RFE2026:Élite:M")).toBe(false);
+    expect(comparaEdad("RFE2026:Júnior:F")).toBe(false);
+    expect(comparaEdad(null)).toBe(true);
+    const joven = p("j", { combates: 4, victorias: 3, derrotas: 1, aura: 10, weightKg: 70, edad: 20 });
+    const mayor = p("m", { ...joven, id: "m", edad: 27 + 10 });
+    expect(distancia(joven, mayor, { edad: false })).toBe(0);
+    expect(distancia(joven, mayor)).toBeGreaterThan(0);
+    expect(avisos(joven, mayor, { edad: false })).toEqual([]);
+    expect(avisos(joven, mayor)).toContain("17 años de diferencia de edad");
+    expect(sugerirRivales(joven, [mayor], 3, { edad: false })[0].parecido).toBe("muy");
   });
 });
