@@ -15,6 +15,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/actualizar-noticias.yml",
+    "purpose": "Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": ".github/workflows/ci.yml",
     "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -26,7 +31,7 @@
   },
   {
     "path": "next.config.mjs",
-    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (miniaturas de i.ytimg.com y vídeos de R2); distingue desarrollo de producción.",
+    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -305,6 +310,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/api/cron/noticias/route.ts",
+    "purpose": "Endpoint del cron de noticias: exige CRON_SECRET (503 si falta) en la cabecera x-cron-secret con comparación en tiempo constante y fuerza la actualización de fuentes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/ayuda/page.tsx",
     "purpose": "Explica cuenta, declaración, trayectoria, respaldo y aura en lenguaje público con enlaces a los flujos disponibles.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -448,6 +458,11 @@
     "path": "src/app/components/Pestanas.tsx",
     "purpose": "Componente de cliente que agrupa secciones en pestañas que se deslizan a los lados (carrusel horizontal con barra de botones).",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/components/PortadaNoticia.tsx",
+    "purpose": "Portada e miniatura de noticia: muestra la foto del medio y, si no hay o falla al cargar, una cubierta dibujada con el color y pictograma de la disciplina.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/components/ProfileDetails.tsx",
@@ -1157,6 +1172,11 @@
   {
     "path": "src/lib/media/storage.ts",
     "purpose": "Almacén de vídeos: R2 (con jurisdicción UE opcional), disco o ninguno; claves por usuario, comprobación de tamaño, borrado y servicio con Range.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/ai.ts",
+    "purpose": "Ayudas opcionales con Gemini (resumen de titulares y texto para generar imágenes); sin GEMINI_API_KEY devuelven el texto original. Aún no las usa la aplicación.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
