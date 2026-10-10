@@ -52,7 +52,7 @@ check("la web no se puede incrustar en otras (X-Frame-Options y frame-ancestors)
 check("se impide el envío de formularios a otros sitios y la carga de contenido de terceros", /form-action 'self'/.test(h["content-security-policy"] ?? "") && /default-src 'self'/.test(h["content-security-policy"] ?? ""));
 check("nosniff, política de referencia, permisos del navegador y HSTS", h["x-content-type-options"] === "nosniff" && !!h["referrer-policy"] && /camera=\(\)/.test(h["permissions-policy"] ?? "") && /max-age=/.test(h["strict-transport-security"] ?? ""));
 check("no se anuncia la tecnología del servidor", !("x-powered-by" in h));
-await anon.goto(B + "/buscar"); await anon.fill("[name=q]", "prueba"); await btn(anon, "Buscar");
+await anon.goto(B + "/buscar"); await anon.fill("main [name=q]", "prueba"); await btn(anon, "Buscar");
 await seen(anon.locator("h2, p:has-text('No hemos encontrado')").first());
 await anon.goto(B + "/registro");
 check("la política de contenido no bloquea nada de la propia web (scripts, estilos, formularios)", violaciones.length === 0);

@@ -57,7 +57,7 @@ export default function RecordarCampos() {
   const ruta = usePathname();
   const params = useSearchParams();
 
-  // Al enviar un formulario: se guarda y, durante unos segundos, cada vez que la pantalla vacía o vuelve a crear el formulario al terminar su acción
+  // Al enviar un formulario: se guarda y, durante 30 segundos, cada vez que la pantalla vacía o vuelve a crear el formulario al terminar su acción
   // con un problema en esta misma pantalla (React lo vacía con un «reset» y, además, Next.js puede volver a montarlo con la respuesta del servidor), se rellena de nuevo.
   useEffect(() => {
     let cierre: ReturnType<typeof setTimeout> | undefined;
@@ -87,7 +87,8 @@ export default function RecordarCampos() {
       document.addEventListener("reset", alReiniciar, true);
       observador = new MutationObserver(() => queueMicrotask(restaurarSiProcede)); // restaurar solo toca valores y desplegables, no los atributos que se observan: no hay bucle
       observador.observe(document.body, { childList: true, subtree: true });
-      cierre = setTimeout(dejarDeVigilar, 8000);
+      // 30 s: en equipos lentos React puede vaciar o volver a montar el formulario varios segundos después; nunca pisa lo que la persona escribe.
+      cierre = setTimeout(dejarDeVigilar, 30_000);
     };
     const marcarTocado = (e: Event) => {
       const el = e.target;
