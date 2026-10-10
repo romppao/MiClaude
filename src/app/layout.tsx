@@ -64,10 +64,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
-                  <Link href="/mi-panel" className="siempre">Mi panel</Link>
-                  {papel === "entidad" && <Link href="/organizador">Mis veladas</Link>}
-                  {papel === "entrenador" && <Link href="/mis-clases">Mis clases</Link>}
-                  {papel === "peleador" && <Link href="/mi-ficha">Mi ficha</Link>}
+                  <Link href="/mi-panel" className="siempre mi-panel-cabecera">Mi panel</Link>
+                  {papel === "entidad" && <Link href="/organizador" className="siempre">Mis veladas</Link>}
+                  {papel === "entrenador" && <Link href="/mis-clases" className="siempre">Mis clases</Link>}
+                  {papel === "peleador" && <Link href="/mi-ficha" className="siempre">Mi ficha</Link>}
                   <Link href="/mi-cuenta" className="siempre">Mi cuenta</Link>
                   <form action={logout} className="siempre"><button className="secondary">Salir</button></form>
                 </>
