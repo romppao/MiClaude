@@ -77,6 +77,7 @@ jobs:
           DEMO_MODE=si EXPERIENCE_LAB=si npx next start -p 3112 > test-results/experience-server.log 2>&1 &
           npx wait-on -t 60000 http://localhost:3112/laboratorio
           BASE_URL=http://localhost:3112 node tests/browser/experiencia.mjs
+          BASE_URL=http://localhost:3112 node tests/browser/adaptacion.mjs
       - name: Capturas de las pruebas de navegador si algo falla
         if: failure()
         uses: actions/upload-artifact@v4

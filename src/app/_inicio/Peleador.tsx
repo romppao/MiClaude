@@ -22,7 +22,7 @@ import { CUENTA } from "./datos";
 export default async function InicioPeleador({ user }: { user: User & { fighter: { id: string } | null } }) {
   if (!user.fighter) {
     return (
-      <div className="pantalla">
+      <div className="pantalla inicio-adaptable">
         <Saludo kicker="Mi panel" nombre={user.name} sub="Peleador" />
         <div className="tarjeta tarjeta-acc anillo" style={{ padding: 22 }}>
           <h2 style={{ font: "800 24px/1.1 var(--font)" }}>Crea tu ficha</h2>
@@ -52,7 +52,7 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
   const nombre = `${me.firstName} ${me.lastName}`;
   const rival = proximo ? (proximo.fighterAId === me.id ? proximo.fighterB : proximo.fighterA) : null;
   return (
-    <div className="pantalla" style={{ gap: 20 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 20 }}>
       <section className="portada a-sangre" style={{ marginTop: -20, minHeight: 470, "--tinte": tinteDe(principal?.discipline) } as CSSProperties} aria-labelledby="mi-nombre">
         <span className="iniciales" aria-hidden="true">{iniciales(nombre)}</span>
         <Foto className="fondo" src={`/imagenes/peleador/${me.id}/banner`} />

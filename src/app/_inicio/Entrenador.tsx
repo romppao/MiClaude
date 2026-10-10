@@ -38,7 +38,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     const b = borrador?.kind === "entrenador" ? borrador : null;
     const clase = b?.clase ? parseClass(b.clase) : null;
     return (
-      <div className="pantalla">
+      <div className="pantalla inicio-adaptable">
         <Saludo kicker="Mi panel" nombre={user.name} sub="Entrenador" />
         {user.emailVerifiedAt && <AccionesPrincipales acciones={[
           { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
@@ -76,7 +76,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
   const desde = activas.length ? Math.min(...activas.map((c) => c.priceEuros)) : null;
   const pendientes = await db.classRequest.count({ where: { class: { trainerId: trainer.id }, status: "PENDING" } });
   return (
-    <div className="pantalla" style={{ gap: 22 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
       <AccionesPrincipales acciones={[
         { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },

@@ -38,3 +38,6 @@ Primera comprobación local de producción: 27 verificaciones correctas, ring y 
 El preview local usa una base PostgreSQL ficticia independiente en el puerto 5462. No utiliza datos ni servicios de producción. Las capturas y métricas se guardan en `test-results/experiencia` y no se versionan. La revisión del fundador/Claude y el despliegue quedan separados de esta entrega.
 
 Comprobaciones adicionales después de retirar el loading global: compilación correcta, 16 verificaciones de emulación táctil, viewport ampliable, menú/Escape, campos de 16 px, alternativa sin WebGPU, acciones, zoom de escritorio 200 % y contenido sin JavaScript. Laboratorio desactivado: HTTP 404 comprobado y sin contenido de demostración. No equivale a prueba en Safari físico. Se excluye solo `test-results` del análisis TypeScript: contiene resultados y copias de fixtures descargados, no código mantenido.
+
+
+Correcci?n posterior del fundador: el ring de bienvenida ha sido rechazado y retirado. El 3D contin?a en el laboratorio. La adaptaci?n a escritorio y sus pruebas se describen en ADAPTACION-DISPOSITIVOS.md; la referencia anterior al ring de bienvenida corresponde al bloque inicial y no al estado final.

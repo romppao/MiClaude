@@ -327,3 +327,7 @@ Correcci?n de verificaci?n (10 oct, Codex): el primer CI de la rama se detuvo po
 
 ## Codex, 10 oct: interacciones y GPU
 No renderizar React por cada touchmove; limpiar recursos al desmontar. Especificar stops de MeshGradient: su paleta predeterminada puede introducir colores ajenos. No confundir cadencia rAF local con certificación de 60 fps en dispositivos reales. Ver EXPERIENCIA-ELITE.md.
+
+
+## Codex, adaptaci?n 10 oct
+No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?720 px en todas las pantallas convierte el escritorio en una columna m?vil; separar pantallas de datos de formularios y utilizar media queries por espacio. Ver ADAPTACION-DISPOSITIVOS.md.

@@ -19,7 +19,7 @@ export default async function PerfilEntrenadorRegistro() {
   const p = previo?.kind === "entrenador" ? previo : null;
   const gimnasios = await db.gym.findMany({ select: { name: true }, orderBy: { name: "asc" }, take: 200 });
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <PasosRegistro tipo="entrenador" paso={2} atras="/mi-cuenta" etiquetaAtras="Ir a mi cuenta" />
       <div>
         <h1>Tu perfil de entrenador</h1>

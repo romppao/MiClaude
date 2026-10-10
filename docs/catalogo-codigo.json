@@ -1215,6 +1215,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "tests/browser/adaptacion.mjs",
+    "purpose": "Verifica anchuras m?viles/tableta/escritorio, columnas, formularios y retirada de decoraci?n en bienvenida.",
+    "guide": "docs/ADAPTACION-DISPOSITIVOS.md"
+  },
+  {
     "path": "tests/browser/experiencia.mjs",
     "purpose": "Verificación local de efectos, layout, accesibilidad, conexión y cadencia.",
     "guide": "docs/EXPERIENCIA-ELITE.md"

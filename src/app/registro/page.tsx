@@ -37,7 +37,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
 
   if (!tipo) {
     return (
-      <div className="pantalla">
+      <div className="pantalla pantalla-formulario">
         <PasosRegistro tipo={null} paso={0} atras="/bienvenida" etiquetaAtras="Volver a la bienvenida" />
         <div>
           <h1>Crear cuenta</h1>
@@ -61,7 +61,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
 
   const panel = PANELES[tipo];
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <PasosRegistro tipo={tipo} paso={1} atras={volverAElegir} etiquetaAtras="Elegir otro tipo de cuenta" />
       <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
         <span className="pildora pildora-acc">{panel.titulo}</span>

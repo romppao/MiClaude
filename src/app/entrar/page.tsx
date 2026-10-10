@@ -12,7 +12,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   const next = internalPath(oneParam(sp.next) ?? "", "");
   const registro = `/registro${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <div className="cabecera-pantalla">
         <Link href="/bienvenida" className="boton-icono" aria-label="Volver a la bienvenida"><Icono nombre="atras" tam={22} /></Link>
         <span className="titulo" aria-hidden="true">Entrar</span>

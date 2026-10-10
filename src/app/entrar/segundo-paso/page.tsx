@@ -29,7 +29,7 @@ export default async function SegundoPaso({ searchParams }: { searchParams: Prom
     // La clave se crea al enseñarla y se guarda sin activar: se activa al escribir el primer código bueno.
     const clave = user.totpSecret ?? (await db.user.update({ where: { id: user.id }, data: { totpSecret: nuevaClave() } })).totpSecret!;
     return (
-      <div className="pantalla" style={{ gap: 18 }}>
+      <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
         <div>
           <h1>Protege la cuenta del creador</h1>
           <p className="lead">Esta cuenta puede cambiarlo todo, así que además de la contraseña pedirá un código cada vez que entres. Se prepara una sola vez y tarda dos minutos.</p>
@@ -49,7 +49,7 @@ export default async function SegundoPaso({ searchParams }: { searchParams: Prom
   }
 
   return (
-    <div className="pantalla" style={{ gap: 18 }}>
+    <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
       <div>
         <h1>Segundo paso para entrar</h1>
         <p className="lead">Escribe el código de 6 cifras de tu aplicación de códigos. Si no tienes el móvil a mano, escribe uno de tus códigos de emergencia (cada uno sirve una vez).</p>

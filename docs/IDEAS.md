@@ -323,3 +323,7 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 
 ## Codex, 10 oct: efectos al servicio del contenido
 Decisión aplicada por petición del fundador: escenas pequeñas, carga diferida y alternativa estática. Propuesta pendiente: validar percepción y batería en teléfonos físicos antes de ampliar 3D a otras pantallas; logo sigue pendiente. Ver EXPERIENCIA-ELITE.md.
+
+
+## Codex, adaptaci?n 10 oct
+Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?n al espacio de pantalla. Mantener identidad y composici?n m?vil; aprovechar columnas en escritorio. Ver ADAPTACION-DISPOSITIVOS.md.

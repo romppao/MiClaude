@@ -30,7 +30,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
   const atencion = pendientes[0];
   const huecos = proxima ? Math.max(6, proxima._count.bouts) : 0;
   return (
-    <div className="pantalla" style={{ gap: 22 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
       <AccionesPrincipales acciones={[
         { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },

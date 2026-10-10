@@ -12,7 +12,7 @@ import { peleadoresConAura, proximasVeladas } from "./datos";
 export default async function InicioVisitante() {
   const [veladas, conAura, noticias] = await Promise.all([proximasVeladas(6), peleadoresConAura(6), ultimasNoticias({ max: 5 })]);
   return (
-    <div className="pantalla" style={{ gap: 30 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 30 }}>
       <section className="portada-visita a-sangre" aria-labelledby="titulo-portada" style={{ marginTop: -20 }}>
         <GpuSurface kind="ambient" />
         <div className="solo-movil" style={{ position: "absolute", top: 18, right: 24 }}>

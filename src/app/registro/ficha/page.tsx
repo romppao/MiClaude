@@ -20,7 +20,7 @@ export default async function FichaRegistro() {
   const previo = readOnboarding(user.onboarding);
   const p = previo?.kind === "peleador" ? previo : null;
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <PasosRegistro tipo="peleador" paso={2} atras="/mi-cuenta" etiquetaAtras="Ir a mi cuenta" />
       <div>
         <h1>Crea tu ficha</h1>
