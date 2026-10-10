@@ -11,8 +11,8 @@ export type EntradaNoticia = { guid: string; url: string; title: string; publish
 export const MAX_ENTRADAS_POR_CANAL = 30;
 export const TITULAR_MAX = 200;
 export const RESUMEN_MAX = 280;
-/** Dominios de miniaturas que se muestran (deben coincidir con img-src en next.config.mjs). */
-export const HOSTS_DE_IMAGEN = ["i.ytimg.com"];
+/** Dominios de miniaturas habituales (compatibilidad). Las imágenes seguras en HTTPS de medios de noticias se permiten. */
+export const HOSTS_DE_IMAGEN = ["i.ytimg.com", "i1.ytimg.com", "i2.ytimg.com", "i3.ytimg.com", "i4.ytimg.com", "img.youtube.com", "espabox.com", "aebox.org", "feboxeo.es", "fekm.es", "mma.es", "jaulamagazine.com", "deportedecontacto.com", "*"];
 
 const ENTIDADES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
 
@@ -51,11 +51,43 @@ function atributo(bloque: string, nombre: string, attr: string, filtro?: (abre: 
   return null;
 }
 
-function imagenPermitida(url: string | null): string | null {
+function extraerImgHtml(bloque: string): string | null {
+  const m = bloque.match(/<img\s+[^>]*src=["'](https?:\/\/[^"'\s>]+)["']/i);
+  return m ? decodificar(m[1]) : null;
+}
+
+function extraerYoutubeVideoId(url: string | null, bloque: string): string | null {
+  const porTag = etiqueta(bloque, "yt:videoId");
+  if (porTag) return porTag.trim();
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+  return m ? m[1] : null;
+}
+
+export function imagenPermitida(url: string | null): string | null {
   const u = url ? safeHttpUrl(url) : null;
   if (!u) return null;
-  const { hostname, protocol } = new URL(u);
-  return protocol === "https:" && HOSTS_DE_IMAGEN.includes(hostname) ? u : null;
+  try {
+    const { hostname, protocol } = new URL(u);
+    if (protocol !== "https:") return null;
+    const h = hostname.toLowerCase();
+    // Bloquear localhost e IPs privadas para evitar SSRF
+    if (
+      h === "localhost" ||
+      h === "127.0.0.1" ||
+      h === "0.0.0.0" ||
+      h.endsWith(".local") ||
+      h.endsWith(".internal") ||
+      /^10\./.test(h) ||
+      /^192\.168\./.test(h) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)
+    ) {
+      return null;
+    }
+    return u;
+  } catch {
+    return null;
+  }
 }
 
 function fecha(texto: string | null, ahora: Date): Date | null {
@@ -84,9 +116,19 @@ export function parseFeed(xml: string, ahora: Date = new Date()): EntradaNoticia
     const resumenBruto = atom ? etiqueta(b, "media:description") ?? etiqueta(b, "summary") : etiqueta(b, "description");
     const resumen = resumenBruto ? textoPlano(resumenBruto) : "";
     const guid = textoPlano(etiqueta(b, atom ? "id" : "guid") ?? "") || url;
-    const imagen = imagenPermitida(
-      atributo(b, "media:thumbnail", "url") ?? atributo(b, "media:content", "url", (abre) => /medium\s*=\s*["']image["']|type\s*=\s*["']image\//i.test(abre)) ?? atributo(b, "enclosure", "url", (abre) => /type\s*=\s*["']image\//i.test(abre)),
-    );
+
+    // Miniatura: YouTube oficial, media:thumbnail, media:content, enclosure, o img en description/content:encoded
+    const ytId = extraerYoutubeVideoId(url, b);
+    let miniatura = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : null;
+    if (!miniatura) {
+      miniatura =
+        atributo(b, "media:thumbnail", "url") ??
+        atributo(b, "media:content", "url", (abre) => !/medium\s*=/i.test(abre) || /medium\s*=\s*["']image["']|type\s*=\s*["']image\//i.test(abre)) ??
+        atributo(b, "enclosure", "url", (abre) => !/type\s*=/i.test(abre) || /type\s*=\s*["']image\//i.test(abre)) ??
+        extraerImgHtml(etiqueta(b, "content:encoded") ?? etiqueta(b, "description") ?? "");
+    }
+    const imagen = imagenPermitida(miniatura);
+
     salida.push({
       guid: recortar(guid, 500),
       url,

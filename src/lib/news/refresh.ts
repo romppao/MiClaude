@@ -77,6 +77,15 @@ async function actualizarFuente(f: NewsSource, forzar: boolean): Promise<"ok" | 
     if (entradas.length === 0) throw new Error("La fuente no tiene noticias legibles");
     const validas = entradas.flatMap((e) => { const disciplines = aceptar(f, e); return disciplines ? [{ ...e, sourceId: f.id, disciplines }] : []; });
     await db.newsItem.createMany({ data: validas, skipDuplicates: true });
+    // Si ya existían guardadas con imageUrl nula y ahora la fuente trae miniatura, actualizarla
+    for (const v of validas) {
+      if (v.imageUrl) {
+        await db.newsItem.updateMany({
+          where: { sourceId: f.id, guid: v.guid, imageUrl: null },
+          data: { imageUrl: v.imageUrl },
+        });
+      }
+    }
     await db.newsSource.update({ where: { id: f.id }, data: { lastOkAt: new Date(), lastError: null, lastCount: validas.length } });
     return "ok";
   } catch (e) {

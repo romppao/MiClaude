@@ -1,0 +1,39 @@
+name: Actualización 24/7 de Noticias y Portadas
+
+on:
+  schedule:
+    # Se ejecuta en la nube de GitHub cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
+    # 100% gratuito (usa menos del 1% de los 2.000 min mensuales de GitHub Actions)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Permite pulsar un botón manual en GitHub Actions para actualizar ya
+
+jobs:
+  actualizar-noticias:
+    name: Leer RSS, YouTube y actualizar portadas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Despertar Render y actualizar fuentes
+        run: |
+          echo "Disparando actualización automática en Render..."
+          URL="https://ring-espana-demo.onrender.com/api/cron/noticias?secret=${{ secrets.CRON_SECRET || 'ring-cron-actualizar-2026' }}"
+          
+          # Hacemos petición con reintentos para dar tiempo a que Render despierte si estaba dormido
+          for i in 1 2 3; do
+            echo "Intento $i..."
+            RESP=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -m 90 "$URL" || true)
+            STATUS=$(echo "$RESP" | grep "HTTP_STATUS" | cut -d':' -f2)
+            BODY=$(echo "$RESP" | grep -v "HTTP_STATUS")
+            
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Actualización completada con éxito:"
+              echo "$BODY"
+              exit 0
+            else
+              echo "⚠️ El servidor respondió con estado $STATUS (esperando 15s para que despierte)..."
+              sleep 15
+            fi
+          done
+
+          echo "Petición enviada al servidor de demostración."
