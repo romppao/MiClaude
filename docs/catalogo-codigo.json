@@ -635,11 +635,6 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
-    "path": "src/app/loading.tsx",
-    "purpose": "Estado accesible de carga durante navegación.",
-    "guide": "docs/EXPERIENCIA-ELITE.md"
-  },
-  {
     "path": "src/app/medios/[id]/imagen/route.ts",
     "purpose": "Sirve la foto de un medio del público no retirado; ?descargar=1 la descarga con nombre limpio.",
     "guide": "docs/mantenimiento/FLUJOS.md"

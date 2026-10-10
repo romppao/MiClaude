@@ -6,7 +6,7 @@ Encargo del fundador, 10 de octubre de 2026: optimizar la aplicación conservand
 
 `Experience` recibe los Server Components como hijos; no convierte sus consultas en peticiones del cliente. El contenido del servidor aparece sin esperar a GSAP, Sonner o Three.js. Animación y avisos se importan después de montar; las escenas solo cuando su superficie está cerca de la vista. `EffectBoundary` aísla fallos de módulos decorativos, incluidos errores de descarga de un chunk. Las guardas, Server Actions y permisos existentes se conservan.
 
-El inicio utiliza un Map para buscar Aura por identificador en lugar de repetir búsquedas lineales. La ficha de peleador obtiene usuario y combates en paralelo, después de encontrar la ficha. No se cachean sesiones de autenticación entre peticiones. `loading.tsx` ofrece una indicación accesible durante navegación sin bloquear ni falsear datos.
+El inicio utiliza un Map para buscar Aura por identificador en lugar de repetir búsquedas lineales. La ficha de peleador obtiene usuario y combates en paralelo, después de encontrar la ficha. No se cachean sesiones de autenticación entre peticiones. Se conserva la entrega de páginas completas: un loading global introducía streaming en todos los formularios y el CI detectó una regresión en moderación; se retiró esa frontera global, sin cambiar ni omitir las pruebas.
 
 La aplicación sigue siendo Next.js para navegador. Las pautas de Expo, Android y Swift se aplican a interacción y física; no se ha creado ni compilado una aplicación nativa. No hay SDK de Android ni compilador Swift comprobados en este entorno. beUI Pro no tiene conexión autenticada: se usan componentes propios, sin copiar recursos de pago.
 

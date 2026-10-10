@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **319 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **318 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -270,7 +270,6 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/imagenes/[kind]/[id]/[slot]/route.ts](../../src/app/imagenes/%5Bkind%5D/%5Bid%5D/%5Bslot%5D/route.ts) | Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `8fb038309e706716` |
 | [src/app/laboratorio/page.tsx](../../src/app/laboratorio/page.tsx) | Guarda de acceso al laboratorio: exige dos indicadores de demostración. | [Contexto](../EXPERIENCIA-ELITE.md) | `dynamic`, `metadata`, `Laboratorio` | `83d354bc5bd673ae` |
 | [src/app/layout.tsx](../../src/app/layout.tsx) | Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí. | [Contexto](MODULOS.md) | `metadata`, `viewport`, `RootLayout` | `f838f5a22e6020ac` |
-| [src/app/loading.tsx](../../src/app/loading.tsx) | Estado accesible de carga durante navegación. | [Contexto](../EXPERIENCIA-ELITE.md) | `Loading` | `1716002316993e8f` |
 | [src/app/medios/[id]/imagen/route.ts](../../src/app/medios/%5Bid%5D/imagen/route.ts) | Sirve la foto de un medio del público no retirado; ?descargar=1 la descarga con nombre limpio. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `70b55b89359b6041` |
 | [src/app/medios/[id]/video/route.ts](../../src/app/medios/%5Bid%5D/video/route.ts) | Sirve (con Range) o descarga el vídeo de un medio del público no retirado, desde R2 por redirección firmada o desde el disco. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `ef894784fb389e25` |
 | [src/app/mi-cuenta/datos/route.ts](../../src/app/mi-cuenta/datos/route.ts) | Exporta JSON de datos propios con sesión y no-store; incluye nuevas entidades personales y evita compartir secretos de acceso. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `bf9971932d2cc0f9` |
