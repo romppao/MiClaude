@@ -9,6 +9,7 @@
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
 | `/` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/ayuda` | ¿Cómo funciona Ring España? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/bienvenida` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | — |
@@ -378,9 +379,10 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `ai.ts` | `generarPromptImagenCombate`, `sintetizarTitularConIA` |
 | `espana.ts` | `delPanoramaEspanol`, `nombraEspana` |
 | `feed.ts` | `Noticia`, `ultimasNoticias` |
-| `parse.ts` | `EntradaNoticia`, `HOSTS_DE_IMAGEN`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `parseFeed`, `textoPlano`, `variar` |
+| `parse.ts` | `EntradaNoticia`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `imagenPermitida`, `parseFeed`, `textoPlano`, `variar` |
 | `refresh.ts` | `actualizarNoticias`, `actualizarSiToca`, `asegurarFuentesIniciales`, `noticiasActivas`, `noticiasPorActualizar` |
 | `sources.ts` | `CONSERVAR_DIAS`, `FUENTES_INICIALES`, `FUENTES_RETIRADAS`, `FuenteInicial`, `REFRESCO_MS`, `TIPO_DE_FUENTE_ETIQUETA`, `googleNoticias` |
 

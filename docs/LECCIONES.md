@@ -331,3 +331,9 @@ No renderizar React por cada touchmove; limpiar recursos al desmontar. Especific
 
 ## Codex, adaptaci?n 10 oct
 No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?720 px en todas las pantallas convierte el escritorio en una columna m?vil; separar pantallas de datos de formularios y utilizar media queries por espacio. Ver ADAPTACION-DISPOSITIVOS.md.
+
+
+## Claude, 10 oct: secretos y documentación generada
+- Un endpoint protegido nunca lleva una clave por defecto en el código: en un repositorio público equivale a no tener clave. Sin variable configurada, responder 503.
+- Una tarea programada que no termina en error cuando falla oculta la avería; salir con código distinto de 0.
+- Para regenerar catálogo y mapa desde Windows sin falsear huellas ni perder pantallas: `git -c core.autocrlf=false archive HEAD` a una carpeta temporal y ejecutar los generadores en un contenedor `node:22` de Linux.
