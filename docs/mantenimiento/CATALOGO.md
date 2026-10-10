@@ -103,9 +103,9 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (miniaturas de i.ytimg.com y vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7b17e83c2d81bf4f` |
 | [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `0dd08838689cae75` |
 | [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `977e99dca97752f4` |
-| [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `fb02313b4a090d87` |
+| [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `6e61d1cddf231e1c` |
 | [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `d30d8e58ab1c24b1` |
-| [vitest.config.mts](../../vitest.config.mts) | Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config. | [Contexto](OPERACION.md) | — | `c7c6bdab4391e62e` |
+| [vitest.config.mts](../../vitest.config.mts) | Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config. | [Contexto](OPERACION.md) | — | `1014c0b47c12c5ff` |
 
 ## Lógica: accounts
 

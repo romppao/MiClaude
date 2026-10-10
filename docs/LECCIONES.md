@@ -321,3 +321,5 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 - El error de una imagen pertenece a su direcci?n, no a todas las futuras fotos del componente. Probar un fallo seguido de una imagen v?lida.
 - Generadores con separadores POSIX y huellas de bytes pueden producir documentaci?n distinta en Windows. Contrastar el resultado con el checkout y no conservar una salida que omite pantallas o cambia huellas solo por finales de l?nea.
 - Dos unitarias de multimedia fallan en Windows por rutas POSIX; no atribuirlas al cambio de interfaz ni modificar pruebas para ocultarlas.
+
+Correcci?n de verificaci?n (10 oct, Codex): el primer CI de la rama se detuvo porque el cat?logo conservaba huellas CRLF de render.yaml y vitest.config.mts. Se regener? desde una exportaci?n del commit con core.autocrlf=false para obtener exactamente los bytes de Git, sin cambiar esos archivos ni las comprobaciones. Las 9 pruebas documentales s? pasaron en Linux.
