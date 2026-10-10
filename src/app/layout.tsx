@@ -7,6 +7,7 @@ import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
 import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
+import Experience from "./components/experience/Experience";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
 };
 
-export const viewport: Viewport = { themeColor: "#0A0A0C", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#0A0A0C", colorScheme: "dark", viewportFit: "cover", interactiveWidget: "resizes-content" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es">
       <body>
+        <Experience>
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
@@ -95,6 +97,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
         <MobileNav papel={papel} />
+        </Experience>
       </body>
     </html>
   );

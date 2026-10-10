@@ -165,3 +165,11 @@ Petición del fundador y captura de referencia: «Me gusta como tiene distribuid
 - **Portada de disciplina:** cabecera con la raya de color de la disciplina (el mismo sistema que las tarjetas de la fase 1) y las secciones en el orden actualidad → veladas → aura → dónde entrenar.
 - **Galería del público:** una columna en el móvil y dos en escritorio; foto o vídeo con proporción 4:3 reservada (sin saltos al cargar) y los botones «Descargar» bajo cada elemento.
 - **«Mi panel»** reutiliza los inicios por papel de la fase 1 con el rótulo «Mi panel» en lima sobre el saludo.
+
+
+## 10 de octubre de 2026 ? Restricci?n vigente: optimizaci?n, no redise?o
+El fundador confirma que le gusta el aspecto actual. Solicita optimizarlo conservando colores, fuentes y composici?n. No hay prioridad entre pantallas: empezar por mejoras compartidas con fallos reproducibles. El logo todav?a no est? elegido y queda para el final. No interpretar kits anteriores como aprobaci?n del logo.
+
+
+## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
+El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.

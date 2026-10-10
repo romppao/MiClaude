@@ -12,12 +12,14 @@ export default async function Bienvenida() {
   return (
     <section className="bienvenida a-sangre" aria-labelledby="titulo-bienvenida">
       <div className="foto" role="img" aria-label="Personas de la comunidad de deportes de contacto (imagen ilustrativa con personas ficticias)" />
-      <span className="sello-marca" style={{ position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)" }}><Marca ancho={24} />RING ESPAÑA</span>
+      <div className="bienvenida-contenido">
+      <span className="sello-marca"><Marca ancho={24} />RING ESPAÑA</span>
       <h1 id="titulo-bienvenida">Tu deporte.<br />Tu gente.</h1>
       <p className="lead" style={{ maxWidth: 300 }}>Tu comunidad de deportes de contacto en toda España: peleadores, veladas y gimnasios.</p>
       <Link href="/registro" className="btn btn-grande" style={{ width: 230, marginTop: 18 }}>Empezar<Icono nombre="siguiente" tam={18} grosor={2.2} /></Link>
       <p style={{ margin: 0 }}><Link href="/entrar">¿Ya tienes cuenta? Entrar</Link></p>
       <p style={{ margin: 0 }}><Link href="/">Explorar sin cuenta</Link></p>
+      </div>
     </section>
   );
 }

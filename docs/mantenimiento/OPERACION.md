@@ -59,6 +59,8 @@ La configuración de demo permite excepciones de correo y papel con `DEMO_MODE=s
 
 `public/` contiene recursos estáticos (incluida la fuente del diseño); comprobar licencia/origen y rutas al sustituirlos. Dependencias se reproducen con `package-lock.json`, no se documenta cada línea del código de terceros. `.next`, `node_modules`, cobertura y capturas son resultados, no fuentes mantenidas.
 
+`test-results` guarda fixtures, exportaciones canónicas y diagnósticos descargados del CI. TypeScript excluye esta carpeta generada para que un diagnóstico con importaciones relativas de otro checkout no bloquee una compilación posterior. Las fuentes mantenidas de `src`, `scripts` y `tests` siguen bajo las opciones estrictas existentes; no se excluyen pruebas de producto.
+
 `docs/ingreso/` contiene ejercicios y entregas aisladas del equipo, no runtime de la aplicación. Sus instrucciones prohíben consultar claves de corrección y trabajos ajenos durante las pruebas. `scripts/corregir-escalera.sh` es una herramienta de evaluación; no usarla como prueba de producto ni descargar la rama de clave en un mantenimiento normal.
 
 ## Entregar a otro programador o a Claude

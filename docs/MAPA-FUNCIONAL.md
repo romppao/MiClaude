@@ -9,6 +9,7 @@
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
 | `/` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/ayuda` | ¿Cómo funciona Ring España? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/bienvenida` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | — |
@@ -28,6 +29,7 @@
 | `/highlights/:id/imagen` | Foto de un highlight. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. Revalida con ETag, como las fotos de perfil. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
 | `/highlights/:id/video` | Vídeo de un highlight subido a la aplicación. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
 | `/imagenes/:kind/:id/:slot` | Siempre se revalida (`no-cache`, `private`): quien ya tiene la imagen recibe un 304 sin bytes, y una ficha ocultada deja de verse al instante. | Pública (cambia lo que ve según la cuenta) | — | Profile |
+| `/laboratorio` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/medios/:id/imagen` | Foto que el público subió a una velada (guardada ya normalizada en WebP). ?descargar=1 la descarga. | Pública | — | MediaItem |
 | `/medios/:id/video` | Vídeo que el público subió a una velada. ?descargar=1 lo descarga (para que el peleador lo guarde). | Pública | — | MediaItem |
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
@@ -377,9 +379,10 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `ai.ts` | `generarPromptImagenCombate`, `sintetizarTitularConIA` |
 | `espana.ts` | `delPanoramaEspanol`, `nombraEspana` |
 | `feed.ts` | `Noticia`, `ultimasNoticias` |
-| `parse.ts` | `EntradaNoticia`, `HOSTS_DE_IMAGEN`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `parseFeed`, `textoPlano`, `variar` |
+| `parse.ts` | `EntradaNoticia`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `imagenPermitida`, `parseFeed`, `textoPlano`, `variar` |
 | `refresh.ts` | `actualizarNoticias`, `actualizarSiToca`, `asegurarFuentesIniciales`, `noticiasActivas`, `noticiasPorActualizar` |
 | `sources.ts` | `CONSERVAR_DIAS`, `FUENTES_INICIALES`, `FUENTES_RETIRADAS`, `FuenteInicial`, `REFRESCO_MS`, `TIPO_DE_FUENTE_ETIQUETA`, `googleNoticias` |
 

@@ -22,7 +22,7 @@ export default async function Intereses() {
   const sigue = new Set(siguiendo.map((x) => x.fighterId));
   const despues = user.emailVerifiedAt ? "/" : "/verificar";
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <PasosRegistro tipo="usuario" paso={2} atras="/mi-cuenta" etiquetaAtras="Ir a mi cuenta" />
       <div>
         <h1>¿Qué te gusta ver?</h1>

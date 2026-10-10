@@ -32,7 +32,7 @@ export default async function InicioAficionado({ user }: { user: User }) {
   const misAuras = resultados.length ? await db.aura.findMany({ where: { userId: user.id, boutId: { in: resultados.map((b) => b.id) } }, select: { boutId: true, fighterId: true } }) : [];
   const disciplinas = [...user.interests, ...DISCIPLINE_ORDER.filter((d) => !user.interests.includes(d))];
   return (
-    <div className="pantalla" style={{ gap: 26 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 26 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={seguidos.length ? `Sigues a ${plural(seguidos.length, "peleador", "peleadores")}` : "Todavía no sigues a ningún peleador"} />
       <AccionesPrincipales acciones={[
         { href: "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },

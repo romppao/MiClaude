@@ -1427,3 +1427,28 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - `inscripciones` y `plazas` adaptadas a la casilla nueva.
 - Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
 - Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
+
+
+## 10 de octubre de 2026 ? Optimizaci?n sin redise?o (Codex)
+**Qu? se pidi?:** ?Es muy importante que no cambies el dise?o visual de la p?gina, ya que me gusta como se ve, simplemente quiero que la optimices?. El logo todav?a no est? elegido y se deja para el final.
+**Qu? se decidi?:** corregir comportamientos y adaptaci?n de componentes compartidos conservando nombre, logo, colores, Archivo y navegaci?n.
+**Qu? se hizo:** envolver textos largos cuando no caben; controles t?ctiles y cancelaci?n de gestos de pesta?as; carga de una foto nueva tras fallar la anterior; respuesta de pulsaci?n con movimiento reducido. Pruebas y l?mites en OPTIMIZACION-PANTALLAS.md.
+**Qu? se comprob?:** TypeScript y build correctos; 12 controles de navegador correctos; captura habitual sin diferencias. Unitarias 647/649: dos fallos de multimedia por rutas de Windows en archivos sin modificar. No se reejecut? la bater?a con base de datos por falta de PostgreSQL local.
+**Qu? sali? mal:** el generador de mapa busca separadores POSIX y en Windows omiti? pantallas; no se conserv? esa salida. Se gener? con una copia temporal que usa separadores portables, sin cambiar c?digo del generador. El cat?logo utiliza huellas de bytes: se conservaron finales LF en la carpeta propia para obtener las mismas huellas que CI Linux.
+**Estado y siguiente paso:** cambio local listo para revisi?n y CI, sin integraci?n ni despliegue. Logo pendiente de elecci?n del fundador.
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
+
+
+## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
+El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 10 de octubre de 2026 — Revisión de portadas de noticias y unión con la optimización de Codex (Claude)
+**Qué se pidió:** revisar el trabajo de Antigravity sobre portadas de noticias y actualización automática (`e26dbd2`) antes de publicarlo, y aplicar el PR #41 de Codex si era viable. El fundador: «quiero intentar terminar la aplicación hoy».
+**Qué se decidió y por qué:** no publicar el cron tal cual: tenía la clave escrita en el código de un repositorio público, sin otra configurada en Render, y el flujo de GitHub daba por buena una actualización fallida. El PR #41 se considera viable: CI verde en `09a5cb0`, licencias gratuitas (MIT y licencia estándar de GSAP), efectos GPU solo visibles y desactivables, y un único conflicto trivial en `.env.example`.
+**Qué se hizo:** `/api/cron/noticias` exige `CRON_SECRET` (503 sin ella), por cabecera y con comparación en tiempo constante; el flujo envía la cabecera y falla si no actualiza; `CRON_SECRET` en `render.yaml` y `.env.example`; se retira `HOSTS_DE_IMAGEN` (con `"*"`, sin uso) y se valida el identificador de YouTube. Secreto creado en GitHub. Rama de Codex unida con la de la demo; catálogo y mapa funcional actualizados con los archivos nuevos.
+**Qué salió mal:** el CI de `78f8342` falló porque los archivos nuevos de `e26dbd2` no estaban en `docs/catalogo-codigo.json`. Al regenerar en Windows, el catálogo cambió todas las huellas (CRLF) y el mapa perdió pantallas: se generaron ambos en un contenedor Linux sobre una exportación con `core.autocrlf=false`.
+**Estado y siguientes pasos:** pendiente de que el fundador pegue `CRON_SECRET` en Render; después, probar el cron a mano. `src/lib/news/ai.ts` aún no se usa. Mencionar en `/privacidad` que las fotos de noticias se cargan desde el medio de origen.

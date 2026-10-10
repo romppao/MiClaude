@@ -16,7 +16,7 @@ const tinte = (d: Discipline | null | undefined) => ({ "--tinte": tinteDe(d) }) 
 export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Date; discipline: Discipline; level: Level; city: string } }) {
   const { dia, mes } = dayAndMonth(e.date);
   return (
-    <Link href={`/veladas/${e.slug}`} className="tarjeta-foto cartel" style={tinte(e.discipline)}>
+    <Link href={`/veladas/${e.slug}`} className="tarjeta-foto cartel" style={tinte(e.discipline)} data-reveal>
       <span className="fecha-cartel" aria-hidden="true"><b>{dia}</b><span>{mes}</span></span>
       <span style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <strong>{e.name}</strong>

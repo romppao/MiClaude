@@ -278,3 +278,20 @@ Durante este periodo, el alcance de Codex es exclusivamente documental: no modif
 El manual describe la base `a34deabb856ff027d74bc15cce8b1abdd943611f`; no se presenta como documentación de los cambios que Claude está realizando. Tras recibir la señal del fundador, contrastar el código final y sus diferencias, actualizar las explicaciones correspondientes e identificar el commit documentado y los puntos que sigan pendientes. No anticipar decisiones ni resultados de la tarea en curso.
 
 El CI de la propuesta documental pasó sobre `a3a9f9b1688ddde61ffdfc32a414e434f9b4497e`: [ejecución del PR](https://github.com/romppao/MiClaude/actions/runs/37748009534). Ese resultado corresponde al bloque anterior, no valida los cambios en curso de Claude ni esta anotación posterior. La propuesta #28 quedó lista para revisión; su integración y despliegue siguen pendientes.
+
+
+## 10 de octubre de 2026 ? Optimizar pantallas conservando el dise?o
+Petici?n expl?cita del fundador: conservar el dise?o que le gusta, optimizar toda la p?gina sin orden de prioridad y dejar el logo para el final porque todav?a no lo ha elegido. Base d1e7ace, rama codex/optimizacion-visual-20261010, carpeta independiente MiClaude-codex-optimizacion.
+Cambios compartidos: globals.css (archivo delicado), Foto y Pestanas; regresi?n de navegador independiente de PostgreSQL y paso de CI (archivo delicado). No se cambian logo, nombre, paleta, fuentes ni distribuci?n de navegaci?n. Detalle en OPTIMIZACION-PANTALLAS.md.
+Ejecutado: TypeScript y compilaci?n Next correctos; 12 comprobaciones en Chrome; captura habitual en reposo id?ntica antes/despu?s; 647/649 unitarias correctas. Dos fallos locales de multimedia por rutas POSIX en Windows, en c?digo sin modificar; no se han relajado esas pruebas. No hay PostgreSQL local disponible; bater?a de usuarios/base y Safari real pendientes de CI/dispositivo.
+Documentaci?n generada: cat?logo actualizado; mapa sin cambios funcionales, generado con una copia temporal que normaliza separadores de ruta en Windows, sin editar el generador. No se tocan carpetas o cambios de otros asistentes. Pendiente revisar CI y propuesta antes de integrar.
+
+Correcci?n de verificaci?n (10 oct, Codex): el primer CI de la rama se detuvo porque el cat?logo conservaba huellas CRLF de render.yaml y vitest.config.mts. Se regener? desde una exportaci?n del commit con core.autocrlf=false para obtener exactamente los bytes de Git, sin cambiar esos archivos ni las comprobaciones. Las 9 pruebas documentales s? pasaron en Linux.
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
+
+
+## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
+El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.

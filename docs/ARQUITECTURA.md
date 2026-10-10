@@ -329,3 +329,11 @@ El navegador reduce las fotos grandes antes de enviarlas (`src/app/components/In
 - `/propuestas`: buscador de rivales con filtros (nombre, gimnasio, disciplina, nivel, peso, provincia, guardia, combates, edad) y cinco órdenes; reglas en `lib/fighters/rivals.ts`. Respeta el récord amateur privado (`recordHidden`).
 - `createEvent` abre la inscripción si llega `inscripcion=1` (casilla marcada por defecto) y el evento no ha pasado; la página pública dice cuándo está cerrada.
 - `lib/events/pairing.ts`: distancia entre dos peleadores (experiencia 35 %, peso 20 %, % de victorias 20 %, aura 15 %, edad 10 %; con división de edad, élite incluida, la edad no se compara y solo se exige que encajen en ella: decisión del fundador del 9 de octubre), etiqueta de parecido y avisos; `/organizador/[slug]/emparejar` propone los tres más parecidos de la misma categoría y añade el combate con `addCartelBout` (que admite volver a esa página con `back`).
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
+
+
+## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
+El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.

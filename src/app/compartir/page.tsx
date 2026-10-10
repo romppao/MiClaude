@@ -35,7 +35,7 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
       take: 30,
     });
     return (
-      <div className="pantalla" style={{ gap: 18 }}>
+      <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
         <div><h1>Subir vídeos o fotos de una velada</h1><p className="lead" style={{ fontSize: 16 }}>Comparte lo que grabaste para que los peleadores tengan las imágenes de sus combates. Primero, elige la velada.</p></div>
         {velada && <div className="notice notice-bad" role="alert"><span aria-hidden="true">⚠ </span>No encontramos esa velada. Búscala en la lista.</div>}
         <form role="search" aria-label="Buscar la velada" className="search" style={{ alignItems: "flex-end" }}>
@@ -54,7 +54,7 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
   const estado = veladaAbiertaAlPublico(e, todayMadrid());
   const almacen = almacenDeVideos();
   return (
-    <div className="pantalla" style={{ gap: 18 }}>
+    <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
       <p style={{ margin: 0 }}><Link href="/compartir">← Elegir otra velada</Link></p>
       <div><h1>Subir vídeos o fotos</h1><p className="lead" style={{ fontSize: 16 }}>{e.name} · {fmtDate(e.date)} · {e.city}</p></div>
       {estado !== "ok" ? <div className="notice notice-bad" role="alert"><span aria-hidden="true">⚠ </span>{MOTIVO[estado]}</div>

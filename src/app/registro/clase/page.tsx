@@ -15,7 +15,7 @@ export default async function ClaseRegistro() {
   const previo = readOnboarding(user.onboarding);
   if (previo?.kind !== "entrenador") redirect("/registro/perfil");
   return (
-    <div className="pantalla">
+    <div className="pantalla pantalla-formulario">
       <PasosRegistro tipo="entrenador" paso={3} atras="/registro/perfil" etiquetaAtras="Volver a tu perfil de entrenador" />
       <div>
         <h1>Tu primera clase</h1>

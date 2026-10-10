@@ -58,13 +58,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const fighter = await getFighter(slug);
   if (!fighter) notFound();
-  const bouts = await db.bout.findMany({
+  const [bouts, user] = await Promise.all([db.bout.findMany({
     where: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] },
     include: { event: true, fighterA: true, fighterB: true, supportAccreditation: true },
     orderBy: { event: { date: "desc" } },
-  });
+  }), getUser()]);
   const records = computeRecords(fighter.id, bouts);
-  const user = await getUser();
   const [followerCount, following] = await Promise.all([
     db.follow.count({ where: { fighterId: fighter.id } }),
     user ? db.follow.findUnique({ where: { userId_fighterId: { userId: user.id, fighterId: fighter.id } } }) : Promise.resolve(null),

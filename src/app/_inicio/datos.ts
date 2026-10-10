@@ -18,8 +18,9 @@ export async function peleadoresConAura(take = 6, discipline?: Discipline) {
   const grupos = await db.aura.groupBy({ by: ["fighterId"], where: { bout, fighter: { listed: true, hiddenAt: null } }, _count: { _all: true }, orderBy: { _count: { fighterId: "desc" } }, take: take * 3 });
   if (!grupos.length) return [];
   const fichas = await db.fighter.findMany({ where: { id: { in: grupos.map((g) => g.fighterId) } }, include: { disciplines: true } });
+  const porId = new Map(fichas.map(f => [f.id, f]));
   return grupos
-    .map((g) => ({ g, f: fichas.find((x) => x.id === g.fighterId) }))
+    .map((g) => ({ g, f: porId.get(g.fighterId) }))
     .filter((x): x is { g: (typeof grupos)[number]; f: (typeof fichas)[number] } => !!x.f && (!!discipline || x.f.disciplines.length > 0))
     .sort((a, b) => b.g._count._all - a.g._count._all || a.f.lastName.localeCompare(b.f.lastName, "es"))
     .slice(0, take)

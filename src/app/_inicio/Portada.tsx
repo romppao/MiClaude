@@ -30,7 +30,7 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
   const de = nombre ? ` de ${nombre}` : "";
   const masNoticias = disciplina ? `/noticias?disciplina=${DISCIPLINE_SLUG[disciplina]}` : "/noticias";
   return (
-    <div className="pantalla" style={{ gap: 26 }}>
+    <div className="pantalla inicio-adaptable" style={{ gap: 26 }}>
       {cabecera}
 
       <nav className="filtros-disciplina desliza-fila con-dibujo" aria-label="Elige un deporte">

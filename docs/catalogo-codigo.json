@@ -15,6 +15,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/actualizar-noticias.yml",
+    "purpose": "Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": ".github/workflows/ci.yml",
     "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -26,7 +31,7 @@
   },
   {
     "path": "next.config.mjs",
-    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (miniaturas de i.ytimg.com y vídeos de R2); distingue desarrollo de producción.",
+    "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -165,6 +170,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "shaders.config.ts",
+    "purpose": "Configura la integración React de shaders sin activar autenticación ni telemetría.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
     "path": "src/app/_inicio/Aficionado.tsx",
     "purpose": "Panel del aficionado en /mi-panel (también moderación y entidad pendiente): combates de seguidos, aura, resultados y sus disciplinas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -298,6 +308,11 @@
     "path": "src/app/actions/trajectory.ts",
     "purpose": "Gestiona títulos, retirada/restauración/revisión, respaldo de combate y acreditaciones; separa derecho a declarar de permiso para avalar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/api/cron/noticias/route.ts",
+    "purpose": "Endpoint del cron de noticias: exige CRON_SECRET (503 si falta) en la cabecera x-cron-secret con comparación en tiempo constante y fuerza la actualización de fuentes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/ayuda/page.tsx",
@@ -445,6 +460,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/components/PortadaNoticia.tsx",
+    "purpose": "Portada e miniatura de noticia: muestra la foto del medio y, si no hay o falla al cargar, una cubierta dibujada con el color y pictograma de la disciplina.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/ProfileDetails.tsx",
     "purpose": "Carga y presenta datos públicos de personalización del perfil sin exponer almacenamiento de imágenes.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -503,6 +523,46 @@
     "path": "src/app/components/VerificationTag.tsx",
     "purpose": "Etiqueta declaración, confirmación o verificación y respaldo efectivo del hecho; no avala toda una carrera.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/experience/Arena3D.tsx",
+    "purpose": "Escena procedural PBR de ring o medalla, DPR adaptativo y liberación de GPU.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/EffectBoundary.tsx",
+    "purpose": "Aísla fallos de módulos decorativos para mantener lectura y acciones.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Experience.tsx",
+    "purpose": "Mantiene contenido de servidor y carga diferida de animación y avisos.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Feedback.tsx",
+    "purpose": "Único Toaster para pérdida y recuperación de conexión.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/GpuSurface.tsx",
+    "purpose": "Activa efectos según visibilidad, preferencias y ahorro de datos; ofrece alternativa estática.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Lab.tsx",
+    "purpose": "Revisión interactiva ficticia de efectos, datos extremos y Aura sin persistencia.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/MotionRuntime.tsx",
+    "purpose": "Gestiona contextos GSAP, revelado por lotes e inclinación con limpieza.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/ShaderAmbient.tsx",
+    "purpose": "Malla y estela WebGPU de paleta explícita, sin telemetría y con fallback.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
   },
   {
     "path": "src/app/disciplinas/[slug]/page.tsx",
@@ -578,6 +638,11 @@
     "path": "src/app/imagenes/[kind]/[id]/[slot]/route.ts",
     "purpose": "Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/laboratorio/page.tsx",
+    "purpose": "Guarda de acceso al laboratorio: exige dos indicadores de demostración.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
   },
   {
     "path": "src/app/layout.tsx",
@@ -1110,6 +1175,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/news/ai.ts",
+    "purpose": "Ayudas opcionales con Gemini (resumen de titulares y texto para generar imágenes); sin GEMINI_API_KEY devuelven el texto original. Aún no las usa la aplicación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/news/espana.ts",
     "purpose": "Panorama español de las noticias: señales de España (comunidades, provincias, federaciones, españoles de élite) y regla delPanoramaEspanol según la fuente.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1163,6 +1233,21 @@
     "path": "src/pages/_error.tsx",
     "purpose": "Respuesta de error del Pages Router usada por Next.js, manteniendo mensaje y navegación en español aunque el producto use App Router.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "tests/browser/adaptacion.mjs",
+    "purpose": "Verifica anchuras m?viles/tableta/escritorio, columnas, formularios y retirada de decoraci?n en bienvenida.",
+    "guide": "docs/ADAPTACION-DISPOSITIVOS.md"
+  },
+  {
+    "path": "tests/browser/experiencia.mjs",
+    "purpose": "Verificación local de efectos, layout, accesibilidad, conexión y cadencia.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "tests/browser/optimizacion.mjs",
+    "purpose": "Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos.",
+    "guide": "docs/OPTIMIZACION-PANTALLAS.md"
   },
   {
     "path": "tests/documentacion/catalogo.test.mjs",
