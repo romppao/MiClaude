@@ -1,0 +1,45 @@
+name: Actualización 24/7 de Noticias y Portadas
+
+on:
+  schedule:
+    # Se ejecuta en la nube de GitHub cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Permite pulsar un botón manual en GitHub Actions para actualizar ya
+
+jobs:
+  actualizar-noticias:
+    name: Leer RSS, YouTube y actualizar portadas
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Despertar Render y actualizar fuentes
+        env:
+          # Mismo valor que la variable CRON_SECRET del servicio en Render (Settings → Secrets → Actions).
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          URL: https://ring-espana-demo.onrender.com/api/cron/noticias
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Falta el secreto CRON_SECRET en GitHub"
+            exit 1
+          fi
+
+          # Reintentos para dar tiempo a que Render despierte si estaba dormido
+          for i in 1 2 3; do
+            echo "Intento $i..."
+            STATUS=$(curl -s -o respuesta.json -w "%{http_code}" -m 90 -H "x-cron-secret: $CRON_SECRET" "$URL" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Actualización completada:"
+              cat respuesta.json
+              exit 0
+            fi
+            if [ "$STATUS" = "401" ] || [ "$STATUS" = "503" ]; then
+              echo "::error::El servidor rechazó la petición ($STATUS): revisa CRON_SECRET en GitHub y en Render"
+              exit 1
+            fi
+            echo "El servidor respondió con estado $STATUS; espero 20 s a que despierte..."
+            sleep 20
+          done
+
+          echo "::error::No se pudo actualizar tras 3 intentos"
+          exit 1

@@ -34,3 +34,6 @@ services:
       # Cuenta del creador (docs/CREADOR.md): el correo se escribe en el panel de Render, no aquí.
       - key: CREADOR_CORREO
         sync: false
+      # Clave del cron de noticias (.github/workflows/actualizar-noticias.yml): el mismo valor va en los secretos de GitHub.
+      - key: CRON_SECRET
+        sync: false

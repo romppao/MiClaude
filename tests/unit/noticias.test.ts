@@ -27,7 +27,7 @@ describe("lector de noticias (RSS y Atom)", () => {
     expect(a).toMatchObject({ guid: "abc", url: "https://news.google.com/rss/articles/abc?oc=5", title: "Sandra Pérez retiene el título europeo en Valencia", publisher: "Diario Deportivo", imageUrl: null });
     expect(a.publishedAt.toISOString()).toBe("2026-10-08T09:30:00.000Z");
     expect(b).toMatchObject({ title: "Crónica: noche de K-1 & kickboxing en Bilbao", summary: "Doce combates amateur y dos profesionales.", guid: "https://medio.example/cronica", publisher: null });
-    expect(b.imageUrl).toBeNull(); // dominio de imagen no permitido por la política de seguridad
+    expect(b.imageUrl).toBe("https://cdn.medio.example/foto.jpg");
     expect(b.publishedAt.toISOString()).toBe("2026-10-07T18:00:00.000Z");
     // Sin enlace, con enlace que no es http(s) o con fecha ilegible: se descartan. Una fecha futura se recorta a «ahora».
     expect(resto.map((x) => x.title)).toEqual(["Del futuro"]);
@@ -37,6 +37,19 @@ describe("lector de noticias (RSS y Atom)", () => {
     const [v] = parseFeed(ATOM_YOUTUBE, AHORA);
     expect(v).toMatchObject({ guid: "yt:video:VID123", url: "https://www.youtube.com/watch?v=VID123", title: "Resumen del combate estelar | Muay Thai", summary: "Lo mejor de la noche.", imageUrl: "https://i.ytimg.com/vi/VID123/hqdefault.jpg" });
     expect(v.publishedAt.toISOString()).toBe("2026-10-07T18:00:00.000Z");
+  });
+  it("extrae imágenes de enclosure y de etiquetas img en descripción", () => {
+    const feed = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Prensa</title>
+      <item><title>Título con enclosure de boxeo</title><link>https://prensa.es/noticia-1</link><pubDate>Wed, 08 Oct 2026 09:00:00 GMT</pubDate><enclosure url="https://prensa.es/foto.jpg" type="image/jpeg"/></item>
+      <item><title>Título con img en descripción</title><link>https://prensa.es/noticia-2</link><pubDate>Wed, 08 Oct 2026 09:00:00 GMT</pubDate><description><![CDATA[<img src="https://prensa.es/foto2.webp" /> Resumen del combate.]]></description></item>
+      <item><title>Rechaza imagen http insegura</title><link>https://prensa.es/noticia-3</link><pubDate>Wed, 08 Oct 2026 09:00:00 GMT</pubDate><enclosure url="http://inseguro.es/foto.jpg" type="image/jpeg"/></item>
+      <item><title>Rechaza IP local privada</title><link>https://prensa.es/noticia-4</link><pubDate>Wed, 08 Oct 2026 09:00:00 GMT</pubDate><enclosure url="https://127.0.0.1/foto.jpg" type="image/jpeg"/></item>
+    </channel></rss>`;
+    const [e1, e2, e3, e4] = parseFeed(feed, AHORA);
+    expect(e1.imageUrl).toBe("https://prensa.es/foto.jpg");
+    expect(e2.imageUrl).toBe("https://prensa.es/foto2.webp");
+    expect(e3.imageUrl).toBeNull();
+    expect(e4.imageUrl).toBeNull();
   });
   it("no se rompe con contenido que no es un canal", () => {
     expect(parseFeed("<html><body>No encontrado</body></html>", AHORA)).toEqual([]);
@@ -153,5 +166,17 @@ describe("solo el panorama español (petición del fundador: «apoyar a los nues
     expect(delPanoramaEspanol({ local: true }, { title: "Resultados del sábado", summary: null })).toBe(true);
     expect(delPanoramaEspanol({ local: false }, { title: "Resultados del sábado", summary: null })).toBe(false);
     expect(delPanoramaEspanol({ local: false }, { title: "Resultados del sábado", summary: "Velada en Zaragoza" })).toBe(true);
+  });
+});
+
+describe("IA Nano Banano (generación de prompts y síntesis)", () => {
+  it("genera prompt de combate por defecto sin clave de API de forma segura", async () => {
+    const { generarPromptImagenCombate, sintetizarTitularConIA } = await import("../../src/lib/news/ai");
+    const p = await generarPromptImagenCombate({ titulo: "Campeonato de España de peso mosca", disciplina: "BOXEO" });
+    expect(p).toContain("BOXEO");
+    expect(p).toContain("Cinematic");
+
+    const t = await sintetizarTitularConIA("Titular corto");
+    expect(t).toBe("Titular corto");
   });
 });
