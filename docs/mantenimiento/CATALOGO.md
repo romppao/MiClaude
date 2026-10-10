@@ -113,7 +113,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `22688f6c8e19f931` |
 | [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `6e61d1cddf231e1c` |
 | [shaders.config.ts](../../shaders.config.ts) | Configura la integración React de shaders sin activar autenticación ni telemetría. | [Contexto](../EXPERIENCIA-ELITE.md) | — | `6d3e8e67ca01ad01` |
-| [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `d30d8e58ab1c24b1` |
+| [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `33b5f6dc12863e5b` |
 | [vitest.config.mts](../../vitest.config.mts) | Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config. | [Contexto](OPERACION.md) | — | `1014c0b47c12c5ff` |
 
 ## Lógica: accounts
@@ -264,7 +264,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/gimnasios/[slug]/page.tsx](../../src/app/gimnasios/%5Bslug%5D/page.tsx) | Ficha del gimnasio con personalización, entrenador y peleadores vinculados, diferenciando su sello. | [Contexto](FLUJOS.md) | `dynamic`, `generateMetadata`, `GymPage` | `f863bc668ecd55af` |
 | [src/app/gimnasios/page.tsx](../../src/app/gimnasios/page.tsx) | Listado filtrado/paginado de gimnasios con ubicación y acceso a fichas. | [Contexto](FLUJOS.md) | `metadata`, `dynamic`, `Gyms` | `1080637e2d21810c` |
 | [src/app/global-error.tsx](../../src/app/global-error.tsx) | Frontera global que aporta documento HTML propio si falla layout; mantiene mensaje público y opción de recuperación. | [Contexto](MODULOS.md) | `GlobalError` | `41d284ac5543e147` |
-| [src/app/globals.css](../../src/app/globals.css) | Tokens, componentes y adaptación móvil del diseño v3 junto a clases heredadas; preservar accesibilidad y revisar todos los papeles al cambiarlo. | [Contexto](MODULOS.md) | — | `030e6ac35bd43502` |
+| [src/app/globals.css](../../src/app/globals.css) | Tokens, componentes y adaptación móvil del diseño v3 junto a clases heredadas; preservar accesibilidad y revisar todos los papeles al cambiarlo. | [Contexto](MODULOS.md) | — | `dda4196333766218` |
 | [src/app/highlights/[id]/imagen/route.ts](../../src/app/highlights/%5Bid%5D/imagen/route.ts) | Sirve foto WebP de highlight tras comprobar existencia/visibilidad, con cabeceras de respuesta y caché propias. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `b23daa172b68533b` |
 | [src/app/highlights/[id]/video/route.ts](../../src/app/highlights/%5Bid%5D/video/route.ts) | Sirve el vídeo subido de un highlight si la ficha es pública o propia y no está retirado. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `1aa195459d3d8716` |
 | [src/app/imagenes/[kind]/[id]/[slot]/route.ts](../../src/app/imagenes/%5Bkind%5D/%5Bid%5D/%5Bslot%5D/route.ts) | Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `8fb038309e706716` |
