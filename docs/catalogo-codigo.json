@@ -25,6 +25,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/mantener-demo-despierta.yml",
+    "purpose": "Visita /salud de la demo de Render cada 10 minutos para que el plan gratuito no la duerma; consume horas gratuitas de Render.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": ".gitignore",
     "purpose": "Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas.",
     "guide": "docs/mantenimiento/OPERACION.md"

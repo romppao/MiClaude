@@ -20,7 +20,7 @@ export function ListaNoticias({ noticias, ahora = new Date() }: { noticias: Noti
             <a href={n.url} target="_blank" rel="noopener noreferrer" className="noticia" style={{ "--tinte": tinteDe(n.disciplines[0]) } as CSSProperties}>
               <MiniaturaNoticia n={n} />
               <span className="cuerpo">
-                <span className="meta">{medio} · {haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span>
+                <span className="meta">{medio} · <span className="sin-corte">{haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span></span>
                 <span className="titular">{n.title}<span className="sr-only"> (se abre en otra pestaña)</span></span>
                 {n.disciplines.length > 0 && <span className="meta-acc">{n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ")}</span>}
               </span>
@@ -41,7 +41,7 @@ export function NoticiaDestacada({ n, ahora = new Date() }: { n: Noticia; ahora?
       <span className="abajo">
         <span className="kicker kicker-acc">{n.disciplines.length ? n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ") : "Deportes de contacto"}</span>
         <span className="titular">{n.title}<span className="sr-only"> (se abre en otra pestaña)</span></span>
-        <span className="meta">{medio} · {haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span>
+        <span className="meta">{medio} · <span className="sin-corte">{haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span></span>
       </span>
     </a>
   );
@@ -64,7 +64,7 @@ export function FilaNoticias({ noticias, etiqueta, ahora = new Date() }: { notic
               <span className="abajo">
                 {n.disciplines.length > 0 && <span className="kicker kicker-acc">{n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ")}</span>}
                 <span className="titular">{n.title}<span className="sr-only"> (se abre en otra pestaña)</span></span>
-                <span className="meta">{medio} · {haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span>
+                <span className="meta">{medio} · <span className="sin-corte">{haceTiempo(n.publishedAt, ahora)}{n.source.kind === "VIDEO" ? " · Vídeo" : ""}</span></span>
               </span>
             </a>
           </li>

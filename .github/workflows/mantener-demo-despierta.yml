@@ -1,0 +1,21 @@
+name: Mantener despierta la demo
+
+# El plan gratuito de Render duerme el servicio tras 15 minutos sin visitas y despertarlo tarda; la primera
+# carga en el móvil se hacía muy lenta. Una visita a /salud cada 10 minutos lo evita. Consume horas del plan
+# gratuito de Render (750 h al mes, suficientes para un único servicio encendido todo el mes).
+# GitHub puede retrasar las ejecuciones programadas unos minutos; no garantiza el intervalo exacto.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  visitar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Visitar /salud
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 120 https://ring-espana-demo.onrender.com/salud || echo "000")
+          echo "Estado: $STATUS"
+          [ "$STATUS" = "200" ]

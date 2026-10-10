@@ -78,6 +78,7 @@ hr{border:0;border-top:1px solid var(--line);margin:24px 0}
 main{max-width:1240px;margin:auto;padding:32px 24px 72px}
 .mut{color:var(--mut)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.sin-corte{white-space:nowrap}
 .skip{position:absolute;left:-999px;top:0;background:var(--acc);color:var(--acc-ink);padding:10px 14px;z-index:100;border-radius:12px}
 .skip:focus{left:8px;top:8px}
 form.search{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;align-items:flex-end}
