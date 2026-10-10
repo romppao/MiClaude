@@ -678,3 +678,24 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
   button,.btn,a.card,a.tarjeta,a.fila,a.tarjeta-foto,.mobile-nav a,.pestanas-barra>a{transition:none}
   a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a:active{transform:none}
 }
+
+/* Escritorio (10 oct, Claude, a partir de la captura del fundador): cabecera en una fila y portada sin huecos.
+   Los enlaces de la cuenta ya están en «Menú»: en la cabecera quedan «Mi panel», «Mi cuenta» y «Salir» (prueba de usabilidad), o «Entrar» y «Registrarse» sin sesión. */
+@media(min-width:1024px){
+  header.top .in{flex-wrap:nowrap}
+  header.top .cuenta>:not(.siempre){display:none}
+  header.top form.buscador{order:3;flex:1 1 180px;max-width:300px;min-width:160px;margin-left:auto}
+  header.top .cuenta{order:4;flex-wrap:nowrap}
+  header.top .menu-open{order:5}
+  .inicio-adaptable>.portada-actualidad,.inicio-adaptable>.portada-panel{grid-column:1 / -1}
+  .portada-actualidad .noticia-destacada{min-height:0;height:420px}
+  .portada-actualidad .noticia-destacada>img{object-position:center 30%}
+  .portada-actualidad .fila-noticias{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;margin:0;padding:0}
+  .portada-actualidad .fila-noticias>li:nth-child(n+9){display:none}
+  .portada-actualidad .fila-noticias .noticia-mini{min-height:260px}
+}
+@media(min-width:1024px){header.top .cuenta a{white-space:nowrap}}
+/* «Entrenadores» sigue en «Menú» («Clases y entrenadores»); a este ancho no cabe en la barra. */
+@media(min-width:1024px) and (max-width:1279px){header.top .in{gap:10px 14px}header.top nav[aria-label=Principal] a[href="/entrenadores"]{display:none}header.top nav[aria-label=Principal]{gap:4px 14px}header.top .cuenta{gap:8px 12px}header.top form.buscador button,header.top .cuenta .btn,header.top .menu-open{padding-left:14px;padding-right:14px}}
+/* En escritorio no cabe el campo junto a la navegación y la cuenta: queda el botón «Buscar», que abre /buscar con su propio campo. */
+@media(min-width:1024px){header.top form.buscador{flex:0 0 auto;min-width:0}header.top form.buscador input{display:none}}

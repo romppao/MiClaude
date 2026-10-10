@@ -75,7 +75,8 @@ await persona("visitante", "Marta, 58 años, sin cuenta, quiere ver si su sobrin
   });
   await paso("abre el menú", async () => { await p.getByRole("button", { name: /Menú/ }).first().click(); await p.locator("dialog[open]").waitFor(); });
   await paso("elige «Veladas» en el menú", async () => { await p.locator("dialog[open]").getByRole("link", { name: /Veladas/ }).first().click(); await p.waitForURL("**/veladas**"); });
-  await paso("busca «demo» con el buscador", async () => { await p.goto(B + "/"); await p.getByPlaceholder("Buscar…").fill("demo"); await p.getByRole("button", { name: "Buscar" }).first().click(); await p.waitForURL("**/buscar**"); });
+  // En escritorio la cabecera solo muestra el botón «Buscar» (no cabe el campo): abre /buscar y allí se escribe.
+  await paso("busca «demo» con el buscador", async () => { await p.goto(B + "/"); await p.locator("header").getByRole("button", { name: "Buscar" }).click(); await p.waitForURL("**/buscar**"); await p.locator("main form[role=search] input[name=q]").fill("demo"); await p.locator("main form[role=search] input[name=q]").press("Enter"); await p.waitForURL("**/buscar?q=demo**"); });
   await paso("abre «¿Cómo funciona?»", async () => { await p.goto(B + "/ayuda"); await p.locator("h1").waitFor(); });
 });
 

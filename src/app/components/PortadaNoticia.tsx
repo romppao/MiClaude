@@ -107,7 +107,7 @@ export function CubiertaGenerada({
             <stop offset="100%" stopColor={color} stopOpacity="0.15" />
           </linearGradient>
         </defs>
-        <polygon points="20,360 580,360 470,215 130,215" fill={color} fillOpacity="0.07" stroke={color} strokeOpacity="0.45" strokeWidth="1.2" />
+        <polygon points="20,360 580,360 470,215 130,215" fill={color} fillOpacity="0.07" />
         <line x1="0" y1="150" x2="600" y2="150" stroke={`url(#${grad})`} strokeWidth="3" />
         <line x1="0" y1="178" x2="600" y2="178" stroke={`url(#${grad})`} strokeWidth="3" />
         <line x1="0" y1="206" x2="600" y2="206" stroke={`url(#${grad})`} strokeWidth="3" />

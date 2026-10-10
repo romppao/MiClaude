@@ -1460,3 +1460,11 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué se hizo:** PR #41 unido. Portada generada sin la etiqueta que se solapaba con la de la tarjeta, con más color y el pictograma como marca de agua; ring en vez de «RE» si no hay disciplina; detección de fotos rotas antes de hidratar; fecha sin cortes; tarea `mantener-demo-despierta.yml` cada 10 minutos.
 **Qué se comprobó:** capturas a 390 px con Playwright sobre base PostgreSQL desechable y noticias reales; tipos sin errores; 650/652 unitarias (los 2 fallos de rutas de Windows).
 **Estado y siguientes pasos:** pendiente de CI y despliegue. La espera de cada cambio de página sigue dependiendo de la CPU del plan gratuito de Render.
+
+
+## 10 de octubre de 2026 — Portada y cabecera en escritorio (Claude)
+**Qué se pidió:** el fundador, con captura a 1366 px: en el móvil todo bien, pero «la web del escritorio no se adapta de la mejor manera».
+**Qué se vio:** cabecera en dos filas (navegación, enlaces de cuenta, «Salir» y buscador mezclados); en la portada, la rejilla de dos columnas ponía «Mi panel» solo en la columna derecha con un hueco grande debajo; la noticia destacada ocupaba casi toda la pantalla.
+**Qué se decidió y por qué:** desde 1024 px la cabecera va en una fila. Los enlaces que ya están en «Menú» (¿Cómo funciona?, Moderación, Mi ficha/Mis clases/Mis veladas) dejan la barra; se conservan «Mi panel», «Mi cuenta» y «Salir» por la decisión que recoge `tests/e2e/usabilidad.mjs`. Medido el ancho: el campo de búsqueda no cabe junto a todo eso (53 px incluso a 1920), así que en escritorio queda el botón «Buscar», que abre `/buscar` con su campo; entre 1024 y 1279 px «Entrenadores» pasa al menú («Clases y entrenadores»). Actualidad y «Mi panel» ocupan todo el ancho; la destacada mide 420 px y debajo van 8 noticias en cuatro columnas.
+**Qué se comprobó:** capturas con sesión y sin ella a 1024, 1100, 1280, 1366, 1440 y 1920 px: una sola fila y nada fuera de pantalla. En local, `usabilidad`, `menu`, `acceso` y `cuenta` pasan sus comprobaciones de cabecera; los fallos restantes son por no tener `psql` en Windows. `escenarios.mjs` (no está en el CI) busca ahora desde `/buscar`.
+**Estado y siguientes pasos:** pendiente de CI y despliegue. Se ve una noticia duplicada por llegar de dos fuentes (AEBOX y su búsqueda): queda para revisar la deduplicación.

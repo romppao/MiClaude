@@ -59,20 +59,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/entrenadores">Entrenadores</Link>
             </nav>
             <NavigationMenu secciones={secciones} logoutForm={user ? <form action={logout}><button className="secondary">Salir</button></form> : undefined} />
-            <div className="cuenta">
+            <div className={user ? "cuenta con-sesion" : "cuenta"}>
               <Link href="/ayuda">¿Cómo funciona?</Link>
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
-                  <Link href="/mi-panel">Mi panel</Link>
+                  <Link href="/mi-panel" className="siempre">Mi panel</Link>
                   {papel === "entidad" && <Link href="/organizador">Mis veladas</Link>}
                   {papel === "entrenador" && <Link href="/mis-clases">Mis clases</Link>}
                   {papel === "peleador" && <Link href="/mi-ficha">Mi ficha</Link>}
-                  <Link href="/mi-cuenta">Mi cuenta</Link>
-                  <form action={logout}><button className="secondary">Salir</button></form>
+                  <Link href="/mi-cuenta" className="siempre">Mi cuenta</Link>
+                  <form action={logout} className="siempre"><button className="secondary">Salir</button></form>
                 </>
               ) : (
-                <><Link href="/entrar">Entrar</Link><Link href="/registro" className="btn">Registrarse</Link></>
+                <><Link href="/entrar" className="siempre">Entrar</Link><Link href="/registro" className="btn siempre">Registrarse</Link></>
               )}
             </div>
             <form action="/buscar" role="search" aria-label="Búsqueda rápida" className="buscador">
