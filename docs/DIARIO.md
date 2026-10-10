@@ -1427,3 +1427,12 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 - `inscripciones` y `plazas` adaptadas a la casilla nueva.
 - Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
 - Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
+
+
+## 10 de octubre de 2026 ? Optimizaci?n sin redise?o (Codex)
+**Qu? se pidi?:** ?Es muy importante que no cambies el dise?o visual de la p?gina, ya que me gusta como se ve, simplemente quiero que la optimices?. El logo todav?a no est? elegido y se deja para el final.
+**Qu? se decidi?:** corregir comportamientos y adaptaci?n de componentes compartidos conservando nombre, logo, colores, Archivo y navegaci?n.
+**Qu? se hizo:** envolver textos largos cuando no caben; controles t?ctiles y cancelaci?n de gestos de pesta?as; carga de una foto nueva tras fallar la anterior; respuesta de pulsaci?n con movimiento reducido. Pruebas y l?mites en OPTIMIZACION-PANTALLAS.md.
+**Qu? se comprob?:** TypeScript y build correctos; 12 controles de navegador correctos; captura habitual sin diferencias. Unitarias 647/649: dos fallos de multimedia por rutas de Windows en archivos sin modificar. No se reejecut? la bater?a con base de datos por falta de PostgreSQL local.
+**Qu? sali? mal:** el generador de mapa busca separadores POSIX y en Windows omiti? pantallas; no se conserv? esa salida. Se gener? con una copia temporal que usa separadores portables, sin cambiar c?digo del generador. El cat?logo utiliza huellas de bytes: se conservaron finales LF en la carpeta propia para obtener las mismas huellas que CI Linux.
+**Estado y siguiente paso:** cambio local listo para revisi?n y CI, sin integraci?n ni despliegue. Logo pendiente de elecci?n del fundador.

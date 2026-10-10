@@ -99,6 +99,12 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
 
   // Gesto con el dedo: solo cuenta si es claramente horizontal; el desplazamiento vertical sigue siendo el de la página.
   const alTocar = (e: React.TouchEvent) => {
+    // Los controles conservan su gesto nativo (por ejemplo, la barra para elegir una hora).
+    // Un segundo dedo pertenece al zoom del navegador, no al cambio de sección.
+    if (e.touches.length !== 1 || (e.target as Element).closest("input, select, textarea, button, video, audio, [contenteditable]:not([contenteditable=false])")) {
+      toque.current = null;
+      return;
+    }
     // Dentro de una fila que ya se desliza a los lados (récords, highlights, galería…), el gesto es de esa fila, no de las pestañas.
     for (let el = e.target as HTMLElement | null; el && el !== pista.current; el = el.parentElement) {
       if (el.scrollWidth > el.clientWidth + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) { toque.current = null; return; }
@@ -107,6 +113,7 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
     toque.current = { x: t.clientX, y: t.clientY, t: Date.now(), horizontal: null };
   };
   const alMover = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) { toque.current = null; setArrastre(0); return; }
     const t0 = toque.current;
     if (!t0) return;
     const dx = e.touches[0].clientX - t0.x, dy = e.touches[0].clientY - t0.y;
@@ -146,7 +153,7 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
         ))}
       </nav>
       <p className="sr-only">Desliza a los lados para cambiar de sección, o usa los botones de arriba.</p>
-      <div ref={pista} className="pestanas-pista" onTouchStart={alTocar} onTouchMove={alMover} onTouchEnd={alSoltar} onTouchCancel={alSoltar}>
+      <div ref={pista} className="pestanas-pista" onTouchStart={alTocar} onTouchMove={alMover} onTouchEnd={alSoltar} onTouchCancel={() => { toque.current = null; setArrastre(0); }}>
         <div ref={riel} className={`pestanas-riel${arrastre ? " arrastrando" : ""}`} style={{ transform: `translateX(calc(${-activa * 100}% + ${arrastre}px))` }}>
           {pestanas.map((t) => (
             <section key={t.id} id={t.id} className="pestanas-panel" aria-label={t.titulo}>{t.contenido}</section>

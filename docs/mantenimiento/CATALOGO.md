@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **306 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **307 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -66,7 +66,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/components/EvitarDobleEnvio.tsx](../../src/app/components/EvitarDobleEnvio.tsx) | Evita envíos repetidos del formulario desde la interfaz; no sustituye unicidad ni control de concurrencia en servidor. | [Contexto](MODULOS.md) | `EvitarDobleEnvio` | `f9f3781789a9fde2` |
 | [src/app/components/Filtros.tsx](../../src/app/components/Filtros.tsx) | Campos etiquetados, botones aplicar/quitar y resumen de filtros activos para listados comprensibles. | [Contexto](MODULOS.md) | `CampoFiltro`, `MasFiltros`, `BotonesFiltro`, `FiltrosActivos` | `f0ae67a8dfca6437` |
 | [src/app/components/FlashNotice.tsx](../../src/app/components/FlashNotice.tsx) | Traduce mensajes de URL, anuncia resultado accesible y ofrece retorno a sección/cola tras acción. | [Contexto](MODULOS.md) | `FlashNotice` | `7d107fbb9daafdfa` |
-| [src/app/components/Foto.tsx](../../src/app/components/Foto.tsx) | Muestra foto opcional y retira imagen si falla para conservar iniciales/fondo; permite alt decorativo. | [Contexto](MODULOS.md) | `Foto` | `65fcc0e7e9d02465` |
+| [src/app/components/Foto.tsx](../../src/app/components/Foto.tsx) | Muestra foto opcional y retira imagen si falla para conservar iniciales/fondo; permite alt decorativo. | [Contexto](MODULOS.md) | `Foto` | `fc5e5035acb4e77b` |
 | [src/app/components/Icono.tsx](../../src/app/components/Icono.tsx) | Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control. | [Contexto](MODULOS.md) | `NombreIcono`, `Icono`, `Marca` | `5eaae3c13a2cdd9f` |
 | [src/app/components/IconoDisciplina.tsx](../../src/app/components/IconoDisciplina.tsx) | Pictogramas propios de cada disciplina (guante, kimono, patada alta, patada con guantes, octógono, rodillazo), decorativos, para el selector, las tarjetas y la cabecera de cada deporte. | [Contexto](FLUJOS.md) | `IconoDisciplina` | `a289e1a87acb0d37` |
 | [src/app/components/InputFoto.tsx](../../src/app/components/InputFoto.tsx) | Componente de cliente para elegir una foto: si es muy grande la reduce en el navegador antes de enviarla y avisa de que se ha ajustado sola. | [Contexto](FLUJOS.md) | `InputFoto` | `c28fb4e47a8fbea0` |
@@ -77,7 +77,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/components/Noticias.tsx](../../src/app/components/Noticias.tsx) | Lista de noticias con medio, fecha y enlace a la web original en otra pestaña; mensaje cuando aún no hay noticias. | [Contexto](MODULOS.md) | `ListaNoticias`, `NoticiaDestacada`, `FilaNoticias`, `SinNoticias`, `FUENTES_EXPLICADAS` | `3ddd92392d0aac20` |
 | [src/app/components/Paginacion.tsx](../../src/app/components/Paginacion.tsx) | Enlaces de página anterior/siguiente conservando filtros; zonas táctiles y texto para un listado acotado. | [Contexto](MODULOS.md) | `Paginacion` | `02aea02c9dd5eb8b` |
 | [src/app/components/PasosRegistro.tsx](../../src/app/components/PasosRegistro.tsx) | Cabecera de alta con progreso y retorno según los pasos del tipo de cuenta; no publica datos por sí misma. | [Contexto](MODULOS.md) | `PasosRegistro` | `488e1e455f80ebfb` |
-| [src/app/components/Pestanas.tsx](../../src/app/components/Pestanas.tsx) | Componente de cliente que agrupa secciones en pestañas que se deslizan a los lados (carrusel horizontal con barra de botones). | [Contexto](FLUJOS.md) | `Pestana`, `Pestanas` | `90b1e3434f590a76` |
+| [src/app/components/Pestanas.tsx](../../src/app/components/Pestanas.tsx) | Componente de cliente que agrupa secciones en pestañas que se deslizan a los lados (carrusel horizontal con barra de botones). | [Contexto](FLUJOS.md) | `Pestana`, `Pestanas` | `f4f499222582cd1d` |
 | [src/app/components/ProfileDetails.tsx](../../src/app/components/ProfileDetails.tsx) | Carga y presenta datos públicos de personalización del perfil sin exponer almacenamiento de imágenes. | [Contexto](MODULOS.md) | `ProfileDetails` | `b6f928badc8d05cf` |
 | [src/app/components/ProfileEditor.tsx](../../src/app/components/ProfileEditor.tsx) | Editor de metadatos, fotos y encuadre con acción recibida desde pantalla; no autoriza una edición por sí solo. | [Contexto](MODULOS.md) | `ProfileEditor` | `3de81c0361c5a34b` |
 | [src/app/components/ProfileHeader.tsx](../../src/app/components/ProfileHeader.tsx) | Cabecera de entidad con nombre, foto/banner y acceso de edición si está autorizado. | [Contexto](MODULOS.md) | `ProfileHeader` | `5c0f014cc222ec5e` |
@@ -98,14 +98,14 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.env.example](../../.env.example) | Plantilla de nombres y significado de variables, sin credenciales reales; punto de partida para configuración local/producción. | [Contexto](OPERACION.md) | — | `1e716aa713e11aca` |
 | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `a96a101f9495f4ee` |
 | [.github/dependabot.yml](../../.github/dependabot.yml) | Configura actualización de dependencias y evita saltos mayores automáticos no planificados. | [Contexto](OPERACION.md) | — | `d3d8f5a4368d2cb4` |
-| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad. | [Contexto](OPERACION.md) | — | `581bd979c7c63a4c` |
+| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad. | [Contexto](OPERACION.md) | — | `7c83cf95e073a24c` |
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `d946785138344fc1` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (miniaturas de i.ytimg.com y vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7b17e83c2d81bf4f` |
 | [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `0dd08838689cae75` |
 | [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `977e99dca97752f4` |
-| [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `6e61d1cddf231e1c` |
+| [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `fb02313b4a090d87` |
 | [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `d30d8e58ab1c24b1` |
-| [vitest.config.mts](../../vitest.config.mts) | Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config. | [Contexto](OPERACION.md) | — | `1014c0b47c12c5ff` |
+| [vitest.config.mts](../../vitest.config.mts) | Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config. | [Contexto](OPERACION.md) | — | `c7c6bdab4391e62e` |
 
 ## Lógica: accounts
 
@@ -255,7 +255,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/gimnasios/[slug]/page.tsx](../../src/app/gimnasios/%5Bslug%5D/page.tsx) | Ficha del gimnasio con personalización, entrenador y peleadores vinculados, diferenciando su sello. | [Contexto](FLUJOS.md) | `dynamic`, `generateMetadata`, `GymPage` | `f863bc668ecd55af` |
 | [src/app/gimnasios/page.tsx](../../src/app/gimnasios/page.tsx) | Listado filtrado/paginado de gimnasios con ubicación y acceso a fichas. | [Contexto](FLUJOS.md) | `metadata`, `dynamic`, `Gyms` | `1080637e2d21810c` |
 | [src/app/global-error.tsx](../../src/app/global-error.tsx) | Frontera global que aporta documento HTML propio si falla layout; mantiene mensaje público y opción de recuperación. | [Contexto](MODULOS.md) | `GlobalError` | `41d284ac5543e147` |
-| [src/app/globals.css](../../src/app/globals.css) | Tokens, componentes y adaptación móvil del diseño v3 junto a clases heredadas; preservar accesibilidad y revisar todos los papeles al cambiarlo. | [Contexto](MODULOS.md) | — | `dd061e3f18e33952` |
+| [src/app/globals.css](../../src/app/globals.css) | Tokens, componentes y adaptación móvil del diseño v3 junto a clases heredadas; preservar accesibilidad y revisar todos los papeles al cambiarlo. | [Contexto](MODULOS.md) | — | `8084b879abb4676b` |
 | [src/app/highlights/[id]/imagen/route.ts](../../src/app/highlights/%5Bid%5D/imagen/route.ts) | Sirve foto WebP de highlight tras comprobar existencia/visibilidad, con cabeceras de respuesta y caché propias. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `b23daa172b68533b` |
 | [src/app/highlights/[id]/video/route.ts](../../src/app/highlights/%5Bid%5D/video/route.ts) | Sirve el vídeo subido de un highlight si la ficha es pública o propia y no está retirado. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `1aa195459d3d8716` |
 | [src/app/imagenes/[kind]/[id]/[slot]/route.ts](../../src/app/imagenes/%5Bkind%5D/%5Bid%5D/%5Bslot%5D/route.ts) | Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `8fb038309e706716` |
@@ -320,6 +320,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
+| [tests/browser/optimizacion.mjs](../../tests/browser/optimizacion.mjs) | Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos. | [Contexto](../OPTIMIZACION-PANTALLAS.md) | — | `f6eeb39cdf07aa49` |
 | [tests/documentacion/catalogo.test.mjs](../../tests/documentacion/catalogo.test.mjs) | Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar. | [Contexto](README.md) | — | `fc34ccfb1c94e584` |
 
 ## Pruebas de navegador

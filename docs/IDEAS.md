@@ -314,3 +314,8 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 - **Cupos por categoría y lista de espera** — **hecho (9 oct):** el fundador lo aprobó («me parece bien que se especifiquen los pesos para los combates, las plazas por categoría»).
 - **Sugerir emparejamientos entre los aceptados** — **hecho (9 oct)** como ayuda, nunca automática («siempre con ayuda […] que se vea el nivel, la popularidad, el número de combates»). Idea derivada (Claude, 9 oct): permitir al organizador ajustar qué pesa más en el parecido (experiencia, peso, aura) si la escala inicial no le convence.
 - **Buscar rival o sparring por gimnasio y características** (el fundador, 9 oct: «sé que está en tal gimnasio pero no me sé su nombre […] que tenga X peleas, que sea zurdo») — **hecho (9 oct)** en `/propuestas`. Idea derivada (Claude, 9 oct): guardar una búsqueda y avisar por correo cuando aparezca un peleador que encaje (pendiente de decisión).
+
+
+## 10 de octubre de 2026 ? Conservar dise?o, optimizar uso
+- Fundador: le gusta el dise?o actual y solicita optimizar las pantallas sin redise?o ni prioridad entre ellas. Correcciones compartidas preparadas por Codex; pendientes de revisi?n/integraci?n.
+- Logo: sigue sin elegir; se aplaza al final. La entrega de un kit no constituye por s? sola aprobaci?n de ese logo.

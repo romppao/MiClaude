@@ -165,3 +165,7 @@ Petición del fundador y captura de referencia: «Me gusta como tiene distribuid
 - **Portada de disciplina:** cabecera con la raya de color de la disciplina (el mismo sistema que las tarjetas de la fase 1) y las secciones en el orden actualidad → veladas → aura → dónde entrenar.
 - **Galería del público:** una columna en el móvil y dos en escritorio; foto o vídeo con proporción 4:3 reservada (sin saltos al cargar) y los botones «Descargar» bajo cada elemento.
 - **«Mi panel»** reutiliza los inicios por papel de la fase 1 con el rótulo «Mi panel» en lima sobre el saludo.
+
+
+## 10 de octubre de 2026 ? Restricci?n vigente: optimizaci?n, no redise?o
+El fundador confirma que le gusta el aspecto actual. Solicita optimizarlo conservando colores, fuentes y composici?n. No hay prioridad entre pantallas: empezar por mejoras compartidas con fallos reproducibles. El logo todav?a no est? elegido y queda para el final. No interpretar kits anteriores como aprobaci?n del logo.

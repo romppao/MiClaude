@@ -1528,5 +1528,10 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/browser/optimizacion.mjs",
+    "purpose": "Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos.",
+    "guide": "docs/OPTIMIZACION-PANTALLAS.md"
   }
 ]

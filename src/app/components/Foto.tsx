@@ -6,7 +6,8 @@ import { useState } from "react";
  * de la disciplina). `alt` vacío cuando la foto es decorativa porque el nombre ya está escrito al lado.
  */
 export default function Foto({ src, alt = "", className, loading = "lazy" }: { src: string; alt?: string; className?: string; loading?: "lazy" | "eager" }) {
-  const [fallo, setFallo] = useState(false);
-  if (fallo) return null;
-  return <img src={src} alt={alt} className={className} loading={loading} onError={() => setFallo(true)} onLoad={(e) => { if (!e.currentTarget.naturalWidth) setFallo(true); }} />;
+  // El fallo pertenece a una dirección concreta: una foto nueva debe poder volver a cargar.
+  const [fallo, setFallo] = useState<string | null>(null);
+  if (fallo === src) return null;
+  return <img src={src} alt={alt} className={className} loading={loading} decoding="async" onError={() => setFallo(src)} onLoad={(e) => { if (!e.currentTarget.naturalWidth) setFallo(src); }} />;
 }

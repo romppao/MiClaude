@@ -314,3 +314,10 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 |---|---|---|
 | El peleador no encontraba cómo inscribirse en una velada | La inscripción quedaba cerrada al crear el evento y, cerrada, la página no decía nada: ni botón ni motivo | Cuando una función depende de que otra persona la active, la pantalla de quien la usa dice siempre en qué estado está y por qué; y por defecto, lo más útil para ambos (aquí, inscripción abierta al crear) |
 | El buscador de retos solo buscaba por nombre | Se pensó para alguien que ya sabe a quién retar | Toda búsqueda de personas se diseña también para quien no sabe el nombre: por lugar (gimnasio, provincia) y por características (peso, guardia, experiencia, edad) |
+
+
+## 10 de octubre de 2026 ? Optimizaci?n de componentes compartidos (Codex)
+- Un gesto de pesta?a no debe apropiarse de controles nativos ni convertir una cancelaci?n en navegaci?n. Probar arrastre, cancelaci?n, teclado y controles por separado.
+- El error de una imagen pertenece a su direcci?n, no a todas las futuras fotos del componente. Probar un fallo seguido de una imagen v?lida.
+- Generadores con separadores POSIX y huellas de bytes pueden producir documentaci?n distinta en Windows. Contrastar el resultado con el checkout y no conservar una salida que omite pantallas o cambia huellas solo por finales de l?nea.
+- Dos unitarias de multimedia fallan en Windows por rutas POSIX; no atribuirlas al cambio de interfaz ni modificar pruebas para ocultarlas.

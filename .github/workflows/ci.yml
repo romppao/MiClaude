@@ -62,6 +62,8 @@ jobs:
       - run: npm run build
       - name: Instalar Chromium
         run: npx playwright-core install --with-deps chromium
+      - name: Comprobar controles y diseño compartidos sin base de datos
+        run: node tests/browser/optimizacion.mjs
       - name: Arrancar servidor
         run: |
           npx next start -p 3111 > "$MAIL_LOG" 2>&1 &
