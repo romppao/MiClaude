@@ -319,3 +319,7 @@ Palabras del fundador: «el proceso para publicar la aplicación oficialmente al
 ## 10 de octubre de 2026 ? Conservar dise?o, optimizar uso
 - Fundador: le gusta el dise?o actual y solicita optimizar las pantallas sin redise?o ni prioridad entre ellas. Correcciones compartidas preparadas por Codex; pendientes de revisi?n/integraci?n.
 - Logo: sigue sin elegir; se aplaza al final. La entrega de un kit no constituye por s? sola aprobaci?n de ese logo.
+
+
+## Codex, 10 oct: efectos al servicio del contenido
+Decisión aplicada por petición del fundador: escenas pequeñas, carga diferida y alternativa estática. Propuesta pendiente: validar percepción y batería en teléfonos físicos antes de ampliar 3D a otras pantallas; logo sigue pendiente. Ver EXPERIENCIA-ELITE.md.

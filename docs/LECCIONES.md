@@ -323,3 +323,7 @@ Fusionar la propuesta en GitHub no cambia inmediatamente la página que sirve Re
 - Dos unitarias de multimedia fallan en Windows por rutas POSIX; no atribuirlas al cambio de interfaz ni modificar pruebas para ocultarlas.
 
 Correcci?n de verificaci?n (10 oct, Codex): el primer CI de la rama se detuvo porque el cat?logo conservaba huellas CRLF de render.yaml y vitest.config.mts. Se regener? desde una exportaci?n del commit con core.autocrlf=false para obtener exactamente los bytes de Git, sin cambiar esos archivos ni las comprobaciones. Las 9 pruebas documentales s? pasaron en Linux.
+
+
+## Codex, 10 oct: interacciones y GPU
+No renderizar React por cada touchmove; limpiar recursos al desmontar. Especificar stops de MeshGradient: su paleta predeterminada puede introducir colores ajenos. No confundir cadencia rAF local con certificación de 60 fps en dispositivos reales. Ver EXPERIENCIA-ELITE.md.

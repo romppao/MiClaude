@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "../../lib/accounts/auth";
 import Icono, { Marca } from "../components/Icono";
+import GpuSurface from "../components/experience/GpuSurface";
 
 export const metadata = { title: "Bienvenida", description: "Ring España: tu comunidad de deportes de contacto en toda España." };
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export default async function Bienvenida() {
   return (
     <section className="bienvenida a-sangre" aria-labelledby="titulo-bienvenida">
       <div className="foto" role="img" aria-label="Personas de la comunidad de deportes de contacto (imagen ilustrativa con personas ficticias)" />
+      <div className="bienvenida-arena"><GpuSurface /></div>
       <span className="sello-marca" style={{ position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)" }}><Marca ancho={24} />RING ESPAÑA</span>
       <h1 id="titulo-bienvenida">Tu deporte.<br />Tu gente.</h1>
       <p className="lead" style={{ maxWidth: 300 }}>Tu comunidad de deportes de contacto en toda España: peleadores, veladas y gimnasios.</p>

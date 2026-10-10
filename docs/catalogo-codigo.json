@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "shaders.config.ts",
+    "purpose": "Configura la integración React de shaders sin activar autenticación ni telemetría.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
     "path": "src/app/_inicio/Aficionado.tsx",
     "purpose": "Panel del aficionado en /mi-panel (también moderación y entidad pendiente): combates de seguidos, aura, resultados y sus disciplinas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -505,6 +510,46 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/experience/Arena3D.tsx",
+    "purpose": "Escena procedural PBR de ring o medalla, DPR adaptativo y liberación de GPU.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/EffectBoundary.tsx",
+    "purpose": "Aísla fallos de módulos decorativos para mantener lectura y acciones.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Experience.tsx",
+    "purpose": "Mantiene contenido de servidor y carga diferida de animación y avisos.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Feedback.tsx",
+    "purpose": "Único Toaster para pérdida y recuperación de conexión.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/GpuSurface.tsx",
+    "purpose": "Activa efectos según visibilidad, preferencias y ahorro de datos; ofrece alternativa estática.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/Lab.tsx",
+    "purpose": "Revisión interactiva ficticia de efectos, datos extremos y Aura sin persistencia.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/MotionRuntime.tsx",
+    "purpose": "Gestiona contextos GSAP, revelado por lotes e inclinación con limpieza.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/experience/ShaderAmbient.tsx",
+    "purpose": "Malla y estela WebGPU de paleta explícita, sin telemetría y con fallback.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
     "path": "src/app/disciplinas/[slug]/page.tsx",
     "purpose": "Portada de una disciplina: actualidad, próximas veladas, peleadores con aura y entrenadores que la enseñan; 404 si la disciplina no existe.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -580,9 +625,19 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/laboratorio/page.tsx",
+    "purpose": "Guarda de acceso al laboratorio: exige dos indicadores de demostración.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
     "path": "src/app/layout.tsx",
     "purpose": "Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/loading.tsx",
+    "purpose": "Estado accesible de carga durante navegación.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
   },
   {
     "path": "src/app/medios/[id]/imagen/route.ts",
@@ -1165,6 +1220,16 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "tests/browser/experiencia.mjs",
+    "purpose": "Verificación local de efectos, layout, accesibilidad, conexión y cadencia.",
+    "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "tests/browser/optimizacion.mjs",
+    "purpose": "Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos.",
+    "guide": "docs/OPTIMIZACION-PANTALLAS.md"
+  },
+  {
     "path": "tests/documentacion/catalogo.test.mjs",
     "purpose": "Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar.",
     "guide": "docs/mantenimiento/README.md"
@@ -1528,10 +1593,5 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/browser/optimizacion.mjs",
-    "purpose": "Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos.",
-    "guide": "docs/OPTIMIZACION-PANTALLAS.md"
   }
 ]

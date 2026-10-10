@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export type Pestana = { id: string; titulo: string; contenido: React.ReactNode };
 
@@ -21,9 +21,31 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
   const riel = useRef<HTMLDivElement>(null);
   const barra = useRef<HTMLElement>(null);
   const [activa, setActiva] = useState(inicial);
-  const [arrastre, setArrastre] = useState(0);
-  const toque = useRef<{ x: number; y: number; t: number; horizontal: boolean | null } | null>(null);
+  const arrastre = useRef(0);
+  const posicion = useRef(0);
+  const frame = useRef(0);
+  const velocidad = useRef(0);
+  const animar = useRef(false);
+  const toque = useRef<{ x: number; y: number; t: number; horizontal: boolean | null; base: number; ultimoX: number; ultimoT: number } | null>(null);
   const ultima = pestanas.length - 1;
+
+  const pintar = useCallback((x: number) => {
+    posicion.current = x;
+    if (riel.current) riel.current.style.transform = `translate3d(${x}px,0,0)`;
+  }, []);
+  const asentar = useCallback((i: number, suave: boolean) => {
+    cancelAnimationFrame(frame.current);
+    const destino = -i * (pista.current?.clientWidth ?? 0);
+    if (!suave || matchMedia("(prefers-reduced-motion: reduce)").matches) { pintar(destino); if(riel.current)riel.current.style.willChange=""; return; }
+    // Resorte amortiguado: parte del valor visible y conserva la velocidad del dedo.
+    const origen=posicion.current, diferencia=origen-destino, v=velocidad.current, inicio=performance.now(), omega=18;
+    const tick=(now:number)=>{const t=(now-inicio)/1000;const x=destino+(diferencia+(v+omega*diferencia)*t)*Math.exp(-omega*t);pintar(x);
+      if(t<.4&&Math.abs(x-destino)>.1)frame.current=requestAnimationFrame(tick);else{pintar(destino);if(riel.current)riel.current.style.willChange="";}};
+    if(riel.current)riel.current.style.willChange="transform";
+    frame.current=requestAnimationFrame(tick);
+  }, [pintar]);
+  useLayoutEffect(() => { asentar(activa,animar.current);animar.current=false; }, [activa,asentar]);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
   // El texto de la «#ancla», tolerando una dirección mal formada (decodeURIComponent lanza un error con «%E0» y similares).
   const ancla = (texto: string) => { try { return decodeURIComponent(texto); } catch { return texto; } };
@@ -92,10 +114,10 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
     if (!p || typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(() => ajustarAltura(activa));
     ro.observe(p);
-    const alRedimensionar = () => ajustarAltura(activa);
+    const alRedimensionar = () => { ajustarAltura(activa); asentar(activa,false); };
     window.addEventListener("resize", alRedimensionar);
     return () => { ro.disconnect(); window.removeEventListener("resize", alRedimensionar); };
-  }, [activa, ajustarAltura]);
+  }, [activa, ajustarAltura, asentar]);
 
   // Gesto con el dedo: solo cuenta si es claramente horizontal; el desplazamiento vertical sigue siendo el de la página.
   const alTocar = (e: React.TouchEvent) => {
@@ -110,10 +132,12 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
       if (el.scrollWidth > el.clientWidth + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) { toque.current = null; return; }
     }
     const t = e.touches[0];
-    toque.current = { x: t.clientX, y: t.clientY, t: Date.now(), horizontal: null };
+    cancelAnimationFrame(frame.current);
+    arrastre.current=0;velocidad.current=0;
+    toque.current = { x: t.clientX, y: t.clientY, t: performance.now(), horizontal: null, base: posicion.current, ultimoX: t.clientX, ultimoT: performance.now() };
   };
   const alMover = (e: React.TouchEvent) => {
-    if (e.touches.length !== 1) { toque.current = null; setArrastre(0); return; }
+    if (e.touches.length !== 1) { toque.current = null; arrastre.current=0;asentar(activa,false);return; }
     const t0 = toque.current;
     if (!t0) return;
     const dx = e.touches[0].clientX - t0.x, dy = e.touches[0].clientY - t0.y;
@@ -121,24 +145,31 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
     if (!t0.horizontal) return;
     // En la primera y en la última sección, el riel se resiste a salir.
     const borde = (activa === 0 && dx > 0) || (activa === ultima && dx < 0);
-    setArrastre(borde ? dx / 4 : dx);
+    const ancho=pista.current?.clientWidth??1;
+    arrastre.current=borde?(dx*ancho*.55)/(ancho+.55*Math.abs(dx)):dx;
+    const now=performance.now();velocidad.current=(e.touches[0].clientX-t0.ultimoX)/Math.max(1,now-t0.ultimoT)*1000;
+    t0.ultimoX=e.touches[0].clientX;t0.ultimoT=now;
+    cancelAnimationFrame(frame.current);frame.current=requestAnimationFrame(()=>pintar(t0.base+arrastre.current));
   };
   const alSoltar = () => {
     const t0 = toque.current;
     toque.current = null;
     if (t0?.horizontal) {
       const ancho = pista.current?.clientWidth ?? 1;
-      const rapido = Math.abs(arrastre) / Math.max(1, Date.now() - t0.t) > 0.5;
-      if (arrastre < 0 && (arrastre < -ancho * 0.2 || rapido)) ir(activa + 1);
-      else if (arrastre > 0 && (arrastre > ancho * 0.2 || rapido)) ir(activa - 1);
-    }
-    setArrastre(0);
+      const dx=arrastre.current;
+      const rapido=Math.abs(velocidad.current)>500;
+      const siguiente=Math.min(ultima,Math.max(0,activa+(dx<0&&(dx<-ancho*.2||rapido)?1:dx>0&&(dx>ancho*.2||rapido)?-1:0)));
+      animar.current=true;
+      if(siguiente===activa){animar.current=false;asentar(activa,true);}else ir(siguiente);
+    } else if(t0) { asentar(activa,false); }
+    arrastre.current=0;
   };
 
   // Flechas del teclado en la barra: sección anterior o siguiente.
   const alTecla = (e: React.KeyboardEvent) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     e.preventDefault();
+    animar.current=false;
     const i = Math.min(ultima, Math.max(0, activa + (e.key === "ArrowRight" ? 1 : -1)));
     ir(i);
     history.replaceState(null, "", `#${pestanas[i].id}`);
@@ -153,8 +184,8 @@ export default function Pestanas({ etiqueta, pestanas, inicial = 0 }: { etiqueta
         ))}
       </nav>
       <p className="sr-only">Desliza a los lados para cambiar de sección, o usa los botones de arriba.</p>
-      <div ref={pista} className="pestanas-pista" onTouchStart={alTocar} onTouchMove={alMover} onTouchEnd={alSoltar} onTouchCancel={() => { toque.current = null; setArrastre(0); }}>
-        <div ref={riel} className={`pestanas-riel${arrastre ? " arrastrando" : ""}`} style={{ transform: `translateX(calc(${-activa * 100}% + ${arrastre}px))` }}>
+      <div ref={pista} className="pestanas-pista" onTouchStart={alTocar} onTouchMove={alMover} onTouchEnd={alSoltar} onTouchCancel={() => { toque.current=null;arrastre.current=0;asentar(activa,false); }}>
+        <div ref={riel} className="pestanas-riel">
           {pestanas.map((t) => (
             <section key={t.id} id={t.id} className="pestanas-panel" aria-label={t.titulo}>{t.contenido}</section>
           ))}

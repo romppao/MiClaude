@@ -1436,3 +1436,7 @@ Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y 
 **Qu? se comprob?:** TypeScript y build correctos; 12 controles de navegador correctos; captura habitual sin diferencias. Unitarias 647/649: dos fallos de multimedia por rutas de Windows en archivos sin modificar. No se reejecut? la bater?a con base de datos por falta de PostgreSQL local.
 **Qu? sali? mal:** el generador de mapa busca separadores POSIX y en Windows omiti? pantallas; no se conserv? esa salida. Se gener? con una copia temporal que usa separadores portables, sin cambiar c?digo del generador. El cat?logo utiliza huellas de bytes: se conservaron finales LF en la carpeta propia para obtener las mismas huellas que CI Linux.
 **Estado y siguiente paso:** cambio local listo para revisi?n y CI, sin integraci?n ni despliegue. Logo pendiente de elecci?n del fundador.
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.

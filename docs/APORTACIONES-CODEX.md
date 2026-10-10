@@ -287,3 +287,7 @@ Ejecutado: TypeScript y compilaci?n Next correctos; 12 comprobaciones en Chrome;
 Documentaci?n generada: cat?logo actualizado; mapa sin cambios funcionales, generado con una copia temporal que normaliza separadores de ruta en Windows, sin editar el generador. No se tocan carpetas o cambios de otros asistentes. Pendiente revisar CI y propuesta antes de integrar.
 
 Correcci?n de verificaci?n (10 oct, Codex): el primer CI de la rama se detuvo porque el cat?logo conservaba huellas CRLF de render.yaml y vitest.config.mts. Se regener? desde una exportaci?n del commit con core.autocrlf=false para obtener exactamente los bytes de Git, sin cambiar esos archivos ni las comprobaciones. Las 9 pruebas documentales s? pasaron en Linux.
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
