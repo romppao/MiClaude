@@ -11,8 +11,6 @@ export type EntradaNoticia = { guid: string; url: string; title: string; publish
 export const MAX_ENTRADAS_POR_CANAL = 30;
 export const TITULAR_MAX = 200;
 export const RESUMEN_MAX = 280;
-/** Dominios de miniaturas habituales (compatibilidad). Las imágenes seguras en HTTPS de medios de noticias se permiten. */
-export const HOSTS_DE_IMAGEN = ["i.ytimg.com", "i1.ytimg.com", "i2.ytimg.com", "i3.ytimg.com", "i4.ytimg.com", "img.youtube.com", "espabox.com", "aebox.org", "feboxeo.es", "fekm.es", "mma.es", "jaulamagazine.com", "deportedecontacto.com", "*"];
 
 const ENTIDADES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
 
@@ -57,8 +55,8 @@ function extraerImgHtml(bloque: string): string | null {
 }
 
 function extraerYoutubeVideoId(url: string | null, bloque: string): string | null {
-  const porTag = etiqueta(bloque, "yt:videoId");
-  if (porTag) return porTag.trim();
+  const porTag = etiqueta(bloque, "yt:videoId")?.trim();
+  if (porTag) return /^[\w-]{1,32}$/.test(porTag) ? porTag : null;
   if (!url) return null;
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
   return m ? m[1] : null;
