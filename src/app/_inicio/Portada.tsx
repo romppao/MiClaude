@@ -39,7 +39,7 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
       </nav>
       {disciplina && <CentrarActivo fila="Elige un deporte" />}
 
-      <section aria-labelledby="titulo-actualidad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <section aria-labelledby="titulo-actualidad" className="portada-actualidad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad">{nombre ? `Actualidad${de}` : "Actualidad"}</h2><Link href={masNoticias}>Todas las noticias</Link></div>
         {destacada ? <><NoticiaDestacada n={destacada} />{resto.length > 0 && <FilaNoticias noticias={resto} etiqueta={`Más noticias${de}`} />}</> : <SinNoticias disciplina={nombre ?? undefined} />}
       </section>

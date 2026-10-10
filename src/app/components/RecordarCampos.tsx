@@ -13,10 +13,12 @@ const formularios = () => Array.from(document.querySelectorAll<HTMLFormElement>(
 const firmaDe = (form: HTMLFormElement) => Array.from(form.elements).filter((el) => esCampo(el) && el.name && !el.name.startsWith("$ACTION")).map((el) => (el as Campo).name).sort().join(",");
 const hayProblema = () => !!new URLSearchParams(location.search).get("problema");
 /**
- * Campos que la persona ha tocado (escrito, borrado o cambiado) DESPUÉS del último envío: restaurar nunca los pisa, ni siquiera si los ha dejado vacíos a propósito
- * (por ejemplo, para quitar un enlace que dio error). Lo que escribió antes de enviar sí se devuelve: el envío empieza una lista nueva.
+ * Campos que la persona ha tocado (escrito, borrado o cambiado) DESPUÉS del último envío, con lo último que escribió, por nombre de campo del formulario enviado:
+ * restaurar nunca los pisa con lo guardado, ni siquiera si los ha dejado vacíos a propósito (por ejemplo, para quitar un enlace que dio error), y si React
+ * vacía el formulario más tarde (al terminar la acción o al volver a montarlo) se les devuelve lo que escribió. Lo que escribió antes de enviar sí se devuelve:
+ * el envío empieza una lista nueva.
  */
-let tocados = new WeakSet<Element>();
+let tocados = new Map<string, string>();
 
 function leer(): Guardado | null {
   try { return JSON.parse(sessionStorage.getItem(CLAVE) ?? "null"); } catch { return null; }
@@ -34,7 +36,9 @@ function restaurar(g: Guardado) {
   for (let d = form.closest("details"); d; d = d.parentElement?.closest("details") ?? null) d.open = true;
   for (const [nombre, valor] of Object.entries(g.valores)) {
     const el = form.elements.namedItem(nombre);
-    if (!(el instanceof Element) || !esCampo(el) || tocados.has(el)) continue;
+    if (!(el instanceof Element) || !esCampo(el)) continue;
+    const escrito = tocados.get(nombre);
+    if (escrito !== undefined) { if (el.value !== escrito) el.value = escrito; continue; }
     if (el instanceof HTMLSelectElement) {
       const inicial = Array.from(el.options).find((o) => o.defaultSelected)?.value ?? el.options[0]?.value;
       if (el.value === inicial) el.value = valor;
@@ -53,7 +57,7 @@ export default function RecordarCampos() {
   const ruta = usePathname();
   const params = useSearchParams();
 
-  // Al enviar un formulario: se guarda y, durante unos segundos, cada vez que la pantalla vacía o vuelve a crear el formulario al terminar su acción
+  // Al enviar un formulario: se guarda y, durante 30 segundos, cada vez que la pantalla vacía o vuelve a crear el formulario al terminar su acción
   // con un problema en esta misma pantalla (React lo vacía con un «reset» y, además, Next.js puede volver a montarlo con la respuesta del servidor), se rellena de nuevo.
   useEffect(() => {
     let cierre: ReturnType<typeof setTimeout> | undefined;
@@ -78,14 +82,20 @@ export default function RecordarCampos() {
         valores[el.name] = el.value;
       }
       try { sessionStorage.setItem(CLAVE, JSON.stringify({ ruta: location.pathname, firma, orden, valores } satisfies Guardado)); } catch { /* sin almacenamiento: simplemente no se recuerda */ }
-      tocados = new WeakSet();
+      tocados = new Map();
       dejarDeVigilar();
       document.addEventListener("reset", alReiniciar, true);
       observador = new MutationObserver(() => queueMicrotask(restaurarSiProcede)); // restaurar solo toca valores y desplegables, no los atributos que se observan: no hay bucle
       observador.observe(document.body, { childList: true, subtree: true });
-      cierre = setTimeout(dejarDeVigilar, 8000);
+      // 30 s: en equipos lentos React puede vaciar o volver a montar el formulario varios segundos después; nunca pisa lo que la persona escribe.
+      cierre = setTimeout(dejarDeVigilar, 30_000);
     };
-    const marcarTocado = (e: Event) => { if (e.target instanceof Element) tocados.add(e.target); };
+    const marcarTocado = (e: Event) => {
+      const el = e.target;
+      if (!(el instanceof Element) || !esCampo(el) || !el.name || !el.form) return;
+      const g = leer();
+      if (g && firmaDe(el.form) === g.firma) tocados.set(el.name, el.value);
+    };
     document.addEventListener("input", marcarTocado, true);
     document.addEventListener("submit", guardar, true);
     return () => { document.removeEventListener("input", marcarTocado, true); document.removeEventListener("submit", guardar, true); dejarDeVigilar(); };

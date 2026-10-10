@@ -35,7 +35,7 @@ export default async function InicioComun({ user }: { user: Usuario }) {
       primero={await disciplinasDe(user)}
       cabecera={<Saludo nombre={user.name} sub="Lo último de los deportes de contacto" />}
       despuesDeNoticias={
-        <Link href="/mi-panel" className="fila" style={{ padding: 16, borderRadius: 26 }}>
+        <Link href="/mi-panel" className="fila portada-panel" style={{ padding: 16, borderRadius: 26 }}>
           <span className="avatar avatar-relleno" aria-hidden="true" style={{ width: 48, height: 48, borderRadius: 16 }}><Icono nombre="capas" /></span>
           <span className="cuerpo"><span style={{ font: "700 17px var(--font)" }}>Mi panel</span><span className="meta">{QUE_HAY_EN_MI_PANEL[papelDe(user)]}</span></span>
           <Icono nombre="siguiente" tam={18} />
