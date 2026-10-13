@@ -61,6 +61,7 @@ async function fillTitle() {
   await f.locator("[name=awardedOn]").fill("1975-06-01");
   await f.locator("[name=scope]").selectOption("NATIONAL");
   await f.locator("[name=discipline]").selectOption("BOXEO");
+  await f.locator("[name=level]").selectOption("AMATEUR");
   await f.locator("[name=weightClass]").selectOption("M70");
 }
 await fillTitle();
