@@ -1,6 +1,6 @@
 // Mapa de gimnasios (petición del fundador, 13 de octubre de 2026: «un mapa de la ubicación en la que se encuentra el usuario en el que
-// le muestren los gimnasios más cercanos»). En las pruebas no hay salida a internet: el fondo del mapa no se descarga, pero los marcadores,
-// la ubicación, los más cercanos y la lista funcionan igual, que es lo que se comprueba.
+// le muestren los gimnasios más cercanos»). El estilo del mapa lo sirve ayudas.mjs (uno mínimo con la autoría de OpenFreeMap): no hace
+// falta internet, y la línea de autoría sale igual que en la aplicación, también en la medición de accesibilidad.
 import AxeBuilder from "@axe-core/playwright";
 import { PrismaClient } from "@prisma/client";
 import { B, rnd, browser, newUser, check, seen, sql, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
