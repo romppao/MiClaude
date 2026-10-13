@@ -1494,3 +1494,21 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - Confirmar con el fundador cuándo se cambia el nombre en la app; todavía no se ha tocado.
 - Comprobar el registro de la marca.
 - La revisión de un diseñador.
+
+## 13 de octubre de 2026 — El ring, icono oficial: favicon, icono y cabecera (Claude)
+
+**Qué se pidió** (el fundador): «La O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
+
+**Qué se hizo:**
+- Favicon, icono del iPhone, manifiesto de la app web con sus iconos, y el símbolo de la cabecera y de la bienvenida: todo pasa al ring.
+- El nombre visible sigue siendo «Ring España» hasta que el fundador lo confirme.
+
+**Qué salió mal:**
+- Hubo que instalar dependencias nuevas que habían añadido otros asistentes.
+- La prueba de móvil (`movil.mjs`) falla en mi base local en la portada (`/`): dos `<polygon>` y dos `<div>` salen por la derecha.
+- **Comprobado que ya fallaba sin estos cambios:** se compiló la rama principal sin ellos y salió lo mismo. Las pruebas de GitHub de la rama principal están en verde. Parece depender de las noticias guardadas en la base local; queda anotado para revisarlo.
+
+**Pruebas:**
+- 652 unitarias.
+- Sin fallos en `diseno`, `enlaces`, `accesibilidad` y `usabilidad`.
+- Las direcciones `/icon.svg`, `/apple-icon.png` y `/manifest.webmanifest` responden bien.

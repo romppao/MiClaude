@@ -325,6 +325,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/apple-icon.png",
+    "purpose": "Icono de la marca (ring de Lona) para la pantalla de inicio del iPhone, 180 px.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/ayuda/page.tsx",
     "purpose": "Explica cuenta, declaración, trayectoria, respaldo y aura en lenguaje público con enlaces a los flujos disponibles.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -645,6 +650,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/icon.svg",
+    "purpose": "Favicon oficial: el ring visto desde arriba, símbolo de la marca Lona.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/imagenes/[kind]/[id]/[slot]/route.ts",
     "purpose": "Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -657,6 +667,11 @@
   {
     "path": "src/app/layout.tsx",
     "purpose": "Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/manifest.ts",
+    "purpose": "Manifiesto de la aplicación web: nombre, colores e iconos oficiales para instalarla en el móvil.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

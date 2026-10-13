@@ -230,3 +230,15 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - Comprobar el registro de «Lona» como marca (OEPM y EUIPO), el dominio y los nombres en las tiendas.
 - Que un diseñador humano revise y pula el dibujo final.
 - Cambiar el nombre en la app: «Ring España» → «Lona», junto con el logotipo de la cabecera, el icono, los títulos, los correos y el manifiesto. Se hará cuando el fundador lo confirme.
+
+### 13 de octubre de 2026 — El ring, icono oficial
+
+**El fundador:** «Obviamente, la O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
+
+**Aplicado en la app:**
+- **Favicon:** `src/app/icon.svg`, el ring sobre un cuadrado negro de esquinas redondeadas.
+- **Icono del iPhone:** `src/app/apple-icon.png`.
+- **Manifiesto** para instalar la app en el móvil: `src/app/manifest.ts`, con los iconos de 192 y 512 px.
+- **Cabecera y bienvenida:** el símbolo de dos anillos se sustituye por el ring (componente `Marca` y cabecera de `layout.tsx`).
+
+El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen diciendo «Ring España» hasta que el fundador confirme el cambio de nombre.

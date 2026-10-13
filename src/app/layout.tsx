@@ -50,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
-            <Link href="/" className="logo"><svg className="brand-mark" viewBox="0 0 64 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="18" ry="12" transform="rotate(-35 24 24)" fill="none" stroke="currentColor" strokeWidth="7"/><ellipse cx="42" cy="24" rx="18" ry="12" transform="rotate(-35 42 24)" fill="none" stroke="currentColor" strokeWidth="7"/></svg>RING <b>ESPAÑA</b></Link>
+            <Link href="/" className="logo"><svg className="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="14" width="72" height="72" rx="6" fill="#D4F67C" /><rect x="24" y="24" width="52" height="52" rx="3" fill="none" stroke="#0A0A0C" strokeWidth="4" /><circle cx="14" cy="14" r="9" fill="#BE33F5" /><circle cx="86" cy="14" r="9" fill="#FFFFFF" /><circle cx="14" cy="86" r="9" fill="#FFFFFF" /><circle cx="86" cy="86" r="9" fill="#BE33F5" /></svg>RING <b>ESPAÑA</b></Link>
             <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>
