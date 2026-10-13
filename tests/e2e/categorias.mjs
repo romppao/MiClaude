@@ -1,4 +1,4 @@
-﻿// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
+// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
 import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, sql, enDias, terminarDiagnosticos } from "./ayudas.mjs";
 const junior="RFE2026:Júnior:M", cadete="RFE2026:Cadete / Schoolboys–Schoolgirls:M", benjamin="RFE2026:Benjamín:M";
 const formButton=(p,name)=>p.locator("main form").filter({has:p.getByRole("button",{name,exact:true})});
@@ -56,6 +56,7 @@ const cartel=formButton(org.p,"Añadir al cartel");
 const valor=async (name,text)=>cartel.locator(`[name=${name}]`).evaluate((el,text)=>[...el.options].find(o=>o.textContent.includes(text))?.value,text);
 const aid=await valor("fighterA",`JuniorCategorias Divisiones${rnd}`), bid=await valor("fighterB",`RivalCategorias Divisiones${rnd}`);
 // El identificador ya elegido en el cartel también permite probar el POST de un peleador contra un rival conocido.
+await birth(b,"2012-01-01");
 await a.p.goto(B+"/mi-ficha");
 const propio=formButton(a.p,"Registrar este combate");
 check("registrar un combate no hereda ni preselecciona el nivel",await propio.locator("[name=level]").inputValue()==="" && await propio.locator("[name=level]").getAttribute("required")!==null);
@@ -117,3 +118,4 @@ check("MMA juvenil no hereda los pesos masculinos adultos",await otra.locator('[
 await otra.locator('[name=discipline]').selectOption("JIUJITSU");await otra.locator('[name=divisionId]').selectOption("IBJJF2024:Mighty Mite I:F");
 check("jiu-jitsu infantil explica las dimensiones que faltan sin ofrecer pesos adultos",await otra.locator('[name=weightClass] option').count()===1 && await seen(otra.getByText(/kimono\/sin kimono y cinturón/).first()));
 await browser.close();await terminarDiagnosticos();
+
