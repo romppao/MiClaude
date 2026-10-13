@@ -25,12 +25,14 @@ Se descartó la **propuesta B**, llevar el código a GitLab o Bitbucket. Tambié
 | Paso | Qué | Por qué |
 |---|---|---|
 | 1 | **Menos minutos de pruebas automáticas** (`.github/workflows/ci.yml`). Las pruebas se ejecutan en cada PR, al fusionar en `claude/ring-espana-mvp` y a mano; ya no al subir a cualquier rama. | Un repositorio privado gratuito tiene **2.000 minutos de GitHub Actions al mes** ([planes de GitHub](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)); en público son ilimitados. La semana del 6 al 13 de octubre hubo 254 ejecuciones de unos 8 minutos de media, con máximos de 15. Cada cambio se probaba dos veces: al subirlo a su rama y en su PR. A ese ritmo, el cupo se habría acabado en una semana y las pruebas se habrían parado. |
-| 2 | **Se desactiva la visita automática que mantenía despierta la demo** (`mantener-demo-despierta.yml`). Se sustituye por **UptimeRobot**, gratuito y aprobado en ADR-003. | Cada visita, cada 10 minutos, cuenta como al menos 1 minuto de GitHub: unos 4.300 minutos al mes, más del doble del cupo. UptimeRobot hace lo mismo desde fuera sin gastar minutos y además avisa por correo si la demo se cae. |
+| 2 | **La visita automática que mantiene despierta la demo** (`mantener-demo-despierta.yml`) **sigue activa por ahora** y se sustituirá por **UptimeRobot** (gratuito, aprobado en ADR-003) en cuanto el fundador lo configure. | El fundador pidió hacerlo **«sin alterar el funcionamiento de la aplicación ni diseño ni nada»**: si se quitara ya, la demo tardaría más en abrir. Pero cada visita cuenta como al menos 1 minuto de GitHub: cada 10 minutos son unos 140 al día, y al mes unos 4.300, más del doble del cupo. Por eso **UptimeRobot es urgente**: con unos días de margen no pasa nada; con semanas, el cupo se agota. UptimeRobot hace lo mismo desde fuera, sin gastar minutos, y además avisa por correo si la demo se cae. |
 | 3 | **Aviso legal** `LICENSE`: «Todos los derechos reservados». En `package.json`, `"license": "UNLICENSED"`. | Sin licencia, el código ya era legalmente del titular. El aviso lo deja escrito y sin dudas para quien lo vea (colaboradores, futuros programadores) y deja a salvo las licencias de terceros, como las tipografías OFL. |
 | 4 | **El repositorio pasa a privado.** | Es lo que protege el código a partir de ahora. Se hace después de los pasos 1 y 2 para que no haya un hueco en el que se agoten los minutos. |
 | 5 | **Cambio de la clave de la tarea de noticias** (`CRON_SECRET`), por el fundador (pasos en la sección 6). | Una clave antigua estuvo escrita en el código público. Hoy la aplicación ya no la acepta por defecto, pero si en Render se configuró con ese mismo valor, cualquiera que la viera podría lanzar la actualización de noticias. Cambiarla cuesta 2 minutos y deja a cero el riesgo. |
 
 ## 4. Para qué (qué se consigue y qué no)
+
+**Lo que no cambia:** nada de la aplicación ni de su diseño. Este cambio solo toca la configuración de GitHub (`.github/workflows/`), el aviso legal (`LICENSE` y un campo de `package.json` que no afecta a la aplicación) y la documentación.
 
 **Se consigue:**
 - Nadie fuera del proyecto puede ver, buscar ni descargar el código desde ahora.
@@ -59,7 +61,7 @@ Se descartó la **propuesta B**, llevar el código a GitLab o Bitbucket. Tambié
 
 **A. Comprobar que GitHub no puede cobrar (1 minuto).** En GitHub → tu foto → **Settings** → **Billing and licensing** → **Budgets and alerts**: el presupuesto de Actions debe estar en **0 €**, que es lo normal en una cuenta sin forma de pago. Así, si un mes se acaban los minutos, las pruebas se paran pero no se cobra nada.
 
-**B. UptimeRobot, para que la demo no se duerma (5 minutos).** Los pasos están en [`DEMO.md`](../DEMO.md), en «Mantener la demo despierta».
+**B. UptimeRobot, para que la demo no se duerma (5 minutos; hazlo en los próximos días).** Los pasos están en [`DEMO.md`](../DEMO.md), en «Mantener la demo despierta». Cuando el monitor salga en verde, díselo a Claude, que quitará la visita automática de GitHub para dejar de gastar minutos.
 
 **C. Clave nueva para la tarea de noticias (3 minutos):**
 1. Inventa una clave larga: por ejemplo, 30 letras y números al azar, sin palabras reales. **No la escribas en el chat.**

@@ -1610,7 +1610,7 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué se hizo:**
 - **Revisión del historial completo** (266 commits) en busca de claves filtradas. No hay ninguna real. Una clave por defecto antigua de la tarea de noticias estuvo en el código público, así que se recomienda cambiar `CRON_SECRET`.
 - **Pruebas automáticas** (`ci.yml`): solo en los PR, al fusionar en `claude/ring-espana-mvp` y a mano. Así no se prueba dos veces cada cambio. El tiempo máximo pasa de 20 a 30 minutos, porque la accesibilidad se mide ahora en los dos temas.
-- **La visita cada 10 minutos para mantener despierta la demo** (unos 4.300 minutos al mes) se desactiva. La sustituye UptimeRobot, con pasos en `DEMO.md`.
+- **La visita cada 10 minutos para mantener despierta la demo** (unos 4.300 minutos al mes) se iba a desactivar, pero el fundador pidió después que el proceso se hiciera «sin alterar el funcionamiento de la aplicación ni diseño ni nada». Sigue activa hasta que configure UptimeRobot (pasos en `DEMO.md`); entonces se quita. Este cambio no toca la aplicación: solo la configuración de GitHub, el aviso legal y la documentación.
 - **Aviso legal:** `LICENSE` («Todos los derechos reservados») y `"license": "UNLICENSED"` en `package.json`.
 - **Repositorio privado:** se cambia cuando el ajuste de pruebas ya está en la rama de la demo. El resultado se anota abajo.
 - **Documentación:**
@@ -1622,6 +1622,6 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 
 **Pendiente del fundador:**
 - comprobar que el presupuesto de GitHub Actions está en 0 €;
-- crear el monitor de UptimeRobot;
+- crear el monitor de UptimeRobot en los próximos días (hasta entonces, la visita automática gasta unos 140 minutos de GitHub al día);
 - cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
 - decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.

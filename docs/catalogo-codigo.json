@@ -26,7 +26,7 @@
   },
   {
     "path": ".github/workflows/mantener-demo-despierta.yml",
-    "purpose": "Visita /salud de la demo; desde ADR-004 solo a mano (la sustituye UptimeRobot para no gastar minutos de GitHub).",
+    "purpose": "Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

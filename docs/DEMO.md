@@ -132,8 +132,8 @@ La escala inicial está centralizada para ajustarla con datos reales. El aura mi
 **Por qué.**
 - El plan gratuito de Render duerme la web tras 15 minutos sin visitas, y despertarla tarda cerca de un minuto.
 - Hasta ahora la mantenía despierta una tarea de GitHub (`mantener-demo-despierta.yml`) que la visitaba cada 10 minutos.
-- Al pasar el repositorio a privado ([ADR-004](decisiones/ADR-004-repositorio-privado.md)), esa tarea gastaría unos 4.300 de los 2.000 minutos gratuitos al mes, así que se ha desactivado.
-- **Mientras no configures UptimeRobot, la primera visita a la demo tardará un poco más.** Nada más cambia.
+- Al pasar el repositorio a privado ([ADR-004](decisiones/ADR-004-repositorio-privado.md)), esa tarea gastaría unos 4.300 de los 2.000 minutos gratuitos al mes.
+- Para no cambiar nada de cómo funciona la demo, la tarea **sigue activa hasta que UptimeRobot esté en marcha**. Configúralo en los próximos días y avisa a Claude, que entonces quitará la tarea de GitHub.
 
 **Para qué.**
 - UptimeRobot visita la demo desde fuera cada 5 minutos, gratis y sin gastar minutos de GitHub.
