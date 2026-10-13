@@ -15,6 +15,8 @@
 > - **Todo fallo queda registrado** en la tabla `AppError` y moderación lo revisa en `/moderacion/fallos`. Usa `registrarFallo` (`src/lib/common/fallos.ts`), nunca `console.error` suelto, y no borres fallos.
 > - Funciones de cada cuenta con permisos: [docs/MODERACION.md](docs/MODERACION.md).
 
+> **Lanzamiento — decisión del fundador, 13 de octubre de 2026:** la aplicación tiene que estar **lista y totalmente funcional el 1 de noviembre**, a falta solo de la revisión jurídica, y el **lanzamiento público es el 15 de noviembre**. Hoja de ruta, imprescindibles y pruebas definitivas en [docs/LANZAMIENTO.md](docs/LANZAMIENTO.md): márcala al terminar cada cosa.
+
 > **Repositorio privado — 13 de octubre de 2026:** por decisión del fundador, el código es privado ([ADR-004](docs/decisiones/ADR-004-repositorio-privado.md)), con todos los derechos reservados (`LICENSE`). GitHub Actions tiene 2.000 minutos gratuitos al mes: las pruebas se ejecutan en los PR, al fusionar en la rama de la demo y a mano. No añadas tareas programadas sin calcular su gasto, no metas secretos en el código y no vuelvas a hacerlo público sin decisión escrita del fundador.
 
 > **Cuenta del creador — 8 de octubre de 2026:** el fundador entra desde cualquier sitio con una cuenta especial (correo en `CREADOR_CORREO`) que tiene todos los permisos de moderación y gestiona cuentas y moderadores, con un segundo paso obligatorio (aplicación de códigos o códigos de emergencia): [docs/CREADOR.md](docs/CREADOR.md). No debilitar ese segundo paso sin que el fundador lo pida.

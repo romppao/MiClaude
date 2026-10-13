@@ -8,6 +8,8 @@ Guía para retomar Lona fuera de la sesión de la aplicación móvil, con Claude
 Está escrita para que la pueda seguir una persona y también para que la lea Claude Code al empezar.
 Redacción original: **30 de septiembre de 2026**. El estado se actualiza con los bloques posteriores; el cierre de APORTACIONES-CODEX identifica los commits y las comprobaciones vigentes.
 
+> **Lanzamiento (13 de octubre de 2026):** aplicación lista el 1 de noviembre y lanzamiento público el 15 de noviembre. Ver [LANZAMIENTO.md](LANZAMIENTO.md).
+
 > **Repositorio privado (13 de octubre de 2026):** el código ya no es público ([ADR-004](decisiones/ADR-004-repositorio-privado.md)). Las pruebas automáticas se ejecutan solo en los PR, al fusionar en `claude/ring-espana-mvp` y a mano: **abre un PR para que se prueben tus cambios**. Hay 2.000 minutos al mes; no añadas tareas programadas sin calcular su gasto.
 
 ## 1. Dónde está todo

@@ -23,6 +23,7 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 | Saber **qué se borra y cuándo** | `src/lib/accounts/retention.ts` |
 | Añadir un **listado con filtros y páginas** | `src/lib/common/search.ts`, `src/lib/common/pagination.ts`, `src/app/components/Filtros.tsx`, `Paginacion.tsx`. Receta 4.6 |
 | Registrar o revisar un **fallo de la aplicación** | `src/lib/common/fallos.ts` (`registrarFallo`), `src/instrumentation.ts` (`onRequestError`) y `/moderacion/fallos`. Receta y reglas en [`MODERACION.md`](MODERACION.md) §3 |
+| Cambiar el **mapa** (proveedor, marcadores, búsqueda de direcciones) | `src/app/components/MapaGimnasios.tsx`, `src/lib/common/mapa.ts` (cálculos), `src/lib/common/geo.ts` (coordenadas) y la CSP de `next.config.mjs`. Ver [`ARQUITECTURA.md`](ARQUITECTURA.md) («Mapa de gimnasios») |
 | Cambiar un **color** (tema claro u oscuro) | Los tokens de `src/app/globals.css` §2: se cambian **en los dos temas** y nunca se escribe un color fijo en un componente. Ver [`DISENO.md`](DISENO.md) («Tema claro y oscuro») |
 | Entender por qué existe una **regla extraña** | `docs/LECCIONES.md` (errores pasados y la regla que dejaron) y `docs/AUDITORIA.md` |
 

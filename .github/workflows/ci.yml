@@ -47,6 +47,8 @@ jobs:
       MAIL_LOG: ${{ github.workspace }}/server.log
       # Sin salida a internet: las pruebas insertan sus noticias; los vídeos de prueba se guardan en una carpeta temporal.
       NEWS_FETCH: "no"
+      # Sin buscar direcciones de gimnasios en OpenStreetMap (lib/common/geo.ts): no hay salida a internet.
+      GEOCODIFICAR: "no"
       # Cuenta del creador de las pruebas (tests/e2e/creador.mjs).
       CREADOR_CORREO: creador@prueba.test
       MEDIA_DIR: /tmp/ring-subidas

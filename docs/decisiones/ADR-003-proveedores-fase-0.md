@@ -101,3 +101,16 @@ Palabras del fundador: «No pongas fecha de nacimiento [en el alta de la cuenta]
 
 ## Fuentes
 Cuatro informes de investigación del 6 de octubre de 2026 (base de datos y alojamiento, imágenes, correo y errores, menores y RGPD), basados en resúmenes de búsqueda de las páginas oficiales de Neon, Render, Cloudflare, Resend, Sentry, UptimeRobot, OVH, AEPD y BOE; **ninguna se pudo abrir directamente**. Detalle de URLs en cada ficha de tarea afectada.
+
+
+## Añadido el 13 de octubre de 2026 — Mapas
+
+Para el mapa de gimnasios (petición del fundador) se usan **OpenFreeMap** (mapas) y **Nominatim de OpenStreetMap** (coordenadas de las direcciones).
+
+**Por qué:** son gratuitos, sin cuenta ni clave, y se basan en estándares abiertos (MapLibre y OpenStreetMap), así que se pueden cambiar en una línea. Se descartó Google Maps porque pide una cuenta de Google Cloud y probablemente una tarjeta, solo es gratis hasta un número de visitas al mes y manda datos de cada visita a Google. El fundador aceptó la recomendación.
+
+**Pendiente de leer en las páginas oficiales:**
+- las condiciones de uso de OpenFreeMap para uso comercial;
+- la política de uso de Nominatim: como mucho una consulta por segundo, agente identificable y atribución. El código ya la cumple.
+
+Si un día el volumen lo exigiera, hay alternativas de pago o propias (alojar los mapas en nuestro servidor).

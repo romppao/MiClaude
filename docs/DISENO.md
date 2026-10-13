@@ -298,3 +298,28 @@ Lo que no cambia de un tema a otro:
 **Regla para el código:** ningún color fijo en componentes. Todo va con los tokens de `globals.css` (`--text`, `--mut`, `--ink`, `--acc-text`…), definidos en los dos temas. La prueba de accesibilidad mide cada pantalla en claro y en oscuro.
 
 **Pendiente:** el fundador aún no ha visto el tema claro. Es una propuesta que se puede ajustar (el tono del fondo, el oliva de los enlaces).
+
+## 13 de octubre de 2026 — Mapa de gimnasios
+
+**Petición del fundador:** «a la hora de buscar gimnasios me aparece una lista. Eso queda un poco aburrido, un poco desactualizado […] quedaría mucho mejor importar ahí un mapa de la ubicación en la que se encuentra el usuario, en el que le muestren los gimnasios más cercanos».
+
+**Qué se eligió y por qué:**
+- **Mapa libre** (MapLibre con los mapas de OpenFreeMap y los datos de OpenStreetMap) **en lugar de Google Maps**. El libre no necesita cuenta, clave ni tarjeta, y según su web no tiene límite de visitas. Google pide una cuenta de Google Cloud y solo es gratis hasta unas 10.000 cargas al mes. Además, el libre no manda datos de cada visita a Google y se adapta a los colores de Lona. Lo recomendó Claude y el fundador lo aceptó («vale, de acuerdo»).
+- **Estilo:** el mapa base es gris claro («positron»). En el tema oscuro se invierte con un filtro, así que queda negro y casa con la aplicación sin descargar otro mapa.
+- **Marcadores:**
+  - gimnasio: punto lima con borde negro, el mismo lenguaje del logotipo;
+  - gimnasio verificado: punto violeta;
+  - tu ubicación: punto azul;
+  - varios gimnasios muy juntos: un círculo negro con el número en lima; al tocarlo, el mapa se acerca.
+
+  Cada marcador ocupa 44 px de zona táctil.
+
+**Cómo se usa:**
+- **«Usar mi ubicación»:** el mapa va a donde estás y aparece «Los más cercanos a ti», con la distancia («a 850 m»). La ubicación se usa solo en el dispositivo y no se guarda.
+- **Sin dar la ubicación:** el filtro de provincia centra el mapa en ella.
+- **La lista no se quita:** se rediseñó en tarjetas con logotipo, ciudad, peleadores y sello de verificado. Es la forma de recorrer los gimnasios con lector de pantalla o sin dar la ubicación, y el fundador pidió no quitar lo que funciona.
+- **Dirección del gimnasio:** se escribe en su perfil («Dirección del gimnasio»). Si no la tiene, sale en el centro de su ciudad y se indica «ubicación aproximada».
+
+**Pendiente:**
+- El fundador aún no ha visto el mapa con el fondo real, porque esta sesión no tiene salida a internet.
+- Ideas: un mapa en entrenadores y veladas.

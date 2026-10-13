@@ -345,3 +345,11 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 - **Repositorio privado** (fundador, 13 oct). Estado: **hecho** (ADR-004).
 - **Registrar la marca «Lona» en la OEPM**, y en la EUIPO si se piensa en Europa (Claude, 13 oct, recomendado como la protección real del negocio). Estado: **pendiente de decisión del fundador**, porque tiene coste. Antes hay que comprobar que nadie la tenga ya registrada en esta clase de servicios.
 - **Acuerdo de confidencialidad y cesión de derechos para programadores humanos** cuando se contraten (Claude, 13 oct). Estado: idea; conviene que lo revise un profesional.
+
+## 13 de octubre de 2026 — Lanzamiento y mapa
+
+- **Lanzamiento público el 15 de noviembre de 2026**, con la aplicación lista el 1 de noviembre (fundador, 13 oct). Estado: **decidido** (`LANZAMIENTO.md`).
+- **Promoción con vídeos, publicaciones y otras estrategias** (fundador, 13 oct). Estado: se define más adelante.
+- **Mapa de gimnasios cercanos a la persona** (fundador, 13 oct). Estado: **hecho** con mapa libre (MapLibre + OpenFreeMap); falta verlo con el fondo real en la demo.
+- **Mejoras visuales en veladas** (fundador, 13 oct: «ahora miro qué se puede mejorar»). Estado: a la espera de lo que diga.
+- **Mapa también en entrenadores y veladas** (Claude, 13 oct). Estado: idea, cuando el de gimnasios esté probado.

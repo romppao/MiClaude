@@ -361,3 +361,12 @@ No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?
 |---|---|---|
 | Al pasar a privado, el cupo gratuito de GitHub Actions (2.000 minutos al mes) se habría agotado en una semana | En público las pruebas no tenían límite y nadie medía el gasto: cada cambio se probaba dos veces (en su rama y en su PR) y una tarea visitaba la demo cada 10 minutos | Antes de cambiar la visibilidad o añadir una tarea programada, medir el gasto con la API de Actions (ejecuciones × duración) y calcularlo al mes |
 | Una clave por defecto estuvo en el código público durante días | Se escribió como «valor de reserva» para que la tarea funcionase sin configurar nada | Un secreto nunca tiene valor por defecto en el código, sea el repositorio público o privado; y cuando se ha publicado, se cambia aunque ya no se use |
+
+## 13 de octubre de 2026 — Mapa de gimnasios (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| El mapa no arrancaba al empaquetarlo | MapLibre 6 busca su «trabajador» junto a su propio archivo (`import.meta.url`), y Next.js mueve ese archivo al empaquetarlo | Las librerías con trabajadores se sirven desde `public/` (copiados al compilar, con la versión en la ruta) y se indican con su función (`setWorkerUrl`) |
+| `getCurrentPosition` no respondía nunca en la prueba sin permiso | El `timeout` de la geolocalización empieza a contar cuando hay permiso, no mientras la pregunta está abierta | En las pruebas, simular la respuesta de la persona; en la aplicación, el botón se puede volver a pulsar y el texto explica la alternativa (la provincia) |
+| Marcadores que se tapan entre sí no pasan la regla de zona táctil (WCAG 2.5.8) | Varios gimnasios en la misma ciudad caen en el mismo punto | Agrupar los marcadores cercanos en pantalla y dar a cada uno 44 px de zona táctil |
+| Los estilos de una librería pisaban los nuestros | Su hoja de estilos se carga después de `globals.css` | Al dar estilo a componentes de una librería, subir la especificidad (contenedor propio delante) en vez de usar `!important` |

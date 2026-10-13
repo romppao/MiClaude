@@ -12,7 +12,10 @@ const csp = [
   "img-src 'self' data: blob: https:",
   "font-src 'self'",
   // Vídeos subidos al almacén R2 (src/lib/media/storage.ts): el navegador los sube y los reproduce directamente desde allí.
-  "connect-src 'self' https://*.r2.cloudflarestorage.com",
+  // Mapa de gimnasios (components/MapaGimnasios.tsx): estilo, teselas, letras e iconos del mapa libre OpenFreeMap.
+  "connect-src 'self' https://*.r2.cloudflarestorage.com https://tiles.openfreemap.org",
+  // El mapa dibuja en un «trabajador» (public/vendor/maplibre, copiado al compilar) que el navegador puede crear desde un blob.
+  "worker-src 'self' blob:",
   "media-src 'self' blob: https://*.r2.cloudflarestorage.com",
   "object-src 'none'",
   "base-uri 'self'",
@@ -32,7 +35,7 @@ const nextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=(), usb=()" },
           ...(produccion
             ? [
                 { key: "Content-Security-Policy", value: csp },

@@ -1625,3 +1625,39 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - crear el monitor de UptimeRobot en los próximos días (hasta entonces, la visita automática gasta unos 140 minutos de GitHub al día);
 - cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
 - decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.
+
+## 13 de octubre de 2026 — Fecha de lanzamiento y mapa de gimnasios (Claude)
+
+**Qué se pidió** (el fundador):
+- Cuándo se puede lanzar. Él proponía el 1 de noviembre, con pruebas definitivas antes («tanto yo como tú entraremos en los distintos tipos de usuarios y probaremos todas las funcionalidades»).
+- Un mapa en «Gimnasios» en vez de solo una lista: «importar ahí un mapa de la ubicación en la que se encuentra el usuario en el que le muestren los gimnasios más cercanos […] una lista se ve un poco aburrida». Dijo que miraría también las veladas.
+
+**Qué se decidió y por qué:**
+- **Lanzamiento.** Claude revisó lo pendiente:
+  - Faltan una versión real separada de la demo, copias de seguridad, correo real, fotos fuera de la base, textos legales y la decisión sobre menores.
+  - Las tiendas (App Store y Google Play) no llegan al 1 de noviembre.
+  - Recomendó abrir primero a un grupo cercano y hacer la promoción unas dos semanas después.
+
+  El fundador decidió: **«retrasaremos el lanzamiento para el día 15 de noviembre […] dejar la aplicación lista ya el día 1 de noviembre, totalmente funcional, a la espera de revisiones jurídicas y legales»**, y la promoción (vídeos, publicaciones, otras estrategias) se define más adelante. Hoja de ruta en `docs/LANZAMIENTO.md`.
+- **Mapa.** Claude propuso dos opciones: Google Maps (pide cuenta de Google Cloud y probablemente tarjeta; gratis solo hasta un número de visitas) o un mapa libre (MapLibre con los mapas de OpenFreeMap y los datos de OpenStreetMap: sin cuenta, sin tarjeta y sin límite de visitas según su web). Recomendó el libre y el fundador respondió «vale, de acuerdo». Se toma como aprobación; si prefiriera Google, el cambio es pequeño.
+  - La lista se queda, más visual y ordenada por distancia: la necesitan quienes usan lector de pantalla o no quieren dar su ubicación.
+  - La ubicación de la persona no se guarda.
+
+**Qué se hizo:**
+- `docs/LANZAMIENTO.md` (calendario, imprescindibles con responsable y estado, pruebas definitivas y promoción) y notas en `CLAUDE.md` y `TRASLADO.md`.
+- **Mapa de gimnasios:**
+  - mapa con «Usar mi ubicación», «Los más cercanos a ti» con la distancia, marcadores agrupados y modo oscuro;
+  - lista rediseñada en tarjetas;
+  - campo «Dirección del gimnasio» en su perfil y coordenadas buscadas en OpenStreetMap;
+  - centro de provincia cuando no hay coordenadas;
+  - nota en la página de privacidad;
+  - CSP y permiso de ubicación ajustados.
+  - Detalle en `DISENO.md` y `ARQUITECTURA.md`; proveedor anotado en ADR-003.
+- **Pruebas:** unitarias en `tests/unit/mapa.test.ts` y de navegador en `tests/e2e/mapa.mjs` (13 comprobaciones, con accesibilidad en los dos temas).
+
+**Qué salió mal:**
+- **El trabajador de MapLibre 6 no carga solo.** Busca su archivo junto al suyo, y al empaquetarlo Next.js lo cambia de sitio. Se copia a `public/vendor/` al compilar.
+- **Los marcadores de gimnasios de la misma ciudad se tapaban** y fallaba la prueba de tamaño de zona táctil. Se agrupan en un círculo con el número.
+- **Los estilos propios de MapLibre pisaban los nuestros en la ventanita**: fondo blanco con texto lima ilegible en oscuro. Se dio más especificidad a los nuestros.
+- **El punto de «tu ubicación» tapaba a los gimnasios** que tenía debajo. Ya no se puede pulsar.
+- **En esta sesión no hay internet**, así que el fondo del mapa no se ha visto: hay que comprobarlo en la demo.

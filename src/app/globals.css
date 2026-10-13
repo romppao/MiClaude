@@ -29,7 +29,7 @@
   --ink:255,255,255;--text:#fff;--mut:rgba(255,255,255,.66);--soft:rgba(255,255,255,.07);--field-border:rgba(255,255,255,.14);
   --acc-text:#D4F67C;--acc2-text:#BE33F5;--inv:#fff;--inv-ink:#141317;
   --ok-bg:rgba(62,207,110,.16);--ok:#7fe3a2;--bad-bg:rgba(255,90,90,.14);--bad:#ffb3b3;--info-bg:rgba(134,200,255,.14);--info:#a9d4ff;--derrota:#ff9a9a;--ok-aviso:#c8f5d6;--info-aviso:#d6ebff;
-  --logo-oscuro:block;--logo-claro:none;--foco:#D4F67C;
+  --logo-oscuro:block;--logo-claro:none;--foco:#D4F67C;--filtro-mapa:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9);
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
@@ -38,7 +38,7 @@
   --ink:10,10,12;--text:#0A0A0C;--mut:rgba(10,10,12,.7);--soft:rgba(10,10,12,.06);--field-border:rgba(10,10,12,.26);
   --acc-text:#4A6200;--acc2-text:#8A17B8;--inv:#0A0A0C;--inv-ink:#fff;
   --ok-bg:rgba(30,140,70,.12);--ok:#17663A;--bad-bg:rgba(200,40,40,.1);--bad:#A4161A;--info-bg:rgba(30,100,200,.1);--info:#174EA6;--derrota:#A4161A;--ok-aviso:#17663A;--info-aviso:#174EA6;
-  --logo-oscuro:none;--logo-claro:block;--foco:#0A0A0C;
+  --logo-oscuro:none;--logo-claro:block;--foco:#0A0A0C;--filtro-mapa:none;
   color-scheme:light;
 }}
 :root[data-tema="claro"]{
@@ -46,7 +46,7 @@
   --ink:10,10,12;--text:#0A0A0C;--mut:rgba(10,10,12,.7);--soft:rgba(10,10,12,.06);--field-border:rgba(10,10,12,.26);
   --acc-text:#4A6200;--acc2-text:#8A17B8;--inv:#0A0A0C;--inv-ink:#fff;
   --ok-bg:rgba(30,140,70,.12);--ok:#17663A;--bad-bg:rgba(200,40,40,.1);--bad:#A4161A;--info-bg:rgba(30,100,200,.1);--info:#174EA6;--derrota:#A4161A;--ok-aviso:#17663A;--info-aviso:#174EA6;
-  --logo-oscuro:none;--logo-claro:block;--foco:#0A0A0C;
+  --logo-oscuro:none;--logo-claro:block;--foco:#0A0A0C;--filtro-mapa:none;
   color-scheme:light;
 }
 /* Lo que va sobre una foto (portadas, carteles, highlights, bienvenida) es siempre oscuro, también en el tema claro: el texto blanco sobre la foto se lee igual. */
@@ -56,7 +56,7 @@
   --ink:255,255,255;--text:#fff;--mut:rgba(255,255,255,.66);--soft:rgba(255,255,255,.07);--field-border:rgba(255,255,255,.14);
   --acc-text:#D4F67C;--acc2-text:#BE33F5;--inv:#fff;--inv-ink:#141317;
   --ok-bg:rgba(62,207,110,.16);--ok:#7fe3a2;--bad-bg:rgba(255,90,90,.14);--bad:#ffb3b3;--info-bg:rgba(134,200,255,.14);--info:#a9d4ff;--derrota:#ff9a9a;--ok-aviso:#c8f5d6;--info-aviso:#d6ebff;
-  --logo-oscuro:block;--logo-claro:none;--foco:#D4F67C;
+  --logo-oscuro:block;--logo-claro:none;--foco:#D4F67C;--filtro-mapa:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9);
   color-scheme:dark;
 }
 
@@ -172,7 +172,7 @@ a.card:hover{border-color:var(--line-strong);color:var(--text)}}
 .graduation-fields{flex:1 1 100%}
 .graduation-fields .field{display:inline-flex;margin-right:12px}
 .card-avatar{position:relative;display:inline-grid;place-items:center;vertical-align:middle;margin:0 12px 12px 0;background:rgba(var(--ink),.1);color:var(--text);width:64px;height:64px;border-radius:50%;overflow:hidden;font-weight:800}
-.card-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.card-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;color:transparent}
 details.opcionales{border:1px solid var(--line);border-radius:20px;padding:4px 16px;margin:6px 0;background:var(--card)}
 details.opcionales summary{min-height:44px;display:flex;align-items:center;font-weight:700}
 details.opcionales[open] summary{margin-bottom:8px}
@@ -751,3 +751,36 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .herramientas-moderacion{list-style:none;margin:0;padding:0}
 .herramientas-moderacion li{display:flex;flex-direction:column;gap:2px;padding:12px 18px}
 .herramientas-moderacion li a{font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+/* Mapa de gimnasios (13 de octubre de 2026): components/MapaGimnasios.tsx. El mapa base es claro (OpenFreeMap «positron»); en el tema
+   oscuro se invierte con un filtro para que case con la aplicación. Los marcadores van fuera del lienzo y no se invierten. */
+.mapa-gimnasios{margin:20px 0 28px}
+.mapa-cabecera{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mapa-cabecera h2{margin:0}
+.mapa-ayuda{margin:8px 0 12px}
+.mapa-lienzo{position:relative;height:360px;border-radius:24px;overflow:hidden;background:var(--card);border:1px solid var(--line)}
+@media (min-width:760px){.mapa-lienzo{height:460px}}
+.mapa-lienzo .maplibregl-canvas{filter:var(--filtro-mapa)}
+.marcador-gimnasio{width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:none;box-shadow:none;cursor:pointer;display:grid;place-items:center}
+.marcador-gimnasio::after{content:"";width:22px;height:22px;border-radius:50%;background:#D4F67C;border:3px solid #0A0A0C;box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.marcador-gimnasio.verificado::after{background:#BE33F5;border-color:#fff}
+.marcador-grupo{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;background:#0A0A0C;color:#D4F67C;border:3px solid #D4F67C;font:800 16px/1 var(--font);box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer}
+.marcador-grupo:focus-visible{outline:3px solid var(--foco);outline-offset:3px}
+.marcador-gimnasio:focus-visible{outline:3px solid var(--foco);outline-offset:3px}
+.marcador-yo{pointer-events:none;width:18px;height:18px;border-radius:50%;background:#2F80ED;border:3px solid #fff;box-shadow:0 0 0 8px rgba(47,128,237,.25)}
+.mapa-lienzo .maplibregl-popup-content{background:var(--sheet);color:var(--text);border-radius:16px;padding:14px 16px;font:400 16px/1.4 var(--font);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.mapa-lienzo .maplibregl-popup-anchor-bottom .maplibregl-popup-tip{border-top-color:var(--sheet)}
+.mapa-lienzo .maplibregl-popup-anchor-top .maplibregl-popup-tip{border-bottom-color:var(--sheet)}
+.mapa-lienzo .maplibregl-popup-close-button{width:44px;height:44px;min-height:44px;font-size:22px;color:var(--text);background:none;border:0;box-shadow:none}
+.popup-gimnasio{display:flex;flex-direction:column;gap:4px;padding-right:28px}
+.mapa-lienzo .popup-gimnasio span{color:var(--mut)}
+.mapa-lienzo .popup-gimnasio a{color:var(--acc-text);text-decoration:underline;min-height:44px;display:inline-flex;align-items:center}
+.mapa-lienzo .maplibregl-ctrl-group button{width:44px;height:44px;min-height:44px;padding:0;box-shadow:none}
+.maplibregl-ctrl-attrib,.maplibregl-ctrl-attrib a{color:#0A0A0C;font-size:13px}
+.mapa-cercanos{margin-top:20px}
+.lista-gimnasios{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:10px}
+@media (min-width:760px){.lista-gimnasios{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tarjeta-gimnasio{display:flex;align-items:center;gap:14px;min-height:76px;padding:12px 16px;border-radius:22px;background:var(--card);border:1px solid var(--line);color:var(--text);text-decoration:none}
+@media (hover: hover) and (pointer: fine){a.tarjeta-gimnasio:hover{border-color:var(--foco);color:var(--text)}}
+.tarjeta-gimnasio .cuerpo{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.tarjeta-gimnasio .card-avatar{margin:0;width:52px;height:52px;flex:none}
+.tarjeta-gimnasio .distancia{flex:none;min-width:72px;text-align:center;padding:6px 10px;border-radius:999px;background:var(--acc);color:var(--acc-ink);font:800 15px/1.2 var(--font)}
