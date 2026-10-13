@@ -138,6 +138,7 @@ export const registrar = async (p, o) => {
   const nivel = form.locator("select[name=level]");
   await nivel.selectOption(o.nivel ?? "AMATEUR");
   if (await nivel.inputValue() !== (o.nivel ?? "AMATEUR")) throw new Error("No se pudo fijar el nivel del combate antes de enviarlo.");
+  if (o.rivalId) await form.evaluate((f, id) => { const el = document.createElement("input"); el.type = "hidden"; el.name = "rivalId"; el.value = id; f.append(el); }, o.rivalId);
   const invalidados = await form.evaluate((f) => [...f.elements]
     .filter((e) => e.willValidate && !e.checkValidity())
     .map((e) => `${e.name || e.tagName}: ${e.validationMessage}`));
