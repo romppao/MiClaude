@@ -118,4 +118,4 @@ check("MMA juvenil no hereda los pesos masculinos adultos",await otra.locator('[
 await otra.locator('[name=discipline]').selectOption("JIUJITSU");await otra.locator('[name=divisionId]').selectOption("IBJJF2024:Mighty Mite I:F");
 check("jiu-jitsu infantil explica las dimensiones que faltan sin ofrecer pesos adultos",await otra.locator('[name=weightClass] option').count()===1 && await seen(otra.getByText(/kimono\/sin kimono y cinturón/).first()));
 await browser.close();await terminarDiagnosticos();
-
+
