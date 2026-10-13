@@ -14,3 +14,6 @@ next-env.d.ts
 test-results
 docs/ingreso/.clave-temporal/
 .subidas/
+
+# Trabajador de MapLibre: lo copia scripts/copiar-maplibre.mjs al compilar (no se sube)
+/public/vendor/

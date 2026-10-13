@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AURA_POLICY, SCOPE_LABEL, SUPPORT_LABEL, SUPPORT_ORDER } from "../../lib/aura/trajectory";
+import { VERSION } from "../../lib/common/version";
 
 export const metadata = { title: "¿Cómo funciona?" };
 
@@ -61,6 +62,7 @@ export default function Help() {
 
       <h2>¿Has visto un error?</h2>
       <p>En la ficha de cualquier peleador encontrarás la opción <strong>«¿Hay un error? Avísanos»</strong>, disponible para usuarios registrados. Un moderador revisará tu aviso.</p>
+      <p className="mut">Versión {VERSION} de Lona.</p>
     </>
   );
 }

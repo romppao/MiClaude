@@ -47,6 +47,8 @@ jobs:
       MAIL_LOG: ${{ github.workspace }}/server.log
       # Sin salida a internet: las pruebas insertan sus noticias; los vídeos de prueba se guardan en una carpeta temporal.
       NEWS_FETCH: "no"
+      # Sin buscar direcciones de gimnasios en OpenStreetMap (lib/common/geo.ts): no hay salida a internet.
+      GEOCODIFICAR: "no"
       # Cuenta del creador de las pruebas (tests/e2e/creador.mjs).
       CREADOR_CORREO: creador@prueba.test
       MEDIA_DIR: /tmp/ring-subidas
@@ -57,6 +59,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Comprobar la versión y su entrada en el registro de cambios (docs/VERSIONES.md)
+        # En un PR, la versión tiene que ser mayor que la de la rama de destino: todo lo que se fusiona es una versión nueva.
+        env:
+          RAMA_DESTINO: ${{ github.base_ref }}
+        run: |
+          if [ -n "$RAMA_DESTINO" ]; then
+            git fetch --quiet --depth=1 origin "$RAMA_DESTINO"
+            node scripts/version.mjs comprobar "$(git show FETCH_HEAD:package.json | node -pe 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
+          else
+            node scripts/version.mjs comprobar
+          fi
       - name: Aplicar las migraciones a la base de datos vacía
         run: npx prisma migrate deploy
       - name: Comprobar que las migraciones reproducen exactamente el esquema
@@ -79,7 +92,10 @@ jobs:
           npx next start -p 3111 > "$MAIL_LOG" 2>&1 &
           npx wait-on -t 60000 http://localhost:3111/registro
       - name: Prueba de extremo a extremo
-        run: npm run test:e2e
+        # Si algo falla, scripts/avisos-ci.mjs lo resume en un aviso del CI (fallos y texto de las páginas guardadas), legible desde el PR.
+        run: |
+          set -o pipefail; mkdir -p test-results
+          npm run test:e2e 2>&1 | tee test-results/e2e.log || { node scripts/avisos-ci.mjs test-results/e2e.log; exit 1; }
       - name: Medición de accesibilidad (WCAG 2.2 AA)
         run: npm run test:a11y
       - name: Comprobar experiencia gráfica en una demo independiente
@@ -98,3 +114,23 @@ jobs:
       - name: Log del servidor si algo falla
         if: failure()
         run: tail -n 100 "$MAIL_LOG" || true
+
+  # Al fusionar en la rama de la demo y solo si todas las pruebas han pasado: crea la etiqueta vX.Y.Z de la versión (y de las
+  # históricas del CHANGELOG que aún no la tengan). Es el único trabajo con permiso de escritura, y tarda unos segundos.
+  etiquetar:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/claude/ring-espana-mvp'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Crear las etiquetas de versión que falten
+        run: |
+          node scripts/version.mjs etiquetas | while read -r etiqueta commit; do
+            if git rev-parse -q --verify "refs/tags/$etiqueta" > /dev/null; then echo "$etiqueta ya existe"; continue; fi
+            git tag "$etiqueta" "$(git rev-parse "$commit^{commit}")" && git push origin "$etiqueta" && echo "::notice::Etiqueta $etiqueta creada"
+          done

@@ -8,6 +8,8 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
 import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { LEVEL_LABEL } from "../../../lib/common/labels";
+import { puntoDeGimnasio } from "../../../lib/common/mapa";
+import DondeEsta from "../../components/DondeEsta";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
   return (
     <>
       <ProfileHeader kind="gimnasio" id={gym.id} name={gym.name} subtitle={[gym.city,gym.province].join(" · ")}>{gym.verifiedAt && <span className="tag" title="Verificado por un moderador">✓ verificado</span>}</ProfileHeader><ProfileDetails kind="gimnasio" id={gym.id}/>
-      <p className="mut">{[gym.address, gym.city, gym.province].filter(Boolean).join(", ")}</p>
+      <DondeEsta titulo="Dónde está" nombre={gym.name} direccion={[gym.address, gym.city, gym.province].filter(Boolean).join(", ")} punto={puntoDeGimnasio(gym)} />
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       <h2>Entrenadores</h2>
       {gym.trainers.length === 0 ? <p className="mut">Este gimnasio todavía no tiene entrenadores registrados.</p> : <ul>{gym.trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</ul>}

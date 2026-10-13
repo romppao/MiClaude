@@ -1,6 +1,7 @@
 // Pruebas de búsqueda, paginación, cabeceras de seguridad y buscadores (robots, mapa del sitio, salud).
 // Requiere el servidor en marcha (ver ayudas.mjs).
 import { datosDeAlta, B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql, terminarDiagnosticos } from "./ayudas.mjs";
+import { readFileSync } from "node:fs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const anon = await (await browser.newContext()).newPage();
@@ -63,7 +64,8 @@ check("robots.txt indica el mapa del sitio y oculta las zonas privadas", /Sitema
 const mapa = await (await anon.request.get(B + "/sitemap.xml")).text();
 check("el mapa del sitio incluye las fichas públicas y no las provisionales", mapa.includes(`/peleadores/alvaro-perez${rnd}-nunez`) && !mapa.includes(`oculto${rnd}`));
 const salud = await anon.request.get(B + "/salud");
-check("la comprobación de salud responde que todo funciona", salud.ok() && (await salud.json()).estado === "ok");
+const datosSalud = await salud.json();
+check("la comprobación de salud responde que todo funciona y con qué versión", salud.ok() && datosSalud.estado === "ok" && datosSalud.version === JSON.parse(readFileSync("package.json", "utf8")).version);
 
 // 5) Títulos propios en las fichas
 await anon.goto(B + `/gimnasios/gimnasio-meta-${rnd}-madrid`);

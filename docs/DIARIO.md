@@ -1625,3 +1625,97 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - crear el monitor de UptimeRobot en los próximos días (hasta entonces, la visita automática gasta unos 140 minutos de GitHub al día);
 - cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
 - decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.
+
+## 13 de octubre de 2026 — Fecha de lanzamiento y mapa de gimnasios (Claude)
+
+**Qué se pidió** (el fundador):
+- Cuándo se puede lanzar. Él proponía el 1 de noviembre, con pruebas definitivas antes («tanto yo como tú entraremos en los distintos tipos de usuarios y probaremos todas las funcionalidades»).
+- Un mapa en «Gimnasios» en vez de solo una lista: «importar ahí un mapa de la ubicación en la que se encuentra el usuario en el que le muestren los gimnasios más cercanos […] una lista se ve un poco aburrida». Dijo que miraría también las veladas.
+
+**Qué se decidió y por qué:**
+- **Lanzamiento.** Claude revisó lo pendiente:
+  - Faltan una versión real separada de la demo, copias de seguridad, correo real, fotos fuera de la base, textos legales y la decisión sobre menores.
+  - Las tiendas (App Store y Google Play) no llegan al 1 de noviembre.
+  - Recomendó abrir primero a un grupo cercano y hacer la promoción unas dos semanas después.
+
+  El fundador decidió: **«retrasaremos el lanzamiento para el día 15 de noviembre […] dejar la aplicación lista ya el día 1 de noviembre, totalmente funcional, a la espera de revisiones jurídicas y legales»**, y la promoción (vídeos, publicaciones, otras estrategias) se define más adelante. Hoja de ruta en `docs/LANZAMIENTO.md`.
+- **Mapa.** Claude propuso dos opciones: Google Maps (pide cuenta de Google Cloud y probablemente tarjeta; gratis solo hasta un número de visitas) o un mapa libre (MapLibre con los mapas de OpenFreeMap y los datos de OpenStreetMap: sin cuenta, sin tarjeta y sin límite de visitas según su web). Recomendó el libre y el fundador respondió «vale, de acuerdo». Se toma como aprobación; si prefiriera Google, el cambio es pequeño.
+  - La lista se queda, más visual y ordenada por distancia: la necesitan quienes usan lector de pantalla o no quieren dar su ubicación.
+  - La ubicación de la persona no se guarda.
+
+**Qué se hizo:**
+- `docs/LANZAMIENTO.md` (calendario, imprescindibles con responsable y estado, pruebas definitivas y promoción) y notas en `CLAUDE.md` y `TRASLADO.md`.
+- **Mapa de gimnasios:**
+  - mapa con «Usar mi ubicación», «Los más cercanos a ti» con la distancia, marcadores agrupados y modo oscuro;
+  - lista rediseñada en tarjetas;
+  - campo «Dirección del gimnasio» en su perfil y coordenadas buscadas en OpenStreetMap;
+  - centro de provincia cuando no hay coordenadas;
+  - nota en la página de privacidad;
+  - CSP y permiso de ubicación ajustados.
+  - Detalle en `DISENO.md` y `ARQUITECTURA.md`; proveedor anotado en ADR-003.
+- **Pruebas:** unitarias en `tests/unit/mapa.test.ts` y de navegador en `tests/e2e/mapa.mjs` (13 comprobaciones, con accesibilidad en los dos temas).
+
+**Qué salió mal:**
+- **El trabajador de MapLibre 6 no carga solo.** Busca su archivo junto al suyo, y al empaquetarlo Next.js lo cambia de sitio. Se copia a `public/vendor/` al compilar.
+- **Los marcadores de gimnasios de la misma ciudad se tapaban** y fallaba la prueba de tamaño de zona táctil. Se agrupan en un círculo con el número.
+- **Los estilos propios de MapLibre pisaban los nuestros en la ventanita**: fondo blanco con texto lima ilegible en oscuro. Se dio más especificidad a los nuestros.
+- **El punto de «tu ubicación» tapaba a los gimnasios** que tenía debajo. Ya no se puede pulsar.
+- **En esta sesión no hay internet**, así que el fondo del mapa no se ha visto: hay que comprobarlo en la demo.
+
+## 13 de octubre de 2026 — «Los mejores de tu zona» y mapa en las fichas (Claude)
+
+**Qué se pidió** (el fundador): «me parece bien un mapa libre […] que el usuario, en vez de que le salga una lista muy aburrida y larga hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración de Google o algo similar». Y en las fichas de entrenadores y gimnasios: «su descripción, todo lo que hace y en el mapa la ubicación exacta de dónde se le puede ir a acudir».
+
+**Qué se decidió y por qué:**
+- **Sin valoraciones de Google:** exigen su servicio de pago y sus condiciones no permiten mostrarlas fuera de un mapa suyo.
+- **Valoración Lona** («algo similar»): sale de datos reales de la comunidad (aura de sus peleadores, peleadores, entrenadores y sello de verificado). Se explica en pantalla y no se puede comprar.
+- **Lista completa:** se conserva, porque es la vía accesible, pero queda recogida debajo.
+- **«Cómo llegar»:** un simple enlace a Google Maps, sin clave ni coste, que abre la aplicación del teléfono.
+
+**Qué se hizo:**
+- «Los mejores de tu zona» con «Mejores / Más cerca».
+- «Ver todos los gimnasios (N)» recogido.
+- Tarjetas más limpias en el móvil: el sello de verificado va dentro de la tarjeta.
+- «Dónde está» en la ficha del gimnasio y «Dónde entrena» en la del entrenador.
+- Parte común del mapa en `components/mapa/base.ts`.
+- `tests/e2e/mapa.mjs` ampliada a 23 comprobaciones; pruebas unitarias de la valoración.
+
+**Qué salió mal:**
+- El primer CI del PR #46 falló en «Prueba de extremo a extremo». Desde aquí no se pueden leer sus registros ni descargar el diagnóstico, así que se busca la causa con la réplica local.
+- En el móvil, las tarjetas quedaban apretadas con el sello a la derecha y los botones de orden ocupaban dos líneas: se corrigió tras ver las capturas.
+
+## 13 de octubre de 2026 — Causa del CI rojo del mapa y control de versiones (Claude)
+
+**Qué se pidió** (el fundador): «Continúa», para terminar el mapa. Y después: «Es importante llevar un buen manejo de versiones para la aplicación, tenlo en cuenta y en caso de que no lo estés haciendo, aplícalo».
+
+**Qué se decidió y por qué:**
+- **Versionado semántico con un registro de cambios en lenguaje llano.** La versión actual pasa a 0.9.0 y la **1.0.0 será el lanzamiento público** del 15 de noviembre.
+- **Versiones anteriores reconstruidas** a partir de los 24 PR fusionados: 0.1.0 a 0.8.0, cada una con su commit de fusión. Así hay puntos fijos a los que volver.
+- **El CI exige que cada PR suba la versión** y tenga su entrada: lo que no se comprueba acaba no haciéndose (fue lo que pasó durante seis semanas).
+- **Las etiquetas las crea el CI**, solo si todas las pruebas pasan tras fusionar. Desde la sesión de Claude no se pueden crear: el proxy bloquea esa escritura, ya sea con `git push` o con la API.
+- **La versión se ve** en la ayuda, en moderación (con el commit), en `/salud` y en cada fallo registrado (primera y última versión). Así se sabe si un arreglo funcionó.
+
+**Qué se hizo:**
+- **Mapa:**
+  - «Acercar» y «Alejar» indican qué mapa controlan (`aria-controls`, en `crearMapa`).
+  - La autoría del mapa se lee bien en tema oscuro.
+  - Las pruebas sirven un estilo de mapa propio con la misma autoría, así que no dependen de internet y ven lo mismo en local y en el CI.
+- **Diagnóstico del CI:** si fallan las pruebas de navegador, `scripts/avisos-ci.mjs` publica un aviso legible desde el PR con los fallos y el texto de las páginas guardadas.
+- **Versiones:**
+  - Archivos nuevos: `CHANGELOG.md`, `docs/VERSIONES.md`, `scripts/version.mjs` y `src/lib/common/version.ts`.
+  - Migración `20261013200000_version_en_fallos`.
+  - Paso de comprobación y trabajo `etiquetar` en el CI.
+  - Pruebas de la versión en `fallos.mjs` y `busqueda.mjs`.
+  - Reglas en `EQUIPO.md`, `DESARROLLO.md`, `REVISION.md` y `CLAUDE.md`.
+
+**Qué salió mal:**
+- El CI del mapa falló cinco veces seguidas, por causas distintas:
+  - los botones de zoom sin `aria-controls`, que la réplica local encontró;
+  - dos veces el catálogo sin regenerar tras tocar un archivo;
+  - el contraste de la autoría, que solo aparece con internet, y en local no se veía.
+- Dos pruebas anteriores al mapa (`cuenta.mjs` y `flujo.mjs`) fallaron una vez cada una en el CI y pasan siempre en local: son intermitentes, y la segunda guardó la página a medio cargar. Se relanzó el CI para confirmarlo. Están anotadas como intermitentes, con la causa todavía sin encontrar.
+- No se podían leer los registros del CI desde aquí, por eso se hizo `avisos-ci.mjs`.
+
+**Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
+
+**Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.

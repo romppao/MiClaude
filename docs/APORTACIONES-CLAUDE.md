@@ -122,3 +122,22 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 - No escribir colores fijos en componentes: usar los tokens, que existen en los dos temas.
 - No usar `console.error` para fallos: usar `registrarFallo`.
 - No borrar filas de `AppError`.
+
+## 13 de octubre de 2026 — Mapa de gimnasios y control de versiones
+
+**Pedido por el fundador:**
+- Mapa con los mejores gimnasios de la zona, y mapa en las fichas de gimnasio y de entrenador.
+- «Es importante llevar un buen manejo de versiones para la aplicación».
+
+**Qué cambié y por qué:** entradas del mismo día en `DIARIO.md`, la guía [`VERSIONES.md`](VERSIONES.md) y las secciones de `ARQUITECTURA.md`.
+
+**Qué ejecuté:**
+- `typecheck`, `npm test` (677) y el build.
+- Pruebas de navegador en la réplica del CI: todas las de `test:e2e` y `accesibilidad`.
+- La validación final la hace el CI.
+
+**Qué debe hacer el siguiente asistente:**
+- Cada PR sube la versión: `node scripts/version.mjs subir parche|menor|mayor`, con su entrada en `CHANGELOG.md`.
+- No escribir `version` a mano en `package.json`.
+- Las pruebas de navegador no salen a internet para el mapa: `ayudas.mjs` sirve el estilo. No quitarlo.
+- `cuenta.mjs` y `flujo.mjs` fallaron una vez cada una en el CI: son intermitentes, con la causa todavía sin encontrar.

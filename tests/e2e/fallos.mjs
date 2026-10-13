@@ -4,6 +4,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { PrismaClient } from "@prisma/client";
 import { B, rnd, browser, newUser, check, seen, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
+import { readFileSync } from "node:fs";
 
 const db = new PrismaClient();
 const axe = async (p, que) => {
@@ -42,6 +43,7 @@ hacerAdmin(mod.email);
 await mod.p.goto(B + "/moderacion");
 check("el panel muestra «Pendiente de revisar»", await seen(mod.p.getByRole("heading", { name: "Pendiente de revisar" })));
 check("el panel muestra «Estado de la aplicación» con los fallos sin resolver", await seen(mod.p.getByRole("link", { name: /Fallos de la aplicación sin resolver: \d+/ })));
+check("el panel dice qué versión de la aplicación está en marcha", await seen(mod.p.getByText(`Versión de la aplicación: ${JSON.parse(readFileSync("package.json", "utf8")).version}`)));
 check("el panel muestra las herramientas, sin perder ninguna", await seen(mod.p.getByRole("heading", { name: "Herramientas" })) && await seen(mod.p.getByRole("link", { name: "Ver el historial de cambios" })) && await seen(mod.p.getByRole("link", { name: "Gestionar acreditaciones" })) && await seen(mod.p.getByRole("link", { name: "Respaldar resultados y títulos" })));
 await axe(mod.p, "Panel de moderación");
 await mod.p.getByRole("link", { name: "Fallos de la aplicación", exact: true }).click();
@@ -51,6 +53,8 @@ await axe(mod.p, "Fallos de la aplicación");
 await mod.p.getByRole("link", { name: new RegExp(`Fallo de prueba ${marca}`) }).click();
 await mod.p.waitForURL(`**/moderacion/fallos/${fila.id}`);
 check("la ficha dice cuántas veces ha ocurrido", await seen(mod.p.locator("dd", { hasText: /^2$/ })));
+const version = JSON.parse(readFileSync("package.json", "utf8")).version;
+check("el fallo guarda la versión de la aplicación y la ficha la muestra", fila.version === version && fila.firstVersion === version && await seen(mod.p.locator("dd", { hasText: version })));
 await axe(mod.p, "Detalle de un fallo");
 // Resolver sin nota: no se deja.
 await mod.p.selectOption("select[name=estado]", "RESOLVED");
@@ -71,16 +75,18 @@ check("y la reapertura queda en el historial", (await db.auditLog.count({ where:
 const p = await (await browser.newContext({ colorScheme: "dark" })).newPage();
 await p.goto(B + "/");
 const fondo = () => p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+// Se espera al estado (como pide seen()): leerlo en un instante fijo falló una vez en el CI, más lento que el ordenador local.
+const temaEs = (tema, color) => p.waitForFunction(([t, c]) => document.documentElement.dataset.tema === t && getComputedStyle(document.body).backgroundColor === c, [tema, color], { timeout: 5000 }).then(() => true, () => false);
 check("sin elegir nada, sigue el tema del sistema (oscuro)", (await fondo()) === "rgb(10, 10, 12)");
 await p.getByRole("button", { name: "Menú" }).click();
 await p.locator(".selector-tema label", { hasText: "Claro" }).click();
-check("al elegir «Claro» la página se vuelve clara", (await p.evaluate(() => document.documentElement.dataset.tema)) === "claro" && (await fondo()) === "rgb(244, 242, 236)");
+check("al elegir «Claro» la página se vuelve clara", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.reload();
-check("la elección se recuerda al volver", (await p.evaluate(() => document.documentElement.dataset.tema)) === "claro" && (await fondo()) === "rgb(244, 242, 236)");
+check("la elección se recuerda al volver", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.getByRole("button", { name: "Menú" }).click();
 check("el menú muestra la opción elegida", await p.getByRole("radio", { name: "Claro" }).isChecked());
 await p.locator(".selector-tema label", { hasText: "Automático" }).click();
-check("«Automático» vuelve al tema del sistema", (await p.evaluate(() => document.documentElement.dataset.tema)) === undefined && (await fondo()) === "rgb(10, 10, 12)");
+check("«Automático» vuelve al tema del sistema", await temaEs(undefined, "rgb(10, 10, 12)"));
 
 await terminarDiagnosticos();
 await db.$disconnect();

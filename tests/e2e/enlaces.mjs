@@ -38,7 +38,8 @@ async function auditarPagina(p, papel, ruta) {
     for (const b of document.querySelectorAll("button, input[type=submit], input[type=button]")) {
       const n = nombre(b) || b.getAttribute("value") || "";
       const f = b.closest("form") || (b.getAttribute("form") && document.getElementById(b.getAttribute("form")));
-      // Un botón que abre o cierra un diálogo (menú) lleva su propia función: se reconoce por aria-controls / aria-haspopup o por estar dentro del diálogo.
+      // Un botón que abre o cierra un diálogo (menú) o que cambia otra parte de la pantalla (pestañas, mapa) lleva su propia función:
+      // se reconoce por aria-controls / aria-haspopup o por estar dentro del diálogo.
       const abreDialogo = b.hasAttribute("aria-controls") || b.hasAttribute("aria-haspopup") || !!b.closest("dialog");
       if (!f && b.type !== "reset" && !abreDialogo) out.push(`botón suelto, sin formulario (no hace nada): «${n}»`);
       else if (f && !f.getAttribute("action") && !f.action) out.push(`formulario sin acción: «${n}»`);

@@ -15,7 +15,19 @@ export const browser = await chromium.launch({ executablePath: process.env.CHROM
 // Diagnóstico al fallar: se guardan una captura y el HTML de todas las pantallas abiertas en test-results/ (el CI las sube como artefacto).
 const contextos = [];
 const crearContexto = browser.newContext.bind(browser);
-browser.newContext = async (...args) => { const c = await crearContexto(...args); contextos.push(c); return c; };
+// Mapas: en vez del estilo de OpenFreeMap se sirve uno mínimo con su misma autoría (enlaces incluidos). Así las pruebas no dependen
+// de internet y ven igual en local que en el CI la línea de autoría, que también debe pasar la medición de contraste.
+const ESTILO_MAPA_PRUEBAS = JSON.stringify({
+  version: 8,
+  sources: { prueba: { type: "geojson", data: { type: "FeatureCollection", features: [] }, attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' } },
+  layers: [{ id: "fondo", type: "background", paint: { "background-color": "#f2f2ee" } }, { id: "prueba", type: "circle", source: "prueba" }],
+});
+browser.newContext = async (...args) => {
+  const c = await crearContexto(...args);
+  contextos.push(c);
+  await c.route("https://tiles.openfreemap.org/**", (r) => r.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: ESTILO_MAPA_PRUEBAS }));
+  return c;
+};
 const pendientes = [];
 const ficheroSeguro = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").slice(0, 60);
 async function volcarDiagnostico(motivo) {

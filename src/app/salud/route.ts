@@ -1,4 +1,5 @@
 import { db } from "../../lib/common/db";
+import { VERSION } from "../../lib/common/version";
 
 export const dynamic = "force-dynamic";
 
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await db.$queryRaw`SELECT 1`;
-    return Response.json({ estado: "ok" }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json({ estado: "ok", version: VERSION }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ estado: "sin conexión con la base de datos" }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }

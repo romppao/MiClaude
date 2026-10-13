@@ -23,7 +23,9 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 | Saber **qué se borra y cuándo** | `src/lib/accounts/retention.ts` |
 | Añadir un **listado con filtros y páginas** | `src/lib/common/search.ts`, `src/lib/common/pagination.ts`, `src/app/components/Filtros.tsx`, `Paginacion.tsx`. Receta 4.6 |
 | Registrar o revisar un **fallo de la aplicación** | `src/lib/common/fallos.ts` (`registrarFallo`), `src/instrumentation.ts` (`onRequestError`) y `/moderacion/fallos`. Receta y reglas en [`MODERACION.md`](MODERACION.md) §3 |
+| Cambiar el **mapa** (proveedor, marcadores, búsqueda de direcciones) | `src/app/components/MapaGimnasios.tsx`, `src/lib/common/mapa.ts` (cálculos), `src/lib/common/geo.ts` (coordenadas) y la CSP de `next.config.mjs`. Ver [`ARQUITECTURA.md`](ARQUITECTURA.md) («Mapa de gimnasios») |
 | Cambiar un **color** (tema claro u oscuro) | Los tokens de `src/app/globals.css` §2: se cambian **en los dos temas** y nunca se escribe un color fijo en un componente. Ver [`DISENO.md`](DISENO.md) («Tema claro y oscuro») |
+| Publicar una **versión** o volver a una anterior | `CHANGELOG.md`, `node scripts/version.mjs subir parche\|menor\|mayor` y las etiquetas `vX.Y.Z`. Ver [`VERSIONES.md`](VERSIONES.md) |
 | Entender por qué existe una **regla extraña** | `docs/LECCIONES.md` (errores pasados y la regla que dejaron) y `docs/AUDITORIA.md` |
 
 ## 2. Estructura del repositorio
@@ -193,6 +195,7 @@ Un cambio no está terminado hasta que:
 5. `npm run mapa` está ejecutado y `docs/MAPA-FUNCIONAL.md` sube con el cambio.
 6. La documentación está al día: entrada **al final** de `docs/DIARIO.md` (qué se pidió, qué se decidió y por qué, qué se hizo, qué salió mal, estado y próximos pasos), `docs/IDEAS.md`, `docs/LECCIONES.md` (cada error con su causa real y la regla resultante) y `docs/ARQUITECTURA.md` si cambia el estado técnico.
 7. El archivo nuevo tiene explicación individual en `docs/catalogo-codigo.json`, el contrato/flujo afectado está actualizado y `node scripts/generar-catalogo.mjs --comprobar` pasa. Un programador nuevo puede encontrar regla, permiso, efecto y prueba sin pedir un chat. Ver [manual](mantenimiento/README.md) y [revisión](REVISION.md).
+8. La versión está subida y el cambio apuntado en `CHANGELOG.md` (`node scripts/version.mjs subir parche|menor|mayor`; ver [`VERSIONES.md`](VERSIONES.md)).
 
 ## 7. Trabajo en equipo
 

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Gym" ADD COLUMN     "geoSource" TEXT,
+ADD COLUMN     "geocodedAt" TIMESTAMP(3),
+ADD COLUMN     "lat" DOUBLE PRECISION,
+ADD COLUMN     "lng" DOUBLE PRECISION;

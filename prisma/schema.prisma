@@ -98,6 +98,13 @@ model Gym {
   verifiedNote String?
   fighters     Fighter[]
   trainers     Trainer[]
+  // Ubicación para el mapa de /gimnasios (13 de octubre de 2026). La pone lib/common/geo.ts: con la dirección si la hay
+  // (geoSource «direccion»), si no con la ciudad («ciudad»). Sin coordenadas, el mapa usa el centro de la provincia.
+  // Se borra al cambiar la dirección o la ciudad para que se vuelva a calcular.
+  lat          Float?
+  lng          Float?
+  geoSource    String?
+  geocodedAt   DateTime?
 
   @@index([province])
 }
@@ -571,6 +578,8 @@ model AppError {
   path         String?
   digest       String?
   role         String? // tipo de cuenta de quien lo sufrió la última vez (sin datos personales)
+  firstVersion String? // versión de la aplicación en la que apareció por primera vez (docs/VERSIONES.md)
+  version      String? // versión en la que apareció la última vez
   count        Int            @default(1)
   firstSeenAt  DateTime       @default(now())
   lastSeenAt   DateTime       @default(now())

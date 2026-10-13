@@ -14,6 +14,7 @@ import { lookup, flatParams } from "../../lib/common/safe";
 import { METHOD_LABEL, VERIFICATION_LABEL, fmtDate } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 import { publicUserName } from "../../lib/common/names";
+import { VERSION, commitDesplegado } from "../../lib/common/version";
 
 export const metadata = { title: "Moderación" };
 export const dynamic = "force-dynamic";
@@ -148,6 +149,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
           <Link href="/moderacion/fallos" className={nFallos > 0 ? "dato con-pendientes" : "dato"} aria-label={`Fallos de la aplicación sin resolver: ${nFallos}`}><span className="clave">Fallos sin resolver</span><strong>{nFallos}</strong></Link>
           <Link href="/moderacion/noticias" className={nFuentesKo > 0 ? "dato con-pendientes" : "dato"} aria-label={`Fuentes de noticias que fallan: ${nFuentesKo}`}><span className="clave">Fuentes de noticias que fallan</span><strong>{nFuentesKo}</strong></Link>
         </div>
+        <p className="mut">Versión de la aplicación: <strong>{VERSION}</strong>{commitDesplegado() ? ` (commit ${commitDesplegado()})` : ""}. Qué trae cada versión: <code>CHANGELOG.md</code> del repositorio.</p>
       </section>
 
       <section aria-labelledby="titulo-herramientas" style={{ margin: "20px 0" }}>

@@ -35,6 +35,7 @@ export default async function Fallo({ params }: { params: Promise<{ id: string }
         <div><dt>Veces que ha ocurrido</dt><dd>{fallo.count}</dd></div>
         <div><dt>Primera vez</dt><dd>{fecha(fallo.firstSeenAt)}</dd></div>
         <div><dt>Última vez</dt><dd>{fecha(fallo.lastSeenAt)}</dd></div>
+        {fallo.version && <div><dt>Versión de la aplicación</dt><dd>{fallo.firstVersion && fallo.firstVersion !== fallo.version ? `Apareció en la ${fallo.firstVersion}; la última vez, en la ${fallo.version}` : fallo.version}</dd></div>}
         {fallo.role && <div><dt>Quién lo sufrió la última vez</dt><dd>{PAPEL[fallo.role] ?? fallo.role}</dd></div>}
         {fallo.digest && <div><dt>Código del fallo</dt><dd>{fallo.digest} <span className="mut">(es el que ve la persona en la pantalla de error)</span></dd></div>}
         {fallo.resolvedAt && <div><dt>Cerrado</dt><dd>{fecha(fallo.resolvedAt)}{quien && ` por ${quien.name}`}</dd></div>}
