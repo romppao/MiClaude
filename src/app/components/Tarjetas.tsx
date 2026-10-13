@@ -20,7 +20,7 @@ export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Da
       <span className="fecha-cartel" aria-hidden="true"><b>{dia}</b><span>{mes}</span></span>
       <span style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <strong>{e.name}</strong>
-        <span className="meta" style={{ color: "rgba(255,255,255,.8)" }}><span className="sr-only">{dia} de {mes} · </span>{DISCIPLINE_LABEL[e.discipline]} · {LEVEL_LABEL[e.level]} · {e.city}</span>
+        <span className="meta" style={{ color: "rgba(var(--ink),.8)" }}><span className="sr-only">{dia} de {mes} · </span>{DISCIPLINE_LABEL[e.discipline]} · {LEVEL_LABEL[e.level]} · {e.city}</span>
       </span>
     </Link>
   );

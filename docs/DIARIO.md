@@ -1543,3 +1543,60 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué salió mal:** nada. Una limitación: la foto del portafolio mide 682 × 1024 píxeles. En pantallas grandes de alta densidad puede verse algo blanda; si el fundador tiene el original a más resolución, basta con sustituir el archivo.
 
 **Pruebas:** capturas en móvil (390 px), escritorio (1440 px) y bienvenida.
+
+## 13 de octubre de 2026 — Tema claro, panel de moderación y registro de fallos (Claude)
+
+**Qué se pidió** (el fundador):
+- «me gustaría también tener la opción de poner un tema blanco, que el usuario, en función de su sistema, como lo tenga predeterminado, pueda elegir el tema oscuro o el tema blanco».
+- «perfilar muy bien el usuario y moderador […] sus funciones bien estructuradas, con su panel de avisos, los errores que tenga la aplicación […] es muy importante que esos fallos queden registrados, que queden plasmados para saber qué ha estado ocurriendo a lo largo de la historia».
+- Que le diga cómo renovar la demo, porque Render le avisó de que iba a caducar.
+- Documentar todo para los otros asistentes y para los programadores humanos que contrate.
+
+**Qué se decidió y por qué:**
+- **Tema.**
+  - Se interpretó como: por defecto, el tema del sistema, y además un selector «Automático / Claro / Oscuro» en el menú, visible para todos, también sin cuenta.
+  - La elección se guarda en el navegador: es una comodidad, no un dato de la cuenta.
+  - El tema claro conserva la marca: fondo hueso del logotipo «sobre fondo claro», texto negro y botones lima. El lima y el violeta, cuando son texto, se oscurecen para cumplir el contraste.
+  - Las zonas con foto siguen oscuras.
+- **Moderación.**
+  - No se quitó nada: las siete colas y sus acciones siguen igual.
+  - Encima se añadió un panel en tres bloques (pendiente de revisar, estado de la aplicación y herramientas), con recuentos que llevan a cada cola.
+  - Se interpretó «el usuario y moderador» como la cuenta de moderador. Las funciones de cada cuenta con permisos quedan descritas en `docs/MODERACION.md`.
+- **Fallos.**
+  - Registro propio en la base de datos (tabla `AppError`), sin proveedores nuevos ni coste: es la historia que pidió el fundador y queda en nuestra base.
+  - Los fallos repetidos se agrupan, se tachan los datos personales, nunca se borran, se reabren si vuelven a ocurrir, y moderación anota la causa y la solución (obligatoria para cerrarlos).
+  - Sentry (T-010) sigue siendo complementario.
+- **Demo.** Lo que caduca es la base de datos gratuita de Render (30 días). La solución ya aprobada en ADR-003 es pasarla a Neon gratis. Necesita que el fundador cree la cuenta: hay pasos para él en `DEMO.md`. Claude no puede crear cuentas ni debe ver la dirección de la base.
+
+**Qué se hizo:**
+- **Tema.**
+  - Tokens de color en los dos temas (`globals.css` §2): unas 150 sustituciones de colores fijos por variables.
+  - `SelectorTema` en el menú y guion en `layout.tsx` que aplica el tema antes de pintar.
+  - Logotipo claro u oscuro según el tema, colores de foco y avisos con contraste suficiente en los dos.
+- **Fallos.**
+  - `src/lib/common/fallos.ts` (`registrarFallo`).
+  - `onRequestError` en `src/instrumentation.ts`.
+  - `/api/fallos` para los fallos del navegador.
+  - `error.tsx` y `global-error.tsx` envían el fallo y enseñan el código a la persona.
+  - Los 17 `console.error` sueltos (correos, avisos, noticias, limpieza) ahora registran el fallo.
+  - Pantallas `/moderacion/fallos` (lista con recuentos y filtros) y `/moderacion/fallos/[id]` (detalle, estado, nota e historial).
+  - Acción `actualizarFallo`.
+  - Migración `20261013120000_registro_de_fallos`.
+- **Documentación:** `docs/MODERACION.md` (nuevo) y actualizaciones en `DESARROLLO.md`, `ARQUITECTURA.md`, `DISENO.md` y `DEMO.md`; catálogo y mapa al día.
+- **Pruebas.**
+  - Unitarias nuevas en `tests/unit/fallos.test.ts`.
+  - Prueba de navegador nueva `tests/e2e/fallos.mjs` (28 comprobaciones).
+  - `accesibilidad.mjs` mide ahora cada pantalla **en claro y en oscuro**.
+  - Se comprobó con una página que fallaba a propósito (borrada después) que un fallo del servidor queda registrado con su pantalla, su código y la pila.
+
+**Qué salió mal:**
+- Al medir el tema oscuro justo después de cambiarlo, axe vio colores a medio cambiar por las transiciones: hay que esperar a que terminen.
+- `node:crypto` en el registro rompía la compilación de `instrumentation.ts` para el entorno *edge*; se cambió por una huella sin criptografía.
+- La prueba usaba un número como marca única y el registro, a propósito, junta los fallos que solo cambian en números: se usa una marca con letras.
+
+**Estado:** hecho, con pruebas. El fundador aún no ha visto el tema claro.
+
+**Pendiente:**
+- **Fundador:** pasar la demo a Neon (pasos en `DEMO.md`).
+- **Claude:** cuando el fundador avise, ajustar `render.yaml` y comprobar la demo.
+- **Ideas:** aviso por correo al creador cuando aparezca un fallo nuevo.

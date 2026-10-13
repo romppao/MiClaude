@@ -20,6 +20,7 @@ import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
 import { parseTipoDeEntidad } from "../../lib/accounts/landing";
 import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
+import { registrarFallo } from "../../lib/common/fallos";
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();
@@ -122,7 +123,7 @@ export async function addCartelBout(f: FormData) {
   revalidatePath("/", "layout");
   // Solo combates de organizador y futuros. Se avisa después de responder: un fallo del correo no debe afectar a un combate ya guardado.
   after(async () => {
-    try { await notifyFollowersOfBout(created.id); } catch (e) { console.error(`[avisos] no se pudieron enviar los avisos del combate: ${e instanceof Error ? e.message : String(e)}`); }
+    try { await notifyFollowersOfBout(created.id); } catch (e) { await registrarFallo({ origen: "AVISOS", contexto: "No se pudieron enviar los avisos de un combate nuevo", error: e }); }
   });
   go(back, { aviso: "cartel_anadido" });
 }

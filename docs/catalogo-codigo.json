@@ -120,6 +120,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261013120000_registro_de_fallos/migration.sql",
+    "purpose": "Migración: registro de fallos de la aplicación (AppError y su estado).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -325,6 +330,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/api/fallos/route.ts",
+    "purpose": "Recibe los fallos del navegador (solo desde nuestras páginas, con límite de frecuencia) y los pasa al registro de fallos.",
+    "guide": "docs/MODERACION.md"
+  },
+  {
     "path": "src/app/apple-icon.png",
     "purpose": "Icono de la marca (ring de Lona) para la pantalla de inicio del iPhone, 180 px.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -520,6 +530,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/SelectorTema.tsx",
+    "purpose": "Selector Automático/Claro/Oscuro del menú; guarda la elección en este navegador y la marca en <html data-tema>.",
+    "guide": "docs/DISENO.md"
+  },
+  {
     "path": "src/app/components/SubirVideo.tsx",
     "purpose": "Componente de cliente que pide dónde subir (/subidas), sube con progreso, deja la clave en videoKey e impide enviar el formulario a medio subir.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -578,6 +593,11 @@
     "path": "src/app/components/experience/ShaderAmbient.tsx",
     "purpose": "Malla y estela WebGPU de paleta explícita, sin telemetría y con fallback.",
     "guide": "docs/EXPERIENCIA-ELITE.md"
+  },
+  {
+    "path": "src/app/components/informarFallo.ts",
+    "purpose": "Envía al registro un fallo ocurrido en el navegador (máximo tres por página); omite los del servidor, que ya llegan solos.",
+    "guide": "docs/MODERACION.md"
   },
   {
     "path": "src/app/disciplinas/[slug]/page.tsx",
@@ -738,6 +758,16 @@
     "path": "src/app/moderacion/acreditaciones/page.tsx",
     "purpose": "Cola/gestión moderadora de cuentas autorizadas para respaldar hechos por disciplina.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/moderacion/fallos/[id]/page.tsx",
+    "purpose": "Ficha de un fallo: dónde, cuántas veces, detalle técnico, historial y formulario de estado con nota de causa y solución.",
+    "guide": "docs/MODERACION.md"
+  },
+  {
+    "path": "src/app/moderacion/fallos/page.tsx",
+    "purpose": "Lista de fallos de la aplicación con recuentos por estado, filtros por estado y origen, y paginación; solo moderación.",
+    "guide": "docs/MODERACION.md"
   },
   {
     "path": "src/app/moderacion/historial/page.tsx",
@@ -1060,6 +1090,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/fallos.ts",
+    "purpose": "Registro de fallos: guarda, agrupa y tacha datos personales de cada fallo (AppError); nunca lanza; reabre los resueltos que vuelven.",
+    "guide": "docs/MODERACION.md"
+  },
+  {
     "path": "src/lib/common/labels.ts",
     "purpose": "Traduce enums y resultados, lista provincias y genera slugs/huellas para nombres; mantiene texto público en español.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1345,6 +1380,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/fallos.mjs",
+    "purpose": "Prueba de navegador del registro de fallos, el panel de moderación por bloques y el selector de tema claro u oscuro.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/fase2a.mjs",
     "purpose": "Recorre la fase 2a con datos reales: portada y noticias, portada por disciplina, menú por tipo, interclub del entrenador, subida y descarga de fotos y vídeos, avisos y moderación.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1492,6 +1532,11 @@
   {
     "path": "tests/unit/env.test.ts",
     "purpose": "Prueba validación de entorno y requisitos al arrancar producción sin depender de secretos reales.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/fallos.test.ts",
+    "purpose": "Pruebas unitarias del registro de fallos: tachado de datos, agrupación, reapertura y que nunca lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

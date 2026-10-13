@@ -84,7 +84,7 @@ export default async function InicioVisitante() {
       <Link href="/entrenadores" className="tarjeta-foto" style={{ minHeight: 210, padding: 20, gap: 6, alignItems: "flex-start", ["--tinte" as string]: "rgba(134,200,255,.35)" }}>
         <span className="pildora pildora-acc">Clases privadas</span>
         <strong style={{ font: "800 24px/1.08 var(--font)", letterSpacing: "-.03em" }}>Entrena con quien sabe</strong>
-        <span className="meta" style={{ color: "rgba(255,255,255,.8)" }}>Entrenadores de todas las disciplinas, cerca de ti.</span>
+        <span className="meta" style={{ color: "rgba(var(--ink),.8)" }}>Entrenadores de todas las disciplinas, cerca de ti.</span>
       </Link>
 
       <Link href="/registro?tipo=entrenador" className="fila" style={{ padding: 18, borderRadius: 26 }}>

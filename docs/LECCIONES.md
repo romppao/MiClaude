@@ -344,3 +344,13 @@ No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | El reemplazo «Ring España → Lona» dejó una frase sin sentido («de Lona a Lona») | La frase hablaba del propio cambio de nombre | En un renombrado masivo, proteger antes las frases que hablan del nombre antiguo y revisar después cada documento con `grep` del nombre nuevo junto al antiguo |
+
+## 13 de octubre de 2026 — Tema claro y registro de fallos (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Al pasar las pruebas de accesibilidad en oscuro justo después de cambiar el tema, salían cientos de fallos de contraste que no existían | Los colores tienen transiciones CSS y axe midió a mitad del cambio | Tras `emulateMedia({ colorScheme })`, esperar a que terminen las transiciones (600 ms) antes de medir |
+| Las pruebas de navegador ya medían el tema claro sin saberlo | Playwright abre las páginas con `colorScheme: "light"` por defecto, y desde hoy la aplicación sigue al sistema | Medir siempre los dos temas (`accesibilidad.mjs` lo hace) y no suponer que el navegador de pruebas está en oscuro |
+| `node:crypto` en un módulo que importa `instrumentation.ts` rompió la compilación | `instrumentation.ts` se compila también para el entorno *edge*, que no admite `node:` | Lo que cargue `instrumentation.ts` no usa módulos `node:`; si hace falta, se importa dentro de `if (process.env.NEXT_RUNTIME === "nodejs")` y sin dependencias de Node en lo común |
+| Una prueba del registro de fallos sumaba fallos de ejecuciones anteriores | El registro agrupa a propósito los mensajes que solo cambian en números, y la marca única de la prueba era un número | En las pruebas del registro de fallos, la marca única va en letras |
+| `check()` de Playwright no puede marcar una casilla oculta visualmente (los segmentos ocultan el `input` y se pulsa la etiqueta) | `opacity:0` y `pointer-events:none` en el `input` | Pulsar la etiqueta, como haría una persona |

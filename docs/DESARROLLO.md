@@ -22,6 +22,8 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 | Cambiar los **límites de intentos** | `src/lib/accounts/ratelimit.ts` y las constantes de cada acción |
 | Saber **qué se borra y cuándo** | `src/lib/accounts/retention.ts` |
 | Añadir un **listado con filtros y páginas** | `src/lib/common/search.ts`, `src/lib/common/pagination.ts`, `src/app/components/Filtros.tsx`, `Paginacion.tsx`. Receta 4.6 |
+| Registrar o revisar un **fallo de la aplicación** | `src/lib/common/fallos.ts` (`registrarFallo`), `src/instrumentation.ts` (`onRequestError`) y `/moderacion/fallos`. Receta y reglas en [`MODERACION.md`](MODERACION.md) §3 |
+| Cambiar un **color** (tema claro u oscuro) | Los tokens de `src/app/globals.css` §2: se cambian **en los dos temas** y nunca se escribe un color fijo en un componente. Ver [`DISENO.md`](DISENO.md) («Tema claro y oscuro») |
 | Entender por qué existe una **regla extraña** | `docs/LECCIONES.md` (errores pasados y la regla que dejaron) y `docs/AUDITORIA.md` |
 
 ## 2. Estructura del repositorio
@@ -51,6 +53,7 @@ src/
     profiles/             origen y permisos de perfiles visuales, normalización y encuadre de imágenes
     news/                 noticias de la portada: lector RSS/Atom, fuentes, actualización en segundo plano
     media/                vídeos y fotos del público: almacén de vídeos (R2 o disco), firma S3, reglas para compartir
+    events/               inscripciones de veladas e interclubs, plazas por categoría y ayuda para emparejar (depende de common y fighters)
 ```
 
 ### Módulos de acciones (`src/app/actions/`)
@@ -62,7 +65,7 @@ src/
 | `bouts.ts` | Registrar combates, poner el resultado de los propios, responder al rival, adjuntar evidencia | Peleador / organizador |
 | `aura.ts` | Dar y retirar aura | Cuenta con sesión |
 | `events.ts` | Pedir ser organizador, crear veladas, montar el cartel, poner resultados | Organizador |
-| `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos | Moderación |
+| `moderation.ts` | Decisiones de moderación: combates, reclamaciones, organizadores, sello de gimnasios, avisos y estado de los fallos de la aplicación (`actualizarFallo`) | Moderación |
 | `community.ts` | Avisos de error, seguir a un peleador | Cuenta con sesión |
 | `trainers.ts` | Perfil propio del entrenador y sus clases (publicar, pausar) | Entrenador con correo verificado |
 | `profiles.ts` | Personalización y fotos; creación moderadora de federación | Titular autorizado o moderación con correo verificado |
@@ -71,6 +74,7 @@ src/
 | `media.ts` | Compartir vídeos y fotos de una velada y borrar los propios | Cuenta con correo verificado |
 | `proposals.ts` | Retos a combate y propuestas de sparring entre peleadores | Peleador con correo verificado |
 | `registrations.ts` | Inscripción en veladas e interclubs: abrir o cerrar, pedir participar, retirarse, aceptar o rechazar (una o varias) | Peleador con correo verificado / organizador del evento |
+| `creador.ts` | Cuenta del creador: segundo paso, códigos de emergencia, tipo de cuenta y sesiones de otras cuentas ([`CREADOR.md`](CREADOR.md)) | Solo el creador |
 | `news.ts` | Fuentes de noticias: actualizar ahora, añadir, activar o desactivar, ocultar un titular | Moderación |
 | `shared.ts` | Ayudantes comunes de las acciones (`go`, `guard`, `withLock`, `str`…) | Solo los módulos de arriba |
 
@@ -135,11 +139,12 @@ lib/events ─▶ lib/fighters, lib/common
 
 ### 4.2 Añadir una acción del servidor (un formulario o botón que hace algo)
 1. Elige el módulo de `src/app/actions/` por dominio (tabla 2). Si no encaja en ninguno, plantea un módulo nuevo antes de forzar uno existente.
-2. Escribe `export async function nombre(f: FormData)` con este orden: **guarda de permisos → lectura y validación de lo recibido (`str`, `checkLengths`…) → límites (`allow`, `withLock`) → cambio dentro de `guard(back, …)`/transacción con `audit()` → avisos/correos con `after()` → `go(destino, { aviso })`.**
-3. Cada rechazo es un `go(back, { problema: "codigo" })` con un código que **tenga su texto** (receta 4.3).
-4. En `tests/unit/autorizacion.test.ts`, añade la acción a la lista que corresponda (solo moderación, solo organizadores, exige correo verificado, exige sesión). La prueba falla si una acción exportada no está clasificada.
-5. Añade su comprobación en `tests/e2e/` (camino feliz y al menos un rechazo) esperando a un estado visible (`seen()`), con datos únicos por ejecución.
-6. Conecta el formulario en la pantalla con un botón cuyo texto diga lo que hace («Guardar cambios»), y `npm run mapa`.
+2. Si captura un error a propósito para seguir adelante (un correo que no sale), lo registra con `registrarFallo` ([`MODERACION.md`](MODERACION.md) §3), nunca solo con `console.error`.
+3. Escribe `export async function nombre(f: FormData)` con este orden: **guarda de permisos → lectura y validación de lo recibido (`str`, `checkLengths`…) → límites (`allow`, `withLock`) → cambio dentro de `guard(back, …)`/transacción con `audit()` → avisos/correos con `after()` → `go(destino, { aviso })`.**
+4. Cada rechazo es un `go(back, { problema: "codigo" })` con un código que **tenga su texto** (receta 4.3).
+5. En `tests/unit/autorizacion.test.ts`, añade la acción a la lista que corresponda (solo moderación, solo organizadores, exige correo verificado, exige sesión). La prueba falla si una acción exportada no está clasificada.
+6. Añade su comprobación en `tests/e2e/` (camino feliz y al menos un rechazo) esperando a un estado visible (`seen()`), con datos únicos por ejecución.
+7. Conecta el formulario en la pantalla con un botón cuyo texto diga lo que hace («Guardar cambios»), y `npm run mapa`.
 
 ### 4.3 Añadir o cambiar un mensaje para la persona
 1. Añade el código y el texto en `AVISOS` (algo ha ido bien) o `PROBLEMAS` (algo no ha podido hacerse) de `src/lib/common/messages.ts`. Texto en español llano, amable, sin culpar, y que diga **cómo arreglarlo**.

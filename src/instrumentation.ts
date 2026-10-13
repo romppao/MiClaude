@@ -10,3 +10,20 @@ export async function register() {
     process.exit(1);
   }
 }
+
+/**
+ * Cualquier fallo no controlado al mostrar una página, guardar un formulario (acción del servidor) o responder una dirección de datos
+ * queda en el registro de fallos (src/lib/common/fallos.ts → /moderacion/fallos). Next.js no llama aquí por las redirecciones ni por
+ * «no encontrada», que no son fallos. `routePath` es la ruta con sus huecos («/peleadores/[slug]»): así la ficha 12 y la 13 suman en el mismo fallo.
+ */
+export async function onRequestError(
+  error: unknown,
+  request: { path: string; method: string },
+  context: { routerKind: string; routePath: string; routeType: string },
+) {
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+  const { registrarFallo } = await import("./lib/common/fallos");
+  const origen = context.routeType === "action" ? "ACCION" : context.routeType === "route" ? "RUTA" : context.routeType === "render" ? "PAGINA" : "SERVIDOR";
+  const digest = typeof error === "object" && error && "digest" in error ? String((error as { digest: unknown }).digest) : null;
+  await registrarFallo({ origen, error, ruta: context.routePath || request.path, digest });
+}

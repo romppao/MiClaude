@@ -4,6 +4,38 @@ Una copia con **datos ficticios** (peleadores, gimnasios y veladas inventados) p
 
 **Demo activa:** <https://ring-espana-demo.onrender.com/>. El 3 de octubre de 2026 se integró la propuesta #11 en `claude/ring-espana-mvp`: incluye categorías por edad, correcciones de calendario/récords y comunicación inclusiva. Comprobados públicamente portada, ránking, ayuda y salud, todos con respuesta 200 y los contenidos nuevos.
 
+## Que la demo no caduque (13 de octubre de 2026)
+
+Render avisó al fundador por correo de que la demo iba a caducar. Lo que caduca es **la base de datos gratuita de Render**, que dura 30 días desde que se creó (hacia el 2 de octubre). Después hay 14 días de gracia y luego Render la borra. La web en sí no caduca, pero sin base de datos no funciona.
+
+**Solución aprobada (ADR-003, 6 de octubre): pasar la base de la demo a Neon.** Es gratis, no caduca y es PostgreSQL normal, así que la aplicación no cambia. Lo hace el fundador en unos 10 minutos, porque hay que crear una cuenta, y Claude comprueba el resultado:
+
+1. Entra en <https://neon.com> y pulsa **Sign up**. Entra con tu cuenta de **GitHub**. Si te pide una tarjeta, **para y avisa**: el plan gratuito no debería pedirla.
+2. Crea un proyecto:
+   - Nombre: `lona-demo`.
+   - Región: **AWS Europe Central 1 (Frankfurt)**.
+   - Deja la versión de PostgreSQL que venga por defecto.
+3. En el panel del proyecto pulsa **Connect**:
+   - **Desactiva «Connection pooling»**: la aplicación usa la conexión directa para preparar las tablas.
+   - Copia la dirección completa. Empieza por `postgresql://` y termina en `sslmode=require`.
+   - **No la pegues en el chat ni en ningún archivo**: es la llave de la base de datos.
+4. En <https://dashboard.render.com>:
+   - Abre el servicio `ring-espana-demo` → **Environment**.
+   - Busca `DATABASE_URL` → **Edit**, pega la dirección de Neon y pulsa **Save, rebuild, and deploy**.
+5. Cuando termine (unos 5 minutos), dile a Claude «ya está». Claude:
+   - cambia `render.yaml` para que Render no vuelva a poner la base antigua en la próxima actualización;
+   - comprueba que la demo responde.
+
+Qué pasa con los datos:
+- La base nueva empieza vacía y la demo carga sola los datos ficticios (`scripts/arranque-demo.sh`).
+- Las cuentas que hayas creado en la demo **no pasan**. Vuelve a registrarte, también con el correo del creador, y configura otra vez el segundo paso; en la aplicación de códigos, borra la entrada antigua.
+- Ten en cuenta:
+  - Neon gratis «duerme» la base tras 5 minutos sin uso, así que la primera visita tarda un poco más (igual que la web de Render).
+  - El plan gratuito tiene 0,5 GB.
+  - Estos límites están anotados en ADR-003; compruébalos en la página de precios de Neon al crear la cuenta.
+
+**Si no da tiempo** (plan B, sin coste, pero hay que repetirlo cada mes): cuando Render borre la base, crea otra gratuita desde el mismo Blueprint y la demo vuelve a cargar los datos ficticios. Dura otros 30 días.
+
 ## A. Alojada en internet (funciona desde el móvil)
 
 La demo se publica en [Render](https://render.com) a partir del fichero `render.yaml` del repositorio: una web y una base de datos propias, sin tocar nada de producción. Se hace una sola vez, desde el navegador del móvil:

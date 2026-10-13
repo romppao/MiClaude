@@ -31,7 +31,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
   const huecos = proxima ? Math.max(6, proxima._count.bouts) : 0;
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
-      <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
+      <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc-text)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
       <AccionesPrincipales acciones={[
         { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
         { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
@@ -62,7 +62,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
             </div>
             <div style={{ padding: "4px 18px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
               <div><h3 style={{ margin: 0, font: "800 24px/1.05 var(--font)", letterSpacing: "-.03em" }}>{proxima.name}</h3><div className="meta" style={{ fontSize: 15 }}>{fmtDate(proxima.date)} · {proxima.venue}, {proxima.city} · {DISCIPLINE_LABEL[proxima.discipline]} {LEVEL_LABEL[proxima.level].toLowerCase()}</div></div>
-              <div style={{ display: "flex", gap: 6 }} aria-hidden="true">{Array.from({ length: huecos }, (_, i) => <span key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: i < proxima._count.bouts ? "var(--acc)" : "rgba(255,255,255,.12)" }} />)}</div>
+              <div style={{ display: "flex", gap: 6 }} aria-hidden="true">{Array.from({ length: huecos }, (_, i) => <span key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: i < proxima._count.bouts ? "var(--acc)" : "rgba(var(--ink),.12)" }} />)}</div>
               <div style={{ display: "flex", justifyContent: "space-between" }} className="meta"><span>{plural(proxima._count.bouts, "combate", "combates")} en el cartel</span><span>{whenLabel(daysUntil(proxima.date))}</span></div>
               <Link href={`/organizador/${proxima.slug}`} className="btn secondary">Gestionar el cartel</Link>
             </div>

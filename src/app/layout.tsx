@@ -23,7 +23,12 @@ export const metadata: Metadata = {
   description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
 };
 
-export const viewport: Viewport = { themeColor: "#0A0A0C", colorScheme: "dark", viewportFit: "cover", interactiveWidget: "resizes-content" };
+export const viewport: Viewport = {
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F2EC" }, { media: "(prefers-color-scheme: dark)", color: "#0A0A0C" }],
+  colorScheme: "dark light", viewportFit: "cover", interactiveWidget: "resizes-content" };
+
+/** Aplica el tema elegido (components/SelectorTema.tsx) antes de pintar la página, para que no parpadee. Sin elección, manda el sistema. */
+const TEMA_INICIAL = `try{var t=localStorage.getItem("lona:tema");if(t==="claro"||t==="oscuro"){document.documentElement.dataset.tema=t;document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.setAttribute("content",t==="oscuro"?"#0A0A0C":"#F4F2EC")})}}catch(e){}`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
@@ -44,13 +49,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     promotorId: user?.role === "ORGANIZER" ? user.id : null,
   });
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: TEMA_INICIAL }} /></head>
       <body>
         <Experience>
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
-            <Link href="/" className="logo" aria-label="Lona, ir al inicio">{/* Logotipo oficial (13 de octubre de 2026): «lona» con la «o» en forma de ring. */}<img src="/brand/lona/lona-logo.svg" alt="" className="logo-lona" width={68} height={35} /></Link>
+            <Link href="/" className="logo" aria-label="Lona, ir al inicio">{/* Logotipo oficial (13 de octubre de 2026): «lona» con la «o» en forma de ring. */}<img src="/brand/lona/lona-logo.svg" alt="" className="logo-lona" width={68} height={35} /><img src="/brand/lona/lona-logo-claro.svg" alt="" className="logo-lona-claro" width={68} height={35} /></Link>
             <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>

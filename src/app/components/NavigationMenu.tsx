@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import type { SeccionMenu } from "../../lib/accounts/menu";
+import SelectorTema from "./SelectorTema";
 
 /** Las secciones llegan ya filtradas por tipo de cuenta (src/lib/accounts/menu.ts). */
 type Props = {
@@ -114,6 +115,7 @@ export default function NavigationMenu({ secciones, logoutForm }: Props) {
                   </section>
                 ))}
               </nav>
+              <SelectorTema />
             </div>
           </dialog>,
           document.body,

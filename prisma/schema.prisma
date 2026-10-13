@@ -551,6 +551,38 @@ model AuditLog {
   @@index([userId])
 }
 
+// Registro de fallos de la aplicación (13 de octubre de 2026, petición del fundador: «es muy importante que esos fallos queden registrados […]
+// para saber qué ha estado ocurriendo a lo largo de la historia»). Un mismo fallo repetido suma en `count` (misma `fingerprint`) en vez de
+// duplicarse; nunca se borra. Moderación lo revisa en /moderacion/fallos, le pone estado y una nota de causa y solución, y cada cambio queda
+// en AuditLog (entity APP_ERROR). Si un fallo resuelto vuelve a pasar, se reabre solo. Detalle: docs/MODERACION.md.
+enum AppErrorStatus {
+  OPEN // sin revisar
+  INVESTIGATING // alguien lo está mirando
+  RESOLVED // corregido (con nota)
+  IGNORED // no es un fallo nuestro o no tiene arreglo (con nota)
+}
+
+model AppError {
+  id           String         @id @default(cuid())
+  fingerprint  String         @unique
+  origin       String // PAGINA | ACCION | RUTA | CLIENTE | CORREO | AVISOS | TAREA | SERVIDOR (lib/common/fallos.ts)
+  message      String
+  stack        String?
+  path         String?
+  digest       String?
+  role         String? // tipo de cuenta de quien lo sufrió la última vez (sin datos personales)
+  count        Int            @default(1)
+  firstSeenAt  DateTime       @default(now())
+  lastSeenAt   DateTime       @default(now())
+  status       AppErrorStatus @default(OPEN)
+  note         String?
+  resolvedById String?
+  resolvedAt   DateTime?
+
+  @@index([status, lastSeenAt])
+  @@index([lastSeenAt])
+}
+
 // Aviso de un usuario sobre un dato que cree incorrecto (combate o ficha). Lo revisa un moderador.
 model Report {
   id             String       @id @default(cuid())

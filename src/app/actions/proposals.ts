@@ -15,11 +15,12 @@ import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
 import { PROPOSAL_KIND_LABEL, PROPOSAL_REPLY_MAX, PROPOSALS_PER_DAY, parseProposal, puedeCancelarPropuesta, puedeResponderPropuesta } from "../../lib/fighters/proposals";
 import { checkLengths, go, str, withLock } from "./shared";
+import { registrarFallo } from "../../lib/common/fallos";
 
 /** Correo después de responder (`after`): un proveedor lento no deja el botón colgado. Al contestarlo, le llega a la otra persona. */
 function avisar(correo: string, asunto: string, texto: string, responderA: string) {
   after(async () => {
-    try { await sendMail(correo, asunto, texto, { replyTo: responderA }); } catch (e) { console.error(`[propuestas] no se pudo enviar «${asunto}»: ${e instanceof Error ? e.message : String(e)}`); }
+    try { await sendMail(correo, asunto, texto, { replyTo: responderA }); } catch (e) { await registrarFallo({ origen: "CORREO", contexto: `No se pudo enviar el correo «${asunto}»`, error: e }); }
   });
 }
 

@@ -33,9 +33,9 @@ export default async function Disciplina({ params }: { params: Promise<{ slug: s
               <span className="raya" aria-hidden="true" style={{ display: "block", width: 46, height: 6, borderRadius: 3, background: COLOR_DISCIPLINA[d] }} />
               <h1 id="titulo-disciplina" style={{ margin: 0 }}>{nombre}</h1>
             </div>
-            <span aria-hidden="true" style={{ color: "var(--acc)" }}><IconoDisciplina d={d} tam={72} grosor={1.4} /></span>
+            <span aria-hidden="true" style={{ color: "var(--acc-text)" }}><IconoDisciplina d={d} tam={72} grosor={1.4} /></span>
           </div>
-          <p className="meta" style={{ margin: 0, color: "rgba(255,255,255,.85)" }}>Noticias, veladas, peleadores y dónde entrenar, solo de {nombre}.</p>
+          <p className="meta" style={{ margin: 0, color: "rgba(var(--ink),.85)" }}>Noticias, veladas, peleadores y dónde entrenar, solo de {nombre}.</p>
         </section>
       }
     />

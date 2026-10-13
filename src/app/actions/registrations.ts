@@ -17,11 +17,12 @@ import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
 import { CATEGORIAS_MAX, REG_REPLY_MAX, REGISTRATIONS_PER_DAY, categoriaSinSitio, claveCategoria, inscripcionAbierta, ocupacion, parsePlazas, parseRegistration, parseRegistrationSettings, puedeResponderInscripcion, puedeRetirarInscripcion } from "../../lib/events/registrations";
 import { checkLengths, go, ownEvent, str, withLock } from "./shared";
+import { registrarFallo } from "../../lib/common/fallos";
 
 /** Correo después de responder (`after`): un proveedor lento no deja el botón colgado. Al contestarlo, le llega a `responderA`. */
 function avisar(correo: string, asunto: string, texto: string, responderA?: string) {
   after(async () => {
-    try { await sendMail(correo, asunto, texto, { replyTo: responderA }); } catch (e) { console.error(`[inscripciones] no se pudo enviar «${asunto}»: ${e instanceof Error ? e.message : String(e)}`); }
+    try { await sendMail(correo, asunto, texto, { replyTo: responderA }); } catch (e) { await registrarFallo({ origen: "CORREO", contexto: `No se pudo enviar el correo «${asunto}»`, error: e }); }
   });
 }
 

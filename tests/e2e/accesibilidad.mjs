@@ -8,9 +8,16 @@ import { datosDeAlta, B, rnd, browser, btn, hoyMadrid, registrar, newUser, hacer
 const problemas = [];
 async function analizar(page, ruta, etiqueta) {
   await page.goto(B + ruta);
-  const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
-  for (const v of r.violations) problemas.push({ pantalla: etiqueta ?? ruta, regla: v.id, impacto: v.impact, ayuda: v.help, nodos: v.nodes.length, ejemplo: v.nodes[0]?.html?.slice(0, 140) });
-  console.log(`${r.violations.length === 0 ? "OK  " : "FALLA"} ${etiqueta ?? ruta} (${r.violations.length} reglas incumplidas)`);
+  // Cada pantalla se mide en los dos temas (13 de octubre de 2026): el claro y el oscuro, que siguen al sistema.
+  for (const tema of ["light", "dark"]) {
+    await page.emulateMedia({ colorScheme: tema });
+    await page.waitForTimeout(tema === "dark" ? 600 : 0); // deja terminar las transiciones de color antes de medir el contraste
+    const nombre = `${etiqueta ?? ruta}${tema === "dark" ? " [oscuro]" : " [claro]"}`;
+    const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+    for (const v of r.violations) problemas.push({ pantalla: nombre, regla: v.id, impacto: v.impact, ayuda: v.help, nodos: v.nodes.length, ejemplo: v.nodes[0]?.html?.slice(0, 140) });
+    console.log(`${r.violations.length === 0 ? "OK  " : "FALLA"} ${nombre} (${r.violations.length} reglas incumplidas)`);
+  }
+  await page.emulateMedia({ colorScheme: "light" });
 }
 
 // Datos: un peleador con un combate, una velada, un gimnasio y un organizador para tener fichas que analizar
