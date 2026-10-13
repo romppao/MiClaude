@@ -63,7 +63,11 @@ async function auditar(p, perfil, papel, ruta) {
       const b = el.getBoundingClientRect();
       // .desliza-fila: el selector de deporte de las portadas se desliza a propósito (sus enlaces se alcanzan con el tabulador).
       // .pestanas-pista y .pestanas-barra: las secciones en pestañas se deslizan a los lados a propósito (components/Pestanas.tsx).
-      if (b.right > ancho + 1 && !el.closest(".table-wrap, [role=region][tabindex], .desliza-fila, .pestanas-pista, .pestanas-barra, pre, code, dialog")) { out.push(`sale por la derecha de la pantalla (${Math.round(b.right)} px): ${desc(el)}`); break; }
+      // Lo que recorta un contenedor (overflow distinto de visible) no se ve: cuenta el borde derecho visible, no el del dibujo entero
+      // (por ejemplo, el dibujo decorativo de una noticia sin foto, .cubierta-generada, recortado por su tarjeta).
+      let derecha = b.right;
+      for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) if (getComputedStyle(a).overflowX !== "visible") derecha = Math.min(derecha, a.getBoundingClientRect().right);
+      if (derecha > ancho + 1 && !el.closest(".table-wrap, [role=region][tabindex], .desliza-fila, .pestanas-pista, .pestanas-barra, pre, code, dialog")) { out.push(`sale por la derecha de la pantalla (${Math.round(derecha)} px): ${desc(el)}`); break; }
     }
     // Barra fija inferior que tape el final.
     const barra = document.querySelector(".mobile-nav");

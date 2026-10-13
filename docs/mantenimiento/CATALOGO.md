@@ -385,7 +385,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/integridad.mjs](../../tests/e2e/integridad.mjs) | Comprueba coherencia de datos y protección de acciones ante duplicados/operaciones indebidas en flujos reales. | [Contexto](OPERACION.md) | — | `0480ccf3d2c44a09` |
 | [tests/e2e/mapa.mjs](../../tests/e2e/mapa.mjs) | Prueba de navegador del mapa de gimnasios: marcadores, ubicación, más cercanos ordenados, sin permiso, dirección en el perfil y accesibilidad en los dos temas. | [Contexto](OPERACION.md) | — | `02a3da352265854c` |
 | [tests/e2e/menu.mjs](../../tests/e2e/menu.mjs) | Recorre el menú por tipo de cuenta (visitante, aficionado, moderación), destinos, foco con teclado y accesibilidad. | [Contexto](OPERACION.md) | — | `53f7d40fc3b4380c` |
-| [tests/e2e/movil.mjs](../../tests/e2e/movil.mjs) | Mide desbordes, tamaño de texto, zonas táctiles y navegación en emulaciones móviles; no acredita iOS/Android físicos. | [Contexto](OPERACION.md) | — | `c6874390ad0986f8` |
+| [tests/e2e/movil.mjs](../../tests/e2e/movil.mjs) | Mide desbordes, tamaño de texto, zonas táctiles y navegación en emulaciones móviles; no acredita iOS/Android físicos. | [Contexto](OPERACION.md) | — | `1d33bc9244e5a486` |
 | [tests/e2e/paneles.mjs](../../tests/e2e/paneles.mjs) | Recorre paneles de organización/moderación, solicitudes, permisos y el destino tras entrar (portada común). | [Contexto](OPERACION.md) | — | `a1ce034439e4dec4` |
 | [tests/e2e/perfiles.mjs](../../tests/e2e/perfiles.mjs) | Recorre edición de foto/banner, propietarios y visibilidad de perfiles e imágenes. | [Contexto](OPERACION.md) | — | `f25063c4e70323e4` |
 | [tests/e2e/plazas.mjs](../../tests/e2e/plazas.mjs) | Prueba de navegador de las plazas por categoría, la lista de espera y la ayuda para emparejar. | [Contexto](OPERACION.md) | — | `546e7cbf20c283aa` |
@@ -448,7 +448,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
 | [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `d04ddc73375eeef3` |
-| [scripts/avisos-ci.mjs](../../scripts/avisos-ci.mjs) | En el CI, si fallan las pruebas de navegador, resume en un solo aviso los fallos y el texto de las páginas guardadas en test-results, para leerlo desde el PR. | [Contexto](OPERACION.md) | — | `d91fcb355f8cbddc` |
+| [scripts/avisos-ci.mjs](../../scripts/avisos-ci.mjs) | En el CI, si fallan las pruebas de navegador, resume en un solo aviso los fallos y el texto de las páginas guardadas en test-results, para leerlo desde el PR. | [Contexto](OPERACION.md) | — | `c353dd2c21e060f9` |
 | [scripts/copiar-maplibre.mjs](../../scripts/copiar-maplibre.mjs) | Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo. | [Contexto](OPERACION.md) | — | `3b0d17cb0d995776` |
 | [scripts/corregir-escalera.sh](../../scripts/corregir-escalera.sh) | Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto. | [Contexto](OPERACION.md) | — | `f39d6ef23d821f8a` |
 | [scripts/demo.sh](../../scripts/demo.sh) | Prepara/prueba una demostración local con base ficticia y comprobaciones de entorno. | [Contexto](OPERACION.md) | — | `8f3041505f3e1d30` |

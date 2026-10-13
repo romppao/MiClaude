@@ -6,7 +6,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 
 const registro = process.argv[2];
 const lineas = registro && existsSync(registro) ? readFileSync(registro, "utf8").split("\n") : [];
-const fallos = lineas.filter((l) => /^(FAIL|FALLO)\b|^\w*Error\b|^\s+at .*tests\/e2e\//.test(l)).slice(0, 30);
+const fallos = lineas.filter((l) => /^(FAIL|FALLO)\b|^\w*Error\b|^\s+at .*tests\/e2e\/|^\s+- /.test(l)).slice(0, 40);
 const paginas = existsSync("test-results") ? readdirSync("test-results").filter((f) => f.endsWith(".html")).slice(0, 6) : [];
 const textoDe = (html) => html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, " ").replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/g, " ").replace(/\s+/g, " ").trim();
 const partes = [`Fallos (${fallos.length}):`, ...fallos];
