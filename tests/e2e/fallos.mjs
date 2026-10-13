@@ -75,16 +75,18 @@ check("y la reapertura queda en el historial", (await db.auditLog.count({ where:
 const p = await (await browser.newContext({ colorScheme: "dark" })).newPage();
 await p.goto(B + "/");
 const fondo = () => p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+// Se espera al estado (como pide seen()): leerlo en un instante fijo falló una vez en el CI, más lento que el ordenador local.
+const temaEs = (tema, color) => p.waitForFunction(([t, c]) => document.documentElement.dataset.tema === t && getComputedStyle(document.body).backgroundColor === c, [tema, color], { timeout: 5000 }).then(() => true, () => false);
 check("sin elegir nada, sigue el tema del sistema (oscuro)", (await fondo()) === "rgb(10, 10, 12)");
 await p.getByRole("button", { name: "Menú" }).click();
 await p.locator(".selector-tema label", { hasText: "Claro" }).click();
-check("al elegir «Claro» la página se vuelve clara", (await p.evaluate(() => document.documentElement.dataset.tema)) === "claro" && (await fondo()) === "rgb(244, 242, 236)");
+check("al elegir «Claro» la página se vuelve clara", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.reload();
-check("la elección se recuerda al volver", (await p.evaluate(() => document.documentElement.dataset.tema)) === "claro" && (await fondo()) === "rgb(244, 242, 236)");
+check("la elección se recuerda al volver", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.getByRole("button", { name: "Menú" }).click();
 check("el menú muestra la opción elegida", await p.getByRole("radio", { name: "Claro" }).isChecked());
 await p.locator(".selector-tema label", { hasText: "Automático" }).click();
-check("«Automático» vuelve al tema del sistema", (await p.evaluate(() => document.documentElement.dataset.tema)) === undefined && (await fondo()) === "rgb(10, 10, 12)");
+check("«Automático» vuelve al tema del sistema", await temaEs(undefined, "rgb(10, 10, 12)"));
 
 await terminarDiagnosticos();
 await db.$disconnect();
