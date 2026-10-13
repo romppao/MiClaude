@@ -81,7 +81,10 @@ jobs:
           npx next start -p 3111 > "$MAIL_LOG" 2>&1 &
           npx wait-on -t 60000 http://localhost:3111/registro
       - name: Prueba de extremo a extremo
-        run: npm run test:e2e
+        # Los fallos («FAIL»/«FALLO») y errores se publican también como avisos del CI, para leerlos en el PR sin descargar el registro.
+        run: |
+          set -o pipefail; mkdir -p test-results
+          npm run test:e2e 2>&1 | tee test-results/e2e.log || { grep -E "^(FAIL|FALLO)|Error|rror:" -A3 test-results/e2e.log | head -40 | sed 's/^/::error::/'; exit 1; }
       - name: Medición de accesibilidad (WCAG 2.2 AA)
         run: npm run test:a11y
       - name: Comprobar experiencia gráfica en una demo independiente
