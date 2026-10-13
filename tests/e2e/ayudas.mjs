@@ -135,6 +135,10 @@ export const registrar = async (p, o) => {
   // El enlace de respaldo está en «Más datos del combate (opcional)»: se abre como lo haría una persona.
   const mas = form.locator("details.opcionales"); if (!(await mas.evaluate((d) => d.open))) await mas.locator("summary").click();
   await form.locator("[name=evidenceUrl]").fill(o.evidencia ?? "");
+  const invalidados = await form.evaluate((f) => [...f.elements]
+    .filter((e) => e.willValidate && !e.checkValidity())
+    .map((e) => `${e.name || e.tagName}: ${e.validationMessage}`));
+  if (invalidados.length) throw new Error(`El formulario de combate no es válido: ${invalidados.join("; ")}`);
   const guardar = form.getByRole("button", { name: "Registrar este combate", exact: true });
   if (o.dobleClic) await guardar.dblclick(); else await guardar.click();
 };
