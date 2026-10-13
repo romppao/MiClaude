@@ -14,6 +14,7 @@ export const MANIFEST = "docs/catalogo-codigo.json";
 export const OUTPUT = "docs/mantenimiento/CATALOGO.md";
 const ROOT_SPECIAL = new Set([".env.example", ".gitignore", "Dockerfile", "Makefile"]);
 const ROOT_SOURCE = /\.(?:[cm]?[jt]sx?|json|ya?ml|toml|sh|sql|css|html|py|go|rs|rb|java)$/;
+const ROOT_GENERATED = new Set(["next-env.d.ts"]);
 const ROOT_DIRS = ["src", "prisma", "scripts", "tests", ".github"];
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const portable = (p) => p.split(path.sep).join("/");
@@ -32,7 +33,7 @@ export function maintainedFiles(root) {
     });
   }
   const rootFiles = fs.readdirSync(root, { withFileTypes: true }).filter((e) =>
-    e.isFile() && (ROOT_SPECIAL.has(e.name) || (!/^\.env(?:\.|$)/.test(e.name) && ROOT_SOURCE.test(e.name))),
+    e.isFile() && !ROOT_GENERATED.has(e.name) && (ROOT_SPECIAL.has(e.name) || (!/^\.env(?:\.|$)/.test(e.name) && ROOT_SOURCE.test(e.name))),
   ).map((e) => e.name);
   return [...rootFiles, ...ROOT_DIRS.flatMap(walk)].sort(compare);
 }

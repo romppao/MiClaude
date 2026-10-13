@@ -35,11 +35,6 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
-    "path": "next-env.d.ts",
-    "purpose": "Referencias de tipos generadas para Next.js; se mantiene mínima y alineada con la configuración del proyecto.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
     "path": "next.config.mjs",
     "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción.",
     "guide": "docs/mantenimiento/OPERACION.md"

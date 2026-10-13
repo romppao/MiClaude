@@ -52,7 +52,7 @@ test("incluye código, pruebas, scripts, migraciones y configuración; excluye d
   const { root, write } = fixture(t);
   const included = ["tests/unit/regla.test.ts", "scripts/herramienta.sh", "prisma/migrations/001/migration.sql", ".github/workflows/ci.yml", "package-lock.json", ".env.example", "config-nueva.mjs", "Dockerfile"];
   for (const p of included) write(p, "fuente\n");
-  for (const p of [".env", ".env.local.json", "public/foto.webp", "node_modules/tercero.js", "docs/ingreso/aislado/reto.ts"]) write(p, "excluido\n");
+  for (const p of [".env", ".env.local.json", "next-env.d.ts", "public/foto.webp", "node_modules/tercero.js", "docs/ingreso/aislado/reto.ts"]) write(p, "excluido\n");
   assert.deepEqual(maintainedFiles(root), [...included, "src/lib/common/regla.ts"].sort());
 });
 
