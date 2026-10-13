@@ -135,6 +135,9 @@ export const registrar = async (p, o) => {
   // El enlace de respaldo está en «Más datos del combate (opcional)»: se abre como lo haría una persona.
   const mas = form.locator("details.opcionales"); if (!(await mas.evaluate((d) => d.open))) await mas.locator("summary").click();
   await form.locator("[name=evidenceUrl]").fill(o.evidencia ?? "");
+  const nivel = form.locator("select[name=level]");
+  await nivel.selectOption(o.nivel ?? "AMATEUR");
+  if (await nivel.inputValue() !== (o.nivel ?? "AMATEUR")) throw new Error("No se pudo fijar el nivel del combate antes de enviarlo.");
   const invalidados = await form.evaluate((f) => [...f.elements]
     .filter((e) => e.willValidate && !e.checkValidity())
     .map((e) => `${e.name || e.tagName}: ${e.validationMessage}`));

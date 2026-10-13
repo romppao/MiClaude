@@ -2,10 +2,11 @@
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import AxeBuilder from '@axe-core/playwright';
-import { B, rnd, browser, newUser, btn, check, seen, terminarDiagnosticos } from './ayudas.mjs';
+import { B, rnd, browser, newUser, btn, check, seen, datosDeAlta, terminarDiagnosticos } from './ayudas.mjs';
 const db = new PrismaClient();
 const own = await newUser('Perfil', 'FIGHTER');
 await own.p.goto(B + '/mi-ficha');
+await datosDeAlta(own.p);
 await own.p.fill('[name=firstName]', 'Perfil');
 await own.p.fill('[name=lastName]', `Personal${rnd}`);
 await own.p.selectOption('select[name=discipline]', 'JIUJITSU');
