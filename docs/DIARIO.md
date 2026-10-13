@@ -1479,3 +1479,18 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué falta:** que el fundador elija; comprobar el registro de «Lona» como marca, el dominio y los nombres en las tiendas (no se ha comprobado nada); y que un diseñador humano dibuje el logotipo definitivo. Detalle en `DISENO.md`.
 
 **Nota:** «Lona» no aparecía en la documentación anterior. Si el fundador lo propuso en otra conversación, aquí queda recogido desde ahora.
+
+## 13 de octubre de 2026 — Elegido el logotipo: B · Cuadrilátero (Claude)
+
+**Qué se pidió** (el fundador): «Definitivamente me quedo con la B, la del cuadrilátero, en la cual la O se hace como una especie de ring. Vamos a tirar con esa.»
+
+**Qué se hizo:**
+- Se preparó la versión oficial en archivos: logotipo para fondo oscuro y claro, símbolo e icono de la app en SVG y PNG.
+- Las letras van convertidas en trazados con un guion propio (`scripts/generar-logo-lona.py`), así que el logotipo se ve igual en cualquier sitio.
+- Se descargaron las fuentes de Bricolage Grotesque, con su licencia libre.
+- Se separó un poco el ring de las letras: en la maqueta, los postes llegaban a tocar la «l» y la «n».
+
+**Qué falta:**
+- Confirmar con el fundador cuándo se cambia el nombre en la app; todavía no se ha tocado.
+- Comprobar el registro de la marca.
+- La revisión de un diseñador.

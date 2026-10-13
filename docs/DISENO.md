@@ -207,3 +207,26 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
   - **G · La L vendada:** la L envuelta como una venda de mano, con la última vuelta en violeta. Letra Big Shoulders Display.
   - **H · La L en movimiento:** una L inclinada con la estela de un golpe. Letra Archivo cursiva y gruesa.
 - Siguen pendientes la elección del fundador, la comprobación de la marca y el dibujo final por un diseñador.
+
+### 13 de octubre de 2026 — Decisión: logotipo B · Cuadrilátero
+
+**El fundador:** «Definitivamente me quedo con la opción de las propuestas iniciales, la **B, la del cuadrilátero**, en la cual la O se hace como una especie de ring. Vamos a tirar con esa. Es la que más me ha gustado.»
+
+**Elegido:**
+- **Logotipo:** «lona» en minúsculas, y la «o» es el ring visto desde arriba: la lona en lima, la cuerda interior en negro y cuatro postes, dos en violeta y dos en blanco (en negro sobre fondo claro).
+- **Tipografía de marca:** **Bricolage Grotesque** (licencia libre SIL OFL) para el nombre y los titulares; **Archivo** sigue para el texto.
+- **Colores:** los ya aprobados: negro `#0A0A0C`, lima `#D4F67C` y violeta `#BE33F5`.
+
+**Descartado:** A (Esquina), C (Cuerdas), D (Cartel) y las cuatro de la L (E–H). Quedan en la hoja de propuestas como referencia.
+
+**Archivos oficiales** (`public/brand/lona/`, generados con `scripts/generar-logo-lona.py`; las letras van convertidas en trazados, así que no dependen de tener la fuente instalada):
+- `lona-logo.svg` (fondo oscuro) y `lona-logo-claro.svg` (fondo claro);
+- `lona-simbolo.svg` y `lona-simbolo-claro.svg`, solo el ring;
+- `lona-icono.svg` y los PNG de 1024, 512, 192, 180 y 32 px para las tiendas, el móvil y la pestaña del navegador.
+- Las fuentes Bricolage Grotesque están en `public/brand/` con su licencia (`BricolageGrotesque-OFL.txt`).
+- Ajuste respecto a la maqueta: el ring es algo más pequeño (90 % de la altura de las minúsculas) y deja aire con la «l» y la «n», para que los postes no toquen las letras.
+
+**Sigue pendiente:**
+- Comprobar el registro de «Lona» como marca (OEPM y EUIPO), el dominio y los nombres en las tiendas.
+- Que un diseñador humano revise y pula el dibujo final.
+- Cambiar el nombre en la app: «Ring España» → «Lona», junto con el logotipo de la cabecera, el icono, los títulos, los correos y el manifiesto. Se hará cuando el fundador lo confirme.

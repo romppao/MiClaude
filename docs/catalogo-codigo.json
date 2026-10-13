@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/README.md"
   },
   {
+    "path": "scripts/generar-logo-lona.py",
+    "purpose": "Genera el logotipo oficial de Lona (dirección B · Cuadrilátero) en SVG con las letras convertidas en trazados, y los símbolos e icono, en public/brand/lona.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
     "guide": "docs/mantenimiento/OPERACION.md"

@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **324 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **325 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -429,5 +429,6 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [scripts/demo.sh](../../scripts/demo.sh) | Prepara/prueba una demostración local con base ficticia y comprobaciones de entorno. | [Contexto](OPERACION.md) | — | `3b95280daab25f98` |
 | [scripts/entorno-aislado.sh](../../scripts/entorno-aislado.sh) | Gestiona base y servidor propios por nombre/puerto para que asistentes no compartan datos de pruebas. | [Contexto](OPERACION.md) | — | `e5d3605c8894ae1e` |
 | [scripts/generar-catalogo.mjs](../../scripts/generar-catalogo.mjs) | Contrasta cada archivo mantenido con explicación individual y guía, genera índice determinista con huellas y rechaza cobertura/salida desactualizada. | [Contexto](README.md) | `MANIFEST`, `OUTPUT`, `maintainedFiles`, `validateCatalog`, `renderCatalog`, `run` | `a683bdcb2c928fd6` |
+| [scripts/generar-logo-lona.py](../../scripts/generar-logo-lona.py) | Genera el logotipo oficial de Lona (dirección B · Cuadrilátero) en SVG con las letras convertidas en trazados, y los símbolos e icono, en public/brand/lona. | [Contexto](OPERACION.md) | — | `3f14f95f4215ab4c` |
 | [scripts/generar-mapa.mjs](../../scripts/generar-mapa.mjs) | Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada. | [Contexto](OPERACION.md) | — | `c9fceeae2a0cd69d` |
 | [scripts/vitest.escalera.config.mts](../../scripts/vitest.escalera.config.mts) | Configuración unitaria separada para retos de ingreso; no forma parte de la batería funcional de la aplicación. | [Contexto](OPERACION.md) | — | `8befcd84acf5599a` |

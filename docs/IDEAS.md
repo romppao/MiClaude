@@ -330,4 +330,4 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 
 ## Nombre y marca — 13 de octubre de 2026
 
-- **Nombre «Lona»** (el fundador: «la lona del ring»). Estado: **propuesto por el fundador**, con cuatro direcciones de logotipo y tipografía preparadas (`DISENO.md`, sección del 13 de octubre). Falta comprobar el registro de marca (OEPM y EUIPO), el dominio y los nombres en las tiendas, y que el fundador elija una dirección. «Ring España» sigue siendo el nombre de trabajo hasta entonces.
+- **Nombre «Lona»** (el fundador: «la lona del ring»). Estado: **elegido el logotipo (B · Cuadrilátero, 13 oct)**; antes, propuesto por el fundador, con cuatro direcciones de logotipo y tipografía preparadas (`DISENO.md`, sección del 13 de octubre). Falta comprobar el registro de marca (OEPM y EUIPO), el dominio y los nombres en las tiendas, y que el fundador elija una dirección. «Ring España» sigue siendo el nombre de trabajo hasta entonces.
