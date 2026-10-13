@@ -106,7 +106,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/components/experience/MotionRuntime.tsx](../../src/app/components/experience/MotionRuntime.tsx) | Gestiona contextos GSAP, revelado por lotes e inclinación con limpieza. | [Contexto](../EXPERIENCIA-ELITE.md) | `MotionRuntime` | `fde98ff18cc079c6` |
 | [src/app/components/experience/ShaderAmbient.tsx](../../src/app/components/experience/ShaderAmbient.tsx) | Malla y estela WebGPU de paleta explícita, sin telemetría y con fallback. | [Contexto](../EXPERIENCIA-ELITE.md) | `ShaderAmbient` | `6af7b28de0015610` |
 | [src/app/components/informarFallo.ts](../../src/app/components/informarFallo.ts) | Envía al registro un fallo ocurrido en el navegador (máximo tres por página); omite los del servidor, que ya llegan solos. | [Contexto](../MODERACION.md) | `informarFallo` | `8b68c61210f50148` |
-| [src/app/components/mapa/base.ts](../../src/app/components/mapa/base.ts) | Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor. | [Contexto](../DISENO.md) | `ESTILO_MAPA`, `crearMapa` | `2f9f90302c86ca68` |
+| [src/app/components/mapa/base.ts](../../src/app/components/mapa/base.ts) | Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor. | [Contexto](../DISENO.md) | `ESTILO_MAPA`, `crearMapa` | `4b29d1600a7f6072` |
 
 ## Configuración y automatización
 
