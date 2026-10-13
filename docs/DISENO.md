@@ -195,3 +195,15 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - **Comprobar que «Lona» se puede registrar como marca:** en la OEPM (España) y la EUIPO (UE), en las clases de aplicaciones y de servicios deportivos. También el dominio y el nombre en App Store y Google Play. **No se ha comprobado nada todavía.** Que la palabra sea común puede dificultar el registro en solitario; quizá haga falta una forma compuesta («Lona App», «Lona Fight»…).
 - **Que un diseñador humano dibuje la versión final** del logotipo e icono a partir de la dirección elegida (recomendación de siempre en este documento).
 - Cuando el fundador elija, documentar aquí qué se eligió y qué se descartó. Después, cambiar el nombre en la app («Ring España» aparece en textos, correos, títulos y manifiesto): es un cambio grande y se planifica aparte.
+
+### 13 de octubre de 2026 (continuación) — La L como icono
+
+**El fundador:** «Me gusta la del **cuadrilátero**, vamos a guardarla ahí por el momento. Quiero que sigas desarrollando otras en las que la letra **L**, la primera de Lona, sea la protagonista […] un toque que sea como el icono de la marca.»
+
+- **Guardada:** B · Cuadrilátero (la «o» es el ring visto desde arriba).
+- **Nuevas, con la L como icono** (misma hoja de propuestas, fila «La L como icono de la marca»):
+  - **E · La L en la lona:** continúa la del cuadrilátero; la L va recortada en la lona, entre los cuatro postes. Letra Bricolage Grotesque, en minúsculas.
+  - **F · La L de campeón:** la L en la placa central de un cinturón, con las correas en violeta. Letra Archivo ancha.
+  - **G · La L vendada:** la L envuelta como una venda de mano, con la última vuelta en violeta. Letra Big Shoulders Display.
+  - **H · La L en movimiento:** una L inclinada con la estela de un golpe. Letra Archivo cursiva y gruesa.
+- Siguen pendientes la elección del fundador, la comprobación de la marca y el dibujo final por un diseñador.
