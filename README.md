@@ -1,4 +1,4 @@
-# Ring España
+# Lona
 
 Comunidad y base de datos de los **deportes de contacto de toda España**: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai,
 amateur y profesional. Fichas de peleadores con su récord, calendario de veladas, gimnasios,

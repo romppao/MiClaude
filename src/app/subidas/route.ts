@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   if (!user) return error(401, "Tu sesión ha caducado. Vuelve a entrar para subir el vídeo.");
   if (!user.emailVerifiedAt) return error(403, "Confirma tu correo electrónico para poder subir vídeos.");
   const almacen = almacenDeVideos();
-  if (!almacen) return error(503, "Ahora mismo no se pueden subir vídeos a Ring España. Pega un enlace de YouTube, Instagram o TikTok.");
+  if (!almacen) return error(503, "Ahora mismo no se pueden subir vídeos a Lona. Pega un enlace de YouTube, Instagram o TikTok.");
   const datos = (await request.json().catch(() => null)) as { tipo?: unknown; bytes?: unknown } | null;
   const tipo = typeof datos?.tipo === "string" ? datos.tipo : "";
   const bytes = typeof datos?.bytes === "number" ? datos.bytes : 0;

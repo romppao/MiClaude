@@ -15,7 +15,7 @@ const p = await (
 await p.goto(B + "/");
 const open = () => p.getByRole("button", { name: "Menú", exact: true });
 const dialog = () =>
-  p.getByRole("dialog", { name: "Explora Ring España", exact: true });
+  p.getByRole("dialog", { name: "Explora Lona", exact: true });
 await open().click();
 // Decisión del fundador (8 de octubre de 2026): el menú solo muestra las opciones del tipo de cuenta. El visitante: empezar, explorar y ayuda.
 check(

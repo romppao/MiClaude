@@ -74,7 +74,7 @@ export async function decideClaim(f: FormData) {
   revalidatePath("/", "layout");
   const nombreFicha = `${claim.fighter.firstName} ${claim.fighter.lastName}`;
   after(async () => {
-    await notifyDecision(claim.userId, approved ? "Tu solicitud de ficha en Ring España ha sido aprobada" : "Tu solicitud de ficha en Ring España no se ha aprobado",
+    await notifyDecision(claim.userId, approved ? "Tu solicitud de ficha en Lona ha sido aprobada" : "Tu solicitud de ficha en Lona no se ha aprobado",
       approved ? `Un moderador ha aprobado tu solicitud: la ficha de ${nombreFicha} ya es tuya. Puedes verla y corregir sus datos aquí: ${APP_URL}/mi-ficha`
         : `Un moderador no ha podido aprobar tu solicitud para reclamar la ficha de ${nombreFicha}.${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nSi crees que es un error, puedes enviar otra solicitud con más información aquí: ${APP_URL}/mi-ficha`);
   });
@@ -106,7 +106,7 @@ export async function decideOrganizer(f: FormData) {
   }));
   revalidatePath("/", "layout");
   after(async () => {
-    await notifyDecision(req.userId, approve ? "Ya puedes publicar veladas en Ring España" : "Tu solicitud de organizador en Ring España no se ha aprobado",
+    await notifyDecision(req.userId, approve ? "Ya puedes publicar veladas en Lona" : "Tu solicitud de organizador en Lona no se ha aprobado",
       approve ? `Un moderador ha aprobado tu solicitud como organizador de «${oneLine(req.orgName)}». Ya puedes crear veladas y montar sus carteles aquí: ${APP_URL}/organizador${req.kind === "FEDERACION" ? `\n\nTu federación ya tiene su perfil en el directorio: puedes completarlo desde Mi cuenta o en ${APP_URL}/federaciones` : ""}`
         : `Un moderador no ha podido aprobar tu solicitud como organizador de «${oneLine(req.orgName)}».${note ? ` Motivo: ${oneLine(note)}.` : ""}\n\nPuedes enviar otra solicitud con más información aquí: ${APP_URL}/organizador`);
   });

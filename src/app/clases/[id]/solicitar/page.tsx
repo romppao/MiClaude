@@ -52,7 +52,7 @@ export default async function SolicitarClase({ params, searchParams }: { params:
           {c.kind === "GROUP" && <p className="hint" style={{ margin: 0 }}>Horario de la clase: {c.schedule}. Elige el día en que quieres empezar.</p>}
           <label className="field"><span>¿Algo importante que deba saber el entrenador? (opcional)</span><textarea name="message" defaultValue={previo("message")} maxLength={REQUEST_MESSAGE_MAX} rows={2} placeholder="Tu nivel, una lesión, si es tu primera clase…" /></label>
           <label className="field"><span>Teléfono (opcional)</span><input name="phone" defaultValue={previo("phone")} type="tel" inputMode="tel" autoComplete="tel" maxLength={REQUEST_PHONE_MAX} /><span className="hint">Solo si prefieres que te llame o te escriba por teléfono.</span></label>
-          <p className="mut" style={{ margin: 0 }}>{c.trainer.name} verá tu nombre, tu correo electrónico y lo que escribas aquí, y te responderá aquí y por correo. Si acepta, podréis escribiros por correo. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>
+          <p className="mut" style={{ margin: 0 }}>{c.trainer.name} verá tu nombre, tu correo electrónico y lo que escribas aquí, y te responderá aquí y por correo. Si acepta, podréis escribiros por correo. La clase se paga directamente al entrenador: Lona no cobra nada.</p>
           <button className="btn-grande">Solicitar la clase</button>
         </form>
       )}

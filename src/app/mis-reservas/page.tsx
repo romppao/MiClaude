@@ -29,7 +29,7 @@ export default async function MisReservas() {
           <div className="meta">Propusiste: {r.preferred}</div>
           {r.reply && <p style={{ margin: 0 }}><strong>Respuesta de {r.class.trainer.name}:</strong> {r.reply}</p>}
           {/* Aceptada: ya se pueden escribir. El correo del entrenador solo se enseña a quien tiene una clase aceptada con él o ella. */}
-          {r.status === "ACCEPTED" && <p className="mut" style={{ margin: 0 }}>Para hablar con {r.class.trainer.name}{r.class.trainer.user ? <>, escribe a <a href={`mailto:${r.class.trainer.user.email}`}>{r.class.trainer.user.email}</a> o</> : ","} responde al correo de la respuesta. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>}
+          {r.status === "ACCEPTED" && <p className="mut" style={{ margin: 0 }}>Para hablar con {r.class.trainer.name}{r.class.trainer.user ? <>, escribe a <a href={`mailto:${r.class.trainer.user.email}`}>{r.class.trainer.user.email}</a> o</> : ","} responde al correo de la respuesta. La clase se paga directamente al entrenador: Lona no cobra nada.</p>}
           {r.status === "DECLINED" && <p className="mut" style={{ margin: 0 }}>Puedes <Link href={`/clases/${r.classId}/solicitar`}>solicitarla otra vez con otras fechas</Link> o buscar otro entrenador.</p>}
           {puedeCancelar(r.status) && (
             <form action={cancelClassRequest} style={{ paddingTop: 10, borderTop: "1px solid var(--line)" }}>

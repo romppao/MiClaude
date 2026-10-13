@@ -16,7 +16,7 @@ const getGym = cache((slug: string) => db.gym.findUnique({ where: { slug }, incl
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const gym = await getGym((await params).slug);
   if (!gym) return { title: "Gimnasio no encontrado" };
-  return { title: gym.name, description: `${gym.name}, gimnasio de deportes de contacto en ${gym.city} (${gym.province}): entrenadores y peleadores en Ring España.` };
+  return { title: gym.name, description: `${gym.name}, gimnasio de deportes de contacto en ${gym.city} (${gym.province}): entrenadores y peleadores en Lona.` };
 }
 
 export default async function GymPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -31,7 +31,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       <h2>Entrenadores</h2>
       {gym.trainers.length === 0 ? <p className="mut">Este gimnasio todavía no tiene entrenadores registrados.</p> : <ul>{gym.trainers.map((t) => <li key={t.id}><Link href={`/entrenadores/${t.slug}`}>{t.name}</Link></li>)}</ul>}
       <h2>Peleadores</h2>
-      {gym.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este gimnasio en Ring España.</p>}
+      {gym.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este gimnasio en Lona.</p>}
       <div className="grid">
         {gym.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">{b.disciplines.map(d => <span key={d.discipline} className={`tag ${d.level}`}>{DISCIPLINE_LABEL[d.discipline]} · {LEVEL_LABEL[d.level]}</span>)}<ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>

@@ -48,7 +48,7 @@ const HALLAZGOS = {
   required: ['persona', 'objetivo_cumplido', 'resumen', 'hallazgos'],
 }
 
-const prompt = (p) => `Eres una persona de pruebas de la aplicación «Ring España» (comunidad de deportes de contacto: fichas de peleadores, récords, aura del público, veladas, gimnasios). Tu persona: «${p.titulo}» (sección ${p.n} del guion).
+const prompt = (p) => `Eres una persona de pruebas de la aplicación «Lona» (comunidad de deportes de contacto: fichas de peleadores, récords, aura del público, veladas, gimnasios). Tu persona: «${p.titulo}» (sección ${p.n} del guion).
 
 LEE PRIMERO, en /home/user/MiClaude: CLAUDE.md (reglas del fundador: la aplicación debe entenderse sin ayuda por cualquiera, con mensajes claros, nada de botones muertos ni pantallas mudas; todo en español) y docs/pruebas/personas.md (tu guion: sección ${p.n}, y la tabla «Qué se anota siempre»). Haz TODOS los pasos de tu sección, y los que se te ocurran como esa persona real. El fundador quiere funcionalidad perfecta: busca fallos, botones que no hacen lo que dicen, enlaces rotos, pantallas sin siguiente paso, mensajes que no ayudan, datos equivocados, cosas que una persona real no entendería.
 

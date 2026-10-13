@@ -56,7 +56,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
     const confirmarNueva = oneParam(sp.problema) === "ficha_con_tu_nombre"; // ya se le avisó de que existe una ficha con su nombre
     return (
       <>
-        <h1>¿Ya apareces en Ring España?</h1>
+        <h1>¿Ya apareces en Lona?</h1>
         <p className="mut">Si alguien ya registró un combate tuyo, tu ficha existe. Búscala y reclámala; un moderador la revisará.</p>
         <form className="search" role="search" aria-label="Buscar mi ficha"><label className="field"><span>Tu nombre o apellidos</span><input name="q" defaultValue={q} maxLength={80} /></label><button>Buscar mi ficha</button></form>
         {candidates.map((b) => pendiente.some((c) => c.fighterId === b.id) ? (

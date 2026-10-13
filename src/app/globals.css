@@ -1,5 +1,5 @@
 /*
- * Ring España · diseño móvil v3 (negro y lima). Fuente: entrega de Claude Design «Ring España App v3», aprobada por el fundador
+ * Lona · diseño móvil v3 (negro y lima). Fuente: entrega de Claude Design «Ring España App v3», aprobada por el fundador
  * el 7 de octubre de 2026. Decisiones y tokens en docs/DISENO.md («Diseño v3»).
  *
  * Organización: 1) fuentes · 2) tokens · 3) elementos base · 4) clases heredadas (todas las pantallas) · 5) cabecera, menú, pie y barra inferior
@@ -699,3 +699,4 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 @media(min-width:1024px) and (max-width:1279px){header.top .in{gap:10px 14px}header.top nav[aria-label=Principal] a[href="/entrenadores"]{display:none}header.top .cuenta .mi-panel-cabecera{display:none}header.top nav[aria-label=Principal]{gap:4px 14px}header.top .cuenta{gap:8px 12px}header.top form.buscador button,header.top .cuenta .btn,header.top .menu-open{padding-left:14px;padding-right:14px}}
 /* En escritorio no cabe el campo junto a la navegación y la cuenta: queda el botón «Buscar», que abre /buscar con su propio campo. */
 @media(min-width:1024px){header.top form.buscador{flex:0 0 auto;min-width:0}header.top form.buscador input{display:none}}
+.logo-lona{display:block;height:35px;width:auto}

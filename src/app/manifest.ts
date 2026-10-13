@@ -2,13 +2,12 @@ import type { MetadataRoute } from "next";
 
 /**
  * Manifiesto de la aplicación web (instalarla en el móvil desde el navegador). El icono es el oficial de la marca: el ring visto desde
- * arriba (decisión del fundador, 13 de octubre de 2026; archivos en public/brand/lona). El nombre sigue siendo el de trabajo hasta que
- * el fundador confirme el cambio a «Lona».
+ * arriba (decisión del fundador, 13 de octubre de 2026; archivos en public/brand/lona). Nombre oficial: Lona.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Ring España",
-    short_name: "Ring España",
+    name: "Lona",
+    short_name: "Lona",
     description: "La comunidad de deportes de contacto de toda España.",
     lang: "es",
     start_url: "/",

@@ -1,4 +1,4 @@
-# Documentación de Ring España
+# Documentación de Lona
 
 > **Entrada para un programador nuevo (8 oct 2026):** [manual de mantenimiento](mantenimiento/README.md), con contratos por módulo, flujos completos, modelo de datos, motivos técnicos, diagnóstico y [catálogo de cada archivo mantenido](mantenimiento/CATALOGO.md). Las actualizaciones vigentes de diseño se consultan en [DISENO.md](DISENO.md); el relevo de abajo conserva contexto histórico.
 

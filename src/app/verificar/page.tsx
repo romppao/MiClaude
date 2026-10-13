@@ -36,7 +36,7 @@ export default async function Verify({ searchParams }: { searchParams: Promise<{
     return (
       <>
         <h1>{confirmado ? "Tu correo electrónico está confirmado" : "Verificación del correo electrónico"}</h1>
-        <p>{confirmado ? "Ya está todo listo. Entra en tu cuenta para empezar a usar Ring España." : "Para confirmar tu correo electrónico o pedir un enlace nuevo, primero entra en tu cuenta."}</p>
+        <p>{confirmado ? "Ya está todo listo. Entra en tu cuenta para empezar a usar Lona." : "Para confirmar tu correo electrónico o pedir un enlace nuevo, primero entra en tu cuenta."}</p>
         <Ir a={entrar}>Entrar en mi cuenta</Ir>
       </>
     );

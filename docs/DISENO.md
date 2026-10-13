@@ -1,4 +1,4 @@
-# Dirección visual de Ring España
+# Dirección visual de Lona
 
 > **Prioridad posterior del fundador — 3 de octubre de 2026:** el diseño publicado no le gusta: «se ve muy desorganizado y saturado». Pide pulir las funciones y volver al diseño al final. La composición actual queda provisional; las aprobaciones históricas no constituyen aceptación del resultado final. No implementar otra maqueta durante este bloque. Retomar con un briefing de jerarquía, recorridos y referencias cuando se cierre la fase funcional; [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md).
 
@@ -16,7 +16,7 @@ Esto autoriza explorar y mostrar propuestas. No supone que se haya elegido una i
 
 Se ha revisado visualmente https://raunder.es/: fondo blanco, texto casi negro, botones rojos intensos y una sección oscura de tono rojizo. Esta descripción es una observación visual, no una extracción exacta de sus valores CSS.
 
-Ring España debe distinguirse con una familia fría verde/azulada en su identidad y sus acciones principales. Se descartan el rojo óxido de la primera propuesta y el naranja de la tercera como direcciones de marca para este encargo.
+Lona debe distinguirse con una familia fría verde/azulada en su identidad y sus acciones principales. Se descartan el rojo óxido de la primera propuesta y el naranja de la tercera como direcciones de marca para este encargo.
 
 ## Primera revisión: petróleo y marfil (no elegida)
 
@@ -90,7 +90,7 @@ Comprobación de contraste con la fórmula de luminancia sRGB: blanco puro sobre
 
 El fundador adjuntó una imagen con quince recursos. Se consultaron sus páginas y resultados públicos; no equivale a haber navegado todas sus bibliotecas ni probado cada interfaz. No se compraron suscripciones ni se accedió a cuentas.
 
-| Recursos | Revisión y utilidad para Ring España |
+| Recursos | Revisión y utilidad para Lona |
 |---|---|
 | https://curated.design/ | Índice público de estilos y sitios; útil para seleccionar referencias de composición |
 | https://land-book.com/ | Revisión visual de la categoría Sport y de Off-Field; fotografía deportiva, tipografía y marca |
@@ -241,4 +241,25 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - **Manifiesto** para instalar la app en el móvil: `src/app/manifest.ts`, con los iconos de 192 y 512 px.
 - **Cabecera y bienvenida:** el símbolo de dos anillos se sustituye por el ring (componente `Marca` y cabecera de `layout.tsx`).
 
-El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen diciendo «Ring España» hasta que el fundador confirme el cambio de nombre.
+El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen diciendo «Ring España» hasta que el fundador confirme el cambio de nombre. **Confirmado el mismo día: la app pasa a llamarse Lona** (ver abajo).
+
+### 13 de octubre de 2026 — La app pasa a llamarse Lona
+
+**El fundador:** «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
+
+**Hecho:**
+- **Cabecera:** el logotipo oficial (`lona-logo.svg`) sustituye al texto «RING ESPAÑA».
+- **Bienvenida:** el sello lleva el logotipo.
+- **En toda la app** pone «Lona»: títulos de las pantallas y de la pestaña, descripciones para buscadores, textos, mensajes, correos (asuntos, cuerpo y firma), la descarga de datos (`mis-datos-lona.json`), el manifiesto y el nombre de la cuenta en la aplicación de códigos del segundo paso.
+- **Documentos vigentes** con el nombre nuevo: README, CLAUDE.md, ARQUITECTURA, PLAN, TRASLADO, PUBLICACION, IDEAS, COMPETENCIA, DISENO, el manual de mantenimiento, los guiones de pruebas y las fichas de tareas.
+
+**Sin cambiar, a propósito:**
+- **Documentos históricos** (DIARIO, LECCIONES, APORTACIONES-*, AUDITORIA, decisiones/): cuentan lo que pasó con el nombre de entonces.
+- **Nombres técnicos invisibles** para la gente: la rama `claude/ring-espana-mvp`, la clave interna `ringespana:` del navegador y los nombres de las bases de datos.
+- **«Ring España App v3»:** es el nombre de una entrega de diseño.
+
+**Pendiente del fundador:**
+- El remitente de los correos: la variable `MAIL_FROM` en Render, que ahora dirá el nombre que tenga configurado.
+- La dirección de la demo (`ring-espana-demo.onrender.com`) y el dominio definitivo.
+- El nombre del repositorio en GitHub.
+- La comprobación de la marca.

@@ -31,7 +31,7 @@ import IconoDisciplina from "./IconoDisciplina";
 import { COLOR_DISCIPLINA } from "../../lib/common/apariencia";
 
 /**
- * Portada generada («Nano Banano / Ring España») para noticias sin fotografía o con imagen externa rota.
+ * Portada generada («Nano Banano / Lona») para noticias sin fotografía o con imagen externa rota.
  * Crea un póster de combate editorial de alta gama: lona oscura, foco cenital del color de la disciplina,
  * cuerdas de ring en perspectiva y el pictograma del deporte al agua.
  */

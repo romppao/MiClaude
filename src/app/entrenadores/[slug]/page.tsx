@@ -18,7 +18,7 @@ const getTrainer = cache((slug: string) => db.trainer.findUnique({ where: { slug
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const t = await getTrainer((await params).slug);
   if (!t) return { title: "Entrenador no encontrado" };
-  return { title: t.name, description: `${t.name}${t.gym ? `, entrenador en ${t.gym.name}` : ", entrenador"}: peleadores a los que entrena en Ring España.` };
+  return { title: t.name, description: `${t.name}${t.gym ? `, entrenador en ${t.gym.name}` : ", entrenador"}: peleadores a los que entrena en Lona.` };
 }
 
 export default async function TrainerPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,10 +44,10 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
             </section>
           ))}
         </div>
-        {t.classes.length > 0 && <p className="mut">Precio por persona y sesión. Pulsa «Solicitar esta clase», dile cuándo te viene bien y el entrenador te responderá. La clase se paga directamente al entrenador: Ring España no cobra nada.</p>}
+        {t.classes.length > 0 && <p className="mut">Precio por persona y sesión. Pulsa «Solicitar esta clase», dile cuándo te viene bien y el entrenador te responderá. La clase se paga directamente al entrenador: Lona no cobra nada.</p>}
       </>}
       <h2>Peleadores</h2>
-      {t.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este entrenador en Ring España.</p>}
+      {t.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este entrenador en Lona.</p>}
       <div className="grid">
         {t.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">{b.disciplines.map(d => <span key={d.discipline} className={`tag ${d.level}`}>{DISCIPLINE_LABEL[d.discipline]} · {LEVEL_LABEL[d.level]}</span>)}<ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
       </div>

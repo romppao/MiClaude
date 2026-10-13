@@ -27,7 +27,7 @@ const getEvent = cache((slug: string) =>
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const e = await getEvent((await params).slug);
   if (!e) return { title: "Velada no encontrada" };
-  return { title: e.name, description: `${e.name}: ${DISCIPLINE_LABEL[e.discipline]} · ${fmtDate(e.date)} · ${e.venue}, ${e.city}. Cartel y resultados en Ring España.` };
+  return { title: e.name, description: `${e.name}: ${DISCIPLINE_LABEL[e.discipline]} · ${fmtDate(e.date)} · ${e.venue}, ${e.city}. Cartel y resultados en Lona.` };
 }
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {

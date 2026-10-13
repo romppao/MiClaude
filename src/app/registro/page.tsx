@@ -41,7 +41,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         <PasosRegistro tipo={null} paso={0} atras="/bienvenida" etiquetaAtras="Volver a la bienvenida" />
         <div>
           <h1>Crear cuenta</h1>
-          <p className="lead">¿Cómo vas a usar Ring España? Elige el tipo de cuenta que necesitas: la aplicación se adapta a lo que haces.</p>
+          <p className="lead">¿Cómo vas a usar Lona? Elige el tipo de cuenta que necesitas: la aplicación se adapta a lo que haces.</p>
         </div>
         {avisoDestino}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -54,7 +54,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
           ))}
         </div>
         <p style={{ margin: 0 }}>¿Ya tienes cuenta? <Link href={entrar}>Entra en tu cuenta</Link>. ¿La contraseña? <Link href="/recuperar">Elige una nueva</Link>.</p>
-        <p className="mut" style={{ margin: 0 }}>¿Dudas? Consulta <Link href="/ayuda">cómo funciona Ring España</Link>.</p>
+        <p className="mut" style={{ margin: 0 }}>¿Dudas? Consulta <Link href="/ayuda">cómo funciona Lona</Link>.</p>
       </div>
     );
   }

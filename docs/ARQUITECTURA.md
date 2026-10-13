@@ -1,4 +1,4 @@
-# Arquitectura de Ring España
+# Arquitectura de Lona
 
 Estado técnico vigente. La historia de cómo se llegó hasta aquí está en [`DIARIO.md`](DIARIO.md); cómo retomar el trabajo, en [`TRASLADO.md`](TRASLADO.md); la revisión de calidad del código, en [`AUDITORIA.md`](AUDITORIA.md).
 

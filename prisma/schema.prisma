@@ -156,7 +156,7 @@ enum ClassRequestStatus {
 }
 
 // Solicitud de una clase publicada (petición del fundador, 8 de octubre de 2026: «poder reservar las clases privadas publicadas es misión
-// imposible»). La persona dice cuándo le viene bien; el entrenador acepta o rechaza con un mensaje. Ring España no cobra: se paga al entrenador.
+// imposible»). La persona dice cuándo le viene bien; el entrenador acepta o rechaza con un mensaje. Lona no cobra: se paga al entrenador.
 model ClassRequest {
   id         String             @id @default(cuid())
   classId    String

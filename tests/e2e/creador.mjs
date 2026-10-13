@@ -76,7 +76,7 @@ check("y sin él todavía no está dentro", (await (await cr.goto(B + "/moderaci
 await cr.goto(B + "/entrar/segundo-paso");
 const clave = (await cr.locator(".clave-app").innerText()).replace(/\s/g, "");
 await accesible(cr, "preparar el segundo paso");
-check("enseña la clave para la aplicación y el enlace que la abre en el móvil", /^[A-Z2-7]{32}$/.test(clave) && (await cr.getByRole("link", { name: /Añadir Ring España/ }).getAttribute("href")).startsWith("otpauth://totp/"));
+check("enseña la clave para la aplicación y el enlace que la abre en el móvil", /^[A-Z2-7]{32}$/.test(clave) && (await cr.getByRole("link", { name: /Añadir Lona/ }).getAttribute("href")).startsWith("otpauth://totp/"));
 await cr.fill("[name=codigo]", "000000"); await btn(cr, "Activar y ver mis códigos");
 check("un código equivocado se explica", await seen(avisoMalo(cr, "Ese código no es válido")));
 await cr.fill("[name=codigo]", totp(clave)); await btn(cr, "Activar y ver mis códigos");

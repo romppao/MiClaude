@@ -221,7 +221,7 @@ export async function resetPassword(f: FormData) {
   if (!(await isResetTokenUsable(token))) go("/recuperar", { problema: "token_invalido" });
   const user = await resetPasswordWithToken(token, await hashPassword(password));
   if (!user) go("/recuperar", { problema: "token_invalido" }); // alguien gastó el enlace justo antes
-  await sendMail(user.email, "Tu contraseña de Ring España se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
+  await sendMail(user.email, "Tu contraseña de Lona se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
   await createSession(user.id);
   go("/", { aviso: "contrasena_cambiada" });
 }
@@ -260,7 +260,7 @@ export async function changePassword(f: FormData) {
   await confirmOwnPassword(user, String(f.get("current") ?? ""), back);
   await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(password) } });
   await destroyOtherSessions(user.id);
-  await sendMail(user.email, "Tu contraseña de Ring España se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
+  await sendMail(user.email, "Tu contraseña de Lona se ha cambiado", `Hola ${oneLine(user.name)},\n\nTu contraseña se ha cambiado y se han cerrado las sesiones abiertas en otros dispositivos.\n\nSi no has sido tú, pide una contraseña nueva cuanto antes desde la página de acceso.\n`);
   go(back, { aviso: "contrasena_guardada" });
 }
 

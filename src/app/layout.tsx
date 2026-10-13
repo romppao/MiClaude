@@ -19,7 +19,7 @@ import { menuDe } from "../lib/accounts/menu";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: { default: "Ring España", template: "%s · Ring España" },
+  title: { default: "Lona", template: "%s · Lona" },
   description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
 };
 
@@ -50,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#contenido" className="skip">Saltar al contenido</a>
         <header className="top">
           <div className="in">
-            <Link href="/" className="logo"><svg className="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="14" width="72" height="72" rx="6" fill="#D4F67C" /><rect x="24" y="24" width="52" height="52" rx="3" fill="none" stroke="#0A0A0C" strokeWidth="4" /><circle cx="14" cy="14" r="9" fill="#BE33F5" /><circle cx="86" cy="14" r="9" fill="#FFFFFF" /><circle cx="14" cy="86" r="9" fill="#FFFFFF" /><circle cx="86" cy="86" r="9" fill="#BE33F5" /></svg>RING <b>ESPAÑA</b></Link>
+            <Link href="/" className="logo" aria-label="Lona, ir al inicio">{/* Logotipo oficial (13 de octubre de 2026): «lona» con la «o» en forma de ring. */}<img src="/brand/lona/lona-logo.svg" alt="" className="logo-lona" width={68} height={35} /></Link>
             <nav aria-label="Principal">
               <Link href="/peleadores">Peleadores</Link>
               <Link href="/ranking">Ránking</Link>

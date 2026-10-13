@@ -19,6 +19,6 @@ export default function ProfileEditor({ kind, id, avatarX, avatarY, bannerX, ban
       <label className="field"><span>Encuadre vertical del banner</span><input type="range" name="bannerY" min="0" max="100" value={bY} onChange={e => setBY(Number(e.target.value))} /></label>
       <label><input type="checkbox" name="removeBanner" /> Quitar el banner actual</label>
     </div></div>
-    <p className="mut">Sin banner se mostrará el fondo violeta de Ring España. Usa imágenes tuyas o que tengas permiso para publicar. Si subes una imagen nueva, sustituye a la anterior.</p>
+    <p className="mut">Sin banner se mostrará el fondo violeta de Lona. Usa imágenes tuyas o que tengas permiso para publicar. Si subes una imagen nueva, sustituye a la anterior.</p>
   </fieldset>;
 }

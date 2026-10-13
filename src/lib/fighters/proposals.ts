@@ -5,7 +5,7 @@ import { isDiscipline } from "../common/disciplines";
  * Retos a combate y propuestas de sparring entre peleadores (propuesta n.º 1 del diseño v3, aprobada por el fundador el 7 de octubre de
  * 2026, y pedida de nuevo el 8 de octubre: «no encuentro la manera de retar a otros peleadores o solicitar sparring»).
  * Un peleador con ficha propone; el otro acepta o rechaza con un mensaje. Aceptar **no crea un combate**: para que cuente en el récord se
- * registra cuando se celebra (o lo pone un organizador en su cartel). Ring España no organiza ni supervisa los sparrings.
+ * registra cuando se celebra (o lo pone un organizador en su cartel). Lona no organiza ni supervisa los sparrings.
  */
 export const PROPOSAL_KIND_LABEL: Record<ProposalKind, string> = { FIGHT: "Reto a combate", SPARRING: "Sparring" };
 export const PROPOSAL_STATUS_LABEL: Record<ProposalStatus, string> = { PENDING: "Esperando respuesta", ACCEPTED: "Aceptada", DECLINED: "Rechazada", CANCELLED: "Cancelada" };

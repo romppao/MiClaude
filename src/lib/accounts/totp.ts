@@ -69,7 +69,7 @@ export function comprobarCodigo(clave: string, introducido: string, { ahora = Da
 }
 
 /** Dirección «otpauth://» que abre directamente la aplicación de códigos del móvil para añadir la cuenta. */
-export function enlaceApp(clave: string, cuenta: string, emisor = "Ring España") {
+export function enlaceApp(clave: string, cuenta: string, emisor = "Lona") {
   const etiqueta = encodeURIComponent(`${emisor}:${cuenta}`);
   return `otpauth://totp/${etiqueta}?secret=${clave}&issuer=${encodeURIComponent(emisor)}&algorithm=SHA1&digits=6&period=${PERIODO_S}`;
 }

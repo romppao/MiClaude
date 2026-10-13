@@ -6,7 +6,7 @@ import { publicFighterName } from "../../../lib/common/names";
 
 export const dynamic = "force-dynamic";
 
-/** Descarga de todos los datos que Ring España guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). */
+/** Descarga de todos los datos que Lona guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). */
 export async function GET(request: Request) {
   const user = await getUser();
   if (!user) return NextResponse.redirect(new URL(loginPath("/mi-cuenta"), request.url));
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
   const datos = {
     generadoEl: new Date().toISOString(),
-    nota: "Estos son los datos personales que Ring España guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
+    nota: "Estos son los datos personales que Lona guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
     cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
     perfilDeEntrenador: entrenador && { nombre: entrenador.name, presentacion: entrenador.bio, disciplinas: entrenador.disciplines, anosEntrenando: entrenador.yearsCoaching, ciudad: entrenador.city, provincia: entrenador.province, gimnasio: entrenador.gym?.name ?? null, creadoEl: entrenador.createdAt,
       clases: entrenador.classes.map((c) => ({ tipo: c.kind, titulo: c.title, disciplina: c.discipline, minutos: c.minutes, precioEuros: c.priceEuros, plazas: c.capacity, horario: c.schedule, publicada: c.active, creadaEl: c.createdAt })) },
@@ -64,6 +64,6 @@ export async function GET(request: Request) {
     historialDeMisCambios: history.map((h) => ({ sobre: h.entity, accion: h.action, antes: h.before, despues: h.after, fecha: h.createdAt })),
   };
   return new NextResponse(JSON.stringify(datos, null, 2), {
-    headers: { "Content-Type": "application/json; charset=utf-8", "Content-Disposition": 'attachment; filename="mis-datos-ring-espana.json"', "Cache-Control": "no-store" },
+    headers: { "Content-Type": "application/json; charset=utf-8", "Content-Disposition": 'attachment; filename="mis-datos-lona.json"', "Cache-Control": "no-store" },
   });
 }

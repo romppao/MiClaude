@@ -118,7 +118,7 @@ await mod.p.goto(B + "/moderacion");
 await fila().locator("button:has-text('Aprobar')").click();
 check("aprobar a un organizador sin anotar la evidencia comprobada tampoco se permite", await seen(malo(mod.p, "anota qué has comprobado")));
 await aprobarOrganizador(mod.p, nombreOrg);
-check("al aprobar, se avisa por correo de que ya puede publicar veladas", !!(await esperarCorreo(solicitante.email, "Ya puedes publicar veladas en Ring España")));
+check("al aprobar, se avisa por correo de que ya puede publicar veladas", !!(await esperarCorreo(solicitante.email, "Ya puedes publicar veladas en Lona")));
 await solicitante.p.goto(B + "/");
 check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(solicitante.p.locator("header a", { hasText: "Mis veladas" })));
 

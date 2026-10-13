@@ -1512,3 +1512,20 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - 652 unitarias.
 - Sin fallos en `diseno`, `enlaces`, `accesibilidad` y `usabilidad`.
 - Las direcciones `/icon.svg`, `/apple-icon.png` y `/manifest.webmanifest` responden bien.
+
+## 13 de octubre de 2026 — Ring España pasa a llamarse Lona (Claude)
+
+**Qué se pidió** (el fundador): «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
+
+**Qué se hizo:**
+- Cambio de nombre en toda la app: cabecera con el logotipo oficial, títulos, textos, correos, descarga de datos, manifiesto y aplicación de códigos.
+- Cambio de nombre en los documentos vigentes.
+- Las entradas antiguas de este diario no se reescriben (regla de la documentación): conservan «Ring España» porque así se llamaba entonces.
+- Detalle y lista de lo que falta en `DISENO.md`.
+
+**Qué salió mal:**
+- El reemplazo automático dejó en `CLAUDE.md` una frase sin sentido («de Lona a Lona»): se corrigió a mano.
+- Una prueba unitaria esperaba el nombre antiguo en el enlace de la aplicación de códigos; se actualizó.
+- Las cuentas que ya tenían el segundo paso configurado seguirán viendo «Ring España» en su aplicación de códigos. Los códigos siguen valiendo; si quieren el nombre nuevo, basta con volver a configurarlo.
+
+**Pendiente del fundador:** cambiar `MAIL_FROM` en Render, el dominio, la dirección de la demo y el nombre del repositorio, y comprobar la marca.

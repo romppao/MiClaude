@@ -40,7 +40,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
   return (
     <>
       <h1>Buscar</h1>
-      <form className="search" role="search" aria-label="Buscar en Ring España">
+      <form className="search" role="search" aria-label="Buscar en Lona">
         <label className="field" style={{ flex: 1 }}>
           <span>Busca peleadores, gimnasios, entrenadores o veladas</span>
           <input name="q" defaultValue={q} maxLength={LIMITS.name} placeholder="Nombre de un peleador, gimnasio, entrenador o velada" />

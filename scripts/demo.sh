@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Demo local de Ring España con datos ficticios, lista para probar en el navegador.
+# Demo local de Lona con datos ficticios, lista para probar en el navegador.
 #
 #   scripts/demo.sh iniciar                 prepara todo (instala, compila, crea la base con datos de ejemplo) y arranca en http://localhost:3000
 #   scripts/demo.sh correos                 enseña los correos que «envía» la aplicación (en la demo no sale ninguno de verdad): ahí están los enlaces para confirmar el correo
