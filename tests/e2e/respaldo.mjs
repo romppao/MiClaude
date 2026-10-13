@@ -15,7 +15,7 @@ const publica = await p.getByRole("link", { name: "Ver mi ficha pública", exact
 
 async function combate(sufijo, dias, resultado = "WIN") {
   const evento = `Trayectoria ${sufijo} ${rnd}`;
-  await registrar(p, { disciplina: "BOXEO", evento, fecha: enDias(dias), rivalNombre: "Rival", rivalApellidos: `${sufijo}${rnd}`, resultado, metodo: resultado === "NC" ? null : "UD" });
+  await registrar(p, { disciplina: "BOXEO", nivel: sufijo === "Amateur" ? "AMATEUR" : "PRO", evento, fecha: enDias(dias), rivalNombre: "Rival", rivalApellidos: `${sufijo}${rnd}`, resultado, metodo: resultado === "NC" ? null : "UD" });
   // La fila nueva distingue este envío de un aviso que siga visible del anterior.
   await p.locator("main table tbody tr", { hasText: evento }).waitFor();
 }
