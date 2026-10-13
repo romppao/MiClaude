@@ -380,3 +380,13 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - **Valoración Lona:** `valoracionGimnasio` y `mejoresDeLaZona` en `lib/common/mapa.ts`. El aura por gimnasio se calcula con una consulta agrupada en `/gimnasios`.
 - **Mapa común:** `components/mapa/base.ts` (`crearMapa`).
 - **Mapa de un punto:** `components/MapaUbicacion.tsx`, usado por `components/DondeEsta.tsx` en las fichas de gimnasio y de entrenador.
+
+## Control de versiones — 13 de octubre de 2026
+
+Petición del fundador: «es importante llevar un buen manejo de versiones para la aplicación». Detalle en [`VERSIONES.md`](VERSIONES.md).
+
+- **Fuente única:** `package.json` → `version` (versionado semántico; mientras empiece por 0 es preparación, y la 1.0.0 será el lanzamiento público). `src/lib/common/version.ts` la expone al servidor (`VERSION`, `commitDesplegado()` con `RENDER_GIT_COMMIT`).
+- **Dónde se ve:** pie de `/ayuda`, «Estado de la aplicación» en `/moderacion`, `/salud` (`{ estado, version }`) y el detalle de cada fallo.
+- **Datos:** `AppError.firstVersion` y `AppError.version` (migración `20261013200000_version_en_fallos`, aditiva y opcional). `registrarFallo` las rellena.
+- **Proceso:** `CHANGELOG.md` + `scripts/version.mjs` (`subir`, `comprobar`, `etiquetas`). El CI comprueba en cada PR que la versión sube respecto a la rama de destino. Al fusionar en la rama de la demo, con todas las pruebas en verde, el trabajo `etiquetar` (el único con `contents: write`) crea `vX.Y.Z`, y también las etiquetas históricas que falten (0.1.0 a 0.8.0, reconstruidas de los PR).
+- **Riesgo conocido:** dos PR abiertos a la vez con la misma versión. El segundo en fusionarse debe volver a subirla; el CI lo detecta porque compara con la rama de destino.

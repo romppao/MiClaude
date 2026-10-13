@@ -578,6 +578,8 @@ model AppError {
   path         String?
   digest       String?
   role         String? // tipo de cuenta de quien lo sufrió la última vez (sin datos personales)
+  firstVersion String? // versión de la aplicación en la que apareció por primera vez (docs/VERSIONES.md)
+  version      String? // versión en la que apareció la última vez
   count        Int            @default(1)
   firstSeenAt  DateTime       @default(now())
   lastSeenAt   DateTime       @default(now())

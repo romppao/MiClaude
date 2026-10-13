@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { VERSION } from "./version";
 
 /**
  * Registro de fallos de la aplicación (13 de octubre de 2026, petición del fundador).
@@ -111,13 +112,13 @@ export async function registrarFallo(datos: DatosFallo): Promise<void> {
     const ahora = new Date();
     const previo = await db.appError.findUnique({ where: { fingerprint }, select: { id: true, status: true } });
     if (!previo) {
-      await db.appError.create({ data: { fingerprint, origin: datos.origen, message: mensaje, stack, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null } });
+      await db.appError.create({ data: { fingerprint, origin: datos.origen, message: mensaje, stack, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null, firstVersion: VERSION, version: VERSION } });
       return;
     }
     const reabrir = previo.status === "RESOLVED";
     await db.appError.update({
       where: { id: previo.id },
-      data: { count: { increment: 1 }, lastSeenAt: ahora, message: mensaje, stack: stack ?? undefined, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null, ...(reabrir ? { status: "OPEN" } : {}) },
+      data: { count: { increment: 1 }, lastSeenAt: ahora, message: mensaje, stack: stack ?? undefined, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null, version: VERSION, ...(reabrir ? { status: "OPEN" } : {}) },
     });
     if (reabrir) await db.auditLog.create({ data: { entity: "APP_ERROR", entityId: previo.id, action: "FALLO_REAPARECE", before: { status: "RESOLVED" }, after: { status: "OPEN" } } });
   } catch (e) {

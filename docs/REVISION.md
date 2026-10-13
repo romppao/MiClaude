@@ -13,4 +13,6 @@ Claude revisa cada PR antes de que el fundador lo integre. Los demás asistentes
 
 **9. Transferencia a una persona nueva:** [manual de mantenimiento](mantenimiento/README.md) y catálogo actualizados. Cada archivo añadido tiene responsabilidad individual; las funciones públicas no evidentes explican entradas, salida, rechazos/efectos y restricciones. El recorrido afectado enlaza pantalla, acción, guarda, datos y prueba; las decisiones nuevas registran alternativas y motivo con evidencia. Contrastar explicaciones con el código, no aprobar solo por porcentaje de cobertura. `node scripts/generar-catalogo.mjs --comprobar` y las pruebas de la herramienta pasan en el último commit. No exigir comentarios que repitan cada línea, ni inventar razones históricas.
 
+**10. Versión:** el PR sube la versión adecuada (parche, menor o mayor según [`VERSIONES.md`](VERSIONES.md)) y su entrada de `CHANGELOG.md` cuenta en lenguaje llano qué notará quien use la aplicación. El CI comprueba que la versión sube; la revisión comprueba que el tipo y el texto son los correctos.
+
 Resultado de la revisión: **aprobado**, **cambios pedidos** (lista numerada y concreta) o **RFC** (el PR revela un problema de plan). Claude lo escribe como comentario del PR con el pie de atribución.

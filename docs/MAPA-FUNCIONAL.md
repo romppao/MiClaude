@@ -344,6 +344,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
 | `url.ts` | `safeHttpUrl` |
+| `version.ts` | `VERSION`, `commitDesplegado` |
 
 ### `lib/community`
 

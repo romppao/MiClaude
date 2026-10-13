@@ -53,6 +53,7 @@ Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen p
 8. **Reglas técnicas** de `CLAUDE.md` (acciones públicas, `hasOwn/lookup`, importaciones relativas, pruebas con `seen()` y datos únicos, etc.) y **ninguna regresión de las pruebas** (`npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run test:a11y`).
 9. **Cero enlaces o botones muertos:** lo que parece pulsable lleva a un sitio o hace algo visible. `tests/e2e/enlaces.mjs` lo comprueba para todos los papeles; si no hay destino, se quita el enlace.
 10. **Prioridad vigente (6 de octubre de 2026): el móvil primero.** Casi todo el uso será desde iOS y Android y el objetivo es publicar la aplicación en App Store y Google Play. Toda pantalla se diseña y se prueba primero en móvil (360–430 px de ancho, táctil); el escritorio es secundario. Ver [`MOVIL.md`](MOVIL.md).
+11. **Versiones (13 de octubre de 2026):** todo PR apunta sus cambios en `CHANGELOG.md` y sube la versión con `node scripts/version.mjs subir parche|menor|mayor`; el CI lo exige. Ver [`VERSIONES.md`](VERSIONES.md).
 
 ## Cómo trabaja Claude (para que los demás sepan qué esperar)
 

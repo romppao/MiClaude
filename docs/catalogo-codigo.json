@@ -130,6 +130,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261013200000_version_en_fallos/migration.sql",
+    "purpose": "Migración: versión de la aplicación en la que apareció cada fallo por primera y por última vez (firstVersion, version).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -162,6 +167,11 @@
   {
     "path": "scripts/copiar-maplibre.mjs",
     "purpose": "Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/version.mjs",
+    "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1172,6 +1182,11 @@
   {
     "path": "src/lib/common/safe.ts",
     "purpose": "Consulta solo claves propias y normaliza parámetros de URL; evita aceptar propiedades heredadas o parámetros repetidos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/version.ts",
+    "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

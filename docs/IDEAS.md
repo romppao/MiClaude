@@ -354,3 +354,6 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 - **Mejoras visuales en veladas** (fundador, 13 oct: «ahora miro qué se puede mejorar»). Estado: a la espera de lo que diga.
 - **Mapa también en entrenadores y veladas** (Claude, 13 oct). Estado: idea, cuando el de gimnasios esté probado.
 - **Reseñas con estrellas de gimnasios y entrenadores** (Claude, 13 oct, como complemento a la valoración Lona). Estado: idea. Necesita moderación y medidas contra reseñas falsas.
+- **Control de versiones** (fundador, 13 oct: «es importante llevar un buen manejo de versiones para la aplicación»). Estado: **hecho**. Versión 0.9.0, ver [`VERSIONES.md`](VERSIONES.md).
+- **Pantalla «Novedades» para los usuarios**, hecha a partir de `CHANGELOG.md` (Claude, 13 oct). Estado: idea, para después del lanzamiento. Hay que reescribir las notas en lenguaje de usuario y no mostrar detalles internos.
+- **Producción solo con versiones etiquetadas** (Claude, 13 oct). Estado: planificado. Se monta con la versión real ([`LANZAMIENTO.md`](LANZAMIENTO.md), punto 1).

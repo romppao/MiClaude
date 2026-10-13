@@ -1683,3 +1683,39 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué salió mal:**
 - El primer CI del PR #46 falló en «Prueba de extremo a extremo». Desde aquí no se pueden leer sus registros ni descargar el diagnóstico, así que se busca la causa con la réplica local.
 - En el móvil, las tarjetas quedaban apretadas con el sello a la derecha y los botones de orden ocupaban dos líneas: se corrigió tras ver las capturas.
+
+## 13 de octubre de 2026 — Causa del CI rojo del mapa y control de versiones (Claude)
+
+**Qué se pidió** (el fundador): «Continúa», para terminar el mapa. Y después: «Es importante llevar un buen manejo de versiones para la aplicación, tenlo en cuenta y en caso de que no lo estés haciendo, aplícalo».
+
+**Qué se decidió y por qué:**
+- **Versionado semántico con un registro de cambios en lenguaje llano.** La versión actual pasa a 0.9.0 y la **1.0.0 será el lanzamiento público** del 15 de noviembre.
+- **Versiones anteriores reconstruidas** a partir de los 24 PR fusionados: 0.1.0 a 0.8.0, cada una con su commit de fusión. Así hay puntos fijos a los que volver.
+- **El CI exige que cada PR suba la versión** y tenga su entrada: lo que no se comprueba acaba no haciéndose (fue lo que pasó durante seis semanas).
+- **Las etiquetas las crea el CI**, solo si todas las pruebas pasan tras fusionar. Desde la sesión de Claude no se pueden crear: el proxy bloquea esa escritura, ya sea con `git push` o con la API.
+- **La versión se ve** en la ayuda, en moderación (con el commit), en `/salud` y en cada fallo registrado (primera y última versión). Así se sabe si un arreglo funcionó.
+
+**Qué se hizo:**
+- **Mapa:**
+  - «Acercar» y «Alejar» indican qué mapa controlan (`aria-controls`, en `crearMapa`).
+  - La autoría del mapa se lee bien en tema oscuro.
+  - Las pruebas sirven un estilo de mapa propio con la misma autoría, así que no dependen de internet y ven lo mismo en local y en el CI.
+- **Diagnóstico del CI:** si fallan las pruebas de navegador, `scripts/avisos-ci.mjs` publica un aviso legible desde el PR con los fallos y el texto de las páginas guardadas.
+- **Versiones:**
+  - Archivos nuevos: `CHANGELOG.md`, `docs/VERSIONES.md`, `scripts/version.mjs` y `src/lib/common/version.ts`.
+  - Migración `20261013200000_version_en_fallos`.
+  - Paso de comprobación y trabajo `etiquetar` en el CI.
+  - Pruebas de la versión en `fallos.mjs` y `busqueda.mjs`.
+  - Reglas en `EQUIPO.md`, `DESARROLLO.md`, `REVISION.md` y `CLAUDE.md`.
+
+**Qué salió mal:**
+- El CI del mapa falló cinco veces seguidas, por causas distintas:
+  - los botones de zoom sin `aria-controls`, que la réplica local encontró;
+  - dos veces el catálogo sin regenerar tras tocar un archivo;
+  - el contraste de la autoría, que solo aparece con internet, y en local no se veía.
+- Dos pruebas anteriores al mapa (`cuenta.mjs` y `flujo.mjs`) fallaron una vez cada una en el CI y pasan siempre en local: son intermitentes, y la segunda guardó la página a medio cargar. Se relanzó el CI para confirmarlo. Están anotadas como intermitentes, con la causa todavía sin encontrar.
+- No se podían leer los registros del CI desde aquí, por eso se hizo `avisos-ci.mjs`.
+
+**Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
+
+**Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
