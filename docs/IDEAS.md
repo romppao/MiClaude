@@ -327,3 +327,7 @@ Decisión aplicada por petición del fundador: escenas pequeñas, carga diferida
 
 ## Codex, adaptaci?n 10 oct
 Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?n al espacio de pantalla. Mantener identidad y composici?n m?vil; aprovechar columnas en escritorio. Ver ADAPTACION-DISPOSITIVOS.md.
+
+## Nombre y marca — 13 de octubre de 2026
+
+- **Nombre «Lona»** (el fundador: «la lona del ring»). Estado: **propuesto por el fundador**, con cuatro direcciones de logotipo y tipografía preparadas (`DISENO.md`, sección del 13 de octubre). Falta comprobar el registro de marca (OEPM y EUIPO), el dominio y los nombres en las tiendas, y que el fundador elija una dirección. «Ring España» sigue siendo el nombre de trabajo hasta entonces.

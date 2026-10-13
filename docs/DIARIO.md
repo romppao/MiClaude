@@ -1469,3 +1469,13 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué se comprobó:** capturas con sesión y sin ella a 1024, 1100, 1280, 1366, 1440 y 1920 px: una sola fila y nada fuera de pantalla. En local, `usabilidad`, `menu`, `acceso` y `cuenta` pasan sus comprobaciones de cabecera; los fallos restantes son por no tener `psql` en Windows. `escenarios.mjs` (no está en el CI) busca ahora desde `/buscar`.
 **Qué salió mal:** el CI destapó que `RecordarCampos` perdía lo escrito si React vaciaba el formulario tarde (la altura de la ficha en `cuenta.mjs`); ahora guarda lo escrito y vigila 30 s. También hubo que adaptar `busqueda.mjs` (escribía en el campo de la cabecera) y mantener «Mis veladas» en la cabecera de quien organiza.
 **Estado y siguientes pasos:** pendiente de CI y despliegue. Se ve una noticia duplicada por llegar de dos fuentes (AEBOX y su búsqueda): queda para revisar la deduplicación.
+
+## 13 de octubre de 2026 — Propuestas de nombre, logotipo y tipografía: «Lona» (Claude)
+
+**Qué se pidió** (el fundador): empezar con el logotipo oficial y el nombre. Como nombre propone **«Lona»**, por la lona del ring, y pide propuestas de logotipo y una tipografía oficial «que nos represente, que nos identifique como marca».
+
+**Qué se hizo:** un lienzo con cuatro direcciones claramente distintas (Esquina, Cuadrilátero, Cuerdas y Cartel) y una hoja comparativa de tipografía. Cada dirección muestra el logotipo sobre oscuro y sobre claro, el icono de la app en tres tamaños, cómo quedaría en la cabecera y su tipografía. Se mantienen los colores aprobados y el lema; no se cambia nada de la app hasta que el fundador elija.
+
+**Qué falta:** que el fundador elija; comprobar el registro de «Lona» como marca, el dominio y los nombres en las tiendas (no se ha comprobado nada); y que un diseñador humano dibuje el logotipo definitivo. Detalle en `DISENO.md`.
+
+**Nota:** «Lona» no aparecía en la documentación anterior. Si el fundador lo propuso en otra conversación, aquí queda recogido desde ahora.

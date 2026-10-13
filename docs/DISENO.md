@@ -173,3 +173,25 @@ El fundador confirma que le gusta el aspecto actual. Solicita optimizarlo conser
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 13 de octubre de 2026 — Nombre «Lona», logotipo y tipografía: propuestas (Claude)
+
+**Encargo del fundador:** «Quiero ir yendo por el logo oficial de la aplicación y el nombre. Como nombre oficial ya había propuesto **Lona**: la lona del ring […] Me gustaría que me enviases propuestas […] También la tipografía oficial de la marca, una tipografía que nos represente, que nos identifique como marca.»
+
+**Punto de partida (no se cambia):** el aspecto aprobado (negro `#0A0A0C`, lima `#D4F67C` y violeta `#BE33F5` como segundo color) y el lema «Tu deporte. Tu gente.». Las propuestas solo tocan nombre, símbolo y letra de titulares; Archivo sigue para el texto.
+
+**Cuatro direcciones, distintas entre sí** (lienzo privado del fundador: «Lona — propuestas de marca», en claude.ai):
+1. **A · Esquina.** La L son tres cuerdas que se juntan en el poste de una esquina (punto violeta). El nombre va en Archivo ancha. Es la más continuista: misma familia tipográfica que la app.
+2. **B · Cuadrilátero.** La «o» de «lona», en minúsculas, es el ring visto desde arriba: lona lima, cuerdas y cuatro postes. Letra Bricolage Grotesque. Es la más cercana y juvenil.
+3. **C · Cuerdas.** «LONA» estrecha y alta (Big Shoulders Display), con tres cuerdas que pasan por detrás de las letras. Recuerda al rótulo de pabellón y se ve muy bien en el móvil.
+4. **D · Cartel.** Letra egipcia de madera (Alfa Slab One) dentro de un marco doble, como los carteles de veladas de siempre, con una barra violeta. Es la más clásica y con más historia.
+
+**Tipografía:** las cuatro son gratuitas, con licencia libre (SIL Open Font License), y tienen ñ, tildes y ¿¡. En todas, la letra de carácter se usa solo para el nombre y los titulares, y Archivo para el resto, por legibilidad y para cumplir los 16 px.
+
+**Evitado a propósito** (lista de `CLAUDE.md`): degradados, cristal, iconos de guante o puño (los usa medio sector) y letras por defecto.
+
+**Pendiente antes de decidir:**
+- **Comprobar que «Lona» se puede registrar como marca:** en la OEPM (España) y la EUIPO (UE), en las clases de aplicaciones y de servicios deportivos. También el dominio y el nombre en App Store y Google Play. **No se ha comprobado nada todavía.** Que la palabra sea común puede dificultar el registro en solitario; quizá haga falta una forma compuesta («Lona App», «Lona Fight»…).
+- **Que un diseñador humano dibuje la versión final** del logotipo e icono a partir de la dirección elegida (recomendación de siempre en este documento).
+- Cuando el fundador elija, documentar aquí qué se eligió y qué se descartó. Después, cambiar el nombre en la app («Ring España» aparece en textos, correos, títulos y manifiesto): es un cambio grande y se planifica aparte.
