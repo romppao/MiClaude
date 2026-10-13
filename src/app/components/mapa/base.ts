@@ -28,6 +28,9 @@ export async function crearMapa(contenedor: HTMLElement, centro: { lat: number; 
     attributionControl: { compact: true }, locale: TEXTOS_MAPA, dragRotate: false, pitchWithRotate: false,
   });
   m.addControl(new ml.NavigationControl({ showCompass: false }), "top-right");
+  // «Acercar» y «Alejar» actúan sobre el mapa: se dice con aria-controls (lo usan los lectores de pantalla y tests/e2e/enlaces.mjs).
+  if (!contenedor.id) contenedor.id = `mapa-${Math.random().toString(36).slice(2, 10)}`;
+  for (const b of contenedor.querySelectorAll(".maplibregl-ctrl-zoom-in, .maplibregl-ctrl-zoom-out")) b.setAttribute("aria-controls", contenedor.id);
   m.on("error", () => { /* Sin conexión con el servidor de mapas: el mapa sale sin fondo, pero los marcadores siguen. */ });
   return { ml, m };
 }
