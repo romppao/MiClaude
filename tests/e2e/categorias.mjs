@@ -1,4 +1,4 @@
-// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
+﻿// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
 import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, sql, enDias, terminarDiagnosticos } from "./ayudas.mjs";
 const junior="RFE2026:Júnior:M", cadete="RFE2026:Cadete / Schoolboys–Schoolgirls:M", benjamin="RFE2026:Benjamín:M";
 const formButton=(p,name)=>p.locator("main form").filter({has:p.getByRole("button",{name,exact:true})});
