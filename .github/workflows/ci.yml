@@ -1,8 +1,17 @@
 name: CI
 
+# Cuándo se ejecuta (13 de octubre de 2026, repositorio privado: docs/decisiones/ADR-004-repositorio-privado.md).
+# Un repositorio privado gratuito tiene 2.000 minutos de GitHub Actions al mes; antes, en público, eran ilimitados y cada cambio
+# se probaba dos veces (al subirlo a su rama y en su PR). Ahora:
+#  - en cada PR (y en cada cambio que se suba a un PR abierto): es donde se decide si algo entra;
+#  - al fusionar en la rama de la demo (claude/ring-espana-mvp), para confirmar el resultado final;
+#  - a mano, con el botón «Run workflow» de la pestaña Actions.
+# Subir a una rama sin PR ya no gasta minutos: abre el PR cuando quieras que se pruebe.
 on:
-  push:
   pull_request:
+  push:
+    branches: [claude/ring-espana-mvp]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,7 +24,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # 30 minutos: desde el 13 de octubre de 2026 la accesibilidad se mide en los dos temas (claro y oscuro).
+    timeout-minutes: 30
     services:
       postgres:
         image: postgres:16

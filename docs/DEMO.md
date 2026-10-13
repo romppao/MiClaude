@@ -126,3 +126,28 @@ El menú agrupa deportistas, clubes/entrenadores, promotores y cuenta/ayuda. Los
 4. Comprueba el desglose en la ficha pública y el ránking. El rival puede solicitar revisión motivada, sin suspender el resultado. Corregir los hechos o la fuente exige comprobar el respaldo de nuevo.
 
 La escala inicial está centralizada para ajustarla con datos reales. El aura mide trayectoria, respaldo y comunidad; el récord sigue separado. Publicado mediante #14 (`0c3fde6`), con CI #131 aprobado: 393 unitarias, 365 comprobaciones E2E y axe sin incumplimientos. Comprobados públicamente Menú, fórmula, explicación del ránking y salud con respuesta 200.
+
+## Mantener la demo despierta con UptimeRobot (13 de octubre de 2026)
+
+**Por qué.**
+- El plan gratuito de Render duerme la web tras 15 minutos sin visitas, y despertarla tarda cerca de un minuto.
+- Hasta ahora la mantenía despierta una tarea de GitHub (`mantener-demo-despierta.yml`) que la visitaba cada 10 minutos.
+- Al pasar el repositorio a privado ([ADR-004](decisiones/ADR-004-repositorio-privado.md)), esa tarea gastaría unos 4.300 de los 2.000 minutos gratuitos al mes, así que se ha desactivado.
+- **Mientras no configures UptimeRobot, la primera visita a la demo tardará un poco más.** Nada más cambia.
+
+**Para qué.**
+- UptimeRobot visita la demo desde fuera cada 5 minutos, gratis y sin gastar minutos de GitHub.
+- Además, **te avisa por correo si la demo se cae**.
+- Es la herramienta que ya aprobaste en ADR-003.
+
+**Cómo (5 minutos).**
+1. Entra en <https://uptimerobot.com> → **Register for FREE**, con tu correo. Si te pide una tarjeta, para y avisa: el plan gratuito no debería pedirla.
+2. Pulsa **+ New monitor** y rellena:
+   - **Monitor type:** HTTP(s).
+   - **Friendly name:** `Lona demo`.
+   - **URL:** `https://ring-espana-demo.onrender.com/salud`.
+   - **Monitoring interval:** 5 minutes.
+3. En **Alert contacts**, marca tu correo y pulsa **Create monitor**.
+4. A los pocos minutos el monitor sale en verde («Up»). Si sale en rojo, la demo está caída: avísame.
+
+Nota: si un día la demo cambia de dirección (por ejemplo, al pasar a un dominio propio), hay que cambiar la URL del monitor.

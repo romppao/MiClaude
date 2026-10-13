@@ -1600,3 +1600,28 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - **Fundador:** pasar la demo a Neon (pasos en `DEMO.md`).
 - **Claude:** cuando el fundador avise, ajustar `render.yaml` y comprobar la demo.
 - **Ideas:** aviso por correo al creador cuando aparezca un fallo nuevo.
+
+## 13 de octubre de 2026 — El código pasa a un repositorio privado (Claude)
+
+**Qué se pidió** (el fundador): «tenemos el repositorio de la aplicación público […] no puedo permitir que alguien me robe, me suplante todo el trabajo […] hay mucha competencia en ese sector […] debemos solventar cuanto antes y de manera gratuita». Tras ver dos propuestas: «haz lo recomendado y, como de costumbre, documenta todo explicando el por qué, el cómo, el para».
+
+**Qué se decidió y por qué:** propuesta A, [ADR-004](decisiones/ADR-004-repositorio-privado.md): el repositorio sigue en GitHub y pasa a privado, que es gratis. Antes hubo que ajustar el gasto de pruebas automáticas. En privado hay 2.000 minutos al mes y la semana anterior se gastaron unos 2.000 (254 ejecuciones): al ritmo de antes, las pruebas se habrían parado en una semana. Se descartó mover el código a otra plataforma porque obligaba a cambiar de proveedor sin ventaja.
+
+**Qué se hizo:**
+- **Revisión del historial completo** (266 commits) en busca de claves filtradas. No hay ninguna real. Una clave por defecto antigua de la tarea de noticias estuvo en el código público, así que se recomienda cambiar `CRON_SECRET`.
+- **Pruebas automáticas** (`ci.yml`): solo en los PR, al fusionar en `claude/ring-espana-mvp` y a mano. Así no se prueba dos veces cada cambio. El tiempo máximo pasa de 20 a 30 minutos, porque la accesibilidad se mide ahora en los dos temas.
+- **La visita cada 10 minutos para mantener despierta la demo** (unos 4.300 minutos al mes) se desactiva. La sustituye UptimeRobot, con pasos en `DEMO.md`.
+- **Aviso legal:** `LICENSE` («Todos los derechos reservados») y `"license": "UNLICENSED"` en `package.json`.
+- **Repositorio privado:** se cambia cuando el ajuste de pruebas ya está en la rama de la demo. El resultado se anota abajo.
+- **Documentación:**
+  - ADR-004, con el porqué, el cómo, el para qué, las reglas desde ahora, los pasos del fundador y cómo deshacerlo;
+  - notas en `CLAUDE.md` y `TRASLADO.md`;
+  - índice de decisiones (ADR-003 figuraba aún como «pendiente», aunque se aprobó el 6 de octubre: corregido).
+
+**Qué salió mal:** nada en este paso. Hay que dejar dicho lo que no se puede arreglar: lo que alguien descargara entre el 24 de septiembre y hoy no se recupera. Esa copia no se puede usar legalmente, porque nunca hubo licencia.
+
+**Pendiente del fundador:**
+- comprobar que el presupuesto de GitHub Actions está en 0 €;
+- crear el monitor de UptimeRobot;
+- cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
+- decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.

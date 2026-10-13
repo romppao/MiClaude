@@ -21,12 +21,12 @@
   },
   {
     "path": ".github/workflows/ci.yml",
-    "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad.",
+    "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004).",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": ".github/workflows/mantener-demo-despierta.yml",
-    "purpose": "Visita /salud de la demo de Render cada 10 minutos para que el plan gratuito no la duerma; consume horas gratuitas de Render.",
+    "purpose": "Visita /salud de la demo; desde ADR-004 solo a mano (la sustituye UptimeRobot para no gastar minutos de GitHub).",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
