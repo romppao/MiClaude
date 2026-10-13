@@ -10,7 +10,7 @@ Hoy no hay manifiesto, ni iconos de aplicación, ni `theme-color`, ni service wo
 
 ## Pasos
 1. Rama `<asistente>/T-003-pwa`.
-2. `src/app/manifest.ts`: `name` «Ring España», `short_name` «Ring España», `start_url` «/», `display` «standalone», `lang` «es», `theme_color` y `background_color` `#BE33F5` / el fondo actual (`--bg` de `globals.css`), iconos 192 y 512 (y «maskable»).
+2. `src/app/manifest.ts`: `name` «Lona», `short_name` «Lona», `start_url` «/», `display` «standalone», `lang` «es», `theme_color` y `background_color` `#BE33F5` / el fondo actual (`--bg` de `globals.css`), iconos 192 y 512 (y «maskable»).
 3. Iconos: genera PNG 192/512/maskable y `apple-touch-icon` 180 a partir del símbolo provisional (script `scripts/generar-iconos.mjs` con `sharp`, que ya es dependencia). Guarda los PNG en `public/`. Documenta que son **provisionales** hasta el diseño final.
 4. `src/app/layout.tsx`: `metadata.themeColor`, `appleWebApp` (capable, título) y `viewport` correcto (sin bloquear el zoom).
 5. Service worker mínimo `public/sw.js` registrado desde un componente cliente: **solo** guarda en caché la página `/sin-conexion` y los iconos; **nunca** cachea datos de usuarios ni respuestas de acciones. Nueva pantalla `src/app/sin-conexion/page.tsx` en español llano («No hay conexión. Cuando vuelva, podrás seguir donde lo dejaste.») con un botón «Reintentar» que recarga.

@@ -126,7 +126,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
         <legend>Graduación de BJJ (opcional)</legend>
         <label className="field"><span>Cinturón</span><select name="belt" defaultValue={defaults.belt ?? ""}><option value="">Sin indicar</option>{Object.entries(BELTS).map(([k,v]) => <option key={k} value={k}>{v}</option>)}</select></label>
         <label className="field"><span>Grados</span><input name="beltDegrees" type="number" min={0} max={10} defaultValue={defaults.beltDegrees ?? ""} /></label>
-        <p className="mut">Indica tu graduación real. Es información declarada por ti, no una acreditación verificada por Ring España. Las reglas de graduación dependen de la edad y de la organización.</p>
+        <p className="mut">Indica tu graduación real. Es información declarada por ti, no una acreditación verificada por Lona. Las reglas de graduación dependen de la edad y de la organización.</p>
       </fieldset>}
     </>
   );

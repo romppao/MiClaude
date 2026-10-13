@@ -70,6 +70,6 @@ Además, **Claude anota por separado**: eficiencia (calidad por token o crédito
 
 Dos sesiones por asistente (una en modo MÁXIMO, otra en MEDIO; las Partes 0, 1, 2 y 4-máximo en la primera; las Partes 3 y 4-medio en la segunda). Pégale esto:
 
-> Eres uno de los asistentes del proyecto Ring España y vas a hacer tu **prueba de ingreso**. Lee `AGENTS.md`, `CLAUDE.md`, `docs/EQUIPO.md` y **`docs/PRUEBA-DE-INGRESO.md`** y sigue sus instrucciones al pie de la letra, empezando por la Parte 0. Trabaja en modo **MÁXIMO** (o **MEDIO**: indica cuál) y anota qué modelo y ajustes usas. Sé completamente honesto sobre lo que ejecutas y lo que no. No leas el trabajo de los demás asistentes.
+> Eres uno de los asistentes del proyecto Lona y vas a hacer tu **prueba de ingreso**. Lee `AGENTS.md`, `CLAUDE.md`, `docs/EQUIPO.md` y **`docs/PRUEBA-DE-INGRESO.md`** y sigue sus instrucciones al pie de la letra, empezando por la Parte 0. Trabaja en modo **MÁXIMO** (o **MEDIO**: indica cuál) y anota qué modelo y ajustes usas. Sé completamente honesto sobre lo que ejecutas y lo que no. No leas el trabajo de los demás asistentes.
 
 Antes de lanzarlos, **dime (o anótalo en `ingreso/RESULTADOS.md`) qué modelo ejecuta cada herramienta en tu cuenta**: cuenta tanto como la herramienta.

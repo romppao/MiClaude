@@ -124,6 +124,6 @@ Además se anotan por separado: **calidad por consumo** (puntos ÷ tokens o cré
 ## Para el fundador: cómo lanzar a cada asistente
 Dos sesiones por asistente (una en MÁXIMO y otra en MEDIO, idealmente otro día). Pégale esto:
 
-> Eres uno de los asistentes del proyecto Ring España y vas a hacer tu **prueba de ingreso 2 («La escalera»)**. Lee `AGENTS.md`, `CLAUDE.md`, `docs/EQUIPO.md` y **`docs/PRUEBA-ESCALERA.md`** y sigue sus instrucciones al pie de la letra, empezando por el Paso 0. Trabaja en modo **MÁXIMO** (o **MEDIO**: indica cuál) y anota qué modelo y ajustes usas. Sé completamente honesto sobre lo que ejecutas y lo que no. No busques ni leas la rama `claude/clave-escalera` ni el trabajo de los demás asistentes.
+> Eres uno de los asistentes del proyecto Lona y vas a hacer tu **prueba de ingreso 2 («La escalera»)**. Lee `AGENTS.md`, `CLAUDE.md`, `docs/EQUIPO.md` y **`docs/PRUEBA-ESCALERA.md`** y sigue sus instrucciones al pie de la letra, empezando por el Paso 0. Trabaja en modo **MÁXIMO** (o **MEDIO**: indica cuál) y anota qué modelo y ajustes usas. Sé completamente honesto sobre lo que ejecutas y lo que no. No busques ni leas la rama `claude/clave-escalera` ni el trabajo de los demás asistentes.
 
 Orden recomendado: primero la **prueba 1** (`PRUEBA-DE-INGRESO.md`, parte 0 y parte 1), después esta. Para corregir, desde Claude Code en el portátil: «corrige la escalera de CODEX» (usa `scripts/corregir-escalera.sh`).

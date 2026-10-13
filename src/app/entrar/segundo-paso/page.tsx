@@ -37,7 +37,7 @@ export default async function SegundoPaso({ searchParams }: { searchParams: Prom
         <ol className="lista-pasos" style={{ display: "flex", flexDirection: "column", gap: 14, paddingLeft: 22, margin: 0 }}>
           <li>Instala en tu móvil una <strong>aplicación de códigos</strong> gratuita: Google Authenticator, Microsoft Authenticator o la de tu gestor de contraseñas.</li>
           <li>
-            Añade la cuenta. Si estás en el móvil, pulsa <a href={enlaceApp(clave, user.email)}>Añadir Ring España a mi aplicación de códigos</a>. Si no, elige en la aplicación «Introducir una clave de configuración» y escribe esta clave:
+            Añade la cuenta. Si estás en el móvil, pulsa <a href={enlaceApp(clave, user.email)}>Añadir Lona a mi aplicación de códigos</a>. Si no, elige en la aplicación «Introducir una clave de configuración» y escribe esta clave:
             <p className="clave-app" aria-label={`Clave: ${clave.split("").join(" ")}`}>{claveLegible(clave)}</p>
           </li>
           <li>Escribe aquí el código de 6 cifras que te muestra la aplicación. Después te daremos <strong>diez códigos de emergencia</strong> para entrar cuando no tengas el móvil a mano.</li>

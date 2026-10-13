@@ -18,7 +18,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
     return (
       <>
         <h1>Organizadores de veladas</h1>
-        <p>Si organizas veladas, puedes publicar tus carteles y resultados verificados en Ring España. Para pedirlo necesitas una cuenta.</p>
+        <p>Si organizas veladas, puedes publicar tus carteles y resultados verificados en Lona. Para pedirlo necesitas una cuenta.</p>
         <p className="acciones"><Link href="/registro" className="btn">Crear mi cuenta</Link><Link href="/entrar?next=%2Forganizador" className="btn secondary">Ya tengo cuenta: entrar</Link></p>
       </>
     );

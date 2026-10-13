@@ -6,8 +6,8 @@ export const metadata = { title: "¿Cómo funciona?" };
 export default function Help() {
   return (
     <>
-      <h1>¿Cómo funciona Ring España?</h1>
-      <p>Ring España reúne a la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Puedes consultar y compartir trayectorias amateur y profesionales, encontrar veladas, gimnasios y entrenadores, y reconocer las actuaciones que has visto. Elige tu disciplina y tu provincia para encontrar lo que te interesa.</p>
+      <h1>¿Cómo funciona Lona?</h1>
+      <p>Lona reúne a la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Puedes consultar y compartir trayectorias amateur y profesionales, encontrar veladas, gimnasios y entrenadores, y reconocer las actuaciones que has visto. Elige tu disciplina y tu provincia para encontrar lo que te interesa.</p>
       <p className="mut">No necesitas una cuenta para consultar veladas, fichas y el ránking. Para dar aura, registrar combates o publicar sí es necesario registrarse.</p>
 
       <h2>Si eres aficionado</h2>
@@ -39,7 +39,7 @@ export default function Help() {
           <tr><th scope="row">Confirmado por el rival</th><td>Los dos peleadores están de acuerdo.</td></tr>
           <tr><th scope="row">Verificado</th><td>Lo ha comprobado un moderador o lo ha publicado el organizador de la velada.</td></tr>
           <tr><th scope="row">En revisión</th><td>Moderación ha suspendido el resultado tras revisar un aviso. No cuenta en el récord ni en el aura hasta que se aclare. El aviso por sí solo no lo suspende.</td></tr>
-          <tr><th scope="row">Declarado por el propio deportista</th><td>El récord anterior a usar Ring España lo indica el peleador y se desglosa aparte. Si declara victorias, derrotas y empates, se suman a la cifra principal; si solo declara el número de combates, ese total se muestra aparte. No supone una verificación.</td></tr>
+          <tr><th scope="row">Declarado por el propio deportista</th><td>El récord anterior a usar Lona lo indica el peleador y se desglosa aparte. Si declara victorias, derrotas y empates, se suman a la cifra principal; si solo declara el número de combates, ese total se muestra aparte. No supone una verificación.</td></tr>
           <tr><th scope="row">Evidencia</th><td>Alguien ha añadido un enlace para respaldar el combate. Puedes abrirlo y comprobar qué aporta; tener un enlace no verifica automáticamente el resultado.</td></tr>
           <tr><th scope="row">✓ Verificado (gimnasios y organizadores)</th><td>Un moderador ha comprobado que existen y son quienes dicen ser.</td></tr>
         </tbody>

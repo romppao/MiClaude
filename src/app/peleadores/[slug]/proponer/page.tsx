@@ -57,7 +57,7 @@ export default async function Proponer({ params, searchParams }: { params: Promi
           <label className="field"><span>Fecha (opcional)</span><input type="date" name="day" min={hoy} max={ultimo} /><span className="hint">Déjala en blanco si preferís acordarla después.</span></label>
           <label className="field"><span>Dónde (opcional)</span><input name="place" maxLength={PROPOSAL_PLACE_MAX} placeholder="Gimnasio o ciudad" /></label>
           <label className="field"><span>Mensaje (opcional)</span><textarea name="message" maxLength={PROPOSAL_MESSAGE_MAX} rows={2} placeholder="Peso, asaltos, nivel…" /></label>
-          <p className="mut" style={{ margin: 0 }}>{nombre} verá tu nombre, tu ficha y lo que escribas; si acepta, podréis escribiros por correo. Aceptar un reto no crea el combate: cuando se celebre, se registra para que cuente en el récord. Ring España no organiza ni supervisa los sparrings: entrenad siempre en un gimnasio y con un entrenador.</p>
+          <p className="mut" style={{ margin: 0 }}>{nombre} verá tu nombre, tu ficha y lo que escribas; si acepta, podréis escribiros por correo. Aceptar un reto no crea el combate: cuando se celebre, se registra para que cuente en el récord. Lona no organiza ni supervisa los sparrings: entrenad siempre en un gimnasio y con un entrenador.</p>
           <button className="btn-grande">Enviar la propuesta</button>
         </form>
       )}

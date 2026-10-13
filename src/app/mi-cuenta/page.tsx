@@ -112,12 +112,12 @@ export default async function Account() {
         </> },
         { id: "pestana-privacidad", titulo: "Privacidad", contenido: <>
           <h2>Mis datos personales</h2>
-          <p>Puedes descargar una copia de todo lo que Ring España guarda de ti, en un fichero que se abre con cualquier editor de texto.</p>
+          <p>Puedes descargar una copia de todo lo que Lona guarda de ti, en un fichero que se abre con cualquier editor de texto.</p>
           <form action="/mi-cuenta/datos"><button className="secondary">Descargar una copia de mis datos</button></form>
           <p className="mut" style={{ marginTop: 12 }}>Consulta cómo tratamos tus datos en la <Link href="/privacidad">política de privacidad</Link>.</p>
 
           <h2>Eliminar mi cuenta</h2>
-          <p>Si ya no quieres estar en Ring España, puedes eliminar tu cuenta y tus datos personales. Antes te explicamos qué se borra y qué se conserva.</p>
+          <p>Si ya no quieres estar en Lona, puedes eliminar tu cuenta y tus datos personales. Antes te explicamos qué se borra y qué se conserva.</p>
           <form action="/mi-cuenta/eliminar"><button className="secondary">Quiero eliminar mi cuenta</button></form>
         </> },
       ]} />

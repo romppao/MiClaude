@@ -1,4 +1,4 @@
-# Publicar Ring España en App Store y Google Play: proceso, web frente a app y costes
+# Publicar Lona en App Store y Google Play: proceso, web frente a app y costes
 
 **Petición del fundador (8 de octubre de 2026):** «Me gustaría que me indicases el proceso para publicar la aplicación oficialmente al mercado […] cómo subirlo tanto a Apple Store como a Google Store para que los aficionados la puedan descargar. También limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación. […] Partimos de una base de 500 clientes como máximo en esta primera etapa. ¿Es sostenible? ¿Voy a necesitar pagar algo?»
 
@@ -27,7 +27,7 @@ Este documento es una **propuesta para estudiar** (el fundador la compartirá co
 | **Capacitor** (recomendado) | Una aplicación nativa para iOS y Android que abre nuestra web y añade funciones del teléfono mediante complementos | 0 € (código abierto) | **Un solo código** para web, iPhone y Android. Cada mejora de la web llega a la app **sin pasar por revisión** (salvo cambios en la parte nativa). |
 | App nativa (React Native, Swift/Kotlin) | Reescribir la interfaz | Meses de trabajo | Descartado en esta etapa. Se puede reconsiderar si la app crece mucho. |
 
-**El riesgo principal es la norma 4.2 de Apple («funcionalidad mínima»):** Apple rechaza las apps que son «una web metida en una caja». Para superarla, la app de Ring España debe aportar cosas que la web no puede:
+**El riesgo principal es la norma 4.2 de Apple («funcionalidad mínima»):** Apple rechaza las apps que son «una web metida en una caja». Para superarla, la app de Lona debe aportar cosas que la web no puede:
 
 1. **Avisos en el teléfono** (notificaciones): «Tu peleador combate el sábado», «Han subido un vídeo de tu combate», «Te han dado aura». Se envían con **Firebase Cloud Messaging**, gratuito, que también sirve para iPhone.
 2. **Subir vídeos y fotos desde la cámara y la galería** del teléfono, con la hoja nativa de compartir.

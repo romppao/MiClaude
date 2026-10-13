@@ -4,7 +4,7 @@
 
 > **Relevo vigente (3 de octubre de 2026):** empezar por [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md) y el cierre de [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md). El fundador considera la composición actual desorganizada y saturada; el diseño es provisional y se retoma al final. No iniciar otro rediseño ni integrar automáticamente la propuesta móvil #13.
 
-Guía para retomar Ring España fuera de la sesión de la aplicación móvil, con Claude Code instalado en tu ordenador.
+Guía para retomar Lona fuera de la sesión de la aplicación móvil, con Claude Code instalado en tu ordenador.
 Está escrita para que la pueda seguir una persona y también para que la lea Claude Code al empezar.
 Redacción original: **30 de septiembre de 2026**. El estado se actualiza con los bloques posteriores; el cierre de APORTACIONES-CODEX identifica los commits y las comprobaciones vigentes.
 
@@ -112,7 +112,7 @@ La demo de Render está publicada; eso no implica servicio real preparado. Mante
 7. **Registro y privacidad de los correos:** el formulario de registro dice «ya hay una cuenta con ese correo» (claro para la persona, pero revela quién tiene cuenta). Se limita por IP. ¿Se acepta ese riesgo?
 8. **Aura:** ¿se normaliza por número de combates o se pondera (lo vi en directo, antigüedad)? Hoy es el total absoluto.
 9. **Categorías de peso:** son orientativas; validarlas con las federaciones.
-10. **Nombre de la marca** («Ring España» encaja peor ahora que hay MMA, K-1…) y **si el código también debe ir en español** (supone un renombrado grande).
+10. **Nombre de la marca** («Ring España» encaja peor ahora que hay MMA, K-1…) y **si el código también debe ir en español** (supone un renombrado grande). **Nombre resuelto (13 oct): Lona;** el código sigue en inglés.
 11. **Alojamiento y correo — APROBADO el 6 de octubre:** [ADR-003](decisiones/ADR-003-proveedores-fase-0.md) (Neon, Render, Cloudflare R2, Resend, Sentry, UptimeRobot), con segunda verificación hecha. El fundador crea las cuentas gratuitas en su portátil siguiendo [`RELEVO-PORTATIL.md`](RELEVO-PORTATIL.md); **sin dominio propio (~7 €/año) no hay correos reales**.
 12. **Personas para probar la usabilidad** (edades y familiaridad con la tecnología).
 13. **Correo de contacto y responsable** (`CONTACT_EMAIL`, `RESPONSABLE_NOMBRE`): hoy, sin ellos, la privacidad no ofrece ningún medio de contacto a quien no tiene cuenta. Hay que decidir cuál es.

@@ -29,7 +29,10 @@ export default function Icono({ nombre, tam = 20, grosor = 2 }: { nombre: Nombre
   return <svg aria-hidden="true" viewBox="0 0 24 24" width={tam} height={tam} fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" strokeLinejoin="round"><path d={TRAZOS[nombre]} /></svg>;
 }
 
-/** El logotipo de dos anillos. */
+/**
+ * Símbolo oficial de la marca: el ring visto desde arriba, la «o» del logotipo de Lona (decisión del fundador, 13 de octubre de 2026;
+ * archivos en public/brand/lona). Lona en lima, cuerda interior en negro y cuatro postes, dos violetas y dos blancos.
+ */
 export const Marca = ({ ancho = 30 }: { ancho?: number }) => (
-  <svg aria-hidden="true" viewBox="0 0 64 48" width={ancho} height={(ancho * 3) / 4} style={{ color: "var(--acc)", flex: "none" }}><ellipse cx="24" cy="24" rx="18" ry="12" transform="rotate(-35 24 24)" fill="none" stroke="currentColor" strokeWidth="7" /><ellipse cx="42" cy="24" rx="18" ry="12" transform="rotate(-35 42 24)" fill="none" stroke="currentColor" strokeWidth="7" /></svg>
+  <svg aria-hidden="true" viewBox="0 0 100 100" width={ancho} height={ancho} style={{ flex: "none" }}><rect x="14" y="14" width="72" height="72" rx="6" fill="#D4F67C" /><rect x="24" y="24" width="52" height="52" rx="3" fill="none" stroke="#0A0A0C" strokeWidth="4" /><circle cx="14" cy="14" r="9" fill="#BE33F5" /><circle cx="86" cy="14" r="9" fill="#FFFFFF" /><circle cx="14" cy="86" r="9" fill="#FFFFFF" /><circle cx="86" cy="86" r="9" fill="#BE33F5" /></svg>
 );

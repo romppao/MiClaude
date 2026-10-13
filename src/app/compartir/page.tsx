@@ -46,7 +46,7 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
           <nav className="lista" aria-label="Veladas de los últimos meses">
             {veladas.map((v) => <Link key={v.id} href={`/compartir?velada=${v.slug}`} className="fila"><span className="cuerpo"><span className="nombre">{v.name}</span><span className="meta">{EVENT_KIND_LABEL[v.kind]} · {fmtDate(v.date)} · {v.city} · {DISCIPLINE_LABEL[v.discipline]}</span></span></Link>)}
           </nav>
-        ) : <p className="mut">{texto ? "No hay veladas de los últimos cuatro meses con ese nombre o ciudad." : "No hay veladas celebradas en los últimos cuatro meses."} Si la velada no está en Ring España, su organizador puede publicarla, o puedes buscarla en el <Link href="/veladas">calendario</Link>.</p>}
+        ) : <p className="mut">{texto ? "No hay veladas de los últimos cuatro meses con ese nombre o ciudad." : "No hay veladas celebradas en los últimos cuatro meses."} Si la velada no está en Lona, su organizador puede publicarla, o puedes buscarla en el <Link href="/veladas">calendario</Link>.</p>}
       </div>
     );
   }

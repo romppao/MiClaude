@@ -3,7 +3,7 @@ import type { ClassRequestStatus } from "@prisma/client";
 /**
  * Solicitudes de clase (petición del fundador, 8 de octubre de 2026: «poder reservar las clases privadas publicadas es misión imposible,
  * ya que no hay opción ni un botón para hacerlo»). La persona pide la clase diciendo cuándo le viene bien; el entrenador la acepta o la
- * rechaza con un mensaje, y los dos lo ven en la aplicación y por correo. Ring España no cobra: la clase se paga al entrenador.
+ * rechaza con un mensaje, y los dos lo ven en la aplicación y por correo. Lona no cobra: la clase se paga al entrenador.
  */
 export const REQUEST_MESSAGE_MAX = 500;
 export const REQUEST_PHONE_MAX = 20;

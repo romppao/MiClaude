@@ -1,4 +1,4 @@
-# Ideas de Ring España
+# Ideas de Lona
 
 Registro vivo de las ideas: de dónde salieron, en qué estado están y qué queda por probar.
 Sirve para revisar los principios del proyecto y para recuperar ideas aparcadas. Se actualiza en cada sesión (ver [`DIARIO.md`](DIARIO.md)).
@@ -121,7 +121,7 @@ Origen: el flujo de personas de prueba (ver [`pruebas/hallazgos-2026-10-01.md`](
 
 ## Preguntas abiertas
 
-- **Nombre:** «Ring España» encaja peor ahora que hay MMA, kickboxing, K-1 y jiu-jitsu. El vocabulario ya es «peleador»; falta decidir el nombre de la marca.
+- **Nombre:** «Ring España» encaja peor ahora que hay MMA, kickboxing, K-1 y jiu-jitsu. El vocabulario ya es «peleador»; falta decidir el nombre de la marca. **Resuelto (13 oct): Lona.**
 - **Jiu-jitsu:** en torneos con muchos combates el mismo día se ha desactivado la señal de «combates muy seguidos»; falta decidir cómo modelar un torneo (varias eliminatorias) de forma más natural.
 - **Aura:** ¿se normaliza por número de combates o se pondera (lo vi en directo, antigüedad de la cuenta)? Hoy es el total absoluto, con filtro de periodo.
 - **Récord de partida:** ¿se bloquea su edición tras el primer combate registrado, o lo revisa un moderador?
@@ -137,7 +137,7 @@ Origen: el flujo de personas de prueba (ver [`pruebas/hallazgos-2026-10-01.md`](
 - ¿Cuántos combates confirmados exige el ránking para que un peleador aparezca?
 - ¿Cómo se trata a los peleadores menores de edad (privacidad, consentimiento parental, visibilidad de su ficha)?
 - ¿Modelo de sostenibilidad del proyecto (gratis, patrocinio de gimnasios y promotoras, entradas…)?
-- ¿Nombre definitivo y marca? («Ring España» es un nombre de trabajo.)
+- ¿Nombre definitivo y marca? («Ring España» es un nombre de trabajo.) **Resuelto (13 oct): Lona.**
 
 - **Modo demostración con cambio de papel** (2 de octubre de 2026, surgió de «lánzame una demo» desde el móvil): botón para probar como aficionado / peleador / organizador / moderador con una sola cuenta. Es un andamio para probar, no una función de producto; pero anticipa el selector A/B/C que pidió el fundador (tarea 13).
 
@@ -327,3 +327,7 @@ Decisión aplicada por petición del fundador: escenas pequeñas, carga diferida
 
 ## Codex, adaptaci?n 10 oct
 Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?n al espacio de pantalla. Mantener identidad y composici?n m?vil; aprovechar columnas en escritorio. Ver ADAPTACION-DISPOSITIVOS.md.
+
+## Nombre y marca — 13 de octubre de 2026
+
+- **Nombre «Lona»** (el fundador: «la lona del ring»). Estado: **elegido el logotipo (B · Cuadrilátero, 13 oct)**; antes, propuesto por el fundador, con cuatro direcciones de logotipo y tipografía preparadas (`DISENO.md`, sección del 13 de octubre). Falta comprobar el registro de marca (OEPM y EUIPO), el dominio y los nombres en las tiendas, y que el fundador elija una dirección. «Lona» sigue siendo el nombre de trabajo hasta entonces.

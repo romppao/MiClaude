@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const nombre = publicFighterName(fighter);
   return {
     title: nombre,
-    description: `Ficha de ${nombre} en Ring España: récord por disciplina, combates y aura del público.`,
+    description: `Ficha de ${nombre} en Lona: récord por disciplina, combates y aura del público.`,
     // Una ficha sin reclamar u ocultada no debe aparecer en los buscadores.
     robots: fighter.listed && !fighter.hiddenAt ? undefined : { index: false, follow: false },
   };

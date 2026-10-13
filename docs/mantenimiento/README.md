@@ -1,4 +1,4 @@
-# Manual para mantener Ring España
+# Manual para mantener Lona
 
 Este manual permite trabajar en el proyecto sin conocer las conversaciones de sus asistentes. Se incorpora por petición expresa del fundador del 8 de octubre de 2026: «que absolutamente todo el código […] esté bien explicado» para que un programador pueda corregirlo y ampliarlo en el futuro.
 

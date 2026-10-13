@@ -1469,3 +1469,77 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Qué se comprobó:** capturas con sesión y sin ella a 1024, 1100, 1280, 1366, 1440 y 1920 px: una sola fila y nada fuera de pantalla. En local, `usabilidad`, `menu`, `acceso` y `cuenta` pasan sus comprobaciones de cabecera; los fallos restantes son por no tener `psql` en Windows. `escenarios.mjs` (no está en el CI) busca ahora desde `/buscar`.
 **Qué salió mal:** el CI destapó que `RecordarCampos` perdía lo escrito si React vaciaba el formulario tarde (la altura de la ficha en `cuenta.mjs`); ahora guarda lo escrito y vigila 30 s. También hubo que adaptar `busqueda.mjs` (escribía en el campo de la cabecera) y mantener «Mis veladas» en la cabecera de quien organiza.
 **Estado y siguientes pasos:** pendiente de CI y despliegue. Se ve una noticia duplicada por llegar de dos fuentes (AEBOX y su búsqueda): queda para revisar la deduplicación.
+
+## 13 de octubre de 2026 — Propuestas de nombre, logotipo y tipografía: «Lona» (Claude)
+
+**Qué se pidió** (el fundador): empezar con el logotipo oficial y el nombre. Como nombre propone **«Lona»**, por la lona del ring, y pide propuestas de logotipo y una tipografía oficial «que nos represente, que nos identifique como marca».
+
+**Qué se hizo:** un lienzo con cuatro direcciones claramente distintas (Esquina, Cuadrilátero, Cuerdas y Cartel) y una hoja comparativa de tipografía. Cada dirección muestra el logotipo sobre oscuro y sobre claro, el icono de la app en tres tamaños, cómo quedaría en la cabecera y su tipografía. Se mantienen los colores aprobados y el lema; no se cambia nada de la app hasta que el fundador elija.
+
+**Qué falta:** que el fundador elija; comprobar el registro de «Lona» como marca, el dominio y los nombres en las tiendas (no se ha comprobado nada); y que un diseñador humano dibuje el logotipo definitivo. Detalle en `DISENO.md`.
+
+**Nota:** «Lona» no aparecía en la documentación anterior. Si el fundador lo propuso en otra conversación, aquí queda recogido desde ahora.
+
+## 13 de octubre de 2026 — Elegido el logotipo: B · Cuadrilátero (Claude)
+
+**Qué se pidió** (el fundador): «Definitivamente me quedo con la B, la del cuadrilátero, en la cual la O se hace como una especie de ring. Vamos a tirar con esa.»
+
+**Qué se hizo:**
+- Se preparó la versión oficial en archivos: logotipo para fondo oscuro y claro, símbolo e icono de la app en SVG y PNG.
+- Las letras van convertidas en trazados con un guion propio (`scripts/generar-logo-lona.py`), así que el logotipo se ve igual en cualquier sitio.
+- Se descargaron las fuentes de Bricolage Grotesque, con su licencia libre.
+- Se separó un poco el ring de las letras: en la maqueta, los postes llegaban a tocar la «l» y la «n».
+
+**Qué falta:**
+- Confirmar con el fundador cuándo se cambia el nombre en la app; todavía no se ha tocado.
+- Comprobar el registro de la marca.
+- La revisión de un diseñador.
+
+## 13 de octubre de 2026 — El ring, icono oficial: favicon, icono y cabecera (Claude)
+
+**Qué se pidió** (el fundador): «La O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
+
+**Qué se hizo:**
+- Favicon, icono del iPhone, manifiesto de la app web con sus iconos, y el símbolo de la cabecera y de la bienvenida: todo pasa al ring.
+- El nombre visible sigue siendo «Ring España» hasta que el fundador lo confirme.
+
+**Qué salió mal:**
+- Hubo que instalar dependencias nuevas que habían añadido otros asistentes.
+- La prueba de móvil (`movil.mjs`) falla en mi base local en la portada (`/`): dos `<polygon>` y dos `<div>` salen por la derecha.
+- **Comprobado que ya fallaba sin estos cambios:** se compiló la rama principal sin ellos y salió lo mismo. Las pruebas de GitHub de la rama principal están en verde. Parece depender de las noticias guardadas en la base local; queda anotado para revisarlo.
+
+**Pruebas:**
+- 652 unitarias.
+- Sin fallos en `diseno`, `enlaces`, `accesibilidad` y `usabilidad`.
+- Las direcciones `/icon.svg`, `/apple-icon.png` y `/manifest.webmanifest` responden bien.
+
+## 13 de octubre de 2026 — Ring España pasa a llamarse Lona (Claude)
+
+**Qué se pidió** (el fundador): «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
+
+**Qué se hizo:**
+- Cambio de nombre en toda la app: cabecera con el logotipo oficial, títulos, textos, correos, descarga de datos, manifiesto y aplicación de códigos.
+- Cambio de nombre en los documentos vigentes.
+- Las entradas antiguas de este diario no se reescriben (regla de la documentación): conservan «Ring España» porque así se llamaba entonces.
+- Detalle y lista de lo que falta en `DISENO.md`.
+
+**Qué salió mal:**
+- El reemplazo automático dejó en `CLAUDE.md` una frase sin sentido («de Lona a Lona»): se corrigió a mano.
+- Una prueba unitaria esperaba el nombre antiguo en el enlace de la aplicación de códigos; se actualizó.
+- Las cuentas que ya tenían el segundo paso configurado seguirán viendo «Ring España» en su aplicación de códigos. Los códigos siguen valiendo; si quieren el nombre nuevo, basta con volver a configurarlo.
+
+**Pendiente del fundador:** cambiar `MAIL_FROM` en Render, el dominio, la dirección de la demo y el nombre del repositorio, y comprobar la marca.
+
+## 13 de octubre de 2026 — La foto de portada pasa a ser del fundador (Claude)
+
+**Qué se pidió** (el fundador): cambiar la foto de la pantalla de inicio («aparecen varias personas sonriendo») por «Bajo las cuerdas», de su portafolio de boxeo, en la que el entrenador le pone el casco al peleador: «es mía la foto y es más realista, porque la otra está hecha con inteligencia artificial».
+
+**Qué se hizo:**
+- Se tomó la foto del repositorio de su portafolio (`portafolio-romppao`, `public/images/boxeo-2.jpg`) y se guardó como `public/brand/bajo-las-cuerdas.webp`.
+- La imagen de IA (`comunidad.webp`) se usaba en tres sitios: la portada del visitante, la bienvenida (en círculo) y la clase `.home-hero`. Se cambió en los tres y se borró, para que no quede en ninguna parte.
+- El encuadre se centra en las manos y el casco.
+- Las descripciones para lector de pantalla ya no hablan de «personas ficticias»: describen la escena real.
+
+**Qué salió mal:** nada. Una limitación: la foto del portafolio mide 682 × 1024 píxeles. En pantallas grandes de alta densidad puede verse algo blanda; si el fundador tiene el original a más resolución, basta con sustituir el archivo.
+
+**Pruebas:** capturas en móvil (390 px), escritorio (1440 px) y bienvenida.

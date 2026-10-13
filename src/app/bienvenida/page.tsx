@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "../../lib/accounts/auth";
-import Icono, { Marca } from "../components/Icono";
+import Icono from "../components/Icono";
 
-export const metadata = { title: "Bienvenida", description: "Ring España: tu comunidad de deportes de contacto en toda España." };
+export const metadata = { title: "Bienvenida", description: "Lona: tu comunidad de deportes de contacto en toda España." };
 export const dynamic = "force-dynamic";
 
 /** Primera pantalla de la aplicación (diseño v3): foto en círculo que se funde con el negro, «Empezar», «Entrar» y «Explorar sin cuenta». */
@@ -11,9 +11,9 @@ export default async function Bienvenida() {
   if (await getUser()) redirect("/");
   return (
     <section className="bienvenida a-sangre" aria-labelledby="titulo-bienvenida">
-      <div className="foto" role="img" aria-label="Personas de la comunidad de deportes de contacto (imagen ilustrativa con personas ficticias)" />
+      <div className="foto" role="img" aria-label="Un entrenador le pone el casco a un peleador, bajo las cuerdas del ring" />
       <div className="bienvenida-contenido">
-      <span className="sello-marca"><Marca ancho={24} />RING ESPAÑA</span>
+      <span className="sello-marca"><img src="/brand/lona/lona-logo.svg" alt="Lona" width={55} height={28} /></span>
       <h1 id="titulo-bienvenida">Tu deporte.<br />Tu gente.</h1>
       <p className="lead" style={{ maxWidth: 300 }}>Tu comunidad de deportes de contacto en toda España: peleadores, veladas y gimnasios.</p>
       <Link href="/registro" className="btn btn-grande" style={{ width: 230, marginTop: 18 }}>Empezar<Icono nombre="siguiente" tam={18} grosor={2.2} /></Link>

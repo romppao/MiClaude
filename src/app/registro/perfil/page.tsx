@@ -30,7 +30,7 @@ export default async function PerfilEntrenadorRegistro() {
           <legend className="leyenda">Disciplinas que enseñas</legend>
           <div className="chips">{DISCIPLINE_ORDER.map((d) => <label key={d} className="chip"><input type="checkbox" name="disciplina" value={d} defaultChecked={p?.disciplines.includes(d)} />{DISCIPLINE_LABEL[d]}</label>)}</div>
         </fieldset>
-        <label className="field"><span>Dónde entrenas (opcional)</span><input name="gym" list="gimnasios-conocidos" defaultValue={p?.gym ?? ""} maxLength={LIMITS.gym} placeholder="Nombre del gimnasio o club" /><span className="hint">Si ya está en Ring España, elígelo de la lista.</span></label>
+        <label className="field"><span>Dónde entrenas (opcional)</span><input name="gym" list="gimnasios-conocidos" defaultValue={p?.gym ?? ""} maxLength={LIMITS.gym} placeholder="Nombre del gimnasio o club" /><span className="hint">Si ya está en Lona, elígelo de la lista.</span></label>
         <datalist id="gimnasios-conocidos">{gimnasios.map((g) => <option key={g.name} value={g.name} />)}</datalist>
         <label className="field"><span>Años entrenando (opcional)</span><input name="years" type="number" inputMode="numeric" min={0} max={TRAINER_YEARS_MAX} defaultValue={p?.years ?? ""} /></label>
         <label className="field"><span>Provincia</span><select name="province" defaultValue={p?.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((x) => <option key={x}>{x}</option>)}</select></label>

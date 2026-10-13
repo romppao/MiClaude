@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/README.md"
   },
   {
+    "path": "scripts/generar-logo-lona.py",
+    "purpose": "Genera el logotipo oficial de Lona (dirección B · Cuadrilátero) en SVG con las letras convertidas en trazados, y los símbolos e icono, en public/brand/lona.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -317,6 +322,11 @@
   {
     "path": "src/app/api/cron/noticias/route.ts",
     "purpose": "Endpoint del cron de noticias: exige CRON_SECRET (503 si falta) en la cabecera x-cron-secret con comparación en tiempo constante y fuerza la actualización de fuentes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/apple-icon.png",
+    "purpose": "Icono de la marca (ring de Lona) para la pantalla de inicio del iPhone, 180 px.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -640,6 +650,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/icon.svg",
+    "purpose": "Favicon oficial: el ring visto desde arriba, símbolo de la marca Lona.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/imagenes/[kind]/[id]/[slot]/route.ts",
     "purpose": "Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -652,6 +667,11 @@
   {
     "path": "src/app/layout.tsx",
     "purpose": "Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/manifest.ts",
+    "purpose": "Manifiesto de la aplicación web: nombre, colores e iconos oficiales para instalarla en el móvil.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

@@ -79,7 +79,7 @@ export default function NavigationMenu({ secciones, logoutForm }: Props) {
           >
             <div className="menu-panel">
               <div className="menu-heading">
-                <strong id="menu-heading">Explora Ring España</strong>
+                <strong id="menu-heading">Explora Lona</strong>
                 <button
                   className="secondary"
                   onClick={close}

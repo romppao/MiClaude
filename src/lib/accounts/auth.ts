@@ -121,7 +121,7 @@ export async function destroyOtherSessions(userId: string) {
 /** Crea el enlace de verificación y lo envía por correo. Devuelve false si el correo no ha podido enviarse. */
 export async function sendVerificationEmail(user: { id: string; email: string; name: string }): Promise<boolean> {
   const token = await issueToken(user.id, "VERIFY", VERIFY_HOURS);
-  return sendMail(user.email, "Confirma tu correo electrónico en Ring España", `Hola ${oneLine(user.name)},\n\nConfirma tu correo electrónico aquí (el enlace caduca en ${VERIFY_HOURS} horas):\n${APP_URL}/verificar?token=${token}\n\nSi no has creado una cuenta en Ring España, ignora este mensaje: no se activará nada.\n`);
+  return sendMail(user.email, "Confirma tu correo electrónico en Lona", `Hola ${oneLine(user.name)},\n\nConfirma tu correo electrónico aquí (el enlace caduca en ${VERIFY_HOURS} horas):\n${APP_URL}/verificar?token=${token}\n\nSi no has creado una cuenta en Lona, ignora este mensaje: no se activará nada.\n`);
 }
 
 /** Consume el enlace de verificación y marca el correo como verificado. Devuelve false si no es válido, ya se usó o ha caducado. */
@@ -139,7 +139,7 @@ export async function consumeVerificationToken(token: string): Promise<boolean> 
 /** Crea el enlace para elegir una contraseña nueva y lo envía por correo (caduca en 1 hora). */
 export async function sendPasswordResetEmail(user: { id: string; email: string; name: string }): Promise<boolean> {
   const token = await issueToken(user.id, "RESET", RESET_HOURS);
-  return sendMail(user.email, "Elige una contraseña nueva en Ring España", `Hola ${oneLine(user.name)},\n\nHemos recibido una petición para elegir una contraseña nueva. Puedes hacerlo aquí (el enlace caduca en ${RESET_HOURS} hora y solo sirve una vez):\n${APP_URL}/recuperar/nueva?token=${token}\n\nSi no lo has pedido tú, ignora este mensaje: tu contraseña actual sigue siendo la misma.\n`);
+  return sendMail(user.email, "Elige una contraseña nueva en Lona", `Hola ${oneLine(user.name)},\n\nHemos recibido una petición para elegir una contraseña nueva. Puedes hacerlo aquí (el enlace caduca en ${RESET_HOURS} hora y solo sirve una vez):\n${APP_URL}/recuperar/nueva?token=${token}\n\nSi no lo has pedido tú, ignora este mensaje: tu contraseña actual sigue siendo la misma.\n`);
 }
 
 /** ¿Es un enlace de recuperación que todavía se puede usar? (solo lectura, para decidir qué enseñar). */

@@ -1,4 +1,4 @@
-# Dirección visual de Ring España
+# Dirección visual de Lona
 
 > **Prioridad posterior del fundador — 3 de octubre de 2026:** el diseño publicado no le gusta: «se ve muy desorganizado y saturado». Pide pulir las funciones y volver al diseño al final. La composición actual queda provisional; las aprobaciones históricas no constituyen aceptación del resultado final. No implementar otra maqueta durante este bloque. Retomar con un briefing de jerarquía, recorridos y referencias cuando se cierre la fase funcional; [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md).
 
@@ -16,7 +16,7 @@ Esto autoriza explorar y mostrar propuestas. No supone que se haya elegido una i
 
 Se ha revisado visualmente https://raunder.es/: fondo blanco, texto casi negro, botones rojos intensos y una sección oscura de tono rojizo. Esta descripción es una observación visual, no una extracción exacta de sus valores CSS.
 
-Ring España debe distinguirse con una familia fría verde/azulada en su identidad y sus acciones principales. Se descartan el rojo óxido de la primera propuesta y el naranja de la tercera como direcciones de marca para este encargo.
+Lona debe distinguirse con una familia fría verde/azulada en su identidad y sus acciones principales. Se descartan el rojo óxido de la primera propuesta y el naranja de la tercera como direcciones de marca para este encargo.
 
 ## Primera revisión: petróleo y marfil (no elegida)
 
@@ -90,7 +90,7 @@ Comprobación de contraste con la fórmula de luminancia sRGB: blanco puro sobre
 
 El fundador adjuntó una imagen con quince recursos. Se consultaron sus páginas y resultados públicos; no equivale a haber navegado todas sus bibliotecas ni probado cada interfaz. No se compraron suscripciones ni se accedió a cuentas.
 
-| Recursos | Revisión y utilidad para Ring España |
+| Recursos | Revisión y utilidad para Lona |
 |---|---|
 | https://curated.design/ | Índice público de estilos y sitios; útil para seleccionar referencias de composición |
 | https://land-book.com/ | Revisión visual de la categoría Sport y de Off-Field; fotografía deportiva, tipografía y marca |
@@ -173,3 +173,100 @@ El fundador confirma que le gusta el aspecto actual. Solicita optimizarlo conser
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 13 de octubre de 2026 — Nombre «Lona», logotipo y tipografía: propuestas (Claude)
+
+**Encargo del fundador:** «Quiero ir yendo por el logo oficial de la aplicación y el nombre. Como nombre oficial ya había propuesto **Lona**: la lona del ring […] Me gustaría que me enviases propuestas […] También la tipografía oficial de la marca, una tipografía que nos represente, que nos identifique como marca.»
+
+**Punto de partida (no se cambia):** el aspecto aprobado (negro `#0A0A0C`, lima `#D4F67C` y violeta `#BE33F5` como segundo color) y el lema «Tu deporte. Tu gente.». Las propuestas solo tocan nombre, símbolo y letra de titulares; Archivo sigue para el texto.
+
+**Cuatro direcciones, distintas entre sí** (lienzo privado del fundador: «Lona — propuestas de marca», en claude.ai):
+1. **A · Esquina.** La L son tres cuerdas que se juntan en el poste de una esquina (punto violeta). El nombre va en Archivo ancha. Es la más continuista: misma familia tipográfica que la app.
+2. **B · Cuadrilátero.** La «o» de «lona», en minúsculas, es el ring visto desde arriba: lona lima, cuerdas y cuatro postes. Letra Bricolage Grotesque. Es la más cercana y juvenil.
+3. **C · Cuerdas.** «LONA» estrecha y alta (Big Shoulders Display), con tres cuerdas que pasan por detrás de las letras. Recuerda al rótulo de pabellón y se ve muy bien en el móvil.
+4. **D · Cartel.** Letra egipcia de madera (Alfa Slab One) dentro de un marco doble, como los carteles de veladas de siempre, con una barra violeta. Es la más clásica y con más historia.
+
+**Tipografía:** las cuatro son gratuitas, con licencia libre (SIL Open Font License), y tienen ñ, tildes y ¿¡. En todas, la letra de carácter se usa solo para el nombre y los titulares, y Archivo para el resto, por legibilidad y para cumplir los 16 px.
+
+**Evitado a propósito** (lista de `CLAUDE.md`): degradados, cristal, iconos de guante o puño (los usa medio sector) y letras por defecto.
+
+**Pendiente antes de decidir:**
+- **Comprobar que «Lona» se puede registrar como marca:** en la OEPM (España) y la EUIPO (UE), en las clases de aplicaciones y de servicios deportivos. También el dominio y el nombre en App Store y Google Play. **No se ha comprobado nada todavía.** Que la palabra sea común puede dificultar el registro en solitario; quizá haga falta una forma compuesta («Lona App», «Lona Fight»…).
+- **Que un diseñador humano dibuje la versión final** del logotipo e icono a partir de la dirección elegida (recomendación de siempre en este documento).
+- Cuando el fundador elija, documentar aquí qué se eligió y qué se descartó. Después, cambiar el nombre en la app («Ring España» aparece en textos, correos, títulos y manifiesto): es un cambio grande y se planifica aparte.
+
+### 13 de octubre de 2026 (continuación) — La L como icono
+
+**El fundador:** «Me gusta la del **cuadrilátero**, vamos a guardarla ahí por el momento. Quiero que sigas desarrollando otras en las que la letra **L**, la primera de Lona, sea la protagonista […] un toque que sea como el icono de la marca.»
+
+- **Guardada:** B · Cuadrilátero (la «o» es el ring visto desde arriba).
+- **Nuevas, con la L como icono** (misma hoja de propuestas, fila «La L como icono de la marca»):
+  - **E · La L en la lona:** continúa la del cuadrilátero; la L va recortada en la lona, entre los cuatro postes. Letra Bricolage Grotesque, en minúsculas.
+  - **F · La L de campeón:** la L en la placa central de un cinturón, con las correas en violeta. Letra Archivo ancha.
+  - **G · La L vendada:** la L envuelta como una venda de mano, con la última vuelta en violeta. Letra Big Shoulders Display.
+  - **H · La L en movimiento:** una L inclinada con la estela de un golpe. Letra Archivo cursiva y gruesa.
+- Siguen pendientes la elección del fundador, la comprobación de la marca y el dibujo final por un diseñador.
+
+### 13 de octubre de 2026 — Decisión: logotipo B · Cuadrilátero
+
+**El fundador:** «Definitivamente me quedo con la opción de las propuestas iniciales, la **B, la del cuadrilátero**, en la cual la O se hace como una especie de ring. Vamos a tirar con esa. Es la que más me ha gustado.»
+
+**Elegido:**
+- **Logotipo:** «lona» en minúsculas, y la «o» es el ring visto desde arriba: la lona en lima, la cuerda interior en negro y cuatro postes, dos en violeta y dos en blanco (en negro sobre fondo claro).
+- **Tipografía de marca:** **Bricolage Grotesque** (licencia libre SIL OFL) para el nombre y los titulares; **Archivo** sigue para el texto.
+- **Colores:** los ya aprobados: negro `#0A0A0C`, lima `#D4F67C` y violeta `#BE33F5`.
+
+**Descartado:** A (Esquina), C (Cuerdas), D (Cartel) y las cuatro de la L (E–H). Quedan en la hoja de propuestas como referencia.
+
+**Archivos oficiales** (`public/brand/lona/`, generados con `scripts/generar-logo-lona.py`; las letras van convertidas en trazados, así que no dependen de tener la fuente instalada):
+- `lona-logo.svg` (fondo oscuro) y `lona-logo-claro.svg` (fondo claro);
+- `lona-simbolo.svg` y `lona-simbolo-claro.svg`, solo el ring;
+- `lona-icono.svg` y los PNG de 1024, 512, 192, 180 y 32 px para las tiendas, el móvil y la pestaña del navegador.
+- Las fuentes Bricolage Grotesque están en `public/brand/` con su licencia (`BricolageGrotesque-OFL.txt`).
+- Ajuste respecto a la maqueta: el ring es algo más pequeño (90 % de la altura de las minúsculas) y deja aire con la «l» y la «n», para que los postes no toquen las letras.
+
+**Sigue pendiente:**
+- Comprobar el registro de «Lona» como marca (OEPM y EUIPO), el dominio y los nombres en las tiendas.
+- Que un diseñador humano revise y pula el dibujo final.
+- Cambiar el nombre en la app: «Ring España» → «Lona», junto con el logotipo de la cabecera, el icono, los títulos, los correos y el manifiesto. Se hará cuando el fundador lo confirme.
+
+### 13 de octubre de 2026 — El ring, icono oficial
+
+**El fundador:** «Obviamente, la O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
+
+**Aplicado en la app:**
+- **Favicon:** `src/app/icon.svg`, el ring sobre un cuadrado negro de esquinas redondeadas.
+- **Icono del iPhone:** `src/app/apple-icon.png`.
+- **Manifiesto** para instalar la app en el móvil: `src/app/manifest.ts`, con los iconos de 192 y 512 px.
+- **Cabecera y bienvenida:** el símbolo de dos anillos se sustituye por el ring (componente `Marca` y cabecera de `layout.tsx`).
+
+El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen diciendo «Ring España» hasta que el fundador confirme el cambio de nombre. **Confirmado el mismo día: la app pasa a llamarse Lona** (ver abajo).
+
+### 13 de octubre de 2026 — La app pasa a llamarse Lona
+
+**El fundador:** «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
+
+**Hecho:**
+- **Cabecera:** el logotipo oficial (`lona-logo.svg`) sustituye al texto «RING ESPAÑA».
+- **Bienvenida:** el sello lleva el logotipo.
+- **En toda la app** pone «Lona»: títulos de las pantallas y de la pestaña, descripciones para buscadores, textos, mensajes, correos (asuntos, cuerpo y firma), la descarga de datos (`mis-datos-lona.json`), el manifiesto y el nombre de la cuenta en la aplicación de códigos del segundo paso.
+- **Documentos vigentes** con el nombre nuevo: README, CLAUDE.md, ARQUITECTURA, PLAN, TRASLADO, PUBLICACION, IDEAS, COMPETENCIA, DISENO, el manual de mantenimiento, los guiones de pruebas y las fichas de tareas.
+
+**Sin cambiar, a propósito:**
+- **Documentos históricos** (DIARIO, LECCIONES, APORTACIONES-*, AUDITORIA, decisiones/): cuentan lo que pasó con el nombre de entonces.
+- **Nombres técnicos invisibles** para la gente: la rama `claude/ring-espana-mvp`, la clave interna `ringespana:` del navegador y los nombres de las bases de datos.
+- **«Ring España App v3»:** es el nombre de una entrega de diseño.
+
+**Pendiente del fundador:**
+- El remitente de los correos: la variable `MAIL_FROM` en Render, que ahora dirá el nombre que tenga configurado.
+- La dirección de la demo (`ring-espana-demo.onrender.com`) y el dominio definitivo.
+- El nombre del repositorio en GitHub.
+- La comprobación de la marca.
+
+## 13 de octubre de 2026 — Foto de portada real: «Bajo las cuerdas»
+
+- El fundador sustituye la imagen ilustrativa generada por IA por una foto suya: «Bajo las cuerdas», en la que un entrenador le pone el casco a un peleador.
+- Se usa en la portada del visitante y en la bienvenida (`public/brand/bajo-las-cuerdas.webp`).
+- Autoría: ROMPPAO (el fundador), que la cede a Lona.
+- Regla desde ahora: **fotos reales del deporte**, no imágenes generadas, en las piezas principales de la marca.

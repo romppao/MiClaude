@@ -3,7 +3,7 @@
 **Fase:** F1 · **Estado:** hecha por Claude el 6 de octubre de 2026 (petición expresa del fundador: «corrige todo lo que dijiste…») · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo
-Sustituir el desplegable «¿Qué quieres hacer en Ring España?» del registro por **tres paneles claros** y profesionales, uno por tipo de persona, y llevar a cada una al sitio adecuado al terminar.
+Sustituir el desplegable «¿Qué quieres hacer en Lona?» del registro por **tres paneles claros** y profesionales, uno por tipo de persona, y llevar a cada una al sitio adecuado al terminar.
 
 ## Petición del fundador (palabras literales, 6 de octubre)
 «Me he dado cuenta que a la hora de iniciar sesión y registrarse has puesto: "¿Cómo te quieres registrar? Aficionado, no sé qué… peleador para ficha… organizador de veladas". No, no, no. **Tiene que ser profesional. Tiene que haber varios paneles. Panel A, para el usuario normal. No tiene que poner nada, simplemente es usuario, crear usuario. Después el panel B, peleadores. Panel C, promotoras, federaciones. Ya está, simplemente eso.** No tienes por qué complicarte ni poner palabras fuera de lugar. Tiene que estar ordenado, bien.»

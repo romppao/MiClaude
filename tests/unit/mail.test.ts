@@ -32,7 +32,7 @@ describe("envío de correo", () => {
     expect(llamada).not.toHaveBeenCalled();
   });
   it("con proveedor envía por HTTP y devuelve el resultado", async () => {
-    vi.stubEnv("RESEND_API_KEY", "clave"); vi.stubEnv("MAIL_FROM", "Ring España <hola@ejemplo.es>");
+    vi.stubEnv("RESEND_API_KEY", "clave"); vi.stubEnv("MAIL_FROM", "Lona <hola@ejemplo.es>");
     const llamada = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
     expect(await sendMail("persona@ejemplo.es", "Hola", "texto")).toBe(true);
     const [url, init] = llamada.mock.calls[0];

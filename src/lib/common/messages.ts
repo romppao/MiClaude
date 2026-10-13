@@ -78,7 +78,7 @@ export const AVISOS: Record<string, string> = {
   cuenta_guardada: "Los cambios de tu cuenta se han guardado.",
   contrasena_guardada: "Tu contraseña se ha cambiado. Hemos cerrado las sesiones abiertas en otros dispositivos.",
   avisos_desactivados: "Listo: ya no recibirás avisos por correo electrónico. Puedes volver a activarlos cuando quieras desde «Mi cuenta».",
-  cuenta_eliminada: "Tu cuenta y tus datos personales se han eliminado. Gracias por haber formado parte de Ring España.",
+  cuenta_eliminada: "Tu cuenta y tus datos personales se han eliminado. Gracias por haber formado parte de Lona.",
   ficha_actualizada: "Los datos de tu ficha se han guardado.",
   // Diseño v3: registro por pasos, entrenadores, récord privado y highlights.
   cuenta_creada: "Tu cuenta se ha creado. Te hemos enviado un correo electrónico para confirmarla. Mientras tanto, completa este último paso o déjalo para después.",

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateEnv } from "../../src/lib/common/env";
 
-const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Ring España <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
+const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Lona <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
 
 describe("comprobación del entorno", () => {
   it("en desarrollo no exige nada", () => {

@@ -2,7 +2,7 @@ import { safeHttpUrl } from "../common/url";
 
 /**
  * Módulo de Inteligencia Artificial («Nano Banano» / Gemini 2.5 Flash gratuito)
- * para enriquecimiento y generación de portadas de combates de Ring España.
+ * para enriquecimiento y generación de portadas de combates de Lona.
  * Utiliza la API gratuita de Google Gemini (15 peticiones/minuto, 0 € de coste).
  * Si no hay clave configurada (GEMINI_API_KEY), opera de forma segura sin interrumpir el flujo.
  */
@@ -34,7 +34,7 @@ export async function generarPromptImagenCombate({
           {
             parts: [
               {
-                text: `You are an elite sports art director for Ring España.
+                text: `You are an elite sports art director for Lona.
 Create a detailed image generation prompt (in English, 35 words max) for a dramatic, cinematic cover photo about this combat sports news:
 Title: "${titulo}"
 Discipline: ${disciplina}
@@ -72,7 +72,7 @@ export async function sintetizarTitularConIA(titularLargo: string): Promise<stri
           {
             parts: [
               {
-                text: `Resume este titular deportivo en una sola frase concisa en español (máximo 80 caracteres), directa y atractiva para la portada de Ring España:
+                text: `Resume este titular deportivo en una sola frase concisa en español (máximo 80 caracteres), directa y atractiva para la portada de Lona:
 "${titularLargo}"`,
               },
             ],

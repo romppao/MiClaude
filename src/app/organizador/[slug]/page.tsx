@@ -171,7 +171,7 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace del acta o del cartel (opcional)</span><input name="evidenceUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /></label>
         <button>Añadir al cartel</button>
       </form>
-      <p className="mut">Elige a cada peleador de la lista desplegable. Si alguien no aparece, debe crear o reclamar antes su ficha en Ring España.{fighters.length > MAX_LISTA && ` Se muestran los primeros ${MAX_LISTA} de la disciplina.`}</p>
+      <p className="mut">Elige a cada peleador de la lista desplegable. Si alguien no aparece, debe crear o reclamar antes su ficha en Lona.{fighters.length > MAX_LISTA && ` Se muestran los primeros ${MAX_LISTA} de la disciplina.`}</p>
 
       <h2>Cartel</h2>
       {event.bouts.length === 0 ? <p className="mut">El cartel está vacío. Añade el primer combate con el formulario de arriba.</p> : (

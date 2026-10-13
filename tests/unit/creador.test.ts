@@ -39,7 +39,7 @@ describe("códigos de la aplicación (RFC 6238)", () => {
     expect(a).toMatch(/^[A-Z2-7]{32}$/);
     expect(a).not.toBe(b);
     expect(claveLegible(a).split(" ")).toHaveLength(8);
-    expect(enlaceApp(a, "yo@correo.es")).toBe(`otpauth://totp/Ring%20Espa%C3%B1a%3Ayo%40correo.es?secret=${a}&issuer=Ring%20Espa%C3%B1a&algorithm=SHA1&digits=6&period=30`);
+    expect(enlaceApp(a, "yo@correo.es")).toBe(`otpauth://totp/Lona%3Ayo%40correo.es?secret=${a}&issuer=Lona&algorithm=SHA1&digits=6&period=30`);
   });
 });
 

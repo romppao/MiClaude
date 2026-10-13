@@ -26,7 +26,7 @@ export default async function Trainers({ searchParams }: { searchParams: Promise
       <div className="grid">
         {trainers.map((t) => <Link key={t.id} href={`/entrenadores/${t.slug}`} className="card"><strong>{t.name}</strong><div className="mut">{t.gym?.name ?? "Independiente"} · {t._count.fighters} peleadores{t._count.classes ? ` · ${t._count.classes} ${t._count.classes === 1 ? "clase" : "clases"}` : ""}</div></Link>)}
       </div>
-      {trainers.length === 0 && <p className="mut">{q ? "No hay entrenadores con ese nombre. Prueba a escribir solo una parte." : "Todavía no hay entrenadores registrados en Ring España."}</p>}
+      {trainers.length === 0 && <p className="mut">{q ? "No hay entrenadores con ese nombre. Prueba a escribir solo una parte." : "Todavía no hay entrenadores registrados en Lona."}</p>}
       <Paginacion ruta="/entrenadores" params={{ q }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["entrenador", "entrenadores"]} />
     </>
   );

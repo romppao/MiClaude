@@ -34,7 +34,7 @@ Una pantalla que funciona pero hace dudar a una persona **también es un fallo**
 
 ## 1. Visitante sin cuenta
 **Objetivo:** curiosear y decidir si le interesa. **Datos:** los de demostración.
-1. Entrar en la portada. ¿Se entiende qué es Ring España y qué puede hacer aquí en 10 segundos? ¿Hay un camino claro para crear cuenta?
+1. Entrar en la portada. ¿Se entiende qué es Lona y qué puede hacer aquí en 10 segundos? ¿Hay un camino claro para crear cuenta?
 2. Recorrer **cada** opción del menú (Peleadores, Ránking, Veladas, Gimnasios, Entrenadores, ¿Cómo funciona?) y volver al inicio desde cada una.
 3. En «Peleadores»: usar cada filtro (nombre, nivel, provincia, disciplina, categoría), pasar de página, abrir una ficha, volver atrás.
 4. En una ficha: leer el récord, el aura, los combates; abrir la velada de un combate y volver.

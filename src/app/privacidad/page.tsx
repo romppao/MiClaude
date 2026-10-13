@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Privacidad y tus datos", description: "Qué datos guarda Ring España, para qué, quién los ve, cuánto tiempo se conservan y cómo ejercer tus derechos." };
+export const metadata = { title: "Privacidad y tus datos", description: "Qué datos guarda Lona, para qué, quién los ve, cuánto tiempo se conservan y cómo ejercer tus derechos." };
 
 // La identidad del responsable y el contacto los define quien despliega la aplicación (variables de entorno); aquí no se inventa ninguno.
 const responsable = process.env.RESPONSABLE_NOMBRE;

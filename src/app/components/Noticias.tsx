@@ -8,7 +8,7 @@ import { MiniaturaNoticia, PortadaNoticia } from "./PortadaNoticia";
 
 /**
  * Noticias de la portada común y de cada disciplina. Cada titular enlaza a la noticia original en su medio (se abre en otra pestaña):
- * Ring España no copia el texto, solo el titular, el medio y la fecha, y siempre dice de dónde viene.
+ * Lona no copia el texto, solo el titular, el medio y la fecha, y siempre dice de dónde viene.
  */
 export function ListaNoticias({ noticias, ahora = new Date() }: { noticias: Noticia[]; ahora?: Date }) {
   return (

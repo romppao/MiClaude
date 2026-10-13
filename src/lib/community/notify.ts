@@ -52,7 +52,7 @@ export async function notifyDecision(userId: string, asunto: string, cuerpo: str
   try {
     const u = await db.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
     if (!u) return false;
-    return await sendMail(u.email, asunto, `Hola ${oneLine(u.name)},\n\n${cuerpo}\n\nUn saludo,\nRing España\n`);
+    return await sendMail(u.email, asunto, `Hola ${oneLine(u.name)},\n\n${cuerpo}\n\nUn saludo,\nLona\n`);
   } catch (e) {
     console.error(`[avisos] no se pudo responder a una solicitud: ${e instanceof Error ? e.message : String(e)}`);
     return false;
@@ -68,7 +68,7 @@ export async function notifyRivalOfBout(boutId: string): Promise<boolean> {
     const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
     if (!bout || bout.verification !== "SELF_REPORTED" || !bout.fighterB.userId) return false;
     return await notifyDecision(bout.fighterB.userId, `${fullName(bout.fighterA)} ha registrado un combate contra ti`,
-      `${fullName(bout.fighterA)} ha registrado en Ring España un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
+      `${fullName(bout.fighterA)} ha registrado en Lona un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
   } catch (e) {
     console.error(`[avisos] no se pudo avisar al rival: ${e instanceof Error ? e.message : String(e)}`);
     return false;
