@@ -29,6 +29,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - Titulares repetidos en las noticias: se descartan por dirección o título normalizados (incluido un fallo con la barra final y parámetros).
 - Al actualizar noticias se rechaza una respuesta que no sea un canal RSS.
 - No se puede pedir inscripción a una velada en cuya cartelera ya figura la persona.
+- Listado de peleadores: sin foto ya no aparece el icono de imagen rota sobre las iniciales (revisión con Impeccable tras integrar el PR #47).
 - Fechas de «Mi ficha» sin zona horaria fija (posible causa de un aviso de hidratación; la causa no está confirmada).
 
 ### Eliminado
