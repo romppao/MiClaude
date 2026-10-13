@@ -270,3 +270,31 @@ El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen dici
 - Se usa en la portada del visitante y en la bienvenida (`public/brand/bajo-las-cuerdas.webp`).
 - Autoría: ROMPPAO (el fundador), que la cede a Lona.
 - Regla desde ahora: **fotos reales del deporte**, no imágenes generadas, en las piezas principales de la marca.
+
+## 13 de octubre de 2026 — Tema claro y oscuro
+
+**Petición del fundador:** «la aplicación tiene un tema oscuro. Esto está bien, pero me gustaría también tener la opción de poner un tema blanco, que el usuario, en función de su sistema, como lo tenga predeterminado, pueda elegir el tema oscuro o el tema blanco».
+
+**Cómo funciona**
+- Por defecto, Lona usa el tema del teléfono u ordenador.
+- En el menú hay un apartado «Tema» con tres opciones: Automático (el del sistema), Claro y Oscuro. La elección se guarda en ese navegador.
+
+**Paleta del tema claro**
+
+Se eligió para que la marca siga siendo la misma:
+
+| Elemento | Color |
+|---|---|
+| Fondo | Hueso `#F4F2EC`, el mismo de las versiones «sobre fondo claro» del logotipo |
+| Tarjetas | Blanco |
+| Texto | Negro de la marca `#0A0A0C` |
+| Botones principales | Lima, con texto negro |
+
+Lo que no cambia de un tema a otro:
+- **Lima y violeta como texto:** el lima sobre blanco no se lee, así que como texto pasa a verde oliva `#4A6200` y el violeta a `#8A17B8`. Los dos cumplen el contraste AA.
+- **Fotos:** las portadas con foto, los carteles, los highlights y la bienvenida siguen oscuros también en el tema claro, porque el texto blanco sobre una foto se lee igual y la foto luce más.
+- **Logotipo:** en claro se usa `lona-logo-claro.svg`.
+
+**Regla para el código:** ningún color fijo en componentes. Todo va con los tokens de `globals.css` (`--text`, `--mut`, `--ink`, `--acc-text`…), definidos en los dos temas. La prueba de accesibilidad mide cada pantalla en claro y en oscuro.
+
+**Pendiente:** el fundador aún no ha visto el tema claro. Es una propuesta que se puede ajustar (el tono del fondo, el oliva de los enlaces).

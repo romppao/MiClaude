@@ -331,3 +331,17 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 ## Nombre y marca — 13 de octubre de 2026
 
 - **Nombre «Lona»** (el fundador: «la lona del ring»). Estado: **elegido el logotipo (B · Cuadrilátero, 13 oct)**; antes, propuesto por el fundador, con cuatro direcciones de logotipo y tipografía preparadas (`DISENO.md`, sección del 13 de octubre). Falta comprobar el registro de marca (OEPM y EUIPO), el dominio y los nombres en las tiendas, y que el fundador elija una dirección. «Lona» sigue siendo el nombre de trabajo hasta entonces.
+
+## 13 de octubre de 2026 — Tema, moderación y fallos
+
+- **Tema claro y oscuro según el sistema, con selector** (fundador, 13 oct). Estado: **hecho**. Pendiente de que el fundador vea el tema claro y ajuste tonos si quiere.
+- **Panel de moderación por bloques y registro de fallos con su historia** (fundador, 13 oct). Estado: **hecho** (`docs/MODERACION.md`).
+- **Aviso por correo al creador cuando aparezca un fallo nuevo** o uno se dispare (propuesta de Claude, 13 oct). Estado: idea. Depende de tener correo real (dominio y Resend).
+- **Tipos de moderador** (solo noticias, solo combates…) cuando crezca el equipo (propuesta de Claude, 13 oct). Estado: idea.
+- **Guardar el tema en la cuenta** para que sea el mismo en todos los dispositivos (propuesta de Claude, 13 oct). Estado: idea; hoy se guarda en cada navegador.
+
+## 13 de octubre de 2026 — Proteger el proyecto
+
+- **Repositorio privado** (fundador, 13 oct). Estado: **hecho** (ADR-004).
+- **Registrar la marca «Lona» en la OEPM**, y en la EUIPO si se piensa en Europa (Claude, 13 oct, recomendado como la protección real del negocio). Estado: **pendiente de decisión del fundador**, porque tiene coste. Antes hay que comprobar que nadie la tenga ya registrada en esta clase de servicios.
+- **Acuerdo de confidencialidad y cesión de derechos para programadores humanos** cuando se contraten (Claude, 13 oct). Estado: idea; conviene que lo revise un profesional.

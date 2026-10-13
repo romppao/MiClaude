@@ -58,11 +58,12 @@ export function resultWord(result: "A_WIN" | "B_WIN" | "DRAW" | "NO_CONTEST" | n
 
 /** Historial de cambios: nombres en español de lo que cambia y de la acción (lo desconocido se muestra en palabras sueltas). */
 export const AUDIT_ENTITY_LABEL: Record<string, string> = {
-  ACHIEVEMENT: "título", ACCREDITATION: "acreditación",
+  ACHIEVEMENT: "título", ACCREDITATION: "acreditación", APP_ERROR: "Fallo de la aplicación",
   BOUT: "Combate", EVENT: "Velada", FIGHTER: "Ficha de peleador", GYM: "Gimnasio", CLAIM: "Reclamación de ficha",
   ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta", CLASS: "Clase", PROPOSAL: "Reto o sparring",
 };
 export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  FALLO_ESTADO: "estado del fallo cambiado", FALLO_REAPARECE: "el fallo ha vuelto a ocurrir y se ha reabierto",
   UPDATED: "corregido", WITHDRAWN: "retirado", REVIEW_REQUESTED: "revisión solicitada", ENDORSE: "respaldado", REJECT: "excluido por moderación", RESTORE: "restaurado como declarado", GRANTED: "acreditación concedida", REVOKED: "acreditación retirada",
   CREATED: "creado", CREATED_BY_ORGANIZER: "añadido al cartel por el organizador", RESULT_SET: "resultado indicado", RESULT_SET_BY_AUTHOR: "resultado indicado por quien lo registró",
   RIVAL_REVIEW_REQUESTED: "revisión solicitada por el rival", ENDORSED: "respaldo del hecho comprobado", WITHDRAWAL_UNDONE: "retirada del título deshecha", EVIDENCE_SET: "enlace de evidencia cambiado", RIVAL_CONFIRMED: "confirmado por el rival", RIVAL_DISPUTED: "rechazado por el rival", ADMIN_VERIFIED: "verificado por un moderador",

@@ -4,6 +4,12 @@ name: Mantener despierta la demo
 # carga en el móvil se hacía muy lenta. Una visita a /salud cada 10 minutos lo evita. Consume horas del plan
 # gratuito de Render (750 h al mes, suficientes para un único servicio encendido todo el mes).
 # GitHub puede retrasar las ejecuciones programadas unos minutos; no garantiza el intervalo exacto.
+#
+# Repositorio privado (13 de octubre de 2026, ADR-004): cada visita cuenta como un minuto de GitHub Actions y, cada 10
+# minutos, suman unos 4.300 al mes, más que los 2.000 gratuitos de un repositorio privado. Por petición del fundador
+# («sin alterar el funcionamiento de la aplicación») sigue activa hasta que esté en marcha el monitor de UptimeRobot
+# (gratuito, aprobado en ADR-003; pasos en docs/DEMO.md), que hace lo mismo sin gastar minutos de GitHub. Cuando el
+# fundador confirme que UptimeRobot funciona, se quita el bloque «schedule» y este flujo queda solo para lanzarlo a mano.
 on:
   schedule:
     - cron: '*/10 * * * *'

@@ -4,6 +4,38 @@ Una copia con **datos ficticios** (peleadores, gimnasios y veladas inventados) p
 
 **Demo activa:** <https://ring-espana-demo.onrender.com/>. El 3 de octubre de 2026 se integró la propuesta #11 en `claude/ring-espana-mvp`: incluye categorías por edad, correcciones de calendario/récords y comunicación inclusiva. Comprobados públicamente portada, ránking, ayuda y salud, todos con respuesta 200 y los contenidos nuevos.
 
+## Que la demo no caduque (13 de octubre de 2026)
+
+Render avisó al fundador por correo de que la demo iba a caducar. Lo que caduca es **la base de datos gratuita de Render**, que dura 30 días desde que se creó (hacia el 2 de octubre). Después hay 14 días de gracia y luego Render la borra. La web en sí no caduca, pero sin base de datos no funciona.
+
+**Solución aprobada (ADR-003, 6 de octubre): pasar la base de la demo a Neon.** Es gratis, no caduca y es PostgreSQL normal, así que la aplicación no cambia. Lo hace el fundador en unos 10 minutos, porque hay que crear una cuenta, y Claude comprueba el resultado:
+
+1. Entra en <https://neon.com> y pulsa **Sign up**. Entra con tu cuenta de **GitHub**. Si te pide una tarjeta, **para y avisa**: el plan gratuito no debería pedirla.
+2. Crea un proyecto:
+   - Nombre: `lona-demo`.
+   - Región: **AWS Europe Central 1 (Frankfurt)**.
+   - Deja la versión de PostgreSQL que venga por defecto.
+3. En el panel del proyecto pulsa **Connect**:
+   - **Desactiva «Connection pooling»**: la aplicación usa la conexión directa para preparar las tablas.
+   - Copia la dirección completa. Empieza por `postgresql://` y termina en `sslmode=require`.
+   - **No la pegues en el chat ni en ningún archivo**: es la llave de la base de datos.
+4. En <https://dashboard.render.com>:
+   - Abre el servicio `ring-espana-demo` → **Environment**.
+   - Busca `DATABASE_URL` → **Edit**, pega la dirección de Neon y pulsa **Save, rebuild, and deploy**.
+5. Cuando termine (unos 5 minutos), dile a Claude «ya está». Claude:
+   - cambia `render.yaml` para que Render no vuelva a poner la base antigua en la próxima actualización;
+   - comprueba que la demo responde.
+
+Qué pasa con los datos:
+- La base nueva empieza vacía y la demo carga sola los datos ficticios (`scripts/arranque-demo.sh`).
+- Las cuentas que hayas creado en la demo **no pasan**. Vuelve a registrarte, también con el correo del creador, y configura otra vez el segundo paso; en la aplicación de códigos, borra la entrada antigua.
+- Ten en cuenta:
+  - Neon gratis «duerme» la base tras 5 minutos sin uso, así que la primera visita tarda un poco más (igual que la web de Render).
+  - El plan gratuito tiene 0,5 GB.
+  - Estos límites están anotados en ADR-003; compruébalos en la página de precios de Neon al crear la cuenta.
+
+**Si no da tiempo** (plan B, sin coste, pero hay que repetirlo cada mes): cuando Render borre la base, crea otra gratuita desde el mismo Blueprint y la demo vuelve a cargar los datos ficticios. Dura otros 30 días.
+
 ## A. Alojada en internet (funciona desde el móvil)
 
 La demo se publica en [Render](https://render.com) a partir del fichero `render.yaml` del repositorio: una web y una base de datos propias, sin tocar nada de producción. Se hace una sola vez, desde el navegador del móvil:
@@ -94,3 +126,28 @@ El menú agrupa deportistas, clubes/entrenadores, promotores y cuenta/ayuda. Los
 4. Comprueba el desglose en la ficha pública y el ránking. El rival puede solicitar revisión motivada, sin suspender el resultado. Corregir los hechos o la fuente exige comprobar el respaldo de nuevo.
 
 La escala inicial está centralizada para ajustarla con datos reales. El aura mide trayectoria, respaldo y comunidad; el récord sigue separado. Publicado mediante #14 (`0c3fde6`), con CI #131 aprobado: 393 unitarias, 365 comprobaciones E2E y axe sin incumplimientos. Comprobados públicamente Menú, fórmula, explicación del ránking y salud con respuesta 200.
+
+## Mantener la demo despierta con UptimeRobot (13 de octubre de 2026)
+
+**Por qué.**
+- El plan gratuito de Render duerme la web tras 15 minutos sin visitas, y despertarla tarda cerca de un minuto.
+- Hasta ahora la mantenía despierta una tarea de GitHub (`mantener-demo-despierta.yml`) que la visitaba cada 10 minutos.
+- Al pasar el repositorio a privado ([ADR-004](decisiones/ADR-004-repositorio-privado.md)), esa tarea gastaría unos 4.300 de los 2.000 minutos gratuitos al mes.
+- Para no cambiar nada de cómo funciona la demo, la tarea **sigue activa hasta que UptimeRobot esté en marcha**. Configúralo en los próximos días y avisa a Claude, que entonces quitará la tarea de GitHub.
+
+**Para qué.**
+- UptimeRobot visita la demo desde fuera cada 5 minutos, gratis y sin gastar minutos de GitHub.
+- Además, **te avisa por correo si la demo se cae**.
+- Es la herramienta que ya aprobaste en ADR-003.
+
+**Cómo (5 minutos).**
+1. Entra en <https://uptimerobot.com> → **Register for FREE**, con tu correo. Si te pide una tarjeta, para y avisa: el plan gratuito no debería pedirla.
+2. Pulsa **+ New monitor** y rellena:
+   - **Monitor type:** HTTP(s).
+   - **Friendly name:** `Lona demo`.
+   - **URL:** `https://ring-espana-demo.onrender.com/salud`.
+   - **Monitoring interval:** 5 minutes.
+3. En **Alert contacts**, marca tu correo y pulsa **Create monitor**.
+4. A los pocos minutos el monitor sale en verde («Up»). Si sale en rojo, la demo está caída: avísame.
+
+Nota: si un día la demo cambia de dirección (por ejemplo, al pasar a un dominio propio), hay que cambiar la URL del monitor.

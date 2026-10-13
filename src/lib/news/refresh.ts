@@ -4,6 +4,7 @@ import { db } from "../common/db";
 import { CONSERVAR_DIAS, FUENTES_INICIALES, FUENTES_RETIRADAS, REFRESCO_MS } from "./sources";
 import { clasificar, enEspanol, parseFeed } from "./parse";
 import { delPanoramaEspanol } from "./espana";
+import { registrarFallo } from "../common/fallos";
 
 /**
  * Actualización de las noticias. Se lanza en segundo plano (after()) cuando alguien abre la portada y alguna fuente lleva más de
@@ -124,7 +125,7 @@ export function actualizarSiToca() {
     try {
       if (await noticiasPorActualizar()) await actualizarNoticias();
     } catch (e) {
-      console.error("No se pudieron actualizar las noticias", e);
+      await registrarFallo({ origen: "TAREA", contexto: "No se pudieron actualizar las noticias", error: e });
     }
   });
 }

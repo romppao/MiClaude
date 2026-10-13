@@ -3,6 +3,7 @@ import { APP_URL, sendMail } from "../common/mail";
 import { unsubscribeLink } from "../accounts/auth";
 import { fmtDate } from "../common/labels";
 import { oneLine } from "../common/text";
+import { registrarFallo } from "../common/fallos";
 
 const fullName = (f: { firstName: string; lastName: string }) => oneLine(`${f.firstName} ${f.lastName}`);
 
@@ -37,7 +38,7 @@ export async function notifyFollowersOfBout(boutId: string): Promise<number> {
       );
       if (ok) sent++;
     } catch (e) {
-      console.error(`[avisos] no se pudo avisar a un seguidor: ${e instanceof Error ? e.message : String(e)}`);
+      await registrarFallo({ origen: "AVISOS", contexto: "No se pudo avisar a un seguidor de un combate nuevo", error: e });
     }
   }
   return sent;
@@ -54,7 +55,7 @@ export async function notifyDecision(userId: string, asunto: string, cuerpo: str
     if (!u) return false;
     return await sendMail(u.email, asunto, `Hola ${oneLine(u.name)},\n\n${cuerpo}\n\nUn saludo,\nLona\n`);
   } catch (e) {
-    console.error(`[avisos] no se pudo responder a una solicitud: ${e instanceof Error ? e.message : String(e)}`);
+    await registrarFallo({ origen: "AVISOS", contexto: "No se pudo responder por correo a una solicitud", error: e });
     return false;
   }
 }
@@ -70,7 +71,7 @@ export async function notifyRivalOfBout(boutId: string): Promise<boolean> {
     return await notifyDecision(bout.fighterB.userId, `${fullName(bout.fighterA)} ha registrado un combate contra ti`,
       `${fullName(bout.fighterA)} ha registrado en Lona un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
   } catch (e) {
-    console.error(`[avisos] no se pudo avisar al rival: ${e instanceof Error ? e.message : String(e)}`);
+    await registrarFallo({ origen: "AVISOS", contexto: "No se pudo avisar al rival de un combate registrado", error: e });
     return false;
   }
 }
@@ -86,7 +87,7 @@ export async function notifyAuthorOfAnswer(boutId: string, confirmed: boolean, m
         ? `${rival} ha confirmado el combate «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}). Ya figura como confirmado por el rival.\n\nPuedes verlo en ${APP_URL}/mi-ficha`
         : `${rival} ha indicado que el combate «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}) no es correcto${motivo ? `. Motivo: ${oneLine(motivo)}` : ""}.\n\nSe ha solicitado una revisión. El aviso del rival no elimina automáticamente el resultado ni su aura. Si ha sido un error al registrarlo, avisa desde tu ficha pública. ${APP_URL}/mi-ficha`);
   } catch (e) {
-    console.error(`[avisos] no se pudo avisar al autor: ${e instanceof Error ? e.message : String(e)}`);
+    await registrarFallo({ origen: "AVISOS", contexto: "No se pudo avisar al autor de la respuesta de su rival", error: e });
     return false;
   }
 }

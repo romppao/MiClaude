@@ -1,4 +1,5 @@
 import { isEmail, oneLine } from "./text";
+import { registrarFallo } from "./fallos";
 
 /**
  * Envío de correo. Tres modos según el entorno:
@@ -16,14 +17,14 @@ const logMode = () => process.env.MAIL_TRANSPORT === "log" || process.env.NODE_E
 export async function sendMail(to: string, subject: string, text: string, opts: { unsubscribeUrl?: string; replyTo?: string } = {}): Promise<boolean> {
   const asunto = oneLine(subject);
   if (!isEmail(to)) {
-    console.error("[mail] destinatario no válido, mensaje descartado");
+    void registrarFallo({ origen: "CORREO", error: "Destinatario no válido: mensaje descartado" });
     return false;
   }
   const key = process.env.RESEND_API_KEY;
   if (key) {
     const from = process.env.MAIL_FROM;
     if (!from) {
-      console.error("[mail] falta MAIL_FROM: no se envía el mensaje");
+      void registrarFallo({ origen: "CORREO", error: "Falta MAIL_FROM (remitente) en la configuración: no se envía ningún correo" });
       return false;
     }
     try {
@@ -33,10 +34,10 @@ export async function sendMail(to: string, subject: string, text: string, opts: 
         body: JSON.stringify({ from, to: [to], subject: asunto, text, ...(opts.replyTo && isEmail(opts.replyTo) && { reply_to: opts.replyTo }), ...(opts.unsubscribeUrl && { headers: { "List-Unsubscribe": `<${opts.unsubscribeUrl}>` } }) }),
         signal: AbortSignal.timeout(8000),
       });
-      if (!res.ok) console.error(`[mail] el proveedor rechazó el mensaje «${asunto}» (código ${res.status})`);
+      if (!res.ok) void registrarFallo({ origen: "CORREO", error: `El proveedor de correo rechazó el mensaje «${asunto}» (código ${res.status})` });
       return res.ok;
     } catch (e) {
-      console.error(`[mail] no se pudo contactar con el proveedor: ${e instanceof Error ? e.message : String(e)}`);
+      void registrarFallo({ origen: "CORREO", contexto: "No se pudo contactar con el proveedor de correo", error: e });
       return false;
     }
   }
@@ -44,6 +45,6 @@ export async function sendMail(to: string, subject: string, text: string, opts: 
     console.log(`[mail] to=${to} subject="${asunto}"${opts.replyTo ? ` reply_to=${opts.replyTo}` : ""}\n${text}\n[/mail]`);
     return true;
   }
-  console.error(`[mail] no hay proveedor de correo configurado (RESEND_API_KEY): no se envía «${asunto}»`);
+  void registrarFallo({ origen: "CORREO", error: `No hay proveedor de correo configurado (RESEND_API_KEY): no se envía «${asunto}»` });
   return false;
 }

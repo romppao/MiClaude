@@ -73,7 +73,7 @@ export default async function InicioAficionado({ user }: { user: User }) {
             <div key={b.id} className="fila">
               <Link href={`/peleadores/${ganador.slug}`} className="avatar" style={{ textDecoration: "none" }} aria-label={`Ficha de ${publicFighterName(ganador)}`}>{iniciales(publicFighterName(ganador))}</Link>
               <span className="cuerpo"><span className="nombre" style={{ fontSize: 15 }}>{textoResultado(b)}</span><span className="meta">{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { day: "numeric", month: "short", timeZone: "Europe/Madrid" })}</span></span>
-              {dada ? <span className="pildora" style={{ border: "1px solid var(--acc)", background: "transparent", color: "var(--acc)" }}><Icono nombre="aura" tam={14} grosor={2.2} />Hecho</span>
+              {dada ? <span className="pildora" style={{ border: "1px solid var(--acc)", background: "transparent", color: "var(--acc-text)" }}><Icono nombre="aura" tam={14} grosor={2.2} />Hecho</span>
                 : <Link href={`/peleadores/${ganador.slug}#combates`} className="btn" style={{ minHeight: 44, padding: "0 14px", fontSize: 14 }} aria-label={`Dar aura por ${textoResultado(b)}`}><Icono nombre="aura" tam={14} grosor={2.2} />Aura</Link>}
             </div>
           );

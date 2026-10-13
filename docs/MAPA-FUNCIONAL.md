@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | `/` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
+| `/api/fallos` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/ayuda` | ¿Cómo funciona Lona? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/bienvenida` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | — |
@@ -42,8 +43,10 @@
 | `/mis-clases` | Solicitudes | Cuenta con sesión iniciada | `trainers.answerClassRequest`, `trainers.createClass`, `trainers.toggleClass` | ClassRequest, Trainer |
 | `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration, EventSlot |
 | `/mis-reservas` | Mis reservas de clases | Cuenta con sesión iniciada | `trainers.cancelClassRequest` | ClassRequest |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, OrganizerRequest, Report |
+| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, NewsSource, OrganizerRequest, Report |
 | `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
+| `/moderacion/fallos` | Fallos de la aplicación | Moderación | — | AppError |
+| `/moderacion/fallos/:id` | Detalle de un fallo | Moderación | `moderation.actualizarFallo` | AppError, AuditLog, User |
 | `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
 | `/moderacion/noticias` | Fuentes de noticias | Moderación | `news.addNewsSource`, `news.refreshNewsNow`, `news.toggleNewsItem`, `news.toggleNewsSource` | NewsItem, NewsSource |
 | `/moderacion/usuarios` | Administración | Pública | `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `creador.regenerarCodigos` | AuditLog, User |
@@ -89,14 +92,14 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `changePassword` | Cuenta con sesión iniciada | RateHit, Session, User | — | Sí | contrasena_guardada |
+| `changePassword` | Cuenta con sesión iniciada | AppError, AuditLog, RateHit, Session, User | — | Sí | contrasena_guardada |
 | `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | AuditLog, RateHit, Session, User | USER: CREADOR_PERMISOS | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
-| `register` | Cualquiera | EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
-| `requestPasswordReset` | Cualquiera | EmailToken, RateHit | — | Sí | recuperar_enviado |
-| `resendVerification` | Cuenta con sesión iniciada | EmailToken, RateHit | — | Sí | correo_reenviado |
-| `resetPassword` | Cualquiera | EmailToken, RateHit, Session, User | — | Sí | contrasena_cambiada |
+| `register` | Cualquiera | AppError, AuditLog, EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
+| `requestPasswordReset` | Cualquiera | AppError, AuditLog, EmailToken, RateHit | — | Sí | recuperar_enviado |
+| `resendVerification` | Cuenta con sesión iniciada | AppError, AuditLog, EmailToken, RateHit | — | Sí | correo_reenviado |
+| `resetPassword` | Cualquiera | AppError, AuditLog, EmailToken, RateHit, Session, User | — | Sí | contrasena_cambiada |
 | `saveFighterIntent` | Cuenta con sesión iniciada | User | — | — | registro_ficha_guardada |
 | `saveInterests` | Cuenta con sesión iniciada | Follow, User | — | — | — |
 | `saveTrainerClassIntent` | Cuenta con sesión iniciada | User | — | — | registro_clase_guardada |
@@ -116,9 +119,9 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `addBout` | Cuenta con correo verificado | AuditLog, Bout, Event, Fighter, FighterDiscipline | BOUT: CREATED | Sí | — |
+| `addBout` | Cuenta con correo verificado | AppError, AuditLog, Bout, Event, Fighter, FighterDiscipline | BOUT: CREATED | Sí | — |
 | `removeMyBout` | Cuenta con correo verificado | AuditLog, Bout, Event, Fighter | BOUT: REMOVED_BY_AUTHOR | — | combate_quitado |
-| `respondBout` | Cuenta con correo verificado | AuditLog, Bout, Fighter, Report | BOUT: (varias), BOUT: RIVAL_REVIEW_REQUESTED | Sí | — |
+| `respondBout` | Cuenta con correo verificado | AppError, AuditLog, Bout, Fighter, Report | BOUT: (varias), BOUT: RIVAL_REVIEW_REQUESTED | Sí | — |
 | `setBoutEvidence` | Cuenta con correo verificado | AuditLog, Bout | BOUT: EVIDENCE_SET | — | — |
 | `setMyBoutResult` | Cuenta con correo verificado | AuditLog, Bout | BOUT: RESULT_SET_BY_AUTHOR | — | — |
 
@@ -150,7 +153,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `addCartelBout` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Fighter, FighterDiscipline | BOUT: CREATED_BY_ORGANIZER | Sí | cartel_anadido |
+| `addCartelBout` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Bout, Fighter, FighterDiscipline | BOUT: CREATED_BY_ORGANIZER | Sí | cartel_anadido |
 | `createEvent` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: CREATED | — | — |
 | `removeCartelBout` | Organizador (o moderación) con correo verificado | AuditLog, Bout | BOUT: REMOVED_FROM_CARTEL | — | cartel_quitado |
 | `requestOrganizer` | Cuenta con correo verificado | OrganizerRequest | — | — | solicitud_enviada |
@@ -182,6 +185,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
+| `actualizarFallo` | Moderación | AppError, AuditLog | APP_ERROR: FALLO_ESTADO | — | fallo_actualizado |
 | `adminDecide` | Moderación | AuditLog, Bout, Fighter | BOUT: (varias) | — | moderacion_rechazado, moderacion_restaurado, moderacion_verificado |
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, Profile, User | ORGANIZER: (varias), PROFILE: FEDERATION_CREATED | Sí | — |
@@ -208,30 +212,30 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerProposal` | Cuenta con correo verificado | AuditLog, FightProposal | PROPOSAL: (varias) | Sí | — |
-| `cancelProposal` | Cuenta con correo verificado | AuditLog, FightProposal | PROPOSAL: PROPOSAL_CANCELLED | Sí | propuesta_cancelada |
-| `proposeFight` | Cuenta con correo verificado | AuditLog, FightProposal, RateHit | PROPOSAL: PROPOSED | Sí | propuesta_enviada |
+| `answerProposal` | Cuenta con correo verificado | AppError, AuditLog, FightProposal | PROPOSAL: (varias) | Sí | — |
+| `cancelProposal` | Cuenta con correo verificado | AppError, AuditLog, FightProposal | PROPOSAL: PROPOSAL_CANCELLED | Sí | propuesta_cancelada |
+| `proposeFight` | Cuenta con correo verificado | AppError, AuditLog, FightProposal, RateHit | PROPOSAL: PROPOSED | Sí | propuesta_enviada |
 
 ### `registrations`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerRegistrations` | Organizador (o moderación) con correo verificado | AuditLog, EventRegistration | EVENT: (varias) | Sí | — |
+| `answerRegistrations` | Organizador (o moderación) con correo verificado | AppError, AuditLog, EventRegistration | EVENT: (varias) | Sí | — |
 | `removeSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_REMOVED | — | plazas_quitadas |
-| `requestRegistration` | Cuenta con correo verificado | AuditLog, EventRegistration, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | — |
+| `requestRegistration` | Cuenta con correo verificado | AppError, AuditLog, EventRegistration, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | — |
 | `setRegistration` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
 | `setSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_SET | — | plazas_guardadas |
-| `withdrawRegistration` | Cuenta con correo verificado | AuditLog, EventRegistration | EVENT: REGISTRATION_WITHDRAWN | Sí | inscripcion_retirada |
+| `withdrawRegistration` | Cuenta con correo verificado | AppError, AuditLog, EventRegistration | EVENT: REGISTRATION_WITHDRAWN | Sí | inscripcion_retirada |
 
 ### `trainers`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerClassRequest` | Cuenta con correo verificado | AuditLog, ClassRequest | CLASS: (varias) | Sí | — |
-| `cancelClassRequest` | Cuenta con correo verificado | AuditLog, ClassRequest | CLASS: REQUEST_CANCELLED | Sí | solicitud_cancelada |
+| `answerClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest | CLASS: (varias) | Sí | — |
+| `cancelClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest | CLASS: REQUEST_CANCELLED | Sí | solicitud_cancelada |
 | `createClass` | Cuenta con correo verificado | AuditLog, TrainingClass | CLASS: CREATED | — | clase_publicada |
 | `createMyTrainer` | Cuenta con correo verificado | AuditLog, Gym, Trainer, TrainingClass, User | TRAINER: CREATED | — | — |
-| `requestClass` | Cuenta con correo verificado | AuditLog, ClassRequest, RateHit | CLASS: REQUESTED | Sí | clase_solicitada |
+| `requestClass` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, RateHit | CLASS: REQUESTED | Sí | clase_solicitada |
 | `toggleClass` | Cuenta con correo verificado | TrainingClass | — | — | — |
 
 ### `trajectory`
@@ -267,7 +271,8 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.login`, `accounts.updateAccount`, `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `bouts.addBout`, `bouts.respondBout`, `events.addCartelBout`, `moderation.actualizarFallo`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | Report | `bouts.respondBout`, `community.createReport`, `moderation.resolveReport` |
 | Follow | `accounts.saveInterests`, `community.toggleFollow`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `moderation.resolveReport` |
@@ -326,6 +331,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `DISCIPLINE_SLUG`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `categoryLabel`, `disciplineFromSlug`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
+| `fallos.ts` | `DatosFallo`, `ESTADOS_FALLO`, `EstadoFallo`, `ORIGENES_FALLO`, `OrigenFallo`, `huellaFallo`, `normalizarMensaje`, `normalizarRuta`, `registrarFallo`, `tacharDatos` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |

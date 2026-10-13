@@ -114,3 +114,11 @@ Registro de Claude (Claude Code en la nube). Formato y reglas comunes en [`EQUIP
 **Pedido por el fundador:** filtros para retar o buscar sparring (gimnasio, combates, guardia…) y que el peleador encuentre cómo inscribirse.
 **Qué cambié y por qué:** entrada del mismo día en `DIARIO.md`.
 **Qué debe hacer el siguiente asistente:** no abrir solos los eventos antiguos; si se añaden filtros, van en `lib/fighters/rivals.ts` con sus pruebas.
+
+## 13 de octubre de 2026 — Tema claro, panel de moderación y registro de fallos
+**Pedido por el fundador:** tema claro u oscuro según el sistema; funciones de moderación bien estructuradas, con avisos y un registro de los fallos con su historia; renovar la demo.
+**Qué cambié y por qué:** entrada del mismo día en `DIARIO.md`, guía en `MODERACION.md`, secciones en `ARQUITECTURA.md` y `DISENO.md`, y pasos en `DEMO.md`.
+**Qué debe hacer el siguiente asistente:**
+- No escribir colores fijos en componentes: usar los tokens, que existen en los dos temas.
+- No usar `console.error` para fallos: usar `registrarFallo`.
+- No borrar filas de `AppError`.

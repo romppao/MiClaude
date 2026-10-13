@@ -60,7 +60,7 @@ Un peleador sin cuenta también existe: cuando alguien registra un combate contr
 
 ## Modelo de datos (`prisma/schema.prisma`)
 
-`User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con división deportiva versionada, peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`.
+`User` (con `Session`, `EmailToken`, `RateHit`) → `Fighter` (1:1 opcional; `FighterDiscipline` por disciplina con división deportiva versionada, peso y récord de partida) → `Bout` ← `Event`; `Gym`, `Trainer`; `Aura` (usuario × combate × peleador); `Follow`; `Report` (avisos de error); `ClaimRequest`; `OrganizerRequest`; `AuditLog`; `AppError` (registro de fallos de la aplicación, desde el 13 de octubre de 2026: ver [`MODERACION.md`](MODERACION.md)).
 
 También `Profile` (personalización por tipo/entidad), `Highlight`, `FighterAchievement`, `SupportAccreditation` y `TrainingClass`. Contratos, relaciones y efectos de bajas/migraciones: [mantenimiento/DATOS.md](mantenimiento/DATOS.md); flujos desde pantalla a escritura: [mantenimiento/FLUJOS.md](mantenimiento/FLUJOS.md).
 
@@ -337,3 +337,19 @@ Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## Registro de fallos, panel de moderación y tema claro — 13 de octubre de 2026
+
+- **Registro de fallos (`AppError`).**
+  - Todo fallo no controlado del servidor llega solo por `onRequestError` (`src/instrumentation.ts`): páginas, acciones y direcciones de datos.
+  - Los fallos del navegador llegan por `/api/fallos`, que solo admite peticiones desde nuestras páginas y como mucho 10 por minuto desde cada dirección.
+  - Los errores capturados a propósito (correos, avisos, tareas) se registran con `registrarFallo` (`src/lib/common/fallos.ts`), que sustituye a los `console.error` sueltos.
+  - Los fallos se agrupan por huella, se tachan los datos personales, nunca se borran y se reabren si vuelven a ocurrir.
+  - Moderación los revisa en `/moderacion/fallos` (estado y nota de causa y solución, con historial en `AuditLog`, entity `APP_ERROR`).
+  - Riesgo conocido: no avisa por correo al aparecer un fallo nuevo; hay que entrar a mirarlo. Sentry (T-010) sigue pendiente y es complementario.
+- **Panel de moderación por bloques** (`/moderacion`): pendiente de revisar, estado de la aplicación y herramientas. Las colas y sus acciones no cambian. Roles y funciones en [`MODERACION.md`](MODERACION.md).
+- **Tema claro y oscuro.**
+  - Tokens de color en `globals.css` §2. Por defecto sigue al sistema (`prefers-color-scheme`); la persona puede fijar uno en el menú (`SelectorTema`, guardado en `localStorage` con la clave `lona:tema`, marcado en `<html data-tema>` antes de pintar).
+  - Las zonas sobre foto (portadas, carteles, highlights, bienvenida) son siempre oscuras.
+  - `tests/e2e/accesibilidad.mjs` mide cada pantalla en los dos temas.

@@ -1,4 +1,5 @@
 import { db } from "../common/db";
+import { registrarFallo } from "../common/fallos";
 
 const DIA = 864e5;
 /** Cuentas cuyo correo nunca se verificó se borran a los 30 días: no han podido publicar nada y así nadie retiene un correo ajeno. */
@@ -31,6 +32,6 @@ export async function maybePurge() {
   try {
     await purgeStale();
   } catch (e) {
-    console.error(`[limpieza] no se pudo completar: ${e instanceof Error ? e.message : String(e)}`);
+    await registrarFallo({ origen: "TAREA", contexto: "La limpieza periódica de datos caducados no se pudo completar", error: e });
   }
 }

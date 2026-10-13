@@ -137,7 +137,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           ? <img className="avatar" src={`/imagenes/peleador/${me.id}/avatar?v=${perfil.updatedAt.getTime()}`} alt="" style={{ width: 62, height: 62, objectFit: "cover", objectPosition: `${perfil.avatarX}% ${perfil.avatarY}%` }} />
           : <span className="avatar avatar-relleno" aria-hidden="true" style={{ width: 62, height: 62, fontSize: 20 }}>{iniciales(`${me.firstName} ${me.lastName}`)}</span>}
         <span className="cuerpo"><h1 style={{ margin: 0, font: "700 18px/1.2 var(--font)" }}>{me.firstName} {me.lastName}</h1><span className="meta">{principal ? `${DISCIPLINE_LABEL[principal.discipline]} · ${LEVEL_LABEL[principal.level]}${principal.weightClass ? ` · ${weightClassLabel(principal.discipline, principal.level, principal.weightClass, principal.divisionId)}` : ""}` : ""}</span><Link href={`/peleadores/${me.slug}`}>Ver mi ficha pública</Link></span>
-        {principal && <span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em", color: "var(--acc)" }}>{recP.w}-{recP.l}-{recP.d}</span>}
+        {principal && <span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em", color: "var(--acc-text)" }}>{recP.w}-{recP.l}-{recP.d}</span>}
       </div>
       {toConfirm.length > 0 && <p className="notice"><span aria-hidden="true">ℹ </span>Tu rival ha declarado {toConfirm.length === 1 ? "un combate" : `${toConfirm.length} combates`} contigo. <a href="#por-confirmar">Revisarlos</a></p>}
       {/* Secciones agrupadas que se cambian deslizando a los lados (petición del fundador, 8 de octubre de 2026: menos desplazamiento hacia abajo). */}
@@ -151,7 +151,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                 <span className="texto"><h2 id="titulo-privacidad" style={{ margin: 0, font: "700 16px var(--font)" }}>Mostrar mi récord amateur completo</h2><span className="meta" style={{ display: "block" }}>{me.recordPublic ? "Ahora el público ve tus victorias, derrotas y empates." : "Ahora el público solo ve cuántos combates llevas."}</span></span>
                 <button role="switch" aria-checked={me.recordPublic} aria-label={me.recordPublic ? "Ocultar mi récord amateur completo" : "Mostrar mi récord amateur completo"}><span aria-hidden="true" /></button>
               </form>
-              <div className="fila" style={{ minHeight: 48, padding: "10px 14px", borderRadius: 16, background: "rgba(255,255,255,.05)", border: 0 }}><span className="cuerpo">Así te ven los demás</span><strong className="acc">{vistoPorOtros}</strong></div>
+              <div className="fila" style={{ minHeight: 48, padding: "10px 14px", borderRadius: 16, background: "rgba(var(--ink),.05)", border: 0 }}><span className="cuerpo">Así te ven los demás</span><strong className="acc">{vistoPorOtros}</strong></div>
               <p className="mut" style={{ margin: 0 }}>Solo para el nivel amateur. En profesional el récord siempre es público.</p>
             </section>
           )}
@@ -159,7 +159,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           <section id="highlights" className="tarjeta" aria-labelledby="titulo-mis-highlights" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
             <div className="titulo-seccion"><h2 id="titulo-mis-highlights" style={{ fontSize: 20 }}>Mis highlights</h2><span className="meta">{misHighlights.length} · aparecen en tu ficha pública</span></div>
             {misHighlights.map((h) => (
-              <div key={h.id} className="fila" style={{ background: "rgba(255,255,255,.04)", flexWrap: "wrap" }}>
+              <div key={h.id} className="fila" style={{ background: "rgba(var(--ink),.04)", flexWrap: "wrap" }}>
                 <span className="cuerpo" style={{ flex: "1 1 60%" }}><span className="nombre">{h.title}{h.pinned && <span className="pildora pildora-acc" style={{ marginLeft: 8, fontSize: 13 }}>Destacado</span>}</span><span className="meta">{HIGHLIGHT_KIND_LABEL[h.kind]}{h.bout ? ` · ${h.bout.event.name}` : ""}</span></span>
                 <form action={manageHighlight} style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                   <input type="hidden" name="highlightId" value={h.id} />

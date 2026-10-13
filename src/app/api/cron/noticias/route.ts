@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { actualizarNoticias } from "../../../../lib/news/refresh";
+import { registrarFallo } from "../../../../lib/common/fallos";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
     const resultado = await actualizarNoticias({ forzar: true });
     return NextResponse.json({ ok: true, resultado, timestamp: new Date().toISOString() });
   } catch (error) {
-    console.error("[cron/noticias]", error);
+    await registrarFallo({ origen: "TAREA", contexto: "La actualización programada de noticias falló", error, ruta: "/api/cron/noticias" });
     return NextResponse.json({ ok: false, error: "Error al actualizar" }, { status: 500 });
   }
 }

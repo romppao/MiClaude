@@ -23,6 +23,7 @@ import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disci
 import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
 import { safeHttpUrl } from "../../lib/common/url";
 import { checkLengths, go, guard, readProvince, Rechazo, str } from "./shared";
+import { registrarFallo } from "../../lib/common/fallos";
 
 const MIN_PASSWORD = 8;
 
@@ -203,7 +204,7 @@ export async function requestPasswordReset(f: FormData) {
       const user = await db.user.findUnique({ where: { email } });
       if (user) await sendPasswordResetEmail(user);
     } catch (e) {
-      console.error(`[recuperar] no se pudo enviar el enlace: ${e instanceof Error ? e.message : String(e)}`);
+      await registrarFallo({ origen: "CORREO", contexto: "No se pudo enviar el enlace para elegir una contraseña nueva", error: e });
     }
   });
   go(back, { aviso: "recuperar_enviado" });

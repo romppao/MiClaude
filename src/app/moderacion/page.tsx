@@ -79,6 +79,10 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
     db.bout.count({ where: flagged }), db.bout.count({ where: unflagged }), db.bout.count({ where: { verification: "DISPUTED" } }),
     db.gym.count({ where: { verifiedAt: null } }),
   ]);
+  const [nFallos, nFuentesKo] = await Promise.all([
+    db.appError.count({ where: { status: { in: ["OPEN", "INVESTIGATING"] } } }),
+    db.newsSource.count({ where: { active: true, lastError: { not: null } } }),
+  ]);
   const counts = [nReports, nClaims, nOrganizers, nGimnasios, nFlags, nUnflagged, nRevision];
   const windows = Object.fromEntries(keys.map((k,i) => [k, pageWindow(counts[i], pageNumber(raw[k]), LIMITE)]));
   const pageParams = Object.fromEntries(keys.map(k => [k, windows[k].current > 1 ? String(windows[k].current) : undefined]));
@@ -121,8 +125,44 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <h1>Moderación</h1><p><Link href="/respaldar">Respaldar resultados y títulos</Link> · <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link></p>
-      <p><Link href="/moderacion/historial">Ver el historial de cambios</Link> · <Link href="/moderacion/noticias">Fuentes de noticias</Link>{esCreador(user) && <> · <Link href="/moderacion/usuarios">Administración: cuentas y moderadores</Link></>}</p>
+      {/* Panel de moderación (13 de octubre de 2026, petición del fundador: funciones bien estructuradas, con su panel de avisos y los fallos).
+          Tres bloques: lo pendiente de revisar (las colas de abajo), el estado de la aplicación y las herramientas. Guía: docs/MODERACION.md. */}
+      <h1>Moderación</h1>
+      <p className="lead">Revisas lo que la comunidad avisa, compruebas los datos y vigilas que la aplicación funcione. Cada decisión queda en el historial de cambios.</p>
+
+      <section aria-labelledby="titulo-pendiente" style={{ margin: "20px 0" }}>
+        <h2 id="titulo-pendiente">Pendiente de revisar</h2>
+        <div className="resumen-moderacion">
+          {([
+            ["avisos", "Avisos de usuarios", nReports], ["reclamaciones", "Fichas reclamadas", nClaims], ["organizadores", "Organizadores", nOrganizers],
+            ["gimnasios", "Gimnasios sin sello", nSinSello], ["senales", "Combates con señales", nFlags], ["combates", "Combates por verificar", nUnflagged], ["revision", "Combates en revisión", nRevision],
+          ] as const).map(([ancla, texto, n]) => (
+            <a key={ancla} href={`#${ancla}`} className={n > 0 ? "dato con-pendientes" : "dato"} aria-label={`${texto}: ${n}`}><span className="clave">{texto}</span><strong>{n}</strong></a>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="titulo-estado-app" style={{ margin: "20px 0" }}>
+        <h2 id="titulo-estado-app">Estado de la aplicación</h2>
+        <div className="resumen-moderacion">
+          <Link href="/moderacion/fallos" className={nFallos > 0 ? "dato con-pendientes" : "dato"} aria-label={`Fallos de la aplicación sin resolver: ${nFallos}`}><span className="clave">Fallos sin resolver</span><strong>{nFallos}</strong></Link>
+          <Link href="/moderacion/noticias" className={nFuentesKo > 0 ? "dato con-pendientes" : "dato"} aria-label={`Fuentes de noticias que fallan: ${nFuentesKo}`}><span className="clave">Fuentes de noticias que fallan</span><strong>{nFuentesKo}</strong></Link>
+        </div>
+      </section>
+
+      <section aria-labelledby="titulo-herramientas" style={{ margin: "20px 0" }}>
+        <h2 id="titulo-herramientas">Herramientas</h2>
+        <ul className="lista herramientas-moderacion">
+          <li><Link href="/respaldar">Respaldar resultados y títulos</Link><span className="mut">Comprobar un resultado o un título con una prueba.</span></li>
+          <li><Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link><span className="mut">Quién puede respaldar resultados (entrenadores, federaciones).</span></li>
+          <li><Link href="/moderacion/historial">Ver el historial de cambios</Link><span className="mut">Todo lo que se ha cambiado, quién y cuándo.</span></li>
+          <li><Link href="/moderacion/fallos">Fallos de la aplicación</Link><span className="mut">Lo que ha fallado, cuántas veces y qué se hizo.</span></li>
+          <li><Link href="/moderacion/noticias">Fuentes de noticias</Link><span className="mut">Qué fuentes funcionan, añadir y ocultar titulares.</span></li>
+          {esCreador(user) && <li><Link href="/moderacion/usuarios">Administración: cuentas y moderadores</Link><span className="mut">Solo la cuenta del creador.</span></li>}
+        </ul>
+      </section>
+
+      <h2 id="colas" className="sr-only">Colas de moderación</h2>
 
       {/* Cada cola en su pestaña, que se cambia deslizando (revisión del 8 de octubre de 2026: la página medía casi 40 000 px en el móvil). */}
       <Pestanas etiqueta="Colas de moderación" inicial={Math.max(0, [nReports, nClaims, nOrganizers, nSinSello, nFlags, nUnflagged, nRevision].findIndex((n) => n > 0))} pestanas={[

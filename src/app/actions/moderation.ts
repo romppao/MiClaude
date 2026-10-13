@@ -162,3 +162,27 @@ export async function resolveReport(f: FormData) {
   revalidatePath("/", "layout");
   go(back, { aviso: hide ? "aviso_resuelto_oculto" : status === "RESOLVED" ? "aviso_resuelto" : "aviso_descartado" });
 }
+
+/**
+ * Registro de fallos (/moderacion/fallos/[id]): cambia el estado de un fallo y anota la causa y la solución. Solo moderadores.
+ * Para darlo por resuelto o descartarlo hace falta la nota: así queda escrito por qué pasó y qué se hizo (petición del fundador).
+ * Cada cambio va al historial (AuditLog, entity APP_ERROR).
+ */
+export async function actualizarFallo(f: FormData) {
+  const admin = await requireAdmin();
+  const id = str(f, "falloId");
+  const back = returnTo(f, `/moderacion/fallos/${encodeURIComponent(id)}`);
+  const fallo = await db.appError.findUnique({ where: { id }, select: { id: true, status: true, note: true } });
+  if (!fallo) go(back, { problema: "no_existe" });
+  const estado = str(f, "estado");
+  if (!["OPEN", "INVESTIGATING", "RESOLVED", "IGNORED"].includes(estado)) go(back, { problema: "decision_no_valida" });
+  const status = estado as "OPEN" | "INVESTIGATING" | "RESOLVED" | "IGNORED";
+  const note = str(f, "nota").slice(0, 2000) || null;
+  if ((status === "RESOLVED" || status === "IGNORED") && !note) go(back, { problema: "fallo_sin_nota" });
+  const cerrado = status === "RESOLVED" || status === "IGNORED";
+  await guard(back, () => db.$transaction(async (tx) => {
+    await tx.appError.update({ where: { id: fallo.id }, data: { status, note, resolvedById: cerrado ? admin.id : null, resolvedAt: cerrado ? new Date() : null } });
+    await audit({ userId: admin.id, entity: "APP_ERROR", entityId: fallo.id, action: "FALLO_ESTADO", before: { status: fallo.status, nota: fallo.note }, after: { status, nota: note } }, tx);
+  }));
+  go(back, { aviso: "fallo_actualizado" });
+}

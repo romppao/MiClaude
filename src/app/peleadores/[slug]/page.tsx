@@ -168,7 +168,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             <button className={following ? "secondary" : undefined} style={{ flex: 1, minHeight: 54 }}>{following ? "Dejar de seguir" : "Seguir a este peleador"}</button>
           </form>
         ) : <Link className="btn secondary" style={{ flex: 1, minHeight: 54 }} href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para seguir a este peleador</Link>)}
-        <span className="pildora" style={{ minHeight: 54, padding: "0 18px", fontWeight: 500, background: "rgba(255,255,255,.06)" }}>{plural(followerCount, "seguidor", "seguidores")}</span>
+        <span className="pildora" style={{ minHeight: 54, padding: "0 18px", fontWeight: 500, background: "rgba(var(--ink),.06)" }}>{plural(followerCount, "seguidor", "seguidores")}</span>
       </div>
       {/* Retar o proponer sparring (propuesta n.º 1 del diseño v3): solo entre peleadores, y a fichas con titular que pueda responder. */}
       {publica && fighter.userId && user?.fighter && user.fighter.id !== fighter.id && (
@@ -200,7 +200,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                     : miniaturaDeEnlace(h.videoUrl) && <img src={miniaturaDeEnlace(h.videoUrl)!} alt="" loading="lazy" />}
                   <span className="arriba"><span className="pildora" style={{ background: "rgba(0,0,0,.6)", fontSize: 13 }}>{HIGHLIGHT_KIND_LABEL[h.kind]}</span>{h.pinned && <span className="pildora pildora-acc" style={{ fontSize: 13 }}>Destacado</span>}</span>
                   {h.kind === "VIDEO" && <span className="play" aria-hidden="true"><Icono nombre="play" /></span>}
-                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(255,255,255,.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "PHOTO" ? "Foto" : h.videoKey ? "Vídeo" : `Vídeo de ${webDeEnlace(h.videoUrl)}`)}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
+                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(var(--ink),.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "PHOTO" ? "Foto" : h.videoKey ? "Vídeo" : `Vídeo de ${webDeEnlace(h.videoUrl)}`)}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
                 </a>
               );
             })}

@@ -69,7 +69,7 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
           <span className="cifra acc" aria-hidden="true">{rec.w}<small>V</small></span>
           <span className="cifra" aria-hidden="true">{rec.l}<small>D</small></span>
           <span className="cifra" aria-hidden="true">{rec.d}<small>E</small></span>
-          <span style={{ marginLeft: "auto", textAlign: "right" }} aria-hidden="true"><span style={{ font: "800 30px/1 var(--font)", color: "var(--acc2)" }}>{auras.length}</span><span className="meta" style={{ display: "block", color: "rgba(255,255,255,.75)" }}>de aura</span></span>
+          <span style={{ marginLeft: "auto", textAlign: "right" }} aria-hidden="true"><span style={{ font: "800 30px/1 var(--font)", color: "var(--acc2-text)" }}>{auras.length}</span><span className="meta" style={{ display: "block", color: "rgba(var(--ink),.75)" }}>de aura</span></span>
         </div>
       </section>
       <AccionesPrincipales acciones={[
