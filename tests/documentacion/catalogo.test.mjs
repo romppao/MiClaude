@@ -84,6 +84,13 @@ test("salida estable, ordenada y con enlaces escapados para rutas dinámicas", (
   assert.match(output, /Ficha \\\| pública/);
 });
 
+test("las huellas del catálogo no dependen de finales de línea Windows o Unix", (t) => {
+  const { root, write, entries } = fixture(t);
+  const lf = renderCatalog(root, entries);
+  write("src/lib/common/regla.ts", "export function regla() { return true; }\r\n");
+  assert.equal(renderCatalog(root, entries), lf);
+});
+
 test("una fuente con enlace simbólico requiere resolver el alcance explícitamente", (t) => {
   const { root } = fixture(t);
   fs.symlinkSync("regla.ts", path.join(root, "src/lib/common/enlace.ts"));

@@ -100,8 +100,9 @@ export function renderCatalog(root, entries) {
   for (const [category, members] of [...groups].sort(([a], [b]) => compare(a, b))) {
     lines.push(`## ${category}`, "", "| Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |", "|---|---|---|---|---|");
     for (const file of members) {
-      const entry = byPath.get(file), bytes = fs.readFileSync(path.join(root, file));
-      const names = declarations(bytes.toString("utf8"));
+      const entry = byPath.get(file), source = fs.readFileSync(path.join(root, file), "utf8").replace(/\r\n?/g, "\n");
+      const bytes = Buffer.from(source, "utf8");
+      const names = declarations(source);
       lines.push(`| [${file}](${link(`../../${file}`)}) | ${cell(entry.purpose)} | [Contexto](${link(portable(path.relative(path.dirname(OUTPUT), entry.guide)))}) | ${names.length ? names.map((n) => `\`${n}\``).join(", ") : "—"} | \`${createHash("sha256").update(bytes).digest("hex").slice(0, 16)}\` |`);
     }
     lines.push("");
