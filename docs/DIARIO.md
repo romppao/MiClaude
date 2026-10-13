@@ -1529,3 +1529,17 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - Las cuentas que ya tenían el segundo paso configurado seguirán viendo «Ring España» en su aplicación de códigos. Los códigos siguen valiendo; si quieren el nombre nuevo, basta con volver a configurarlo.
 
 **Pendiente del fundador:** cambiar `MAIL_FROM` en Render, el dominio, la dirección de la demo y el nombre del repositorio, y comprobar la marca.
+
+## 13 de octubre de 2026 — La foto de portada pasa a ser del fundador (Claude)
+
+**Qué se pidió** (el fundador): cambiar la foto de la pantalla de inicio («aparecen varias personas sonriendo») por «Bajo las cuerdas», de su portafolio de boxeo, en la que el entrenador le pone el casco al peleador: «es mía la foto y es más realista, porque la otra está hecha con inteligencia artificial».
+
+**Qué se hizo:**
+- Se tomó la foto del repositorio de su portafolio (`portafolio-romppao`, `public/images/boxeo-2.jpg`) y se guardó como `public/brand/bajo-las-cuerdas.webp`.
+- La imagen de IA (`comunidad.webp`) se usaba en tres sitios: la portada del visitante, la bienvenida (en círculo) y la clase `.home-hero`. Se cambió en los tres y se borró, para que no quede en ninguna parte.
+- El encuadre se centra en las manos y el casco.
+- Las descripciones para lector de pantalla ya no hablan de «personas ficticias»: describen la escena real.
+
+**Qué salió mal:** nada. Una limitación: la foto del portafolio mide 682 × 1024 píxeles. En pantallas grandes de alta densidad puede verse algo blanda; si el fundador tiene el original a más resolución, basta con sustituir el archivo.
+
+**Pruebas:** capturas en móvil (390 px), escritorio (1440 px) y bienvenida.

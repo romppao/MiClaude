@@ -263,3 +263,10 @@ El **texto** de la cabecera, los títulos y el nombre del manifiesto siguen dici
 - La dirección de la demo (`ring-espana-demo.onrender.com`) y el dominio definitivo.
 - El nombre del repositorio en GitHub.
 - La comprobación de la marca.
+
+## 13 de octubre de 2026 — Foto de portada real: «Bajo las cuerdas»
+
+- El fundador sustituye la imagen ilustrativa generada por IA por una foto suya: «Bajo las cuerdas», en la que un entrenador le pone el casco a un peleador.
+- Se usa en la portada del visitante y en la bienvenida (`public/brand/bajo-las-cuerdas.webp`).
+- Autoría: ROMPPAO (el fundador), que la cede a Lona.
+- Regla desde ahora: **fotos reales del deporte**, no imágenes generadas, en las piezas principales de la marca.

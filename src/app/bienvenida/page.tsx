@@ -11,7 +11,7 @@ export default async function Bienvenida() {
   if (await getUser()) redirect("/");
   return (
     <section className="bienvenida a-sangre" aria-labelledby="titulo-bienvenida">
-      <div className="foto" role="img" aria-label="Personas de la comunidad de deportes de contacto (imagen ilustrativa con personas ficticias)" />
+      <div className="foto" role="img" aria-label="Un entrenador le pone el casco a un peleador, bajo las cuerdas del ring" />
       <div className="bienvenida-contenido">
       <span className="sello-marca"><img src="/brand/lona/lona-logo.svg" alt="Lona" width={55} height={28} /></span>
       <h1 id="titulo-bienvenida">Tu deporte.<br />Tu gente.</h1>
