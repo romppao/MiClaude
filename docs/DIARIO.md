@@ -1661,3 +1661,25 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - **Los estilos propios de MapLibre pisaban los nuestros en la ventanita**: fondo blanco con texto lima ilegible en oscuro. Se dio más especificidad a los nuestros.
 - **El punto de «tu ubicación» tapaba a los gimnasios** que tenía debajo. Ya no se puede pulsar.
 - **En esta sesión no hay internet**, así que el fondo del mapa no se ha visto: hay que comprobarlo en la demo.
+
+## 13 de octubre de 2026 — «Los mejores de tu zona» y mapa en las fichas (Claude)
+
+**Qué se pidió** (el fundador): «me parece bien un mapa libre […] que el usuario, en vez de que le salga una lista muy aburrida y larga hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración de Google o algo similar». Y en las fichas de entrenadores y gimnasios: «su descripción, todo lo que hace y en el mapa la ubicación exacta de dónde se le puede ir a acudir».
+
+**Qué se decidió y por qué:**
+- **Sin valoraciones de Google:** exigen su servicio de pago y sus condiciones no permiten mostrarlas fuera de un mapa suyo.
+- **Valoración Lona** («algo similar»): sale de datos reales de la comunidad (aura de sus peleadores, peleadores, entrenadores y sello de verificado). Se explica en pantalla y no se puede comprar.
+- **Lista completa:** se conserva, porque es la vía accesible, pero queda recogida debajo.
+- **«Cómo llegar»:** un simple enlace a Google Maps, sin clave ni coste, que abre la aplicación del teléfono.
+
+**Qué se hizo:**
+- «Los mejores de tu zona» con «Mejores / Más cerca».
+- «Ver todos los gimnasios (N)» recogido.
+- Tarjetas más limpias en el móvil: el sello de verificado va dentro de la tarjeta.
+- «Dónde está» en la ficha del gimnasio y «Dónde entrena» en la del entrenador.
+- Parte común del mapa en `components/mapa/base.ts`.
+- `tests/e2e/mapa.mjs` ampliada a 23 comprobaciones; pruebas unitarias de la valoración.
+
+**Qué salió mal:**
+- El primer CI del PR #46 falló en «Prueba de extremo a extremo». Desde aquí no se pueden leer sus registros ni descargar el diagnóstico, así que se busca la causa con la réplica local.
+- En el móvil, las tarjetas quedaban apretadas con el sello a la derecha y los botones de orden ocupaban dos líneas: se corrigió tras ver las capturas.

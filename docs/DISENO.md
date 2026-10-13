@@ -323,3 +323,23 @@ Lo que no cambia de un tema a otro:
 **Pendiente:**
 - El fundador aún no ha visto el mapa con el fondo real, porque esta sesión no tiene salida a internet.
 - Ideas: un mapa en entrenadores y veladas.
+
+### Ampliación del mismo día: «Los mejores de tu zona» y mapa en las fichas
+
+**Petición del fundador:** «que el usuario, en vez de que le salga una lista muy aburrida y larga hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración de Google o algo similar», y «en los perfiles de los entrenadores y los clubes de gimnasio […] en el mapa la ubicación exacta de dónde se le puede ir a acudir».
+
+**«Los mejores de tu zona».** Debajo del mapa salen 6 gimnasios:
+- **Sin ubicación:** los mejores de la búsqueda, de la provincia o de España.
+- **Con «Usar mi ubicación»:** los mejores a menos de 30 km. Si hay menos de 3, se amplía el radio. Con «Más cerca» se ordenan por distancia.
+
+**La lista completa no se quita**, pero queda recogida en «Ver todos los gimnasios (N)».
+
+**Por qué no la valoración de Google.** Exige su servicio de lugares, de pago y con tarjeta, y sus condiciones no permiten mostrarla fuera de un mapa de Google.
+
+**Valoración Lona** («algo similar»): aura que la comunidad ha dado a sus peleadores + 5 por peleador + 3 por entrenador + 20 si está verificado (`lib/common/mapa.ts`). Se explica en la pantalla («¿Cómo se valoran los gimnasios?») y nadie puede pagar para salir antes.
+
+**Fichas.**
+- **Gimnasio:** «Dónde está», con la dirección, el mapa y «Cómo llegar». «Cómo llegar» es un enlace a Google Maps que abre la aplicación del móvil: sin coste ni clave, y solo si hay dirección exacta.
+- **Entrenador:** «Dónde entrena», con el mapa de su gimnasio, o su provincia como zona aproximada si no tiene gimnasio.
+
+**Idea para más adelante:** reseñas con estrellas de los usuarios. Necesitaría moderación y medidas contra reseñas falsas.

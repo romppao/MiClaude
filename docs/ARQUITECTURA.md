@@ -375,3 +375,8 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 - La ubicación de la persona nunca sale del navegador.
 
 **Riesgo conocido.** OpenFreeMap es un servicio gratuito sin contrato. Si fallara, el mapa sale sin fondo, pero los marcadores y la lista siguen funcionando. Cambiar de proveedor es cambiar la constante `ESTILO` (y la CSP).
+
+**Ampliación (13 de octubre de 2026):**
+- **Valoración Lona:** `valoracionGimnasio` y `mejoresDeLaZona` en `lib/common/mapa.ts`. El aura por gimnasio se calcula con una consulta agrupada en `/gimnasios`.
+- **Mapa común:** `components/mapa/base.ts` (`crearMapa`).
+- **Mapa de un punto:** `components/MapaUbicacion.tsx`, usado por `components/DondeEsta.tsx` en las fichas de gimnasio y de entrenador.

@@ -39,3 +39,24 @@ describe("mapa de gimnasios", () => {
     expect(puntoDeGimnasio({ id: "x", lat: null, lng: null, geoSource: null, province: "Narnia" })).toBeNull();
   });
 });
+
+import { mejoresDeLaZona, valoracionGimnasio } from "../../src/lib/common/mapa";
+
+describe("los mejores gimnasios de la zona", () => {
+  it("la valoración suma aura, peleadores, entrenadores y el sello", () => {
+    expect(valoracionGimnasio({ aura: 10, peleadores: 2, entrenadores: 1, verificado: true })).toBe(10 + 10 + 3 + 20);
+    expect(valoracionGimnasio({ aura: 0, peleadores: 0, entrenadores: 0, verificado: false })).toBe(0);
+  });
+  const madrid = CENTROS_PROVINCIA["Madrid"];
+  const g = (nombre: string, lat: number, lng: number, valoracion: number) => ({ nombre, lat, lng, valoracion });
+  const lista = [g("Cerca flojo", 40.42, -3.70, 5), g("Cerca bueno", 40.45, -3.68, 50), g("Toledo top", 39.86, -4.03, 900), g("Getafe medio", 40.30, -3.73, 20)];
+  it("con ubicación, solo los de la zona, del mejor al peor", () => {
+    expect(mejoresDeLaZona(lista, madrid).map((x) => x.nombre)).toEqual(["Cerca bueno", "Getafe medio", "Cerca flojo"]);
+  });
+  it("si en la zona hay menos de 3, amplía el radio", () => {
+    expect(mejoresDeLaZona(lista.slice(1, 3), madrid).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
+  });
+  it("sin ubicación, todos por valoración", () => {
+    expect(mejoresDeLaZona(lista, null, 2).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
+  });
+});

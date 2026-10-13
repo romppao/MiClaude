@@ -784,3 +784,17 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .tarjeta-gimnasio .cuerpo{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .tarjeta-gimnasio .card-avatar{margin:0;width:52px;height:52px;flex:none}
 .tarjeta-gimnasio .distancia{flex:none;min-width:72px;text-align:center;padding:6px 10px;border-radius:999px;background:var(--acc);color:var(--acc-ink);font:800 15px/1.2 var(--font)}
+/* Mapa de la ficha de un gimnasio o entrenador (components/DondeEsta.tsx) */
+.donde-esta{margin:20px 0}
+.mapa-ficha{height:240px}
+@media (min-width:760px){.mapa-ficha{height:300px}}
+.marcador-sitio{width:28px;height:28px;border-radius:50%;background:#D4F67C;border:4px solid #0A0A0C;box-shadow:0 0 0 6px rgba(212,246,124,.35),0 2px 8px rgba(0,0,0,.45);pointer-events:none}
+/* «Los mejores de tu zona» y la lista completa recogida (gimnasios) */
+.mapa-mejores{margin-top:20px}
+.mapa-mejores .segmentos{min-width:260px}
+.tarjeta-gimnasio .puesto{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--inv);color:var(--inv-ink);font:800 18px/1 var(--font)}
+.como-se-valora{margin:4px 0 0}
+.como-se-valora summary,.lista-completa>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+.lista-completa{margin:8px 0 24px;padding:4px 16px 8px;border-radius:22px;background:var(--card);border:1px solid var(--line)}
+.lista-completa[open]>summary{margin-bottom:8px}
+.sello-verificado{display:inline-block;margin-right:8px;padding:1px 8px;border-radius:999px;background:var(--acc);color:var(--acc-ink);font-weight:700}

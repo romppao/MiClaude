@@ -10,6 +10,8 @@ import { db } from "../../../lib/common/db";
 import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { LEVEL_LABEL } from "../../../lib/common/labels";
 import { CLASS_KIND_LABEL, classMeta } from "../../../lib/trainers/classes";
+import { CENTROS_PROVINCIA, puntoDeGimnasio } from "../../../lib/common/mapa";
+import DondeEsta from "../../components/DondeEsta";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,12 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
       {t.gym && <p className="mut">Gimnasio: <Link href={`/gimnasios/${t.gym.slug}`}>{t.gym.name}</Link></p>}
       {(t.disciplines.length > 0 || t.yearsCoaching !== null) && <p className="chips" style={{ marginTop: 12 }}>{t.disciplines.map((d) => <span key={d} className="pildora">{DISCIPLINE_LABEL[d]}</span>)}{t.yearsCoaching !== null && <span className="pildora pildora-acc">{t.yearsCoaching} años entrenando</span>}{t.province && <span className="pildora">{t.city && t.city !== t.province ? `${t.city}, ` : ""}{t.province}</span>}</p>}
       {t.bio && <p>{t.bio}</p>}
+      {/* Dónde entrena (13 de octubre de 2026): su gimnasio en el mapa; si no tiene, su provincia, como zona aproximada. */}
+      {t.gym ? (
+        <DondeEsta titulo="Dónde entrena" nombre={t.gym.name} direccion={[t.gym.name, t.gym.address, t.gym.city, t.gym.province].filter(Boolean).join(", ")} punto={puntoDeGimnasio(t.gym)} />
+      ) : t.province && CENTROS_PROVINCIA[t.province] ? (
+        <DondeEsta titulo="Dónde entrena" nombre={t.name} direccion={`Zona de ${t.city && t.city !== t.province ? `${t.city}, ` : ""}${t.province}`} punto={{ ...CENTROS_PROVINCIA[t.province], origen: "provincia" }} />
+      ) : null}
       {t.userId && <>
         <h2>Clases</h2>
         {t.classes.length === 0 && <p className="mut">Este entrenador todavía no ha publicado clases.</p>}

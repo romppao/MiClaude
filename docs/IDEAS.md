@@ -353,3 +353,4 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 - **Mapa de gimnasios cercanos a la persona** (fundador, 13 oct). Estado: **hecho** con mapa libre (MapLibre + OpenFreeMap); falta verlo con el fondo real en la demo.
 - **Mejoras visuales en veladas** (fundador, 13 oct: «ahora miro qué se puede mejorar»). Estado: a la espera de lo que diga.
 - **Mapa también en entrenadores y veladas** (Claude, 13 oct). Estado: idea, cuando el de gimnasios esté probado.
+- **Reseñas con estrellas de gimnasios y entrenadores** (Claude, 13 oct, como complemento a la valoración Lona). Estado: idea. Necesita moderación y medidas contra reseñas falsas.

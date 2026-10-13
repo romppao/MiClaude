@@ -335,7 +335,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail.ts` | `APP_URL`, `sendMail` |
-| `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `Punto`, `distanciaKm`, `puntoDeGimnasio`, `textoDistancia` |
+| `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `PESOS_VALORACION`, `Punto`, `distanciaKm`, `enlaceComoLlegar`, `mejoresDeLaZona`, `puntoDeGimnasio`, `textoDistancia`, `valoracionGimnasio` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
 | `names.ts` | `normalizeName`, `publicFighterName`, `publicUserName` |
 | `pagination.ts` | `PAGE_SIZE`, `pageNumber`, `pageWindow` |

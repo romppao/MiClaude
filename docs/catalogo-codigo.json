@@ -415,6 +415,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/DondeEsta.tsx",
+    "purpose": "Sección «Dónde está» / «Dónde entrena»: dirección en texto, mapa y enlace «Cómo llegar» cuando hay dirección exacta.",
+    "guide": "docs/DISENO.md"
+  },
+  {
     "path": "src/app/components/ElegirHorario.tsx",
     "purpose": "Componente de cliente para elegir el día en una tira de fechas o calendario y la franja horaria con una barra de dos tiradores.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -456,7 +461,12 @@
   },
   {
     "path": "src/app/components/MapaGimnasios.tsx",
-    "purpose": "Mapa libre (MapLibre + OpenFreeMap) de /gimnasios con marcadores agrupados, «Usar mi ubicación» sin guardar la ubicación y los más cercanos con su distancia.",
+    "purpose": "Mapa de /gimnasios con marcadores agrupados, «Usar mi ubicación» sin guardar la ubicación y «Los mejores de tu zona» por valoración Lona, o por cercanía.",
+    "guide": "docs/DISENO.md"
+  },
+  {
+    "path": "src/app/components/MapaUbicacion.tsx",
+    "purpose": "Mapa pequeño con un solo punto para la ficha de un gimnasio o entrenador; si el dispositivo no puede dibujarlo, no se muestra.",
     "guide": "docs/DISENO.md"
   },
   {
@@ -613,6 +623,11 @@
     "path": "src/app/components/informarFallo.ts",
     "purpose": "Envía al registro un fallo ocurrido en el navegador (máximo tres por página); omite los del servidor, que ya llegan solos.",
     "guide": "docs/MODERACION.md"
+  },
+  {
+    "path": "src/app/components/mapa/base.ts",
+    "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor.",
+    "guide": "docs/DISENO.md"
   },
   {
     "path": "src/app/disciplinas/[slug]/page.tsx",
@@ -1126,7 +1141,7 @@
   },
   {
     "path": "src/lib/common/mapa.ts",
-    "purpose": "Cálculos del mapa de gimnasios sin red ni base de datos: centros de provincia, distancia, texto de la distancia y dónde pintar cada gimnasio.",
+    "purpose": "Cálculos del mapa sin red ni base de datos: centros de provincia, distancia, ubicación aproximada, valoración Lona de gimnasios, mejores de la zona y enlace «Cómo llegar».",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
