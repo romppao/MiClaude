@@ -69,7 +69,7 @@ export const check = (label, cond) => {
 export const terminarDiagnosticos = () => Promise.all(pendientes);
 export const btn = (p, t) => p.click(`main button:has-text("${t}")`);
 /** Elige explícitamente los datos ficticios de las altas antiguas; la aplicación ya no presupone Madrid ni boxeo. */
-export async function datosDeAlta(p) {
+export async function datosDeAlta(p, { nivel = "AMATEUR" } = {}) {
   const form = p.locator("main form").filter({ has: p.getByRole("button", { name: /^(Crear mi ficha|Crear el evento)$/ }) });
   for (const [name, value] of [["discipline", "BOXEO"], ["province", "Madrid"]]) {
     const campo = form.locator(`select[name=${name}]`);
@@ -77,6 +77,8 @@ export async function datosDeAlta(p) {
   }
   const ciudad = form.locator("input[name=city]");
   if (!(await ciudad.inputValue())) await ciudad.fill("Madrid");
+  const nivelCampo = form.locator("select[name=level]");
+  if (nivel && await nivelCampo.count() && !(await nivelCampo.inputValue())) await nivelCampo.selectOption(nivel);
 }
 
 export const hoyMadrid = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });

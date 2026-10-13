@@ -6,9 +6,10 @@ const disciplina=(p)=>p.locator('main details').filter({has:p.locator('summary s
 async function create(name,division,peso) {
   const u=await newUser(name,"FIGHTER");
   await u.p.goto(B+"/mi-ficha");
-  await datosDeAlta(u.p);
+  await datosDeAlta(u.p, { nivel: null });
   const f=formButton(u.p,"Crear mi ficha");
   check("crear una ficha no preselecciona nivel; es obligatorio elegirlo",await f.locator("[name=level]").inputValue()==="" && await f.locator("[name=level]").getAttribute("required")!==null);
+  await f.locator("[name=level]").selectOption("AMATEUR");
   await f.locator("[name=firstName]").fill(name); await f.locator("[name=lastName]").fill(`Divisiones${rnd}`);
   if (division) await f.locator("[name=divisionId]").selectOption(division);
   if (peso) await f.locator("[name=weightClass]").selectOption(peso);
