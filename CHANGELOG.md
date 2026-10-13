@@ -13,6 +13,8 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [0.9.1] — 2026-10-13
 
+PR #47. Propuesta en borrador; pendiente de las revisiones de Claude y de integración.
+
 ### Corregido
 - Cabecera y navegación distribuidas en escritorio y ajustadas a móviles estrechos.
 - Tarjetas que crecen con nombres largos; noticias visibles y ordenadas según el espacio disponible.

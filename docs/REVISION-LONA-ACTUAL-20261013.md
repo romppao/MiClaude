@@ -29,3 +29,7 @@ Validar instalación, tipos, build y flujos con PostgreSQL aislado en un entorno
 ## Autorización posterior del fundador
 
 El fundador autoriza subir esta propuesta a GitHub y ordena esperar a que Claude termine las revisiones que está ejecutando antes de aplicarla. Se prepara una rama propia desde el SHA oficial y un PR en borrador, sin integración automática ni despliegue. Al retomar: comprobar los cambios finales de Claude, conciliar posibles conflictos, actualizar la versión si fuera necesario y verificar CI antes de plantear la integración. La subida de la propuesta no acredita que Claude haya terminado.
+
+
+## Propuesta subida — espera indicada por el fundador
+2026-10-13, Codex. El fundador autoriza subir la propuesta y pide esperar a que Claude termine sus revisiones antes de aplicarla. PR en borrador: https://github.com/romppao/MiClaude/pull/47, rama codex/responsive-lona-20261013, desde la base oficial 46c17253985aaf277b2801e41a80c81c2f386b16. Se verificó que la diferencia contiene solo los 23 archivos previstos (402 líneas añadidas/42 retiradas antes de esta anotación). El commit inicial de propuesta es f8c0dc7e9765940bb8d25248add7ccebf2af3e57; las anotaciones de entrega se añaden después. Sin integración, auto-merge ni despliegue. CI pendiente de resultado; no se ha confirmado que Claude termine. Siguiente paso: esperar confirmación, contrastar sus cambios finales y validar la propuesta actualizada antes de integrar.
