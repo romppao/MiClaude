@@ -165,9 +165,9 @@ export async function hayCorreoPara(email, espera = 1500) {
 }
 
 /** Crea una cuenta nueva (y, salvo que se pida lo contrario, verifica su correo). */
-export async function newUser(name, role = "FAN", verify = true) {
+export async function newUser(name, role = "FAN", verify = true, contextOptions = {}) {
   const email = `${name.toLowerCase()}${rnd}@test.es`;
-  const p = await (await browser.newContext()).newPage();
+  const p = await (await browser.newContext(contextOptions)).newPage();
   await p.goto(B + `/registro?tipo=${role === "FIGHTER" ? "peleador" : "usuario"}`);
   await p.fill("[name=name]", name); await p.fill("[name=email]", email); await p.fill("[name=password]", "contraseña123");
   // Diseño v3: tras crear la cuenta viene el último paso del registro (opcional); el guion lo deja para después.

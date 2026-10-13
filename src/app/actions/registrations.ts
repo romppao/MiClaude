@@ -108,7 +108,9 @@ export async function requestRegistration(f: FormData) {
   const datos = parseRegistration({ weightKg: str(f, "weightKg"), message: str(f, "message") });
   if (!datos.ok) go(back, { problema: datos.problema });
   const valores = { divisionId: categoria.divisionId, weightClass: categoria.weightClass, ...datos.value };
-  const r = await withLock(`inscripcion:${event.id}:${me.id}`, async (tx) => {
+  const r = await withLock(`cartel:${event.id}`, async (tx) => {
+    const enCartel = await tx.bout.count({ where: { eventId: event.id, OR: [{ fighterAId: me.id }, { fighterBId: me.id }] } });
+    if (enCartel) go(back, { problema: "inscripcion_ya_cartel" });
     const previa = await tx.eventRegistration.findUnique({ where: { eventId_fighterId: { eventId: event.id, fighterId: me.id } } });
     if (previa && previa.status !== "WITHDRAWN") go(back, { problema: previa.status === "DECLINED" ? "inscripcion_rechazada" : "inscripcion_repetida" });
     if (!(await allow(`inscripcion:${me.id}`, REGISTRATIONS_PER_DAY, 24 * HORA))) go(back, { problema: "inscripciones_diarias" });

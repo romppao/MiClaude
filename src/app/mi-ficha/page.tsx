@@ -37,6 +37,7 @@ export const dynamic = "force-dynamic";
 export default async function MyProfile({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser("/mi-ficha");
   if (!user.emailVerifiedAt) redirect("/verificar");
+  const ahora = new Date();
   const sp = await searchParams;
   const q = oneParam(sp.q)?.slice(0, 100);
   // Al volver desde «¿Quién es tu rival?» con «Corregir los datos del combate», el formulario se rellena con lo que se había escrito.
@@ -220,7 +221,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           )}
           <h2 id="registrar-combate">Registrar un combate</h2>
           <form className="search" action={addBout}>
-            <SelectorCategoria modo="combate" nivelesPorDisciplina={Object.fromEntries(me.disciplines.map(d=>[d.discipline,d.level]))} disciplinas={me.disciplines.map(d=>d.discipline)} defaults={{ discipline: (previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"], level: (previo("level") || me.disciplines[0]?.level) as typeof me.disciplines[0]["level"], divisionId: previo("divisionId"), weightClass: previo("weightClass") }} />
+            <SelectorCategoria modo="combate" nivelesPorDisciplina={Object.fromEntries(me.disciplines.map(d=>[d.discipline,d.level]))} disciplinas={me.disciplines.map(d=>d.discipline)} defaults={{ discipline: (previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"], level: previo("level") as typeof me.disciplines[0]["level"], divisionId: previo("divisionId"), weightClass: previo("weightClass") }} />
             <p className="hint">Indica la división y el peso de este combate, aunque hoy compitas en otra categoría. Si no los recuerdas, elige «Prefiero indicarlo más tarde».</p>
             <label className="field"><span>Nombre de la velada</span><input name="eventName" defaultValue={previo("eventName")} required maxLength={LIMITS.eventName} /></label>
             <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={previo("date")} required min="1980-01-01" /></label>
@@ -258,10 +259,10 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                   const isA = b.fighterAId === me.id;
                   const soyAutor = b.createdById === user.id;
                   const opp = isA ? b.fighterB : b.fighterA;
-                  const puedeCorregir = soyAutor && (b.verification === "SELF_REPORTED" || (b.verification === "CONFIRMED" && !b.result)) && eventDayReached(b.event.date);
+                  const puedeCorregir = soyAutor && (b.verification === "SELF_REPORTED" || (b.verification === "CONFIRMED" && !b.result)) && eventDayReached(b.event.date, ahora);
                   return (
                     <tr key={b.id}>
-                      <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div>
+                      <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}<div className="mut">contra {publicFighterName(opp)}</div>
                         {soyAutor && b.verification === "SELF_REPORTED" && (
                           <details style={{ marginTop: 6 }}>
                             <summary className="mut" aria-label={`Quitar este combate: ${b.event.name}`}>Quitar este combate</summary>
@@ -273,7 +274,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                           </details>
                         )}
                       </td>
-                      <td data-label="Estado"><VerificationTag verification={b.verification} backing={b} /></td>
+                      <td data-label="Estado"><VerificationTag bout={b} verification={b.verification} backing={b} now={ahora} /></td>
                       <td data-label="Resultado">
                         {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
                         {puedeCorregir && (
@@ -376,7 +377,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         { id: "pestana-videos", titulo: "Vídeos", contenido: <>
           <section id="multimedia" className="tarjeta" aria-labelledby="titulo-mi-multimedia" style={{ marginBottom: 12, scrollMarginTop: 80 }}>
             <div className="titulo-seccion"><h2 id="titulo-mi-multimedia" style={{ fontSize: 20 }}>Vídeos y fotos de mis combates</h2><span className="meta">Grabados por el público</span></div>
-            {mediosDeMisCombates.length ? <GaleriaMedios medios={mediosDeMisCombates} conVelada back="/mi-ficha#multimedia" />
+            {mediosDeMisCombates.length ? <GaleriaMedios medios={mediosDeMisCombates} conVelada back="/mi-ficha#multimedia" ahora={ahora} />
               : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de tus combates. Cuando alguien lo haga desde la página de la velada, aparecerán aquí para que puedas verlos y descargarlos.</p>}
           </section>
         </> },

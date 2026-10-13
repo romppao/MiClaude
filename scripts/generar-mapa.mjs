@@ -84,7 +84,7 @@ const rutaDe = (f) => {
   const partes = rel(f).replace(/^src\/app\/?/, "").replace(/\/?(page\.tsx|route\.ts)$/, "").split("/").filter(Boolean).map((p) => (p.startsWith("[") ? ":" + p.slice(1, -1) : p));
   return "/" + partes.join("/");
 };
-const pantallas = walk(path.join(RAIZ, "src/app")).filter((f) => /\/(page\.tsx|route\.ts)$/.test(f)).map((f) => {
+const pantallas = walk(path.join(RAIZ, "src/app")).filter((f) => /\/(page\.tsx|route\.ts)$/.test(rel(f))).map((f) => {
   const texto = leer(f);
   const sf = parse(f);
   const usa = []; // acciones importadas

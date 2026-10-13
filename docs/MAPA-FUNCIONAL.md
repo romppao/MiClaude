@@ -79,7 +79,7 @@
 | `/subidas/:...clave` | Recibe un vídeo cuando el almacén es el disco del servidor (desarrollo, pruebas y demo). Con R2, el navegador sube directamente allí. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
 | `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.createReport` | Event, EventRegistration, EventSlot, MediaItem |
-| `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Event, EventRegistration, EventSlot, FighterDiscipline |
+| `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Bout, Event, EventRegistration, EventSlot, FighterDiscipline |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
 «Quién puede entrar» se deduce del código de cada pantalla; las acciones comprueban sus permisos por su cuenta (siguiente tabla), nunca se fían de que la pantalla los haya comprobado.
@@ -318,6 +318,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `form.ts` | `BOUT_FIELDS`, `boutQuery` |
 | `rules.ts` | `OUTCOME_TO_RESULT`, `OutcomeKey`, `OutcomeProblema`, `boutVersion`, `pairKey`, `validateOutcome` |
+| `status.ts` | `estadoSinResultado` |
 
 ### `lib/common`
 
@@ -343,7 +344,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
-| `url.ts` | `safeHttpUrl` |
+| `url.ts` | `safeHttpUrl`, `safeHttpsUrl` |
 | `version.ts` | `VERSION`, `commitDesplegado` |
 
 ### `lib/community`
@@ -357,6 +358,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `cartel-search.ts` | `SUGERENCIAS_CARTEL`, `buscarParaCartel` |
 | `pairing.ts` | `DatosPareja`, `OpcionesPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `comparaEdad`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
 | `registrations-data.ts` | `SolicitudConDatos`, `solicitudesDeEvento` |
 | `registrations.ts` | `CATEGORIAS_MAX`, `ESTADOS_LISTA`, `EstadoLista`, `FilaInscripcion`, `FiltrosInscripcion`, `ORDENES`, `Ocupacion`, `Orden`, `PESO_MAX`, `PESO_MIN`, `PLAZAS_MAX`, `Plaza`, `REGISTRATIONS_PER_DAY`, `REG_MESSAGE_MAX`, `REG_NOTE_MAX`, `REG_REPLY_MAX`, `REG_STATUS_LABEL`, `RegistrationParsed`, `categoriaSinSitio`, `claveCategoria`, `enListaDeEspera`, `filtrarYOrdenar`, `inscripcionAbierta`, `numeroDeFiltro`, `ocupacion`, `parseEstadoLista`, `parseOrden`, `parsePlazas`, `parseRegistration`, `parseRegistrationSettings`, `puedeResponderInscripcion`, `puedeRetirarInscripcion` |
@@ -389,6 +391,8 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | Fichero | Exporta |
 |---|---|
 | `ai.ts` | `generarPromptImagenCombate`, `sintetizarTitularConIA` |
+| `deduplicate.ts` | `enlaceNormalizado`, `fusionarNoticias`, `tituloNormalizado` |
+| `diagnosis.ts` | `causaRetirada`, `diagnosticoFuente` |
 | `espana.ts` | `delPanoramaEspanol`, `nombraEspana` |
 | `feed.ts` | `Noticia`, `ultimasNoticias` |
 | `parse.ts` | `EntradaNoticia`, `MAX_ENTRADAS_POR_CANAL`, `RESUMEN_MAX`, `TITULAR_MAX`, `clasificar`, `decodificar`, `detectarDisciplinas`, `enEspanol`, `imagenPermitida`, `parseFeed`, `textoPlano`, `variar` |

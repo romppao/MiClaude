@@ -9,3 +9,9 @@ export function safeHttpUrl(input: string): string | null {
     return null;
   }
 }
+
+/** Los enlaces de venta de entradas deben proteger el acceso mediante HTTPS. */
+export function safeHttpsUrl(input: string): string | null {
+  const url = safeHttpUrl(input);
+  return url && new URL(url).protocol === "https:" ? url : null;
+}

@@ -14,6 +14,8 @@ export default async function Noticias({ searchParams }: { searchParams: Promise
   const { disciplina: slug = "" } = await searchParams;
   const disciplina = disciplineFromSlug(slug) ?? undefined;
   const noticias = await ultimasNoticias({ disciplina, max: 40 });
+  // El texto relativo se calcula con un mismo instante en SSR e hidratación.
+  const ahora = new Date();
   return (
     <div className="pantalla" style={{ gap: 20 }}>
       <div><h1>Noticias{disciplina ? ` de ${DISCIPLINE_LABEL[disciplina]}` : ""}</h1><p className="lead" style={{ fontSize: 16 }}>{FUENTES_EXPLICADAS}</p></div>
@@ -21,7 +23,7 @@ export default async function Noticias({ searchParams }: { searchParams: Promise
         <Link href="/noticias" aria-current={!disciplina ? "page" : undefined}>Todas</Link>
         {DISCIPLINE_ORDER.map((d) => <Link key={d} href={`/noticias?disciplina=${DISCIPLINE_SLUG[d]}`} aria-current={d === disciplina ? "page" : undefined}>{DISCIPLINE_LABEL[d]}</Link>)}
       </nav>
-      {noticias.length ? <ListaNoticias noticias={noticias} /> : <SinNoticias disciplina={disciplina && DISCIPLINE_LABEL[disciplina]} />}
+      {noticias.length ? <ListaNoticias noticias={noticias} ahora={ahora} /> : <SinNoticias disciplina={disciplina && DISCIPLINE_LABEL[disciplina]} />}
     </div>
   );
 }

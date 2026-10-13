@@ -109,6 +109,9 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  entradas_https: "El enlace de entradas debe empezar por https://. Copia la dirección segura de la web de venta.",
+  nivel_obligatorio: "Elige tu nivel: amateur o profesional.",
+  inscripcion_ya_cartel: "Ya estás en el cartel de esta velada.",
   logro_datos: "Indica el campeonato, la entidad organizadora y el ámbito del título.",
   logro_no_excluido: "Este título no está excluido. No necesita restaurarse y conserva su respaldo actual.",
   logro_fecha: "Indica una fecha válida en la que ya hayas ganado el título, posterior a tu nacimiento si lo has indicado.",

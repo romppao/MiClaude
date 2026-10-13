@@ -30,3 +30,4 @@ Aquí se discute y se registra lo que afecta a la arquitectura, al plan o a los 
 
 ## Índice
 - [ADR-001](ADR-001-gobierno-del-equipo.md) Gobierno del equipo · [ADR-002](ADR-002-rangos-del-equipo.md) Rangos del equipo · [ADR-003](ADR-003-proveedores-fase-0.md) Proveedores de la fase 0 (base de datos, imágenes, correo, errores, menores) — aprobada el 6 de octubre de 2026 · [ADR-004](ADR-004-repositorio-privado.md) Repositorio privado y gasto de GitHub Actions — aprobada el 13 de octubre de 2026.
+- [RFC-005](RFC-005-rss-directos-noticias.md) Evaluar RSS directos para sustituir las búsquedas de Google Noticias — pendiente del fundador; no se han añadido fuentes.

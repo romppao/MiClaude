@@ -56,6 +56,7 @@ const COUNTED = { verification: { not: "DISPUTED" as const }, event: { status: {
 
 export default async function FighterPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const ahora = new Date();
   const fighter = await getFighter(slug);
   if (!fighter) notFound();
   const [bouts, user] = await Promise.all([db.bout.findMany({
@@ -104,7 +105,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           : <Link href={`/entrar?next=${encodeURIComponent(back)}`}>¿Hay un error en esta ficha? Entra en tu cuenta para avisarnos</Link>}
       </p>
     ) : null;
-  const age = publica && fighter.birthDate ? Math.floor((Date.now() - fighter.birthDate.getTime()) / 3.15576e10) : null;
+  const age = publica && fighter.birthDate ? Math.floor((ahora.getTime() - fighter.birthDate.getTime()) / 3.15576e10) : null;
   // Diseño v3: highlights del propio peleador, aura por combate y por mes, y récord amateur privado salvo para su titular.
   const propia = !!user?.fighter && user.fighter.id === fighter.id;
   const [highlights, auraPorCombate, perfil, aurasRecientes, acceso, medios] = await Promise.all([
@@ -227,7 +228,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             // Cuando no se puede dar aura, se dice por qué (en vez de dejar el hueco vacío).
             const notaAura = !aura.ok ? lookup(PROBLEMAS, aura.problema) : null;
             const rival = publicFighterName(opp);
-            const estado = enRevision ? "Resultado en revisión" : !b.result ? (eventDayReached(b.event.date) ? "Resultado por anotar" : "Próximo combate") : privado ? null : r.text;
+            const estado = enRevision ? "Resultado en revisión" : !b.result ? (eventDayReached(b.event.date, ahora) ? "Resultado por anotar" : "Próximo combate") : privado ? null : r.text;
             const corto = !b.result || enRevision || privado ? "·" : r.cls === "W" ? "V" : r.cls === "L" ? "D" : "E";
             const n = auraDe(b.id);
             return (
@@ -243,7 +244,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                   <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link>
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
-                  <VerificationTag verification={b.verification} backing={b} />
+                  <VerificationTag bout={b} verification={b.verification} backing={b} now={ahora} />
                   {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
                 </div>
                 {(b.divisionId || b.weightClass) && <div className="meta">{categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}</div>}
@@ -295,7 +296,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           ...(medios.length > 0 ? [{ id: "multimedia", titulo: "Vídeos", contenido: <>
             <h2 id="titulo-multimedia">Vídeos y fotos de sus combates</h2>
             <p className="mut" style={{ margin: 0 }}>Grabados por el público en las veladas.</p>
-            <GaleriaMedios medios={medios} conVelada back={`/peleadores/${fighter.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} />
+            <GaleriaMedios medios={medios} conVelada back={`/peleadores/${fighter.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} ahora={ahora} />
           </> }] : []),
           { id: "publico", titulo: "Público", contenido: <>
           <h2 id="titulo-publico">Lo que dice el público</h2>

@@ -126,8 +126,18 @@ check("y la cabecera de quien organiza muestra «Mis veladas»", await seen(soli
 const doble = await nueva();
 await doble.goto(B + "/registro?tipo=usuario");
 await doble.fill("[name=name]", "Doble Clic"); await doble.fill("[name=email]", `dobleclic${rnd}@test.es`); await doble.fill("[name=password]", "contraseña-larga-1");
-await doble.dblclick('main button:has-text("Crear mi cuenta")');
-check("un doble clic en «Crear mi cuenta» lleva al paso siguiente del registro, sin un error de «ya hay una cuenta»", await doble.waitForURL("**/registro/intereses**", { timeout: 8000 }).then(() => true, () => false) && await doble.locator("[role=alert] .notice-bad").count() === 0);
+let enviosRegistro = 0;
+await doble.route((url) => url.request().method() === "POST" && url.url().includes("/registro?tipo=usuario"), async (route) => {
+  enviosRegistro++;
+  await new Promise((resolve) => setTimeout(resolve, 3800));
+  await route.continue();
+});
+await doble.getByRole("button", { name: "Crear mi cuenta" }).click();
+check("el registro lento muestra un estado de progreso accesible", await seen(bueno(doble, "Creando tu cuenta")));
+await doble.waitForTimeout(3600); // Supera el antiguo límite de 3,5 s.
+check("el botón sigue bloqueado mientras responde el servidor", await doble.getByRole("button", { name: "Crear mi cuenta" }).isDisabled());
+await doble.locator("form").evaluate((f) => f.requestSubmit());
+check("un segundo envío durante el registro lento se descarta; solo llega una petición", await doble.waitForURL("**/registro/intereses**", { timeout: 10000 }).then(() => true, () => false) && enviosRegistro === 1 && await doble.locator("[role=alert] .notice-bad").count() === 0);
 const peleadorDoble = await newUser("Dobleficha", "FIGHTER");
 await peleadorDoble.p.goto(B + "/mi-ficha");
 await peleadorDoble.p.fill("[name=firstName]", "Doble"); await peleadorDoble.p.fill("[name=lastName]", `Ficha${rnd}`);

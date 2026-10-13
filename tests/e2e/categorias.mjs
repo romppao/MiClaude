@@ -1,4 +1,4 @@
-// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
+﻿// Divisiones federativas: ficha, validación de servidor, búsqueda, cartel e historial.
 import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, sql, enDias, terminarDiagnosticos } from "./ayudas.mjs";
 const junior="RFE2026:Júnior:M", cadete="RFE2026:Cadete / Schoolboys–Schoolgirls:M", benjamin="RFE2026:Benjamín:M";
 const formButton=(p,name)=>p.locator("main form").filter({has:p.getByRole("button",{name,exact:true})});
@@ -8,6 +8,7 @@ async function create(name,division,peso) {
   await u.p.goto(B+"/mi-ficha");
   await datosDeAlta(u.p);
   const f=formButton(u.p,"Crear mi ficha");
+  check("crear una ficha no preselecciona nivel; es obligatorio elegirlo",await f.locator("[name=level]").inputValue()==="" && await f.locator("[name=level]").getAttribute("required")!==null);
   await f.locator("[name=firstName]").fill(name); await f.locator("[name=lastName]").fill(`Divisiones${rnd}`);
   if (division) await f.locator("[name=divisionId]").selectOption(division);
   if (peso) await f.locator("[name=weightClass]").selectOption(peso);
@@ -56,6 +57,7 @@ const aid=await valor("fighterA",`JuniorCategorias Divisiones${rnd}`), bid=await
 // El identificador ya elegido en el cartel también permite probar el POST de un peleador contra un rival conocido.
 await a.p.goto(B+"/mi-ficha");
 const propio=formButton(a.p,"Registrar este combate");
+check("registrar un combate no hereda ni preselecciona el nivel",await propio.locator("[name=level]").inputValue()==="" && await propio.locator("[name=level]").getAttribute("required")!==null);
 await propio.locator('[name=divisionId]').selectOption(junior);await propio.locator('[name=weightClass]').selectOption("M66");
 await propio.evaluate((form,id)=>{const el=document.createElement('input');el.type='hidden';el.name='rivalId';el.value=id;form.append(el);},bid);
 await registrar(a.p,{evento:`Edades propias ${rnd}`,fecha:enDias(-1),rivalNombre:"RivalCategorias",rivalApellidos:`Divisiones${rnd}`,resultado:"WIN",metodo:"UD"});

@@ -45,7 +45,7 @@ export async function addBout(f: FormData) {
   const myDiscipline = isDiscipline(disciplineRaw) ? me.disciplines.find((d) => d.discipline === disciplineRaw) : undefined;
   if (!myDiscipline) go(back, { problema: "combate_sin_disciplina" });
   const discipline = myDiscipline.discipline;
-  const category = parseCompetitionChoice(discipline, str(f, "level") || myDiscipline.level, str(f, "weightClass"), str(f, "divisionId"));
+  const category = parseCompetitionChoice(discipline, str(f, "level"), str(f, "weightClass"), str(f, "divisionId"));
   if (!category) go(back, { problema: "cartel_categoria" });
   if (!knownBoxingAgeEligible(discipline, category.level, me.birthDate, date)) go(back, { problema: "categoria_edad_combate" });
   const currentDivision = divisionById(myDiscipline.divisionId);

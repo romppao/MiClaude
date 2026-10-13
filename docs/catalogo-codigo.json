@@ -35,6 +35,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "next-env.d.ts",
+    "purpose": "Referencias de tipos generadas para Next.js; se mantiene mínima y alineada con la configuración del proyecto.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "next.config.mjs",
     "purpose": "Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -170,11 +175,6 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
-    "path": "scripts/version.mjs",
-    "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
     "path": "scripts/corregir-escalera.sh",
     "purpose": "Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -202,6 +202,11 @@
   {
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/version.mjs",
+    "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1095,6 +1100,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/bouts/status.ts",
+    "purpose": "Determina la etiqueta pública del combate según fecha, resultado y estado de verificación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "src/lib/common/apariencia.ts",
     "purpose": "Deriva tinte por disciplina, alfa e iniciales del diseño v3 desde datos; evita repetir estas reglas visuales en pantallas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1185,11 +1195,6 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
-    "path": "src/lib/common/version.ts",
-    "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
     "path": "src/lib/common/search.ts",
     "purpose": "Busca palabras sin distinguir tildes/mayúsculas mediante SQL parametrizado y limita IDs de resultados; depende de PostgreSQL.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1205,6 +1210,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/version.ts",
+    "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/community/notify.ts",
     "purpose": "Avisa a seguidores/rival/autor y responde a solicitudes; agrupa destinatarios, respeta preferencias y tolera fallos de envío individuales.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1213,6 +1223,11 @@
     "path": "src/lib/community/reports.ts",
     "purpose": "Catálogo de motivos de aviso por entidad (incluida MEDIA con «Aparezco yo y no doy permiso») y límite diario; separa solicitud de revisión de decisión moderadora.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/cartel-search.ts",
+    "purpose": "Normaliza y limita la búsqueda GET de peleadores para el cartel por nombre, alias, gimnasio y ciudad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "src/lib/events/pairing.ts",
@@ -1298,6 +1313,16 @@
     "path": "src/lib/news/ai.ts",
     "purpose": "Ayudas opcionales con Gemini (resumen de titulares y texto para generar imágenes); sin GEMINI_API_KEY devuelven el texto original. Aún no las usa la aplicación.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/news/deduplicate.ts",
+    "purpose": "Fusiona titulares repetidos por URL o título normalizados sin perder disciplinas ni imágenes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/news/diagnosis.ts",
+    "purpose": "Traduce fallos observados en fuentes RSS a diagnósticos prudentes para moderación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "src/lib/news/espana.ts",
@@ -1460,6 +1485,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/hidratacion.mjs",
+    "purpose": "Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/inclusiva.mjs",
     "purpose": "Comprueba cobertura y vocabulario públicos sin priorizar una ciudad o disciplina.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1537,6 +1567,11 @@
   {
     "path": "tests/unit/acciones-ayudantes.test.ts",
     "purpose": "Comprueba lectura y restricciones de ayudantes de acciones para no publicar utilidades como endpoints.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/afilar-revision.test.ts",
+    "purpose": "Prueba deduplicación, diagnósticos, filtros del cartel y estados de combates programados.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

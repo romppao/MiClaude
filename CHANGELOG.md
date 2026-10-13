@@ -11,6 +11,27 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.10.0] — 2026-10-13
+
+### Añadido
+- Diagnóstico de respuesta y estado para fuentes de noticias en `/moderacion/noticias`.
+- Búsqueda accesible de peleadores para cada esquina del cartel.
+- Prueba de navegador para vigilar errores de hidratación en rutas públicas.
+
+### Cambiado
+- Los combates futuros aparecen como «Programado» y los ya celebrados sin resultado como «Resultado por anotar».
+- Los formularios exigen elegir el nivel; los botones de envío muestran progreso y permanecen bloqueados mientras se procesa.
+- Los enlaces de entradas solo admiten HTTPS.
+
+### Corregido
+- Se fusionan noticias repetidas por enlace o título normalizado.
+- Se evita solicitar inscripción a una velada cuando el peleador ya está en su cartel.
+- Se fija la zona horaria de las fechas en «Mi ficha».
+- Se rechazan las respuestas que no contienen un canal RSS/Atom válido.
+
+### Propuesta pendiente de aprobación
+- Sustituir las búsquedas de Google Noticias por canales RSS directos de medios y federaciones. No se activan fuentes nuevas en este cambio.
+
 ## [0.9.0] — 2026-10-13
 
 PR #46.

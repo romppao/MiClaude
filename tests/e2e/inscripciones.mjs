@@ -3,7 +3,7 @@
 // a la vez), descarga la lista y empareja a los aceptados en el cartel.
 import AxeBuilder from "@axe-core/playwright";
 import { PrismaClient } from "@prisma/client";
-import { B, rnd, browser, newUser, btn, check, seen, sql, enDias, esperarCorreo, terminarDiagnosticos } from "./ayudas.mjs";
+import { B, rnd, browser, newUser, btn, check, seen, sql, enDias, esperarCorreo, terminarDiagnosticos, anadirAlCartel } from "./ayudas.mjs";
 
 const db = new PrismaClient();
 const axe = async (p, que) => {
@@ -53,6 +53,8 @@ const ana = await peleador("Ana", "Valencia");
 const bea = await peleador("Bea", "Sevilla");
 const cris = await peleador("Cris", "Valencia");
 const otro = await peleador("Otro", "Valencia", "BOXEO");
+const gimnasioBea = await db.gym.create({ data: { slug: `gym-buscador-${rnd}`, name: `Gimnasio buscador ${rnd}`, city: "Valencia", province: "Valencia" } });
+await db.fighter.update({ where: { id: bea.f.id }, data: { alias: "Tornado buscador", city: "Valencia", gymId: gimnasioBea.id } });
 sql(`update "Fighter" set "birthDate"='1998-05-01' where id='${ana.f.id}'; update "Fighter" set "birthDate"='2006-03-01' where id='${bea.f.id}';`);
 await ana.p.goto(B + "/mi-panel");
 check("el panel del peleador tiene «Inscribirme en una velada» y «Mis inscripciones»", await seen(ana.p.locator(".accion-principal", { hasText: "Inscribirme en una velada" })) && await seen(ana.p.locator(".accion-principal", { hasText: "Mis inscripciones" })));
@@ -127,6 +129,25 @@ check("Cris retira su solicitud y se avisa al organizador", await seen(cris.p.lo
 await org.p.goto(B + `/organizador/${slug}`);
 const grupo = await org.p.$eval("select[name=fighterA] optgroup", (g) => ({ etiqueta: g.label, nombres: [...g.querySelectorAll("option")].map((o) => o.textContent) }));
 check("al añadir un combate, los aceptados salen primero en su propio grupo", grupo.etiqueta === "Aceptados en la inscripción" && grupo.nombres.length === 1 && grupo.nombres[0].startsWith("Ana"));
+check("los peleadores de otra disciplina no aparecen ni entre las sugerencias del cartel", await org.p.locator(`select[name=fighterA] option[value="${otro.f.id}"]`).count() === 0);
+const buscarRoja = org.p.locator('form[method="get"][aria-label="Buscar peleadores para el cartel"]');
+check("el buscador es un formulario GET con campos etiquetados", await buscarRoja.count() === 1 && await org.p.getByLabel("Buscar esquina roja").count() === 1 && await org.p.getByLabel("Buscar esquina azul").count() === 1);
+for (const [termino, por] of [["Bea", "nombre"], ["Tornado buscador", "alias"], [gimnasioBea.name, "gimnasio"], ["Valencia", "ciudad"]]) {
+  await org.p.getByLabel("Buscar esquina roja").fill(termino);
+  await org.p.getByRole("button", { name: "Buscar peleadores" }).click();
+  await org.p.waitForURL((url) => url.searchParams.get("roja") === termino);
+  check(`el buscador del cartel encuentra por ${por}`, await org.p.locator(`select[name=fighterA] option[value="${bea.f.id}"]`).count() === 1);
+}
+await org.p.getByLabel("Buscar esquina roja").fill("");
+await org.p.getByRole("button", { name: "Buscar peleadores" }).click();
+await org.p.waitForURL((url) => !url.searchParams.has("roja"));
+const esquina = org.p.getByLabel("Esquina roja");
+await esquina.focus(); await org.p.keyboard.press("ArrowDown");
+check("las sugerencias del cartel también se pueden recorrer con el teclado", await esquina.inputValue() !== "");
+await anadirAlCartel(org.p, `Ana ${apellido}`, `Cris ${apellido}`);
+await org.p.locator("tbody tr", { hasText: "Ana" }).waitFor();
+await ana.p.goto(B + `/veladas/${slug}/inscribirme`);
+check("quien ya figura en el cartel ve el aviso y no puede volver a solicitar participar", await seen(ana.p.getByText("Ya estás en el cartel de esta velada")) && await ana.p.locator("[name=weightKg]").count() === 0);
 // Cerrar la inscripción: deja de verse en la página pública.
 await org.p.locator("#inscripcion").getByRole("button", { name: "Cerrar la inscripción" }).click();
 await org.p.locator(".notice-ok").waitFor();

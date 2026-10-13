@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const ahora = new Date();
   const e = await getEvent(slug);
   if (!e) notFound();
   const org = e.organizer?.organizerRequest;
@@ -110,7 +111,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                     : b.result === "NO_CONTEST" ? "Sin decisión"
                     : <>Gana {ganador}{b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? `, asalto ${b.endRound}` : ""})` : ""}</>}
                 </td>
-                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag verification={b.verification} backing={b} /> : <span className="mut">—</span>}</td>
+                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag bout={{ result: b.result, event: { date: e.date } }} verification={b.verification} backing={b} now={ahora} /> : <span className="mut">—</span>}</td>
               </tr>
             );
           })}
@@ -124,7 +125,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <p className="mut" style={{ margin: 0 }}>Lo que graba el público en la velada, para que los peleadores tengan las imágenes de sus combates.</p>
         {compartir === "ok" ? <p className="acciones" style={{ margin: 0 }}><Link className="btn" href={user ? `/compartir?velada=${e.slug}` : `/entrar?next=${encodeURIComponent(`/compartir?velada=${e.slug}`)}`}>Subir vídeos o fotos de esta velada</Link></p>
           : compartir === "futura" ? <p className="mut" style={{ margin: 0 }}>El día de la velada podrás compartir aquí lo que grabes.</p> : null}
-        {medios.length ? <GaleriaMedios medios={medios} back={`/veladas/${e.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} /> : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de esta velada.</p>}
+        {medios.length ? <GaleriaMedios medios={medios} back={`/veladas/${e.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} ahora={ahora} /> : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de esta velada.</p>}
       </section>
     </>
   );

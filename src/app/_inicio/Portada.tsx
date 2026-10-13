@@ -27,6 +27,7 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
     disciplina ? db.trainer.findMany({ where: { disciplines: { has: disciplina } }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 6, include: { gym: { select: { name: true } } } }) : Promise.resolve([]),
   ]);
   const [destacada, ...resto] = noticias;
+  const ahora = new Date();
   const de = nombre ? ` de ${nombre}` : "";
   const masNoticias = disciplina ? `/noticias?disciplina=${DISCIPLINE_SLUG[disciplina]}` : "/noticias";
   return (
@@ -41,7 +42,7 @@ export default async function Portada({ disciplina, cabecera, despuesDeNoticias,
 
       <section aria-labelledby="titulo-actualidad" className="portada-actualidad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad">{nombre ? `Actualidad${de}` : "Actualidad"}</h2><Link href={masNoticias}>Todas las noticias</Link></div>
-        {destacada ? <><NoticiaDestacada n={destacada} />{resto.length > 0 && <FilaNoticias noticias={resto} etiqueta={`Más noticias${de}`} />}</> : <SinNoticias disciplina={nombre ?? undefined} />}
+        {destacada ? <><NoticiaDestacada n={destacada} ahora={ahora} />{resto.length > 0 && <FilaNoticias noticias={resto} etiqueta={`Más noticias${de}`} ahora={ahora} />}</> : <SinNoticias disciplina={nombre ?? undefined} />}
       </section>
 
       {despuesDeNoticias}

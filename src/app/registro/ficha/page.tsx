@@ -27,7 +27,7 @@ export default async function FichaRegistro() {
         <p className="lead">Con tu disciplina, tu categoría y tu provincia. Podrás añadir más disciplinas después.</p>
       </div>
       <form action={saveFighterIntent} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <SelectorCategoria modo="ficha" chips defaults={{ discipline: p?.discipline ?? "", level: p?.level ?? "AMATEUR", divisionId: p?.divisionId, weightClass: p?.weightClass }} />
+        <SelectorCategoria modo="ficha" chips defaults={{ discipline: p?.discipline ?? "", level: p?.level ?? "", divisionId: p?.divisionId, weightClass: p?.weightClass }} />
         <label className="field"><span>Provincia</span><select name="province" defaultValue={p?.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((x) => <option key={x}>{x}</option>)}</select></label>
         <p className="mut" style={{ margin: 0 }}>Cuando confirmes tu correo electrónico revisarás estos datos en «Mi ficha», con tu nombre y tu gimnasio, y la ficha se publicará.</p>
         <button className="btn-grande">Guardar mi ficha</button>

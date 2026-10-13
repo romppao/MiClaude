@@ -11,6 +11,7 @@ import { peleadoresConAura, proximasVeladas } from "./datos";
 /** Inicio del visitante sin cuenta (diseño v3, «homeVisit»): portada pública, actualidad de todos los deportes, disciplinas, veladas y una invitación por tipo de cuenta. */
 export default async function InicioVisitante() {
   const [veladas, conAura, noticias] = await Promise.all([proximasVeladas(6), peleadoresConAura(6), ultimasNoticias({ max: 5 })]);
+  const ahora = new Date();
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 30 }}>
       <section className="portada-visita a-sangre" aria-labelledby="titulo-portada" style={{ marginTop: -20 }}>
@@ -52,7 +53,7 @@ export default async function InicioVisitante() {
 
       <section aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad-visita">Actualidad</h2><Link href="/noticias">Todas las noticias</Link></div>
-        {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <FilaNoticias noticias={noticias.slice(1)} etiqueta="Más noticias" />}</> : <SinNoticias />}
+        {noticias.length ? <><NoticiaDestacada n={noticias[0]} ahora={ahora} />{noticias.length > 1 && <FilaNoticias noticias={noticias.slice(1)} etiqueta="Más noticias" ahora={ahora} />}</> : <SinNoticias />}
       </section>
 
       <section aria-labelledby="titulo-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 14 }}>

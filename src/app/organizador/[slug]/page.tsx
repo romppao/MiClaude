@@ -4,6 +4,7 @@ import { getUser } from "../../../lib/accounts/auth";
 import { loginPath } from "../../../lib/common/paths";
 import { eventDayReached } from "../../../lib/common/dates";
 import { db } from "../../../lib/common/db";
+import { buscarParaCartel, SUGERENCIAS_CARTEL } from "../../../lib/events/cartel-search";
 import { METHOD_LABEL, fmtDate } from "../../../lib/common/labels";
 import SelectorCategoria from "../../components/SelectorCategoria";
 import { divisionLabel } from "../../../lib/common/competition";
@@ -20,15 +21,18 @@ import { todayMadrid } from "../../../lib/common/dates";
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const MAX_LISTA = 500;
+const MAX_LISTA = SUGERENCIAS_CARTEL;
 
-export default async function ManageEvent({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ManageEvent({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ roja?: string; azul?: string }> }) {
   const [{ slug }, user] = await Promise.all([params, getUser()]);
   if (!user) redirect(loginPath(`/organizador/${slug}`));
   const event = await db.event.findUnique({ where: { slug }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } });
   if (!event) notFound();
   if (event.organizerId !== user.id && user.role !== "ADMIN") redirect("/organizador?problema=sin_permiso");
-  const fighters = await db.fighter.findMany({ where: { hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }], take: MAX_LISTA + 1, include: { gym: true } });
+  const paramsBusqueda = await searchParams;
+  const roja = (typeof paramsBusqueda.roja === "string" ? paramsBusqueda.roja : "").slice(0, 80);
+  const azul = (typeof paramsBusqueda.azul === "string" ? paramsBusqueda.azul : "").slice(0, 80);
+  const [fighters, fightersAzul] = await Promise.all([buscarParaCartel(event.discipline, roja), buscarParaCartel(event.discipline, azul)]);
   const past = eventDayReached(event.date);
   // Inscripción: cuántas solicitudes esperan respuesta y quiénes están aceptados (salen primero al formar el cartel).
   const [porEstado, aceptados, plazas, filasCategoria] = await Promise.all([
@@ -43,17 +47,17 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
   const hoy = todayMadrid();
   const abierta = inscripcionAbierta(event, hoy);
   const diaEvento = event.date.toISOString().slice(0, 10);
-  // Un aceptado que quede fuera de los primeros 500 de la lista también tiene que poder elegirse.
-  const visiblesIds = new Set(fighters.slice(0, MAX_LISTA).map((b) => b.id));
-  const faltan = [...idsAceptados].filter((id) => !visiblesIds.has(id));
-  const extra = faltan.length ? await db.fighter.findMany({ where: { id: { in: faltan }, hiddenAt: null }, include: { gym: true } }) : [];
-  const opciones = (lista: typeof fighters) => {
-    const visibles = [...extra, ...lista.slice(0, MAX_LISTA)];
-    const ac = visibles.filter((b) => idsAceptados.has(b.id));
-    const resto = visibles.filter((b) => !idsAceptados.has(b.id));
+  // Los aceptados en la inscripción siempre se pueden elegir, coincidan o no con la búsqueda, y salen primero.
+  const fichasAceptadas = idsAceptados.size ? await db.fighter.findMany({ where: { id: { in: [...idsAceptados] }, hiddenAt: null, disciplines: { some: { discipline: event.discipline } } }, include: { gym: true }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }] }) : [];
+  const opciones = (lista: typeof fighters, busqueda: string) => {
     const op = (b: (typeof fighters)[number]) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>;
-    return ac.length ? <><optgroup label="Aceptados en la inscripción">{ac.map(op)}</optgroup><optgroup label="Todos los peleadores de la disciplina">{resto.map(op)}</optgroup></> : resto.map(op);
+    const resto = lista.slice(0, MAX_LISTA).filter((b) => !idsAceptados.has(b.id));
+    const titulo = busqueda ? "Resultados de la búsqueda" : "Peleadores de la disciplina";
+    return fichasAceptadas.length ? <><optgroup label="Aceptados en la inscripción">{fichasAceptadas.map(op)}</optgroup>{resto.length > 0 && <optgroup label={titulo}>{resto.map(op)}</optgroup>}</> : resto.map(op);
   };
+  const resumen = (lista: typeof fighters, busqueda: string, esquina: string) =>
+    lista.length > MAX_LISTA ? (busqueda ? `Esquina ${esquina}: hay más de ${MAX_LISTA} coincidencias; concreta la búsqueda.` : `Esquina ${esquina}: se muestran los primeros ${MAX_LISTA} de la disciplina; busca para encontrar al resto.`)
+      : `Esquina ${esquina}: ${lista.length} ${busqueda ? "coincidencias" : "peleadores de la disciplina"}.`;
   const nombre = (b: { firstName: string; lastName: string; listed?: boolean; hiddenAt?: Date | null }) => publicFighterName(b); // como lo ve el público: una ficha provisional solo enseña la inicial del apellido
   // En la lista se distinguen los homónimos con el alias, la ciudad y el gimnasio.
   const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
@@ -158,20 +162,26 @@ export default async function ManageEvent({ params }: { params: Promise<{ slug: 
       </section>
 
       <h2 id="anadir-combate" style={{ scrollMarginTop: 80 }}>Añadir un combate al cartel</h2>
+      <form method="get" action={`/organizador/${event.slug}#anadir-combate`} className="search" aria-label="Buscar peleadores para el cartel">
+        <label className="field"><span>Buscar esquina roja</span><input name="roja" type="search" maxLength={80} defaultValue={roja} aria-describedby="ayuda-buscar-cartel" /></label>
+        <label className="field"><span>Buscar esquina azul</span><input name="azul" type="search" maxLength={80} defaultValue={azul} aria-describedby="ayuda-buscar-cartel" /></label>
+        <button>Buscar peleadores</button>
+        <p id="ayuda-buscar-cartel" className="hint">Busca por nombre, alias, gimnasio o ciudad. Solo aparecen peleadores de la disciplina de esta velada. Elige una sugerencia para cada esquina.</p>
+      </form>
+      <p role="status">{resumen(fighters, roja, "roja")} {resumen(fightersAzul, azul, "azul")}{fichasAceptadas.length > 0 && " Los aceptados en la inscripción aparecen siempre primero."}</p>
       <form className="search" action={addCartelBout}>
         <input type="hidden" name="eventId" value={event.id} />
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Esquina roja</span>
-          <select name="fighterA" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fighters)}</select>
+          <select name="fighterA" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fighters, roja)}</select>
         </label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Esquina azul</span>
-          <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fighters)}</select>
+          <select name="fighterB" required defaultValue=""><option value="" disabled>Elige a un peleador…</option>{opciones(fightersAzul, azul)}</select>
         </label>
         <SelectorCategoria modo="combate" fijas={{ discipline: event.discipline, level: event.level }} />
         <label className="field"><span>Número de asaltos (opcional)</span><input name="rounds" type="number" min={1} max={12} /></label>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Enlace del acta o del cartel (opcional)</span><input name="evidenceUrl" type="url" maxLength={LIMITS.url} placeholder="https://…" /></label>
         <button>Añadir al cartel</button>
       </form>
-      <p className="mut">Elige a cada peleador de la lista desplegable. Si alguien no aparece, debe crear o reclamar antes su ficha en Lona.{fighters.length > MAX_LISTA && ` Se muestran los primeros ${MAX_LISTA} de la disciplina.`}</p>
 
       <h2>Cartel</h2>
       {event.bouts.length === 0 ? <p className="mut">El cartel está vacío. Añade el primer combate con el formulario de arriba.</p> : (

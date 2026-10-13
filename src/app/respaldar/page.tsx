@@ -27,6 +27,7 @@ export default async function Backing({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const actor = await requireSupportActor("/respaldar");
+  const ahora = new Date();
   const admin = actor.user.role === "ADMIN";
   const raw = await searchParams;
   const q = oneParam(raw.q)?.trim().slice(0, 160) ?? "";
@@ -233,7 +234,7 @@ export default async function Backing({
                 : `Gana ${b.result === "A_WIN" ? b.fighterA.firstName : b.fighterB.firstName}`}
           </p>
           <p>{levelName(b.event.level)} · {categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}{b.weightClass ? "" : " · Peso sin confirmar"}</p>
-          <VerificationTag verification={b.verification} backing={b} />
+          <VerificationTag bout={b} verification={b.verification} backing={b} now={ahora} />
           <form action={endorseBout} className="search">
             <input type="hidden" name="boutId" value={b.id} />
             <input type="hidden" name="back" value={`${back}#combates`} />

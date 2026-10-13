@@ -295,3 +295,11 @@ Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque A (Codex)
+**Pedido por el fundador:** «Parte de main actualizado, separa los bloques A, B y C en PR y corrige los fallos sin tocar el diseño».
+**Base:** `origin/claude/ring-espana-mvp` (`46c1725`). **Rama:** `codex/afilar-a-20261013`. **PR:** pendiente de publicación.
+**Qué cambié:** incorporé A1–A8 de la propuesta de Claude sin su rediseño ni feeds nuevos; añadí diagnósticos documentados para FEKM/MMA España y la propuesta RFC-005; corregí hidratación pasando una fecha estable desde servidor; protegí el cartel por disciplina; eliminé niveles predeterminados en ficha y combate; amplié pruebas de envío lento y de duplicidad. Corregí el generador del mapa para rutas Windows.
+**Qué ejecuté:** cuatro grupos unitarios, 69/69; mapa generado y comprobado (73 pantallas); catálogo generado y comprobado (358 archivos); `git diff --check`. Typecheck falla por `.next/types/app/revision-ui/page.ts`, referencia generada obsoleta ajena al árbol actual. La prueba documental del catálogo pasa 8/9; Windows bloquea la creación de un enlace simbólico (EPERM). No ejecuté e2e/a11y: no hay `DATABASE_URL` ni navegador Chromium configurado.
+**Qué debe hacer el siguiente asistente:** revisar los cambios y ejecutar CI Linux con PostgreSQL y navegador; completar B1–B3 y C en ramas/PR separados.
+**Decisiones del fundador abiertas:** aprobación para activar RSS directos; visibilidad del récord completo para organizadores/moderadores; política sobre menores sigue abierta. No se modificó el diseño ni se desplegó.

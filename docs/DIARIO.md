@@ -1719,3 +1719,6 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
 
 **Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque A (Codex)
+Se parte de `46c1725` en `codex/afilar-a-20261013`, sin los cambios responsive abiertos. Se integran A1–A8 de la revisión de Claude, se evita activar fuentes nuevas y se deja RFC-005 para decisión del fundador. Se mejora la estabilidad temporal de render/hidratación, el filtro del cartel, la protección de envío y el nivel obligatorio. Cuatro grupos unitarios: 69/69; mapa (73 pantallas) y catálogo (358 archivos) regenerados y comprobados. El typecheck queda impedido por tipos `.next` obsoletos de `revision-ui`; una prueba de catálogo requiere symlink que Windows rechaza (EPERM); no hay base de datos ni Chromium para e2e/a11y. PR y CI pendientes. La aprobación sobre feeds directos, el acceso de organizadores/moderadores al récord completo y la política de menores siguen abiertas.

@@ -5,6 +5,7 @@ import { CONSERVAR_DIAS, FUENTES_INICIALES, FUENTES_RETIRADAS, REFRESCO_MS } fro
 import { clasificar, enEspanol, parseFeed } from "./parse";
 import { delPanoramaEspanol } from "./espana";
 import { registrarFallo } from "../common/fallos";
+import { causaRetirada } from "./diagnosis";
 
 /**
  * Actualización de las noticias. Se lanza en segundo plano (after()) cuando alguien abre la portada y alguna fuente lleva más de
@@ -24,15 +25,15 @@ export async function asegurarFuentesIniciales() {
   await db.newsSource.createMany({ data: FUENTES_INICIALES, skipDuplicates: true });
   // Las fuentes iniciales que solo cubren España quedan marcadas así aunque se crearan antes de existir la marca.
   await db.newsSource.updateMany({ where: { url: { in: FUENTES_INICIALES.filter((f) => f.local).map((f) => f.url) }, local: false }, data: { local: true } });
-  const retiradas = await db.newsSource.findMany({ where: { url: { in: FUENTES_RETIRADAS }, OR: [{ active: true }, { items: { some: {} } }] }, select: { id: true } });
+  const retiradas = await db.newsSource.findMany({ where: { url: { in: FUENTES_RETIRADAS }, OR: [{ active: true }, { items: { some: {} } }] }, select: { id: true, url: true } });
   if (retiradas.length) {
     const ids = retiradas.map((r) => r.id);
     await db.newsItem.deleteMany({ where: { sourceId: { in: ids } } });
-    await db.newsSource.updateMany({ where: { id: { in: ids } }, data: { active: false, lastError: RETIRADA } });
+    for (const fuente of retiradas) {
+      await db.newsSource.update({ where: { id: fuente.id }, data: { active: false, lastError: causaRetirada(fuente.url) } });
+    }
   }
 }
-const RETIRADA = "Retirada: en inglés o mezclaba disciplinas (8 de octubre de 2026)";
-
 /** Solo titulares en español, del panorama español y con su disciplina bien puesta; lo demás se descarta. */
 function aceptar(f: Pick<NewsSource, "disciplines" | "kind" | "local">, e: { title: string; summary: string | null }): import("@prisma/client").Discipline[] | null {
   if (!enEspanol(e.title) || !delPanoramaEspanol(f, e)) return null;
@@ -63,6 +64,7 @@ async function leer(url: string): Promise<string> {
   if (Number(r.headers.get("content-length") ?? 0) > MAX_BYTES) throw new Error("La fuente es demasiado grande");
   const texto = await r.text();
   if (texto.length > MAX_BYTES) throw new Error("La fuente es demasiado grande");
+  if (!/<(?:rss|feed|rdf:RDF)[\s>]/i.test(texto)) throw new Error("La respuesta no es un canal RSS o Atom (puede ser HTML)");
   return texto;
 }
 
