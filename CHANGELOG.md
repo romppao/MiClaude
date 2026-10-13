@@ -11,14 +11,38 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.10.0] — 2026-10-13
+
+### Añadido
+- **Diagnóstico de fuentes de noticias** en `/moderacion/noticias`: cada fuente muestra si responde, si devuelve un canal válido y cuántos titulares aporta.
+- **Buscador de peleadores en el cartel** (organizador): cada esquina del combate tiene su búsqueda; los inscritos aceptados salen siempre primero, y sin búsqueda se ve una lista corta.
+- Nueva fuente de noticias: Marca (boxeo) y Marca (MMA), comprobadas el 13-10-2026.
+- Prueba de navegador `hidratacion.mjs`: vigila errores de hidratación en zona horaria de Madrid y de Nueva York.
+
+### Cambiado
+- Los combates futuros muestran «Programado»; los pasados sin resultado, «Resultado por anotar».
+- «Nivel» ya no viene preseleccionado al crear una velada: hay que elegirlo («Elige tu nivel»).
+- Los botones de envío se bloquean hasta que termina la acción y muestran «Creando tu cuenta…» o «Guardando…» (con tope de seguridad de 30 s).
+- El enlace de entradas de una velada debe empezar por https.
+
+### Corregido
+- Titulares repetidos en las noticias: se descartan por dirección o título normalizados (incluido un fallo con la barra final y parámetros).
+- Al actualizar noticias se rechaza una respuesta que no sea un canal RSS.
+- No se puede pedir inscripción a una velada en cuya cartelera ya figura la persona.
+- Fechas de «Mi ficha» sin zona horaria fija (posible causa de un aviso de hidratación; la causa no está confirmada).
+
+### Eliminado
+- Fuentes de noticias FEKM (rechaza las peticiones, 403) y MMA España (sin canal, devuelve HTML); quedan anotadas como retiradas.
+
 ## [0.9.1] — 2026-10-13
 
-PR #47. Propuesta en borrador; pendiente de las revisiones de Claude y de integración.
+PR #47 (Codex). Integrada por Claude el 13-10-2026 junto con la 0.10.0, en la rama `claude/afilar-y-responsive-20261013`.
 
 ### Corregido
 - Cabecera y navegación distribuidas en escritorio y ajustadas a móviles estrechos.
 - Tarjetas que crecen con nombres largos; noticias visibles y ordenadas según el espacio disponible.
 - Fotos ausentes con iniciales legibles, incluidos nombres con emoji, y cifras de aura con formato español.
+
 
 ## [0.9.0] — 2026-10-13
 

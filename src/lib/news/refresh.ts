@@ -63,6 +63,7 @@ async function leer(url: string): Promise<string> {
   if (Number(r.headers.get("content-length") ?? 0) > MAX_BYTES) throw new Error("La fuente es demasiado grande");
   const texto = await r.text();
   if (texto.length > MAX_BYTES) throw new Error("La fuente es demasiado grande");
+  if (!/<(?:rss|feed|rdf:RDF)[\s>]/i.test(texto)) throw new Error("La respuesta no es un canal RSS o Atom (puede ser HTML)");
   return texto;
 }
 

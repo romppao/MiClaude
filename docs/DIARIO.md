@@ -1733,3 +1733,31 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 ## 13 de octubre de 2026 — Corrección de base oficial (Codex)
 El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
 Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.
+
+## 13 de octubre de 2026 — Afilar antes del lanzamiento: bloque A (Claude, con el trabajo previo de Codex)
+
+**Qué se pidió:** el encargo «afilar y gimnasios» (`docs/ecosistema/traspasos/2026-10-13-claude-encargo-codex-afilar-y-gimnasios.md`). Codex empezó el bloque A y se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso; Claude lo revisó, lo terminó y lo confirmó.
+
+**Qué se decidió y por qué:**
+- Versión 0.10.0 (menor): trae cosas nuevas para el usuario (buscador del cartel, diagnóstico de noticias, estados de combate).
+- Se mantienen las búsquedas de Google Noticias aunque a veces devuelven 503 desde Render; queda pendiente decidir si se quitan.
+- Se quitan FEKM (403) y MMA España (HTML, sin canal) y se añaden Marca boxeo y Marca MMA (comprobadas con curl).
+
+**Qué se hizo:**
+- A1 Noticias: sin titulares repetidos (`src/lib/news/deduplicate.ts`), diagnóstico de fuentes (`diagnosis.ts`), rechazo de respuestas que no son RSS, fuentes cambiadas (`sources.ts`).
+- A2 Hidratación #418: fecha de «Mi ficha» con zona horaria fija y prueba `tests/e2e/hidratacion.mjs` (Madrid y Nueva York).
+- A3 `EvitarDobleEnvio` reescrito: bloquea hasta que termina la acción, con tope de 30 s y texto de progreso.
+- A4 Cartel del organizador con búsqueda de peleadores por esquina (`src/lib/events/cartel-search.ts`).
+- A5 Estados «Programado» y «Resultado por anotar» (`src/lib/bouts/status.ts`).
+- A6 No se puede pedir inscripción si ya se figura en el cartel (bloqueo común `cartel:<eventId>`).
+- A7 Nivel sin preseleccionar. A8 Enlace de entradas solo https.
+
+**Qué salió mal:**
+- La causa del error de hidratación #418 NO está confirmada: se vio una vez en la demo y no se reproduce (unas 30 cargas y en local). La hipótesis es una mezcla de HTML y JavaScript de versiones distintas durante un despliegue de Render.
+- Fallo de la deduplicación: una dirección con barra final y parámetros no se normalizaba igual; corregido y con prueba.
+- Codex se quedó sin créditos con el trabajo sin confirmar.
+
+**Estado:** A1–A8 hechos y confirmados en local (sin subir). Pruebas: typecheck limpio; vitest 695/697 (dos fallos anteriores de rutas de Windows en `multimedia.test.ts`). La suite de navegador no se ha pasado entera. A4 no está validado en un navegador con una cuenta de organizador.
+
+**Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
+

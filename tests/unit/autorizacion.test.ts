@@ -163,7 +163,7 @@ describe("una persona que no es organizadora", () => {
   it("un entrenador sí puede crear veladas e interclubs (decisión del fundador): pasa la guarda y llega a validar los datos", async () => {
     iniciarSesion(persona("TRAINER"));
     expect(await destino(acciones.createEvent, { name: "" })).toBe("/organizador?problema=velada_datos");
-    expect(await destino(acciones.createEvent, { name: "Interclub", date: "2026-11-10", kind: "OTRO" })).toBe("/organizador?problema=velada_tipo");
+    expect(await destino(acciones.createEvent, { name: "Interclub", date: "2026-11-10", level: "AMATEUR", kind: "OTRO" })).toBe("/organizador?problema=velada_tipo");
     expect(mundo.estado.escrituras).toEqual([]);
   });
   it("nadie puede borrar el vídeo o la foto que subió otra persona", async () => {

@@ -110,7 +110,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                     : b.result === "NO_CONTEST" ? "Sin decisión"
                     : <>Gana {ganador}{b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? `, asalto ${b.endRound}` : ""})` : ""}</>}
                 </td>
-                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag verification={b.verification} backing={b} /> : <span className="mut">—</span>}</td>
+                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag bout={{ result: b.result, event: { date: e.date } }} verification={b.verification} backing={b} /> : <span className="mut">—</span>}</td>
               </tr>
             );
           })}

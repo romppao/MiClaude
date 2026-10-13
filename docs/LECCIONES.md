@@ -393,3 +393,13 @@ No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?
 
 ## 13 de octubre de 2026 — Base de una revisión visual (Codex)
 Confirmar el SHA live del despliegue antes de corregir una copia local. Que git fetch falle no implica que todos los conectores estén inaccesibles: GitHub y Render sí permitieron contrastar e importar la base oficial. No trasladar los resultados de compilación de una base antigua a una actualizada.
+
+## 13 de octubre de 2026 — Afilar antes del lanzamiento (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Codex se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso | Se trabajó un bloque entero sin confirmar ni dejar nota | Al cerrar cada bloque, aunque sea parcial, se confirma en Git y se deja un traspaso en `docs/ecosistema/traspasos/` |
+| Una noticia repetida no se detectaba cuando la dirección acababa en barra y llevaba parámetros | La normalización quitaba la barra final solo en algunos casos, así que dos formas de la misma dirección no coincidían | Normalizar la dirección entera (barra final, parámetros de seguimiento, mayúsculas) antes de comparar, con una prueba para cada caso |
+| Un error de hidratación (#418) apareció una vez en la demo y no se pudo reproducir | Causa sin confirmar; sospecha de HTML y JavaScript de versiones distintas durante un despliegue, y de fechas sin zona horaria fija | No dar por resuelto lo que no se reproduce: dejar la prueba que lo vigila (`hidratacion.mjs`) y anotar que la causa sigue sin confirmar |
+| Fuentes de noticias que fallan sin avisar (403, HTML en vez de RSS) | Nadie comprobaba lo que devolvía cada fuente | Comprobar cada fuente con una petición real antes de añadirla y mostrar su diagnóstico en moderación |
+
