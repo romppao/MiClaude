@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **347 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **348 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -116,7 +116,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `a96a101f9495f4ee` |
 | [.github/dependabot.yml](../../.github/dependabot.yml) | Configura actualización de dependencias y evita saltos mayores automáticos no planificados. | [Contexto](OPERACION.md) | — | `d3d8f5a4368d2cb4` |
 | [.github/workflows/actualizar-noticias.yml](../../.github/workflows/actualizar-noticias.yml) | Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza. | [Contexto](OPERACION.md) | — | `2d00f5ce8fad3416` |
-| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `8e5888092016c581` |
+| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `c200977dee3a8688` |
 | [.github/workflows/mantener-demo-despierta.yml](../../.github/workflows/mantener-demo-despierta.yml) | Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub. | [Contexto](OPERACION.md) | — | `cf2d035c95075c65` |
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `06cfb5f10f2bb270` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7c2af99ba83c7572` |
@@ -446,6 +446,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
 | [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `d04ddc73375eeef3` |
+| [scripts/avisos-ci.mjs](../../scripts/avisos-ci.mjs) | En el CI, si fallan las pruebas de navegador, resume en un solo aviso los fallos y el texto de las páginas guardadas en test-results, para leerlo desde el PR. | [Contexto](OPERACION.md) | — | `d91fcb355f8cbddc` |
 | [scripts/copiar-maplibre.mjs](../../scripts/copiar-maplibre.mjs) | Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo. | [Contexto](OPERACION.md) | — | `3b0d17cb0d995776` |
 | [scripts/corregir-escalera.sh](../../scripts/corregir-escalera.sh) | Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto. | [Contexto](OPERACION.md) | — | `f39d6ef23d821f8a` |
 | [scripts/demo.sh](../../scripts/demo.sh) | Prepara/prueba una demostración local con base ficticia y comprobaciones de entorno. | [Contexto](OPERACION.md) | — | `8f3041505f3e1d30` |
