@@ -15,6 +15,7 @@ import { DISCIPLINE_ORDER, categoryLabel, weightClassesFor } from "../../lib/com
 import { LEVEL_LABEL, PROVINCES, STANCE_LABEL } from "../../lib/common/labels";
 import { combinedRecord, computeRecords, emptyTally, type BoutForRecord } from "../../lib/fighters/record";
 import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
+import { boutsQueCuentan } from "../../lib/common/record-eligibility";
 import { ORDENES_RIVAL, filtrarYOrdenarRivales, hayFiltrosRival, parseFiltrosRival, type FiltrosRival } from "../../lib/fighters/rivals";
 import { BotonesFiltro, CampoFiltro, FiltrosActivos, MasFiltros } from "../components/Filtros";
 
@@ -49,8 +50,8 @@ async function nivelDe(fichas: FichaConDisciplinas[], f: FiltrosRival) {
   const ids = fichas.map((x) => x.id);
   if (!ids.length) return new Map<string, { combates: number; aura: number; edad: number | null; peso: string | null; record: string; categoria: string }>();
   const [bouts, auras] = await Promise.all([
-    db.bout.findMany({ where: { OR: [{ fighterAId: { in: ids } }, { fighterBId: { in: ids } }] }, select: { fighterAId: true, fighterBId: true, result: true, method: true, verification: true, event: { select: { discipline: true, level: true, status: true } } } }),
-    db.aura.groupBy({ by: ["fighterId"], where: { fighterId: { in: ids } }, _count: { _all: true } }),
+    db.bout.findMany({ where: { OR: [{ fighterAId: { in: ids } }, { fighterBId: { in: ids } }] }, select: { fighterAId: true, fighterBId: true, result: true, method: true, verification: true, createdAt: true, event: { select: { discipline: true, level: true, status: true } } } }),
+    db.aura.groupBy({ by: ["fighterId"], where: { fighterId: { in: ids }, bout: boutsQueCuentan() }, _count: { _all: true } }),
   ]);
   const auraDe = new Map(auras.map((a) => [a.fighterId, a._count._all]));
   return new Map(fichas.map((x) => {

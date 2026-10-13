@@ -62,6 +62,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
       {entrenador && <p className="mut">Como entrenador puedes organizar veladas e interclubs con tu club: crea el evento, monta el cartel y publica los resultados.</p>}
       {!user.emailVerifiedAt && <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Para crear veladas primero <Link href="/verificar">confirma tu correo electrónico</Link>.</div>}
       <h2 id="crear">Crear una velada o un interclub</h2>
+      <p className="notice notice-info" role="note">Las veladas ya celebradas necesitan la autorización de un moderador. Si eliges una fecha pasada, la velada no será pública hasta que se revise.</p>
       <form className="search" action={createEvent}>
         <fieldset className="field" style={{ flexBasis: "100%", border: 0, padding: 0, margin: 0 }}>
           <legend className="leyenda">Tipo de evento</legend>
@@ -87,7 +88,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
             <caption className="sr-only">Tus veladas, de la más reciente a la más antigua</caption>
             <thead><tr><th scope="col">Evento</th><th scope="col">Tipo</th><th scope="col">Fecha</th><th scope="col">Cartel</th><th scope="col">Solicitudes para participar</th></tr></thead>
             <tbody>
-              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link></th><td>{EVENT_KIND_LABEL[e.kind]}</td><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td><td>{e._count.registrations ? <Link href={`/organizador/${e.slug}/inscripciones`}>{plural(e._count.registrations, "pendiente", "pendientes")}</Link> : e.registrationOpen ? <span className="mut">Abierta, sin pendientes</span> : <span className="mut">Cerrada</span>}</td></tr>)}
+              {events.map((e) => <tr key={e.id}><th scope="row" style={{ color: "var(--text)" }}><Link href={`/organizador/${e.slug}`}>{e.name}</Link>{e.status === "PENDING_AUTHORIZATION" && <div className="mut">Pendiente de autorización de moderación</div>}{e.status === "REJECTED" && <div className="mut">Publicación rechazada; corrige la fecha o los datos</div>}</th><td>{EVENT_KIND_LABEL[e.kind]}</td><td>{fmtDate(e.date)}</td><td className="mut">{plural(e._count.bouts, "combate", "combates")}</td><td>{e._count.registrations ? <Link href={`/organizador/${e.slug}/inscripciones`}>{plural(e._count.registrations, "pendiente", "pendientes")}</Link> : e.registrationOpen ? <span className="mut">Abierta, sin pendientes</span> : <span className="mut">Cerrada</span>}</td></tr>)}
             </tbody>
           </table>
         </div>

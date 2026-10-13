@@ -21,6 +21,8 @@ export const PROVINCES = [
 
 export const fmtDate = (d: Date) =>
   d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" });
+export const fmtFechaHoraMadrid = (d: Date) =>
+  d.toLocaleString("es-ES", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
 
 export const slugify = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -63,6 +65,7 @@ export const AUDIT_ENTITY_LABEL: Record<string, string> = {
   ORGANIZER: "Solicitud de organizador", REPORT: "Aviso de error", USER: "Cuenta", CLASS: "Clase", PROPOSAL: "Reto o sparring",
 };
 export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  PAST_EVENT_AUTHORIZATION_REQUESTED: "autorización solicitada para velada pasada", PAST_EVENT_APPROVED: "velada pasada autorizada", PAST_EVENT_REJECTED: "velada pasada rechazada",
   FALLO_ESTADO: "estado del fallo cambiado", FALLO_REAPARECE: "el fallo ha vuelto a ocurrir y se ha reabierto",
   UPDATED: "corregido", WITHDRAWN: "retirado", REVIEW_REQUESTED: "revisión solicitada", ENDORSE: "respaldado", REJECT: "excluido por moderación", RESTORE: "restaurado como declarado", GRANTED: "acreditación concedida", REVOKED: "acreditación retirada",
   CREATED: "creado", CREATED_BY_ORGANIZER: "añadido al cartel por el organizador", RESULT_SET: "resultado indicado", RESULT_SET_BY_AUTHOR: "resultado indicado por quien lo registró",

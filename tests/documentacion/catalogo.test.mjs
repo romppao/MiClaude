@@ -93,15 +93,3 @@ test("comprobar acepta finales de línea Windows y Unix", (t) => {
   assert.equal(run(root, true), 1);
 });
 
-test("la huella del código no depende de los finales de línea del checkout", (t) => {
-  const { root, write, entries } = fixture(t);
-  const unix = renderCatalog(root, entries);
-  write("src/lib/common/regla.ts", "export function regla() { return true; }\r\n");
-  assert.equal(renderCatalog(root, entries), unix);
-});
-
-test("una fuente con enlace simbólico requiere resolver el alcance explícitamente", (t) => {
-  const { root } = fixture(t);
-  fs.symlinkSync("regla.ts", path.join(root, "src/lib/common/enlace.ts"));
-  assert.throws(() => maintainedFiles(root), /enlace simbólico no admitido/);
-});

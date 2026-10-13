@@ -1,4 +1,7 @@
 import type { Discipline, Level, Method, Result, Verification } from "@prisma/client";
+import { fechaInicioEnRecord, HORAS_PARA_CONTAR_DECLARADO } from "../common/record-time";
+
+export { fechaInicioEnRecord, HORAS_PARA_CONTAR_DECLARADO };
 
 export type Tally = { w: number; l: number; d: number; nc: number; ko: number; sub: number; unverified: number };
 
@@ -7,8 +10,12 @@ export type BoutForRecord = {
   result: Result | null;
   method: Method | null;
   verification: Verification;
+  createdAt: Date;
   event: { level: Level; status: string; discipline: Discipline };
 };
+
+export const cuentaEnRecord = (bout: Pick<BoutForRecord, "verification" | "createdAt">, now: Date = new Date()) =>
+  bout.verification !== "SELF_REPORTED" || now.getTime() >= fechaInicioEnRecord(bout.createdAt).getTime();
 
 const empty = (): Tally => ({ w: 0, l: 0, d: 0, nc: 0, ko: 0, sub: 0, unverified: 0 });
 
@@ -19,10 +26,10 @@ export type Records = Partial<Record<Discipline, Record<Level, Tally>>>;
  * Los DISPUTED no cuentan; `unverified` indica cuántos de los contados son solo autodeclarados.
  * `ko` cuenta victorias por KO/TKO/abandono y `sub` por sumisión.
  */
-export function computeRecords(fighterId: string, bouts: BoutForRecord[]): Records {
+export function computeRecords(fighterId: string, bouts: BoutForRecord[], now: Date = new Date()): Records {
   const records: Records = {};
   for (const b of bouts) {
-    if (!b.result || b.event.status === "CANCELLED" || b.verification === "DISPUTED") continue;
+    if (!b.result || ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"].includes(b.event.status) || b.verification === "DISPUTED" || !cuentaEnRecord(b, now)) continue;
     // La declaración cuenta con su etiqueta en ambas esquinas; el rival puede pedir una revisión independiente.
     const perLevel = (records[b.event.discipline] ??= { PRO: empty(), AMATEUR: empty() });
     const r = perLevel[b.event.level];

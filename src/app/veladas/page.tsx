@@ -22,6 +22,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
   const dayStart = calendarDayStart();
   const period = past === "1" ? "1" : past === "todas" ? "todas" : "";
   const where: Prisma.EventWhereInput = {
+    status: { notIn: ["PENDING_AUTHORIZATION", "REJECTED"] },
     // past: vacío = próximas · «1» = ya celebradas · «todas» = sin filtrar por fecha (lo usa «Ver todos» de la búsqueda, que encuentra veladas de cualquier fecha)
     ...(period === "todas" ? {} : { date: period === "1" ? { lt: dayStart } : { gte: dayStart } }),
     ...(level === "PRO" || level === "AMATEUR" ? { level } : {}),

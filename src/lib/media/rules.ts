@@ -31,8 +31,9 @@ export function parseMedio(i: MedioInput): MedioParsed {
 }
 
 /** ¿Se puede compartir contenido de esta velada? Ya celebrada (o de hoy), no cancelada y como mucho DIAS_PARA_COMPARTIR días después. */
-export function veladaAbiertaAlPublico(e: { date: Date; status: string }, hoy: string): "ok" | "futura" | "cancelada" | "antigua" {
+export function veladaAbiertaAlPublico(e: { date: Date; status: string }, hoy: string): "ok" | "futura" | "cancelada" | "pendiente" | "antigua" {
   const dia = e.date.toISOString().slice(0, 10);
+  if (["PENDING_AUTHORIZATION", "REJECTED"].includes(e.status)) return "pendiente";
   if (e.status === "CANCELLED") return "cancelada";
   if (dia > hoy) return "futura";
   if (Date.parse(hoy) - Date.parse(dia) > DIAS_PARA_COMPARTIR * 864e5) return "antigua";

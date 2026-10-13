@@ -36,7 +36,7 @@ export default function Help() {
       <div className="table-wrap" tabIndex={0} role="region" aria-label="Qué significan las etiquetas de un combate">
 <table>
         <tbody>
-          <tr><th scope="row">Declarado · confirmación opcional</th><td>Lo ha registrado uno de los peleadores. Si tiene resultado, se muestra como declarado en ambas fichas. Confirmarlo o aportar un respaldo es opcional.</td></tr>
+          <tr><th scope="row">Declarado · confirmación opcional</th><td>Lo ha registrado uno de los peleadores. Durante las primeras 24 horas no suma en el récord, el ránking ni las estadísticas. Después cuenta si nadie lo rechaza ni moderación lo pone en revisión. Si el rival confirma o un organizador o moderador lo verifica antes, cuenta en ese momento. La ficha muestra la hora a partir de la que contará.</td></tr>
           <tr><th scope="row">Confirmado por el rival</th><td>Los dos peleadores están de acuerdo.</td></tr>
           <tr><th scope="row">Verificado</th><td>Lo ha comprobado un moderador o lo ha publicado el organizador de la velada.</td></tr>
           <tr><th scope="row">En revisión</th><td>Moderación ha suspendido el resultado tras revisar un aviso. No cuenta en el récord ni en el aura hasta que se aclare. El aviso por sí solo no lo suspende.</td></tr>
@@ -49,6 +49,7 @@ export default function Help() {
 
       <h2>Cómo cuidamos que los datos sean fiables</h2>
       <p>Mostramos cuánto respaldo tiene cada combate. Los resultados sin confirmar y el récord anterior declarado se identifican como tales. El reconocimiento de la comunidad está ligado a un combate concreto, se limita por usuario y solo pueden darlo personas registradas con el correo confirmado. Los cambios importantes quedan registrados.</p>
+      <p>Un combate autodeclarado con resultado empieza a contar en el récord 24 horas después de registrarse. Si el rival lo rechaza o moderación lo pone en revisión, no llega a contar; si el rival lo confirma o una persona organizadora o moderadora lo verifica antes, cuenta en ese momento. El plazo se calcula desde la fecha de registro.</p>
       <p>El <Link href="/ranking">ránking de aura</Link> combina trayectoria, respaldo y reconocimiento de la comunidad. No es una clasificación deportiva oficial ni cambia el resultado de un combate.</p>
 
       <h2 id="aura">Cómo se calcula el aura</h2>
@@ -58,7 +59,7 @@ export default function Help() {
       <div className="table-wrap" tabIndex={0} role="region" aria-label="Bonificaciones por respaldo"><table><thead><tr><th>Respaldo del hecho</th><th>Bonificación del título</th><th>Puntos por combate</th></tr></thead><tbody>{SUPPORT_ORDER.map(kind=><tr key={kind}><th scope="row">{SUPPORT_LABEL[kind]}</th><td>{AURA_POLICY.supportPercent[kind]} %</td><td>{AURA_POLICY.boutSupportPoints[kind]}</td></tr>)}</tbody></table></div>
       <p>Por ejemplo, un título nacional declarado aporta 50 puntos; con documentación comprobada, 62; con entrenador u organizador acreditado, 75; con federación acreditada, 100. Al mejorar el respaldo se sustituye la bonificación anterior, no se suman todos los niveles. Los respaldos de combates tienen un máximo de {AURA_POLICY.maxBoutSupportPerCategory} puntos por categoría.</p>
       <p>Los reconocimientos de la comunidad añaden un punto cada uno. Nadie puede votar su propio combate ni concederse un respaldo. Los moderadores comprueban la identidad de quien respalda; un perfil que diga «federación» no concede permisos. Una declaración excluida por moderación deja de aportar; retirar una acreditación elimina sus bonificaciones. Corregir los datos requiere un respaldo nuevo.</p>
-      <p>El récord cuenta los resultados y distingue declaraciones de resultados respaldados. La escala de aura es una versión inicial que se revisará con datos reales; no calcula automáticamente el nivel deportivo de una persona.</p>
+      <p>El récord cuenta los resultados y distingue declaraciones de resultados respaldados. Las declaraciones con resultado esperan 24 horas antes de sumar, salvo confirmación o verificación anterior; las disputadas o en revisión no cuentan. La escala de aura es una versión inicial que se revisará con datos reales; no calcula automáticamente el nivel deportivo de una persona.</p>
 
       <h2>¿Has visto un error?</h2>
       <p>En la ficha de cualquier peleador encontrarás la opción <strong>«¿Hay un error? Avísanos»</strong>, disponible para usuarios registrados. Un moderador revisará tu aviso.</p>

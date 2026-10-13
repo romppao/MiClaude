@@ -55,6 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 const COUNTED = { verification: { not: "DISPUTED" as const }, event: { status: { not: "CANCELLED" as const } } };
 
 export default async function FighterPage({ params }: { params: Promise<{ slug: string }> }) {
+  const ahora = new Date();
   const { slug } = await params;
   const fighter = await getFighter(slug);
   if (!fighter) notFound();
@@ -243,7 +244,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                   <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link>
                   <span className="tag">{DISCIPLINE_LABEL[b.event.discipline]}</span><span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span>
                   {b.event.status === "CANCELLED" && <span className="tag">cancelada</span>}
-                  <VerificationTag bout={b} verification={b.verification} backing={b} />
+                  <VerificationTag bout={b} verification={b.verification} backing={b} now={ahora} recordCreatedAt={b.createdAt} />
                   {b.evidenceUrl && <a className="tag" href={b.evidenceUrl} target="_blank" rel="noopener noreferrer nofollow ugc">Ver evidencia<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>}
                 </div>
                 {(b.divisionId || b.weightClass) && <div className="meta">{categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}</div>}

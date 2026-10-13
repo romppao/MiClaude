@@ -64,6 +64,8 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
   return (
     <>
       <h1>{event.name}</h1>
+      {event.status === "PENDING_AUTHORIZATION" && <p className="notice notice-info" role="status">Pendiente de autorización. La velada no es pública y sus combates todavía no cuentan.</p>}
+      {event.status === "REJECTED" && <p className="notice notice-bad" role="status">La publicación fue rechazada. Corrige la fecha o los datos para solicitar una nueva revisión.</p>}
       <p className="mut"><span className="tag">{DISCIPLINE_LABEL[event.discipline]}</span> {fmtDate(event.date)} · {event.venue}, {event.city} · <Link href={`/veladas/${event.slug}`}>Ver la página pública</Link></p>
       {event.status === "CANCELLED" && <p className="notice notice-bad" role="note">Esta velada está cancelada. Sigue visible con esa etiqueta y sus combates no cuentan. Puedes volver a activarla abajo.</p>}
       <p><Link href="/organizador">← Volver a mis veladas</Link></p>

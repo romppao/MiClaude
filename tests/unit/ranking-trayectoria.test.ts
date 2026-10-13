@@ -38,9 +38,12 @@ it("el periodo solo limita reconocimientos; las fuentes históricas mantienen ca
 it("se excluyen revisiones, cancelaciones y eventos futuros en las consultas del ranking", async () => {
   await auraRanking({ discipline: "MMA", level: "PRO" });
   const community = mocks.auraQuery.mock.calls[0][0].where.bout;
-  expect(community.verification).toEqual({ not: "DISPUTED" });
-  expect(community.event).toMatchObject({ discipline: "MMA", level: "PRO", status: { not: "CANCELLED" } });
-  expect(community.event.date.lt).toBeInstanceOf(Date);
+  const eligibility = community.AND[0].AND;
+  expect(eligibility[0].verification).toEqual({ not: "DISPUTED" });
+  expect(eligibility[1].event.status).toEqual({ notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] });
+  expect(eligibility[2].OR[0].verification).toEqual({ not: "SELF_REPORTED" });
+  expect(eligibility[2].OR[1].createdAt.lte).toBeInstanceOf(Date);
+  expect(community.AND[1].event.date.lt).toBeInstanceOf(Date);
   expect(mocks.boutQuery.mock.calls[0][0].where).toMatchObject({ verification: "VERIFIED", result: { not: null }, supportKind: { not: null } });
 });
 it("retirar una acreditación elimina ambos tipos de bonus sin borrar la trayectoria declarada", async () => {

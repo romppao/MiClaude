@@ -20,7 +20,7 @@ export function canGiveAura(input: { bout: BoutForAura; fighterId: string; viewe
   const { bout, fighterId, viewerFighterId, now } = input;
   if (fighterId !== bout.fighterAId && fighterId !== bout.fighterBId) return { ok: false, problema: "aura_no_existe" };
   if (bout.verification === "DISPUTED") return { ok: false, problema: "aura_revision" };
-  if (bout.event.status === "CANCELLED") return { ok: false, problema: "aura_cancelado" };
+  if (["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"].includes(bout.event.status)) return { ok: false, problema: "aura_cancelado" };
   if (!eventDayReached(bout.event.date, now)) return { ok: false, problema: "aura_futuro" };
   if (!bout.result) return { ok: false, problema: "aura_sin_resultado" };
   if (viewerFighterId && (viewerFighterId === bout.fighterAId || viewerFighterId === bout.fighterBId)) return { ok: false, problema: "aura_propio" };

@@ -1705,6 +1705,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/record-eligibility.test.ts",
+    "purpose": "Prueba el filtro de persistencia para el récord en el límite de 24 horas y excluye disputas y veladas pendientes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/recuperar.test.ts",
     "purpose": "Prueba lógica de enlaces de recuperación, consumo y comportamiento de acceso asociado mediante simulación.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1770,6 +1775,16 @@
     "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   },
   {
+    "path": "prisma/migrations/20261013210000_bout_registered_at/migration.sql",
+    "purpose": "Añade la fecha de registro de cada combate y la rellena desde el historial cuando existe, para aplicar el plazo de 24 horas a declaraciones nuevas sin retrasar combates históricos.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261013220000_past_event_authorization/migration.sql",
+    "purpose": "Añade estados para veladas pasadas pendientes de autorización o rechazadas por moderación, sin reescribir eventos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "src/lib/bouts/status.ts",
     "purpose": "Determina la etiqueta pública del combate según fecha, resultado y estado de verificación.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1798,5 +1813,30 @@
     "path": "tests/unit/afilar-revision.test.ts",
     "purpose": "Prueba deduplicación, diagnósticos, filtros del cartel y estados de combates programados.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/app/moderacion/veladas/page.tsx",
+    "purpose": "Cola de veladas pasadas pendientes de autorizaci?n, con datos de revisi?n y formularios para autorizar o rechazar con nota.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/e2e/record-24h.mjs",
+    "purpose": "Comprueba de extremo a extremo el aviso de espera, el r?cord antes del plazo y su inclusi?n al alcanzar las 24 horas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/veladas-pasadas.mjs",
+    "purpose": "Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/common/record-time.ts",
+    "purpose": "Constante y c?lculo del plazo de 24 horas para incorporar al r?cord una declaraci?n propia.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/record-eligibility.ts",
+    "purpose": "Filtro compartido de base de datos para r?cord, aura y r?nking; incluye declaraciones tras 24 horas y excluye disputas y veladas no autorizadas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   }
 ]

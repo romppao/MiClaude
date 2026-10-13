@@ -1761,8 +1761,9 @@ Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos t
 
 **Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
 
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque B (Codex)
 
-## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
+Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autorización moderadora para veladas pasadas; B3 incorpora el plazo de 24 horas a partir del registro con exclusión de combates disputados y aviso al peleador. B2 conserva la privacidad amateur actual y deja pendiente la visibilidad interna para moderación. Se eliminaron los BOM UTF-8 de `record-eligibility.ts` y `record-time.ts`. CI y revisión de los PR apilados pendientes.
 
 **Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
 **Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.

@@ -402,6 +402,7 @@ Confirmar el SHA live del despliegue antes de corregir una copia local. Que git 
 | Una noticia repetida no se detectaba cuando la dirección acababa en barra y llevaba parámetros | La normalización quitaba la barra final solo en algunos casos, así que dos formas de la misma dirección no coincidían | Normalizar la dirección entera (barra final, parámetros de seguimiento, mayúsculas) antes de comparar, con una prueba para cada caso |
 | Un error de hidratación (#418) apareció una vez en la demo y no se pudo reproducir | Causa sin confirmar; sospecha de HTML y JavaScript de versiones distintas durante un despliegue, y de fechas sin zona horaria fija | No dar por resuelto lo que no se reproduce: dejar la prueba que lo vigila (`hidratacion.mjs`) y anotar que la causa sigue sin confirmar |
 | Fuentes de noticias que fallan sin avisar (403, HTML en vez de RSS) | Nadie comprobaba lo que devolvía cada fuente | Comprobar cada fuente con una petición real antes de añadirla y mostrar su diagnóstico en moderación |
+| Un catálogo generado en CI difería aunque sus pruebas pasaban | Había BOM UTF-8 en dos archivos TypeScript y se incluía `next-env.d.ts`, generado localmente e ignorado por Git; las escrituras de PowerShell también añadían firmas o finales de línea distintos | Escribir código como UTF-8 sin BOM, excluir salidas generadas del catálogo y, después del rebase, regenerar mapa y catálogo una vez |
 
 
 ## 14 de octubre de 2026 — Correcciones de CI #48/#50/#51 (Codex)

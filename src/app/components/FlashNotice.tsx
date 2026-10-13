@@ -24,7 +24,12 @@ export default function FlashNotice() {
   const sectionLabel = lookup(lookup(SECCIONES, pathname) ?? {}, section);
   const resume = sectionLabel ? <> <a href={`#${section}`}>Volver a {sectionLabel}</a></> : null;
   const problema = lookup(PROBLEMAS, params?.get("problema"));
-  const aviso = problema ? undefined : lookup(AVISOS, params?.get("aviso"));
+  const avisoBase = problema ? undefined : lookup(AVISOS, params?.get("aviso"));
+  const cuentaDesde = params?.get("cuentaDesde") ?? "";
+  const fechaCuenta = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(cuentaDesde) ? new Date(cuentaDesde) : null;
+  const aviso = avisoBase && params?.get("aviso") === "combate_registrado" && fechaCuenta && Number.isFinite(fechaCuenta.getTime())
+    ? `Combate registrado. Contará en tu récord a partir del ${fechaCuenta.toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Madrid" })} si nadie lo discute.`
+    : avisoBase;
   const message = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!aviso && !problema) return;

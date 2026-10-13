@@ -160,6 +160,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
           <li><Link href="/moderacion/historial">Ver el historial de cambios</Link><span className="mut">Todo lo que se ha cambiado, quién y cuándo.</span></li>
           <li><Link href="/moderacion/fallos">Fallos de la aplicación</Link><span className="mut">Lo que ha fallado, cuántas veces y qué se hizo.</span></li>
           <li><Link href="/moderacion/noticias">Fuentes de noticias</Link><span className="mut">Qué fuentes funcionan, añadir y ocultar titulares.</span></li>
+          <li><Link href="/moderacion/veladas">Autorizar veladas pasadas</Link><span className="mut">Revisar y decidir sobre eventos con fecha anterior a hoy.</span></li>
           {esCreador(user) && <li><Link href="/moderacion/usuarios">Administración: cuentas y moderadores</Link><span className="mut">Solo la cuenta del creador.</span></li>}
         </ul>
       </section>

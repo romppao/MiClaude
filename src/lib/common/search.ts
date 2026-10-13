@@ -18,7 +18,7 @@ const SOURCES = {
   fighterUnclaimed: { table: "Fighter", fields: ["firstName", "lastName", "alias"], where: Prisma.sql`"userId" IS NULL AND "hiddenAt" IS NULL`, order: `"lastName", "firstName"` },
   gym: { table: "Gym", fields: ["name", "city"], where: Prisma.sql`true`, order: `"name"` },
   trainer: { table: "Trainer", fields: ["name"], where: Prisma.sql`true`, order: `"name"` },
-  event: { table: "Event", fields: ["name", "city", "venue"], where: Prisma.sql`true`, order: `"date" DESC` },
+  event: { table: "Event", fields: ["name", "city", "venue"], where: Prisma.sql`"status" NOT IN ('CANCELLED', 'PENDING_AUTHORIZATION', 'REJECTED')`, order: `"date" DESC` },
 } as const;
 
 export type SearchKind = keyof typeof SOURCES;

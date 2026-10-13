@@ -53,6 +53,7 @@ export default function RecordCards({ records, disciplines, ocultarAmateur = fal
               {tally.ko > 0 && `${tally.ko} por KO`}{tally.ko > 0 && tally.sub > 0 && " · "}{tally.sub > 0 && `${plural(tally.sub, "sumisión", "sumisiones")}`}
               {tally.unverified > 0 && `${tally.ko + tally.sub > 0 ? " · " : ""}${plural(tally.unverified, "pendiente de confirmar", "pendientes de confirmar")}`}
             </div>
+            <div className="mut">Un combate declarado empieza a contar 24 horas después de registrarse, salvo que se rechace o pase a revisión; si se confirma o verifica antes, cuenta en ese momento.</div>
             {c.priorDetailed && <div className="mut">Incluye {plural(c.priorTotal, "combate anterior", "combates anteriores")} declarados por el propio deportista (registrado en la app: {formatRecord(tally)}).</div>}
             {!c.priorDetailed && c.priorTotal > 0 && <div className="mut">Además, {plural(c.priorTotal, "combate anterior", "combates anteriores")} sin detallar, declarados por el propio deportista.</div>}
             <p className="mut"><Link href="/ayuda#respaldo">Cómo se calcula este récord y qué respaldo tiene</Link></p>

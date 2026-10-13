@@ -11,6 +11,18 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.11.0] — 2026-10-13
+
+### Añadido
+- Las veladas pasadas requieren autorización de moderación antes de publicarse o contar en récords y ránquines.
+- Las declaraciones de combates entran en el récord 24 horas después si siguen sin disputarse ni estar en revisión.
+
+### Cambiado
+- El público ve solo el total de combates amateur también en el cartel cuando el récord está privado.
+
+### Corregido
+- Las decisiones de autorización de veladas quedan auditadas y se notifican al organizador.
+
 ## [0.10.0] — 2026-10-13
 
 PR #48; incluye el trabajo responsive de #47, que no se publicó como 0.9.1.

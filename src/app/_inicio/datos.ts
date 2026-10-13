@@ -1,9 +1,10 @@
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { calendarDayStart } from "../../lib/common/dates";
+import { boutsQueCuentan } from "../../lib/common/record-eligibility";
 
 /** Consultas que comparten las pantallas de inicio (diseño v3). Los combates que cuentan: ni en revisión ni de veladas canceladas. */
-export const CUENTA = { verification: { not: "DISPUTED" as const }, event: { status: { not: "CANCELLED" as const } } };
+export const CUENTA = boutsQueCuentan();
 
 /** Próximas veladas de todas las disciplinas y provincias, por fecha (sin prioridad editorial). */
 export const proximasVeladas = (take = 6, discipline?: Discipline) =>
@@ -14,7 +15,7 @@ export const proximasVeladas = (take = 6, discipline?: Discipline) =>
  * Con `discipline`, solo cuenta el aura de combates de esa disciplina (portada de cada disciplina).
  */
 export async function peleadoresConAura(take = 6, discipline?: Discipline) {
-  const bout = discipline ? { ...CUENTA, event: { ...CUENTA.event, discipline } } : CUENTA;
+  const bout = discipline ? { AND: [CUENTA, { event: { discipline } }] } : CUENTA;
   const grupos = await db.aura.groupBy({ by: ["fighterId"], where: { bout, fighter: { listed: true, hiddenAt: null } }, _count: { _all: true }, orderBy: { _count: { fighterId: "desc" } }, take: take * 3 });
   if (!grupos.length) return [];
   const fichas = await db.fighter.findMany({ where: { id: { in: grupos.map((g) => g.fighterId) } }, include: { disciplines: true } });

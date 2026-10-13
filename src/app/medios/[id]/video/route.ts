@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (id.length > 40) return new Response(null, { status: 404 });
-  const m = await db.mediaItem.findUnique({ where: { id }, select: { videoKey: true, hiddenAt: true, event: { select: { slug: true } } } });
-  if (!m?.videoKey || m.hiddenAt) return new Response(null, { status: 404 });
+  const m = await db.mediaItem.findUnique({ where: { id }, select: { videoKey: true, hiddenAt: true, event: { select: { slug: true, status: true } } } });
+  if (!m?.videoKey || m.hiddenAt || ["PENDING_AUTHORIZATION", "REJECTED"].includes(m.event.status)) return new Response(null, { status: 404 });
   const descargar = new URL(request.url).searchParams.get("descargar") === "1";
   return responderVideo(m.videoKey, request.headers.get("range"), descargar ? nombreDeDescarga(`${m.event.slug}-${id.slice(-6)}`, TIPOS_DE_VIDEO[tipoDeClave(m.videoKey)]) : undefined);
 }

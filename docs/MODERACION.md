@@ -29,11 +29,16 @@ Tiene tres bloques, de arriba abajo:
    | Combates por verificar | Combates declarados sin señales. | Verificar o rechazar. |
    | Combates en revisión | Rechazados por el rival o por moderación. | Verificar o restaurarlos como declarados. |
 
-2. **Estado de la aplicación.**
+2. **Autorización de veladas pasadas.**
+   - `/moderacion/veladas` reúne eventos `PENDING_AUTHORIZATION` creados con fecha pasada por una organización.
+   - La persona moderadora autoriza o rechaza mediante una nota obligatoria. La decisión se registra en `AuditLog` y se notifica al organizador por correo.
+   - Hasta su autorización, el evento no se publica y sus combates se excluyen de récord, aura y ránking.
+
+3. **Estado de la aplicación.**
    - **Fallos sin resolver:** el registro de fallos (abajo).
    - **Fuentes de noticias que fallan:** `/moderacion/noticias`.
 
-3. **Herramientas.**
+4. **Herramientas.**
    - Respaldar resultados y títulos.
    - Acreditaciones.
    - Historial de cambios.
