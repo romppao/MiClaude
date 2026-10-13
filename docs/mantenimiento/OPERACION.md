@@ -68,3 +68,7 @@ La configuración de demo permite excepciones de correo y papel con `DEMO_MODE=s
 El relevo debe incluir: rama y SHA de partida/final; problema y alcance; archivos/contratos cambiados; comandos ejecutados con resultado real; comprobaciones pendientes; migraciones/variables nuevas si existen; PR y CI del último commit; riesgos conocidos y siguiente paso reproducible. Registrar en `APORTACIONES-<NOMBRE>.md` y diario, siguiendo [EQUIPO](../EQUIPO.md).
 
 La revisión de documentación requiere que la otra persona compruebe un flujo y localice una regla usando el manual. Si debe pedir una conversación anterior, documentar ese atasco. Integración y despliegue siguen el protocolo del fundador; una rama preparada no equivale a cambio publicado en la demo.
+
+
+## Revisión visual aislada en desarrollo
+/revision-ui reutiliza la vista pública con fixtures ficticias por propiedades. No consulta contenido ni escribe datos. Solo desarrollo: producción devuelve 404. Estados en ?data=demo|extremo|vacio|uno|mil; vista=comun comprueba actualidad. tests/browser/responsive.mjs necesita servidor local dev y Chromium; CHROMIUM_PATH indica el ejecutable. Contratos y límites: [revisión del 13 de octubre](../REVISION-RESPONSIVE-20261013.md). No reemplaza la batería con base y permisos.

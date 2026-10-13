@@ -17,8 +17,9 @@ export function conAlfa(hex: string, alfa: number): string {
 /** Tinte de fondo de una tarjeta o portada según la disciplina (el lima si no se sabe). */
 export const tinteDe = (d: Discipline | null | undefined) => conAlfa(d ? COLOR_DISCIPLINA[d] : "#D4F67C", 0.38);
 
-/** Hasta dos iniciales de un nombre: «Álvaro Ruiz» → «ÁR». */
-export const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase() || "·";
+const grafemas = new Intl.Segmenter("es", { granularity: "grapheme" });
+/** Hasta dos iniciales de un nombre: conserva letras con diacríticos y emojis completos. */
+export const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => grafemas.segment(w)[Symbol.iterator]().next().value?.segment ?? "").join("").toUpperCase() || "·";
 
 /** Nombre de pila: «Laura Pérez» → «Laura». */
 export const nombreDePila = (nombre: string) => nombre.trim().split(/\s+/)[0] ?? nombre;

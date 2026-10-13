@@ -357,3 +357,7 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 - **Control de versiones** (fundador, 13 oct: «es importante llevar un buen manejo de versiones para la aplicación»). Estado: **hecho**. Versión 0.9.0, ver [`VERSIONES.md`](VERSIONES.md).
 - **Pantalla «Novedades» para los usuarios**, hecha a partir de `CHANGELOG.md` (Claude, 13 oct). Estado: idea, para después del lanzamiento. Hay que reescribir las notas en lenguaje de usuario y no mostrar detalles internos.
 - **Producción solo con versiones etiquetadas** (Claude, 13 oct). Estado: planificado. Se monta con la versión real ([`LANZAMIENTO.md`](LANZAMIENTO.md), punto 1).
+
+
+## Codex, 13 octubre: regresión con datos plausibles
+Encargo aprobado: adaptar móvil/escritorio conservando el diseño. Banco dev implementado con vista real y estados ejemplo/extremo/vacío/uno/mil. Propuesta pendiente: incorporar la prueba a CI con servidor de desarrollo aislado; no se modificó CI.

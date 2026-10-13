@@ -73,6 +73,7 @@
 | `/registro/intereses` | ¿Qué te gusta ver? | Cuenta con sesión iniciada | `accounts.saveInterests` | Fighter, Follow |
 | `/registro/perfil` | Tu perfil de entrenador | Cuenta con sesión iniciada | `accounts.saveTrainerIntent` | Gym |
 | `/respaldar` | Respaldar resultados y títulos | Moderación o cuenta acreditada para la disciplina (correo verificado) | `trajectory.endorseBout`, `trajectory.reviewAchievement` | Bout, FighterAchievement |
+| `/revision-ui` | Actualidad de los deportes de contacto | Pública | — | — |
 | `/salud` | Comprobación de salud para el alojamiento: responde 200 si la aplicación y la base de datos funcionan, y 503 si no. | Pública | — | — |
 | `/siguiendo` | Peleadores que sigo | Cuenta con sesión iniciada | `community.toggleFollow` | Bout, Follow |
 | `/subidas` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |

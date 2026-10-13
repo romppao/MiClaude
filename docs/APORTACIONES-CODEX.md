@@ -295,3 +295,17 @@ Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 13 de octubre de 2026 — Adaptación de móvil y escritorio
+**Encargo:** revisar MiClaude y corregir móvil/escritorio con impeccable y break-ui; entregar nueva demo.
+**Base:** d64de99, checkout limpio. **Rama propia:** codex/adaptacion-responsive-20261013. Sin PR, integración ni publicación remota; GitHub inaccesible.
+**Cambios:** cabecera y distribución responsive, alturas flexibles, actualidad del visitante a ancho completo, noticias visibles, disciplinas en cuadrícula, cifras españolas, grafemas y alternativas de fotos. Archivo compartido delicado: globals.css. VistaVisitante separa consultas de presentación. /revision-ui solo desarrollo: fixtures ficticias por propiedades, sin base de datos. Detalle: REVISION-RESPONSIVE-20261013.md.
+**Ejecutado:** 60 comprobaciones de navegador correctas en Chromium; tipos y build correctos; /revision-ui responde 404 en producción. Unitarias 650/652: dos fallos previos POSIX/Windows en multimedia sin modificar. Documentación 8/9: symlink EPERM de Windows. Catálogo de 327 fuentes comprobado desde copia temporal con LF, excluyendo next-env.d.ts generado. Mapa de 71 pantallas comprobado con copia temporal que normaliza rutas; generadores originales conservados.
+**Límites:** base local detenida; sin batería completa de cuentas/escrituras ni Safari/teléfonos físicos. La demo es visual local: http://127.0.0.1:3137/revision-ui. Logs propios en docs/logs/. Sin migraciones ni cambios de datos o permisos.
+**Siguiente:** revisión y CI Linux con base aislada antes de integrar/publicar con autorización específica.
+
+
+## 13 de octubre de 2026 — Corrección de base oficial (Codex)
+El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
+Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.

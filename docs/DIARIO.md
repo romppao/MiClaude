@@ -1719,3 +1719,17 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
 
 **Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
+
+
+## 13 de octubre de 2026 — Revisión responsive (Codex)
+**Pedido:** adaptar móvil y escritorio con impeccable y break-ui y entregar la demo ajustada.
+**Decisión:** conservar identidad y funciones; corregir distribución, recortes y casos extremos.
+**Hecho:** cabecera por espacio, tarjetas que crecen, actualidad a ancho completo, todas las noticias visibles, disciplinas en cuadrícula, números españoles, grafemas y fotos ausentes. Banco visual exclusivo de desarrollo sin PostgreSQL. Ver REVISION-RESPONSIVE-20261013.md.
+**Validación:** 60 comprobaciones de navegador correctas; tipos y build correctos; 404 del banco en producción. Unitarias 650/652 (dos fallos previos de rutas Windows); documentación 8/9 (symlink EPERM). Catálogo/mapa comprobados en copia temporal normalizada sin modificar generadores.
+**Problemas corregidos de verificación:** las imágenes lazy deben acercarse a la vista y esperar antes de exigir alternativas. PowerShell requiere UTF-8 explícito también en su entrada a Python: se corrigieron únicamente las anotaciones propias de este bloque y se regeneró el mapa.
+**Pendiente:** GitHub y PostgreSQL inaccesibles en esta sesión; falta CI completo/base aislada y demo remota. Demo visual local en 127.0.0.1:3137/revision-ui.
+
+
+## 13 de octubre de 2026 — Corrección de base oficial (Codex)
+El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
+Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.

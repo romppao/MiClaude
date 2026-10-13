@@ -1753,5 +1753,20 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/app/revision-ui/datos.ts",
+    "purpose": "Fixtures ficticias de revisión visual; estados ejemplo, extremo, vacío, uno y mil; sin consultas ni escrituras.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
+  },
+  {
+    "path": "src/app/revision-ui/page.tsx",
+    "purpose": "Banco visual exclusivo de desarrollo, con vista real y selector en URL; devuelve 404 en producción.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
+  },
+  {
+    "path": "tests/browser/responsive.mjs",
+    "purpose": "Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   }
 ]

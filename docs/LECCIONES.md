@@ -381,3 +381,15 @@ No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?
 | Desde la sesión de Claude no se pueden crear etiquetas en GitHub (ni con `git push` ni con la API) | El proxy de la sesión bloquea esas escrituras | Las etiquetas las crea el CI al fusionar (trabajo `etiquetar`). Además así solo se etiqueta lo que ha pasado las pruebas |
 | `movil.mjs` decía que la portada «se sale por la derecha» cuando la noticia destacada no tenía foto | La prueba medía el dibujo decorativo entero, aunque su tarjeta lo recorta (`overflow:hidden`) y no se ve ni provoca desplazamiento. Dependía de los datos, por eso fallaba a ratos | Las pruebas de aspecto miden lo que la persona ve: el borde visible tras los recortes de los contenedores, no la caja completa del elemento |
 | Cada ejecución del CI del PR #46 fallaba en una prueba distinta y antigua (`cuenta`, `flujo`, el tema de `fallos`), y en local pasaban siempre | Esas comprobaciones leían la dirección o el color en un instante fijo, justo después de una navegación. En la máquina del CI, más lenta, a veces llegaban antes de que la página terminara | Toda comprobación tras navegar espera al estado (`waitForURL`, `waitForFunction`, `seen()`) en vez de leerlo una sola vez. Un fallo intermitente se apunta y se corrige, no se relanza hasta que pase |
+
+
+## Codex, 13 octubre: adaptación y verificación
+- La altura fija puede recortar localidades válidas; usar mínimos y dejar crecer contenido.
+- No ocultar noticias para hacer caber la cuadrícula; adaptar columnas al contenedor.
+- Para probar una foto lazy, acercar la tarjeta a la vista y esperar su descarga o alternativa. Comprobar fallos anteriores a hidratación mediante complete/naturalWidth.
+- Configurar UTF-8 explícito tanto en lectura/escritura como en las tuberías de PowerShell a Python; corregir solo los registros propios, sin reescribir historia.
+- Un banco visual no certifica permisos, escrituras ni publicación remota.
+
+
+## 13 de octubre de 2026 — Base de una revisión visual (Codex)
+Confirmar el SHA live del despliegue antes de corregir una copia local. Que git fetch falle no implica que todos los conectores estén inaccesibles: GitHub y Render sí permitieron contrastar e importar la base oficial. No trasladar los resultados de compilación de una base antigua a una actualizada.

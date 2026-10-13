@@ -368,16 +368,17 @@ label.chip:has(input:focus-visible){outline:3px solid var(--foco);outline-offset
 .tarjeta-foto .arriba{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:6px}
 .tarjeta-foto .abajo{padding:14px;display:flex;flex-direction:column;gap:3px}
 .disciplina{height:190px;align-items:center;padding-bottom:16px}
+.disciplina-pequena{flex:none;width:140px;min-height:170px;height:auto}
 .disciplina .raya{width:28px;height:4px;border-radius:2px;background:var(--color)}
 .disciplina .disciplina-dibujo{flex:1;display:grid;place-items:center;color:var(--acc-text);opacity:.9}
 .disciplina strong{font:800 25px/1.1 var(--font);letter-spacing:-.035em}
-.cartel{flex:none;width:230px;height:300px;justify-content:space-between;padding:16px}
+.cartel{flex:none;width:230px;min-height:300px;justify-content:space-between;gap:24px;padding:16px}
 .cartel::after{background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(0,0,0,.85))}
 .fecha-cartel{align-self:flex-start;display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:18px;background:var(--acc);color:var(--acc-ink)}
 .fecha-cartel b{font:800 26px/1 var(--font)}
 .fecha-cartel span{font:700 13px var(--font);text-transform:uppercase}
 .cartel strong{font:800 22px/1.05 var(--font);letter-spacing:-.03em}
-.mini-peleador{flex:none;width:150px;height:200px}
+.mini-peleador{flex:none;width:150px;min-height:200px}
 .mini-peleador .pos{font:800 26px/1 var(--font);color:var(--acc-text)}
 /* Combate «VS» */
 .vs{position:relative;display:flex;flex-direction:column;padding:0;border-radius:30px;overflow:hidden;background:var(--card);border:1px solid rgba(var(--ink),.07);color:var(--text);text-decoration:none}
@@ -712,26 +713,24 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
   a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a:active{transform:none}
 }
 
-/* Escritorio (10 oct, Claude, a partir de la captura del fundador): cabecera en una fila y portada sin huecos.
-   Los enlaces de la cuenta ya están en «Menú»: en la cabecera quedan «Mi panel», el enlace propio de la cuenta (Mi ficha, Mis clases o Mis veladas), «Mi cuenta» y «Salir» (pruebas de usabilidad), o «Entrar» y «Registrarse» sin sesión. */
+/* Adaptación revisada (13 oct, Codex): la navegación ocupa su propia fila para que
+   quepan también las acciones de entrenador, organizador y moderación. No se ocultan destinos. */
 @media(min-width:1024px){
-  header.top .in{flex-wrap:nowrap}
+  header.top .in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px 18px}
+  header.top .logo{grid-column:1;grid-row:1}
+  header.top nav[aria-label=Principal]{grid-column:1 / -1;grid-row:2;justify-content:center;flex-wrap:wrap}
   header.top .cuenta>:not(.siempre){display:none}
-  header.top form.buscador{order:3;flex:1 1 180px;max-width:300px;min-width:160px;margin-left:auto}
-  header.top .cuenta{order:4;flex-wrap:nowrap}
-  header.top .menu-open{order:5}
+  header.top form.buscador{grid-column:3;grid-row:1;min-width:0;margin:0}
+  header.top form.buscador input{display:none}
+  header.top .cuenta{grid-column:2;grid-row:1;justify-content:flex-end;flex-wrap:wrap;min-width:0}
+  header.top .menu-open{grid-column:4;grid-row:1;margin:0}
   .inicio-adaptable>.portada-actualidad,.inicio-adaptable>.portada-panel{grid-column:1 / -1}
-  .portada-actualidad .noticia-destacada{min-height:0;height:420px}
+  .portada-actualidad .noticia-destacada{min-height:420px;height:auto}
   .portada-actualidad .noticia-destacada>img{object-position:center 30%}
-  .portada-actualidad .fila-noticias{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;margin:0;padding:0}
-  .portada-actualidad .fila-noticias>li:nth-child(n+9){display:none}
+  .portada-actualidad .fila-noticias{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;margin:0;padding:0}
+  .portada-actualidad .fila-noticias>li{min-width:0}
   .portada-actualidad .fila-noticias .noticia-mini{min-height:260px}
 }
-@media(min-width:1024px){header.top .cuenta a{white-space:nowrap}}
-/* A este ancho no caben en la barra «Entrenadores» ni «Mi panel»: siguen en «Menú» (y «Mi panel» en la portada y en la barra del móvil). */
-@media(min-width:1024px) and (max-width:1279px){header.top .in{gap:10px 14px}header.top nav[aria-label=Principal] a[href="/entrenadores"]{display:none}header.top .cuenta .mi-panel-cabecera{display:none}header.top nav[aria-label=Principal]{gap:4px 14px}header.top .cuenta{gap:8px 12px}header.top form.buscador button,header.top .cuenta .btn,header.top .menu-open{padding-left:14px;padding-right:14px}}
-/* En escritorio no cabe el campo junto a la navegación y la cuenta: queda el botón «Buscar», que abre /buscar con su propio campo. */
-@media(min-width:1024px){header.top form.buscador{flex:0 0 auto;min-width:0}header.top form.buscador input{display:none}}
 .logo-lona{display:var(--logo-oscuro);height:35px;width:auto}
 .logo-lona-claro{display:var(--logo-claro);height:35px;width:auto}
 /* Tema claro: la portada del visitante queda como un bloque oscuro con la foto, redondeado abajo, sobre la página clara. */
@@ -800,3 +799,32 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .lista-completa{margin:8px 0 24px;padding:4px 16px 8px;border-radius:22px;background:var(--card);border:1px solid var(--line)}
 .lista-completa[open]>summary{margin-bottom:8px}
 .sello-verificado{display:inline-block;margin-right:8px;padding:1px 8px;border-radius:999px;background:var(--acc);color:var(--acc-ink);font-weight:700}
+
+
+/* Las alturas mínimas conservan la composición con datos normales, pero dejan crecer
+   nombres, cifras y títulos. Los iconos y fechas no ceden espacio al texto. */
+.tarjeta-foto,.noticia .cuerpo,.portada .identidad>div{min-width:0;overflow-wrap:anywhere}
+.tarjeta-foto .abajo{min-width:0}
+.fecha-cartel,.buscador-cristal>svg,.buscador-cristal>button,.fila>svg{flex-shrink:0}
+.mini-peleador .meta-acc,.fecha-cartel,.dato .valor{font-variant-numeric:tabular-nums}
+.noticia .sin-corte,.noticia-mini .sin-corte,.noticia-destacada .sin-corte{white-space:normal}
+.inicio-adaptable>section{container-type:inline-size}
+.portada-actualidad .fila-noticias .noticia-mini{width:100%;overflow-wrap:anywhere}
+@container (min-width:800px){
+  .portada-actualidad .fila-noticias{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(min-width:1024px){
+  .disciplinas-portada{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .disciplinas-portada>.disciplina{width:auto}
+}
+@media(min-width:651px) and (max-width:1023px){
+  header.top nav[aria-label=Principal]{display:none}
+  header.top .cuenta.con-sesion>:not(.mi-panel-cabecera):not([href="/mi-cuenta"]){display:none}
+  header.top .cuenta{margin-left:auto;flex-wrap:wrap}
+  header.top .buscador{flex-basis:100%}
+}
+@media(max-width:380px){
+  header.top .logo{gap:6px;font-size:13px;letter-spacing:.03em}
+  header.top .menu-open{gap:6px;padding-inline:10px}
+  .portada-visita h1{font-size:clamp(40px,13vw,52px)}
+}
