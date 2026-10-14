@@ -25,6 +25,7 @@ await ana.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
 // Este escenario comprueba el récord de un combate autodeclarado ya maduro.
 // El flujo de uno recién declarado (que aún no suma durante 24 h) se prueba en flujo.mjs.
 execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}'`]);
+await ana.reload();
 check("un combate de hoy conserva su resultado en el récord", await seen(ana.locator(".rec", { hasText: /^\s*1-0-0\s*$/ }).first()));
 await registrar(ana, { evento: `Velada Futura Ana ${rnd}`, fecha: enDias(10), rivalNombre: "Carlos", rivalApellidos: `Futuro${rnd}` });
 check("un combate que aún no se ha celebrado no admite resultado y lo explica", await seen(ana.locator(".notice-bad", { hasText: "todavía no se ha celebrado" })));
