@@ -911,7 +911,7 @@
   },
   {
     "path": "src/app/propuestas/page.tsx",
-    "purpose": "Pantalla «Retos y sparrings»: buscar a quién retar y las propuestas recibidas (aceptar o rechazar) y enviadas (cancelar).",
+    "purpose": "Búsqueda autorizada de rivales por zona y características, opciones de clubes compatibles y gestión de propuestas de combate oficial y sparring.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1276,7 +1276,7 @@
   },
   {
     "path": "src/lib/fighters/rivals.ts",
-    "purpose": "Filtros y orden para buscar a quién retar o con quién hacer sparring (gimnasio, guardia, combates, edad, peso…).",
+    "purpose": "Reglas puras de filtros y orden de rivales; opciones de ciudad y gimnasio por perfiles compatibles, clubes por id y compatibilidad con enlaces antiguos.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1521,7 +1521,7 @@
   },
   {
     "path": "tests/e2e/servicios.mjs",
-    "purpose": "Prueba de navegador de las acciones principales de cada panel, «Buscar clases» y los retos y sparrings de punta a punta.",
+    "purpose": "Recorridos de servicios y propuestas; reproduce la ausencia de selección local, comprueba privacidad y compatibilidad de clubes, ambos tipos de reto y móvil en ambos temas.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

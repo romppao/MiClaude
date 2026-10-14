@@ -340,3 +340,7 @@ C queda sobre B corregida 56ddb92 y A f7937e1. Se conservó su entrada de versi�
 ## Estado del rebase final, 14 de octubre
 
 A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/categorías y mantienen las exigencias públicas. C está nuevamente sobre esa B (0.11.1). Frente a la pila anterior, src, prisma, scripts y unitarias de B/C son idénticos; cambian los guiones indicados y documentación generada. Se valida el CI de estos heads, no el de sus predecesores fallidos. Las pruebas dirigidas pasan: cuenta 33/33, cuenta CPU ×6 33/33, categorías 18/18 y respaldo 22/22. La descripción de sparring sigue pendiente; no hay PR ni versión ficticios para ese caso.
+
+14 de octubre: el fundador concretó la búsqueda local de rivales; reproducción E2E primero, ciudad/gimnasio por opciones compatibles y nombre opcional para reto oficial y sparring, versión 0.11.2. Detalle en el traspaso 2026-10-14-codex-ci48-51.md; sin fusión ni despliegue.
+
+14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.

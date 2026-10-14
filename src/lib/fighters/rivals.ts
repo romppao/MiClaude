@@ -7,7 +7,7 @@
 import type { Discipline, Level, Stance } from "@prisma/client";
 
 export type FiltrosRival = {
-  texto?: string; gimnasio?: string; provincia?: string; disciplina?: Discipline; nivel?: Level; peso?: string; guardia?: Stance;
+  texto?: string; gimnasio?: string; gimnasioId?: string; ciudad?: string; provincia?: string; disciplina?: Discipline; nivel?: Level; peso?: string; guardia?: Stance;
   minCombates?: number; maxCombates?: number; minEdad?: number; maxEdad?: number; orden: OrdenRival;
 };
 
@@ -33,7 +33,7 @@ export function parseFiltrosRival(p: Record<string, string | undefined>, miDisci
   const d = p.disciplina === "todas" ? undefined : DISCIPLINAS.find((x) => x === p.disciplina) ?? (p.disciplina ? undefined : miDisciplina);
   const orden = (Object.keys(ORDENES_RIVAL) as OrdenRival[]).find((o) => o === p.orden) ?? "parecido";
   return {
-    texto: corto(p.q), gimnasio: corto(p.gimnasio), provincia: corto(p.provincia), disciplina: d,
+    texto: corto(p.q), gimnasio: corto(p.gimnasio), gimnasioId: corto(p.gimnasioId), ciudad: corto(p.ciudad), provincia: corto(p.provincia), disciplina: d,
     nivel: p.nivel === "PRO" || p.nivel === "AMATEUR" ? p.nivel : undefined,
     peso: d && p.peso && /^[A-Z0-9+.\-]{1,12}$/.test(p.peso) ? p.peso : undefined,
     guardia: GUARDIAS.find((g) => g === p.guardia),
@@ -66,4 +66,25 @@ export function filtrarYOrdenarRivales<T extends Candidato>(lista: T[], f: Filtr
 }
 
 /** ¿Hay algún filtro puesto además de la disciplina por defecto? (para decir «sugerencias» o «resultados»). */
-export const hayFiltrosRival = (f: FiltrosRival) => !!(f.texto || f.gimnasio || f.provincia || f.nivel || f.peso || f.guardia || f.minCombates !== undefined || f.maxCombates !== undefined || f.minEdad !== undefined || f.maxEdad !== undefined);
+export const hayFiltrosRival = (f: FiltrosRival) => !!(f.texto || f.gimnasio || f.gimnasioId || f.ciudad || f.provincia || f.nivel || f.peso || f.guardia || f.minCombates !== undefined || f.maxCombates !== undefined || f.minEdad !== undefined || f.maxEdad !== undefined);
+
+
+/** La zona usa la ciudad del gimnasio cuando consta; si no, la indicada por el peleador. No se geolocaliza al usuario. */
+export type CandidatoLocal = { city: string | null; gym: { id: string; name: string; city: string; province: string } | null };
+export const ciudadDelRival = (c: CandidatoLocal) => c.gym?.city || c.city || "";
+
+/** Opciones de perfiles ya autorizados y filtrados por características; evita clubes vacíos o sin candidatos compatibles.
+ * Se deduplican por id (dos clubes pueden llamarse igual). La ciudad elegida acota los gimnasios, no las opciones de ciudad.
+ */
+export function opcionesLocalesRival<T extends CandidatoLocal>(candidatos: T[], ciudad?: string) {
+  const ciudades = [...new Set(candidatos.map(ciudadDelRival).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
+  const gimnasios = [...new Map(candidatos.filter(c => !ciudad || ciudadDelRival(c) === ciudad).flatMap(c => c.gym ? [[c.gym.id, c.gym] as const] : [])).values()]
+    .sort((a, b) => a.name.localeCompare(b.name, "es") || a.id.localeCompare(b.id));
+  return { ciudades, gimnasios };
+}
+
+/** También admite enlaces antiguos con el nombre parcial del gimnasio. La selección nueva usa su id inequívoco. */
+export function coincideLocalRival(c: CandidatoLocal, f: FiltrosRival) {
+  return (!f.ciudad || ciudadDelRival(c) === f.ciudad) && (!f.gimnasioId || c.gym?.id === f.gimnasioId) &&
+    (!f.gimnasio || !!c.gym?.name.toLocaleLowerCase("es").includes(f.gimnasio.toLocaleLowerCase("es")));
+}

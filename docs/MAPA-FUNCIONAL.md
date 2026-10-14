@@ -381,7 +381,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `privacy.ts` | `recordHidden`, `shownRecord` |
 | `proposals.ts` | `PROPOSALS_PER_DAY`, `PROPOSAL_DAYS_AHEAD`, `PROPOSAL_KIND_LABEL`, `PROPOSAL_MESSAGE_MAX`, `PROPOSAL_PLACE_MAX`, `PROPOSAL_REPLY_MAX`, `PROPOSAL_STATUS_LABEL`, `ProposalInput`, `ProposalParsed`, `parseProposal`, `parseProposalKind`, `puedeCancelarPropuesta`, `puedeResponderPropuesta` |
 | `record.ts` | `BoutForRecord`, `Prior`, `Records`, `Tally`, `combinedRecord`, `computeRecords`, `cuentaEnRecord`, `emptyTally`, `formatRecord`, `priorIsDetailed` |
-| `rivals.ts` | `Candidato`, `FiltrosRival`, `ORDENES_RIVAL`, `OrdenRival`, `filtrarYOrdenarRivales`, `hayFiltrosRival`, `parseFiltrosRival` |
+| `rivals.ts` | `Candidato`, `CandidatoLocal`, `FiltrosRival`, `ORDENES_RIVAL`, `OrdenRival`, `ciudadDelRival`, `coincideLocalRival`, `filtrarYOrdenarRivales`, `hayFiltrosRival`, `opcionesLocalesRival`, `parseFiltrosRival` |
 
 ### `lib/media`
 
