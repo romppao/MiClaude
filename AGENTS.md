@@ -15,3 +15,10 @@ Antes de cambiar nada, lee **[`docs/EQUIPO.md`](docs/EQUIPO.md)** (protocolo de 
 Prioridad vigente: **móvil primero** (iOS y Android; objetivo: App Store y Google Play) — ver [`docs/MOVIL.md`](docs/MOVIL.md). Todo en español. Nada de enlaces o botones muertos.
 
 **Proveedores y costes:** no contrates ni cambies proveedores (base de datos, almacenamiento, correo, errores, alojamiento) sin una propuesta aprobada por el fundador; las vigentes están en [`docs/decisiones/ADR-003-proveedores-fase-0.md`](docs/decisiones/ADR-003-proveedores-fase-0.md). Principio del fundador: mínimo coste al empezar, escalable y fácil de cambiar. No escribas precios sin haberlos leído en la página oficial.
+
+**Uso proporcional de modelos (petición del fundador, 14 oct 2026):** el razonamiento alto gasta muchos créditos y tiempo.
+- **Por defecto:** esfuerzo medio.
+- **Alto, solo para:** seguridad y permisos, fallos difíciles, migraciones y arquitectura.
+- **Modelo económico o esfuerzo bajo para lo sencillo:** documentación, CHANGELOG, DIARIO, catálogo, textos y arreglos de una línea. Si estás en alto, dilo y sugiere al fundador bajarlo en el selector.
+- **Pruebas:** la batería completa (e2e, catálogo, mapa) una vez antes del PR, no en cada paso.
+- **Lectura:** no releas documentos largos ya leídos en la misma tarea.

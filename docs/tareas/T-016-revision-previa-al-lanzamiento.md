@@ -1,6 +1,6 @@
 # T-016 — Revisión completa antes de montar la versión oficial
 
-**Estado:** en curso. Parte 1 hecha (14-10-2026, Claude); partes 3-5 encargadas a Codex; parte 2 pendiente.
+**Estado:** revisión hecha (14-10-2026): partes 1 y 2 de Claude, 3-5 de Codex (`docs/tareas/T-016-hallazgos-codex.md` en `codex/revision-t016`). Siguiente: PR de arreglos.
 - 14-10-2026: Claude Code lanzó las cinco partes en paralelo y las cinco se cortaron por un fallo del servicio de Anthropic (`[reasoning_extraction]`), no de la app. No hay resultados parciales.
 - Se repite desde cero.
 
@@ -142,3 +142,50 @@ Hecha por Claude Code el 14-10-2026, en la sesión y sin subagentes, sobre `f720
 **No revisado en esta parte** (queda para las siguientes o para Codex):
 - el detalle de cada comprobación de propiedad dentro de los 80 cuerpos de acción, más allá de la guarda inicial. Se han mirado `saveProfile`, las acciones de demo y el creador; el resto se cubre en las partes 3 a 5, recorriendo cada flujo;
 - `src/app/actions/media.ts` y la subida directa de vídeos a R2 (URL prefirmadas): solo se vio el límite de tamaño y de cantidad al día.
+
+#### Parte 2. Preparación de la versión oficial
+Hecha por Claude Code el 14-10-2026 sobre `f7204ac` (0.14.0). Con permiso del fundador, se construyó la imagen y se arrancó **en local** contra un PostgreSQL 18 vacío y desechable (Docker). Después se borró todo. No se tocaron la demo ni Neon.
+
+**Comprobado y correcto:**
+- `docker build` del `Dockerfile` termina bien:
+  - imagen de 493 MB;
+  - salida *standalone*;
+  - Prisma con OpenSSL;
+  - `public/`;
+  - trabajador de MapLibre en `/vendor/maplibre/6.11.2/maplibre-gl-worker.mjs`, que responde 200;
+  - `sharp` funciona dentro de la imagen.
+- `prisma migrate deploy` aplica las 20 migraciones sobre una base vacía.
+- **Arranque con base vacía y sin `DEMO_MODE`:**
+  - «Ready» en 2,2 s;
+  - solo avisos esperados: no hay `RESEND_API_KEY`, no hay `R2_*` y faltan los datos `TITULAR_*`;
+  - ningún error en el registro.
+- **Con la base vacía:**
+  - 22 rutas públicas responden 200, entre ellas la portada, peleadores, veladas, gimnasios, noticias, ranking, buscar, entrar, registro, recuperar, las 4 páginas legales, `sitemap.xml`, `robots.txt` y el manifiesto;
+  - las privadas (`/propuestas`, `/siguiendo`, `/mi-cuenta`, `/moderacion`) redirigen a «Entrar»;
+  - `/laboratorio` da 404;
+  - la CSP sale en las respuestas;
+  - no aparecen «Ring España», `onrender`, `localhost` ni datos de ejemplo.
+- **Nada depende del seed:** las fuentes de noticias se crean solas al primer refresco (`src/lib/news/refresh.ts:24`).
+
+**Hallazgos:**
+1. **BLOQUEA EL LANZAMIENTO. Sin Resend no se puede crear la cuenta del creador ni ningún moderador** (comprobado por lectura).
+   - **Por qué:** `esCreador` exige el correo verificado, y sin el modo demo la única forma de verificarlo es el enlace por correo. Sin moderador no se pueden autorizar veladas ni organizadores.
+   - **Arreglo:** configurar Resend (lonaclub.es verificado, `RESEND_API_KEY`, `MAIL_FROM`) **antes** de abrir. Después: registrarse con `CREADOR_CORREO`, confirmar el correo, entrar y activar el segundo paso en ese mismo momento (parte 1, hallazgo 3).
+2. **IMPORTANTE. Las fotos se guardan en la base de datos y el plan gratuito de Neon es de 1 GB** (estimación, no medido).
+   - **Dónde:** `Bytes` en `prisma/schema.prisma:287`, `:679-680` y `:775`. El límite es `MAX_MEDIOS_POR_DIA = 20` (`src/lib/media/rules.ts:9`), con fotos recodificadas de hasta 1920 px.
+   - **El riesgo:** unos cientos de usuarios activos subiendo fotos de veladas pueden llenar el GB en semanas.
+   - **Arreglo:** a corto plazo, bajar el límite diario de fotos (por ejemplo, a 5) y mostrar en moderación el tamaño de la base. A medio plazo, T-004 parte 2: las fotos a R2.
+3. **IMPORTANTE. La versión oficial arranca sin gimnasios** (comprobado).
+   - **Por qué:** con la base vacía, `/gimnasios` y el mapa salen vacíos hasta cargar los reales (bloque D, sin Cataluña).
+   - **Arreglo:** el bloque D tiene que estar hecho antes de abrir. Codex confirmó (C5-02) que hoy no hay importador ni exclusión de Cataluña.
+
+**Sin comprobar:** el correo real con Resend, la conexión *pooled* de Neon desde Cloud Run y `/moderacion/fallos` con una sesión de moderador. Necesitan la infraestructura real.
+
+#### Revisión de los hallazgos de Codex (partes 3-5, rama `codex/revision-t016`)
+Revisados por Claude el 14-10-2026 contra la 0.14.0:
+- **C3-01** confirmado. `src/app/siguiendo/page.tsx` escribe «Gana …» sin comprobar si el récord es privado.
+- **C5-01** confirmado:
+  - `setBoutResult` pone `COMPLETED` sin comprobar la autorización (`src/app/actions/events.ts`);
+  - reabrir tras cancelar también calcula `COMPLETED`.
+- **C3-03** ya está resuelto en la 0.14.0 (PR #63): `/condiciones`, `/cookies` y `/aviso-legal`, el inventario de almacenamiento y los enlaces en el registro y el pie.
+- El resto se da por bueno tal como lo describe Codex. Los arreglos irán en el PR de correcciones.
