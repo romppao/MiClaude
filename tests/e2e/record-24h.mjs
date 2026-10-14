@@ -1,6 +1,6 @@
 // Comprueba el plazo en la pantalla y en el récord; la frontera exacta se prueba en tests/unit/record.test.ts.
 import { PrismaClient } from "@prisma/client";
-import { B, browser, btn, check, datosDeAlta, enDias, newUser, registrar, rnd, terminarDiagnosticos } from "./ayudas.mjs";
+import { B, browser, btn, check, seen, datosDeAlta, enDias, newUser, registrar, rnd, terminarDiagnosticos } from "./ayudas.mjs";
 
 const db = new PrismaClient();
 const user = await newUser("Record24h", "FIGHTER");
@@ -18,7 +18,7 @@ const success = p.locator("[role=status]", { hasText: "Combate registrado. Conta
 await success.waitFor();
 let ownText = await p.locator("main").innerText();
 check("la declaración reciente no suma todavía en el récord propio", !ownText.includes("1-0-0"));
-check("la ficha muestra la fecha y hora en que empezará a contar", await p.locator("tbody tr", { hasText: eventName }).getByText(/Declarado · cuenta en el récord a partir del/).count() === 1);
+check("la ficha muestra la fecha y hora en que empezará a contar", await seen(p.locator("tbody tr", { hasText: eventName }).getByText(/Declarado · cuenta en el récord a partir del/)));
 
 const bout = await db.bout.findFirstOrThrow({ where: { event: { name: eventName } } });
 await db.bout.update({ where: { id: bout.id }, data: { createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000) } });

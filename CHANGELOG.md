@@ -17,6 +17,7 @@ PR de Claude sobre #52.
 
 ### Corregido
 - Las pruebas vuelven a comprobar que el comentario de un aura se ve en la ficha del peleador y que un combate declarado suma en el récord cuando pasan sus 24 horas. Esas comprobaciones se habían perdido al adaptar las pruebas al bloque B.
+- Las pruebas de veladas pasadas y del plazo de 24 horas ya no fallan a ratos. Usan nombres únicos, esperan a que la página muestre el dato y ya no confunden lo buscado, que la página repite, con un resultado.
 
 ## [0.11.2] — 2026-10-14
 
