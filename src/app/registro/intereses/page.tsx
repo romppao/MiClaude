@@ -12,11 +12,12 @@ export const metadata = { title: "¿Qué te gusta ver?" };
 export const dynamic = "force-dynamic";
 
 /** Registro del aficionado, último paso (opcional): disciplinas que le interesan y peleadores para seguir. */
-export default async function Intereses() {
+export default async function Intereses({ searchParams }: { searchParams: Promise<{ paso?: string }> }) {
   const user = await requireUser("/registro/intereses");
+  const segundoPaso = (await searchParams).paso === "seguir";
   // Sugerencias: las fichas públicas con más seguidores (sin prioridad por disciplina ni por provincia), sin la propia.
   const [sugeridos, siguiendo] = await Promise.all([
-    db.fighter.findMany({ where: { listed: true, hiddenAt: null, NOT: { userId: user.id } }, include: { disciplines: true }, orderBy: [{ followers: { _count: "desc" } }, { lastName: "asc" }], take: 6 }),
+    db.fighter.findMany({ where: { listed: true, hiddenAt: null, NOT: { userId: user.id }, ...(user.interests.length ? { disciplines: { some: { discipline: { in: user.interests } } } } : {}) }, include: { disciplines: true }, orderBy: [{ followers: { _count: "desc" } }, { lastName: "asc" }], take: 6 }),
     db.follow.findMany({ where: { userId: user.id }, select: { fighterId: true } }),
   ]);
   const sigue = new Set(siguiendo.map((x) => x.fighterId));
@@ -29,11 +30,13 @@ export default async function Intereses() {
         <p className="lead">Elige disciplinas y sigue a peleadores: verás sus veladas y resultados en tu inicio.</p>
       </div>
       <form action={saveInterests} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+        {!segundoPaso && <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
           <legend className="leyenda">Disciplinas</legend>
           <div className="chips">{DISCIPLINE_ORDER.map((d) => <label key={d} className="chip"><input type="checkbox" name="disciplina" value={d} defaultChecked={user.interests.includes(d)} />{DISCIPLINE_LABEL[d]}</label>)}</div>
-        </fieldset>
-        {sugeridos.length > 0 && (
+        </fieldset>}
+        {segundoPaso && user.interests.map((d) => <input key={d} type="hidden" name="disciplina" value={d} />)}
+        <input type="hidden" name="paso" value={segundoPaso ? "terminar" : "disciplinas"} />
+        {segundoPaso && sugeridos.length > 0 && (
           <fieldset style={{ border: 0, padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
             <legend className="kicker" style={{ marginBottom: 8 }}>Peleadores para seguir</legend>
             {sugeridos.map((f) => {
@@ -48,7 +51,7 @@ export default async function Intereses() {
             })}
           </fieldset>
         )}
-        <button className="btn-grande">Terminar</button>
+        <button className="btn-grande">{segundoPaso ? "Terminar" : "Continuar"}</button>
       </form>
       <p style={{ margin: 0, textAlign: "center" }}><Link href={despues}>Lo haré después</Link></p>
     </div>

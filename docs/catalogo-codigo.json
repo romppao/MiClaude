@@ -1898,5 +1898,25 @@
     "path": "tests/unit/paneles-fallos.test.ts",
     "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/app/_inicio/TeToca.tsx",
+    "purpose": "Pendientes personales de cada panel: omite cantidades cero y enlaza cada acción con su recuento completo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/_inicio/CompletaPerfil.tsx",
+    "purpose": "Progreso accesible del perfil calculado con campos existentes; desaparece al completar todos y enlaza los formularios pendientes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "tests/unit/paneles-pulido.test.tsx",
+    "purpose": "Verifica renderizado vacío y completo de pendientes, progreso del perfil y accesos conservados en el menú.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/paneles-pulido.mjs",
+    "purpose": "Comprueba dar y quitar aura a ambos participantes desde el panel, con y sin JavaScript, accesibilidad y anchura móvil.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

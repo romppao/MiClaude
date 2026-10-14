@@ -12,10 +12,12 @@ export default async function Edit({ params }: { params: Promise<{ kind: string;
   if (!source) notFound(); if (!editable) redirect("/mi-cuenta?problema=sin_permiso");
   const owner = p?.ownerId ? await db.user.findUnique({ where: { id: p.ownerId }, select: { email: true } }) : null;
   const gym = kind === "gimnasio" ? await db.gym.findUnique({ where: { id }, select: { address: true, city: true } }) : null;
+  const trainer = kind === "entrenador" ? await db.trainer.findUnique({ where: { id }, include: { gym: true } }) : null;
   return <><h1>Personalizar {source.name}</h1><p><Link href={source.href}>Volver al perfil público</Link></p>
     <form action={saveProfile} className="profile-form">
       <input type="hidden" name="kind" value={kind} /><input type="hidden" name="entityId" value={id} />
       <ProfileEditor kind={kind} id={id} avatarX={p?.avatarX ?? 50} avatarY={p?.avatarY ?? 50} bannerX={p?.bannerX ?? 50} bannerY={p?.bannerY ?? 50} version={p?.updatedAt.getTime()} />
+      {trainer && <label className="field"><span>Gimnasio donde entrenas</span><input name="trainerGym" defaultValue={trainer.gym?.name ?? ""} maxLength={120} /><span className="hint">Se buscará por nombre en tu ciudad. Déjalo vacío si no entrenas en un gimnasio.</span></label>}
       {kind !== "peleador" && <>
         {kind === "federacion" && <label className="field"><span>Nombre de la federación</span><input name="name" defaultValue={p?.name ?? source.name} required maxLength={150} /></label>}
         <label className="field"><span>Presentación</span><textarea name="bio" defaultValue={p?.bio ?? ""} maxLength={2000} rows={5} /></label>

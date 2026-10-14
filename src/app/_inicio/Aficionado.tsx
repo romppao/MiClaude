@@ -3,13 +3,19 @@ import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { calendarDayStart } from "../../lib/common/dates";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
-import { iniciales } from "../../lib/common/apariencia";
 import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
-import Icono from "../components/Icono";
+import TeToca from "./TeToca";
+import CompletaPerfil from "./CompletaPerfil";
+import { giveAura, removeAura } from "../actions/aura";
+import { toggleFollow } from "../actions/community";
+import { AURA_PER_DAY, canGiveAura } from "../../lib/aura/rules";
+import { filtrosSiguiendo } from "../../lib/community/siguiendo";
+import { boutsQueCuentan } from "../../lib/common/record-eligibility";
+import { fmtDate } from "../../lib/common/labels";
 import { TarjetaDisciplina } from "../components/Tarjetas";
 import { AccionesPrincipales, CombateVS, Saludo, textoResultado } from "./comun";
-import { CUENTA } from "./datos";
+import { peleadoresConAura, proximasVeladas, CUENTA } from "./datos";
 
 const conRecord = { include: { disciplines: true, boutsAsA: { where: CUENTA, include: { event: true } }, boutsAsB: { where: CUENTA, include: { event: true } } } } as const;
 
@@ -18,7 +24,7 @@ const conRecord = { include: { disciplines: true, boutsAsA: { where: CUENTA, inc
  * de sus peleadores con el botón de aura y sus disciplinas. También lo usan moderación y las entidades pendientes de aprobar.
  */
 export default async function InicioAficionado({ user }: { user: User }) {
-  const seguidos = (await db.follow.findMany({ where: { userId: user.id }, select: { fighterId: true } })).map((x) => x.fighterId);
+  const seguidos = (await db.follow.findMany({ where: { userId: user.id, fighter: { hiddenAt: null } }, select: { fighterId: true } })).map((x) => x.fighterId);
   const deSeguidos = { OR: [{ fighterAId: { in: seguidos } }, { fighterBId: { in: seguidos } }] };
   // Solicitudes de clase abiertas (esperando respuesta o ya aceptadas): acceso directo a «Mis reservas».
   const reservas = await db.classRequest.count({ where: { userId: user.id, status: { in: ["PENDING", "ACCEPTED"] } } });
@@ -26,19 +32,31 @@ export default async function InicioAficionado({ user }: { user: User }) {
     seguidos.length ? db.bout.findFirst({ where: { ...deSeguidos, event: { date: { gte: calendarDayStart() }, status: "SCHEDULED" } }, include: { event: true, fighterA: conRecord, fighterB: conRecord }, orderBy: [{ event: { date: "asc" } }, { order: "asc" }] }) : null,
     db.aura.count({ where: { userId: user.id } }),
     db.aura.count({ where: { userId: user.id, attended: true } }),
-    seguidos.length ? db.bout.findMany({ where: { ...deSeguidos, result: { not: null }, ...CUENTA }, include: { event: true, fighterA: true, fighterB: true }, orderBy: [{ event: { date: "desc" } }, { id: "asc" }], take: 5 }) : [],
+    seguidos.length ? db.bout.findMany({ where: { AND: [deSeguidos, { result: { not: null } }, boutsQueCuentan()] }, include: { event: true, fighterA: true, fighterB: true }, orderBy: [{ event: { date: "desc" } }, { id: "asc" }], take: 5 }) : [],
     db.organizerRequest.findUnique({ where: { userId: user.id } }),
+  ]);
+  const [recientes, respuestas, sinAura, destacados, veladas, propiaFicha] = await Promise.all([
+    db.aura.count({ where: { userId: user.id, updatedAt: { gte: new Date(Date.now() - 864e5) } } }),
+    db.classRequest.count({ where: { userId: user.id, status: { in: ["ACCEPTED", "DECLINED"] } } }),
+    db.bout.count({ where: { AND: [filtrosSiguiendo(seguidos).resultados, { auras: { none: { userId: user.id } } }] } }),
+    seguidos.length ? [] : peleadoresConAura(6, undefined, user.interests),
+    seguidos.length ? [] : proximasVeladas(6, undefined, user.interests),
+    db.fighter.findUnique({ where: { userId: user.id }, select: { id: true } }),
   ]);
   const misAuras = resultados.length ? await db.aura.findMany({ where: { userId: user.id, boutId: { in: resultados.map((b) => b.id) } }, select: { boutId: true, fighterId: true } }) : [];
   const disciplinas = [...user.interests, ...DISCIPLINE_ORDER.filter((d) => !user.interests.includes(d))];
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 26 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={seguidos.length ? `Sigues a ${plural(seguidos.length, "peleador", "peleadores")}` : "Todavía no sigues a ningún peleador"} />
+      <TeToca pendientes={[
+        { texto: "Confirmar el correo", href: "/verificar", cantidad: user.emailVerifiedAt ? 0 : 1 },
+        { texto: "Combates sin tu aura", href: "/mi-panel#resultados", cantidad: sinAura },
+        { texto: "Respuestas a tus solicitudes de clase", href: "/mis-reservas", cantidad: respuestas },
+      ]} />
+      <CompletaPerfil campos={[{ texto: "Elegir disciplinas", completo: user.interests.length > 0, href: "/registro/intereses" }]} />
       <AccionesPrincipales acciones={[
         { href: "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },
-        { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Síguelos y dales aura", icono: "buscar" },
-        { href: "/veladas", titulo: "Próximas veladas", detalle: "Cartel y resultados", icono: "trofeo" },
-        { href: "/mis-reservas", titulo: "Mis reservas", detalle: "Tus clases solicitadas", icono: "bandeja", aviso: reservas },
+        ...(reservas ? [{ href: "/mis-reservas", titulo: "Mis reservas", detalle: "Tus clases solicitadas", icono: "bandeja" as const, aviso: reservas }] : []),
         { href: "/compartir", titulo: "Subir vídeos o fotos", detalle: "De una velada a la que fuiste", icono: "camara" },
         { href: "/siguiendo", titulo: "Peleadores que sigo", detalle: "Sus próximos combates", icono: "personas" },
       ]} />
@@ -51,11 +69,11 @@ export default async function InicioAficionado({ user }: { user: User }) {
         </div>
       )}
 
-      <section aria-labelledby="titulo-proximo" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {seguidos.length > 0 && <section aria-labelledby="titulo-proximo" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-proximo">Próximo combate</h2></div>
         {proximo ? <CombateVS b={proximo} />
           : <div className="tarjeta"><p className="mut" style={{ margin: 0 }}>{seguidos.length ? "Ninguno de los peleadores que sigues tiene un combate programado." : "Sigue a peleadores y aquí verás su próximo combate."}</p><Link href={seguidos.length ? "/veladas" : "/peleadores"} className="btn secondary" style={{ alignSelf: "flex-start" }}>{seguidos.length ? "Ver el calendario" : "Buscar peleadores"}</Link></div>}
-      </section>
+      </section>}
 
       <div className="rejilla-2">
         <div className="dato"><span className="clave">Auras dadas</span><span className="valor-grande acc">{auras}</span></div>
@@ -64,22 +82,34 @@ export default async function InicioAficionado({ user }: { user: User }) {
 
 
 
-      <section aria-labelledby="titulo-resultados" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div className="titulo-seccion"><h2 id="titulo-resultados">Últimos resultados</h2>{seguidos.length > 0 && <Link href="/siguiendo">Siguiendo</Link>}</div>
-        {resultados.map((b) => {
-          const ganador = b.result === "B_WIN" ? b.fighterB : b.fighterA;
-          const dada = misAuras.some((x) => x.boutId === b.id);
-          return (
-            <div key={b.id} className="fila">
-              <Link href={`/peleadores/${ganador.slug}`} className="avatar" style={{ textDecoration: "none" }} aria-label={`Ficha de ${publicFighterName(ganador)}`}>{iniciales(publicFighterName(ganador))}</Link>
-              <span className="cuerpo"><span className="nombre" style={{ fontSize: 15 }}>{textoResultado(b)}</span><span className="meta">{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { day: "numeric", month: "short", timeZone: "Europe/Madrid" })}</span></span>
-              {dada ? <span className="pildora" style={{ border: "1px solid var(--acc)", background: "transparent", color: "var(--acc-text)" }}><Icono nombre="aura" tam={14} grosor={2.2} />Hecho</span>
-                : <Link href={`/peleadores/${ganador.slug}#combates`} className="btn" style={{ minHeight: 44, padding: "0 14px", fontSize: 14 }} aria-label={`Dar aura por ${textoResultado(b)}`}><Icono nombre="aura" tam={14} grosor={2.2} />Aura</Link>}
-            </div>
-          );
-        })}
-        {resultados.length === 0 && <p className="mut" style={{ margin: 0 }}>{seguidos.length ? "Todavía no hay resultados de los peleadores que sigues." : "Cuando sigas a peleadores, aquí verás sus últimos resultados para darles aura."}</p>}
-      </section>
+      {seguidos.length === 0 && <>
+        <section className="tarjeta" aria-label="Peleadores destacados de tus disciplinas"><h2>Peleadores destacados de tus disciplinas</h2>
+          {destacados.map((f) => <div key={f.id} className="fila"><Link className="cuerpo" href={`/peleadores/${f.slug}`}>{f.name}</Link><form action={toggleFollow}><input type="hidden" name="fighterId" value={f.id} /><input type="hidden" name="back" value="/mi-panel" /><button aria-label={`Seguir a ${f.name}`}>Seguir</button></form></div>)}
+          {!destacados.length && <Link href="/peleadores">Explorar peleadores de la comunidad</Link>}
+        </section>
+        <section className="tarjeta" aria-label="Próximas veladas de tus disciplinas"><h2>Próximas veladas de tus disciplinas</h2>
+          {veladas.map((v) => <Link className="fila" key={v.id} href={`/veladas/${v.slug}`}>{v.name} · {fmtDate(v.date)} · {v.city}</Link>)}
+          {!veladas.length && <Link href="/veladas">Consultar el calendario de veladas</Link>}
+        </section>
+      </>}
+      {seguidos.length > 0 && <section id="resultados" aria-labelledby="titulo-resultados" className="tarjeta">
+        <div className="titulo-seccion"><h2 id="titulo-resultados">Últimos resultados</h2><Link href="/siguiendo">Siguiendo</Link></div>
+        {resultados.map((b) => <article key={b.id} aria-label={textoResultado(b)}>
+          <h3>{textoResultado(b)}</h3><p className="meta">{b.event.name} · {fmtDate(b.event.date)}</p>
+          {[b.fighterA, b.fighterB].map((f) => {
+            const dada = misAuras.some((x) => x.boutId === b.id && x.fighterId === f.id);
+            const permite = canGiveAura({ bout: b, fighterId: f.id, viewerFighterId: propiaFicha?.id }).ok;
+            return <div className="fila" key={f.id}>
+              <Link className="cuerpo" href={`/peleadores/${f.slug}`}>{publicFighterName(f)}</Link>
+              {dada ? <><span className="pildora">Hecho</span><form action={removeAura}><input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={f.id} /><input type="hidden" name="back" value="/mi-panel" /><button className="secondary" aria-label={`Quitar aura a ${publicFighterName(f)}`}>Quitar aura</button></form></>
+                : !user.emailVerifiedAt ? <Link href="/verificar">Confirma el correo para dar aura</Link>
+                : permite && recientes < AURA_PER_DAY ? <form action={giveAura}><input type="hidden" name="boutId" value={b.id} /><input type="hidden" name="fighterId" value={f.id} /><input type="hidden" name="back" value="/mi-panel" /><button aria-label={`Dar aura a ${publicFighterName(f)}`}>Dar aura</button></form>
+                : <span className="meta">{recientes >= AURA_PER_DAY ? "Has alcanzado el límite diario de aura" : "No puedes dar aura en este combate"}</span>}
+            </div>;
+          })}
+        </article>)}
+        {!resultados.length && <p>No hay resultados recientes de los peleadores que sigues.</p>}
+      </section>}
 
       <section aria-labelledby="titulo-tus-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div><h2 id="titulo-tus-disciplinas" style={{ fontSize: 24 }}>Tus disciplinas</h2><p className="lead">{user.interests.length ? "Primero las que elegiste." : "Elige una para ver su actualidad, sus veladas y sus peleadores."}</p></div>

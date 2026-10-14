@@ -88,3 +88,7 @@ Pruebas: `tests/e2e/cuenta.mjs`, `integridad.mjs`, `trayectoria.mjs`, `perfiles.
 ## Revisar cualquier flujo nuevo
 
 Escribir desencadenante y resultado visible; enlazar pantalla, acción, guarda, regla, tablas y pruebas; explicar transacción, concurrencia, fallo de servicios externos y privacidad. Comprobar un éxito y un rechazo real con el rol afectado. No declarar implementado un flujo que solo aparece en una maqueta o en el plan.
+
+
+## Paneles por usuario, bloque F
+`/mi-panel` selecciona Aficionado/Peleador/Entrenador/Entidad. `TeToca` recibe cantidades completas y destinos; `CompletaPerfil` calcula el avance sin campos nuevos. Los botones de aura reutilizan `giveAura`/`removeAura` con vuelta fija al panel y las guardas existentes. `answerClassRequest` solo admite vuelta al panel o a Mis clases y mantiene autorización por titular. El gimnasio del entrenador se completa desde `saveProfile`, con el mismo permiso de edición, validación de longitud y auditoría en la transacción. El registro guarda disciplinas antes de consultar sugerencias filtradas. `paneles-pulido.test.tsx` cubre los componentes; `paneles-pulido.mjs` cubre aura sin JS y accesibilidad.

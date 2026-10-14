@@ -1,4 +1,6 @@
 import Link from "next/link";
+import TeToca from "./TeToca";
+import CompletaPerfil from "./CompletaPerfil";
 import type { CSSProperties } from "react";
 import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
@@ -29,17 +31,24 @@ export default async function InicioEntidad({ user }: { user: User }) {
   const kind = parseTipoDeEntidad(solicitud?.kind ?? "") ?? "PROMOTORA";
   const nombre = solicitud?.status === "APPROVED" ? solicitud.orgName : user.name;
   const porResultado = resumenResultadosPendientes(pendientes);
+  const perfil = await db.profile.findUnique({ where: { kind_entityId: { kind: "promotor", entityId: user.id } }, select: { hasAvatar: true, bio: true, website: true } });
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc-text)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
+      <TeToca pendientes={[
+        { texto: "Resultados por poner", href: "/organizador#mis-eventos", cantidad: porResultado.total },
+        { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },
+      ]} />
+      <CompletaPerfil campos={[
+        { texto: "Añadir logotipo", completo: !!perfil?.hasAvatar, href: `/perfiles/promotor/${user.id}/editar` },
+        { texto: "Añadir presentación", completo: !!perfil?.bio, href: `/perfiles/promotor/${user.id}/editar` },
+        { texto: "Añadir web", completo: !!perfil?.website, href: `/perfiles/promotor/${user.id}/editar` },
+      ]} />
       <AccionesPrincipales acciones={[
-        { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
-        { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
+        { href: "/organizador#crear", titulo: "Crear una velada o interclub", detalle: "Cartel abierto al público", icono: "trofeo" },
         { href: "/organizador", titulo: "Mis veladas", detalle: "Cartel y resultados", icono: "calendario" },
-        { href: "/organizador#mis-eventos", titulo: "Solicitudes para participar", detalle: "Peleadores que quieren entrar", icono: "check", aviso: inscripciones },
         { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
         { href: `/promotores/${user.id}`, titulo: "Mi perfil público", detalle: "Cómo te ve la gente", icono: "escudo" },
-        { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "capas" },
       ]} />
       <div className="rejilla-3">
         <div className="dato"><span className="clave">Veladas</span><span className="valor" style={{ fontSize: 34 }}>{veladas}</span></div>

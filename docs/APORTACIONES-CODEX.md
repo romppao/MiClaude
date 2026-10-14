@@ -344,3 +344,10 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 14 de octubre: el fundador concretó la búsqueda local de rivales; reproducción E2E primero, ciudad/gimnasio por opciones compatibles y nombre opcional para reto oficial y sparring, versión 0.11.2. Detalle en el traspaso 2026-10-14-codex-ci48-51.md; sin fusión ni despliegue.
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
+
+
+## 2026-10-14 — Bloque F de paneles
+**Base:** 8146d0f (#55); **rama:** codex/paneles-f-pulido. El fundador autoriza avanzar sobre esta base antes de su integración.
+**Cambios:** componentes TeToca/CompletaPerfil; cuatro paneles; selección de disciplina; alta de intereses en dos pasos; aura sin JavaScript; respuestas del entrenador y editor de su gimnasio; menú y tarjetas de seguidos.
+**Comprobaciones:** tipos, 741 unitarias, build inicial. CI pendiente; sin PostgreSQL/Docker disponible localmente. No se ha desplegado.
+**Relevo:** revisar PR F antes de integrar; continuar G y H en PR separados. H4 conserva revisión de modelo previa a interfaz.

@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { textoResultado } from "../_inicio/comun";
 import { requireUser } from "../../lib/accounts/auth";
 import { db } from "../../lib/common/db";
-import { LEVEL_LABEL, METHOD_LABEL, fmtDate } from "../../lib/common/labels";
+import { LEVEL_LABEL, fmtDate } from "../../lib/common/labels";
 import { eventDayReached } from "../../lib/common/dates";
 import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
-import VerificationTag from "../components/VerificationTag";
+import { fechaInicioEnRecord } from "../../lib/common/record-time";
 import { toggleFollow } from "../actions/community";
 import { filtrosSiguiendo } from "../../lib/community/siguiendo";
 
@@ -32,7 +33,7 @@ export default async function Following() {
   const fights = (b: (typeof proximos)[number]) => `${publicFighterName(b.fighterA)} contra ${publicFighterName(b.fighterB)}`;
 
   return (
-    <>
+    <div className="pantalla inicio-adaptable">
       <h1>Peleadores que sigo</h1>
       {follows.length === 0 ? (
         <>
@@ -43,46 +44,23 @@ export default async function Following() {
         <>
           <h2>Próximos combates</h2>
           {upcoming.length === 0 ? <p className="mut">Ninguno de los peleadores que sigues tiene un combate programado por ahora.</p> : (
-            <div className="table-wrap" tabIndex={0} role="region" aria-label="Próximos combates de los peleadores que sigues">
-<table>
-              <caption className="sr-only">Próximos combates de los peleadores que sigues</caption>
-              <thead><tr><th scope="col">Fecha</th><th scope="col">Combate</th><th scope="col">Velada</th><th scope="col">Respaldo</th></tr></thead>
-              <tbody>
-                {upcoming.map((b) => (
-                  <tr key={b.id}>
-                    <td>{fmtDate(b.event.date)}</td>
-                    <td>{fights(b)}</td>
-                    <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span></td>
-                    <td><VerificationTag bout={b} verification={b.verification} now={ahora} recordCreatedAt={b.createdAt} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-</div>
+            <div className="tarjeta" aria-label="Próximos combates de los peleadores que sigues">
+              {upcoming.map((b) => <div key={b.id} className="fila"><span className="cuerpo"><strong>{fights(b)}</strong><span>{fmtDate(b.event.date)} · <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> · {LEVEL_LABEL[b.event.level]}</span><span className="meta">Programado</span></span></div>)}
+            </div>
           )}
           <h2>Últimos resultados</h2>
           {recent.length === 0 ? <p className="mut">Aún no hay resultados recientes.</p> : (
-            <div className="table-wrap" tabIndex={0} role="region" aria-label="Combates recientes de los peleadores que sigues">
-<table>
-              <caption className="sr-only">Últimos resultados de los peleadores que sigues</caption>
-              <thead><tr><th scope="col">Fecha</th><th scope="col">Combate</th><th scope="col">Resultado</th><th scope="col">Respaldo</th></tr></thead>
-              <tbody>
-                {recent.map((b) => (
-                  <tr key={b.id}>
-                    <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
-                    <td>{fights(b)}</td>
-                    <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${publicFighterName(b.result === "A_WIN" ? b.fighterA : b.fighterB)}`}{b.method && b.result !== "DRAW" && b.result !== "NO_CONTEST" ? ` (${METHOD_LABEL[b.method]})` : ""}</td>
-                    <td><VerificationTag bout={b} verification={b.verification} now={ahora} recordCreatedAt={b.createdAt} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-</div>
+            <div className="tarjeta" aria-label="Combates recientes de los peleadores que sigues">
+              {recent.map((b) => <div key={b.id} className="fila"><span className="cuerpo"><strong>{fights(b)}</strong><span>{fmtDate(b.event.date)} · <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link></span>
+                <span>{textoResultado(b)}</span>
+                <span className="meta">{b.verification === "SELF_REPORTED" ? `Declarado: cuenta a partir del ${fechaInicioEnRecord(b.createdAt).toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}` : b.verification === "VERIFIED" ? "Verificado" : "Confirmado por el rival"}</span>
+              </span></div>)}
+            </div>
           )}
           <h2>Peleadores que sigues ({follows.length})</h2>
-          <div className="grid">
+          <div className="lista">
             {follows.map((f) => (
-              <div key={f.fighterId} className="card">
+              <div key={f.fighterId} className="tarjeta">
                 <Link href={`/peleadores/${f.fighter.slug}`}><strong>{publicFighterName(f.fighter)}</strong></Link>
                 <div className="mut">{f.fighter.gym?.name ?? f.fighter.city ?? ""}</div>
                 <form action={toggleFollow} style={{ marginTop: 8 }}>
@@ -95,6 +73,6 @@ export default async function Following() {
           <p className="mut">Sigues a {plural(follows.length, "peleador", "peleadores")}. {user.notifyEmails ? "Recibirás un correo cuando un organizador publique un nuevo combate de alguno de ellos." : <>No recibirás correos con sus novedades porque tienes los avisos desactivados. Puedes activarlos en <Link href="/mi-cuenta">Mi cuenta</Link>.</>}</p>
         </>
       )}
-    </>
+    </div>
   );
 }
