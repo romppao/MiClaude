@@ -32,6 +32,7 @@ await org.p.selectOption("select[name=discipline]", "KICKBOXING"); await org.p.f
 check("al crear un evento, la inscripción viene marcada para abrirse", await org.p.locator("input[name=inscripcion]").isChecked());
 // Aquí se desmarca para probar también cómo se abre después.
 await org.p.locator("input[name=inscripcion]").uncheck();
+await org.p.selectOption("select[name=level]", "AMATEUR");
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();
 check("sin marcarla, el evento recién creado tiene la inscripción cerrada", await seen(org.p.locator("#inscripcion").getByText("Cerrada", { exact: true })));

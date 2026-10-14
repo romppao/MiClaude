@@ -29,7 +29,7 @@ export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Da
 /** Tarjeta grande de una disciplina, con su raya de color. */
 export function TarjetaDisciplina({ d, href, pequena = false }: { d: Discipline; href: string; pequena?: boolean }) {
   return (
-    <Link href={href} className="tarjeta-foto disciplina" style={{ ...tinte(d), "--color": COLOR_DISCIPLINA[d], ...(pequena ? { flex: "none", width: 140, height: 170 } : {}) } as CSSProperties}>
+    <Link href={href} className={`tarjeta-foto disciplina${pequena ? " disciplina-pequena" : ""}`} style={{ ...tinte(d), "--color": COLOR_DISCIPLINA[d] } as CSSProperties}>
       <span className="disciplina-dibujo" aria-hidden="true"><IconoDisciplina d={d} tam={pequena ? 64 : 84} grosor={1.5} /></span>
       <span className="raya" aria-hidden="true" />
       <strong style={pequena ? { fontSize: 19 } : undefined}>{DISCIPLINE_LABEL[d]}</strong>
@@ -38,13 +38,14 @@ export function TarjetaDisciplina({ d, href, pequena = false }: { d: Discipline;
 }
 
 /** Peleador en una fila deslizable (ránking de aura): posición, nombre y aura. */
-export function MiniPeleador({ f }: { f: { id: string; slug: string; name: string; discipline: Discipline; aura: number; pos?: number } }) {
+export function MiniPeleador({ f }: { f: { id: string; slug: string; name: string; discipline: Discipline; aura: number; pos?: number; avatarUrl?: string } }) {
   return (
     <Link href={`/peleadores/${f.slug}`} className="tarjeta-foto mini-peleador" style={tinte(f.discipline)}>
       <span className="iniciales" aria-hidden="true">{iniciales(f.name)}</span>
-      <Foto src={`/imagenes/peleador/${f.id}/avatar`} />
+      {/* La revisión aislada proporciona una imagen ficticia; producción conserva su endpoint autorizado. */}
+      <Foto src={f.avatarUrl ?? `/imagenes/peleador/${f.id}/avatar`} />
       {f.pos !== undefined && <span className="arriba"><span className="pos">#{f.pos}</span></span>}
-      <span className="abajo"><strong style={{ font: "800 16px/1.1 var(--font)", letterSpacing: "-.02em" }}>{f.name}</strong><span className="meta-acc">{f.aura} de aura · {DISCIPLINE_LABEL[f.discipline]}</span></span>
+      <span className="abajo"><strong style={{ font: "800 16px/1.1 var(--font)", letterSpacing: "-.02em" }}>{f.name}</strong><span className="meta-acc">{new Intl.NumberFormat("es-ES").format(f.aura)} de aura · {DISCIPLINE_LABEL[f.discipline]}</span></span>
     </Link>
   );
 }

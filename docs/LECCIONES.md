@@ -381,3 +381,43 @@ No colocar objetos 3D solo porque exista capacidad t?cnica. Un max-width de 640?
 | Desde la sesión de Claude no se pueden crear etiquetas en GitHub (ni con `git push` ni con la API) | El proxy de la sesión bloquea esas escrituras | Las etiquetas las crea el CI al fusionar (trabajo `etiquetar`). Además así solo se etiqueta lo que ha pasado las pruebas |
 | `movil.mjs` decía que la portada «se sale por la derecha» cuando la noticia destacada no tenía foto | La prueba medía el dibujo decorativo entero, aunque su tarjeta lo recorta (`overflow:hidden`) y no se ve ni provoca desplazamiento. Dependía de los datos, por eso fallaba a ratos | Las pruebas de aspecto miden lo que la persona ve: el borde visible tras los recortes de los contenedores, no la caja completa del elemento |
 | Cada ejecución del CI del PR #46 fallaba en una prueba distinta y antigua (`cuenta`, `flujo`, el tema de `fallos`), y en local pasaban siempre | Esas comprobaciones leían la dirección o el color en un instante fijo, justo después de una navegación. En la máquina del CI, más lenta, a veces llegaban antes de que la página terminara | Toda comprobación tras navegar espera al estado (`waitForURL`, `waitForFunction`, `seen()`) en vez de leerlo una sola vez. Un fallo intermitente se apunta y se corrige, no se relanza hasta que pase |
+
+
+## Codex, 13 octubre: adaptación y verificación
+- La altura fija puede recortar localidades válidas; usar mínimos y dejar crecer contenido.
+- No ocultar noticias para hacer caber la cuadrícula; adaptar columnas al contenedor.
+- Para probar una foto lazy, acercar la tarjeta a la vista y esperar su descarga o alternativa. Comprobar fallos anteriores a hidratación mediante complete/naturalWidth.
+- Configurar UTF-8 explícito tanto en lectura/escritura como en las tuberías de PowerShell a Python; corregir solo los registros propios, sin reescribir historia.
+- Un banco visual no certifica permisos, escrituras ni publicación remota.
+
+
+## 13 de octubre de 2026 — Base de una revisión visual (Codex)
+Confirmar el SHA live del despliegue antes de corregir una copia local. Que git fetch falle no implica que todos los conectores estén inaccesibles: GitHub y Render sí permitieron contrastar e importar la base oficial. No trasladar los resultados de compilación de una base antigua a una actualizada.
+
+## 13 de octubre de 2026 — Afilar antes del lanzamiento (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Codex se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso | Se trabajó un bloque entero sin confirmar ni dejar nota | Al cerrar cada bloque, aunque sea parcial, se confirma en Git y se deja un traspaso en `docs/ecosistema/traspasos/` |
+| Una noticia repetida no se detectaba cuando la dirección acababa en barra y llevaba parámetros | La normalización quitaba la barra final solo en algunos casos, así que dos formas de la misma dirección no coincidían | Normalizar la dirección entera (barra final, parámetros de seguimiento, mayúsculas) antes de comparar, con una prueba para cada caso |
+| Un error de hidratación (#418) apareció una vez en la demo y no se pudo reproducir | Causa sin confirmar; sospecha de HTML y JavaScript de versiones distintas durante un despliegue, y de fechas sin zona horaria fija | No dar por resuelto lo que no se reproduce: dejar la prueba que lo vigila (`hidratacion.mjs`) y anotar que la causa sigue sin confirmar |
+| Fuentes de noticias que fallan sin avisar (403, HTML en vez de RSS) | Nadie comprobaba lo que devolvía cada fuente | Comprobar cada fuente con una petición real antes de añadirla y mostrar su diagnóstico en moderación |
+
+
+## 14 de octubre de 2026 — Correcciones de CI #48/#50/#51 (Codex)
+
+- El catálogo de #48 omitía seis archivos de A; regenerar no inventa responsabilidades. Incorporar las entradas reales, portar la normalización de LF y la exclusión de next-env.d.ts de B, y comprobar después de cada rebase. El mapa de A también conservaba exports anteriores.
+- La prueba de rival leía .count() durante una transición. La traza identifica un único POST, una petición RSC y HistoryUpdater de Next.js haciendo pushState y replaceState; se observa también con los componentes anteriores a A3 y en la base 0.9.0. Dos framenavigated no prueban dos envíos ni dos cargas de documento. Esperar URL y botón visible sin quitar datos de la dirección.
+- innerText no sirve para comprobar datos en una pestaña cerrada. Abrir Datos mediante mostrar(), esperar a alias, altura y presentación por separado y conservar las tres exigencias.
+- A3 leía form.method, ocultado por un input con name=method. Leer el atributo del formulario; trasladar a A la corrección ya existente en B.
+- A7 retiró el nivel por defecto, pero algunos datos de prueba seguían suponiéndolo. Elegirlo explícitamente; al registrar, conservar el nivel ya elegido (incluido profesional), salvo que el caso pida otro.
+- 0.9.1 no se publicó: sus notas pertenecen a 0.10.0. Para un fondo var(--acc), el texto usa var(--acc-ink), no --inv-ink (blanco en tema claro).
+- Los comandos de red requieren el permiso de red del entorno; el fallo inicial del proxy se resolvió así, sin modificar la política ni quitar el proxy. npm necesitó una caché dentro de /workspace, porque su ubicación por defecto no era escribible. No cambiar dependencias para arreglar permisos del entorno.
+
+14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
+
+14 oct, segunda revisión de CI: categorias.mjs perdía división/peso al elegir de nuevo el mismo nivel, porque SelectorCategoria reinicia sus dependientes en change. Elegir nivel antes de división/peso, evitar change redundante en el ayudante y poner rivalId después de rellenar; se traslada la preparación de edad de B a A. El artefacto de #51 (11876608015, head 0667240) confirma alias/presentación pero altura ausente en HTML. Cuenta ahora espera la URL del rechazo y exige los tres valores en el formulario antes de enviar, escribiendo altura al final; mantiene los tres seen() públicos y añade diagnóstico por dato si falla. Pasadas locales completas: categorías 18/18; cuenta 33/33 y otra 33/33 con CPU ralentizada seis veces. Sin cambios de src ni reglas de producto; el vaciado anterior no se atribuye sin evidencia a una causa distinta del estado de formulario durante la transición.
+
+14 oct — A7 exige nivel en las veladas: cinco recorridos seguían suponiendo el valor por defecto eliminado (inclusiva, inscripciones, plazas, rivales, escenarios). Elegir AMATEUR antes de crear, como una persona; conservar todas las expectativas. Una prueba abortada puede dejar sus seis eventos ficticios y contaminar una repetición local de portada; usar base desechable o eliminar solo sus prefijos conocidos antes de repetir. El CI utiliza una base nueva.
+
+14 oct — A3, causa del doble envío independiente de HistoryUpdater: React hidrata ciertas acciones sin atributo method, con su action javascript de protección. El lector seguro de atributos que sustituía form.method (ocultable por input[name=method]) suponía GET si faltaba el atributo, y por ello no bloqueaba estas acciones. El diagnóstico real registra dos click (detail 1/2), dos submit y dos POST. Reconocer la acción hidratada evita confundirla con una búsqueda GET; suprimir el segundo clic físico también evita reenvío si una respuesta síncrona resetea el formulario antes. El test de componentes cubre ambos casos y un clic independiente posterior. No confundir estos dos POST con la transición normal pushState/replaceState de Next (un POST, reproducida en 0.9.0).

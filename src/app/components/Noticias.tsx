@@ -59,7 +59,7 @@ export function FilaNoticias({ noticias, etiqueta, ahora = new Date() }: { notic
         const medio = n.publisher ?? n.source.name;
         return (
           <li key={n.id}>
-            <a href={n.url} target="_blank" rel="noopener noreferrer" className="tarjeta-foto noticia-mini" style={{ "--tinte": tinteDe(n.disciplines[0]) } as CSSProperties}>
+            <a href={n.url} title={n.title} target="_blank" rel="noopener noreferrer" className="tarjeta-foto noticia-mini" style={{ "--tinte": tinteDe(n.disciplines[0]) } as CSSProperties}>
               <PortadaNoticia n={n} loading="lazy" />
               <span className="abajo">
                 {n.disciplines.length > 0 && <span className="kicker kicker-acc">{n.disciplines.map((d) => DISCIPLINE_LABEL[d]).join(" · ")}</span>}

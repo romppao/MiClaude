@@ -33,7 +33,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
   const id = useId();
   const esFiltro = modo === "filtro";
   const [disciplina, setDisciplina] = useState<Discipline | "">(fijas?.discipline ?? defaults.discipline ?? (modo === "combate" ? disciplinas[0] ?? "" : ""));
-  const [nivel, setNivel] = useState<Level | "">(fijas?.level ?? defaults.level ?? (esFiltro ? "" : "AMATEUR"));
+  const [nivel, setNivel] = useState<Level | "">(fijas?.level ?? defaults.level ?? "");
   const [divisionId, setDivisionId] = useState(defaults.divisionId ?? "");
   const division = divisionById(divisionId);
   const [categoria, setCategoria] = useState(defaults.weightClass ?? "");
@@ -47,7 +47,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
   const sinLista = !!disciplina && !!nivel && weightClassesFor(disciplina, nivel, divisionId).length === 0;
 
   const cambiar = (d: Discipline | "", n: Level | "") => {
-    setDisciplina(d); setNivel(modo === "combate" && d && d !== disciplina && nivelesPorDisciplina ? lookup(nivelesPorDisciplina, d) ?? n : n); setDivisionId("");
+    setDisciplina(d); setNivel(n); setDivisionId("");
     if (divisionId) { setCategoria(""); return; }
     // Si la categoría elegida no existe en la nueva combinación, se vacía (nunca se queda una categoría que no corresponde).
     if (categoria) {
@@ -81,7 +81,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
       <label className="field">
         <span>Nivel</span>
         <select name={nombres.level} value={nivel} onChange={(e) => cambiar(disciplina, e.target.value as Level | "")} required={!esFiltro}>
-          {esFiltro && <option value="">Profesional y amateur</option>}
+          <option value="">{esFiltro ? "Profesional y amateur" : "Elige tu nivel"}</option>
           {LEVEL_ORDER.map((n) => <option key={n} value={n}>{levelName(n)}</option>)}
         </select>
         {!esFiltro && <span className="hint">Profesional si compites en veladas profesionales; amateur en las demás. Es lo que tú declaras.</span>}

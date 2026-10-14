@@ -176,6 +176,7 @@ await persona("promotora", "Clara, 41 años, organiza veladas amateur: pide ser 
   await paso("crea su velada", async () => {
     await p.locator("form [name=name]").first().fill(`Velada Clara ${rnd}`); await p.fill("form [name=date]", enDias(20));
     await p.selectOption("form select[name=discipline]", "BOXEO"); await p.selectOption("form select[name=province]", "Madrid"); await p.fill("form [name=city]", "Madrid");
+    await p.selectOption("form select[name=level]", "AMATEUR");
     await p.getByRole("button", { name: "Crear el evento" }).click(); await p.waitForURL(/\/organizador\/velada-clara/);
   });
   await paso("añade un combate al cartel", async () => {

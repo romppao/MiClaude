@@ -48,7 +48,7 @@ export default async function Following() {
                     <td>{fmtDate(b.event.date)}</td>
                     <td>{fights(b)}</td>
                     <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span></td>
-                    <td><VerificationTag verification={b.verification} /></td>
+                    <td><VerificationTag bout={b} verification={b.verification} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -67,7 +67,7 @@ export default async function Following() {
                     <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
                     <td>{fights(b)}</td>
                     <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${publicFighterName(b.result === "A_WIN" ? b.fighterA : b.fighterB)}`}{b.method && b.result !== "DRAW" && b.result !== "NO_CONTEST" ? ` (${METHOD_LABEL[b.method]})` : ""}</td>
-                    <td><VerificationTag verification={b.verification} /></td>
+                    <td><VerificationTag bout={b} verification={b.verification} /></td>
                   </tr>
                 ))}
               </tbody>

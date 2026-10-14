@@ -27,6 +27,7 @@ export default async function Inscribirme({ params }: { params: Promise<{ slug: 
     db.eventRegistration.findUnique({ where: { eventId_fighterId: { eventId: e.id, fighterId: me.id } } }),
     db.fighterDiscipline.findUnique({ where: { fighterId_discipline: { fighterId: me.id, discipline: e.discipline } } }),
   ]) : [null, null];
+  const enCartel = me ? await db.bout.count({ where: { eventId: e.id, OR: [{ fighterAId: me.id }, { fighterBId: me.id }] } }) > 0 : false;
   const abierta = inscripcionAbierta(e, todayMadrid());
   // Plazas por categoría: si el organizador las ha puesto, se elige entre ellas y se ve cuántas quedan.
   const [plazas, filas] = await Promise.all([
@@ -41,7 +42,7 @@ export default async function Inscribirme({ params }: { params: Promise<{ slug: 
     <div className="pantalla" style={{ gap: 18, maxWidth: 640 }}>
       <div><h1>Solicitar participar</h1><p className="lead" style={{ fontSize: 16 }}>En <Link href={`/veladas/${e.slug}`}>{e.name}</Link>: {EVENT_KIND_LABEL[e.kind].toLowerCase()} de {DISCIPLINE_LABEL[e.discipline]} {LEVEL_LABEL[e.level].toLowerCase()}, {fmtDate(e.date)}, {e.city}.</p></div>
       {e.registrationNote && <p className="notice" style={{ margin: 0 }}><span aria-hidden="true">ℹ </span><strong>Requisitos del organizador:</strong> {e.registrationNote}</p>}
-      {mia && mia.status !== "WITHDRAWN" ? (
+      {enCartel ? <p className="notice">Ya estás en el cartel de esta velada.</p> : mia && mia.status !== "WITHDRAWN" ? (
         <section className="tarjeta" aria-label="Tu solicitud">
           <span className={`pildora ${mia.status === "ACCEPTED" ? "pildora-acc" : mia.status === "PENDING" ? "pildora-violeta" : ""}`} style={{ alignSelf: "flex-start" }}>{enEspera ? "En lista de espera" : REG_STATUS_LABEL[mia.status]}</span>
           <div>Categoría: {categoryLabel(e.discipline, e.level, mia.divisionId, mia.weightClass)}{mia.weightKg ? ` · ${String(mia.weightKg).replace(".", ",")} kg` : ""}</div>

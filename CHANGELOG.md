@@ -11,6 +11,39 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.10.0] — 2026-10-13
+
+PR #48; incluye el trabajo responsive de #47, que no se publicó como 0.9.1.
+
+### Añadido
+- **Diagnóstico de fuentes de noticias** en `/moderacion/noticias`: cada fuente muestra si responde, si devuelve un canal válido y cuántos titulares aporta.
+- **Buscador de peleadores en el cartel** (organizador): cada esquina del combate tiene su búsqueda; los inscritos aceptados salen siempre primero, y sin búsqueda se ve una lista corta.
+- Nueva fuente de noticias: Marca (boxeo) y Marca (MMA), comprobadas el 13-10-2026.
+- Prueba de navegador `hidratacion.mjs`: vigila errores de hidratación en zona horaria de Madrid y de Nueva York.
+
+### Cambiado
+- Los combates futuros muestran «Programado»; los pasados sin resultado, «Resultado por anotar».
+- «Nivel» ya no viene preseleccionado al crear una velada: hay que elegirlo («Elige tu nivel»).
+- Los botones de envío se bloquean hasta que termina la acción y muestran «Creando tu cuenta…» o «Guardando…» (con tope de seguridad de 30 s).
+- El enlace de entradas de una velada debe empezar por https.
+
+### Corregido
+- Catálogo y mapa de mantenimiento al día; huellas estables entre Windows y Linux, sin incluir archivos generados.
+- Pruebas de rival y ficha pública que esperan al contenido visible y abren su pestaña; datos de prueba con nivel explícito, también en los combates profesionales del recorrido de respaldo.
+- Protección de envíos en formularios con un campo llamado «method»; el banco visual usa el color del tema para texto sobre el acento.
+- Titulares repetidos en las noticias: se descartan por dirección o título normalizados (incluido un fallo con la barra final y parámetros).
+- Al actualizar noticias se rechaza una respuesta que no sea un canal RSS.
+- No se puede pedir inscripción a una velada en cuya cartelera ya figura la persona.
+- Listado de peleadores: sin foto ya no aparece el icono de imagen rota sobre las iniciales (revisión con Impeccable tras integrar el PR #47).
+- Fechas de «Mi ficha» sin zona horaria fija (posible causa de un aviso de hidratación; la causa no está confirmada).
+
+- Cabecera y navegación distribuidas en escritorio y ajustadas a móviles estrechos.
+- Tarjetas que crecen con nombres largos; noticias visibles y ordenadas según el espacio disponible.
+- Fotos ausentes con iniciales legibles, incluidos nombres con emoji, y cifras de aura con formato español.
+
+### Eliminado
+- Fuentes de noticias FEKM (rechaza las peticiones, 403) y MMA España (sin canal, devuelve HTML); quedan anotadas como retiradas.
+
 ## [0.9.0] — 2026-10-13
 
 PR #46.

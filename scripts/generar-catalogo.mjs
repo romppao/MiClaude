@@ -14,6 +14,7 @@ export const MANIFEST = "docs/catalogo-codigo.json";
 export const OUTPUT = "docs/mantenimiento/CATALOGO.md";
 const ROOT_SPECIAL = new Set([".env.example", ".gitignore", "Dockerfile", "Makefile"]);
 const ROOT_SOURCE = /\.(?:[cm]?[jt]sx?|json|ya?ml|toml|sh|sql|css|html|py|go|rs|rb|java)$/;
+const ROOT_GENERATED = new Set(["next-env.d.ts"]);
 const ROOT_DIRS = ["src", "prisma", "scripts", "tests", ".github"];
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const portable = (p) => p.split(path.sep).join("/");
@@ -32,7 +33,7 @@ export function maintainedFiles(root) {
     });
   }
   const rootFiles = fs.readdirSync(root, { withFileTypes: true }).filter((e) =>
-    e.isFile() && (ROOT_SPECIAL.has(e.name) || (!/^\.env(?:\.|$)/.test(e.name) && ROOT_SOURCE.test(e.name))),
+    e.isFile() && !ROOT_GENERATED.has(e.name) && (ROOT_SPECIAL.has(e.name) || (!/^\.env(?:\.|$)/.test(e.name) && ROOT_SOURCE.test(e.name))),
   ).map((e) => e.name);
   return [...rootFiles, ...ROOT_DIRS.flatMap(walk)].sort(compare);
 }
@@ -99,9 +100,11 @@ export function renderCatalog(root, entries) {
   for (const [category, members] of [...groups].sort(([a], [b]) => compare(a, b))) {
     lines.push(`## ${category}`, "", "| Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |", "|---|---|---|---|---|");
     for (const file of members) {
-      const entry = byPath.get(file), bytes = fs.readFileSync(path.join(root, file));
-      const names = declarations(bytes.toString("utf8"));
-      lines.push(`| [${file}](${link(`../../${file}`)}) | ${cell(entry.purpose)} | [Contexto](${link(portable(path.relative(path.dirname(OUTPUT), entry.guide)))}) | ${names.length ? names.map((n) => `\`${n}\``).join(", ") : "—"} | \`${createHash("sha256").update(bytes).digest("hex").slice(0, 16)}\` |`);
+      const entry = byPath.get(file);
+      // core.autocrlf cambia los bytes en Windows; las huellas deben ser iguales en CI Linux.
+      const source = fs.readFileSync(path.join(root, file), "utf8").replace(/\r\n?/g, "\n");
+      const names = declarations(source);
+      lines.push(`| [${file}](${link(`../../${file}`)}) | ${cell(entry.purpose)} | [Contexto](${link(portable(path.relative(path.dirname(OUTPUT), entry.guide)))}) | ${names.length ? names.map((n) => `\`${n}\``).join(", ") : "—"} | \`${createHash("sha256").update(source, "utf8").digest("hex").slice(0, 16)}\` |`);
     }
     lines.push("");
   }
@@ -113,7 +116,13 @@ export function run(root, check = false) {
   const entries = JSON.parse(fs.readFileSync(path.join(root, MANIFEST), "utf8"));
   const generated = renderCatalog(root, entries), output = path.join(root, OUTPUT);
   if (check) {
-    if (!fs.existsSync(output) || fs.readFileSync(output, "utf8") !== generated) throw new Error("Catálogo desactualizado. Ejecuta node scripts/generar-catalogo.mjs y sube CATALOGO.md.");
+    const current = fs.existsSync(output) ? fs.readFileSync(output, "utf8").replace(/\r\n?/g, "\n") : "";
+    if (current !== generated) {
+      const currentLines = current.split("\n"), generatedLines = generated.split("\n");
+      let line = 0;
+      while (line < currentLines.length && line < generatedLines.length && currentLines[line] === generatedLines[line]) line++;
+      throw new Error(`Catálogo desactualizado en línea ${line + 1}: actual ${JSON.stringify(currentLines[line] ?? "<fin>")}; generado ${JSON.stringify(generatedLines[line] ?? "<fin>")}. Ejecuta node scripts/generar-catalogo.mjs y sube CATALOGO.md.`);
+    }
   } else {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, generated);

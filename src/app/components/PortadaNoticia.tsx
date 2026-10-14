@@ -18,12 +18,12 @@ function IconoRing({ tam }: { tam: number }) {
  */
 function useFotoRota(url: string | null) {
   const ref = useRef<HTMLImageElement>(null);
-  const [fallo, setFallo] = useState(false);
+  const [urlFallida, setUrlFallida] = useState<string | null>(null);
   useEffect(() => {
     const img = ref.current;
-    if (img && img.complete && img.naturalWidth === 0) setFallo(true);
+    if (img && img.complete && img.naturalWidth === 0) setUrlFallida(url);
   }, [url]);
-  return { ref, fallo, alFallar: () => setFallo(true) };
+  return { ref, fallo: !!url && urlFallida === url, alFallar: () => setUrlFallida(url) };
 }
 import type { Discipline } from "@prisma/client";
 import type { Noticia } from "../../lib/news/feed";

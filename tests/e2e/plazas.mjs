@@ -29,6 +29,7 @@ await org.p.setViewportSize({ width: 390, height: 844 });
 await org.p.goto(B + "/organizador");
 await org.p.fill("[name=name]", `Velada Plazas ${rnd}`); await org.p.fill("[name=date]", enDias(45));
 await org.p.selectOption("select[name=discipline]", "KICKBOXING"); await org.p.fill("[name=city]", "Valencia"); await org.p.selectOption("select[name=province]", "Valencia");
+await org.p.selectOption("select[name=level]", "AMATEUR");
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();
 // La inscripción se abre al crear el evento (casilla marcada por defecto).

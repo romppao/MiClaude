@@ -7,10 +7,23 @@ import Icono from "../components/Icono";
 import GpuSurface from "../components/experience/GpuSurface";
 import { MiniPeleador, TarjetaCartel, TarjetaDisciplina } from "../components/Tarjetas";
 import { peleadoresConAura, proximasVeladas } from "./datos";
+import type { Noticia } from "../../lib/news/feed";
+
+/** Datos de lectura separados de las consultas para probar la misma portada sin escribir en la base. */
+export type DatosVisitante = {
+  veladas: (Parameters<typeof TarjetaCartel>[0]["e"] & { id: string })[];
+  conAura: Parameters<typeof MiniPeleador>[0]["f"][];
+  noticias: Noticia[];
+};
 
 /** Inicio del visitante sin cuenta (diseño v3, «homeVisit»): portada pública, actualidad de todos los deportes, disciplinas, veladas y una invitación por tipo de cuenta. */
 export default async function InicioVisitante() {
   const [veladas, conAura, noticias] = await Promise.all([proximasVeladas(6), peleadoresConAura(6), ultimasNoticias({ max: 5 })]);
+  return <VistaVisitante veladas={veladas} conAura={conAura} noticias={noticias} />;
+}
+
+/** Vista compartida por la portada pública y la revisión de desarrollo; conserva contenido y destinos. */
+export function VistaVisitante({ veladas, conAura, noticias }: DatosVisitante) {
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 30 }}>
       <section className="portada-visita a-sangre" aria-labelledby="titulo-portada" style={{ marginTop: -20 }}>
@@ -50,7 +63,7 @@ export default async function InicioVisitante() {
         <Link href="/ayuda" className="btn secondary" style={{ flex: "1 1 180px", minHeight: 58 }}>Ver cómo funciona</Link>
       </div>
 
-      <section aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <section className="portada-actualidad" aria-labelledby="titulo-actualidad-visita" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="titulo-seccion"><h2 id="titulo-actualidad-visita">Actualidad</h2><Link href="/noticias">Todas las noticias</Link></div>
         {noticias.length ? <><NoticiaDestacada n={noticias[0]} />{noticias.length > 1 && <FilaNoticias noticias={noticias.slice(1)} etiqueta="Más noticias" />}</> : <SinNoticias />}
       </section>

@@ -54,11 +54,12 @@ const cartel=formButton(org.p,"Añadir al cartel");
 const valor=async (name,text)=>cartel.locator(`[name=${name}]`).evaluate((el,text)=>[...el.options].find(o=>o.textContent.includes(text))?.value,text);
 const aid=await valor("fighterA",`JuniorCategorias Divisiones${rnd}`), bid=await valor("fighterB",`RivalCategorias Divisiones${rnd}`);
 // El identificador ya elegido en el cartel también permite probar el POST de un peleador contra un rival conocido.
+await birth(b,"2012-01-01");
 await a.p.goto(B+"/mi-ficha");
 const propio=formButton(a.p,"Registrar este combate");
+await propio.locator('[name=level]').selectOption("AMATEUR");
 await propio.locator('[name=divisionId]').selectOption(junior);await propio.locator('[name=weightClass]').selectOption("M66");
-await propio.evaluate((form,id)=>{const el=document.createElement('input');el.type='hidden';el.name='rivalId';el.value=id;form.append(el);},bid);
-await registrar(a.p,{evento:`Edades propias ${rnd}`,fecha:enDias(-1),rivalNombre:"RivalCategorias",rivalApellidos:`Divisiones${rnd}`,resultado:"WIN",metodo:"UD"});
+await registrar(a.p,{evento:`Edades propias ${rnd}`,fecha:enDias(-1),rivalNombre:"RivalCategorias",rivalApellidos:`Divisiones${rnd}`,resultado:"WIN",metodo:"UD",rivalId:bid});
 await a.p.locator('[role=alert]',{hasText:"edad"}).waitFor();
 check("el registro del peleador también comprueba la edad conocida del rival",true);
 await cartel.locator('[name=fighterA]').selectOption(aid); await cartel.locator('[name=fighterB]').selectOption(bid);

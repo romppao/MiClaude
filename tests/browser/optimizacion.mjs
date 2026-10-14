@@ -11,13 +11,16 @@ await writeFile(path.join(dir,'fixture.tsx'),`
 import React,{useState} from 'react';import {createRoot} from 'react-dom/client';
 import Pestanas from '../../src/app/components/Pestanas';
 import Foto from '../../src/app/components/Foto';
-function App(){const [foto,setFoto]=useState('/inexistente');return <main>
+import EvitarDobleEnvio from '../../src/app/components/EvitarDobleEnvio';
+function App(){const [foto,setFoto]=useState('/inexistente');const [envios,setEnvios]=useState(0);const [acciones,setAcciones]=useState(0);return <main><EvitarDobleEnvio/>
 <section id="normal"><div className="titulo-seccion"><h2>Próximas veladas</h2><a href="#pruebas">Calendario</a></div>
 <a className="fila" href="#pruebas"><span className="avatar avatar-relleno">A</span><span className="cuerpo"><strong className="nombre">Tu próxima cita</strong><span className="meta">Descubre tu comunidad</span></span></a></section>
 <section id="pruebas"><div className="titulo-seccion"><h2>OrganizadoresInternacionalesDeDeportesDeContacto</h2><a href="#normal">Ver todas las inscripciones</a></div>
 <div className="acciones-principales"><a href="#normal" className="accion-principal tarjeta"><strong>OrganizadoresInternacionalesDeDeportesDeContacto</strong><span className="meta">Una etiqueta larga</span></a><a href="#normal" className="accion-principal tarjeta">Mi ficha</a></div></section>
 <Pestanas etiqueta="Prueba de secciones" pestanas={[{id:'uno',titulo:'Datos',contenido:<><label className="field">Horario<input id="horario" type="range" defaultValue="50"/></label><p>Datos deportivos</p></>},{id:'dos',titulo:'Combates',contenido:<p>Historial de combates</p>}]} />
 <div id="foto"><Foto src={foto} loading="eager"/><button type="button" id="cambiar-foto" onClick={()=>setFoto('/foto.svg')}>Cambiar foto</button></div>
+<form id="envio-rapido" method="post" onSubmit={e=>{e.preventDefault();setEnvios(n=>n+1);e.currentTarget.reset();}}><input type="hidden" name="method" defaultValue="UD"/><button>Guardar rápido</button><output aria-live="polite">{envios}</output></form>
+<form id="accion-react" action={async()=>{setAcciones(n=>n+1)}}><input type="hidden" name="method" defaultValue="UD"/><button>Guardar acción React</button><output aria-live="polite">{acciones}</output></form>
 </main>};createRoot(document.getElementById('root')!).render(<App/>);`);
 await build({entryPoints:[path.join(dir,'fixture.tsx')],outfile:path.join(dir,'bundle.js'),bundle:true,platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'}});
 const server=createServer(async(req,res)=>{
@@ -60,6 +63,16 @@ try{
  check('Los paneles permiten desplazamientos nativos y zoom',await page.locator('.pestanas-pista').evaluate(el=>getComputedStyle(el).touchAction==='auto'));
  await page.waitForFunction(()=>!document.querySelector('#foto img'));await page.locator('#cambiar-foto').click();
  await page.waitForTimeout(150);check('Una foto nueva puede cargar tras fallar la anterior',await page.locator('#foto img').count()===1&&await page.locator('#foto img').evaluate(el=>el.naturalWidth>0));
+ // Respuesta síncrona: el primer reset libera el bloqueo antes del segundo clic físico.
+ await page.locator('#envio-rapido button').dblclick();
+ await page.waitForFunction(()=>document.querySelector('#envio-rapido output').textContent==='1');
+ check('Un doble clic con respuesta inmediata envía una sola vez, aunque exista un campo method',await page.locator('#envio-rapido output').innerText()==='1');
+ await page.locator('#envio-rapido button').click();
+ await page.waitForFunction(()=>document.querySelector('#envio-rapido output').textContent==='2');
+ check('Un clic independiente posterior permite volver a enviar',await page.locator('#envio-rapido output').innerText()==='2');
+ await page.locator('#accion-react button').dblclick();
+ await page.waitForFunction(()=>document.querySelector('#accion-react output').textContent==='1');
+ check('Una acción React hidratada sin method y con input method tampoco se duplica',await page.locator('#accion-react output').innerText()==='1');
  await page.emulateMedia({reducedMotion:'reduce'});
  check('Movimiento reducido sin transiciones',await page.locator('a.fila').evaluate(el=>getComputedStyle(el).transitionDuration.split(',').every(v=>parseFloat(v)===0)));
  await writeFile(path.join(dir,before?'baseline.json':'resultado.json'),JSON.stringify(results,null,2));

@@ -42,11 +42,13 @@ export const FUENTES_INICIALES: FuenteInicial[] = [
   { name: "Espabox", url: "https://www.espabox.com/feed/", kind: "PRENSA", disciplines: ["BOXEO"] },
   { name: "Asociación Española de Boxeo (AEBOX)", url: "https://aebox.org/feed/", kind: "FEDERACION", disciplines: ["BOXEO"], local: true },
   { name: "Real Federación Española de Boxeo", url: "https://feboxeo.es/feed/", kind: "FEDERACION", disciplines: ["BOXEO"], local: true },
-  { name: "MMA España", url: "https://www.mma.es/feed/", kind: "PRENSA", disciplines: ["MMA"] },
+  // Marca (13 de octubre de 2026): canales comprobados con curl, RSS válido y actualizado. Cubren también lo internacional: cada titular
+  // pasa el filtro del panorama español (no llevan `local`).
+  { name: "Marca: boxeo", url: "https://e00-marca.uecdn.es/rss/boxeo.xml", kind: "PRENSA", disciplines: ["BOXEO"] },
+  { name: "Marca: MMA", url: "https://e00-marca.uecdn.es/rss/mma.xml", kind: "PRENSA", disciplines: ["MMA"] },
   { name: "UFC Español (canal de vídeo)", url: youtube("UCYXJFtx4SUkrb2p_8mhLPzQ"), kind: "VIDEO", disciplines: ["MMA"] },
   { name: "Fighter Corner (jiu-jitsu)", url: "https://fightercorner.es/feed/", kind: "PRENSA", disciplines: ["JIUJITSU"], local: true },
   // Tratan varias disciplinas: cada titular va a la que nombra
-  { name: "Federación Española de Kickboxing y Muaythai (FEKM)", url: "https://fekm.es/feed/", kind: "FEDERACION", disciplines: [], local: true },
   { name: "Jaula Magazine", url: "https://jaulamagazine.com/feed/", kind: "PRENSA", disciplines: [] },
   { name: "Deporte de Contacto", url: "https://deportedecontacto.com/category/noticias/feed/", kind: "PRENSA", disciplines: [] },
 ];
@@ -67,6 +69,9 @@ export const FUENTES_RETIRADAS: string[] = [
   googleNoticias('MMA OR UFC "artes marciales mixtas"'),
   googleNoticias('"muay thai"'),
   googleNoticias('"federación española" boxeo OR kickboxing OR "muay thai" OR "jiu-jitsu" OR "lucha"'),
+  // 13 de octubre de 2026: nunca se pudieron leer. FEKM responde 403 con una página web y MMA España devuelve HTML en lugar de un canal.
+  "https://fekm.es/feed/",
+  "https://www.mma.es/feed/",
 ];
 
 export const TIPO_DE_FUENTE_ETIQUETA: Record<NewsSourceKind, string> = { VIDEO: "Canal de vídeo", PRENSA: "Prensa", FEDERACION: "Federación", AGREGADOR: "Varios medios" };

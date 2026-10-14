@@ -295,3 +295,39 @@ Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders
 
 ## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
 El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 13 de octubre de 2026 — Adaptación de móvil y escritorio
+**Encargo:** revisar MiClaude y corregir móvil/escritorio con impeccable y break-ui; entregar nueva demo.
+**Base:** d64de99, checkout limpio. **Rama propia:** codex/adaptacion-responsive-20261013. Sin PR, integración ni publicación remota; GitHub inaccesible.
+**Cambios:** cabecera y distribución responsive, alturas flexibles, actualidad del visitante a ancho completo, noticias visibles, disciplinas en cuadrícula, cifras españolas, grafemas y alternativas de fotos. Archivo compartido delicado: globals.css. VistaVisitante separa consultas de presentación. /revision-ui solo desarrollo: fixtures ficticias por propiedades, sin base de datos. Detalle: REVISION-RESPONSIVE-20261013.md.
+**Ejecutado:** 60 comprobaciones de navegador correctas en Chromium; tipos y build correctos; /revision-ui responde 404 en producción. Unitarias 650/652: dos fallos previos POSIX/Windows en multimedia sin modificar. Documentación 8/9: symlink EPERM de Windows. Catálogo de 327 fuentes comprobado desde copia temporal con LF, excluyendo next-env.d.ts generado. Mapa de 71 pantallas comprobado con copia temporal que normaliza rutas; generadores originales conservados.
+**Límites:** base local detenida; sin batería completa de cuentas/escrituras ni Safari/teléfonos físicos. La demo es visual local: http://127.0.0.1:3137/revision-ui. Logs propios en docs/logs/. Sin migraciones ni cambios de datos o permisos.
+**Siguiente:** revisión y CI Linux con base aislada antes de integrar/publicar con autorización específica.
+
+
+## 13 de octubre de 2026 — Corrección de base oficial (Codex)
+El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
+Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.
+
+
+## Propuesta subida — espera indicada por el fundador
+2026-10-13, Codex. El fundador autoriza subir la propuesta y pide esperar a que Claude termine sus revisiones antes de aplicarla. PR en borrador: https://github.com/romppao/MiClaude/pull/47, rama codex/responsive-lona-20261013, desde la base oficial 46c17253985aaf277b2801e41a80c81c2f386b16. Se verificó que la diferencia contiene solo los 23 archivos previstos (402 líneas añadidas/42 retiradas antes de esta anotación). El commit inicial de propuesta es f8c0dc7e9765940bb8d25248add7ccebf2af3e57; las anotaciones de entrega se añaden después. Sin integración, auto-merge ni despliegue. CI pendiente de resultado; no se ha confirmado que Claude termine. Siguiente paso: esperar confirmación, contrastar sus cambios finales y validar la propuesta actualizada antes de integrar.
+
+
+## 14 de octubre de 2026 — Corrección autorizada de la pila #48/#50/#51
+**Pedido:** encargo explícito del fundador para corregir las tres ramas y rebasar las siguientes; esta autorización permite actualizar #48 de Claude y reescribir B/C con comprobación del SHA remoto, excepcionalmente al protocolo normal de ramas propias.
+**Base de A:** 03233fc7878bcf4c9cba9706e0efbd193b67d241. **B original:** d785699575dea02bc3c9ee47125090912f29993a. **C original:** 73d73aa2b00f5914ddb693e3d989ea828dc1b8ad (basado en B antiguo 8420ed1).
+**Cambios:** catálogo, mapa, pruebas y trámites; normalización y protección del campo method de B trasladadas a su origen A. Sin alterar las reglas de negocio. Cuenta abre Datos y espera los tres textos; rival mantiene dirección, datos y botón. Las notas responsive pasan a 0.10.0 y revision-ui usa --acc-ink.
+**Capacidad actual:** clon real e instalación npm disponibles con permiso de red y caché escribible; PostgreSQL 16 en contenedor propio, base aislada y Chromium real. Esto sustituye para este encargo los límites locales de sesiones anteriores.
+**Evidencia:** 11/11 documentales, catálogo 360, mapa 74/82/29, tipos, 697 unitarias, build; reproducción y comparación de navegación, con un POST y pushState/replaceState, incluidos pre-A3 y 0.9.0. Resultados definitivos de recorridos y CI se registran por head en el traspaso/PR.
+**Errores:** primeros comandos sin permiso de red/caché npm fuera del área escribible; datos E2E sin nivel tras A7. Corregidos sin ocultar comprobaciones. La traza de 0.9.0 solo compara navegación, no valida expectativas de B.
+**Relevo:** [traspaso de correcciones](ecosistema/traspasos/2026-10-14-codex-ci48-51.md). Mantener borradores y no integrar/desplegar. Esperar la descripción del fallo de sparring antes de escribir su reproducción, arreglo y versión parche en una nueva rama apilada.
+
+14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
+
+14 oct, segunda revisión de CI: categorias.mjs perdía división/peso al elegir de nuevo el mismo nivel, porque SelectorCategoria reinicia sus dependientes en change. Elegir nivel antes de división/peso, evitar change redundante en el ayudante y poner rivalId después de rellenar; se traslada la preparación de edad de B a A. El artefacto de #51 (11876608015, head 0667240) confirma alias/presentación pero altura ausente en HTML. Cuenta ahora espera la URL del rechazo y exige los tres valores en el formulario antes de enviar, escribiendo altura al final; mantiene los tres seen() públicos y añade diagnóstico por dato si falla. Pasadas locales completas: categorías 18/18; cuenta 33/33 y otra 33/33 con CPU ralentizada seis veces. Sin cambios de src ni reglas de producto; el vaciado anterior no se atribuye sin evidencia a una causa distinta del estado de formulario durante la transición.
+
+14 oct: continúa la revisión de A7, preparando nivel explícito en las cinco creaciones directas de velada que faltaban; diagnóstico de residuos en la base local desechable y CI 38530144100. Sin cambios de producto.
+
+14 oct: diagnóstico y corrección de doble envío real en A3 por method ausente en acciones React hidratadas; prueba de componentes con reset inmediato, campo method y siguiente clic. Se mantiene separado de las dos notificaciones normales del router. Dependencias Prisma de A aisladas de B/C y pruebas afectadas registradas como fallidas.

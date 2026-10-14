@@ -1719,3 +1719,62 @@ El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escr
 **Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
 
 **Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
+
+
+## 13 de octubre de 2026 — Revisión responsive (Codex)
+**Pedido:** adaptar móvil y escritorio con impeccable y break-ui y entregar la demo ajustada.
+**Decisión:** conservar identidad y funciones; corregir distribución, recortes y casos extremos.
+**Hecho:** cabecera por espacio, tarjetas que crecen, actualidad a ancho completo, todas las noticias visibles, disciplinas en cuadrícula, números españoles, grafemas y fotos ausentes. Banco visual exclusivo de desarrollo sin PostgreSQL. Ver REVISION-RESPONSIVE-20261013.md.
+**Validación:** 60 comprobaciones de navegador correctas; tipos y build correctos; 404 del banco en producción. Unitarias 650/652 (dos fallos previos de rutas Windows); documentación 8/9 (symlink EPERM). Catálogo/mapa comprobados en copia temporal normalizada sin modificar generadores.
+**Problemas corregidos de verificación:** las imágenes lazy deben acercarse a la vista y esperar antes de exigir alternativas. PowerShell requiere UTF-8 explícito también en su entrada a Python: se corrigieron únicamente las anotaciones propias de este bloque y se regeneró el mapa.
+**Pendiente:** GitHub y PostgreSQL inaccesibles en esta sesión; falta CI completo/base aislada y demo remota. Demo visual local en 127.0.0.1:3137/revision-ui.
+
+
+## 13 de octubre de 2026 — Corrección de base oficial (Codex)
+El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
+Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.
+
+## 13 de octubre de 2026 — Afilar antes del lanzamiento: bloque A (Claude, con el trabajo previo de Codex)
+
+**Qué se pidió:** el encargo «afilar y gimnasios» (`docs/ecosistema/traspasos/2026-10-13-claude-encargo-codex-afilar-y-gimnasios.md`). Codex empezó el bloque A y se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso; Claude lo revisó, lo terminó y lo confirmó.
+
+**Qué se decidió y por qué:**
+- Versión 0.10.0 (menor): trae cosas nuevas para el usuario (buscador del cartel, diagnóstico de noticias, estados de combate).
+- Se mantienen las búsquedas de Google Noticias aunque a veces devuelven 503 desde Render; queda pendiente decidir si se quitan.
+- Se quitan FEKM (403) y MMA España (HTML, sin canal) y se añaden Marca boxeo y Marca MMA (comprobadas con curl).
+
+**Qué se hizo:**
+- A1 Noticias: sin titulares repetidos (`src/lib/news/deduplicate.ts`), diagnóstico de fuentes (`diagnosis.ts`), rechazo de respuestas que no son RSS, fuentes cambiadas (`sources.ts`).
+- A2 Hidratación #418: fecha de «Mi ficha» con zona horaria fija y prueba `tests/e2e/hidratacion.mjs` (Madrid y Nueva York).
+- A3 `EvitarDobleEnvio` reescrito: bloquea hasta que termina la acción, con tope de 30 s y texto de progreso.
+- A4 Cartel del organizador con búsqueda de peleadores por esquina (`src/lib/events/cartel-search.ts`).
+- A5 Estados «Programado» y «Resultado por anotar» (`src/lib/bouts/status.ts`).
+- A6 No se puede pedir inscripción si ya se figura en el cartel (bloqueo común `cartel:<eventId>`).
+- A7 Nivel sin preseleccionar. A8 Enlace de entradas solo https.
+
+**Qué salió mal:**
+- La causa del error de hidratación #418 NO está confirmada: se vio una vez en la demo y no se reproduce (unas 30 cargas y en local). La hipótesis es una mezcla de HTML y JavaScript de versiones distintas durante un despliegue de Render.
+- Fallo de la deduplicación: una dirección con barra final y parámetros no se normalizaba igual; corregido y con prueba.
+- Codex se quedó sin créditos con el trabajo sin confirmar.
+
+**Estado:** A1–A8 hechos y confirmados en local (sin subir). Pruebas: typecheck limpio; vitest 695/697 (dos fallos anteriores de rutas de Windows en `multimedia.test.ts`). La suite de navegador no se ha pasado entera. A4 no está validado en un navegador con una cuenta de organizador.
+
+**Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
+
+
+## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
+
+**Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
+**Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.
+**Qué se hizo:** seis responsabilidades ausentes del catálogo, normalización Windows/Linux y exclusión de next-env.d.ts con sus pruebas; catálogo/mapa regenerados; URL y seen() en rival; mostrar() y tres seen() en ficha; registro de versiones y token --acc-ink corregidos. Las reglas de datos/permisos de la aplicación se conservan.
+**Qué ejecuté:** clon real por Git, reproducción de la comprobación defectuosa en Chromium/producción, captura de POST/RSC/history en #51, control con componentes pre-A3 y base 0.9.0; catálogo 360 archivos, 11/11 documentales, mapa 74 pantallas/82 acciones/29 tablas, tipos, 697 unitarias y build de A. Los recorridos completos y CI de los heads finales se registran en el traspaso/PR tras completarse, no se presuponen aprobados aquí.
+**Qué salió mal:** acceso de red y caché de npm sin permisos adecuados al primer intento; primeras pasadas de flujo/cuenta encontraron datos sin nivel obligatorio, corregidos sin saltar comprobaciones. El diagnóstico sobre 0.9.0 usa solo su tramo de navegación; sus expectativas de 24 horas (de B) no se consideran una prueba válida de esa versión.
+**Estado y próximos pasos:** borrador, sin integración/despliegue. Rebasar B/C, regenerar ambos documentos generados y comprobar cada CI. Sparring depende de la descripción que falta.
+
+14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
+
+14 oct, segunda revisión de CI: categorias.mjs perdía división/peso al elegir de nuevo el mismo nivel, porque SelectorCategoria reinicia sus dependientes en change. Elegir nivel antes de división/peso, evitar change redundante en el ayudante y poner rivalId después de rellenar; se traslada la preparación de edad de B a A. El artefacto de #51 (11876608015, head 0667240) confirma alias/presentación pero altura ausente en HTML. Cuenta ahora espera la URL del rechazo y exige los tres valores en el formulario antes de enviar, escribiendo altura al final; mantiene los tres seen() públicos y añade diagnóstico por dato si falla. Pasadas locales completas: categorías 18/18; cuenta 33/33 y otra 33/33 con CPU ralentizada seis veces. Sin cambios de src ni reglas de producto; el vaciado anterior no se atribuye sin evidencia a una causa distinta del estado de formulario durante la transición.
+
+14 oct, continuidad de CI: los heads 0da663b/01bb8bd/a4f7203 aprueban catálogo, mapa, tipos, unitarias y build, y #51 ya aprueba flujo/cuenta. La ejecución 38530144100 se detiene en inclusiva.mjs por crear una velada sin nivel obligatorio tras A7. Se preparan explícitamente AMATEUR también en inscripciones, plazas, rivales y escenarios, sin cambiar la aplicación ni quitar expectativas. En local se limpian exclusivamente los datos 000Inclusiva de esta base desechable tras una pasada fallida: repetirla con residuos altera qué seis eventos enseña la portada. No se presenta esa primera pasada como verde.
+
+14 oct — El recorrido de doble clic descubrió un fallo distinto de la navegación: React puede hidratar acciones sin method; el lector getAttribute con valor por defecto GET omitía el bloqueo. Diagnóstico en Chromium: dos clics (detail 1/2), dos submit, dos POST y selección de rival tras haber registrado el primero. A reconoce esas acciones y descarta el segundo clic físico, conservando búsquedas GET y reintento independiente. Prueba de componentes: acción React sin method con input llamado method, reset síncrono y siguiente clic; se ejecuta antes del build final. El diagnóstico inicial de «respuesta rápida» era una hipótesis; la ausencia de method es la causa demostrada. Se separa de HistoryUpdater en el traspaso.

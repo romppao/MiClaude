@@ -10,7 +10,7 @@ import { requireOrganizer } from "../../lib/accounts/permissions";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { parseEventKind, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
-import { safeHttpUrl } from "../../lib/common/url";
+import { safeHttpUrl, safeHttpsUrl } from "../../lib/common/url";
 import { dayKey, eventDayReached, parseDay, todayMadrid } from "../../lib/common/dates";
 import { divisionById, divisionEligible, knownBoxingAgeEligible } from "../../lib/common/competition";
 import { isDiscipline, parseCompetitionChoice } from "../../lib/common/disciplines";
@@ -50,7 +50,8 @@ export async function createEvent(f: FormData) {
   if (!name) go(back, { problema: "velada_datos" });
   const date = parseDay(str(f, "date"));
   if (!date) go(back, { problema: "fecha_invalida" });
-  const level = str(f, "level") === "PRO" ? "PRO" : "AMATEUR";
+  const level = str(f, "level");
+  if (level !== "PRO" && level !== "AMATEUR") go(back, { problema: "nivel_obligatorio" });
   const kind = parseEventKind(str(f, "kind") || "VELADA");
   if (!kind) go(back, { problema: "velada_tipo" });
   const disciplineRaw = str(f, "discipline");
@@ -58,8 +59,8 @@ export async function createEvent(f: FormData) {
   const discipline = disciplineRaw;
   const province = readProvince(f, "province", back);
   const ticketRaw = str(f, "ticketUrl");
-  const ticketUrl = ticketRaw ? safeHttpUrl(ticketRaw) : null;
-  if (ticketRaw && !ticketUrl) go(back, { problema: "url_invalida" });
+  const ticketUrl = ticketRaw ? safeHttpsUrl(ticketRaw) : null;
+  if (ticketRaw && !ticketUrl) go(back, { problema: "entradas_https" });
   const base = slugify(`${name} ${dayKey(date)}`) || `velada-${dayKey(date)}`;
   if (await db.event.findFirst({ where: { organizerId: user.id, slug: { startsWith: base }, name, date } })) go(back, { problema: "velada_duplicada" });
   const created = await guard(back, async () => {
@@ -90,7 +91,7 @@ export async function addCartelBout(f: FormData) {
     db.fighter.findFirst({ where: { id: str(f, "fighterA"), hiddenAt: null }, include: { disciplines: true } }),
     db.fighter.findFirst({ where: { id: str(f, "fighterB"), hiddenAt: null }, include: { disciplines: true } }),
   ]);
-  if (!a || !b || a.id === b.id) go(back, { problema: "cartel_boxeadores" });
+  if (!a || !b || a.id === b.id || ![a, b].every(x => x.disciplines.some(d => d.discipline === event.discipline))) go(back, { problema: "cartel_boxeadores" });
   const rounds = intOrNull(f, "rounds");
   const weightClassRaw = str(f, "weightClass");
   const category = parseCompetitionChoice(event.discipline, event.level, weightClassRaw, str(f, "divisionId"));
@@ -107,6 +108,7 @@ export async function addCartelBout(f: FormData) {
 
   const created = await guard(back, () =>
     db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`cartel:${event.id}`}))`;
       // Aparecer en un cartel oficial hace pública la ficha del peleador.
       await listFighters(tx, [a.id, b.id]);
       await Promise.all([ensureDiscipline(tx, a.id, event.discipline), ensureDiscipline(tx, b.id, event.discipline)]);
@@ -162,8 +164,8 @@ export async function updateEvent(f: FormData) {
   if (!date) go(back, { problema: "fecha_invalida" });
   const province = readProvince(f, "province", back, event.province);
   const ticketRaw = str(f, "ticketUrl");
-  const ticketUrl = ticketRaw ? safeHttpUrl(ticketRaw) : null;
-  if (ticketRaw && !ticketUrl) go(back, { problema: "url_invalida" });
+  const ticketUrl = ticketRaw ? safeHttpsUrl(ticketRaw) : null;
+  if (ticketRaw && !ticketUrl) go(back, { problema: "entradas_https" });
   const disciplineRaw = str(f, "discipline");
   const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
   const kind = parseEventKind(str(f, "kind")) ?? event.kind;

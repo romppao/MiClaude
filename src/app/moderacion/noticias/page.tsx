@@ -7,6 +7,7 @@ import { haceTiempo } from "../../../lib/common/dates";
 import { LIMITS } from "../../../lib/common/text";
 import { asegurarFuentesIniciales, noticiasActivas } from "../../../lib/news/refresh";
 import { TIPO_DE_FUENTE_ETIQUETA } from "../../../lib/news/sources";
+import { diagnosticoFuente } from "../../../lib/news/diagnosis";
 import { addNewsSource, refreshNewsNow, toggleNewsItem, toggleNewsSource } from "../../actions/news";
 
 export const metadata: Metadata = { title: "Fuentes de noticias", robots: { index: false, follow: false } };
@@ -46,6 +47,7 @@ export default async function FuentesDeNoticias() {
                     : f.lastError ? <span><span aria-hidden="true">⚠ </span>Falla: {f.lastError}{f.lastOkAt ? ` (última lectura correcta: ${haceTiempo(f.lastOkAt, ahora).toLowerCase()})` : " (nunca se ha leído bien)"}</span>
                     : f.lastOkAt ? <span><span aria-hidden="true">✓ </span>Funciona · {haceTiempo(f.lastOkAt, ahora).toLowerCase()}</span>
                     : "Todavía no se ha leído"}
+                  {f.lastError && <p className="hint">{diagnosticoFuente(f)}</p>}
                 </td>
                 <td>{f._count.items}</td>
                 <td><form action={toggleNewsSource}><input type="hidden" name="sourceId" value={f.id} /><button className="secondary">{f.active ? `Desactivar ${f.name}` : `Activar ${f.name}`}</button></form></td>

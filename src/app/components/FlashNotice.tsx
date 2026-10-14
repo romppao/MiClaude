@@ -28,6 +28,7 @@ export default function FlashNotice() {
   const message = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!aviso && !problema) return;
+    window.dispatchEvent(new Event("lona:accion-terminada"));
     const frame = requestAnimationFrame(() => {
       message.current?.focus({ preventScroll: true });
       message.current?.scrollIntoView({ block: "center" });

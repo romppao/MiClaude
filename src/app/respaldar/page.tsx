@@ -233,7 +233,7 @@ export default async function Backing({
                 : `Gana ${b.result === "A_WIN" ? b.fighterA.firstName : b.fighterB.firstName}`}
           </p>
           <p>{levelName(b.event.level)} · {categoryLabel(b.event.discipline, b.event.level, b.divisionId, b.weightClass)}{b.weightClass ? "" : " · Peso sin confirmar"}</p>
-          <VerificationTag verification={b.verification} backing={b} />
+          <VerificationTag bout={b} verification={b.verification} backing={b} />
           <form action={endorseBout} className="search">
             <input type="hidden" name="boutId" value={b.id} />
             <input type="hidden" name="back" value={`${back}#combates`} />

@@ -220,7 +220,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
           )}
           <h2 id="registrar-combate">Registrar un combate</h2>
           <form className="search" action={addBout}>
-            <SelectorCategoria modo="combate" nivelesPorDisciplina={Object.fromEntries(me.disciplines.map(d=>[d.discipline,d.level]))} disciplinas={me.disciplines.map(d=>d.discipline)} defaults={{ discipline: (previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"], level: (previo("level") || me.disciplines[0]?.level) as typeof me.disciplines[0]["level"], divisionId: previo("divisionId"), weightClass: previo("weightClass") }} />
+            <SelectorCategoria modo="combate" nivelesPorDisciplina={Object.fromEntries(me.disciplines.map(d=>[d.discipline,d.level]))} disciplinas={me.disciplines.map(d=>d.discipline)} defaults={{ discipline: (previo("discipline") || me.disciplines[0]?.discipline) as typeof me.disciplines[0]["discipline"], level: previo("level") as typeof me.disciplines[0]["level"], divisionId: previo("divisionId"), weightClass: previo("weightClass") }} />
             <p className="hint">Indica la división y el peso de este combate, aunque hoy compitas en otra categoría. Si no los recuerdas, elige «Prefiero indicarlo más tarde».</p>
             <label className="field"><span>Nombre de la velada</span><input name="eventName" defaultValue={previo("eventName")} required maxLength={LIMITS.eventName} /></label>
             <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={previo("date")} required min="1980-01-01" /></label>
@@ -261,7 +261,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                   const puedeCorregir = soyAutor && (b.verification === "SELF_REPORTED" || (b.verification === "CONFIRMED" && !b.result)) && eventDayReached(b.event.date);
                   return (
                     <tr key={b.id}>
-                      <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES")}<div className="mut">contra {publicFighterName(opp)}</div>
+                      <td>{b.event.name} · {b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}<div className="mut">contra {publicFighterName(opp)}</div>
                         {soyAutor && b.verification === "SELF_REPORTED" && (
                           <details style={{ marginTop: 6 }}>
                             <summary className="mut" aria-label={`Quitar este combate: ${b.event.name}`}>Quitar este combate</summary>
@@ -273,7 +273,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                           </details>
                         )}
                       </td>
-                      <td data-label="Estado"><VerificationTag verification={b.verification} backing={b} /></td>
+                      <td data-label="Estado"><VerificationTag bout={b} verification={b.verification} backing={b} /></td>
                       <td data-label="Resultado">
                         {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
                         {puedeCorregir && (

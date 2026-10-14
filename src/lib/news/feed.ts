@@ -1,6 +1,7 @@
 import type { Discipline } from "@prisma/client";
 import { db } from "../common/db";
 import { variar } from "./parse";
+import { fusionarNoticias } from "./deduplicate";
 
 /** Noticias para la portada común y las de cada disciplina: recientes, de fuentes activas, sin las ocultadas por moderación, y variadas. */
 export async function ultimasNoticias({ disciplina, max = 12 }: { disciplina?: Discipline; max?: number } = {}) {
@@ -10,6 +11,6 @@ export async function ultimasNoticias({ disciplina, max = 12 }: { disciplina?: D
     take: max * 4,
     include: { source: { select: { name: true, kind: true } } },
   });
-  return variar(filas.map((n) => ({ ...n, clave: n.publisher ?? n.sourceId })), max);
+  return variar(fusionarNoticias(filas).map((n) => ({ ...n, clave: n.publisher ?? n.sourceId })), max);
 }
 export type Noticia = Awaited<ReturnType<typeof ultimasNoticias>>[number];
