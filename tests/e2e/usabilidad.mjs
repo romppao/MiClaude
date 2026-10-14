@@ -196,7 +196,18 @@ await peleadorMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha 
 const publicarRecord = peleadorMovil.p.getByRole("switch", { name: "Mostrar mi récord amateur completo", exact: true });
 await mostrar(publicarRecord); await publicarRecord.click();
 await peleadorMovil.p.getByRole("switch", { name: "Ocultar mi récord amateur completo", exact: true }).waitFor();
+// El resultado de un combate amateur solo es público si AMBOS participantes lo autorizan.
+const rivalMovil = await newUser("RivalMovil", "FIGHTER");
+await rivalMovil.p.goto(B + "/mi-ficha");
+await rivalMovil.p.fill("[name=firstName]", "Rival"); await rivalMovil.p.fill("[name=lastName]", `Movil${rnd}`);
+await datosDeAlta(rivalMovil.p); await btn(rivalMovil.p, "Crear mi ficha");
+await rivalMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+const publicarRival = rivalMovil.p.getByRole("switch", { name: "Mostrar mi récord amateur completo", exact: true });
+await mostrar(publicarRival); await publicarRival.click();
+await rivalMovil.p.getByRole("switch", { name: "Ocultar mi récord amateur completo", exact: true }).waitFor();
 await registrar(peleadorMovil.p, { evento: `Velada Movil ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Movil${rnd}` });
+await peleadorMovil.p.waitForURL(u => u.pathname === "/mi-ficha/rival");
+await peleadorMovil.p.getByRole("button", { name: "Es esta persona", exact: true }).click();
 await peleadorMovil.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
 // Este recorrido comprueba la identificación de un resultado que ya puede mostrarse, no el periodo de espera de B3.
 sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada Movil ${rnd}'`);
