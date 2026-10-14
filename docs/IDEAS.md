@@ -397,6 +397,7 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
   - panel propio de federación.
 - **Visitante:** «Esta semana en Madrid» con cambio de provincia.
 - **Moderación:** bandeja única ordenada por urgencia.
+- **Relevo entre sesiones sin repetir contexto** (fundador, 14 oct). Estado: **hecho** (0.12.2): `docs/ESTADO.md` y `scripts/estado.mjs`. Mejoras posibles: un aviso automático en el PR cuando toca ficheros de una rama ajena (cuesta minutos de CI: solo si hace falta); una pantalla de «Estado del equipo» para el fundador dentro de moderación.
 
 
 ### Seguimiento del bloque F (Codex, 14 oct 2026)

@@ -26,6 +26,10 @@ const csp = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // Versión real en Google Cloud Run (ADR-005): la imagen Docker usa la salida «standalone», que incluye solo lo necesario
+  // para arrancar con `node server.js`. Solo se activa al compilar la imagen (NEXT_OUTPUT=standalone en el Dockerfile);
+  // la demo de Render sigue arrancando con `next start`.
+  ...(process.env.NEXT_OUTPUT === "standalone" && { output: "standalone" }),
   experimental: { serverActions: { bodySizeLimit: "9mb" } },
   async headers() {
     return [
