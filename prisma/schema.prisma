@@ -433,6 +433,7 @@ model User {
   role                  Role                   @default(FAN)
   notifyEmails          Boolean                @default(true)
   emailVerifiedAt       DateTime?
+  googleSub             String?                @unique // identificador de la cuenta de Google vinculada (entrar con Google, T-015)
   createdAt             DateTime               @default(now())
   accreditation         SupportAccreditation?  @relation("AccreditedUser")
   grantedAccreditations SupportAccreditation[] @relation("AccreditationGrantor")

@@ -11,7 +11,8 @@ import { B, rnd, browser, check, newUser, hacerAdmin, sql, datosDeAlta, terminar
 const MAX_PAGINAS = Number(process.env.ENLACES_MAX ?? 90);
 const origen = new URL(B).origin;
 // Rutas que no se recorren: acciones destructivas o de un solo uso, que no son pantallas.
-const OMITIR = [/\/mi-cuenta\/datos/, /\/mi-cuenta\/eliminar/, /\/baja/, /^\/salud/, /\/sitemap/, /\/robots/];
+// «Continuar con Google» (/api/auth/google) lleva fuera de Lona, a Google: lo comprueba tests/e2e/google.mjs sin salir a internet.
+const OMITIR = [/\/mi-cuenta\/datos/, /\/mi-cuenta\/eliminar/, /\/baja/, /^\/salud/, /\/sitemap/, /\/robots/, /^\/api\/auth\/google/];
 
 const problemas = [];
 const anotar = (papel, desde, texto) => problemas.push(`[${papel}] ${desde}: ${texto}`);

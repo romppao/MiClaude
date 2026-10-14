@@ -9,6 +9,8 @@
 | Dirección | Qué es | Quién puede entrar | Acciones que lanza | Lee de |
 |---|---|---|---|---|
 | `/` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/api/auth/google` | (respuesta técnica, sin pantalla) | Pública | — | — |
+| `/api/auth/google/callback` | (respuesta técnica, sin pantalla) | Pública | — | User |
 | `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/api/fallos` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/ayuda` | ¿Cómo funciona Lona? | Pública | — | — |
@@ -298,7 +300,8 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `completeSecondFactor`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `getUserPendingSecondFactor`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
 | `backing.ts` | `canEndorse`, `requireSupportActor` |
 | `creador.ts` | `EstadoCodigos`, `correoCreador`, `esCreador` |
-| `landing.ts` | `PASOS_REGISTRO`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
+| `google.ts` | `COOKIE_GOOGLE`, `DURACION_VIAJE_S`, `DecisionCuenta`, `GOOGLE_AUTORIZACION`, `GOOGLE_TOKENS`, `IdentidadGoogle`, `ViajeGoogle`, `canjearCodigo`, `configGoogle`, `decidirCuenta`, `escribirViaje`, `googleDisponible`, `leerViaje`, `nuevoViaje`, `urlDeAutorizacion`, `validarIdToken` |
+| `landing.ts` | `PASOS_REGISTRO`, `PASO_TRAS_DATOS`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
 | `menu.ts` | `EXPLORAR`, `EnlaceMenu`, `ExtrasMenu`, `SeccionMenu`, `menuDe` |
 | `onboarding.ts` | `ClassDraft`, `FighterIntent`, `Onboarding`, `TrainerIntent`, `readOnboarding` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |

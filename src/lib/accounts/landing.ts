@@ -27,6 +27,9 @@ export const parseTipoDeCuenta = (v: string, role = ""): TipoDeCuenta => TIPOS_D
 /** Papel con el que empieza cada tipo de cuenta. La entidad empieza como persona normal: el permiso de organizadora lo concede un moderador. */
 export const ROL_INICIAL: Record<TipoDeCuenta, "FAN" | "FIGHTER" | "TRAINER"> = { usuario: "FAN", peleador: "FIGHTER", entrenador: "TRAINER", entidad: "FAN" };
 
+/** Siguiente paso del registro tras crear la cuenta (con contraseña o con Google): cada tipo tiene el suyo; la entidad ya ha terminado. */
+export const PASO_TRAS_DATOS: Record<TipoDeCuenta, string> = { usuario: "/registro/intereses", peleador: "/registro/ficha", entrenador: "/registro/perfil", entidad: "/verificar" };
+
 /** Pasos del registro de cada tipo de cuenta (el primero, elegir el tipo, es común). */
 export const PASOS_REGISTRO: Record<TipoDeCuenta, readonly ("tipo" | "datos" | "intereses" | "ficha" | "perfil" | "clase")[]> = {
   usuario: ["tipo", "datos", "intereses"],

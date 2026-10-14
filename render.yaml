@@ -37,3 +37,8 @@ services:
       # Clave del cron de noticias (.github/workflows/actualizar-noticias.yml): el mismo valor va en los secretos de GitHub.
       - key: CRON_SECRET
         sync: false
+      # Entrar con Google (docs/GOOGLE.md): se pegan en el panel de Render, nunca aquí. Sin ellas el botón no aparece.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

@@ -11,6 +11,16 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.12.0] — 2026-10-14
+
+PR de Claude (entrar con Google, T-015).
+
+### Añadido
+- **Entrar y registrarse con Google** («Continuar con Google»). Si ya existe una cuenta con ese correo, se entra en ella; si no, se crea con el correo ya confirmado y se sigue el mismo paso del alta. La cuenta del creador mantiene el segundo paso. El botón solo aparece cuando están puestas las claves de Google (guía en `docs/GOOGLE.md`). Las promotoras, federaciones y clubes siguen registrándose con correo y contraseña.
+
+### Seguridad
+- Al vincular Google a una cuenta que no había confirmado su correo, se invalida su contraseña y se cierran sus sesiones, por si otra persona la creó con un correo ajeno.
+
 ## [0.11.3] — 2026-10-14
 
 PR de Claude sobre #52.

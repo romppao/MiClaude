@@ -1841,3 +1841,50 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - Batería completa en local sobre una base vacía: 796 comprobaciones de navegador bien, ninguna mal.
 
 **Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.
+
+## 14 de octubre de 2026 — Entrar y registrarse con Google (Claude)
+
+**Qué se pidió** (el fundador): «que se pudiera registrar la gente mediante Google […] La parte de Apple lo dejaremos aplazado para cuando lo lancemos. Pero por lo menos la de Google que ya esté, que creo que se puede y es gratuito». Codex se quedó sin créditos, así que: «hazlo tú. Todo lo que haya que hacer, hazlo tú […] dame el texto en caso de que a ti se te acaben los créditos».
+
+**Qué se decidió y por qué:**
+- **OpenID Connect con PKCE, `state` y `nonce`, programado en Lona y sin librerías nuevas.** Son unas 150 líneas, fáciles de revisar y sin dependencias que mantener. Solo se piden nombre y correo: con eso Google no limita a usuarios de prueba ni muestra avisos (ayuda oficial de Google Cloud, «Manage App Audience» y «Unverified apps»).
+- **Cuentas:**
+  - si el `sub` ya está vinculado, se entra;
+  - si el correo ya existe, se vincula;
+  - si no existe, se crea con el correo confirmado.
+- **Protección contra el «secuestro previo»:** si la cuenta existente no había confirmado su correo, se invalida su contraseña y se cierran sus sesiones antes de vincularla.
+- **El creador** sigue pasando por el segundo paso.
+- **Las entidades** se registran con correo y contraseña, porque su solicitud necesita datos que Google no da.
+- **Sin claves no hay botón.** Las claves las pone el fundador en Render (`docs/GOOGLE.md`).
+
+**Qué se hizo:**
+- `lib/accounts/google.ts`.
+- Rutas `/api/auth/google` y `/api/auth/google/callback`.
+- `BotonGoogle` en «Entrar» y «Registrarse».
+- Campo `User.googleSub` y su migración.
+- Mensajes, ayuda y privacidad.
+- `render.yaml` y `.env.example`.
+- Pruebas: 16 unitarias y `tests/e2e/google.mjs`. En el CI se usan claves de mentira y no se llega a hablar con Google; `enlaces.mjs` no sigue esa ruta.
+- Ficha `T-015` (sirve también de encargo para Codex) y guía para el fundador.
+
+**Qué salió mal:**
+- Desde la sesión no se pueden abrir las páginas de Google para desarrolladores (sin resolución DNS). Las condiciones de uso se comprobaron con la búsqueda web, citando las páginas oficiales de ayuda.
+- No se puede probar el viaje real a Google hasta que el fundador ponga las claves.
+
+- **Pausa pedida por el fundador:** «no empieces las nuevas cosas que te he dicho sin antes haber validado, corregido todo lo anterior». Google se apartó hasta publicar y comprobar la 0.11.3, y se retomó después.
+- **Vuelta completa comprobada con un Google simulado** (`tests/e2e/google-falso.mjs`, cargado con `node --import` solo en el servidor de pruebas). Casos:
+  - cuenta nueva (peleador, correo confirmado, sesión iniciada);
+  - volver a entrar sin crear otra;
+  - vincular una cuenta con el correo confirmado sin tocar su contraseña;
+  - proteger la que no lo tenía;
+  - rechazar un correo sin confirmar en Google;
+  - creador con segundo paso.
+
+  `google.mjs`: 25 de 25. Capturas en el móvil, en claro y oscuro, revisadas.
+- **Contratiempos de la comprobación local:**
+  - `NODE_OPTIONS` no llega al servidor de Next, así que el simulador se carga con `node --import` directamente.
+  - Un servidor anterior seguía ocupando el puerto (`EADDRINUSE`) y se estuvo probando contra él sin saberlo.
+  - Dos veces `pkill -f` se mató a sí mismo, porque su propio texto contenía el patrón.
+  - Las vueltas fallidas confirmaron que el error se registra y que la persona ve un mensaje claro.
+
+**Estado y próximos pasos:** batería completa en marcha; después, PR y CI. El fundador crea las credenciales (`docs/GOOGLE.md`) y Claude lo comprueba en la demo.

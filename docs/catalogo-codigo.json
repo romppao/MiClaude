@@ -360,6 +360,16 @@
     "guide": "docs/MODERACION.md"
   },
   {
+    "path": "src/app/api/auth/google/route.ts",
+    "purpose": "Inicio de «Continuar con Google»: guarda el viaje en una cookie de 10 minutos y redirige a Google con PKCE; sin claves vuelve a «Entrar» con un aviso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/api/auth/google/callback/route.ts",
+    "purpose": "Vuelta de Google: comprueba el viaje, canjea el código, valida la identidad y entra, vincula o crea la cuenta; el creador pasa por el segundo paso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/apple-icon.png",
     "purpose": "Icono de la marca (ring de Lona) para la pantalla de inicio del iPhone, 180 px.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -398,6 +408,11 @@
     "path": "src/app/compartir/page.tsx",
     "purpose": "Subir vídeos o fotos: elegir la velada de los últimos cuatro meses y formulario con foto, vídeo subido o enlace, combate opcional y consentimiento.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/components/BotonGoogle.tsx",
+    "purpose": "Botón «Continuar con Google» (enlace a /api/auth/google); solo aparece si el alojamiento tiene las claves de Google.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/components/AuraBreakdown.tsx",
@@ -1035,6 +1050,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/accounts/google.ts",
+    "purpose": "Entrar con Google: configuración, viaje (state, nonce, PKCE), dirección de Google, validación del id_token y decisión de cuenta (entrar, vincular protegiendo o crear).",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/accounts/landing.ts",
     "purpose": "Tipos de cuenta, rol inicial, pasos del registro y destino al entrar (portada común salvo moderación); papelDe() decide menú, barra y panel, y puedeOrganizar() quién crea veladas e interclubs (entidad aprobada, entrenador, moderación).",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1485,6 +1505,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/google.mjs",
+    "purpose": "Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad, accesibilidad y, con el Google simulado, la vuelta completa (crear, entrar, vincular, proteger, creador).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/google-falso.mjs",
+    "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/menu.mjs",
     "purpose": "Recorre el menú por tipo de cuenta (visitante, aficionado, moderación), destinos, foco con teclado y accesibilidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1632,6 +1662,11 @@
   {
     "path": "tests/unit/mapa.test.ts",
     "purpose": "Pruebas unitarias de los cálculos del mapa: centros de provincia, distancias, textos y ubicación aproximada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/google.test.ts",
+    "purpose": "Pruebas unitarias de entrar con Google: viaje, dirección de autorización con PKCE, validación del id_token y decisión de cuenta.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1788,6 +1823,11 @@
     "path": "prisma/migrations/20261013220000_past_event_authorization/migration.sql",
     "purpose": "Añade estados para veladas pasadas pendientes de autorización o rechazadas por moderación, sin reescribir eventos existentes.",
     "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261014120000_entrar_con_google/migration.sql",
+    "purpose": "Migración: identificador de la cuenta de Google vinculada (User.googleSub, único).",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "src/lib/bouts/status.ts",

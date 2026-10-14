@@ -396,3 +396,24 @@ Petición del fundador: «es importante llevar un buen manejo de versiones para 
 - **Datos:** `AppError.firstVersion` y `AppError.version` (migración `20261013200000_version_en_fallos`, aditiva y opcional). `registrarFallo` las rellena.
 - **Proceso:** `CHANGELOG.md` + `scripts/version.mjs` (`subir`, `comprobar`, `etiquetas`). El CI comprueba en cada PR que la versión sube respecto a la rama de destino. Al fusionar en la rama de la demo, con todas las pruebas en verde, el trabajo `etiquetar` (el único con `contents: write`) crea `vX.Y.Z`, y también las etiquetas históricas que falten (0.1.0 a 0.8.0, reconstruidas de los PR).
 - **Riesgo conocido:** dos PR abiertos a la vez con la misma versión. El segundo en fusionarse debe volver a subirla; el CI lo detecta porque compara con la rama de destino.
+
+## Entrar con Google — 14 de octubre de 2026
+
+Ficha [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md) y guía del fundador [`GOOGLE.md`](GOOGLE.md).
+
+- **Flujo:**
+  1. `GET /api/auth/google` crea `state`, `nonce` y el verificador PKCE, y los guarda en una cookie httpOnly (`google_oidc`, ruta `/api/auth/google`, 10 minutos).
+  2. Redirige a `accounts.google.com`.
+  3. `GET /api/auth/google/callback` comprueba `state`, canjea el código en `oauth2.googleapis.com/token` (con `code_verifier`) y valida el `id_token`: `iss`, `aud`, `exp`, `nonce` y `email_verified`. La firma no se comprueba porque llega directo por TLS (OIDC Core §3.1.3.7).
+- **Datos:** `User.googleSub` (único y opcional). La cuenta creada con Google tiene una contraseña aleatoria que nadie conoce.
+- **Seguridad:**
+  - protección contra el «secuestro previo» al vincular;
+  - límite de 30 intentos por hora y por IP;
+  - creador con segundo paso;
+  - historial `CUENTA_GOOGLE_VINCULADA` y `CUENTA_GOOGLE_CREADA`;
+  - fallos registrados con `registrarFallo`.
+- **Configuración:** `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`. Sin ellas, `googleDisponible()` es falso y no aparece ningún botón.
+- **Pendiente:**
+  - Apple antes de las tiendas;
+  - desvincular desde «Mi cuenta»;
+  - añadir la dirección de vuelta de producción cuando exista.

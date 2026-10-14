@@ -40,6 +40,7 @@ export default function Privacy() {
         <li><strong>Las personas moderadoras</strong> ven tu correo electrónico solo para revisar avisos y solicitudes.</li>
         <li><strong>El proveedor de envío de correo</strong> recibe tu dirección y el mensaje solo para poder entregártelo.</li>
         <li><strong>El mapa de gimnasios</strong> se descarga del servicio libre OpenFreeMap (datos de OpenStreetMap), que solo recibe qué zona del mapa estás mirando. Si pulsas «Usar mi ubicación», tu ubicación se usa en tu propio dispositivo para ordenar los gimnasios por distancia: no se envía a Lona ni se guarda. Para colocar los gimnasios en el mapa se busca su dirección pública en OpenStreetMap.</li>
+        <li><strong>Si entras con Google</strong>, Google nos confirma tu nombre, tu correo electrónico y un identificador de tu cuenta de Google. No recibimos tu contraseña de Google ni pedimos acceso a nada más (ni contactos, ni correo, ni archivos). Usamos esos datos solo para crear tu cuenta o entrar en ella.</li>
         <li>Si otra persona registra un combate contra ti y no tienes ficha, se crea una ficha provisional que solo enseña tu nombre y la inicial de tu apellido, y no sale en listados ni en buscadores hasta que la reclames o el combate se confirme.</li>
       </ul>
 
