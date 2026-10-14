@@ -83,3 +83,44 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 
 ## Contenido inicial
 La versión real empieza **vacía**: sin peleadores, veladas ni cuentas de ejemplo. El arranque de la demo (`scripts/arranque-demo.sh`) es el único que carga datos ficticios. Los gimnasios reales se cargarán con el importador del bloque D (OpenStreetMap, con su atribución ODbL).
+
+## Cuentas y dónde está cada cosa
+
+| Servicio | Cuenta | Para qué |
+|---|---|---|
+| Infomaniak | Del fundador | Dominio lonaclub.es, zona DNS y buzón info@lonaclub.es |
+| Google Cloud | Proyecto `lona-511613`, creado con la cuenta de Gmail del fundador; info@lonaclub.es como propietaria | Cloud Run, Secret Manager, «Entrar con Google» (cliente OAuth «Lona web») |
+| Neon | info@lonaclub.es | Bases `lona-produccion` y `lona-demo` |
+| Cloudflare | info@lonaclub.es | R2: copias y vídeos |
+| Resend | info@lonaclub.es | Correos de la aplicación |
+| Sentry | info@lonaclub.es | Errores |
+| Render | Del fundador | Solo la demo (`ring-espana-demo`) |
+| GitHub | `romppao/MiClaude` (privado) | Código, CI, despliegue y copias |
+
+Las claves de cada servicio solo están en Secret Manager o en los secretos de GitHub. Si una se pierde, se crea otra nueva en el servicio y se sustituye; nunca se recupera la antigua.
+
+## DNS de lonaclub.es (estado esperado)
+
+| Nombre | Tipo | Valor | Para qué | ¿Se puede tocar? |
+|---|---|---|---|---|
+| `lonaclub.es` | MX | `mta-gw.infomaniak.ch` | Recibir correo en info@ | **No** |
+| `lonaclub.es` | TXT | `v=spf1 include:spf.infomaniak.ch -all` | SPF del buzón | Solo para añadir un `include` si un proveedor lo exige |
+| `_dmarc.lonaclub.es` | TXT | `v=DMARC1; p=reject;` | Protección contra suplantación | **No** |
+| `lonaclub.es` y `www` | A, AAAA o CNAME | Los que indique Cloud Run (hoy, hasta que se haga el cambio: A `216.24.57.1` y CNAME `ring-espana-demo.onrender.com`, que es la demo) | Web | Sí, al cambiar de alojamiento |
+| Registros de Resend | TXT/MX en su subdominio | Los que indique Resend | Envío de correos | Sí, si se cambia de proveedor |
+
+## Problemas conocidos y cómo resolverlos
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| Render o Google dicen que no pueden verificar el dominio recién comprado | Red.es tarda horas en publicar un `.es` nuevo (lonaclub.es: comprado a las 14:20 y publicado a las 16:10 del 14-10-2026). Se comprueba con `nslookup -type=NS lonaclub.es a.nic.es` | Esperar y volver a pulsar «Verify». No es un fallo de los registros |
+| No llega un correo a info@lonaclub.es justo después de activar el dominio | Los servidores de correo recuerdan durante un tiempo que el dominio «no existía» (la zona `.es` permite guardarlo hasta 24 h) | Esperar y pedir que se reenvíe. Mirar también el spam en https://mail.infomaniak.com |
+| «Continuar con Google» da `redirect_uri_mismatch` | `APP_URL` no coincide letra por letra con la URI autorizada en Google | `APP_URL=https://lonaclub.es`, sin barra final. URI autorizada: `https://lonaclub.es/api/auth/google/callback` |
+| El botón «Continuar con Google» no aparece | Falta `GOOGLE_CLIENT_ID` o `GOOGLE_CLIENT_SECRET` en el servicio | Añadirlas y volver a desplegar |
+| Una clave secreta se ha visto en un chat, una captura o un documento | Exposición | Crear una clave nueva en el servicio, sustituirla, desactivar la antigua y borrar la captura |
+| El despliegue falla en «Aplicar las migraciones» | Migración incompatible o falta `PROD_DATABASE_URL_DIRECT` | No se ha publicado nada: corregir y repetir. Si la base quedó a medias, restaurar (sección anterior) |
+| `/salud` da 503 | La app no llega a la base: Neon dormido que no despierta, contraseña cambiada o cuota agotada | Panel de Neon: estado y consumo de CU-h. Comprobar `DATABASE_URL` en Secret Manager |
+| La web va lenta la primera vez | Arranque en frío de Cloud Run y de Neon tras un rato sin uso (segundos) | Normal en el plan gratuito. Si molesta, mínimo 1 instancia, con coste y con decisión del fundador |
+| GitHub Actions deja de ejecutarse a final de mes | Se agotaron los 2.000 minutos gratuitos (repositorio privado) | `mantener-demo-despierta.yml` gasta unos 4.300 al mes: sustituirlo por UptimeRobot o Better Stack |
+| La demo deja de funcionar a primeros de noviembre de 2026 | Caducó la base gratuita de Render (creada el 2-10-2026) | Pasar la demo a Neon (`lona-demo`) antes del 1-11. Render la borra 14 días después de caducar |
+| Algo extraño en la app | — | Moderación → «Fallos de la aplicación» (`/moderacion/fallos`) y, cuando esté, Sentry |
