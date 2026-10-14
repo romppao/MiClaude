@@ -777,6 +777,7 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 /* Autoría del mapa: fondo opaco del tema (la librería pone un blanco translúcido que, sobre el mapa oscuro, no da contraste). */
 .mapa-lienzo .maplibregl-ctrl.maplibregl-ctrl-attrib{background:var(--sheet);color:var(--text);font-size:13px}
 .mapa-lienzo .maplibregl-ctrl-attrib a{color:var(--text);text-decoration:underline}
+.mapa-lienzo .maplibregl-ctrl-attrib-button{width:44px;height:44px;min-height:44px;background-position:center}
 .mapa-cercanos{margin-top:20px}
 .lista-gimnasios{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:10px}
 @media (min-width:760px){.lista-gimnasios{grid-template-columns:repeat(2,minmax(0,1fr))}}
