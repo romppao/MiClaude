@@ -402,3 +402,7 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 
 ### Revisión antes de la oficial (Codex, 14 oct)
 Partes 3–5 de T-016 revisadas y documentadas en tareas/T-016-hallazgos-codex.md. Hallazgos pendientes de decisión y corrección en PR separado. No se declara lista la oficial.
+
+
+### Propuesta estratégica de entrada al mercado (Codex, 14 oct, solicitada por el fundador)
+Estado: propuesta abierta, no decisión aprobada. [RFC-001](decisiones/RFC-001-foco-producto-lona.md) recomienda validar coordinación de veladas amateur locales antes de ampliar la comunidad. Incluye otras tres vías y criterios de repetición/pago. No cambia los estados aprobados de F/G/D/H.

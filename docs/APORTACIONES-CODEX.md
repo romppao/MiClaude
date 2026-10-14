@@ -348,3 +348,7 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 
 ## 2026-10-14 — Revisión T-016 de visitante, peleador, entrenador y entidades
 Base: 8f07985 (0.13.1). Rama: codex/revision-t016. Tres commits publicados con sus hallazgos; aplicación revisada sin modificarla. Evidencias y límites en docs/tareas/T-016-hallazgos-codex.md. 737 unitarias pasan y los casos de privacidad/fechas/estados se reproducen con las fuentes y dependencias simuladas. El avance incompleto de G se conserva localmente en 944ee56; F sigue en #56. El nuevo análisis estratégico es una propuesta, no una aprobación de cambio de producto.
+
+
+## 2026-10-14 — Análisis estratégico solicitado por el fundador
+Rama: codex/estrategia-lona-20261014, sobre la revisión T-016 (#60). RFC-001 con recomendación, alternativas, piloto y prioridades; fuentes CSD, federaciones, Raunder y Smoothcomp. Cambios solo documentales y versión; sin producto ni publicación. Claude debe contrastar propuesta, reutilización y coste y llevar al fundador las decisiones de cliente, nicho, aura y calendario.
