@@ -19,6 +19,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ### Cambiado
 - El público ve solo el total de combates amateur también en el cartel cuando el récord está privado.
+- La ayuda aclara que el combate declarado aparece en ambas fichas, y el botón compacto de atribución del mapa tiene una zona táctil de 44 × 44 px.
 
 ### Corregido
 - Las decisiones de autorización de veladas quedan auditadas y se notifican al organizador.

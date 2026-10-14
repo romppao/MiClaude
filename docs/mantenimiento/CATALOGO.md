@@ -369,7 +369,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/browser/experiencia.mjs](../../tests/browser/experiencia.mjs) | Verificación local de efectos, layout, accesibilidad, conexión y cadencia. | [Contexto](../EXPERIENCIA-ELITE.md) | — | `e62680a00d6051b3` |
 | [tests/browser/optimizacion.mjs](../../tests/browser/optimizacion.mjs) | Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos. | [Contexto](../OPTIMIZACION-PANTALLAS.md) | — | `76023afd404e8ee1` |
 | [tests/browser/responsive.mjs](../../tests/browser/responsive.mjs) | Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad. | [Contexto](../REVISION-RESPONSIVE-20261013.md) | — | `b49b3b718acae186` |
-| [tests/documentacion/catalogo.test.mjs](../../tests/documentacion/catalogo.test.mjs) | Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar. | [Contexto](README.md) | — | `1dfb4065f99c5d2f` |
+| [tests/documentacion/catalogo.test.mjs](../../tests/documentacion/catalogo.test.mjs) | Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar. | [Contexto](README.md) | — | `ff080db8dc7e3bc8` |
 
 ## Pruebas de navegador
 
@@ -391,7 +391,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/fallos.mjs](../../tests/e2e/fallos.mjs) | Prueba de navegador del registro de fallos, el panel de moderación por bloques y el selector de tema claro u oscuro. | [Contexto](OPERACION.md) | — | `b2f69116a4ad7ab5` |
 | [tests/e2e/fase2a.mjs](../../tests/e2e/fase2a.mjs) | Recorre la fase 2a con datos reales: portada y noticias, portada por disciplina, menú por tipo, interclub del entrenador, subida y descarga de fotos y vídeos, avisos y moderación. | [Contexto](OPERACION.md) | — | `bfa8afefd814d417` |
 | [tests/e2e/filtros.mjs](../../tests/e2e/filtros.mjs) | Comprueba aplicar/quitar filtros, mantener consulta y paginación en listados. | [Contexto](OPERACION.md) | — | `c1ea42763f3e455a` |
-| [tests/e2e/flujo.mjs](../../tests/e2e/flujo.mjs) | Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles. | [Contexto](OPERACION.md) | — | `993ac98984a77cf9` |
+| [tests/e2e/flujo.mjs](../../tests/e2e/flujo.mjs) | Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles. | [Contexto](OPERACION.md) | — | `cd432e20ead1eec2` |
 | [tests/e2e/hidratacion.mjs](../../tests/e2e/hidratacion.mjs) | Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias. | [Contexto](OPERACION.md) | — | `86f76d71e0742ba2` |
 | [tests/e2e/inclusiva.mjs](../../tests/e2e/inclusiva.mjs) | Comprueba cobertura y vocabulario públicos sin priorizar una ciudad o disciplina. | [Contexto](OPERACION.md) | — | `4964624d83f00a9c` |
 | [tests/e2e/inscripciones.mjs](../../tests/e2e/inscripciones.mjs) | Prueba de navegador de la inscripción: abrir, pedir participar, filtrar, ordenar, CSV, aceptar en bloque, rechazar, retirarse y cartel. | [Contexto](OPERACION.md) | — | `9092d2716c799e4f` |

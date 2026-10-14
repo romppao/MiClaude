@@ -1769,6 +1769,8 @@ Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autoriz
 
 CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba para que se vea el récord actualizado. CI #514 encontró que el botón compacto de atribución de MapLibre medía 24 × 44 px en móvil. Se amplió su zona táctil a 44 × 44 px, manteniendo el icono centrado. La CI debe volver a comprobar E2E y accesibilidad; el ajuste es de tamaño de interacción y no cambia el diseño de la página.
 
+## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
+
 **Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
 **Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.
 **Qué se hizo:** seis responsabilidades ausentes del catálogo, normalización Windows/Linux y exclusión de next-env.d.ts con sus pruebas; catálogo/mapa regenerados; URL y seen() en rival; mostrar() y tres seen() en ficha; registro de versiones y token --acc-ink corregidos. Las reglas de datos/permisos de la aplicación se conservan.
