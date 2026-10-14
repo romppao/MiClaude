@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PROVINCES } from "../../lib/common/labels";
 import Pestanas from "../components/Pestanas";
 import { papelDe, puedeOrganizar } from "../../lib/accounts/landing";
 import { requireUser } from "../../lib/accounts/auth";
@@ -51,6 +52,7 @@ export default async function Account() {
               <input type="checkbox" name="notifyEmails" defaultChecked={user.notifyEmails} style={{ width: 24, height: 24 }} />
               <span>Quiero recibir avisos por correo electrónico cuando un peleador que sigo tenga un nuevo combate.</span>
             </label>
+            <label className="field"><span>Provincia (opcional)</span><select name="province" defaultValue={user.province ?? ""}><option value="">Sin elegir</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
             <button>Guardar cambios</button>
           </form>
         </> },

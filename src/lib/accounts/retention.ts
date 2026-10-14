@@ -11,6 +11,7 @@ export const DIAS_CUENTA_SIN_VERIFICAR = 30;
  */
 export async function purgeStale(now: Date = new Date()) {
   await db.$transaction([
+    db.fighter.updateMany({ where: { availableToFight: true, availableSince: { lte: new Date(now.getTime() - 60 * DIA) } }, data: { availableToFight: false, currentWeightKg: null } }),
     db.session.deleteMany({ where: { expiresAt: { lt: now } } }),
     db.emailToken.deleteMany({ where: { expiresAt: { lt: now } } }),
     db.rateHit.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 2 * DIA) } } }),

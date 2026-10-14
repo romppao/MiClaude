@@ -18,7 +18,8 @@ import DisciplineFields from "../components/DisciplineFields";
 import MetodoSegunDisciplina from "../components/MetodoSegunDisciplina";
 import RecordCards from "../components/RecordCards";
 import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } from "../actions/bouts";
-import { createMyFighter, manageHighlight, publishHighlight, removeDiscipline, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
+import { setAvailability, createMyFighter, manageHighlight, publishHighlight, removeDiscipline, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
+import { isAvailable } from "../../lib/fighters/availability";
 import { readOnboarding } from "../../lib/accounts/onboarding";
 import { HIGHLIGHT_KIND_LABEL, HIGHLIGHT_TITLE_MAX, orderHighlights } from "../../lib/fighters/highlights";
 import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
@@ -142,6 +143,16 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
       </div>
       {toConfirm.length > 0 && <p className="notice"><span aria-hidden="true">ℹ </span>Tu rival ha declarado {toConfirm.length === 1 ? "un combate" : `${toConfirm.length} combates`} contigo. <a href="#por-confirmar">Revisarlos</a></p>}
       {/* Secciones agrupadas que se cambian deslizando a los lados (petición del fundador, 8 de octubre de 2026: menos desplazamiento hacia abajo). */}
+      <section id="disponibilidad" className="tarjeta" aria-label="Disponible para pelear">
+        <h2>Disponible para pelear</h2>
+        {me.availableSince && !isAvailable(me) && <p>Tu disponibilidad ha caducado después de 60 días. Puedes renovarla.</p>}
+        <form action={setAvailability}>
+          <label className="chip"><input type="checkbox" name="available" defaultChecked={isAvailable(me)} />Estoy disponible para pelear</label>
+          <label className="field"><span>Peso actual en kg (opcional)</span><input name="weight" type="number" min="20" max="300" step="0.01" defaultValue={isAvailable(me) ? me.currentWeightKg?.toString() ?? "" : ""} /></label>
+          <p className="hint">Se muestra solo mientras estás disponible. Caduca a los 60 días; guardar con la opción activada renueva el plazo.</p>
+          <button>Guardar disponibilidad</button>
+        </form>
+      </section>
       <Pestanas etiqueta="Secciones de mi ficha" pestanas={[
         { id: "pestana-perfil", titulo: "Mi perfil", contenido: <>
           <p><Link className="btn" href={`/perfiles/peleador/${me.id}/editar`}>Editar foto y banner</Link></p>

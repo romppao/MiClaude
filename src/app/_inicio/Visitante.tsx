@@ -1,4 +1,6 @@
 import Link from "next/link";
+import CercaDeTi from "./CercaDeTi";
+import { PROVINCES } from "../../lib/common/labels";
 import { AccionesPrincipales } from "./comun";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { ultimasNoticias } from "../../lib/news/feed";
@@ -17,9 +19,9 @@ export type DatosVisitante = {
 };
 
 /** Inicio del visitante sin cuenta (diseño v3, «homeVisit»): portada pública, actualidad de todos los deportes, disciplinas, veladas y una invitación por tipo de cuenta. */
-export default async function InicioVisitante() {
+export default async function InicioVisitante({ provincia }: { provincia?: string } = {}) {
   const [veladas, conAura, noticias] = await Promise.all([proximasVeladas(6), peleadoresConAura(6), ultimasNoticias({ max: 5 })]);
-  return <VistaVisitante veladas={veladas} conAura={conAura} noticias={noticias} />;
+  return <><VistaVisitante veladas={veladas} conAura={conAura} noticias={noticias} /><CercaDeTi province={provincia && PROVINCES.includes(provincia) ? provincia : "Madrid"} semana /></>;
 }
 
 /** Vista compartida por la portada pública y la revisión de desarrollo; conserva contenido y destinos. */

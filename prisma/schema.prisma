@@ -296,6 +296,9 @@ model Highlight {
 }
 
 model Fighter {
+  availableToFight Boolean @default(false)
+  currentWeightKg Decimal? @db.Decimal(5, 2)
+  availableSince DateTime?
   id                String               @id @default(cuid())
   slug              String               @unique
   firstName         String
@@ -334,6 +337,7 @@ model Fighter {
   proposalsReceived FightProposal[]      @relation("PropuestasRecibidas")
   registrations     EventRegistration[]
 
+  @@index([availableToFight, availableSince])
   @@index([gymId])
   @@index([trainerId])
   @@index([listed])
@@ -348,6 +352,7 @@ enum EventKind {
 }
 
 model Event {
+  attendances EventAttendance[]
   id                String              @id @default(cuid())
   slug              String              @unique
   name              String
@@ -426,6 +431,8 @@ model Bout {
 }
 
 model User {
+  province String?
+  attendances EventAttendance[]
   id                    String                 @id @default(cuid())
   email                 String                 @unique
   name                  String
@@ -831,4 +838,15 @@ model NewsItem {
 
   @@unique([sourceId, guid])
   @@index([hiddenAt, publishedAt])
+}
+
+// Asistencia privada: solo se publica el recuento. Baja de cuenta y borrado de velada eliminan la marca.
+model EventAttendance {
+  userId String
+  eventId String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  @@id([userId, eventId])
+  @@index([eventId])
 }

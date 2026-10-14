@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PROVINCES } from "../../../lib/common/labels";
 import { requireUser } from "../../../lib/accounts/auth";
 import { db } from "../../../lib/common/db";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/common/disciplines";
@@ -35,6 +36,7 @@ export default async function Intereses({ searchParams }: { searchParams: Promis
           <div className="chips">{DISCIPLINE_ORDER.map((d) => <label key={d} className="chip"><input type="checkbox" name="disciplina" value={d} defaultChecked={user.interests.includes(d)} />{DISCIPLINE_LABEL[d]}</label>)}</div>
         </fieldset>}
         {segundoPaso && user.interests.map((d) => <input key={d} type="hidden" name="disciplina" value={d} />)}
+        {segundoPaso ? <input type="hidden" name="province" value={user.province ?? ""} /> : <label className="field"><span>Provincia (opcional)</span><select name="province" defaultValue={user.province ?? ""}><option value="">Sin elegir</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>}
         <input type="hidden" name="paso" value={segundoPaso ? "terminar" : "disciplinas"} />
         {segundoPaso && sugeridos.length > 0 && (
           <fieldset style={{ border: 0, padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
