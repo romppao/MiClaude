@@ -43,7 +43,7 @@ await ent.p.goto(B + "/mi-panel");
 const accEnt = await acciones(ent.p);
 check("el panel del entrenador empieza por crear velada e interclub, publicar clase y solicitudes", ["Publicar una clase", "Crear una velada o interclub", "Mis clases", "Mis veladas"].every((t, i) => accEnt[i] === t));
 await ent.p.locator(".accion-principal", { hasText: "Crear una velada o interclub" }).click(); await ent.p.waitForURL("**/organizador**");
-await ent.p.locator("input[name=kind][value=INTERCLUB]").check();
+await ent.p.locator("label.chip", { has: ent.p.locator('input[name=kind][value=INTERCLUB]') }).click();
 check("«Crear un interclub» lleva al formulario con «Interclub» ya elegido", await ent.p.locator("input[name=kind][value=INTERCLUB]").isChecked());
 await visita.goto(B + `/clases?q=${encodeURIComponent(`Clinch ${rnd}`)}`);
 check("«Buscar clases» encuentra la clase con su entrenador y precio", await seen(visita.locator("main section", { hasText: `Clinch ${rnd}` }).getByText("30 €")));
