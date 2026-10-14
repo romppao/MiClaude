@@ -28,7 +28,8 @@ check("la portada permite cambiar provincia", await seen(fan.p.getByRole("headin
 await db.user.update({ where: { id: user.id }, data: { role: "FIGHTER" } });
 const fighter = await db.fighter.create({ data: { userId: user.id, firstName: "Disponible", lastName: `Agenda${rnd}`, slug: `disponible-agenda-${rnd}`, disciplines: { create: { discipline: "BOXEO", level: "AMATEUR" } } } });
 await fan.p.goto(B + "/mi-ficha");
-await fan.p.locator('#disponibilidad input[name=available]').check();
+await fan.p.locator('#disponibilidad label.chip').click();
+check("el titular activa voluntariamente la disponibilidad", await fan.p.locator('#disponibilidad input[name=available]').isChecked());
 await fan.p.locator('#disponibilidad input[name=weight]').fill("70.25");
 await fan.p.getByRole("button", { name: "Guardar disponibilidad", exact: true }).click();
 await fan.p.locator('.notice-ok').waitFor();
