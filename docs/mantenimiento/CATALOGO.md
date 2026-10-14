@@ -278,7 +278,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
 | [src/app/_inicio/Aficionado.tsx](../../src/app/_inicio/Aficionado.tsx) | Panel del aficionado en /mi-panel (también moderación y entidad pendiente): combates de seguidos, aura, resultados y sus disciplinas. | [Contexto](MODULOS.md) | `InicioAficionado` | `5495be8037765b65` |
-| [src/app/_inicio/CercaDeTi.tsx](../../src/app/_inicio/CercaDeTi.tsx) | Actividad por provincia: veladas de los siguientes siete días y ofertas de clases para solicitar, sin inventar un horario confirmado. | [Contexto](FLUJOS.md) | `CercaDeTi` | `2c69aff37fe936ec` |
+| [src/app/_inicio/CercaDeTi.tsx](../../src/app/_inicio/CercaDeTi.tsx) | Actividad por provincia: veladas de los siguientes siete días y ofertas de clases para solicitar, sin inventar un horario confirmado. | [Contexto](FLUJOS.md) | `CercaDeTi` | `3c2ae835bc1c95a2` |
 | [src/app/_inicio/CompletaPerfil.tsx](../../src/app/_inicio/CompletaPerfil.tsx) | Progreso accesible del perfil calculado con campos existentes; desaparece al completar todos y enlaza los formularios pendientes. | [Contexto](MODULOS.md) | `CompletaPerfil` | `2386e1cde26d5f47` |
 | [src/app/_inicio/Entidad.tsx](../../src/app/_inicio/Entidad.tsx) | Panel de la entidad aprobada en /mi-panel con sus veladas, cifras y resultados pendientes del cartel. | [Contexto](MODULOS.md) | `InicioEntidad` | `202f434c1e6c9c4c` |
 | [src/app/_inicio/Entrenador.tsx](../../src/app/_inicio/Entrenador.tsx) | Panel del entrenador en /mi-panel: crear perfil con la intención guardada o gestionar clases, y sus veladas e interclubs. | [Contexto](MODULOS.md) | `InicioEntrenador` | `a2832a0864ab6ee5` |
