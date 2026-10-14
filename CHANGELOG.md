@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.1] — 2026-10-14
+
+PR de Claude: solo documentación.
+
+### Añadido
+- Ficha [T-016](docs/tareas/T-016-revision-previa-al-lanzamiento.md): revisión completa antes de montar la versión oficial, por partes, para que cualquier asistente la retome. El fundador decidió revisar la app antes de lanzar lonaclub.es y de publicar en Google.
+
 ## [0.13.0] — 2026-10-14
 
 PR de Claude: preparación de la versión real en lonaclub.es (ADR-005).
