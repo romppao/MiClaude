@@ -409,7 +409,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/servicios.mjs](../../tests/e2e/servicios.mjs) | Recorridos de servicios y propuestas; reproduce la ausencia de selección local, comprueba privacidad y compatibilidad de clubes, ambos tipos de reto y móvil en ambos temas. | [Contexto](OPERACION.md) | — | `281d8c85f905e3e6` |
 | [tests/e2e/trayectoria.mjs](../../tests/e2e/trayectoria.mjs) | Recorre títulos, revisión, respaldo acreditado y ránking histórico, incluyendo baja/privacidad. | [Contexto](OPERACION.md) | — | `945f665546d1c08d` |
 | [tests/e2e/usabilidad.mjs](../../tests/e2e/usabilidad.mjs) | Comprueba mensajes, estados vacíos, retorno y respuestas visibles de acciones; complementa revisión humana de comprensión. | [Contexto](OPERACION.md) | — | `2d8676934b0db220` |
-| [tests/e2e/veladas-pasadas.mjs](../../tests/e2e/veladas-pasadas.mjs) | Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo. | [Contexto](OPERACION.md) | — | `348fa0a003193046` |
+| [tests/e2e/veladas-pasadas.mjs](../../tests/e2e/veladas-pasadas.mjs) | Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo. | [Contexto](OPERACION.md) | — | `92405396d0fae413` |
 
 ## Pruebas unitarias
 
