@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.2] — 2026-10-14
+
+## [0.13.2] — 2026-10-14
+
+### Documentación
+- Revisión previa al lanzamiento de visitante, aficionado, peleador, entrenador, gimnasios y veladas: hallazgos, reproducciones y prioridades para decidir las correcciones. No cambia el funcionamiento de la aplicación.
+
+
 ## [0.13.1] — 2026-10-14
 
 PR de Claude: solo documentación.
