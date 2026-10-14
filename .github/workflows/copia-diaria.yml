@@ -1,0 +1,48 @@
+name: Copia diaria de la base real
+
+# Copia de seguridad de la versión real (ADR-005, docs/PRODUCCION.md, ficha T-012): cada noche se vuelca la base de Neon
+# con pg_dump y se guarda cifrada en tránsito en un cubo de Cloudflare R2 con jurisdicción UE. Se conservan 30 días
+# (regla de ciclo de vida del cubo). Neon gratis solo guarda 6 horas de historial: esta copia es la que de verdad protege.
+# Unos 2 minutos al día ≈ 60 minutos de Actions al mes.
+#
+# Secretos del repositorio: PROD_DATABASE_URL_DIRECT, BACKUP_R2_ACCOUNT_ID, BACKUP_R2_ACCESS_KEY_ID,
+# BACKUP_R2_SECRET_ACCESS_KEY, BACKUP_R2_BUCKET (clave de R2 con permiso SOLO sobre el cubo de copias).
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  copia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Instalar el cliente de PostgreSQL 18
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-18
+
+      - name: Volcar y subir a R2
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL_DIRECT }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          CUENTA: ${{ secrets.BACKUP_R2_ACCOUNT_ID }}
+          CUBO: ${{ secrets.BACKUP_R2_BUCKET }}
+        run: |
+          for v in DATABASE_URL AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY CUENTA CUBO; do
+            [ -n "${!v}" ] || { echo "::error::Falta el secreto de $v"; exit 1; }
+          done
+          ARCHIVO="lona-$(date -u +%Y-%m-%dT%H%M)Z.dump"
+          /usr/lib/postgresql/18/bin/pg_dump --format=custom --no-owner --no-privileges "$DATABASE_URL" -f "$ARCHIVO"
+          ls -lh "$ARCHIVO"
+          # Cubo con jurisdicción UE: su dirección lleva «.eu.» (docs/PRODUCCION.md).
+          aws s3 cp "$ARCHIVO" "s3://$CUBO/diarias/$ARCHIVO" --endpoint-url "https://$CUENTA.eu.r2.cloudflarestorage.com"
+          echo "Copia guardada: diarias/$ARCHIVO"

@@ -351,3 +351,6 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 **Cambios:** componentes TeToca/CompletaPerfil; cuatro paneles; selección de disciplina; alta de intereses en dos pasos; aura sin JavaScript; respuestas del entrenador y editor de su gimnasio; menú y tarjetas de seguidos.
 **Comprobaciones:** tipos, 741 unitarias, build inicial. CI pendiente; sin PostgreSQL/Docker disponible localmente. No se ha desplegado.
 **Relevo:** revisar PR F antes de integrar; continuar G y H en PR separados. H4 conserva revisión de modelo previa a interfaz.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.

@@ -54,6 +54,7 @@ Las instrucciones del fundador están en [`CLAUDE.md`](../CLAUDE.md) y **valen p
 9. **Cero enlaces o botones muertos:** lo que parece pulsable lleva a un sitio o hace algo visible. `tests/e2e/enlaces.mjs` lo comprueba para todos los papeles; si no hay destino, se quita el enlace.
 10. **Prioridad vigente (6 de octubre de 2026): el móvil primero.** Casi todo el uso será desde iOS y Android y el objetivo es publicar la aplicación en App Store y Google Play. Toda pantalla se diseña y se prueba primero en móvil (360–430 px de ancho, táctil); el escritorio es secundario. Ver [`MOVIL.md`](MOVIL.md).
 11. **Versiones (13 de octubre de 2026):** todo PR apunta sus cambios en `CHANGELOG.md` y sube la versión con `node scripts/version.mjs subir parche|menor|mayor`; el CI lo exige. Ver [`VERSIONES.md`](VERSIONES.md).
+12. **Relevo entre sesiones (14 de octubre de 2026):** no os podéis hablar, así que el repositorio es el canal. Al empezar, `git fetch`, `node scripts/estado.mjs` y leer [`ESTADO.md`](ESTADO.md); antes de un trabajo grande, `node scripts/estado.mjs reservar <asistente> "<tema>"` (rama vacía subida: no gasta CI y las demás sesiones la ven); si ya hay un trabajo igual, no se empieza y se avisa al fundador; al terminar, se actualiza la propia fila de `ESTADO.md` en el mismo PR. Lo que el fundador diga en una conversación y afecte a otros se apunta ahí con sus palabras.
 
 ## Cómo trabaja Claude (para que los demás sepan qué esperar)
 

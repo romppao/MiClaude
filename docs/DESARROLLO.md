@@ -25,6 +25,7 @@ Para quien vaya a tocar el código (una persona nueva en el equipo, o Claude Cod
 | Registrar o revisar un **fallo de la aplicación** | `src/lib/common/fallos.ts` (`registrarFallo`), `src/instrumentation.ts` (`onRequestError`) y `/moderacion/fallos`. Receta y reglas en [`MODERACION.md`](MODERACION.md) §3 |
 | Cambiar el **mapa** (proveedor, marcadores, búsqueda de direcciones) | `src/app/components/MapaGimnasios.tsx`, `src/lib/common/mapa.ts` (cálculos), `src/lib/common/geo.ts` (coordenadas) y la CSP de `next.config.mjs`. Ver [`ARQUITECTURA.md`](ARQUITECTURA.md) («Mapa de gimnasios») |
 | Cambiar un **color** (tema claro u oscuro) | Los tokens de `src/app/globals.css` §2: se cambian **en los dos temas** y nunca se escribe un color fijo en un componente. Ver [`DISENO.md`](DISENO.md) («Tema claro y oscuro») |
+| Saber **cómo está todo**, qué hay en curso y **reservar** un trabajo | [`ESTADO.md`](ESTADO.md) y `node scripts/estado.mjs` (con `reservar <asistente> "<tema>"`) |
 | Publicar una **versión** o volver a una anterior | `CHANGELOG.md`, `node scripts/version.mjs subir parche\|menor\|mayor` y las etiquetas `vX.Y.Z`. Ver [`VERSIONES.md`](VERSIONES.md) |
 | Entender por qué existe una **regla extraña** | `docs/LECCIONES.md` (errores pasados y la regla que dejaron) y `docs/AUDITORIA.md` |
 

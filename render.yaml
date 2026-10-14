@@ -1,13 +1,8 @@
-# Despliegue de la DEMOSTRACIÓN en Render (render.com): una web con datos ficticios y su base de datos PostgreSQL.
+# Despliegue de la DEMOSTRACIÓN en Render (render.com): una web con datos ficticios.
+# Desde el 14-10-2026 su base está en Neon (proyecto «lona-demo», Fráncfort), porque la base gratuita de Render caduca
+# a los 30 días. La dirección de la base se pega en el panel de Render (DATABASE_URL), nunca aquí. Detalle en docs/PRODUCCION.md.
 # Uso: en Render, «New» → «Blueprint» → elegir este repositorio. Detalle en docs/DEMO.md.
 # No es la configuración de producción: aquí DEMO_MODE=si y los correos se escriben en el registro en vez de enviarse.
-databases:
-  - name: ring-demo-db
-    databaseName: ring
-    user: ring
-    plan: free
-    region: frankfurt
-
 services:
   - type: web
     name: ring-espana-demo
@@ -21,10 +16,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
+      # Conexión «pooled» del proyecto Neon «lona-demo».
       - key: DATABASE_URL
-        fromDatabase:
-          name: ring-demo-db
-          property: connectionString
+        sync: false
       - key: DEMO_MODE
         value: "si"
       - key: MAIL_TRANSPORT
