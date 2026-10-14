@@ -2,7 +2,7 @@ import { datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 const futura = enDias(120); // la aplicación no admite veladas a más de un año vista
 
 // 1) email sin verificar: no puede dar aura ni crear ficha
@@ -123,7 +123,9 @@ await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
 check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "Has dado aura" }).count() === 1);
 await fan.reload();
 await fan.getByRole("link", { name: "Récord", exact: true }).click();
-check("el aura queda registrada y suma en la ficha", await fan.locator("body").innerText().then((t) => t.includes("1 aura recibida") && t.includes("Increíble, alucinante")));
+check("el aura queda registrada y suma en la ficha", (await fan.locator("body").innerText()).includes("1 aura recibida"));
+await fan.getByRole("link", { name: "Público", exact: true }).click();
+check("el comentario del aura se muestra en la sección pública", (await fan.locator("body").innerText()).includes("Increíble, alucinante"));
 await fan.getByRole("button", { name: /Quitar mi aura del combate de Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
 check("se puede quitar el aura", await fan.locator("text=0 auras recibidas").waitFor({ timeout: 8000 }).then(() => true, () => false));
@@ -249,7 +251,7 @@ await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor()
 await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 // Para comprobar la vista pública con récord habilitado, madura ambos combates declarados de prueba.
-execSync(`psql "${process.env.DATABASE_URL}" -c "update \"Bout\" b set \"createdAt\" = now() - interval '25 hours' from \"Event\" e where b.\"eventId\" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')"`);
+execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')`]);
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
 const privada = await anon.locator("body").innerText();
