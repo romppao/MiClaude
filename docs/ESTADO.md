@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
 | Claude Code (portátil) | **Versión real en Cloud Run**, separada de la demo, en `lonaclub.es` (ADR-005, aprobada por el fundador el 14-10-2026), y **base de la demo pasada a Neon** | `claude/produccion-cloud-run`, **#57**, versión 0.13.0 | **en pausa por decisión del fundador** hasta que dé por buena la app (ver sección 4). Hecho: base real `lona-produccion` vacía, base de la demo `lona-demo` en uso, Google en info@lonaclub.es (`lona-511614`). Hay que fusionar #57 pronto: su `render.yaml` evita que Render vuelva a enlazar la base que caduca |
-| Codex | Revisión T-016 partes 3–5 terminada; análisis estratégico solicitado por el fundador en preparación | `codex/revision-t016`; F #56 y G local conservados | Hallazgos publicados por partes; sin corregir producto. Propuesta de enfoque pendiente de Claude y fundador |
+| Codex | T-016 partes 3–5 terminadas (#60); propuesta de estrategia RFC-001 para Claude y fundador | `codex/estrategia-lona-20261014`; F #56 y G local conservados | Propuesta abierta: piloto de veladas amateur locales. Ningún cambio de producto o calendario aprobado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

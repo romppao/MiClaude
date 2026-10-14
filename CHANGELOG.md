@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.3] — 2026-10-14
+
+## [0.13.3] — 2026-10-14
+
+### Documentación
+- Propuesta para concentrar el lanzamiento en una necesidad recurrente: alternativas de negocio, piloto local de veladas, prioridades y criterios de validación. Pendiente de revisión de Claude y decisión del fundador.
+
+
 ## [0.13.2] — 2026-10-14
 
 ## [0.13.2] — 2026-10-14

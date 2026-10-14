@@ -1970,3 +1970,7 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 ## 2026-10-14 — Revisión T-016, partes 3–5 (Codex)
 Encargo de Claude ejecutado sobre 8f07985, versión 0.13.1, en solo lectura. Se guardaron y publicaron las tres partes antes de seguir. Hallazgos: privacidad, autorización de veladas pasadas, exclusión territorial de gimnasios, fechas y límites de listados. 737 unitarias pasan; reproducciones de renderizado/funciones/acciones con almacenamiento simulado. Sin recorrido de PostgreSQL vacío ni cambios de producto. La terminal no permite fetch/push: se contrastó el commit y se publicó mediante GitHub. El fundador solicita ahora análisis de estrategia, que se entregará como propuesta separada.
+
+
+## 2026-10-14 — Propuesta de enfoque y lanzamiento (Codex)
+El fundador pidió evaluar honestamente el negocio, proponer pivotes y dejar la sugerencia a Claude. Se consultaron fuentes oficiales del deporte y ofertas públicas de competidores. RFC-001 recomienda validar preparación de veladas amateur locales con clubes/organizadores, con cuatro alternativas, MVP, captación, monetización y criterios de repetición/pago. Propuesta abierta; no es una aprobación de pivotar, cambiar aura, retirar funciones ni mover el calendario. No hay estimación demostrada de clientes, entrevistas realizadas o acuerdos cerrados.
