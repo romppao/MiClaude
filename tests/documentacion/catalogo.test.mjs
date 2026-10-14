@@ -52,7 +52,7 @@ test("incluye código, pruebas, scripts, migraciones y configuración; excluye d
   const { root, write } = fixture(t);
   const included = ["tests/unit/regla.test.ts", "scripts/herramienta.sh", "prisma/migrations/001/migration.sql", ".github/workflows/ci.yml", "package-lock.json", ".env.example", "config-nueva.mjs", "Dockerfile"];
   for (const p of included) write(p, "fuente\n");
-  for (const p of [".env", ".env.local.json", "public/foto.webp", "node_modules/tercero.js", "docs/ingreso/aislado/reto.ts"]) write(p, "excluido\n");
+  for (const p of [".env", ".env.local.json", "next-env.d.ts", "public/foto.webp", "node_modules/tercero.js", "docs/ingreso/aislado/reto.ts"]) write(p, "excluido\n");
   assert.deepEqual(maintainedFiles(root), [...included, "src/lib/common/regla.ts"].sort());
 });
 
@@ -71,7 +71,7 @@ test("una salida editada a mano también se rechaza", (t) => {
   const { root, write } = fixture(t);
   run(root);
   write(OUTPUT, "Catálogo manipulado\n");
-  assert.throws(() => run(root, true), /Catálogo desactualizado/);
+  assert.throws(() => run(root, true), /Catálogo desactualizado en línea 1: actual "Catálogo manipulado"/);
 });
 
 test("salida estable, ordenada y con enlaces escapados para rutas dinámicas", (t) => {
@@ -82,6 +82,22 @@ test("salida estable, ordenada y con enlaces escapados para rutas dinámicas", (
   assert.equal(output, renderCatalog(root, [...all].reverse()));
   assert.match(output, /%5Bslug%5D/);
   assert.match(output, /Ficha \\\| pública/);
+});
+
+test("comprobar acepta finales de línea Windows y Unix", (t) => {
+  const { root } = fixture(t);
+  run(root);
+  const output = path.join(root, OUTPUT);
+  const unix = fs.readFileSync(output, "utf8");
+  fs.writeFileSync(output, unix.replace(/\n/g, "\r\n"));
+  assert.equal(run(root, true), 1);
+});
+
+test("la huella del código no depende de los finales de línea del checkout", (t) => {
+  const { root, write, entries } = fixture(t);
+  const unix = renderCatalog(root, entries);
+  write("src/lib/common/regla.ts", "export function regla() { return true; }\r\n");
+  assert.equal(renderCatalog(root, entries), unix);
 });
 
 test("una fuente con enlace simbólico requiere resolver el alcance explícitamente", (t) => {

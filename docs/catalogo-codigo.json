@@ -1768,5 +1768,35 @@
     "path": "tests/browser/responsive.mjs",
     "purpose": "Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad.",
     "guide": "docs/REVISION-RESPONSIVE-20261013.md"
+  },
+  {
+    "path": "src/lib/bouts/status.ts",
+    "purpose": "Determina la etiqueta pública del combate según fecha, resultado y estado de verificación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/events/cartel-search.ts",
+    "purpose": "Normaliza y limita la búsqueda GET de peleadores para el cartel por nombre, alias, gimnasio y ciudad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/news/deduplicate.ts",
+    "purpose": "Fusiona titulares repetidos por URL o título normalizados sin perder disciplinas ni imágenes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/news/diagnosis.ts",
+    "purpose": "Traduce fallos observados en fuentes RSS a diagnósticos prudentes para moderación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/hidratacion.mjs",
+    "purpose": "Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/afilar-revision.test.ts",
+    "purpose": "Prueba deduplicación, diagnósticos, filtros del cartel y estados de combates programados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

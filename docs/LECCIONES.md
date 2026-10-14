@@ -403,3 +403,13 @@ Confirmar el SHA live del despliegue antes de corregir una copia local. Que git 
 | Un error de hidratación (#418) apareció una vez en la demo y no se pudo reproducir | Causa sin confirmar; sospecha de HTML y JavaScript de versiones distintas durante un despliegue, y de fechas sin zona horaria fija | No dar por resuelto lo que no se reproduce: dejar la prueba que lo vigila (`hidratacion.mjs`) y anotar que la causa sigue sin confirmar |
 | Fuentes de noticias que fallan sin avisar (403, HTML en vez de RSS) | Nadie comprobaba lo que devolvía cada fuente | Comprobar cada fuente con una petición real antes de añadirla y mostrar su diagnóstico en moderación |
 
+
+## 14 de octubre de 2026 — Correcciones de CI #48/#50/#51 (Codex)
+
+- El catálogo de #48 omitía seis archivos de A; regenerar no inventa responsabilidades. Incorporar las entradas reales, portar la normalización de LF y la exclusión de next-env.d.ts de B, y comprobar después de cada rebase. El mapa de A también conservaba exports anteriores.
+- La prueba de rival leía .count() durante una transición. La traza identifica un único POST, una petición RSC y HistoryUpdater de Next.js haciendo pushState y replaceState; se observa también con los componentes anteriores a A3 y en la base 0.9.0. Dos framenavigated no prueban dos envíos ni dos cargas de documento. Esperar URL y botón visible sin quitar datos de la dirección.
+- innerText no sirve para comprobar datos en una pestaña cerrada. Abrir Datos mediante mostrar(), esperar a alias, altura y presentación por separado y conservar las tres exigencias.
+- A3 leía form.method, ocultado por un input con name=method. Leer el atributo del formulario; trasladar a A la corrección ya existente en B.
+- A7 retiró el nivel por defecto, pero algunos datos de prueba seguían suponiéndolo. Elegirlo explícitamente; al registrar, conservar el nivel ya elegido (incluido profesional), salvo que el caso pida otro.
+- 0.9.1 no se publicó: sus notas pertenecen a 0.10.0. Para un fondo var(--acc), el texto usa var(--acc-ink), no --inv-ink (blanco en tema claro).
+- Los comandos de red requieren el permiso de red del entorno; el fallo inicial del proxy se resolvió así, sin modificar la política ni quitar el proxy. npm necesitó una caché dentro de /workspace, porque su ubicación por defecto no era escribible. No cambiar dependencias para arreglar permisos del entorno.

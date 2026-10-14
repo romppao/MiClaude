@@ -1761,3 +1761,12 @@ Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos t
 
 **Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
 
+
+## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
+
+**Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
+**Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.
+**Qué se hizo:** seis responsabilidades ausentes del catálogo, normalización Windows/Linux y exclusión de next-env.d.ts con sus pruebas; catálogo/mapa regenerados; URL y seen() en rival; mostrar() y tres seen() en ficha; registro de versiones y token --acc-ink corregidos. Las reglas de datos/permisos de la aplicación se conservan.
+**Qué ejecuté:** clon real por Git, reproducción de la comprobación defectuosa en Chromium/producción, captura de POST/RSC/history en #51, control con componentes pre-A3 y base 0.9.0; catálogo 360 archivos, 11/11 documentales, mapa 74 pantallas/82 acciones/29 tablas, tipos, 697 unitarias y build de A. Los recorridos completos y CI de los heads finales se registran en el traspaso/PR tras completarse, no se presuponen aprobados aquí.
+**Qué salió mal:** acceso de red y caché de npm sin permisos adecuados al primer intento; primeras pasadas de flujo/cuenta encontraron datos sin nivel obligatorio, corregidos sin saltar comprobaciones. El diagnóstico sobre 0.9.0 usa solo su tramo de navegación; sus expectativas de 24 horas (de B) no se consideran una prueba válida de esa versión.
+**Estado y próximos pasos:** borrador, sin integración/despliegue. Rebasar B/C, regenerar ambos documentos generados y comprobar cada CI. Sparring depende de la descripción que falta.

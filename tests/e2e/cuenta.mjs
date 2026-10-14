@@ -1,6 +1,6 @@
 // Pruebas de privacidad y cuenta: corregir datos, contraseña, descarga de datos, baja de avisos, eliminación de la cuenta.
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { mostrar, datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, esperarEnlace, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext()).newPage();
@@ -26,8 +26,12 @@ await ana.p.click("details button:has-text('Guardar los datos de mi ficha')");
 check("los datos de la ficha se guardan y se confirma", await seen(bueno(ana.p, "datos de tu ficha se han guardado")));
 const anon = await nueva();
 await anon.goto(B + `/peleadores/ana-corregida${rnd}`);
-const pub = await cuerpo(anon);
-check("la ficha pública muestra los datos corregidos", pub.includes("La Rápida") && pub.includes("171 cm") && pub.includes(`Presentación de prueba ${rnd}`));
+const alturaPublica = anon.locator("main").getByText("171 cm", { exact: true });
+await mostrar(alturaPublica); // Abre Datos y espera a que su panel termine de deslizarse.
+const aliasVisible = await seen(anon.locator("main .apodo", { hasText: "La Rápida" }));
+const alturaVisible = await seen(alturaPublica);
+const presentacionVisible = await seen(anon.locator("main").getByText(`Presentación de prueba ${rnd}`, { exact: true }));
+check("la ficha pública muestra los datos corregidos", aliasVisible && alturaVisible && presentacionVisible);
 
 // 2) Mi cuenta: nombre y avisos por correo
 await ana.p.goto(B + "/mi-cuenta");

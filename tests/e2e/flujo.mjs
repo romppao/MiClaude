@@ -26,8 +26,8 @@ check("y cada candidata dice cuántos combates tienes contra ella y cuándo se c
 await btn(pepe, "Es esta persona");
 await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
 check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
-await pepe.waitForURL(/\/mi-ficha\/rival\?/, { timeout: 10000 }).catch(() => {}); // en el CI la página se guardó a medio cargar: se espera a la dirección final
-check("y se vuelve a la pantalla de elegir rival con los datos escritos, no a un formulario vacío", pepe.url().includes("/mi-ficha/rival") && pepe.url().includes("eventName=Velada+Claim+Test") && await pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" }).count() === 1);
+await pepe.waitForURL((u) => u.pathname === "/mi-ficha/rival" && u.searchParams.get("problema") === "combate_duplicado", { timeout: 10000 });
+check("y se vuelve a la pantalla de elegir rival con los datos escritos, no a un formulario vacío", pepe.url().includes("/mi-ficha/rival") && pepe.url().includes("eventName=Velada+Claim+Test") && await seen(pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" })));
 await pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" }).click();
 await pepe.waitForURL("**/mi-ficha?*");
 check("«Corregir los datos del combate» devuelve el formulario relleno para cambiar lo que haga falta", await pepe.inputValue("[name=eventName]") === "Velada Claim Test" && await pepe.inputValue("[name=oppLast]") === `Dos${rnd}` && await pepe.inputValue("[name=date]") === "2026-08-01");

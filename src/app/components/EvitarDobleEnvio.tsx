@@ -15,7 +15,7 @@ export default function EvitarDobleEnvio() {
     const pendientes = new Map<HTMLFormElement, () => void>();
     const alEnviar = (e: Event) => {
       const form = e.target;
-      if (!(form instanceof HTMLFormElement) || e.defaultPrevented || form.method.toLowerCase() === "get") return;
+      if (!(form instanceof HTMLFormElement) || e.defaultPrevented || (form.getAttribute("method") ?? "get").toLowerCase() === "get") return;
       if (pendientes.has(form)) { e.preventDefault(); e.stopImmediatePropagation(); return; }
       const bloqueados: (HTMLButtonElement | HTMLInputElement)[] = [];
       const aviso = document.createElement("p");
