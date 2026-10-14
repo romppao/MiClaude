@@ -92,7 +92,8 @@ jobs:
         run: node tests/browser/optimizacion.mjs
       - name: Arrancar servidor
         run: |
-          npx next start -p 3111 > "$MAIL_LOG" 2>&1 &
+          # Con el Google simulado (tests/e2e/google-falso.mjs): solo cambia la respuesta del endpoint de tokens de Google.
+          node --import ./tests/e2e/google-falso.mjs node_modules/next/dist/bin/next start -p 3111 > "$MAIL_LOG" 2>&1 &
           npx wait-on -t 60000 http://localhost:3111/registro
       - name: Prueba de extremo a extremo
         # Si algo falla, scripts/avisos-ci.mjs lo resume en un aviso del CI (fallos y texto de las páginas guardadas), legible desde el PR.

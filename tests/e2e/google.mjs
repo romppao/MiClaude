@@ -1,7 +1,8 @@
 // Entrar y registrarse con Google (T-015). El servidor de pruebas tiene claves de mentira (GOOGLE_CLIENT_ID/SECRET en el CI):
 // se comprueba todo lo que ocurre en Lona sin hablar con Google (no hay salida a internet). La prueba real, en la demo (docs/GOOGLE.md).
 import AxeBuilder from "@axe-core/playwright";
-import { B, browser, check, seen, terminarDiagnosticos } from "./ayudas.mjs";
+import { execSync } from "node:child_process";
+import { B, rnd, browser, check, seen, terminarDiagnosticos } from "./ayudas.mjs";
 
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const p = await ctx.newPage();
@@ -48,6 +49,46 @@ for (const tema of ["light", "dark"]) {
 }
 const alto = await boton.evaluate((el) => el.getBoundingClientRect().height);
 check("el botón de Google tiene zona táctil de al menos 44 px", alto >= 44);
+
+// 6) Vuelta completa con el Google simulado del servidor de pruebas (tests/e2e/google-falso.mjs, cargado en el CI al arrancar).
+const consulta = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "${q.replace(/"/g, '\\"')}"`).toString().trim();
+const CLIENTE = destino.searchParams.get("client_id");
+async function viaje(inicio, datos) {
+  const c = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pg = await c.newPage();
+  const ida = await pg.request.get(B + inicio, { maxRedirects: 0 });
+  const g = new URL(ida.headers()["location"]);
+  const code = Buffer.from(JSON.stringify({ iss: "https://accounts.google.com", aud: CLIENTE, exp: Math.floor(Date.now() / 1000) + 600, nonce: g.searchParams.get("nonce"), email_verified: true, ...datos })).toString("base64url");
+  await pg.goto(`${B}/api/auth/google/callback?state=${g.searchParams.get("state")}&code=${code}`);
+  return { c, pg };
+}
+const prueba = await viaje("/api/auth/google?modo=entrar", { sub: `sondeo-${rnd}`, email: `sondeo${rnd}@gmail.com`, name: "Sondeo" });
+if (await prueba.pg.locator("[role=alert]", { hasText: "Google no ha podido confirmar tu cuenta" }).count()) {
+  console.log("AVISO: el servidor no tiene el Google simulado (tests/e2e/google-falso.mjs): se omite la vuelta completa. En el CI sí se comprueba.");
+} else {
+  let v = await viaje("/api/auth/google?modo=registro&tipo=peleador", { sub: `g-${rnd}`, email: `nuevo${rnd}@gmail.com`, name: "Nuevo Google" });
+  check("cuenta nueva con Google: va al paso de su ficha y lo explica", v.pg.url().includes("/registro/ficha") && await seen(v.pg.locator("[role=status]", { hasText: "Tu cuenta se ha creado con Google" })));
+  check("cuenta nueva con Google: correo confirmado, tipo peleador y vinculada", consulta(`select role||'|'||("emailVerifiedAt" is not null)||'|'||"googleSub" from "User" where email='nuevo${rnd}@gmail.com'`) === `FIGHTER|true|g-${rnd}`);
+  check("cuenta nueva con Google: queda con la sesión iniciada", (await v.c.cookies()).some((x) => x.name === "session"));
+  v = await viaje("/api/auth/google?modo=entrar", { sub: `g-${rnd}`, email: `nuevo${rnd}@gmail.com`, name: "Nuevo Google" });
+  check("al volver con Google entra en la misma cuenta, sin crear otra", consulta(`select count(*) from "User" where email='nuevo${rnd}@gmail.com'`) === "1" && (await v.c.cookies()).some((x) => x.name === "session"));
+  consulta(`insert into "User"(id,email,name,role,"passwordHash","emailVerifiedAt") values ('ex-${rnd}','existe${rnd}@gmail.com','Existe','FAN','x',now())`);
+  v = await viaje("/api/auth/google?modo=entrar", { sub: `ge-${rnd}`, email: `existe${rnd}@gmail.com`, name: "Existe" });
+  check("una cuenta con ese correo ya confirmado se vincula, sin tocar su contraseña", await seen(v.pg.locator("[role=status]", { hasText: "Has entrado con Google" })) && consulta(`select "googleSub"||'|'||"passwordHash" from "User" where id='ex-${rnd}'`) === `ge-${rnd}|x`);
+  consulta(`insert into "User"(id,email,name,role,"passwordHash") values ('sc-${rnd}','sinconf${rnd}@gmail.com','Sin','FAN','puesta-por-otro')`);
+  await viaje("/api/auth/google?modo=entrar", { sub: `gs-${rnd}`, email: `sinconf${rnd}@gmail.com`, name: "Sin" });
+  check("si esa cuenta no había confirmado el correo, su contraseña anterior deja de valer", consulta(`select ("passwordHash"<>'puesta-por-otro')||'|'||("emailVerifiedAt" is not null)||'|'||"googleSub" from "User" where id='sc-${rnd}'`) === `true|true|gs-${rnd}`);
+  v = await viaje("/api/auth/google?modo=entrar", { sub: `gx-${rnd}`, email: `x${rnd}@gmail.com`, email_verified: false });
+  check("un correo sin confirmar en Google se rechaza con un mensaje claro y sin crear cuenta", await seen(v.pg.locator("[role=alert]", { hasText: "no tiene el correo electrónico confirmado" })) && consulta(`select count(*) from "User" where email='x${rnd}@gmail.com'`) === "0");
+  const creador = (process.env.CREADOR_CORREO ?? "").toLowerCase();
+  if (creador) {
+    consulta(`insert into "User"(id,email,name,role,"passwordHash","emailVerifiedAt") values ('cr-${rnd}','${creador}','Creador','FAN','x',now()) on conflict (email) do nothing`);
+    v = await viaje("/api/auth/google?modo=entrar", { sub: consulta(`select coalesce("googleSub",'gc-${rnd}') from "User" where email='${creador}'`), email: creador, name: "Creador" });
+    check("el creador que entra con Google pasa por el segundo paso", v.pg.url().includes("/entrar/segundo-paso"));
+    const mod = await v.pg.request.get(B + "/moderacion", { maxRedirects: 0 });
+    check("y sin el segundo paso no puede entrar en moderación", mod.status() >= 300 && mod.status() < 400);
+  }
+}
 
 await terminarDiagnosticos();
 await browser.close();

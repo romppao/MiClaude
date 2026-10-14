@@ -440,3 +440,11 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | El comentario del aura «desaparecía»: el campo tenía el texto y el envío llegaba vacío. En #50 se quitó la comprobación en vez de arreglarla | La prueba escribía en el primer `input[name=comment]` de la página. Con cuatro combates (y el orden cambiado por A5), ese campo pertenecía a otro combate | Cuando hay un formulario por elemento, la prueba localiza el formulario por su botón (`form.filter({ has: botón })`) y escribe dentro. Y una comprobación que falla se investiga hasta su causa; nunca se quita sin sustituirla |
 | La prueba de veladas pasadas «demostraba» que la búsqueda revelaba una velada pendiente | La página de búsqueda repite lo buscado en «No hemos encontrado nada para «…»», y la prueba buscaba el texto en toda la página. Además, usaba un nombre que no era único | Para comprobar que algo no aparece, se busca su enlace o su tarjeta, no su texto en toda la página. Y los nombres de prueba llevan siempre `rnd` |
 | El tema elegido se perdía a veces al recargar, y solo fallaba en el CI | El atributo `data-tema` lo ponía un guion antes de pintar; si React volvía a pintar `<html>` (hidratación), desaparecía y nada lo reponía | Lo que un guion pone fuera de React sobre `<html>` o `<body>` necesita un componente que lo mantenga. Y una prueba que falla a ratos en distintos sitios con el mismo síntoma es un fallo real hasta que se demuestre lo contrario |
+
+## 14 de octubre de 2026 — Entrar con Google (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Se probó varias veces contra un servidor viejo sin saberlo | El reinicio no mató el proceso `next-server` (el PID guardado era el del envoltorio) y el nuevo falló con `EADDRINUSE` en silencio | Tras arrancar el servidor, comprobar en su registro que no hay `EADDRINUSE` y que responde la versión esperada (`/salud`). Para pararlo, matar `next-server` por su PID, no con `pkill -f` (se mata a sí mismo si el patrón está en la orden) |
+| El Google simulado no se cargaba con `NODE_OPTIONS` | El servidor de Next no lo hereda | Cargar ayudas de prueba con `node --import <archivo> node_modules/next/dist/bin/next start` |
+

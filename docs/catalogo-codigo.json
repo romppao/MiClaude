@@ -1506,7 +1506,12 @@
   },
   {
     "path": "tests/e2e/google.mjs",
-    "purpose": "Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad y accesibilidad.",
+    "purpose": "Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad, accesibilidad y, con el Google simulado, la vuelta completa (crear, entrar, vincular, proteger, creador).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/google-falso.mjs",
+    "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

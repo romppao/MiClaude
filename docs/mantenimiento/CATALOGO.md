@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **376 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **377 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -122,7 +122,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `a96a101f9495f4ee` |
 | [.github/dependabot.yml](../../.github/dependabot.yml) | Configura actualización de dependencias y evita saltos mayores automáticos no planificados. | [Contexto](OPERACION.md) | — | `d3d8f5a4368d2cb4` |
 | [.github/workflows/actualizar-noticias.yml](../../.github/workflows/actualizar-noticias.yml) | Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza. | [Contexto](OPERACION.md) | — | `2d00f5ce8fad3416` |
-| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `e00799963344a85c` |
+| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `4c4b63a29de6543a` |
 | [.github/workflows/mantener-demo-despierta.yml](../../.github/workflows/mantener-demo-despierta.yml) | Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub. | [Contexto](OPERACION.md) | — | `cf2d035c95075c65` |
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `06cfb5f10f2bb270` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7c2af99ba83c7572` |
@@ -398,7 +398,8 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/fase2a.mjs](../../tests/e2e/fase2a.mjs) | Recorre la fase 2a con datos reales: portada y noticias, portada por disciplina, menú por tipo, interclub del entrenador, subida y descarga de fotos y vídeos, avisos y moderación. | [Contexto](OPERACION.md) | — | `bfa8afefd814d417` |
 | [tests/e2e/filtros.mjs](../../tests/e2e/filtros.mjs) | Comprueba aplicar/quitar filtros, mantener consulta y paginación en listados. | [Contexto](OPERACION.md) | — | `c1ea42763f3e455a` |
 | [tests/e2e/flujo.mjs](../../tests/e2e/flujo.mjs) | Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles. | [Contexto](OPERACION.md) | — | `ae3ddc935a264635` |
-| [tests/e2e/google.mjs](../../tests/e2e/google.mjs) | Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad y accesibilidad. | [Contexto](OPERACION.md) | — | `ce6ae11d6cc4624f` |
+| [tests/e2e/google-falso.mjs](../../tests/e2e/google-falso.mjs) | Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI. | [Contexto](OPERACION.md) | — | `254736b8f28e6475` |
+| [tests/e2e/google.mjs](../../tests/e2e/google.mjs) | Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad, accesibilidad y, con el Google simulado, la vuelta completa (crear, entrar, vincular, proteger, creador). | [Contexto](OPERACION.md) | — | `f2055e958d8f60f5` |
 | [tests/e2e/hidratacion.mjs](../../tests/e2e/hidratacion.mjs) | Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias. | [Contexto](OPERACION.md) | — | `86f76d71e0742ba2` |
 | [tests/e2e/inclusiva.mjs](../../tests/e2e/inclusiva.mjs) | Comprueba cobertura y vocabulario públicos sin priorizar una ciudad o disciplina. | [Contexto](OPERACION.md) | — | `4964624d83f00a9c` |
 | [tests/e2e/inscripciones.mjs](../../tests/e2e/inscripciones.mjs) | Prueba de navegador de la inscripción: abrir, pedir participar, filtrar, ordenar, CSV, aceptar en bloque, rechazar, retirarse y cartel. | [Contexto](OPERACION.md) | — | `9092d2716c799e4f` |

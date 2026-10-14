@@ -2,7 +2,7 @@
 
 > **Petición del fundador, 14 de octubre de 2026:** «que se pudiera registrar la gente mediante Google […] La parte de Apple lo dejaremos aplazado para cuando lo lancemos. Pero por lo menos la de Google que ya esté».
 >
-> Estado: **en curso (Claude)**. Si Claude se queda sin créditos, la continúa Codex con esta ficha. Antes de seguir, comprueba en GitHub qué está ya hecho: rama `claude/entrar-con-google` y su PR.
+> Estado: **hecha (Claude, 14 de octubre de 2026)**; falta que el fundador ponga las claves y se compruebe en la demo. Si Claude se queda sin créditos, la continúa Codex con esta ficha. Antes de seguir, comprueba en GitHub qué está ya hecho: rama `claude/entrar-con-google` y su PR.
 
 ## Qué tiene que poder hacer una persona
 

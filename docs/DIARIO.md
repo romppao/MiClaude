@@ -1871,4 +1871,20 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - Desde la sesión no se pueden abrir las páginas de Google para desarrolladores (sin resolución DNS). Las condiciones de uso se comprobaron con la búsqueda web, citando las páginas oficiales de ayuda.
 - No se puede probar el viaje real a Google hasta que el fundador ponga las claves.
 
-**Estado y próximos pasos:** PR en borrador, apilado sobre #53. Después: el fundador crea las credenciales y Claude lo comprueba en la demo.
+- **Pausa pedida por el fundador:** «no empieces las nuevas cosas que te he dicho sin antes haber validado, corregido todo lo anterior». Google se apartó hasta publicar y comprobar la 0.11.3, y se retomó después.
+- **Vuelta completa comprobada con un Google simulado** (`tests/e2e/google-falso.mjs`, cargado con `node --import` solo en el servidor de pruebas). Casos:
+  - cuenta nueva (peleador, correo confirmado, sesión iniciada);
+  - volver a entrar sin crear otra;
+  - vincular una cuenta con el correo confirmado sin tocar su contraseña;
+  - proteger la que no lo tenía;
+  - rechazar un correo sin confirmar en Google;
+  - creador con segundo paso.
+
+  `google.mjs`: 25 de 25. Capturas en el móvil, en claro y oscuro, revisadas.
+- **Contratiempos de la comprobación local:**
+  - `NODE_OPTIONS` no llega al servidor de Next, así que el simulador se carga con `node --import` directamente.
+  - Un servidor anterior seguía ocupando el puerto (`EADDRINUSE`) y se estuvo probando contra él sin saberlo.
+  - Dos veces `pkill -f` se mató a sí mismo, porque su propio texto contenía el patrón.
+  - Las vueltas fallidas confirmaron que el error se registra y que la persona ve un mensaje claro.
+
+**Estado y próximos pasos:** batería completa en marcha; después, PR y CI. El fundador crea las credenciales (`docs/GOOGLE.md`) y Claude lo comprueba en la demo.
