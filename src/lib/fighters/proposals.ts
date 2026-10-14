@@ -1,3 +1,4 @@
+import { esDiaReal } from "../common/dates";
 import type { Discipline, ProposalKind, ProposalStatus } from "@prisma/client";
 import { isDiscipline } from "../common/disciplines";
 
@@ -33,7 +34,7 @@ export function parseProposal(input: ProposalInput): ProposalParsed {
   let day: Date | null = null;
   if (input.day) {
     const limite = new Date(Date.parse(`${input.today}T00:00:00Z`) + PROPOSAL_DAYS_AHEAD * 864e5).toISOString().slice(0, 10);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(input.day) || Number.isNaN(Date.parse(`${input.day}T00:00:00Z`)) || input.day < input.today || input.day > limite) return { ok: false, problema: "propuesta_dia" };
+    if (!esDiaReal(input.day) || input.day < input.today || input.day > limite) return { ok: false, problema: "propuesta_dia" };
     day = new Date(`${input.day}T00:00:00Z`);
   }
   const place = limpio(input.place);

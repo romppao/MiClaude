@@ -7,6 +7,11 @@ import { safeHttpUrl } from "../common/url";
  */
 export const PIE_MAX = 120;
 export const MAX_MEDIOS_POR_DIA = 20;
+/**
+ * Las fotos se guardan, de momento, dentro de la base de datos, y el plan gratuito de Neon da 1 GB (T-016, parte 2): como mucho 5 al día
+ * por persona hasta que pasen al almacén de archivos (T-004, parte 2). Los vídeos van al almacén o por enlace y no cuentan aquí.
+ */
+export const MAX_FOTOS_POR_DIA = 5;
 /** Cuántos días después de la velada se puede seguir compartiendo (las imágenes llegan días después). */
 export const DIAS_PARA_COMPARTIR = 120;
 
