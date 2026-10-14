@@ -368,3 +368,32 @@ Encargo aprobado: adaptar móvil/escritorio conservando el diseño. Banco dev im
 - **Entrar con Google** (fundador, 14 oct). Estado: **hecho** (0.12.0), a falta de que el fundador ponga las claves (`docs/GOOGLE.md`).
 - **Entrar con Apple** (fundador, 14 oct: «lo dejaremos aplazado para cuando lo lancemos»). Estado: aplazado. Apple lo exige en la App Store si la aplicación ofrece otros inicios de sesión de terceros, así que hay que hacerlo antes de publicar en tiendas.
 - **Desvincular Google desde «Mi cuenta»** (Claude, 14 oct). Estado: idea. Hoy se puede entrar también con contraseña eligiéndola en «¿Has olvidado tu contraseña?».
+
+### Paneles por tipo de usuario (14 de octubre de 2026, propuesta de Claude aprobada por el fundador)
+Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`, en la carpeta del ecosistema. El bloque E (fallos) lo hizo Claude en la 0.12.1.
+- **Común:**
+  - bloque «Te toca» con lo pendiente al principio de cada panel;
+  - como mucho 4 accesos rápidos;
+  - «Completa tu perfil»;
+  - campanita de avisos dentro de la app (sustituye la idea ⚪ «Avisos dentro de la app»).
+- **Aficionado:**
+  - dar aura desde el panel y a los dos peleadores;
+  - panel útil sin seguir a nadie;
+  - provincia opcional y «Cerca de ti»;
+  - «Voy a ir» con calendario (.ics) y «Mi agenda».
+- **Peleador:**
+  - «Disponible para pelear» con peso actual (60 días);
+  - récord por disciplina;
+  - vídeos del público como highlights;
+  - seguidores y comentarios de aura.
+- **Entrenador:**
+  - contestar solicitudes desde el panel;
+  - agenda «Esta semana»;
+  - «Mis peleadores»;
+  - cifras útiles.
+- **Entidad:**
+  - lista de preparación de cada velada;
+  - cifras de público;
+  - panel propio de federación.
+- **Visitante:** «Esta semana en Madrid» con cambio de provincia.
+- **Moderación:** bandeja única ordenada por urgencia.

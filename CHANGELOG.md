@@ -11,6 +11,15 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.12.1] — 2026-10-14
+
+PR de Claude (bloque E del encargo de paneles por tipo de usuario: fallos de la revisión del 14 de octubre).
+
+### Corregido
+- **«Peleadores que sigo»** ya no muestra combates de veladas pendientes de autorizar ni de veladas rechazadas. Sus «Últimos resultados» siguen la misma regla que el récord, el panel y el ránking: solo cuentan los combates autodeclarados cuando han pasado sus 24 horas.
+- **Panel de la promotora, federación o club:** la cifra «Por resultado» suma los combates sin resultado de **todas** sus veladas ya celebradas (antes solo miraba la última). El aviso enlaza cada velada pendiente, como mucho tres, y ofrece ver las demás.
+- **Panel de la entidad:** se quita la barra del cartel, que suponía seis combates por velada. Queda el número real de combates del cartel.
+
 ## [0.12.0] — 2026-10-14
 
 PR de Claude (entrar con Google, T-015).

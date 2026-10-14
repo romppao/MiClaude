@@ -1888,3 +1888,22 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
   - Las vueltas fallidas confirmaron que el error se registra y que la persona ve un mensaje claro.
 
 **Estado y próximos pasos:** batería completa en marcha; después, PR y CI. El fundador crea las credenciales (`docs/GOOGLE.md`) y Claude lo comprueba en la demo.
+
+## 2026-10-14 — Paneles por tipo de usuario: revisión y fallos del bloque E (Claude)
+
+**Qué se pidió:** el fundador pidió revisar el usuario aficionado y las funciones de su panel; después, propuestas para todos los tipos de cuenta. Aprobó todas («me han gustado todas tus propuestas») y pidió a Claude que corrigiera él mismo los fallos y dejara a Codex lo largo.
+
+**Qué se decidió y por qué:**
+- El encargo completo para Codex está en `docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md` (en la carpeta del ecosistema): F, pulido común; G, funciones para Madrid; H, después.
+- Claude hace el bloque E porque son tres arreglos pequeños y con riesgo para la confianza en los datos.
+
+**Qué se hizo:**
+- `src/lib/community/siguiendo.ts`: filtros de «Peleadores que sigo».
+- `src/lib/events/resultados-pendientes.ts`: recuento de resultados por poner de todas las veladas.
+- `Entidad.tsx` sin la barra de seis huecos.
+- Pruebas en `tests/unit/paneles-fallos.test.ts`.
+- Versión 0.12.1.
+
+**Qué salió mal:** la base de datos local (Docker) no estaba en marcha, así que las pruebas de navegador se dejan al CI. En local pasaron la comprobación de tipos, las 737 pruebas unitarias, el catálogo y el mapa.
+
+**Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.

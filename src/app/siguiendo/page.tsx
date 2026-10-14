@@ -7,6 +7,7 @@ import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
 import VerificationTag from "../components/VerificationTag";
 import { toggleFollow } from "../actions/community";
+import { filtrosSiguiendo } from "../../lib/community/siguiendo";
 
 export const metadata = { title: "Peleadores que sigo" };
 export const dynamic = "force-dynamic";
@@ -16,16 +17,19 @@ export default async function Following() {
   const ahora = new Date();
   const follows = await db.follow.findMany({ where: { userId: user.id, fighter: { hiddenAt: null } }, include: { fighter: { include: { gym: true } } }, orderBy: { createdAt: "desc" } });
   const ids = follows.map((f) => f.fighterId);
-  const bouts = ids.length
-    ? await db.bout.findMany({
-        where: { verification: { not: "DISPUTED" }, event: { status: { not: "CANCELLED" } }, OR: [{ fighterAId: { in: ids } }, { fighterBId: { in: ids } }] },
-        include: { event: true, fighterA: true, fighterB: true }, orderBy: { event: { date: "asc" } },
-      })
-    : [];
+  // Solo veladas públicas: ni canceladas, ni pendientes de autorizar, ni rechazadas. Los resultados, solo los que cuentan en el récord.
+  const filtros = filtrosSiguiendo(ids, ahora);
+  const incluir = { event: true, fighterA: true, fighterB: true } as const;
+  const [proximos, celebrados] = ids.length
+    ? await Promise.all([
+        db.bout.findMany({ where: filtros.proximos, include: incluir, orderBy: { event: { date: "asc" } } }),
+        db.bout.findMany({ where: filtros.resultados, include: incluir, orderBy: [{ event: { date: "desc" } }, { id: "asc" }], take: 30 }),
+      ])
+    : [[], []];
   // «Próximos» y «celebrados» usan la misma definición de «ya celebrada» que el resto de la aplicación (día de Madrid).
-  const upcoming = bouts.filter((b) => !eventDayReached(b.event.date) || !b.result);
-  const recent = bouts.filter((b) => eventDayReached(b.event.date) && b.result).slice(-10).reverse();
-  const fights = (b: (typeof bouts)[number]) => `${publicFighterName(b.fighterA)} contra ${publicFighterName(b.fighterB)}`;
+  const upcoming = proximos.filter((b) => !eventDayReached(b.event.date) || !b.result);
+  const recent = celebrados.filter((b) => eventDayReached(b.event.date)).slice(0, 10);
+  const fights = (b: (typeof proximos)[number]) => `${publicFighterName(b.fighterA)} contra ${publicFighterName(b.fighterB)}`;
 
   return (
     <>

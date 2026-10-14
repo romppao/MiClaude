@@ -1883,5 +1883,20 @@
     "path": "src/lib/common/record-eligibility.ts",
     "purpose": "Filtro compartido de base de datos para r?cord, aura y r?nking; incluye declaraciones tras 24 horas y excluye disputas y veladas no autorizadas.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/siguiendo.ts",
+    "purpose": "Filtros de «Peleadores que sigo»: próximos combates solo de veladas públicas y resultados que cuentan en el récord.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/resultados-pendientes.ts",
+    "purpose": "Veladas celebradas de un organizador con combates sin resultado y resumen para su panel (total, tres visibles y resto).",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "tests/unit/paneles-fallos.test.ts",
+    "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

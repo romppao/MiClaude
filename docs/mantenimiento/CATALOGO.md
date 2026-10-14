@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **377 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **380 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -126,8 +126,8 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.github/workflows/mantener-demo-despierta.yml](../../.github/workflows/mantener-demo-despierta.yml) | Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub. | [Contexto](OPERACION.md) | — | `cf2d035c95075c65` |
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `06cfb5f10f2bb270` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7c2af99ba83c7572` |
-| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `6fca0fab84ae2903` |
-| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `97ede1d3863d5607` |
+| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `d3a807a358eb2cb8` |
+| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `d793e776fa87154e` |
 | [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `bffb3e96a472f47f` |
 | [shaders.config.ts](../../shaders.config.ts) | Configura la integración React de shaders sin activar autenticación ni telemetría. | [Contexto](../EXPERIENCIA-ELITE.md) | — | `6d3e8e67ca01ad01` |
 | [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `33b5f6dc12863e5b` |
@@ -201,6 +201,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 |---|---|---|---|---|
 | [src/lib/community/notify.ts](../../src/lib/community/notify.ts) | Avisa a seguidores/rival/autor y responde a solicitudes; agrupa destinatarios, respeta preferencias y tolera fallos de envío individuales. | [Contexto](MODULOS.md) | `notifyFollowersOfBout`, `notifyDecision`, `notifyRivalOfBout`, `notifyAuthorOfAnswer` | `757f7a3cce3383eb` |
 | [src/lib/community/reports.ts](../../src/lib/community/reports.ts) | Catálogo de motivos de aviso por entidad (incluida MEDIA con «Aparezco yo y no doy permiso») y límite diario; separa solicitud de revisión de decisión moderadora. | [Contexto](MODULOS.md) | `REPORT_REASONS`, `REPORT_ENTITIES`, `ReportEntity`, `REASONS_BY_ENTITY`, `MAX_REPORTS_PER_DAY` | `1ca28070c03ad704` |
+| [src/lib/community/siguiendo.ts](../../src/lib/community/siguiendo.ts) | Filtros de «Peleadores que sigo»: próximos combates solo de veladas públicas y resultados que cuentan en el récord. | [Contexto](MODULOS.md) | `VELADAS_NO_PUBLICAS`, `filtrosSiguiendo` | `6e313107e1801315` |
 
 ## Lógica: events
 
@@ -210,6 +211,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/lib/events/pairing.ts](../../src/lib/events/pairing.ts) | Distancia y parecido entre dos peleadores (experiencia, peso, victorias, aura, edad) y avisos de diferencias para la ayuda a emparejar. | [Contexto](MODULOS.md) | `DatosPareja`, `Parecido`, `PARECIDO_LABEL`, `porcentajeVictorias`, `OpcionesPareja`, `comparaEdad`, `distancia`, `parecido`, `avisos`, `Sugerencia`, `sugerirRivales` | `a7e079cbd7a8173e` |
 | [src/lib/events/registrations-data.ts](../../src/lib/events/registrations-data.ts) | Carga las solicitudes de un evento con el récord de cada peleador en la disciplina y el nivel del evento, su aura y su edad. | [Contexto](MODULOS.md) | `SolicitudConDatos`, `solicitudesDeEvento` | `cec32f95070601f5` |
 | [src/lib/events/registrations.ts](../../src/lib/events/registrations.ts) | Reglas de la inscripción: cuándo está abierta, validación del peso y los requisitos, filtros y órdenes de la lista del organizador. | [Contexto](MODULOS.md) | `REG_STATUS_LABEL`, `REG_MESSAGE_MAX`, `REG_REPLY_MAX`, `REG_NOTE_MAX`, `PESO_MIN`, `PESO_MAX`, `REGISTRATIONS_PER_DAY`, `inscripcionAbierta`, `RegistrationParsed`, `parseRegistration`, `parseRegistrationSettings`, `FilaInscripcion`, `ORDENES`, `Orden`, `parseOrden`, `FiltrosInscripcion`, `numeroDeFiltro`, `filtrarYOrdenar`, `puedeResponderInscripcion`, `puedeRetirarInscripcion`, `ESTADOS_LISTA`, `EstadoLista`, `parseEstadoLista`, `PLAZAS_MAX`, `CATEGORIAS_MAX`, `Plaza`, `claveCategoria`, `parsePlazas`, `Ocupacion`, `ocupacion`, `enListaDeEspera`, `categoriaSinSitio` | `088957cc4c68e4ec` |
+| [src/lib/events/resultados-pendientes.ts](../../src/lib/events/resultados-pendientes.ts) | Veladas celebradas de un organizador con combates sin resultado y resumen para su panel (total, tres visibles y resto). | [Contexto](MODULOS.md) | `veladasConResultadosPendientes`, `resumenResultadosPendientes` | `15af2f388c392098` |
 
 ## Lógica: fighters
 
@@ -266,7 +268,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
 | [src/app/_inicio/Aficionado.tsx](../../src/app/_inicio/Aficionado.tsx) | Panel del aficionado en /mi-panel (también moderación y entidad pendiente): combates de seguidos, aura, resultados y sus disciplinas. | [Contexto](MODULOS.md) | `InicioAficionado` | `edad9461cf56153a` |
-| [src/app/_inicio/Entidad.tsx](../../src/app/_inicio/Entidad.tsx) | Panel de la entidad aprobada en /mi-panel con sus veladas, cifras y resultados pendientes del cartel. | [Contexto](MODULOS.md) | `InicioEntidad` | `0da955c21df598cd` |
+| [src/app/_inicio/Entidad.tsx](../../src/app/_inicio/Entidad.tsx) | Panel de la entidad aprobada en /mi-panel con sus veladas, cifras y resultados pendientes del cartel. | [Contexto](MODULOS.md) | `InicioEntidad` | `d2cd840fd93c4248` |
 | [src/app/_inicio/Entrenador.tsx](../../src/app/_inicio/Entrenador.tsx) | Panel del entrenador en /mi-panel: crear perfil con la intención guardada o gestionar clases, y sus veladas e interclubs. | [Contexto](MODULOS.md) | `InicioEntrenador` | `9ce565e2d0f2f3f9` |
 | [src/app/_inicio/MisSubidas.tsx](../../src/app/_inicio/MisSubidas.tsx) | «Mis vídeos y fotos» en /mi-panel: lo compartido por la persona, su estado (retirado por moderación) y borrado con confirmación. | [Contexto](FLUJOS.md) | `MisSubidas` | `4c61c73a6b7f043a` |
 | [src/app/_inicio/Peleador.tsx](../../src/app/_inicio/Peleador.tsx) | Panel del peleador en /mi-panel: ficha, próximo combate con cuenta atrás, declaraciones por responder, récord y aura del público. | [Contexto](MODULOS.md) | `InicioPeleador` | `c1be011a8ed63492` |
@@ -355,7 +357,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/revision-ui/page.tsx](../../src/app/revision-ui/page.tsx) | Banco visual exclusivo de desarrollo, con vista real y selector en URL; devuelve 404 en producción. | [Contexto](../REVISION-RESPONSIVE-20261013.md) | `RevisionUI` | `56287d0104796776` |
 | [src/app/robots.ts](../../src/app/robots.ts) | Indica rutas indexables y privadas a buscadores; robots no reemplaza protección de acceso. | [Contexto](MODULOS.md) | `dynamic`, `robots` | `0114034553816bdf` |
 | [src/app/salud/route.ts](../../src/app/salud/route.ts) | Responde 200/503 según conexión de base mediante SELECT 1; no es prueba de todas las funciones del producto. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `f8e9a12d2ec3ba9d` |
-| [src/app/siguiendo/page.tsx](../../src/app/siguiendo/page.tsx) | Listado de peleadores seguidos por la cuenta y retirada de seguimiento; explica preferencia de avisos. | [Contexto](FLUJOS.md) | `metadata`, `dynamic`, `Following` | `de5d22fbe8fd884a` |
+| [src/app/siguiendo/page.tsx](../../src/app/siguiendo/page.tsx) | Listado de peleadores seguidos por la cuenta y retirada de seguimiento; explica preferencia de avisos. | [Contexto](FLUJOS.md) | `metadata`, `dynamic`, `Following` | `51bec0c3a939cc10` |
 | [src/app/sitemap.ts](../../src/app/sitemap.ts) | Genera direcciones públicas para buscadores excluyendo fichas no publicables; debe seguir privacidad del directorio. | [Contexto](MODULOS.md) | `dynamic`, `sitemap` | `52387e7f0194cee9` |
 | [src/app/subidas/[...clave]/route.ts](../../src/app/subidas/%5B...clave%5D/route.ts) | Recibe un vídeo por PUT solo con el almacén en disco (desarrollo, pruebas, demo): sesión verificada, clave propia y tamaño máximo. | [Contexto](FLUJOS.md) | `dynamic`, `PUT` | `11806b73edbcf2d5` |
 | [src/app/subidas/route.ts](../../src/app/subidas/route.ts) | Pide permiso para subir un vídeo: sesión verificada, formato, tamaño, límite diario y almacén disponible; devuelve clave y dirección de subida. | [Contexto](FLUJOS.md) | `dynamic`, `POST` | `e0f59b9a3297458b` |
@@ -451,6 +453,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/unit/noticias.test.ts](../../tests/unit/noticias.test.ts) | Comprueba el lector RSS/Atom, entidades, descartes, disciplinas por palabras clave, variedad de medios y fuentes iniciales. | [Contexto](OPERACION.md) | — | `91fb11fdc60690a5` |
 | [tests/unit/notify.test.ts](../../tests/unit/notify.test.ts) | Prueba selección/agrupación de destinatarios, preferencias y tolerancia a errores de avisos mediante dobles de dependencias. | [Contexto](OPERACION.md) | — | `1e3043f730954aa1` |
 | [tests/unit/pagination.test.ts](../../tests/unit/pagination.test.ts) | Prueba número de página y ventanas acotadas ante valores vacíos, enormes o inválidos. | [Contexto](OPERACION.md) | — | `9ba298ae5266b031` |
+| [tests/unit/paneles-fallos.test.ts](../../tests/unit/paneles-fallos.test.ts) | Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad. | [Contexto](OPERACION.md) | — | `220c8643e22d59dc` |
 | [tests/unit/password.test.ts](../../tests/unit/password.test.ts) | Prueba scrypt, hashes antiguos, comprobación y refuerzo de parámetros sin convertirlos en texto público. | [Contexto](OPERACION.md) | — | `62c924cb40f6b0a2` |
 | [tests/unit/paths.test.ts](../../tests/unit/paths.test.ts) | Prueba retorno interno y rechaza URLs/variantes que redirigirían fuera de la aplicación. | [Contexto](OPERACION.md) | — | `68a087a0f00b8da8` |
 | [tests/unit/plazas-y-emparejar.test.ts](../../tests/unit/plazas-y-emparejar.test.ts) | Pruebas unitarias de las plazas por categoría y de la ayuda para emparejar. | [Contexto](OPERACION.md) | — | `c116bba9ae37c98c` |
