@@ -13,9 +13,12 @@ export default function EvitarDobleEnvio() {
   useEffect(() => { liberarTodo.current(); }, [pathname]);
   useEffect(() => {
     const pendientes = new Map<HTMLFormElement, () => void>();
+    // React puede quitar method al hidratar una acción y dejar su action javascript de protección.
+    // Leer el atributo evita que input[name=method] oculte la propiedad, pero no se debe confundir esa acción con una búsqueda GET.
+    const esGet = (form: HTMLFormElement) => (form.getAttribute("method") ?? (form.getAttribute("action")?.startsWith("javascript:") ? "post" : "get")).toLowerCase() === "get";
     const alEnviar = (e: Event) => {
       const form = e.target;
-      if (!(form instanceof HTMLFormElement) || e.defaultPrevented || (form.getAttribute("method") ?? "get").toLowerCase() === "get") return;
+      if (!(form instanceof HTMLFormElement) || e.defaultPrevented || esGet(form)) return;
       if (pendientes.has(form)) { e.preventDefault(); e.stopImmediatePropagation(); return; }
       const bloqueados: (HTMLButtonElement | HTMLInputElement)[] = [];
       const aviso = document.createElement("p");
@@ -40,15 +43,27 @@ export default function EvitarDobleEnvio() {
         aviso.textContent = form.dataset.progreso || (location.pathname === "/registro" ? "Creando tu cuenta…" : "Guardando…");
       }, 0);
     };
+    // Un reset/respuesta rápida puede liberar el formulario entre los dos clics físicos.
+    // El segundo clic de un doble clic no es una nueva intención de enviar, aunque el primer envío ya haya terminado.
+    const alClic = (e: MouseEvent) => {
+      if (e.detail < 2 || !(e.target instanceof Element)) return;
+      const boton = e.target.closest("button,input[type=submit]");
+      if (!(boton instanceof HTMLButtonElement || boton instanceof HTMLInputElement) || boton.type !== "submit") return;
+      const form = boton.form;
+      if (!form || esGet(form)) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+    };
     const liberar = () => { for (const fin of [...pendientes.values()]) fin(); };
     liberarTodo.current = liberar;
     document.addEventListener("submit", alEnviar, true);
+    document.addEventListener("click", alClic, true);
     window.addEventListener("pageshow", liberar);
     window.addEventListener("lona:accion-terminada", liberar);
     window.addEventListener("error", liberar);
     window.addEventListener("unhandledrejection", liberar);
     return () => {
       liberar(); document.removeEventListener("submit", alEnviar, true);
+      document.removeEventListener("click", alClic, true);
       window.removeEventListener("pageshow", liberar); window.removeEventListener("lona:accion-terminada", liberar);
       window.removeEventListener("error", liberar); window.removeEventListener("unhandledrejection", liberar);
     };
