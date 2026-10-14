@@ -45,6 +45,8 @@ await fan.p.locator('.notice-ok').waitFor();
 check("desactivar elimina el peso", (await db.fighter.findUniqueOrThrow({ where: { id: fighter.id } })).currentWeightKg === null);
 const coach = await newUser("AgendaCoach", "TRAINER");
 const coachUser = await db.user.findUniqueOrThrow({ where: { email: coach.email } });
+// newUser solo diferencia FAN y FIGHTER; el perfil por sí solo no cambia el tipo de cuenta.
+await db.user.update({ where: { id: coachUser.id }, data: { role: "TRAINER" } });
 const trainer = await db.trainer.create({ data: { userId: coachUser.id, name: `CoachAgenda ${rnd}`, slug: `coach-agenda-${rnd}`, disciplines: ["BOXEO"], province: "Madrid" } });
 const training = await db.trainingClass.create({ data: { trainerId: trainer.id, title: `ClaseAgenda ${rnd}`, kind: "INDIVIDUAL", minutes: 30, priceEuros: 20 } });
 const monday = new Date(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()) + "T00:00:00Z");
@@ -55,6 +57,7 @@ for (const [day, fromMinute, preferred] of [[monday, 600, "Mañana"], [monday, 5
 await coach.p.goto(B + "/mi-panel");
 const weekly = coach.p.getByRole("region", { name: "Esta semana", exact: true });
 const rows = await weekly.locator('.fila').allTextContents();
+if (rows.length !== 3) console.log("Diagnóstico de agenda:", rows);
 check("agenda ordenada por hora y solicitudes antiguas al final", rows.length === 3 && rows[0].includes("09:00–09:30") && rows[1].includes("10:00–10:30") && rows[2].includes("Antigua por acordar"));
 await db.event.update({ where: { id: event.id }, data: { organizerId: coachUser.id } });
 await coach.p.goto(B + `/organizador/${event.slug}`);
