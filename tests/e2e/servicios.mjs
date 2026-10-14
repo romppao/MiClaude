@@ -61,6 +61,24 @@ check("el panel del aficionado empieza por «Buscar clases» y tiene «Mis reser
 // 4) Retos y sparring entre dos peleadores.
 const ana = await peleador("Ana");
 const bea = await peleador("Bea");
+// El fundador no conoce el nombre: elige ciudad y gimnasio y encuentra a quien encaja.
+const gym = await db.gym.create({ data: { name: `Turia filtros ${rnd}`, slug: `turia-filtros-${rnd}`, city: "Valencia", province: "Valencia" } });
+await db.fighter.update({ where: { id: bea.f.id }, data: { gymId: gym.id, city: "Valencia", stance: "ZURDO" } });
+await ana.p.goto(B + "/propuestas?provincia=Valencia&guardia=ZURDO");
+const busqueda = ana.p.getByRole("search", { name: "Buscar rival o sparring" });
+check("se puede elegir ciudad y gimnasio sin escribir sus nombres", await seen(busqueda.locator("select[name=ciudad]")) && await seen(busqueda.locator("select[name=gimnasioId]")));
+await busqueda.locator("select[name=ciudad]").selectOption("Valencia");
+await busqueda.getByRole("button", { name: "Aplicar filtros" }).click(); await ana.p.waitForURL(u => u.searchParams.get("ciudad") === "Valencia");
+await busqueda.locator("select[name=gimnasioId]").selectOption(gym.id);
+await busqueda.getByRole("button", { name: "Aplicar filtros" }).click(); await ana.p.waitForURL(u => u.searchParams.get("gimnasioId") === gym.id);
+const candidata = ana.p.locator("#proponer article", { hasText: `Bea Servicios${rnd}` });
+check("sin nombre escrito aparecen candidatos de la ciudad, gimnasio y guardia elegidos", await seen(candidata) && await busqueda.locator("[name=q]").inputValue() === "");
+for (const [tipo, nombre] of [["FIGHT", `Retar a Bea Servicios${rnd}`], ["SPARRING", `Proponer un sparring a Bea Servicios${rnd}`]]) {
+  await candidata.getByRole("link", { name: nombre, exact: true }).click();
+  await ana.p.waitForURL(u => u.pathname.endsWith("/proponer") && u.searchParams.get("tipo") === tipo);
+  check(`el candidato elegido permite abrir ${tipo === "FIGHT" ? "reto oficial" : "sparring"}`, await seen(ana.p.locator(`input[name=kind][value=${tipo}]`)) && await ana.p.locator(`input[name=kind][value=${tipo}]`).isChecked());
+  await ana.p.goBack(); await ana.p.waitForURL(u => u.searchParams.get("gimnasioId") === gym.id);
+}
 await ana.p.goto(B + "/mi-panel");
 check("el panel del peleador tiene «Retar o proponer sparring» y «Mis propuestas»", (await acciones(ana.p)).includes("Retar o proponer sparring") && (await acciones(ana.p)).includes("Mis propuestas"));
 await fan.p.goto(B + `/peleadores/${bea.f.slug}`);
