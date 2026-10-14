@@ -77,6 +77,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
           <p className="hint mut" style={{ margin: 0 }}>Usaremos el nombre y el correo de tu cuenta de Google; el correo quedará confirmado.</p>
           <p className="separador-o" aria-hidden="true">o con tu correo</p>
         </>)}
+      {tipo === "entidad" && <p><Link href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo y reclámalo con tu cuenta</Link></p>}
       <form action={register} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <input type="hidden" name="tipo" value={tipo} />
         {next && <input type="hidden" name="next" value={next} />}

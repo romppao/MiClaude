@@ -20,7 +20,7 @@ export default function MapaUbicacion({ lat, lng, nombre, origen }: { lat: numbe
     (async () => {
       try {
         if (!contenedor.current) return;
-        const creado = await crearMapa(contenedor.current, { lat, lng }, origen === "direccion" ? 15 : origen === "ciudad" ? 12 : 9);
+        const creado = await crearMapa(contenedor.current, { lat, lng }, ["direccion", "osm"].includes(origen) ? 15 : origen === "ciudad" ? 12 : 9);
         if (cancelado) { creado.m.remove(); return; }
         m = creado.m;
         const punto = document.createElement("span");
@@ -35,5 +35,5 @@ export default function MapaUbicacion({ lat, lng, nombre, origen }: { lat: numbe
     return () => { cancelado = true; m?.remove(); };
   }, [lat, lng, origen]);
   if (fallo) return null;
-  return <div ref={contenedor} className="mapa-lienzo mapa-ficha" data-listo={listo ? "si" : "no"} role="region" aria-label={`Mapa: ubicación ${origen === "direccion" ? "" : "aproximada "}de ${nombre}`} />;
+  return <div ref={contenedor} className="mapa-lienzo mapa-ficha" data-listo={listo ? "si" : "no"} role="region" aria-label={`Mapa: ubicación ${["direccion", "osm"].includes(origen) ? "" : "aproximada "}de ${nombre}`} />;
 }

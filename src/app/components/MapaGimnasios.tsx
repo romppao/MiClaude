@@ -156,7 +156,7 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
                   {g.km !== null ? <span className="distancia">{textoDistancia(g.km)}</span> : <span className="puesto"><span className="sr-only">Puesto </span>{i + 1}</span>}
                   <span className="cuerpo">
                     <strong>{g.nombre}</strong>
-                    <span className="meta">{g.ciudad} ({g.provincia}){g.origen !== "direccion" && " · ubicación aproximada"}</span>
+                    <span className="meta">{g.ciudad} ({g.provincia}){!["direccion", "osm"].includes(g.origen) && " · ubicación aproximada"}</span>
                     <span className="meta">{g.verificado && <span className="sello-verificado"><span aria-hidden="true">✓ </span>Verificado</span>}{razones(g)}</span>
                   </span>
                 </Link>
@@ -198,7 +198,7 @@ function contenidoPopup(g: GimnasioEnMapa): HTMLElement {
   const nombre = document.createElement("strong");
   nombre.textContent = g.nombre;
   const lugar = document.createElement("span");
-  lugar.textContent = `${g.ciudad} (${g.provincia})${g.origen !== "direccion" ? " · ubicación aproximada" : ""}`;
+  lugar.textContent = `${g.ciudad} (${g.provincia})${!["direccion", "osm"].includes(g.origen) ? " · ubicación aproximada" : ""}`;
   const enlace = document.createElement("a");
   enlace.href = `/gimnasios/${g.slug}`;
   enlace.textContent = "Ver el gimnasio";

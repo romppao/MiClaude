@@ -131,3 +131,6 @@ Las claves de cada servicio solo están en Secret Manager o en los secretos de G
 - Copia de una base a otra sin ver las claves (así se pasó la demo de Render a Neon): las direcciones van en variables de entorno a un contenedor `postgres:18-alpine` que hace `pg_dump --format=custom --no-owner --no-privileges` y `pg_restore --no-owner --no-privileges`, y después se comparan los recuentos de todas las tablas.
 - Para usar la base desde la terminal sin ver la clave, pasarla directamente de Neon al programa, por ejemplo:
   `DATABASE_URL="$(npx neon@latest connection-string --project-id solitary-morning-87085163)" npx prisma migrate deploy`.
+
+## Gimnasios reales (bloque D)
+La base oficial empieza vacía. Solo se cargan gimnasios reales mediante el importador de [GIMNASIOS-REALES.md](GIMNASIOS-REALES.md), después de aplicar sus migraciones. No ejecutar el seed. Primero generar y comparar el plan contra la base oficial y mostrar el recuento por provincia al fundador. La carga exige IMPORTAR_EN_REAL=si y el hash autorizado en RECUENTO_OSM_REVISADO; el script verifica el destino. Sin Cataluña, contactos dudosos por revisar y atribución ODbL. En esta sesión no se ha cargado ningún dato ni obtenido un recuento real por el bloqueo de red.

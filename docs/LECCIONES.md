@@ -468,3 +468,5 @@ La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba un
 14 oct: esperar la URL de una transición React no acredita que el formulario nuevo esté montado. En registro, esperar el campo que identifica el paso y verificar sus valores; conservar la prueba de persistencia en base.
 
 14 oct, G: caducidad en filtros y vistas además de limpieza; DATE se interpreta como día elegido, semana según Madrid. Una oferta de clase sin fecha nunca se anuncia como reserva confirmada.
+
+14 oct, D: un recuento de fixtures comprueba reglas y nunca sustituye el inventario real; el plan de carga debe quedar ligado al destino y conservar la protección dentro de la transacción. La propiedad natural y la visual deben sincronizarse al ceder.

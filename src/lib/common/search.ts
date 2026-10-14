@@ -1,3 +1,4 @@
+import { EXCLUDED_GYM_PROVINCES } from "./gym-policy";
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { normalizeName } from "./names";
@@ -16,7 +17,7 @@ export const ACCENT_TO = ACCENT_PAIRS.map(([letters, plain]) => plain.repeat([..
 const SOURCES = {
   fighter: { table: "Fighter", fields: ["firstName", "lastName", "alias"], where: Prisma.sql`"listed" = true AND "hiddenAt" IS NULL`, order: `"lastName", "firstName"` },
   fighterUnclaimed: { table: "Fighter", fields: ["firstName", "lastName", "alias"], where: Prisma.sql`"userId" IS NULL AND "hiddenAt" IS NULL`, order: `"lastName", "firstName"` },
-  gym: { table: "Gym", fields: ["name", "city"], where: Prisma.sql`true`, order: `"name"` },
+  gym: { table: "Gym", fields: ["name", "city"], where: Prisma.sql`"status" = 'PUBLISHED' AND "province" NOT IN (${Prisma.join([...EXCLUDED_GYM_PROVINCES, ""])}) AND ("isFictional" = false OR ${process.env.DEMO_MODE === "si"})`, order: `"name"` },
   trainer: { table: "Trainer", fields: ["name"], where: Prisma.sql`true`, order: `"name"` },
   event: { table: "Event", fields: ["name", "city", "venue"], where: Prisma.sql`"status" NOT IN ('CANCELLED', 'PENDING_AUTHORIZATION', 'REJECTED')`, order: `"date" DESC` },
 } as const;

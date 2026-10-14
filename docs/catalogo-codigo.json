@@ -2008,5 +2008,60 @@
     "path": "tests/e2e/paneles-agenda.mjs",
     "purpose": "Flujos G en CI con base de pruebas: marcar/quitar asistencia, agenda, provincia, calendario público, disponibilidad y preparación.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261014210000_gimnasios_reales/migration.sql",
+    "purpose": "Migración aditiva D: contacto, procedencia, estado y propietario de gimnasio; reclamaciones revisadas; preserva propiedad visual y marca solo los tres seed conocidos.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/importar-gimnasios-osm.mjs",
+    "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/app/actions/gyms.ts",
+    "purpose": "Acciones verificadas de alta, reclamación, revisión, cesión y miembros del gimnasio; propiedad comprobada dentro de transacciones bloqueadas y auditoría.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/app/components/FormularioGimnasio.tsx",
+    "purpose": "Formulario de contacto profesional y disciplinas compartido; recibe la acción desde la página y no publica altas por sí solo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/app/mis-gimnasios/page.tsx",
+    "purpose": "Área privada de búsqueda, reclamación y gestión del gimnasio propio, con edición, miembros, retirada y cesión de propiedad.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/app/moderacion/gimnasios/page.tsx",
+    "purpose": "Colas paginadas de altas/importaciones dudosas y reclamaciones de propiedad; las pruebas privadas solo llegan a moderación.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-directory.ts",
+    "purpose": "Filtro común de gimnasios publicados, territorio permitido y exclusión del seed en producción.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-policy.ts",
+    "purpose": "Política territorial aprobada del gimnasio, publicación, distancia para duplicados y protección frente a reimportación; compartida con script.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-osm.ts",
+    "purpose": "Transformación pura de OSM: provincia, disciplina, descartes y contactos dudosos sin publicar; sin base ni llamadas de red.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "tests/unit/gimnasios-reales.test.ts",
+    "purpose": "Pruebas de exclusión territorial con provincia y áreas de coordenadas, ficción, contactos, duplicados y protección del propietario.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-reales.mjs",
+    "purpose": "Flujo D con datos sintéticos: reclamación pendiente, aprobación, edición profesional y exclusión de alta manual en directorio/mapa/ficha.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   }
 ]

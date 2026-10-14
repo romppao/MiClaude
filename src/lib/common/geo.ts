@@ -1,3 +1,4 @@
+import { publicGyms } from "./gym-directory";
 import { db } from "./db";
 import { registrarFallo } from "./fallos";
 import type { OrigenUbicacion, Punto } from "./mapa";
@@ -56,7 +57,7 @@ export async function ubicarPendientes(maximo = 5): Promise<void> {
   if (!geocodificarActivo() || ocupado) return;
   ocupado = true;
   try {
-    const pendientes = await db.gym.findMany({ where: { geocodedAt: null }, select: { id: true }, take: maximo, orderBy: { id: "asc" } });
+    const pendientes = await db.gym.findMany({ where: { AND: [publicGyms()], geocodedAt: null }, select: { id: true }, take: maximo, orderBy: { id: "asc" } });
     for (const p of pendientes) await ubicarGimnasio(p.id);
   } finally {
     ocupado = false;

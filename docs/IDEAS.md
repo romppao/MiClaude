@@ -404,3 +404,5 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.
 
 14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.
+
+14 oct, D: código de directorio e importador preparado; recuento real/cargas pendientes por red y CI/revisión sin cerrar. H sigue pendiente.

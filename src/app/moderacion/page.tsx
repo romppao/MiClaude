@@ -106,11 +106,12 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
   const rechazos = await db.auditLog.findMany({ where: { entity: "BOUT", action: "RIVAL_DISPUTED", entityId: { in: enRevision.map((b) => b.id) } }, orderBy: { createdAt: "asc" }, select: { entityId: true, after: true } });
   const motivoDe = new Map(rechazos.map((r) => [r.entityId, (r.after as { motivo?: string } | null)?.motivo ?? ""]));
   const ids = (e: string) => reports.filter((r) => r.entity === e).map((r) => r.entityId);
-  const [reportedBouts, reportedFighters, reportedAuras, reportedMedia] = await Promise.all([
+  const [reportedBouts, reportedFighters, reportedAuras, reportedMedia, reportedGyms] = await Promise.all([
     db.bout.findMany({ where: { id: { in: ids("BOUT") } }, include: { event: true, fighterA: true, fighterB: true } }),
     db.fighter.findMany({ where: { id: { in: ids("FIGHTER") } } }),
     db.aura.findMany({ where: { id: { in: ids("AURA") } }, include: { fighter: true, user: { select: { name: true } } } }),
     db.mediaItem.findMany({ where: { id: { in: ids("MEDIA") } }, select: { id: true, kind: true, caption: true, hiddenAt: true, videoUrl: true, event: { select: { slug: true, name: true } }, uploader: { select: { name: true } } } }),
+    db.gym.findMany({ where: { id: { in: ids("GYM") } }, select: { id: true, name: true } }),
   ]);
   // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
   // En los organizadores, la nota es siempre obligatoria: al aprobar recoge la evidencia comprobada, que respalda el sello.
@@ -180,6 +181,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
                   const bout = reportedBouts.find((b) => b.id === r.entityId);
                   const fighter = reportedFighters.find((b) => b.id === r.entityId);
                   const aura = reportedAuras.find((b) => b.id === r.entityId);
+                  const gimnasio = reportedGyms.find((g) => g.id === r.entityId);
                   const medio = reportedMedia.find((m) => m.id === r.entityId);
                   return (
                     <tr key={r.id}>
@@ -193,7 +195,8 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
                         {fighter && <><span className="mut">Ficha: </span><Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link></>}
                         {aura && <><span className="mut">Comentario de {publicUserName(aura.user.name)} en </span><Link href={`/peleadores/${aura.fighter.slug}`}>{aura.fighter.firstName} {aura.fighter.lastName}</Link>: «{aura.comment}»</>}
                         {medio && <><span className="mut">{medio.kind === "PHOTO" ? "Foto" : "Vídeo"} de {publicUserName(medio.uploader.name)} en </span><Link href={`/veladas/${medio.event.slug}#medio-${medio.id}`}>{medio.event.name}</Link>{medio.caption ? <>: «{medio.caption}»</> : null}{medio.kind === "PHOTO" ? <> · <a href={`/medios/${medio.id}/imagen`} target="_blank" rel="noopener noreferrer">Ver la foto</a></> : medio.videoUrl ? <> · <a href={medio.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></> : <> · <a href={`/medios/${medio.id}/video`} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></>}{medio.hiddenAt ? " (ya retirado)" : ""}</>}
-                        {!bout && !fighter && !aura && !medio && <span className="mut">El elemento ya no existe.</span>}
+                        {gimnasio && <Link href={`/mis-gimnasios?gimnasio=${gimnasio.id}`}>Gimnasio: {gimnasio.name}</Link>}
+                        {!bout && !fighter && !aura && !medio && !gimnasio && <span className="mut">El elemento ya no existe.</span>}
                       </td>
                       <td>
                         <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -252,6 +255,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
           )}
         </> },
         { id: "pestana-gimnasios", titulo: `Gimnasios (${nSinSello})`, contenido: <>
+          <Link href="/moderacion/gimnasios">Altas, importaciones y reclamaciones de gimnasio</Link>
           <h2 id="gimnasios">Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
           {paging("gimnasios", ["gimnasio", "gimnasios"], "gimnasios")}
           <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.</p>

@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.4] — 2026-10-14
+
+### Añadido
+- Directorio de gimnasios con procedencia OSM, contactos profesionales y disciplinas, revisión de altas, reclamación, gestión y cesión de propiedad.
+- Importador manual con recuento previo, protección de datos corregidos, duplicados por revisar y guardas de carga oficial.
+- Exclusión de Cataluña en directorio y mapa; atribución ODbL y distinción del seed ficticio.
+
 ## [0.13.3] — 2026-10-14
 
 ### Añadido

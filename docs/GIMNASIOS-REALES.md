@@ -1,0 +1,20 @@
+# Directorio de gimnasios y carga de OSM
+
+El bloque D conserva la procedencia de cada gimnasio y separa publicación, sello y propiedad. `Gym.sourceRef` identifica el elemento OSM; `sourceLicense` conserva ODbL incluso después de una reclamación. Una corrección manual cambia `source` a MANUAL/PROPIETARIO: una descarga posterior no la pisa. La importación no incorpora datos de Google Maps, Raunder ni federaciones sin autorización.
+
+`EXCLUDED_GYM_PROVINCES` en `src/lib/common/gym-policy.ts` es la única lista territorial aprobada por el fundador. La importación descarta esas provincias, también cuando se resuelven por coordenadas. Una provincia desconocida queda por revisar; nunca se sustituye por Madrid ni por la capital más cercana. Las altas manuales excluidas no se publican. Lista, mapa, buscador y ficha usan el mismo criterio y producción excluye ficción.
+
+La cuenta verificada busca y reclama desde `/mis-gimnasios`. Aporta texto y enlace profesional, sin DNI. Moderación decide en `/moderacion/gimnasios`, deja nota y envía un aviso individual. Si existe un propietario, la solicitud queda en conflicto y no lo sustituye. El propietario revisado edita, vincula miembros, retira y cede el gimnasio; el perfil visual ofrece fotos y presentación. La cesión sincroniza propietario natural y visual. La migración preserva asignaciones anteriores de moderación. Bloqueos por gimnasio, comprobación dentro de la transacción y auditoría protegen la propiedad.
+
+El importador `npm run gimnasios:osm` requiere Node 22 con strip-types. Por defecto solo consulta Overpass y guarda en `docs/logs/gimnasios-osm/` la fuente y un plan, sin tocar la base. `--entrada ruta.json` reutiliza una respuesta conservada. Las provincias ausentes se resuelven con áreas administrativas OSM que contienen el punto y caché local. No usa Nominatim para hacer geocodificación masiva. Un endpoint alternativo de Overpass puede indicarse con `OSM_OVERPASS_URL`; debe ser HTTPS.
+
+Preparación y carga, a realizar por el asistente en el entorno que corresponda:
+
+1. Generar el plan. Los contactos dudosos no se publican; los dudosos de disciplina/ciudad quedan por revisar.
+2. Compararlo con la base destino usando `--comparar-base --demo` o `--comparar-base --real`. Los gimnasios reclamados, corregidos o verificados quedan protegidos; coincidencias de nombre normalizado a menos de 150 m van a revisión. Conservar el plan generado y el recuento por provincia.
+3. Antes de una carga oficial, presentar al fundador el recuento real y los dudosos. `--aplicar --real --plan ruta.json` requiere `IMPORTAR_EN_REAL=si` y `RECUENTO_OSM_REVISADO` igual al hash presentado. El plan también está ligado al host y nombre de la base, sin imprimir credenciales. La demo exige `DEMO_MODE=si` y `--demo` explícito.
+4. La carga solo crea/actualiza gimnasios y auditoría. Recomprueba propiedad y duplicados dentro de cada transacción. No usa el seed, no crea cuentas, no envía correos masivos y no elimina gimnasios ausentes de la nueva descarga.
+
+Los datos OSM tienen licencia [ODbL](https://www.openstreetmap.org/copyright). Las fichas importadas y el directorio muestran atribución y enlace. La fuente y los datos derivados conservan sus referencias de licencia; esta entrega no certifica jurídicamente una mezcla de bases. La revisión jurídica del lanzamiento sigue pendiente. [Overpass QL](https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL) documenta las consultas. La geolocalización manual existente de direcciones usa Nominatim; conserva sus [límites y condiciones](https://operations.osmfoundation.org/policies/nominatim/) y no debe ejecutarse como importación masiva.
+
+Validación de esta sesión: el acceso real a Overpass falla con EACCES de red. No hay recuento real ni carga. El ensayo sin base con seis gimnasios **ficticios** conserva Madrid y Valencia y descarta las cuatro provincias excluidas; acredita el filtro, no el inventario nacional. CI prueba migraciones sobre base vacía, paridad de esquema y los flujos de reclamación.

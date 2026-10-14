@@ -37,6 +37,8 @@ export async function GET(request: Request) {
 
   const agenda = await db.eventAttendance.findMany({ where: { userId: user.id }, include: { event: { select: { name: true, date: true } } }, orderBy: { createdAt: "desc" } });
 
+  const [misGimnasios, reclamacionesGimnasio] = await Promise.all([db.gym.findMany({ where: { ownerUserId: user.id } }), db.gymClaimRequest.findMany({ where: { userId: user.id }, include: { gym: { select: { name: true } } } })]);
+
   const datos = {
     generadoEl: new Date().toISOString(),
     nota: "Estos son los datos personales que Lona guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
@@ -58,6 +60,8 @@ export async function GET(request: Request) {
     solicitudesRecibidasEnMisClases: solicitudesRecibidas.map((r) => ({ clase: r.class.title, persona: r.user.name, cuandoLeVieneBien: r.preferred, estado: r.status, fecha: r.createdAt })),
     retosYSparrings: propuestas.map((p) => ({ tipo: p.kind, enviadaPorMi: p.fromId === fighter?.id, otroPeleador: publicFighterName(p.fromId === fighter?.id ? p.to : p.from), disciplina: p.discipline, fecha: p.day, lugar: p.place, mensaje: p.message, estado: p.status, respuesta: p.reply, creadaEl: p.createdAt })),
     inscripcionesEnVeladas: inscripciones.map((r) => ({ evento: r.event.name, fecha: r.event.date, categoria: r.weightClass, divisionDeportiva: r.divisionId, pesoDeclaradoKg: r.weightKg, mensaje: r.message, estado: r.status, respuesta: r.reply, solicitadaEl: r.createdAt, respondidaEl: r.answeredAt })),
+    gimnasiosQueGestiono: misGimnasios.map((g) => ({ nombre: g.name, ciudad: g.city, provincia: g.province, telefonoProfesional: g.phone, correoProfesional: g.email, estado: g.status, reclamadoEl: g.claimedAt })),
+    reclamacionesDeGimnasio: reclamacionesGimnasio.map((c) => ({ gimnasio: c.gym.name, prueba: c.evidence, enlaceDePrueba: c.evidenceUrl, estado: c.status, nota: c.note, creadaEl: c.createdAt, revisadaEl: c.reviewedAt })),
     veladasQueHeMarcado: agenda.map((a) => ({ evento: a.event.name, fecha: a.event.date, marcadaEl: a.createdAt })),
     disponibilidadParaPelear: fighter && { activada: fighter.availableToFight, desde: fighter.availableSince, pesoDeclaradoKg: fighter.currentWeightKg },
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),

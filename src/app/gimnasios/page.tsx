@@ -1,3 +1,4 @@
+import { publicGyms } from "../../lib/common/gym-directory";
 import Link from "next/link";
 import { after } from "next/server";
 import { Prisma } from "@prisma/client";
@@ -26,7 +27,7 @@ const MAX_EN_MAPA = 1500;
 export default async function Gyms({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { q, province, pagina } = flatParams(await searchParams);
   const ids = await searchIds("gym", q);
-  const where = { ...(province && { province }), ...(ids && { id: { in: ids } }) };
+  const where = { AND: [publicGyms()], ...(province && { province }), ...(ids && { id: { in: ids } }) };
   const total = await db.gym.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
   const [gyms, enMapa] = await Promise.all([
@@ -50,6 +51,8 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <h1>Gimnasios</h1>
+      <Link href="/mis-gimnasios">¿Es tu gimnasio? Búscalo y reclámalo</Link>
+      <p className="meta"><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">© colaboradores de OpenStreetMap · datos ODbL</a></p>
       <form className="search" role="search" aria-label="Filtrar gimnasios">
         <CampoFiltro etiqueta="Nombre o ciudad"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>

@@ -46,7 +46,8 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     return (
       <div className="pantalla inicio-adaptable">
         <Saludo kicker="Mi panel" nombre={user.name} sub="Entrenador" />
-        <TeToca pendientes={[
+        <Link href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo o gestiona el tuyo</Link>
+      <TeToca pendientes={[
           { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },
           { texto: "Resultados por poner", href: "/organizador#mis-eventos", cantidad: resultados },
         ]} />
@@ -96,6 +97,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={user.name} sub={`Entrenador${trainer.gym ? ` · ${trainer.gym.name}` : ""}${trainer.city ? `, ${trainer.city}` : ""}`} extra={<Link href={`/entrenadores/${trainer.slug}`} className="btn secondary" style={{ minHeight: 44, fontSize: 14 }}>Mi perfil</Link>} />
+      <Link href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo o gestiona el tuyo</Link>
       <TeToca pendientes={[
         { texto: "Solicitudes de clase", href: "/mi-panel#solicitudes", cantidad: pendientes },
         { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },

@@ -18,6 +18,7 @@ export async function purgeStale(now: Date = new Date()) {
     db.rateHit.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 2 * DIA) } } }),
     // Solicitudes ya decididas: se borran a los 90 días (el texto con datos de comprobación se vacía al decidir).
     db.claimRequest.deleteMany({ where: { status: { not: "PENDING" }, OR: [{ reviewedAt: { lt: new Date(now.getTime() - 90 * DIA) } }, { reviewedAt: null, createdAt: { lt: new Date(now.getTime() - 90 * DIA) } }] } }),
+    db.gymClaimRequest.deleteMany({ where: { status: { in: ["APPROVED", "REJECTED"] }, reviewedAt: { lt: new Date(now.getTime() - 90 * DIA) } } }),
     // Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.
     db.report.deleteMany({ where: { status: { not: "OPEN" }, resolvedAt: { lt: new Date(now.getTime() - 365 * DIA) } } }),
     db.auditLog.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 3 * 365 * DIA) } } }),

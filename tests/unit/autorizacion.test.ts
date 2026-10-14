@@ -60,10 +60,11 @@ import * as entrenadores from "../../src/app/actions/trainers";
 import * as noticias from "../../src/app/actions/news";
 import * as medios from "../../src/app/actions/media";
 import * as propuestas from "../../src/app/actions/proposals";
+import * as gimnasios from "../../src/app/actions/gyms";
 import * as inscripciones from "../../src/app/actions/registrations";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones, ...gimnasios };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -80,9 +81,9 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
-const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
+const SOLO_MODERADORES = ["decideGymClaim","adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
 const EXIGEN_SESION = ["setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
@@ -610,5 +611,31 @@ describe("bloque G: acciones de disponibilidad y asistencia", () => {
     mundo.estado.respuestas["eventAttendance.deleteMany"] = (a: { where: { userId: string } }) => { expect(a.where.userId).toBe("u-FAN"); return { count: 1 }; };
     expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "1", userId: "ajeno" })).toContain("aviso=asistencia_guardada");
     expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "0", userId: "ajeno" })).toContain("aviso=asistencia_quitada");
+  });
+});
+
+
+describe("gimnasios: control de propiedad", () => {
+  it("editar un gimnasio ajeno no escribe datos ni historial", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "otro" };
+    expect(await destino(acciones.saveGym, { gymId: "g" })).toContain("problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("aprobar una reclamación con titular existente crea conflicto sin cambiar propiedad", async () => {
+    iniciarSesion(persona("ADMIN"));
+    mundo.estado.respuestas["gymClaimRequest.findUnique"] = { id: "c", gymId: "g", userId: "nuevo", status: "PENDING", user: { email: "nuevo@x.es", emailVerifiedAt: verificado } };
+    mundo.estado.respuestas["gym.findUniqueOrThrow"] = { id: "g", ownerUserId: "anterior", province: "Madrid" };
+    expect(await destino(acciones.decideGymClaim, { claimId: "c", decision: "approve", note: "Comprobación de prueba" })).toContain("aviso=gimnasio_conflicto");
+    expect(mundo.estado.escrituras).not.toContain("gym.update");
+    expect(mundo.estado.escrituras).not.toContain("profile.upsert");
+  });
+  it("el titular anterior no puede ceder o desvincular después de perder la propiedad", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["user.findUnique"] = { id: "nuevo", emailVerifiedAt: verificado };
+    mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "otro" };
+    expect(await destino(acciones.transferGym, { gymId: "g", email: "nuevo@x.es" })).toContain("problema=sin_permiso");
+    expect(await destino(acciones.setGymMember, { gymId: "g", kind: "fighter", memberId: "f", decision: "unlink" })).toContain("problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
   });
 });

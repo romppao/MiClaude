@@ -8,7 +8,7 @@ export const REPORT_REASONS: Record<string, string> = {
   OTRO: "Otro motivo",
 };
 
-export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA"] as const;
+export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA", "GYM"] as const;
 export type ReportEntity = (typeof REPORT_ENTITIES)[number];
 
 /** Motivos que se ofrecen según lo que se avisa. */
@@ -17,6 +17,7 @@ export const REASONS_BY_ENTITY: Record<ReportEntity, string[]> = {
   FIGHTER: ["DATOS_PERSONALES", "SUPLANTACION", "OTRO"],
   AURA: ["INAPROPIADO", "DATOS_PERSONALES", "OTRO"],
   MEDIA: ["MI_IMAGEN", "INAPROPIADO", "OTRO"],
+  GYM: ["DATOS_PERSONALES", "OTRO"],
 };
 
 export const MAX_REPORTS_PER_DAY = 10;

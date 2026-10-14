@@ -4,6 +4,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { excludedGymProvince } from "../../lib/common/gym-policy";
 import { db } from "../../lib/common/db";
 import { parseCurrentWeight } from "../../lib/fighters/availability";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
@@ -74,7 +75,7 @@ export async function createMyFighter(f: FormData) {
     let gymId: string | undefined;
     if (gymName) {
       const gymSlug = slugName(gymName, city);
-      const gym = await db.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} });
+      const gym = await db.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province, status: excludedGymProvince(province) ? "PENDING" : "PUBLISHED" }, update: {} });
       gymId = gym.id;
     }
     const slug = await uniqueSlug(slugify(`${firstName} ${lastName}`), async (s) => !!(await db.fighter.findUnique({ where: { slug: s } })), "peleador");
@@ -124,7 +125,7 @@ export async function updateMyFighter(f: FormData) {
     let gymId: string | null = null;
     if (gymName) {
       const gymSlug = slugName(gymName, city);
-      gymId = (await tx.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} })).id;
+      gymId = (await tx.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province, status: excludedGymProvince(province) ? "PENDING" : "PUBLISHED" }, update: {} })).id;
     }
     await tx.fighter.update({ where: { id: me.id }, data: { ...patch, gymId } });
     await audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: "PROFILE_UPDATED", before: { firstName: me.firstName, lastName: me.lastName, alias: me.alias, city: me.city, province: me.province, gymId: me.gymId }, after: { firstName, lastName, alias: patch.alias, city, province, gymId } }, tx);
