@@ -129,7 +129,9 @@ export const registrar = async (p, o) => {
   if (!(await form.locator("select[name=province]").inputValue())) await form.locator("select[name=province]").selectOption(o.provincia ?? "Madrid");
   if (o.disciplina) await form.locator("select[name=discipline]").selectOption(o.disciplina);
   const nivelCampo = form.locator("select[name=level]");
-  await nivelCampo.selectOption(o.nivel ?? ((await nivelCampo.inputValue()) || "AMATEUR"));
+  const nivelElegido = o.nivel ?? ((await nivelCampo.inputValue()) || "AMATEUR");
+  // Cambiar nivel reinicia división y peso: no emitir change si ya es el pedido.
+  if (await nivelCampo.inputValue() !== nivelElegido) await nivelCampo.selectOption(nivelElegido);
   if (o.resultado === null) { await form.locator("select[name=outcome]").selectOption(""); await form.locator("select[name=method]").selectOption(""); } // tras un error el formulario conserva lo elegido: «sin resultado» se elige de forma explícita
   if (o.resultado !== null) { await form.locator("select[name=outcome]").selectOption(o.resultado ?? "WIN"); if (o.metodo !== null) await form.locator("select[name=method]").selectOption(o.metodo ?? "UD"); }
   if (o.peso) await form.locator("select[name=weightClass]").selectOption(o.peso);
@@ -137,6 +139,7 @@ export const registrar = async (p, o) => {
   // El enlace de respaldo está en «Más datos del combate (opcional)»: se abre como lo haría una persona.
   const mas = form.locator("details.opcionales"); if (!(await mas.evaluate((d) => d.open))) await mas.locator("summary").click();
   await form.locator("[name=evidenceUrl]").fill(o.evidencia ?? "");
+  if (o.rivalId) await form.evaluate((f, id) => { const el = document.createElement("input"); el.type = "hidden"; el.name = "rivalId"; el.value = id; f.append(el); }, o.rivalId);
   const guardar = form.getByRole("button", { name: "Registrar este combate", exact: true });
   if (o.dobleClic) await guardar.dblclick(); else await guardar.click();
 };

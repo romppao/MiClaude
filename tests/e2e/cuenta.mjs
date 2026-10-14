@@ -21,7 +21,10 @@ await ana.p.fill("details [name=alias]", "La Rápida"); await ana.p.fill("detail
 await ana.p.click("details button:has-text('Guardar los datos de mi ficha')");
 check("una altura imposible se rechaza con un mensaje que explica cómo escribirla", await seen(malo(ana.p, "en centímetros")));
 check("tras el error el formulario vuelve abierto y con lo escrito: se ve dónde corregir", await seen(ana.p.locator("details[open] [name=alias]")) && await ana.p.waitForFunction(() => document.querySelector("details [name=alias]")?.value === "La Rápida", null, { timeout: 4000 }).then(() => true, () => false));
-await ana.p.fill("details [name=heightCm]", "171"); await ana.p.fill("details [name=bio]", `Presentación de prueba ${rnd}`);
+await ana.p.waitForURL((u) => u.pathname === "/mi-ficha" && u.searchParams.get("problema") === "medida_invalida");
+await ana.p.fill("details [name=bio]", `Presentación de prueba ${rnd}`);
+await ana.p.fill("details [name=heightCm]", "171");
+await ana.p.waitForFunction((presentacion) => document.querySelector("details [name=alias]")?.value === "La Rápida" && document.querySelector("details [name=heightCm]")?.value === "171" && document.querySelector("details [name=bio]")?.value === presentacion, `Presentación de prueba ${rnd}`);
 await ana.p.click("details button:has-text('Guardar los datos de mi ficha')");
 check("los datos de la ficha se guardan y se confirma", await seen(bueno(ana.p, "datos de tu ficha se han guardado")));
 const anon = await nueva();
@@ -32,6 +35,7 @@ const aliasVisible = await seen(anon.locator("main .apodo", { hasText: "La Rápi
 const alturaVisible = await seen(alturaPublica);
 const presentacionVisible = await seen(anon.locator("main").getByText(`Presentación de prueba ${rnd}`, { exact: true }));
 check("la ficha pública muestra los datos corregidos", aliasVisible && alturaVisible && presentacionVisible);
+if (!aliasVisible || !alturaVisible || !presentacionVisible) console.log("Datos visibles de la ficha:", { aliasVisible, alturaVisible, presentacionVisible });
 
 // 2) Mi cuenta: nombre y avisos por correo
 await ana.p.goto(B + "/mi-cuenta");
