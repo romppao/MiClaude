@@ -2,6 +2,7 @@
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
 import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
+import { execFileSync } from "node:child_process";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -21,6 +22,9 @@ await ana.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).w
 // 1) Un combate celebrado hoy conserva su resultado; uno futuro no admite resultado
 await registrar(ana, { evento: `Velada de Hoy ${rnd}`, fecha: hoyMadrid, rivalNombre: "Bruno", rivalApellidos: `Tercero${rnd}` });
 await ana.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
+// Este escenario comprueba el récord de un combate autodeclarado ya maduro.
+// El flujo de uno recién declarado (que aún no suma durante 24 h) se prueba en flujo.mjs.
+execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}'`]);
 check("un combate de hoy conserva su resultado en el récord", await seen(ana.locator(".rec", { hasText: /^\s*1-0-0\s*$/ }).first()));
 await registrar(ana, { evento: `Velada Futura Ana ${rnd}`, fecha: enDias(10), rivalNombre: "Carlos", rivalApellidos: `Futuro${rnd}` });
 check("un combate que aún no se ha celebrado no admite resultado y lo explica", await seen(ana.locator(".notice-bad", { hasText: "todavía no se ha celebrado" })));
