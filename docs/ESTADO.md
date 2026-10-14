@@ -18,7 +18,7 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
-| Claude (otra sesión; no consta si nube o portátil) | **Versión real en Cloud Run**, separada de la demo, en `lonaclub.es` (ADR-005, «aprobada por el fundador el 14-10-2026» según el PR) | `claude/produccion-cloud-run`, **#57**, versión 0.13.0 | abierto; faltan las cuentas de Google Cloud, Neon y R2, que crea el fundador |
+| Claude Code (portátil) | **Versión real en Cloud Run**, separada de la demo, en `lonaclub.es` (ADR-005, aprobada por el fundador el 14-10-2026), y **base de la demo pasada a Neon** | `claude/produccion-cloud-run`, **#57**, versión 0.13.0 | **en pausa por decisión del fundador** hasta que dé por buena la app (ver sección 4). Hecho: base real `lona-produccion` vacía, base de la demo `lona-demo` en uso, Google en info@lonaclub.es (`lona-511614`). Hay que fusionar #57 pronto: su `render.yaml` evita que Render vuelva a enlazar la base que caduca |
 | Codex (**sin créditos**, según el fundador el 14 oct) | Paneles por tipo de usuario, **bloque F** (pendientes en «Te toca», aura desde el panel, registro en dos pasos…) | `codex/paneles-f-pulido`, **#56** (borrador), 0.12.2 | parado; al volver hay que **cambiar su destino** (apuntaba a #55, ya fusionado) y **renumerar a 0.12.3** si este PR se fusiona antes |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
@@ -28,7 +28,7 @@
 
 1. **Poner el repositorio en privado.**
 2. **Claves de Google** ([`GOOGLE.md`](GOOGLE.md)): proyecto en Google Cloud, ID de cliente con la dirección de vuelta de la demo, y pegar `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en Render (nunca en el chat). Mientras no haya dominio propio, **no pulsar «Publicar aplicación»** (Google pide verificar los dominios); basta el modo de prueba con él como usuario. Con el dominio real habrá que añadir su dirección de vuelta.
-3. **Cuentas de producción** de #57 (Google Cloud, Neon y R2) y la **base de datos gratuita de la demo, que caduca hacia el 1 de noviembre** ([`DEMO.md`](DEMO.md)).
+3. **Cuentas de producción** de #57 (facturación de Google Cloud, R2, Resend y Sentry), cuando el fundador decida montar la versión real. Neon ya está; **la demo ya usa su base de Neon** (`lona-demo`) desde el 14-10-2026, así que la caducidad de la base de Render ya no la afecta.
 4. **UptimeRobot** y cambiar la clave de noticias `CRON_SECRET`.
 5. **Decisiones:** menores (T-014: abrir solo a mayores de 18 o hacer la política), abogado para condiciones de uso y privacidad, y los gastos que falten por aprobar ([`LANZAMIENTO.md`](LANZAMIENTO.md), sección 2).
 
@@ -39,6 +39,8 @@
 - **Entrar con Google sí; Apple aplazado** hasta el lanzamiento (Apple lo exigirá en la tienda si hay otros inicios de sesión de terceros).
 - **Dominio:** lona.es y lona.com están ocupados. Pidió más nombres; según #57 se eligió **lonaclub.es**. Falta que el fundador lo confirme por escrito aquí. También mencionó Infomaniak (dominio y correo); sin decidir y sin precios comprobados.
 - **Mejoras de las veladas:** dijo que tenía y que las daría; sigue a la espera de su lista.
+- **Versión real (14 oct, tarde):** primero hay que comprobar que la app está bien desarrollada y, solo después, montar la versión oficial en lonaclub.es. Tiene que ser «la aplicación real y definitiva»: sin datos de prueba, sin avisos de demo y completamente independiente de la demo. Habrá un espacio de pruebas aparte (la demo) para las próximas actualizaciones. No hay que pulsar «Publicar app» en Google hasta entonces. Hoy lonaclub.es enseña la demo de forma provisional: **no poner `APP_URL=https://lonaclub.es` en Render**.
+- **Dominio confirmado:** lonaclub.es (Infomaniak, comprado el 14-10-2026), con el buzón info@lonaclub.es.
 - **Siempre:** no tocar ni quitar lo que funciona sin que lo pida; avisarle de lo que un diseño aprobado trae y no está hecho; nada de pago sin su aprobación; todo en español.
 
 ## 5. Siguiente, por orden
