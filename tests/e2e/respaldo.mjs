@@ -1,6 +1,6 @@
 // Recorrido de una ficha con historial amateur y profesional: categoría por nivel y explicación del récord.
 // Solo contra el servidor y la base de pruebas; datos ficticios únicos creados mediante la interfaz.
-import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos, mostrar } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos, mostrar, sql } from "./ayudas.mjs";
 
 const { p } = await newUser("Trayectoria", "FIGHTER");
 await p.goto(B + "/mi-ficha");
@@ -31,6 +31,10 @@ async function categoria(nivel, peso) {
 }
 
 await combate("Amateur", -90);
+// Este recorrido evalúa categorías y privacidad con un resultado que ya entra en el récord.
+// Los recién declarados y el límite exacto de 24 horas se prueban en record-24h.mjs.
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Trayectoria Amateur ${rnd}'`);
+await p.goto(B + "/mi-ficha");
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el visitante solo ve cuántos combates lleva hasta que el deportista lo publica.
 const visitantePrevio = await (await browser.newContext()).newPage();
 await visitantePrevio.goto(B + publica);
