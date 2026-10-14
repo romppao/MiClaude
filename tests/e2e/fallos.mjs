@@ -83,6 +83,9 @@ await p.locator(".selector-tema label", { hasText: "Claro" }).click();
 check("al elegir «Claro» la página se vuelve clara", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.reload();
 check("la elección se recuerda al volver", await temaEs("claro", "rgb(244, 242, 236)"));
+// Si React vuelve a pintar <html> al cargar y se pierde el atributo, la elección se repone sola (components/TemaPersistente.tsx).
+await p.evaluate(() => { delete document.documentElement.dataset.tema; });
+check("si la página pierde el tema al cargar, se vuelve a aplicar el elegido", await temaEs("claro", "rgb(244, 242, 236)"));
 await p.getByRole("button", { name: "Menú" }).click();
 check("el menú muestra la opción elegida", await p.getByRole("radio", { name: "Claro" }).isChecked());
 await p.locator(".selector-tema label", { hasText: "Automático" }).click();

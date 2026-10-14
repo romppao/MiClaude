@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **375 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **376 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -100,6 +100,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/components/SelectorTema.tsx](../../src/app/components/SelectorTema.tsx) | Selector Automático/Claro/Oscuro del menú; guarda la elección en este navegador y la marca en <html data-tema>. | [Contexto](../DISENO.md) | `CLAVE_TEMA`, `SelectorTema` | `6b2440fca5971fa0` |
 | [src/app/components/SubirVideo.tsx](../../src/app/components/SubirVideo.tsx) | Componente de cliente que pide dónde subir (/subidas), sube con progreso, deja la clave en videoKey e impide enviar el formulario a medio subir. | [Contexto](FLUJOS.md) | `SubirVideo` | `648c60b5d2ea219e` |
 | [src/app/components/Tarjetas.tsx](../../src/app/components/Tarjetas.tsx) | Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base. | [Contexto](MODULOS.md) | `TarjetaCartel`, `TarjetaDisciplina`, `MiniPeleador`, `GraficoAura` | `40a648c4a9c13cb2` |
+| [src/app/components/TemaPersistente.tsx](../../src/app/components/TemaPersistente.tsx) | Mantiene el tema elegido en <html data-tema>: lo vuelve a aplicar al cargar y si React lo borra al volver a pintar la página. | [Contexto](../DISENO.md) | `TemaPersistente` | `150051e2fc777a5f` |
 | [src/app/components/TrajectoryList.tsx](../../src/app/components/TrajectoryList.tsx) | Presenta títulos y respaldo de trayectoria con datos de revisión/retirada; no recalcula el récord. | [Contexto](MODULOS.md) | `TrajectoryList` | `88788320fdf03460` |
 | [src/app/components/VerificationTag.tsx](../../src/app/components/VerificationTag.tsx) | Etiqueta declaración, confirmación o verificación y respaldo efectivo del hecho; no avala toda una carrera. | [Contexto](MODULOS.md) | `VerificationTag` | `8a7cfb5adc8b7d6a` |
 | [src/app/components/experience/Arena3D.tsx](../../src/app/components/experience/Arena3D.tsx) | Escena procedural PBR de ring o medalla, DPR adaptativo y liberación de GPU. | [Contexto](../EXPERIENCIA-ELITE.md) | `Arena3D` | `b4c0c40ec5753d01` |
@@ -303,7 +304,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [src/app/icon.svg](../../src/app/icon.svg) | Favicon oficial: el ring visto desde arriba, símbolo de la marca Lona. | [Contexto](MODULOS.md) | — | `188108943809ec79` |
 | [src/app/imagenes/[kind]/[id]/[slot]/route.ts](../../src/app/imagenes/%5Bkind%5D/%5Bid%5D/%5Bslot%5D/route.ts) | Sirve avatar/banner autorizado; revisa visibilidad antes de ETag y lee bytes solo si necesita devolver WebP. | [Contexto](MODULOS.md) | `dynamic`, `GET` | `8fb038309e706716` |
 | [src/app/laboratorio/page.tsx](../../src/app/laboratorio/page.tsx) | Guarda de acceso al laboratorio: exige dos indicadores de demostración. | [Contexto](../EXPERIENCIA-ELITE.md) | `dynamic`, `metadata`, `Laboratorio` | `83d354bc5bd673ae` |
-| [src/app/layout.tsx](../../src/app/layout.tsx) | Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí. | [Contexto](MODULOS.md) | `metadata`, `viewport`, `RootLayout` | `f3fa4c9f70499b7a` |
+| [src/app/layout.tsx](../../src/app/layout.tsx) | Composición global de documento, fuente, cabecera, menú y barra móvil según papelDe(); construye las secciones del menú con menuDe() y pasa acciones a componentes sin importarlas allí. | [Contexto](MODULOS.md) | `metadata`, `viewport`, `RootLayout` | `5c3eeeb479ca4d8e` |
 | [src/app/manifest.ts](../../src/app/manifest.ts) | Manifiesto de la aplicación web: nombre, colores e iconos oficiales para instalarla en el móvil. | [Contexto](MODULOS.md) | `manifest` | `b30f8590aa0f25ff` |
 | [src/app/medios/[id]/imagen/route.ts](../../src/app/medios/%5Bid%5D/imagen/route.ts) | Sirve la foto de un medio del público no retirado; ?descargar=1 la descarga con nombre limpio. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `0a970fb929887859` |
 | [src/app/medios/[id]/video/route.ts](../../src/app/medios/%5Bid%5D/video/route.ts) | Sirve (con Range) o descarga el vídeo de un medio del público no retirado, desde R2 por redirección firmada o desde el disco. | [Contexto](FLUJOS.md) | `dynamic`, `GET` | `2f137579a195a41f` |
@@ -393,7 +394,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/diseno.mjs](../../tests/e2e/diseno.mjs) | Recorre funciones v3 por tipos de cuenta y sus paneles (/mi-panel), barra móvil, perfil de entrenador, clases, privacidad y highlights. | [Contexto](OPERACION.md) | — | `2acac72c9e095bca` |
 | [tests/e2e/enlaces.mjs](../../tests/e2e/enlaces.mjs) | Audita enlaces/botones por papel y detecta destinos inservibles; considera controles de diálogo. | [Contexto](OPERACION.md) | — | `dbf52b1578971772` |
 | [tests/e2e/escenarios.mjs](../../tests/e2e/escenarios.mjs) | Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual. | [Contexto](OPERACION.md) | — | `c93d4c246ddaf45b` |
-| [tests/e2e/fallos.mjs](../../tests/e2e/fallos.mjs) | Prueba de navegador del registro de fallos, el panel de moderación por bloques y el selector de tema claro u oscuro. | [Contexto](OPERACION.md) | — | `b2f69116a4ad7ab5` |
+| [tests/e2e/fallos.mjs](../../tests/e2e/fallos.mjs) | Prueba de navegador del registro de fallos, el panel de moderación por bloques y el selector de tema claro u oscuro. | [Contexto](OPERACION.md) | — | `2011b161f91f34f1` |
 | [tests/e2e/fase2a.mjs](../../tests/e2e/fase2a.mjs) | Recorre la fase 2a con datos reales: portada y noticias, portada por disciplina, menú por tipo, interclub del entrenador, subida y descarga de fotos y vídeos, avisos y moderación. | [Contexto](OPERACION.md) | — | `bfa8afefd814d417` |
 | [tests/e2e/filtros.mjs](../../tests/e2e/filtros.mjs) | Comprueba aplicar/quitar filtros, mantener consulta y paginación en listados. | [Contexto](OPERACION.md) | — | `c1ea42763f3e455a` |
 | [tests/e2e/flujo.mjs](../../tests/e2e/flujo.mjs) | Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles. | [Contexto](OPERACION.md) | — | `ae3ddc935a264635` |
@@ -415,7 +416,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/servicios.mjs](../../tests/e2e/servicios.mjs) | Recorridos de servicios y propuestas; reproduce la ausencia de selección local, comprueba privacidad y compatibilidad de clubes, ambos tipos de reto y móvil en ambos temas. | [Contexto](OPERACION.md) | — | `281d8c85f905e3e6` |
 | [tests/e2e/trayectoria.mjs](../../tests/e2e/trayectoria.mjs) | Recorre títulos, revisión, respaldo acreditado y ránking histórico, incluyendo baja/privacidad. | [Contexto](OPERACION.md) | — | `945f665546d1c08d` |
 | [tests/e2e/usabilidad.mjs](../../tests/e2e/usabilidad.mjs) | Comprueba mensajes, estados vacíos, retorno y respuestas visibles de acciones; complementa revisión humana de comprensión. | [Contexto](OPERACION.md) | — | `2d8676934b0db220` |
-| [tests/e2e/veladas-pasadas.mjs](../../tests/e2e/veladas-pasadas.mjs) | Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo. | [Contexto](OPERACION.md) | — | `348fa0a003193046` |
+| [tests/e2e/veladas-pasadas.mjs](../../tests/e2e/veladas-pasadas.mjs) | Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo. | [Contexto](OPERACION.md) | — | `92405396d0fae413` |
 
 ## Pruebas unitarias
 
