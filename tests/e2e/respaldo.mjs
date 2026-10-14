@@ -50,6 +50,8 @@ await p.goto(B + "/mi-ficha");
 
 const visitante = await (await browser.newContext()).newPage();
 async function comprobar(page, contexto, nivelActual) {
+  const nombreNavegacion = contexto.startsWith("Mi ficha") ? "Secciones de mi ficha" : "Secciones de la ficha";
+  await page.getByRole("navigation", { name: nombreNavegacion }).getByRole("link", { name: "Récord", exact: true }).click();
   const cards = page.locator("main :is(.grid, .fila-tarjetas) > .card").filter({ has: page.locator(".rec") });
   const pro = cards.filter({ hasText: "Boxeo · Profesional" });
   const amateur = cards.filter({ hasText: "Boxeo · Amateur" });
