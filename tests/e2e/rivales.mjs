@@ -69,6 +69,7 @@ await org.p.goto(B + "/organizador");
 await org.p.fill("[name=name]", `Velada Cerrada ${rnd}`); await org.p.fill("[name=date]", new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10));
 await org.p.selectOption("select[name=discipline]", "MUAYTHAI"); await org.p.fill("[name=city]", "Valencia"); await org.p.selectOption("select[name=province]", "Valencia");
 await org.p.locator("input[name=inscripcion]").uncheck();
+await org.p.selectOption("select[name=level]", "AMATEUR");
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();
 await yo.p.goto(B + `/veladas/${slug}`);
