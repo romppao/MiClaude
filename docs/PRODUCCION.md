@@ -89,7 +89,7 @@ La versión real empieza **vacía**: sin peleadores, veladas ni cuentas de ejemp
 |---|---|---|
 | Infomaniak | Del fundador | Dominio lonaclub.es, zona DNS y buzón info@lonaclub.es |
 | Google Cloud | Proyecto **`lona-511614`**, de **info@lonaclub.es** | Cloud Run, Secret Manager, «Entrar con Google» (cliente OAuth «Lona web»). El proyecto `lona-511613`, de la cuenta de Gmail del fundador, está **en desuso** y hay que borrarlo: su secreto quedó expuesto |
-| Neon | info@lonaclub.es, organización «Lona Club» (`org-shiny-sky-35660821`) | Base real `lona-produccion` (`solitary-morning-87085163`, Fráncfort `aws-eu-central-1`, PostgreSQL 18), creada el 14-10-2026 con todas las migraciones y vacía. Falta `lona-demo` |
+| Neon | info@lonaclub.es, organización «Lona Club» (`org-shiny-sky-35660821`) | Base real `lona-produccion` (`solitary-morning-87085163`, Fráncfort `aws-eu-central-1`, PostgreSQL 18), creada el 14-10-2026 con todas las migraciones y vacía. Base de la demo `lona-demo` (`mute-king-39532104`, Fráncfort, PostgreSQL 18): copia de la base de Render hecha el 14-10-2026 (30 tablas, mismos recuentos) |
 | Cloudflare | info@lonaclub.es | R2: copias y vídeos |
 | Resend | info@lonaclub.es | Correos de la aplicación |
 | Sentry | info@lonaclub.es | Errores |
@@ -121,12 +121,13 @@ Las claves de cada servicio solo están en Secret Manager o en los secretos de G
 | `/salud` da 503 | La app no llega a la base: Neon dormido que no despierta, contraseña cambiada o cuota agotada | Panel de Neon: estado y consumo de CU-h. Comprobar `DATABASE_URL` en Secret Manager |
 | La web va lenta la primera vez | Arranque en frío de Cloud Run y de Neon tras un rato sin uso (segundos) | Normal en el plan gratuito. Si molesta, mínimo 1 instancia, con coste y con decisión del fundador |
 | GitHub Actions deja de ejecutarse a final de mes | Se agotaron los 2.000 minutos gratuitos (repositorio privado) | `mantener-demo-despierta.yml` gasta unos 4.300 al mes: sustituirlo por UptimeRobot o Better Stack |
-| La demo deja de funcionar a primeros de noviembre de 2026 | Caducó la base gratuita de Render (creada el 2-10-2026) | Pasar la demo a Neon (`lona-demo`) antes del 1-11. Render la borra 14 días después de caducar |
+| La demo deja de funcionar a primeros de noviembre de 2026 | Sigue usando la base gratuita de Render (`ring-demo-db`, caduca el 1-11-2026) | Su copia ya está en Neon (`lona-demo`). En Render → `ring-espana-demo` → Environment, `DATABASE_URL` debe ser la conexión *pooled* de `lona-demo`. `render.yaml` ya no la enlaza a la base de Render |
 | Algo extraño en la app | — | Moderación → «Fallos de la aplicación» (`/moderacion/fallos`) y, cuando esté, Sentry |
 
 ## Herramientas de Neon para asistentes (instaladas el 14-10-2026)
 - Skills `neon` y `neon-postgres` a nivel de usuario, para Claude Code (`neon skills --global`).
 - Servidor MCP «Neon» (`https://mcp.neon.tech/mcp`) en la configuración de usuario de Claude Code, en modo OAuth: no guarda claves en archivos y pide iniciar sesión al primer uso.
 - Copia de la configuración anterior: `~/.claude.json.antes-neon-20261014`.
+- Copia de una base a otra sin ver las claves (así se pasó la demo de Render a Neon): las direcciones van en variables de entorno a un contenedor `postgres:18-alpine` que hace `pg_dump --format=custom --no-owner --no-privileges` y `pg_restore --no-owner --no-privileges`, y después se comparan los recuentos de todas las tablas.
 - Para usar la base desde la terminal sin ver la clave, pasarla directamente de Neon al programa, por ejemplo:
   `DATABASE_URL="$(npx neon@latest connection-string --project-id solitary-morning-87085163)" npx prisma migrate deploy`.
