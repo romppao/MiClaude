@@ -8,3 +8,5 @@ Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy
 Archivos: prisma/schema y migración paneles_agenda, paneles, acciones de cuentas/veladas/ficha, directorio y buscador del cartel, calendario, limpieza, mensajes y pruebas. Ficheros compartidos: schema y package. Limitaciones: CI pendiente, 14/15 pruebas documentales por EPERM de symlink Windows en F; sin PostgreSQL local. Siguiente: revisar F/G con Claude, después D; H4 requiere modelo revisado antes de interfaz.
 
 Validación local: versión 0.13.3 > F 0.13.2, esquema Prisma válido, guion E2E sin errores sintácticos, catálogo 402 y mapa 78/85/30 comprobados. Compilación final aprobada. Navegador y migraciones en base vacía pendientes de CI.
+
+CI 38617712681: migración y paridad, tipos, unitarias y build aprobados; E2E G pasa asistencia, calendario, provincia y disponibilidad. Falla agenda porque newUser no crea TRAINER: ese ayudante solo distingue FAN/FIGHTER. Se prepara explícitamente el papel TRAINER y se conserva la comprobación de orden. Se añaden provincia, asistencia y disponibilidad a descarga privada y privacidad. No se declara CI verde.
