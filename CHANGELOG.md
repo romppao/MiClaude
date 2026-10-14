@@ -11,6 +11,11 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.11.1] — 2026-10-13
+
+### Cambiado
+- Se documenta el cierre de la revisión de lanzamiento, las comprobaciones locales y los pendientes para la segunda revisión.
+
 ## [0.11.0] — 2026-10-13
 
 ### Añadido

@@ -13,6 +13,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Entender el proyecto sin conversaciones previas y mantenerlo como programador nuevo** | [Manual de mantenimiento](mantenimiento/README.md) |
 | **Localizar la responsabilidad de cualquier archivo, sus exportaciones directas y su contexto** | [Catálogo del código](mantenimiento/CATALOGO.md) |
 | **Retomar el proyecto** en otro ordenador o con Claude Code: ponerlo en marcha y saber en qué punto está | [`TRASLADO.md`](TRASLADO.md) |
+| **Leer los traspasos técnicos recientes** entre asistentes | [`ecosistema/traspasos/`](ecosistema/traspasos/) |
 | **Saber dónde está cada cosa en el código** y por qué ruta ir para hacer algo (añadir una pantalla, una acción, un mensaje, cambiar la base de datos…) | [`DESARROLLO.md`](DESARROLLO.md) |
 | **Probar la aplicación en el navegador** con datos ficticios | [`DEMO.md`](DEMO.md) |
 | **Saber qué se hace, en qué orden y por qué** (plan maestro) · rangos y rendimiento de los asistentes | [`PLAN.md`](PLAN.md) · [`RANGOS.md`](RANGOS.md) |

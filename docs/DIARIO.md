@@ -1765,6 +1765,12 @@ Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos t
 
 Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autorización moderadora para veladas pasadas; B3 incorpora el plazo de 24 horas a partir del registro con exclusión de combates disputados y aviso al peleador. B2 conserva la privacidad amateur actual y deja pendiente la visibilidad interna para moderación. Se eliminaron los BOM UTF-8 de `record-eligibility.ts` y `record-time.ts`. CI y revisión de los PR apilados pendientes.
 
+La primera ejecución de CI reveló supuestos E2E que ya no eran válidos tras hacer obligatorio el nivel y aplicar el plazo de 24 horas. Las pruebas se ajustaron para elegir nivel, esperar al resultado y comprobar los combates después de 25 horas cuando corresponde.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque C (Codex)
+
+El traspaso técnico reúne el alcance A/B, comprobaciones y límites. Los PR se mantienen en borrador y no se ha desplegado la demo. Pendientes: CI de la pila rebasada, revisión final de Claude y publicación autorizada.
+
 ## 14 de octubre de 2026 — Afinado de pruebas de lanzamiento (Codex)
 
 CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba para que se vea el récord actualizado. CI #514 encontró que el botón compacto de atribución de MapLibre medía 24 × 44 px en móvil. Se amplió su zona táctil a 44 × 44 px, manteniendo el icono centrado. La CI debe volver a comprobar E2E y accesibilidad; el ajuste es de tamaño de interacción y no cambia el diseño de la página.
@@ -1788,3 +1794,6 @@ CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba
 14 oct — La prueba de usabilidad de B conserva su comprobación de «Gana Movil» y declaración opcional: activa por la interfaz la publicación del récord amateur de su fixture y madura ese combate 25 horas antes de verlo. La captura anterior ocultaba el resultado por privacidad; no era un error de la aplicación. El doble clic fallido del mismo recorrido queda resuelto en A3. No se atribuye a este guion una pasada verde hasta repetirlo sobre A corregida.
 
 14 oct, precisión de usabilidad B: la privacidad amateur protege a ambos participantes. Se prepara también la autorización del rival a través de su cuenta e interruptor y se selecciona su ficha existente. La segunda pasada que publicaba solo el récord del ganador seguía ocultando correctamente el resultado y se registra como fallida. No se relaja la comprobación ni se modifica la política.
+## Estado del rebase final, 14 de octubre
+
+A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/categorías y mantienen las exigencias públicas. C está nuevamente sobre esa B (0.11.1). Frente a la pila anterior, src, prisma, scripts y unitarias de B/C son idénticos; cambian los guiones indicados y documentación generada. Se valida el CI de estos heads, no el de sus predecesores fallidos. Las pruebas dirigidas pasan: cuenta 33/33, cuenta CPU ×6 33/33, categorías 18/18 y respaldo 22/22. La descripción de sparring sigue pendiente; no hay PR ni versión ficticios para ese caso.
