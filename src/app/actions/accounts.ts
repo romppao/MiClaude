@@ -17,7 +17,7 @@ import { internalPath } from "../../lib/common/paths";
 import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
 import { almacenDeVideos } from "../../lib/media/storage";
-import { ROL_INICIAL, landingFor, parseTipoDeCuenta, parseTipoDeEntidad, type TipoDeCuenta, type TipoDeEntidad } from "../../lib/accounts/landing";
+import { PASO_TRAS_DATOS, ROL_INICIAL, landingFor, parseTipoDeCuenta, parseTipoDeEntidad, type TipoDeEntidad } from "../../lib/accounts/landing";
 import { readOnboarding, type FighterIntent, type TrainerIntent } from "../../lib/accounts/onboarding";
 import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
@@ -33,8 +33,6 @@ function checkNewPassword(password: string, back: string) {
   if (password.length > LIMITS.password) go(back, { problema: "contrasena_larga" });
 }
 
-/** Siguiente paso del registro tras crear la cuenta: cada tipo tiene el suyo (diseño v3); la entidad ya ha terminado. */
-const PASO_TRAS_DATOS: Record<TipoDeCuenta, string> = { usuario: "/registro/intereses", peleador: "/registro/ficha", entrenador: "/registro/perfil", entidad: "/verificar" };
 
 /**
  * Alta de cuenta (paso «datos» del registro) para los cuatro tipos: aficionado («usuario»), peleador, entrenador y entidad

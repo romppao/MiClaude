@@ -365,3 +365,6 @@ Encargo aprobado: adaptar móvil/escritorio conservando el diseño. Banco dev im
 ## 13 de octubre de 2026 — Pregunta de privacidad pendiente
 
 - **Visibilidad interna del récord amateur completo:** los organizadores lo ven en las solicitudes para participar. No se encontró una decisión clara sobre el acceso de moderación. Pendiente del fundador; no cambiar permisos.
+- **Entrar con Google** (fundador, 14 oct). Estado: **hecho** (0.12.0), a falta de que el fundador ponga las claves (`docs/GOOGLE.md`).
+- **Entrar con Apple** (fundador, 14 oct: «lo dejaremos aplazado para cuando lo lancemos»). Estado: aplazado. Apple lo exige en la App Store si la aplicación ofrece otros inicios de sesión de terceros, así que hay que hacerlo antes de publicar en tiendas.
+- **Desvincular Google desde «Mi cuenta»** (Claude, 14 oct). Estado: idea. Hoy se puede entrar también con contraseña eligiéndola en «¿Has olvidado tu contraseña?».

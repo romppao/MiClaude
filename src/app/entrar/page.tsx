@@ -4,6 +4,8 @@ import { LIMITS } from "../../lib/common/text";
 import { internalPath } from "../../lib/common/paths";
 import { oneParam } from "../../lib/common/safe";
 import Icono from "../components/Icono";
+import BotonGoogle from "../components/BotonGoogle";
+import { googleDisponible } from "../../lib/accounts/google";
 
 export const metadata = { title: "Entrar" };
 
@@ -31,6 +33,11 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
         <button className="btn-grande" style={{ marginTop: 8 }}>Entrar en mi cuenta</button>
       </form>
       <p style={{ margin: 0 }}><Link href="/recuperar">¿Has olvidado tu contraseña? Elige una nueva</Link></p>
+      {googleDisponible() && <>
+        <p className="separador-o" aria-hidden="true">o</p>
+        <BotonGoogle modo="entrar" next={next} />
+        <p className="hint mut" style={{ margin: 0 }}>Si aún no tienes cuenta, se creará con tu correo de Google, ya confirmado.</p>
+      </>}
       <div className="tarjeta" style={{ alignItems: "flex-start" }}>
         <h2 style={{ fontSize: 20 }}>¿Todavía no tienes cuenta?</h2>
         <p className="acciones" style={{ margin: 0 }}><Link className="btn secondary" href={registro}>Crear mi cuenta</Link></p>

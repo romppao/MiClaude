@@ -51,6 +51,9 @@ jobs:
       GEOCODIFICAR: "no"
       # Cuenta del creador de las pruebas (tests/e2e/creador.mjs).
       CREADOR_CORREO: creador@prueba.test
+      # Claves de mentira para que aparezca «Continuar con Google» (tests/e2e/google.mjs); nunca se llega a hablar con Google.
+      GOOGLE_CLIENT_ID: cliente-de-pruebas.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: secreto-de-pruebas
       MEDIA_DIR: /tmp/ring-subidas
     steps:
       - uses: actions/checkout@v4

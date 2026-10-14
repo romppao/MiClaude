@@ -86,6 +86,9 @@ export const AVISOS: Record<string, string> = {
   ficha_actualizada: "Los datos de tu ficha se han guardado.",
   // Diseño v3: registro por pasos, entrenadores, récord privado y highlights.
   cuenta_creada: "Tu cuenta se ha creado. Te hemos enviado un correo electrónico para confirmarla. Mientras tanto, completa este último paso o déjalo para después.",
+  // Entrar con Google (T-015).
+  cuenta_creada_google: "Tu cuenta se ha creado con Google y tu correo electrónico ya está confirmado. Completa este último paso o déjalo para después.",
+  google_vinculada: "Has entrado con Google. Desde ahora puedes entrar con Google o con tu correo y contraseña.",
   intereses_guardados: "Tus disciplinas se han guardado: tu inicio te mostrará primero lo que te interesa.",
   intereses_y_seguidos: "Listo: ya sigues a esos peleadores y verás sus veladas y resultados en tu inicio.",
   registro_ficha_guardada: "Hemos guardado los datos de tu ficha. Cuando confirmes tu correo electrónico, revísalos en «Mi ficha» y pulsa «Crear mi ficha».",
@@ -132,6 +135,13 @@ export const PROBLEMAS: Record<string, string> = {
   titular_invalido: "El titular debe tener una cuenta con ese correo electrónico confirmado.",
   cinturon_invalido: "Elige un cinturón de la lista y un número de grados entre 0 y 10. Para indicar grados debes elegir el cinturón.",
   login_incorrecto: "El correo electrónico o la contraseña no son correctos. Revísalos e inténtalo de nuevo, o elige una contraseña nueva si la has olvidado.",
+  google_no_disponible: "Entrar con Google no está disponible en este momento. Entra con tu correo electrónico y tu contraseña.",
+  google_cancelado: "No has terminado de entrar con Google. Puedes volver a intentarlo o entrar con tu correo electrónico y tu contraseña.",
+  google_caducado: "La entrada con Google ha caducado o no se ha podido comprobar. Pulsa otra vez «Continuar con Google».",
+  google_error: "Google no ha podido confirmar tu cuenta. Vuelve a intentarlo dentro de un momento o entra con tu correo electrónico y tu contraseña.",
+  google_correo: "Tu cuenta de Google no tiene el correo electrónico confirmado. Confírmalo en Google o regístrate con tu correo y una contraseña.",
+  google_otra_cuenta: "Tu cuenta de Lona ya está vinculada a otra cuenta de Google. Entra con esa cuenta de Google o con tu correo electrónico y tu contraseña.",
+  google_reintentar: "Tu cuenta se estaba creando en ese momento. Pulsa otra vez «Continuar con Google» para entrar.",
   demasiados_intentos: "Has hecho demasiados intentos seguidos. Espera unos minutos y vuelve a probar.",
   registro_datos: "Revisa tu nombre y tu correo electrónico: el nombre es obligatorio y el correo debe ser una dirección completa, como nombre@ejemplo.es.",
   registro_password: "La contraseña necesita 8 caracteres como mínimo.",

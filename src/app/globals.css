@@ -829,3 +829,9 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
   header.top .menu-open{gap:6px;padding-inline:10px}
   .portada-visita h1{font-size:clamp(40px,13vw,52px)}
 }
+
+/* Entrar con Google (T-015): mismo botón secundario, con el logotipo de Google a la izquierda. */
+.boton-google{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;width:100%}
+.boton-google img{flex:none}
+.separador-o{display:flex;align-items:center;gap:12px;margin:4px 0;color:var(--mut);font-size:16px}
+.separador-o::before,.separador-o::after{content:"";flex:1;border-top:1px solid var(--line)}

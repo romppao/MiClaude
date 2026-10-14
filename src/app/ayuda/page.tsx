@@ -61,6 +61,9 @@ export default function Help() {
       <p>Los reconocimientos de la comunidad añaden un punto cada uno. Nadie puede votar su propio combate ni concederse un respaldo. Los moderadores comprueban la identidad de quien respalda; un perfil que diga «federación» no concede permisos. Una declaración excluida por moderación deja de aportar; retirar una acreditación elimina sus bonificaciones. Corregir los datos requiere un respaldo nuevo.</p>
       <p>El récord cuenta los resultados y distingue declaraciones de resultados respaldados. Las declaraciones con resultado esperan 24 horas antes de sumar, salvo confirmación o verificación anterior; las disputadas o en revisión no cuentan. La escala de aura es una versión inicial que se revisará con datos reales; no calcula automáticamente el nivel deportivo de una persona.</p>
 
+      <h2 id="google">Entrar con Google</h2>
+      <p>Si ves el botón «Continuar con Google», puedes entrar o crear tu cuenta con tu cuenta de Google, sin inventar otra contraseña. Si ya tenías una cuenta en Lona con el mismo correo, entrarás en ella. Si no, se crea una nueva con el correo ya confirmado. Si algún día quieres entrar también con contraseña, elige una en «¿Has olvidado tu contraseña?».</p>
+
       <h2>¿Has visto un error?</h2>
       <p>En la ficha de cualquier peleador encontrarás la opción <strong>«¿Hay un error? Avísanos»</strong>, disponible para usuarios registrados. Un moderador revisará tu aviso.</p>
       <p className="mut">Versión {VERSION} de Lona.</p>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { register } from "../actions/accounts";
+import BotonGoogle from "../components/BotonGoogle";
+import { googleDisponible } from "../../lib/accounts/google";
 import { LIMITS } from "../../lib/common/text";
 import { internalPath } from "../../lib/common/paths";
 import { oneParam } from "../../lib/common/safe";
@@ -68,6 +70,13 @@ export default async function Register({ searchParams }: { searchParams: Promise
         <h1 style={{ margin: 0 }}>{panel.titular}</h1>
       </div>
       {avisoDestino}
+      {googleDisponible() && (tipo === "entidad"
+        ? <p className="hint mut" style={{ margin: 0 }}>Las promotoras, federaciones y clubes se registran con correo y contraseña, porque su solicitud necesita estos datos.</p>
+        : <>
+          <BotonGoogle modo="registro" tipo={tipo} next={next} texto="Registrarme con Google" />
+          <p className="hint mut" style={{ margin: 0 }}>Usaremos el nombre y el correo de tu cuenta de Google; el correo quedará confirmado.</p>
+          <p className="separador-o" aria-hidden="true">o con tu correo</p>
+        </>)}
       <form action={register} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <input type="hidden" name="tipo" value={tipo} />
         {next && <input type="hidden" name="next" value={next} />}

@@ -1834,3 +1834,34 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.
 
 **Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.
+
+## 14 de octubre de 2026 — Entrar y registrarse con Google (Claude)
+
+**Qué se pidió** (el fundador): «que se pudiera registrar la gente mediante Google […] La parte de Apple lo dejaremos aplazado para cuando lo lancemos. Pero por lo menos la de Google que ya esté, que creo que se puede y es gratuito». Codex se quedó sin créditos, así que: «hazlo tú. Todo lo que haya que hacer, hazlo tú […] dame el texto en caso de que a ti se te acaben los créditos».
+
+**Qué se decidió y por qué:**
+- **OpenID Connect con PKCE, `state` y `nonce`, programado en Lona y sin librerías nuevas.** Son unas 150 líneas, fáciles de revisar y sin dependencias que mantener. Solo se piden nombre y correo: con eso Google no limita a usuarios de prueba ni muestra avisos (ayuda oficial de Google Cloud, «Manage App Audience» y «Unverified apps»).
+- **Cuentas:**
+  - si el `sub` ya está vinculado, se entra;
+  - si el correo ya existe, se vincula;
+  - si no existe, se crea con el correo confirmado.
+- **Protección contra el «secuestro previo»:** si la cuenta existente no había confirmado su correo, se invalida su contraseña y se cierran sus sesiones antes de vincularla.
+- **El creador** sigue pasando por el segundo paso.
+- **Las entidades** se registran con correo y contraseña, porque su solicitud necesita datos que Google no da.
+- **Sin claves no hay botón.** Las claves las pone el fundador en Render (`docs/GOOGLE.md`).
+
+**Qué se hizo:**
+- `lib/accounts/google.ts`.
+- Rutas `/api/auth/google` y `/api/auth/google/callback`.
+- `BotonGoogle` en «Entrar» y «Registrarse».
+- Campo `User.googleSub` y su migración.
+- Mensajes, ayuda y privacidad.
+- `render.yaml` y `.env.example`.
+- Pruebas: 16 unitarias y `tests/e2e/google.mjs`. En el CI se usan claves de mentira y no se llega a hablar con Google; `enlaces.mjs` no sigue esa ruta.
+- Ficha `T-015` (sirve también de encargo para Codex) y guía para el fundador.
+
+**Qué salió mal:**
+- Desde la sesión no se pueden abrir las páginas de Google para desarrolladores (sin resolución DNS). Las condiciones de uso se comprobaron con la búsqueda web, citando las páginas oficiales de ayuda.
+- No se puede probar el viaje real a Google hasta que el fundador ponga las claves.
+
+**Estado y próximos pasos:** PR en borrador, apilado sobre #53. Después: el fundador crea las credenciales y Claude lo comprueba en la demo.
