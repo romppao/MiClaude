@@ -67,7 +67,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
         </Link>
       ))}
       {porResultado.resto > 0 && <Link href="/organizador#mis-eventos" style={{ alignSelf: "flex-start" }}>{porResultado.resto === 1 ? "Ver otra velada" : `Ver otras ${porResultado.resto} veladas`} con resultados por poner</Link>}
-      <section aria-label="Preparar mis veladas"><h2>Preparar mis veladas</h2>{preparaciones.map((v, i) => <div key={v.id}><Link href={`/organizador/${v.slug}`}>{v.name}</Link><PreparacionVelada event={v} asistentes={audiencias[i].asistentes} seguidores={audiencias[i].seguidores} /></div>)}<Link href="/organizador">Ver todas mis veladas</Link></section>
+      <section aria-label="Preparar mis veladas"><h2>Preparar mis veladas</h2>{preparaciones.map((v, i) => <div key={v.id}><Link className="btn secondary" href={`/organizador/${v.slug}`}>{v.name}</Link><PreparacionVelada event={v} asistentes={audiencias[i].asistentes} seguidores={audiencias[i].seguidores} /></div>)}<Link className="btn secondary" href="/organizador">Ver todas mis veladas</Link></section>
       <section aria-labelledby="titulo-proxima-velada" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-proxima-velada">Próxima velada</h2><Link href="/organizador">Todas</Link></div>
         {proxima ? (

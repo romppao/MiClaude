@@ -61,8 +61,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       <h1>{e.name}</h1>
       <p>{asistentes} van a ir</p>
       {e.status === "SCHEDULED" && e.date >= calendarDayStart() && <section className="tarjeta" aria-label="Asistencia y calendario">
-        {user ? <form action={setAttendance}><input type="hidden" name="eventId" value={e.id} /><input type="hidden" name="asistir" value={asistencia ? "0" : "1"} /><button>{asistencia ? "Ya no voy a ir" : "Voy a ir"}</button></form> : <Link href={`/entrar?next=${encodeURIComponent(`/veladas/${e.slug}`)}`}>Entra para marcar «Voy a ir»</Link>}
-        <a href={`/veladas/${e.slug}/calendario`}>Añadir a mi calendario</a>
+        {user ? <form action={setAttendance}><input type="hidden" name="eventId" value={e.id} /><input type="hidden" name="asistir" value={asistencia ? "0" : "1"} /><button>{asistencia ? "Ya no voy a ir" : "Voy a ir"}</button></form> : <Link className="btn secondary" href={`/entrar?next=${encodeURIComponent(`/veladas/${e.slug}`)}`}>Entra para marcar «Voy a ir»</Link>}
+        <a className="btn secondary" href={`/veladas/${e.slug}/calendario`}>Añadir a mi calendario</a>
       </section>}
       {!e.organizerId && <p className="mut">Esta velada no la ha publicado un organizador: la indicó un peleador al registrar su combate. Los datos pueden estar incompletos.</p>}
       <p className="mut">

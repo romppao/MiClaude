@@ -121,7 +121,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
       <section className="tarjeta" aria-label="Esta semana"><h2>Esta semana</h2>
         {agenda.map((r) => <div className="fila" key={r.id}><span className="cuerpo"><strong>{r.user.name} · {r.class.title}</strong><span>{r.day ? `${fmtDate(r.day)} · ${agendaTime(r.fromMinute, r.toMinute)}` : `Fecha por acordar · ${r.preferred}`}</span></span></div>)}
         {!agenda.length && <p>No tienes clases aceptadas esta semana.</p>}
-        <Link href="/mis-clases#solicitudes">Ver todas las solicitudes y clases aceptadas</Link>
+        <Link className="btn secondary" href="/mis-clases#solicitudes">Ver todas las solicitudes y clases aceptadas</Link>
       </section>
       <section id="solicitudes" className="tarjeta" aria-label="Solicitudes de clase pendientes">
         <h2>Solicitudes de clase pendientes</h2>
