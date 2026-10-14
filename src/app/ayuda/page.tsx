@@ -36,7 +36,7 @@ export default function Help() {
       <div className="table-wrap" tabIndex={0} role="region" aria-label="Qué significan las etiquetas de un combate">
 <table>
         <tbody>
-          <tr><th scope="row">Declarado · confirmación opcional</th><td>Lo ha registrado uno de los peleadores. Durante las primeras 24 horas no suma en el récord, el ránking ni las estadísticas. Después cuenta si nadie lo rechaza ni moderación lo pone en revisión. Si el rival confirma o un organizador o moderador lo verifica antes, cuenta en ese momento. La ficha muestra la hora a partir de la que contará.</td></tr>
+          <tr><th scope="row">Declarado · confirmación opcional</th><td>Lo ha registrado uno de los peleadores y se muestra como declarado en ambas fichas. Durante las primeras 24 horas no suma en el récord, el ránking ni las estadísticas. Después cuenta si nadie lo rechaza ni moderación lo pone en revisión. Si el rival confirma o un organizador o moderador lo verifica antes, cuenta en ese momento. La ficha muestra la hora a partir de la que contará.</td></tr>
           <tr><th scope="row">Confirmado por el rival</th><td>Los dos peleadores están de acuerdo.</td></tr>
           <tr><th scope="row">Verificado</th><td>Lo ha comprobado un moderador o lo ha publicado el organizador de la velada.</td></tr>
           <tr><th scope="row">En revisión</th><td>Moderación ha suspendido el resultado tras revisar un aviso. No cuenta en el récord ni en el aura hasta que se aclare. El aviso por sí solo no lo suspende.</td></tr>
