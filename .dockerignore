@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.*
+!.env.example
+test-results
+tests
+docs
+animation-plans
+*.log
+tsconfig.tsbuildinfo

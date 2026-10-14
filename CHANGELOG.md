@@ -11,6 +11,21 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.0] — 2026-10-14
+
+PR de Claude: preparación de la versión real en lonaclub.es (ADR-005).
+
+### Añadido
+- **La versión real se puede publicar en Google Cloud Run** con su propia base de datos en Neon, separada de la demo. Incluye:
+  - imagen Docker (`Dockerfile`, salida *standalone* de Next.js solo al compilar la imagen);
+  - despliegue manual desde Actions, que aplica las migraciones antes de publicar y comprueba `/salud`;
+  - guía de operación en `docs/PRODUCCION.md`.
+- **Copia de seguridad diaria** de la base real en Cloudflare R2, con jurisdicción UE (`copia-diaria.yml`).
+
+### Cambiado
+- La actualización de noticias cada 6 horas también llega a la versión real cuando tiene dirección (variable `PROD_URL`). Cada destino usa su propia clave.
+- La demo de Render no cambia: sigue arrancando con `next start` y sus datos de ejemplo.
+
 ## [0.12.1] — 2026-10-14
 
 PR de Claude (bloque E del encargo de paneles por tipo de usuario: fallos de la revisión del 14 de octubre).
