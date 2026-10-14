@@ -12,6 +12,7 @@ import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
 import ProfileThumbnail from "../components/ProfileThumbnail";
 import MapaGimnasios, { type GimnasioEnMapa } from "../components/MapaGimnasios";
 import { PROVINCES } from "../../lib/common/labels";
+import { gimnasiosVisibles } from "../../lib/common/territorio";
 
 export const metadata = { title: "Gimnasios" };
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ const MAX_EN_MAPA = 1500;
 export default async function Gyms({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { q, province, pagina } = flatParams(await searchParams);
   const ids = await searchIds("gym", q);
-  const where = { ...(province && { province }), ...(ids && { id: { in: ids } }) };
+  const where: Prisma.GymWhereInput = { AND: [gimnasiosVisibles(), { ...(province && { province }), ...(ids && { id: { in: ids } }) }] };
   const total = await db.gym.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
   const [gyms, enMapa] = await Promise.all([
