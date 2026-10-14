@@ -45,6 +45,7 @@
 
 ## 5. Siguiente, por orden
 
+0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación pendiente: bloquear usuarios, avisos automáticos de moderación (DSA) y aviso sin cuenta.
 0. **Revisión completa antes de la versión oficial:** [`tareas/T-016-revision-previa-al-lanzamiento.md`](tareas/T-016-revision-previa-al-lanzamiento.md). Es lo que pidió el fundador antes de montar lonaclub.es y publicar en Google. Sin empezar: el primer intento se cortó por un fallo del servicio.
 1. Resolver #57 (producción) y #56 (bloque F): revisar, retargetar y renumerar.
 2. **Probar «Continuar con Google»** en la demo en cuanto el fundador ponga las claves.

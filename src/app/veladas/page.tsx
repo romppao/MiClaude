@@ -62,7 +62,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
           <Link key={e.id} href={`/veladas/${e.slug}`} className="card">
             <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
-            {!e.organizerId && <span className="tag">no oficial</span>}
+            {!e.organizerId && <span className="tag">No oficial</span>}
             {e.registrationOpen && e.status === "SCHEDULED" && <span className="tag" style={{ background: "var(--acc)", color: "var(--acc-ink)" }}>Inscripción abierta</span>}
             <strong>{e.name}</strong>
             <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
