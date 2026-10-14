@@ -12,19 +12,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
 
+    # Demo (Render) y versión real (Cloud Run, ADR-005). Cada una con su propia clave: un fallo en una no impide la otra.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destino: demo
+          - destino: real
     steps:
-      - name: Despertar Render y actualizar fuentes
+      - name: Despertar y actualizar fuentes (${{ matrix.destino }})
         env:
-          # Mismo valor que la variable CRON_SECRET del servicio en Render (Settings → Secrets → Actions).
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          URL: https://ring-espana-demo.onrender.com/api/cron/noticias
+          # Demo: secreto CRON_SECRET (el mismo valor que en Render). Versión real: PROD_CRON_SECRET (el de Secret Manager).
+          DESTINO: ${{ matrix.destino }}
+          CLAVE_DEMO: ${{ secrets.CRON_SECRET }}
+          CLAVE_REAL: ${{ secrets.PROD_CRON_SECRET }}
+          PROD_URL: ${{ vars.PROD_URL }}
         run: |
+          # Se elige en el shell: en las expresiones de GitHub, «a && b || c» devuelve c cuando b está vacío.
+          if [ "$DESTINO" = "real" ]; then BASE="$PROD_URL"; CRON_SECRET="$CLAVE_REAL"; else BASE="https://ring-espana-demo.onrender.com"; CRON_SECRET="$CLAVE_DEMO"; fi
+          if [ -z "$BASE" ]; then
+            echo "La versión real todavía no tiene dirección (variable PROD_URL): se omite."
+            exit 0
+          fi
           if [ -z "$CRON_SECRET" ]; then
-            echo "::error::Falta el secreto CRON_SECRET en GitHub"
+            echo "::error::Falta el secreto de la clave del cron para $BASE"
             exit 1
           fi
+          URL="$BASE/api/cron/noticias"
 
-          # Reintentos para dar tiempo a que Render despierte si estaba dormido
+          # Reintentos para dar tiempo a que el servidor despierte si estaba dormido
           for i in 1 2 3; do
             echo "Intento $i..."
             STATUS=$(curl -s -o respuesta.json -w "%{http_code}" -m 90 -H "x-cron-secret: $CRON_SECRET" "$URL" || echo "000")
@@ -34,7 +50,7 @@ jobs:
               exit 0
             fi
             if [ "$STATUS" = "401" ] || [ "$STATUS" = "503" ]; then
-              echo "::error::El servidor rechazó la petición ($STATUS): revisa CRON_SECRET en GitHub y en Render"
+              echo "::error::El servidor rechazó la petición ($STATUS): revisa la clave del cron en GitHub y en el servidor"
               exit 1
             fi
             echo "El servidor respondió con estado $STATUS; espero 20 s a que despierte..."

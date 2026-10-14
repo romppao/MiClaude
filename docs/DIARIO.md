@@ -1908,9 +1908,71 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 **Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.
 
+## 2026-10-14 — Relevo entre sesiones: que Claude, Claude Code y Codex no se pisen (Claude, nube)
+
+**Qué se pidió** (el fundador): «entre tú y Code no os podéis comunicar, por lo que quiero que creéis una documentación en la que actualicéis lo que hagáis cada uno para así no solapar trabajo y tengáis contexto de todo lo que se haya hecho en cada sesión, así no tengo que gastar token repitiendo cosas que ya he hecho en el móvil […] en caso de que no esté esto ya implementado, hacerlo de la manera más óptima».
+
+**Qué se encontró:** ya había mucha documentación (`EQUIPO.md`, un registro por asistente, traspasos de Codex, `TRASLADO.md`), pero no resolvía el problema:
+- **Ningún punto de entrada corto.** `TRASLADO.md` es del 6 de octubre y está anticuado; el diario tiene casi 1.900 líneas. Leerlo todo cuesta muchos tokens, y por eso nadie lo hacía.
+- **Ninguna forma de reservar un trabajo.** Los arreglos A1–A8 acabaron hechos a la vez en #48 y #49. Mientras esta sesión hacía lo de Google, otra montaba la versión real en Cloud Run (#57, con dominio `lonaclub.es`) y Codex los paneles (#56), y esta sesión no se enteró.
+- **Nada obligaba a leer el estado al empezar.** `CLAUDE.md` no lo decía.
+- **Un encargo que no existe en el repositorio:** el de los paneles (F, G y H) que citan el diario y `IDEAS.md` no está subido a ninguna rama.
+
+**Qué se decidió y por qué:** lo mínimo que cierre esos cuatro huecos, sin añadir otro registro que se quede sin leer.
+- **`docs/ESTADO.md`**, de unas 70 líneas: dónde estamos, quién tiene qué, lo que solo puede hacer el fundador, **lo que el fundador ya ha dicho** (para no repetírselo), lo siguiente y las reglas. Cada asistente edita solo su fila, para no pisarse.
+- **`scripts/estado.mjs`**: lo que dice la realidad **en directo**, sin depender de que nadie se acuerde de apuntarlo: versión de la demo, ramas y PR en curso, y ficheros que dos trabajos independientes tocan a la vez. Sin dependencias; vale en Windows. Si ve que la página tiene más de 3 días, avisa.
+- **Reservar** un trabajo: `node scripts/estado.mjs reservar <asistente> "<tema>"` crea una rama desde la demo con un commit vacío y la sube. El CI solo se ejecuta en PR y en la rama de la demo, así que **reservar no gasta minutos** (el cupo gratuito de GitHub es de 2.000 al mes).
+- **Obligar a leerlo:** aviso al principio de `CLAUDE.md` (lo cargan solas todas las sesiones de Claude), en `AGENTS.md` (Codex y los demás) y en las instrucciones de Copilot.
+
+**Qué se hizo:** los archivos anteriores, la regla 12 de `EQUIPO.md`, una fila en `DESARROLLO.md`, un aviso en `TRASLADO.md` y 4 pruebas (`tests/documentacion/estado.test.mjs`, que el CI ya ejecuta). Versión 0.12.2.
+
+**Qué salió mal:**
+- La primera versión del script enseñaba 19 ramas y 30 solapes falsos (ramas de hace una semana con el PR ya cerrado, y ramas apiladas que comparten ficheros por construcción). Ahora solo cuenta las de los últimos 3 días con el PR abierto, y no cruza ramas apiladas.
+- Una prueba mía destapó un fallo de la lógica: dos ramas apiladas más una independiente no avisaban del solape. Corregido.
+- `gh pr list` usa un canal que las sesiones de la nube tienen bloqueado; el script usa la API normal.
+
+**Límites que conviene decir con honestidad:** funciona **si cada sesión sigue las instrucciones**; no hay forma técnica de obligarlas. El estado solo fluye cuando se sube al repositorio. Y no sustituye al diario, que sigue siendo el archivo completo.
+
+**Estado y próximos pasos:** PR con CI. Cuando se fusione, el fundador solo tiene que hacer `git pull` en el portátil: la sesión de Claude Code leerá el aviso de `CLAUDE.md` por sí sola. Queda pendiente que quien tenga el encargo de los paneles lo suba.
+
+## 2026-10-14 — Versión real gratuita en lonaclub.es: investigación y código (Claude)
+
+**Qué se pidió:**
+- El fundador compró lonaclub.es y avisó de que Render «tiene un periodo de prueba».
+- Pidió investigar «profundamente y al más mínimo detalle» si las herramientas eran las mejores para funcionar gratis, sin contar Apple.
+- Después pidió que la versión real esté «completamente virgen», solo con los gimnasios reales de España menos Cataluña.
+
+**Qué se decidió y por qué:**
+- Cloud Run (`europe-west1`) para la versión real, con Neon Free y copias en R2 (ADR-005).
+- Render prohíbe producción en su plan gratuito y sus 750 h al mes ya las gasta la demo.
+- Neon subió a 1 GB por proyecto.
+- Madrid no admite la asignación de dominio de Cloud Run.
+
+**Qué se hizo:**
+- `Dockerfile`, `desplegar-produccion.yml`, `copia-diaria.yml`.
+- Noticias también para la versión real.
+- `docs/PRODUCCION.md` y ADR-005.
+- Compilación *standalone* comprobada en local: arranca; `/salud` da 503 sin base, como se esperaba, y `/privacidad` da 200.
+
+**Qué salió mal:**
+- El sistema de permisos de Claude Code bloqueó varios pasos, que pasan al fundador con guía:
+  - conceder acceso a otra cuenta en Google Cloud;
+  - fusionar sin revisión;
+  - cambios de DNS;
+  - leer variables secretas de Render.
+- `mantener-demo-despierta.yml` gasta unos 4.300 minutos de Actions al mes, más de los 2.000 gratuitos del repositorio privado.
+
+**Estado y próximos pasos:**
+- El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
+- Claude monta y comprueba el primer despliegue.
+- Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
+
 
 ## 2026-10-14 — Paneles, bloque F (Codex)
 **Pedido:** ejecutar el encargo de paneles; el fundador autoriza expresamente avanzar en rama propia desde #55 sin esperar su integración.
 **Cambios:** pendientes, cuatro accesos, aura en panel, sugerencias por disciplinas, tarjetas de seguidos, solicitudes del entrenador, récord por disciplina y progreso de perfil. Se completa el editor del gimnasio del entrenador porque antes no había destino para esa carencia.
 **Validación:** tipos y 741 unitarias pasan; build inicial pasa. Pruebas de navegador nuevas y adaptadas preparadas para CI; Docker no está disponible localmente. No se afirma validación de navegador ni despliegue.
 **Siguiente paso:** CI del PR de F y revisión de Claude; G y H pendientes.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
