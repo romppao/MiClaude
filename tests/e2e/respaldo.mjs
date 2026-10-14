@@ -33,6 +33,8 @@ async function categoria(nivel, peso) {
 await combate("Amateur", -90);
 // Este recorrido evalúa categorías y privacidad con un resultado que ya entra en el récord.
 // Los recién declarados y el límite exacto de 24 horas se prueban en record-24h.mjs.
+// These historical test events stand in for an already authorized card. The authorization queue has its own E2E.
+sql(`update "Event" set status = 'SCHEDULED' where name = 'Trayectoria Amateur ${rnd}'`);
 sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Trayectoria Amateur ${rnd}'`);
 await p.goto(B + "/mi-ficha");
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el visitante solo ve cuántos combates lleva hasta que el deportista lo publica.
@@ -45,6 +47,7 @@ await p.locator(".notice-ok", { hasText: "Tu récord completo ya es público" })
 await categoria("PRO", "Wélter");
 await combate("Profesional", -30, "WIN", "PRO");
 await combate("SinDecision", -10, "NC", "PRO");
+sql(`update "Event" set status = 'SCHEDULED' where name in ('Trayectoria Profesional ${rnd}', 'Trayectoria SinDecision ${rnd}')`);
 sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Trayectoria Profesional ${rnd}', 'Trayectoria SinDecision ${rnd}')`);
 await p.goto(B + "/mi-ficha");
 
