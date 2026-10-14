@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.12.2] — 2026-10-14
+
+PR de Claude (nube). Si se fusiona antes que #56, ese PR (0.12.2) pasa a 0.12.3.
+
+### Añadido
+- **Relevo entre sesiones** (petición del fundador): [`docs/ESTADO.md`](docs/ESTADO.md), una página corta con cómo está todo, qué hay en curso, qué ha dicho ya el fundador y qué está reservado, y `scripts/estado.mjs`, que enseña en directo la demo, las ramas y PR en curso y los ficheros que dos trabajos tocan a la vez. Reservar un trabajo (`node scripts/estado.mjs reservar <asistente> "<tema>"`) sube una rama vacía y no gasta minutos de pruebas. `CLAUDE.md`, `AGENTS.md` y las instrucciones de Copilot mandan leerlo al empezar.
+
 ## [0.12.1] — 2026-10-14
 
 PR de Claude (bloque E del encargo de paneles por tipo de usuario: fallos de la revisión del 14 de octubre).

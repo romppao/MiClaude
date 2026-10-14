@@ -452,3 +452,11 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 ## 2026-10-14 — Una pantalla con su propio filtro de combates se salta las reglas nuevas
 **Qué pasó:** al aprobar las veladas pasadas con autorización (bloque B), el filtro común `boutsQueCuentan()` se actualizó, pero «Peleadores que sigo» tenía su propio filtro (solo excluía las canceladas) y siguió enseñando veladas pendientes y rechazadas. El panel de la entidad contaba los resultados pendientes con `take: 1` y su cifra se quedaba corta.
 **Regla:** toda lista de combates o veladas visible al público usa los filtros compartidos (`boutsQueCuentan`, `VELADAS_NO_PUBLICAS`). Una cifra de un panel se calcula sobre todos los elementos, no sobre el primero que se muestra.
+
+## 14 de octubre de 2026 — Relevo entre sesiones (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Se hizo trabajo duplicado (A1–A8 en #48 y #49) y una sesión se enteró tarde de que otra había montado la versión real y elegido dominio | Había mucha documentación, pero ningún punto de entrada corto ni forma de reservar un trabajo. Un diario de 1.900 líneas no se lee al empezar | Un único `docs/ESTADO.md` de una página, más un script que lee la realidad (Git) en lugar de depender de que alguien lo apunte. Lo que se puede deducir del repositorio no se escribe a mano |
+| El encargo de los paneles para Codex se citaba en el diario y en las ideas, pero no estaba subido a ninguna rama | Se escribió en un ordenador y nunca se hizo `git add` | Un documento al que se remite desde otro tiene que estar en el repositorio **antes** de citarlo; `git ls-tree` o `git grep` lo comprueban en segundos |
+| El primer script daba 30 solapes falsos | Comparaba ramas apiladas (un PR sobre otro), que comparten ficheros por construcción, y ramas olvidadas de hace una semana | Una herramienta de aviso que grita tanto como una que no avisa. Antes de darla por buena se mira su salida con datos reales y se afina hasta que lo que enseña sea accionable |

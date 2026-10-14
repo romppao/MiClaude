@@ -79,7 +79,7 @@ jobs:
         run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - name: Comprobar cobertura y vigencia de la documentación del código
         run: |
-          node --test tests/documentacion/catalogo.test.mjs
+          node --test tests/documentacion/catalogo.test.mjs tests/documentacion/estado.test.mjs
           node scripts/generar-catalogo.mjs --comprobar
       - run: npm run typecheck
       - name: Comprobar que el mapa funcional está al día (npm run mapa)
