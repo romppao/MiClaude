@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     db.gym.findMany({ select: { slug: true }, take: 2000 }),
     db.trainer.findMany({ select: { slug: true }, take: 2000 }),
   ]);
-  const fijas = ["", "/peleadores", "/ranking", "/veladas", "/gimnasios", "/entrenadores", "/ayuda", "/privacidad"].map((p) => ({ url: `${APP_URL}${p}` }));
+  const fijas = ["", "/peleadores", "/ranking", "/veladas", "/gimnasios", "/entrenadores", "/ayuda", "/privacidad", "/condiciones", "/cookies", "/aviso-legal"].map((p) => ({ url: `${APP_URL}${p}` }));
   return [
     ...fijas,
     ...fighters.map((f) => ({ url: `${APP_URL}/peleadores/${f.slug}` })),

@@ -47,7 +47,7 @@ for (const [ruta, etiqueta] of [
   ...(fichaGimnasio ? [[fichaGimnasio, "Ficha de gimnasio"]] : []), ["/entrenadores", "Entrenadores"], [fichaEntrenador, "Ficha de entrenador"],
   ["/ranking", "Ránking"], ["/ayuda", "Ayuda"], ["/buscar", "Búsqueda (vacía)"], ["/buscar?q=accesible", "Búsqueda (con resultados)"], ["/buscar?q=zzzzqq", "Búsqueda (sin resultados)"],
   ["/bienvenida", "Bienvenida"], ["/registro", "Registro"], ["/registro?tipo=usuario", "Registro de aficionado"], ["/registro?tipo=peleador", "Registro de peleador"], ["/registro?tipo=entrenador", "Registro de entrenador"], ["/registro?tipo=entidad", "Registro de promotora, federación o club"], ["/entrar", "Entrar"], ["/recuperar", "Recuperar contraseña"], ["/recuperar/nueva?token=x", "Enlace de recuperación caducado"],
-  ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/organizador", "Organizadores (sin sesión)"],
+  ["/verificar", "Verificar correo (sin sesión)"], ["/baja", "Baja de avisos"], ["/privacidad", "Privacidad"], ["/condiciones", "Condiciones de uso"], ["/cookies", "Cookies"], ["/aviso-legal", "Aviso legal"], ["/organizador", "Organizadores (sin sesión)"],
   ["/pagina-que-no-existe", "Página no encontrada"], ["/noticias", "Noticias"], ["/noticias?disciplina=muay-thai", "Noticias de una disciplina"], ["/disciplinas/boxeo", "Portada de una disciplina"],
 ]) await analizar(anon, ruta, etiqueta);
 

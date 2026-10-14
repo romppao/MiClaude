@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
 | Claude Code (portátil) | **Versión real en Cloud Run**, separada de la demo, en `lonaclub.es` (ADR-005, aprobada por el fundador el 14-10-2026), y **base de la demo pasada a Neon** | `claude/produccion-cloud-run`, **#57**, versión 0.13.0 | **en pausa por decisión del fundador** hasta que dé por buena la app (ver sección 4). Hecho: base real `lona-produccion` vacía, base de la demo `lona-demo` en uso, Google en info@lonaclub.es (`lona-511614`). Hay que fusionar #57 pronto: su `render.yaml` evita que Render vuelva a enlazar la base que caduca |
-| Codex | Continúa F → G → D → H; T016 entregada en #60 y estrategia propuesta en #61 | `codex/paneles-f-pulido`, #56; G local conservado | F actualizado sobre 0.13.1; CI y revisión pendientes |
+| Codex | F/G/D preparados; H en curso; adaptando la pila a los textos legales de Claude | #56 → #62 → #64; H local | CI y revisión pendientes; sin despliegue |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
@@ -45,6 +45,7 @@
 
 ## 5. Siguiente, por orden
 
+0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación pendiente: bloquear usuarios, avisos automáticos de moderación (DSA) y aviso sin cuenta.
 0. **Revisión completa antes de la versión oficial:** [`tareas/T-016-revision-previa-al-lanzamiento.md`](tareas/T-016-revision-previa-al-lanzamiento.md). Es lo que pidió el fundador antes de montar lonaclub.es y publicar en Google. Sin empezar: el primer intento se cortó por un fallo del servicio.
 1. Resolver #57 (producción) y #56 (bloque F): revisar, retargetar y renumerar.
 2. **Probar «Continuar con Google»** en la demo en cuanto el fundador ponga las claves.

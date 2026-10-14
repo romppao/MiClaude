@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateEnv } from "../../src/lib/common/env";
 
-const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Lona <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", ...extra }) as NodeJS.ProcessEnv;
+const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Lona <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", TITULAR_NOMBRE: "Titular de prueba", TITULAR_NIF: "00000000T", TITULAR_DOMICILIO: "Calle Falsa 1, Madrid", ...extra }) as NodeJS.ProcessEnv;
 
 describe("comprobación del entorno", () => {
   it("en desarrollo no exige nada", () => {
@@ -37,5 +37,14 @@ describe("comprobación del entorno", () => {
   it("avisa si APP_URL no usa https", () => {
     expect(validateEnv(prod({ APP_URL: "http://ringespana.es" })).warnings.join()).toContain("https");
     expect(validateEnv(prod({ APP_URL: "http://localhost:3111" })).warnings).toEqual([]);
+  });
+  it("avisa si el aviso legal está incompleto (art. 10 LSSI), salvo en la demo", () => {
+    const w = validateEnv(prod({ TITULAR_NIF: "", TITULAR_DOMICILIO: "" })).warnings.join();
+    expect(w).toContain("TITULAR_NIF");
+    expect(w).toContain("TITULAR_DOMICILIO");
+    expect(validateEnv(prod({ TITULAR_NIF: "", DEMO_MODE: "si" })).warnings.join()).not.toContain("TITULAR_NIF");
+  });
+  it("el nombre antiguo RESPONSABLE_NOMBRE sigue valiendo como titular", () => {
+    expect(validateEnv(prod({ TITULAR_NOMBRE: "", RESPONSABLE_NOMBRE: "Otro" })).warnings.join()).not.toContain("TITULAR_NOMBRE");
   });
 });

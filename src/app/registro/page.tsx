@@ -98,7 +98,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         )}
         <p className="mut" style={{ margin: 0 }}>{QUE_SIGUE[tipo]}</p>
         <button className="btn-grande" style={{ marginTop: 6 }}>{panel.boton}<Icono nombre="siguiente" tam={18} grosor={2.2} /></button>
-        <span className="hint" style={{ textAlign: "center", color: "var(--mut)" }}>Al crear tu cuenta aceptas que tratemos tus datos como explicamos en la <Link href="/privacidad">política de privacidad</Link>.</span>
+        <span className="hint" style={{ textAlign: "center", color: "var(--mut)" }}>Al crear tu cuenta aceptas las <Link href="/condiciones">condiciones de uso</Link> y que tratemos tus datos como explicamos en la <Link href="/privacidad">política de privacidad</Link>.</span>
       </form>
       <p style={{ margin: 0 }}><Link href={volverAElegir}>Elegir otro tipo de cuenta</Link></p>
       <p style={{ margin: 0 }}>¿Ya tienes cuenta? <Link href={entrar}>Entra en tu cuenta</Link>. ¿La contraseña? <Link href="/recuperar">Elige una nueva</Link>.</p>
