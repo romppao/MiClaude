@@ -1,4 +1,4 @@
-import { datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { mostrar, datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
@@ -118,13 +118,21 @@ check("fan sin verificar no ve el botón de dar aura", await fanU.p.locator("but
 const fanAcc = await newUser("Fandos");
 const fan = fanAcc.p;
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
-await fan.fill("input[name=comment]", "Increíble, alucinante");
-await fan.getByRole("button", { name: /Dar aura a Pepe.*Velada Claim Test/ }).click();
+// Cada combate tiene su propio formulario de aura: el comentario se escribe en el del combate al que se da (Pepe ya tiene varios combates).
+const darAura = fan.getByRole("button", { name: /Dar aura a Pepe.*Velada Claim Test/ });
+const formAura = fan.locator("main form").filter({ has: darAura });
+await mostrar(formAura);
+await formAura.locator("input[name=comment]").fill("Increíble, alucinante");
+await darAura.click();
 await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
 check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "Has dado aura" }).count() === 1);
 await fan.reload();
 await fan.getByRole("link", { name: "Récord", exact: true }).click();
 check("el aura queda registrada y suma en la ficha", (await fan.locator("body").innerText()).includes("1 aura recibida"));
+// El comentario que acompaña al aura se ve en la ficha (comprobación recuperada el 14 de octubre de 2026: se perdió al pasar a pestañas).
+const comentarioAura = fan.locator("main").getByText("Increíble, alucinante");
+await mostrar(comentarioAura);
+check("el comentario del aura se ve en la ficha", await seen(comentarioAura));
 await fan.getByRole("button", { name: /Quitar mi aura del combate de Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
 check("se puede quitar el aura", await fan.locator("text=0 auras recibidas").waitFor({ timeout: 8000 }).then(() => true, () => false));
@@ -256,6 +264,11 @@ await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 // Para comprobar la vista pública con récord habilitado, madura ambos combates declarados de prueba.
 execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')`]);
+// Pasadas las 24 horas, el combate declarado ya suma: 10-3-1 de partida + 1-0-0 (comprobación recuperada el 14 de octubre de 2026).
+await vet.goto(B + "/mi-ficha");
+const recordMaduro = vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first();
+await mostrar(recordMaduro);
+check("pasadas 24 horas, el combate declarado suma en el récord (10-3-1 + 1-0-0)", await seen(recordMaduro));
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
 const privada = await anon.locator("body").innerText();

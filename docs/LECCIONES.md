@@ -432,3 +432,9 @@ Corrección del rebase (14 oct, Codex): una expresión regular con DOTALL para r
 El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring: buscar exigía escribir un gimnasio o un nombre, sin catálogo local elegible. La reproducción de navegador falla por ausencia de select[name=ciudad] y select[name=gimnasioId]. Los desplegables deben nacer de los mismos perfiles visibles, reclamados y compatibles que los resultados; listar todos los gimnasios daría opciones vacías y podría revelar asociaciones de fichas ocultas. Identificar el club por id evita mezclar homónimos. El ámbito es ciudad/provincia indicada por la persona (o enlace explícito a su ciudad), sin solicitar geolocalización ni inventar distancias. Las listas siguen el límite de 400 candidatos, comunicado en pantalla, y se actualizan al aplicar filtros. Conservar gimnasio=<nombre> mantiene enlaces existentes.
 
 14 oct — El texto visible de un botón no siempre coincide con su nombre accesible: «Es esta persona» incluye en aria-label el nombre y titularidad. Usar ese nombre completo en getByRole exact:true permite seleccionar por la interfaz al rival concreto; evitar count() instantáneo o manipular la ficha para saltarse la pantalla. Usabilidad final B 52/52.
+
+## 14 de octubre de 2026 — Revisión de los PR de Codex (Claude)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| El comentario del aura «desaparecía»: el campo tenía el texto y el envío llegaba vacío. En #50 se quitó la comprobación en vez de arreglarla | La prueba escribía en el primer `input[name=comment]` de la página. Con cuatro combates (y el orden cambiado por A5), ese campo pertenecía a otro combate | Cuando hay un formulario por elemento, la prueba localiza el formulario por su botón (`form.filter({ has: botón })`) y escribe dentro. Y una comprobación que falla se investiga hasta su causa; nunca se quita sin sustituirla |

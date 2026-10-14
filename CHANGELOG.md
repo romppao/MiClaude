@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.11.3] — 2026-10-14
+
+PR de Claude sobre #52.
+
+### Corregido
+- Las pruebas vuelven a comprobar que el comentario de un aura se ve en la ficha del peleador y que un combate declarado suma en el récord cuando pasan sus 24 horas. Esas comprobaciones se habían perdido al adaptar las pruebas al bloque B.
+
 ## [0.11.2] — 2026-10-14
 
 ### Cambiado

@@ -1805,3 +1805,25 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 14 oct, cierre actual: #48 eb5a366 → #50 e8d239c → #51 c9d2546 → #52, todo en borrador. A usabilidad 52/52 y siete recorridos 154/154; B usabilidad final 52/52 tras autorización real de ambos participantes; búsqueda final 33/33, 712 unitarias, tipos/build y móvil claro/oscuro a 390 revisado. Catálogo/mapa/versiones comprobados. El selector intermedio del rival falló por no incluir el aria-label completo; corregido sin quitar comprobaciones. E2E de CI A aprobado al consultar, accesibilidad aún en curso; estados finales de CI se entregan separados de lo local. Sin fusión ni despliegue.
 
 14 oct — La prueba previa rivales.mjs también se adapta al nuevo desplegable: selección por gimnasioId, espera de dirección/candidata y las mismas comprobaciones; conserva un enlace antiguo por nombre para verificar compatibilidad. Recorrido completo 12/12 en local. CI A 38533976870 completamente aprobado; B/C/#52 finales en curso al cerrar esta entrada.
+
+## 14 de octubre de 2026 — Revisión de los PR de Codex y comprobaciones recuperadas (Claude)
+
+**Qué se pidió** (el fundador): revisar lo que había hecho Codex y, si estaba bien, actualizar GitHub y la demo. Después: «Prefiero que hagas tú la corrección».
+
+**Qué se decidió y por qué:**
+- **#48 se fusionó** (0.10.0): CI en verde y revisión correcta (esperas de las pruebas y bloqueo del doble envío, con pruebas propias).
+- **#50 se redirigió** a la rama de la demo, para que no se fusionara dentro de la rama de #48.
+- **Las dos comprobaciones que #50 había quitado se recuperan en un PR propio de Claude** (`claude/recupera-comprobaciones`, sobre #52). No se escribe en la rama de otro asistente (`EQUIPO.md`, regla 2).
+
+**Qué se hizo:**
+- `tests/e2e/flujo.mjs`:
+  - El comentario del aura se escribe en el formulario del combate al que se da el aura y se comprueba que se ve en la ficha.
+  - Tras «madurar» el combate del veterano más de 24 horas, se comprueba que el récord pasa a 11-3-1.
+- Versión 0.11.3.
+
+**Qué salió mal:**
+- El comentario no aparecía y parecía un fallo de la aplicación: el campo tenía el texto, pero el envío llegaba vacío.
+- La causa real era la prueba. La ficha de Pepe tiene cuatro combates y cuatro cajas de comentario. La prueba escribía en la primera de la página y pulsaba «Dar aura» en otro combate, que ya no era el primero porque cambió el orden de los combates.
+- Probablemente por eso #50 quitó la comprobación en lugar de arreglarla.
+
+**Estado y próximos pasos:** fusionar #50, #51 y #52 en orden cuando su CI esté en verde, y después este PR.
