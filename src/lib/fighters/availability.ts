@@ -1,7 +1,8 @@
 import type { Prisma } from "@prisma/client";
+import { FIGHTER_AVAILABILITY_DAYS } from "../common/periods";
 
 /** La disponibilidad caduca a los 60 días aunque todavía no haya pasado la limpieza periódica. */
-export const AVAILABILITY_DAYS = 60;
+export const AVAILABILITY_DAYS = FIGHTER_AVAILABILITY_DAYS;
 export const availabilityCutoff = (now = new Date()) => new Date(now.getTime() - AVAILABILITY_DAYS * 864e5);
 export function availableFighters(now = new Date()): Prisma.FighterWhereInput {
   return { availableToFight: true, availableSince: { gt: availabilityCutoff(now) } };

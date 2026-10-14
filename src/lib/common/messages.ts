@@ -3,6 +3,9 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  asistencia_guardada: "Has marcado que vas a ir. La velada aparece en tu agenda.",
+  asistencia_quitada: "Has retirado la velada de tu agenda.",
+  disponibilidad_guardada: "Disponibilidad guardada. Si la activas, caduca a los 60 días.",
   creador_dentro: "Has entrado con la cuenta del creador.",
   creador_ultimo_codigo: "Has entrado con un código de emergencia. Te quedan pocos: crea otros nuevos en «Administración».",
   tipo_cambiado: "Tipo de cuenta cambiado. La persona ya tiene los permisos nuevos.",
@@ -115,6 +118,8 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  opcion_invalida: "La opción enviada no es válida. Vuelve a intentarlo desde el formulario.",
+  peso_actual_invalido: "Escribe un peso de 20 a 300 kg, con como máximo dos decimales, o deja el campo vacío.",
   entradas_https: "El enlace de entradas debe empezar por https://. Copia la dirección segura de la web de venta.",
   nivel_obligatorio: "Elige tu nivel: amateur o profesional.",
   inscripcion_ya_cartel: "Ya estás en el cartel de esta velada.",

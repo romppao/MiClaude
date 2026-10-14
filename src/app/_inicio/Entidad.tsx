@@ -1,3 +1,5 @@
+import PreparacionVelada from "./PreparacionVelada";
+import { preparationAudience } from "../../lib/events/preparation-data";
 import Link from "next/link";
 import TeToca from "./TeToca";
 import CompletaPerfil from "./CompletaPerfil";
@@ -26,6 +28,8 @@ export default async function InicioEntidad({ user }: { user: User }) {
     db.event.findMany({ where: veladasConResultadosPendientes(user.id, hoy), include: { _count: { select: { bouts: { where: { result: null } } } } }, orderBy: [{ date: "desc" }, { id: "asc" }] }),
     db.event.findFirst({ where: { organizerId: user.id, date: { gte: hoy }, status: "SCHEDULED" }, include: { _count: { select: { bouts: true } } }, orderBy: [{ date: "asc" }, { id: "asc" }] }),
   ]);
+  const preparaciones = await db.event.findMany({ where: { organizerId: user.id, status: { in: ["SCHEDULED", "COMPLETED"] }, OR: [{ date: { gte: hoy } }, { bouts: { some: { result: null } } }] }, include: { bouts: { select: { result: true, weightClass: true } } }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 3 });
+  const audiencias = await Promise.all(preparaciones.map((v) => preparationAudience(v.id)));
   const combates = await db.bout.count({ where: { event: { organizerId: user.id } } });
   const inscripciones = veladas ? await db.eventRegistration.count({ where: { status: "PENDING", event: { organizerId: user.id } } }) : 0;
   const kind = parseTipoDeEntidad(solicitud?.kind ?? "") ?? "PROMOTORA";
@@ -63,6 +67,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
         </Link>
       ))}
       {porResultado.resto > 0 && <Link href="/organizador#mis-eventos" style={{ alignSelf: "flex-start" }}>{porResultado.resto === 1 ? "Ver otra velada" : `Ver otras ${porResultado.resto} veladas`} con resultados por poner</Link>}
+      <section aria-label="Preparar mis veladas"><h2>Preparar mis veladas</h2>{preparaciones.map((v, i) => <div key={v.id}><Link href={`/organizador/${v.slug}`}>{v.name}</Link><PreparacionVelada event={v} asistentes={audiencias[i].asistentes} seguidores={audiencias[i].seguidores} /></div>)}<Link href="/organizador">Ver todas mis veladas</Link></section>
       <section aria-labelledby="titulo-proxima-velada" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-proxima-velada">Próxima velada</h2><Link href="/organizador">Todas</Link></div>
         {proxima ? (

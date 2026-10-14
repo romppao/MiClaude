@@ -1976,3 +1976,6 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 ## 2026-10-14 — Continuación del encargo de paneles
 F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.

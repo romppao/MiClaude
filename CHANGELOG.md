@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.13.3] — 2026-10-14
+
+### Añadido
+- Provincia opcional y actividad local, asistencia voluntaria a veladas y calendario ICS público.
+- Disponibilidad del peleador con peso opcional y caducidad de 60 días, filtros en directorio y cartel.
+- Agenda semanal del entrenador y lista de preparación de veladas con cantidades agregadas de asistentes y seguidores.
+
 ## [0.13.2] — 2026-10-14
 
 ### Mejorado

@@ -585,3 +585,30 @@ describe("diseño v3: entrenadores, highlights y registro por pasos", () => {
     expect(await destino(acciones.saveInterests, { disciplina: "BOXEO", seguir: "f1" })).toBe("/?aviso=intereses_guardados");
   });
 });
+
+
+describe("bloque G: acciones de disponibilidad y asistencia", () => {
+  it("un peso inválido no modifica la ficha", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "propia", disciplines: [] } }));
+    expect(await destino(acciones.setAvailability, { available: "on", weight: "70.001" })).toContain("problema=peso_actual_invalido");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("asistencia rechaza veladas ocultas y decisiones desconocidas sin escribir", async () => {
+    iniciarSesion(persona("FAN"));
+    for (const status of ["PENDING_AUTHORIZATION", "REJECTED", "CANCELLED"]) {
+      mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status, date: new Date(Date.now() + 864e5) };
+      expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "1" })).toBe("/veladas?problema=no_existe");
+    }
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status: "SCHEDULED", date: new Date(Date.now() + 864e5) };
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "inventado" })).toContain("problema=opcion_invalida");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("la cuenta no puede usar userId ajeno para marcar o quitar asistencia", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status: "SCHEDULED", date: new Date(Date.now() + 864e5) };
+    mundo.estado.respuestas["eventAttendance.upsert"] = (a: { create: { userId: string } }) => { expect(a.create.userId).toBe("u-FAN"); return {}; };
+    mundo.estado.respuestas["eventAttendance.deleteMany"] = (a: { where: { userId: string } }) => { expect(a.where.userId).toBe("u-FAN"); return { count: 1 }; };
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "1", userId: "ajeno" })).toContain("aviso=asistencia_guardada");
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "0", userId: "ajeno" })).toContain("aviso=asistencia_quitada");
+  });
+});

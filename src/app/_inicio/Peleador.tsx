@@ -1,3 +1,4 @@
+import { isAvailable } from "../../lib/fighters/availability";
 import Link from "next/link";
 import TeToca from "./TeToca";
 import CompletaPerfil from "./CompletaPerfil";
@@ -60,6 +61,7 @@ export default async function InicioPeleador({ user, disciplina }: { user: User 
   const rival = proximo ? (proximo.fighterAId === me.id ? proximo.fighterB : proximo.fighterA) : null;
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 20 }}>
+      {me.availableSince && !isAvailable(me) && <p className="notice notice-info" role="status">Tu disponibilidad ha caducado después de 60 días. <Link href="/mi-ficha#disponibilidad">Renovarla</Link></p>}
       <section className="portada a-sangre" style={{ marginTop: -20, minHeight: 470, "--tinte": tinteDe(principal?.discipline) } as CSSProperties} aria-labelledby="mi-nombre">
         <span className="iniciales" aria-hidden="true">{iniciales(nombre)}</span>
         <Foto className="fondo" src={`/imagenes/peleador/${me.id}/banner`} />
