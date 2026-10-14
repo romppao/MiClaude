@@ -408,7 +408,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/e2e/rivales.mjs](../../tests/e2e/rivales.mjs) | Prueba de navegador del buscador de rivales con filtros y de la inscripción cerrada o abierta vista por el peleador. | [Contexto](OPERACION.md) | — | `895cd86a10cfe639` |
 | [tests/e2e/servicios.mjs](../../tests/e2e/servicios.mjs) | Prueba de navegador de las acciones principales de cada panel, «Buscar clases» y los retos y sparrings de punta a punta. | [Contexto](OPERACION.md) | — | `3329376aa151a2af` |
 | [tests/e2e/trayectoria.mjs](../../tests/e2e/trayectoria.mjs) | Recorre títulos, revisión, respaldo acreditado y ránking histórico, incluyendo baja/privacidad. | [Contexto](OPERACION.md) | — | `945f665546d1c08d` |
-| [tests/e2e/usabilidad.mjs](../../tests/e2e/usabilidad.mjs) | Comprueba mensajes, estados vacíos, retorno y respuestas visibles de acciones; complementa revisión humana de comprensión. | [Contexto](OPERACION.md) | — | `a012cb663c9753b6` |
+| [tests/e2e/usabilidad.mjs](../../tests/e2e/usabilidad.mjs) | Comprueba mensajes, estados vacíos, retorno y respuestas visibles de acciones; complementa revisión humana de comprensión. | [Contexto](OPERACION.md) | — | `2d8676934b0db220` |
 | [tests/e2e/veladas-pasadas.mjs](../../tests/e2e/veladas-pasadas.mjs) | Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo. | [Contexto](OPERACION.md) | — | `460bcb4cfa61a340` |
 
 ## Pruebas unitarias
