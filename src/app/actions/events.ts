@@ -7,7 +7,8 @@ import { revalidatePath } from "next/cache";
 import type { Discipline } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { requireOrganizer } from "../../lib/accounts/permissions";
-import { requireVerifiedUser } from "../../lib/accounts/auth";
+import { requireUser, requireVerifiedUser } from "../../lib/accounts/auth";
+import { calendarDayStart } from "../../lib/common/dates";
 import { parseEventKind, slugify } from "../../lib/common/labels";
 import { audit } from "../../lib/common/audit";
 import { safeHttpUrl, safeHttpsUrl } from "../../lib/common/url";
@@ -21,6 +22,19 @@ import { LIMITS } from "../../lib/common/text";
 import { parseTipoDeEntidad } from "../../lib/accounts/landing";
 import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
+
+/** Marca o retira intención de asistir; las cuentas solo pueden modificar su propia marca. */
+export async function setAttendance(f: FormData) {
+  const user = await requireUser("/mi-panel");
+  const event = await db.event.findUnique({ where: { id: str(f, "eventId") } });
+  if (!event || event.status !== "SCHEDULED" || event.date < calendarDayStart()) go("/veladas", { problema: "no_existe" });
+  if (!["0", "1"].includes(str(f, "asistir"))) go(`/veladas/${event.slug}`, { problema: "opcion_invalida" });
+  const asistir = str(f, "asistir") === "1";
+  if (asistir) await db.eventAttendance.upsert({ where: { userId_eventId: { userId: user.id, eventId: event.id } }, create: { userId: user.id, eventId: event.id }, update: {} });
+  else await db.eventAttendance.deleteMany({ where: { userId: user.id, eventId: event.id } });
+  revalidatePath("/", "layout");
+  go(`/veladas/${event.slug}`, { aviso: asistir ? "asistencia_guardada" : "asistencia_quitada" });
+}
 
 export async function requestOrganizer(f: FormData) {
   const user = await requireVerifiedUser();

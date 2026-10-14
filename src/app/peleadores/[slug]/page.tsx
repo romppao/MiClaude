@@ -2,6 +2,7 @@ import { graduationLabel } from "../../../lib/fighters/graduation";
 import { cache } from "react";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
+import { isAvailable } from "../../../lib/fighters/availability";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
@@ -171,6 +172,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         ) : <Link className="btn secondary" style={{ flex: 1, minHeight: 54 }} href={`/entrar?next=${encodeURIComponent(back)}`}>Entra para seguir a este peleador</Link>)}
         <span className="pildora" style={{ minHeight: 54, padding: "0 18px", fontWeight: 500, background: "rgba(var(--ink),.06)" }}>{plural(followerCount, "seguidor", "seguidores")}</span>
       </div>
+      {publica && isAvailable(fighter) && <p className="pildora">Disponible para pelear{fighter.currentWeightKg !== null ? ` · Peso declarado: ${fighter.currentWeightKg} kg` : ""}</p>}
       {/* Retar o proponer sparring (propuesta n.º 1 del diseño v3): solo entre peleadores, y a fichas con titular que pueda responder. */}
       {publica && fighter.userId && user?.fighter && user.fighter.id !== fighter.id && (
         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>

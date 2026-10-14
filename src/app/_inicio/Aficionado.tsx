@@ -5,6 +5,7 @@ import { calendarDayStart } from "../../lib/common/dates";
 import { DISCIPLINE_ORDER, DISCIPLINE_SLUG } from "../../lib/common/disciplines";
 import { publicFighterName } from "../../lib/common/names";
 import { plural } from "../../lib/common/text";
+import CercaDeTi from "./CercaDeTi";
 import TeToca from "./TeToca";
 import CompletaPerfil from "./CompletaPerfil";
 import { giveAura, removeAura } from "../actions/aura";
@@ -44,6 +45,7 @@ export default async function InicioAficionado({ user }: { user: User }) {
     db.fighter.findUnique({ where: { userId: user.id }, select: { id: true } }),
   ]);
   const misAuras = resultados.length ? await db.aura.findMany({ where: { userId: user.id, boutId: { in: resultados.map((b) => b.id) } }, select: { boutId: true, fighterId: true } }) : [];
+  const agenda = await db.eventAttendance.findMany({ where: { userId: user.id, event: { status: "SCHEDULED", date: { gte: calendarDayStart() } } }, include: { event: true }, orderBy: [{ event: { date: "asc" } }, { eventId: "asc" }], take: 20 });
   const disciplinas = [...user.interests, ...DISCIPLINE_ORDER.filter((d) => !user.interests.includes(d))];
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 26 }}>
@@ -53,9 +55,9 @@ export default async function InicioAficionado({ user }: { user: User }) {
         { texto: "Combates sin tu aura", href: "/mi-panel#resultados", cantidad: sinAura },
         { texto: "Respuestas a tus solicitudes de clase", href: "/mis-reservas", cantidad: respuestas },
       ]} />
-      <CompletaPerfil campos={[{ texto: "Elegir disciplinas", completo: user.interests.length > 0, href: "/registro/intereses" }]} />
+      <CompletaPerfil campos={[{ texto: "Elegir disciplinas", completo: user.interests.length > 0, href: "/registro/intereses" }, { texto: "Elegir provincia", completo: !!user.province, href: "/mi-cuenta" }]} />
       <AccionesPrincipales acciones={[
-        { href: "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },
+        { href: user.province ? `/clases?provincia=${encodeURIComponent(user.province)}` : "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },
         ...(reservas ? [{ href: "/mis-reservas", titulo: "Mis reservas", detalle: "Tus clases solicitadas", icono: "bandeja" as const, aviso: reservas }] : []),
         { href: "/compartir", titulo: "Subir vídeos o fotos", detalle: "De una velada a la que fuiste", icono: "camara" },
         { href: "/siguiendo", titulo: "Peleadores que sigo", detalle: "Sus próximos combates", icono: "personas" },
@@ -111,6 +113,12 @@ export default async function InicioAficionado({ user }: { user: User }) {
         {!resultados.length && <p>No hay resultados recientes de los peleadores que sigues.</p>}
       </section>}
 
+      <section className="tarjeta" aria-label="Mi agenda"><h2>Mi agenda</h2>
+        {agenda.map(({ event: v }) => <Link key={v.id} className="fila" href={`/veladas/${v.slug}`}>{v.name} · {fmtDate(v.date)}</Link>)}
+        {proximo && <Link className="fila" href={`/veladas/${proximo.event.slug}`}>Próximo combate de tus peleadores: {proximo.event.name} · {fmtDate(proximo.event.date)}</Link>}
+        {!agenda.length && !proximo && <p>Marca «Voy a ir» en una velada para verla aquí.</p>}
+      </section>
+      {user.province && <CercaDeTi province={user.province} />}
       <section aria-labelledby="titulo-tus-disciplinas" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div><h2 id="titulo-tus-disciplinas" style={{ fontSize: 24 }}>Tus disciplinas</h2><p className="lead">{user.interests.length ? "Primero las que elegiste." : "Elige una para ver su actualidad, sus veladas y sus peleadores."}</p></div>
         <div className="desliza" role="region" tabIndex={0} aria-label="Tus disciplinas (desliza para ver más)">{disciplinas.map((d) => <TarjetaDisciplina key={d} d={d} href={`/disciplinas/${DISCIPLINE_SLUG[d]}`} pequena />)}</div>

@@ -402,3 +402,5 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 
 ### Seguimiento del bloque F (Codex, 14 oct 2026)
 Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.
+
+14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.

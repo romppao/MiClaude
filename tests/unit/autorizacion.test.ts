@@ -82,8 +82,8 @@ beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; i
 
 const SOLO_MODERADORES = ["adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
-const EXIGEN_SESION = ["updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
+const EXIGEN_SESION = ["setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
 const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
@@ -583,5 +583,32 @@ describe("diseño v3: entrenadores, highlights y registro por pasos", () => {
     iniciarSesion(persona("FAN"));
     mundo.estado.respuestas["fighter.findMany"] = (a: { where: Record<string, unknown> }) => { expect(a.where).toMatchObject({ listed: true, hiddenAt: null, NOT: { userId: "u-FAN" } }); return []; };
     expect(await destino(acciones.saveInterests, { disciplina: "BOXEO", seguir: "f1" })).toBe("/?aviso=intereses_guardados");
+  });
+});
+
+
+describe("bloque G: acciones de disponibilidad y asistencia", () => {
+  it("un peso inválido no modifica la ficha", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "propia", disciplines: [] } }));
+    expect(await destino(acciones.setAvailability, { available: "on", weight: "70.001" })).toContain("problema=peso_actual_invalido");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("asistencia rechaza veladas ocultas y decisiones desconocidas sin escribir", async () => {
+    iniciarSesion(persona("FAN"));
+    for (const status of ["PENDING_AUTHORIZATION", "REJECTED", "CANCELLED"]) {
+      mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status, date: new Date(Date.now() + 864e5) };
+      expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "1" })).toBe("/veladas?problema=no_existe");
+    }
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status: "SCHEDULED", date: new Date(Date.now() + 864e5) };
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "inventado" })).toContain("problema=opcion_invalida");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("la cuenta no puede usar userId ajeno para marcar o quitar asistencia", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["event.findUnique"] = { id: "e1", slug: "velada", status: "SCHEDULED", date: new Date(Date.now() + 864e5) };
+    mundo.estado.respuestas["eventAttendance.upsert"] = (a: { create: { userId: string } }) => { expect(a.create.userId).toBe("u-FAN"); return {}; };
+    mundo.estado.respuestas["eventAttendance.deleteMany"] = (a: { where: { userId: string } }) => { expect(a.where.userId).toBe("u-FAN"); return { count: 1 }; };
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "1", userId: "ajeno" })).toContain("aviso=asistencia_guardada");
+    expect(await destino(acciones.setAttendance, { eventId: "e1", asistir: "0", userId: "ajeno" })).toContain("aviso=asistencia_quitada");
   });
 });
