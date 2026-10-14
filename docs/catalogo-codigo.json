@@ -575,6 +575,11 @@
     "guide": "docs/DISENO.md"
   },
   {
+    "path": "src/app/components/TemaPersistente.tsx",
+    "purpose": "Mantiene el tema elegido en <html data-tema>: lo vuelve a aplicar al cargar y si React lo borra al volver a pintar la página.",
+    "guide": "docs/DISENO.md"
+  },
+  {
     "path": "src/app/components/SubirVideo.tsx",
     "purpose": "Componente de cliente que pide dónde subir (/subidas), sube con progreso, deja la clave en videoKey e impide enviar el formulario a medio subir.",
     "guide": "docs/mantenimiento/FLUJOS.md"
