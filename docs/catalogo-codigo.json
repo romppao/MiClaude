@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/estado.mjs",
+    "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "scripts/copiar-maplibre.mjs",
     "purpose": "Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1398,6 +1403,11 @@
     "path": "tests/documentacion/catalogo.test.mjs",
     "purpose": "Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar.",
     "guide": "docs/mantenimiento/README.md"
+  },
+  {
+    "path": "tests/documentacion/estado.test.mjs",
+    "purpose": "Pruebas de scripts/estado.mjs: solapes entre ramas (con ramas apiladas y ficheros de registro), días transcurridos y nombre de la rama reservada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "tests/e2e/accesibilidad.mjs",

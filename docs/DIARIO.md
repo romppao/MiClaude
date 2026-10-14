@@ -1908,6 +1908,33 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 **Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.
 
+## 2026-10-14 — Relevo entre sesiones: que Claude, Claude Code y Codex no se pisen (Claude, nube)
+
+**Qué se pidió** (el fundador): «entre tú y Code no os podéis comunicar, por lo que quiero que creéis una documentación en la que actualicéis lo que hagáis cada uno para así no solapar trabajo y tengáis contexto de todo lo que se haya hecho en cada sesión, así no tengo que gastar token repitiendo cosas que ya he hecho en el móvil […] en caso de que no esté esto ya implementado, hacerlo de la manera más óptima».
+
+**Qué se encontró:** ya había mucha documentación (`EQUIPO.md`, un registro por asistente, traspasos de Codex, `TRASLADO.md`), pero no resolvía el problema:
+- **Ningún punto de entrada corto.** `TRASLADO.md` es del 6 de octubre y está anticuado; el diario tiene casi 1.900 líneas. Leerlo todo cuesta muchos tokens, y por eso nadie lo hacía.
+- **Ninguna forma de reservar un trabajo.** Los arreglos A1–A8 acabaron hechos a la vez en #48 y #49. Mientras esta sesión hacía lo de Google, otra montaba la versión real en Cloud Run (#57, con dominio `lonaclub.es`) y Codex los paneles (#56), y esta sesión no se enteró.
+- **Nada obligaba a leer el estado al empezar.** `CLAUDE.md` no lo decía.
+- **Un encargo que no existe en el repositorio:** el de los paneles (F, G y H) que citan el diario y `IDEAS.md` no está subido a ninguna rama.
+
+**Qué se decidió y por qué:** lo mínimo que cierre esos cuatro huecos, sin añadir otro registro que se quede sin leer.
+- **`docs/ESTADO.md`**, de unas 70 líneas: dónde estamos, quién tiene qué, lo que solo puede hacer el fundador, **lo que el fundador ya ha dicho** (para no repetírselo), lo siguiente y las reglas. Cada asistente edita solo su fila, para no pisarse.
+- **`scripts/estado.mjs`**: lo que dice la realidad **en directo**, sin depender de que nadie se acuerde de apuntarlo: versión de la demo, ramas y PR en curso, y ficheros que dos trabajos independientes tocan a la vez. Sin dependencias; vale en Windows. Si ve que la página tiene más de 3 días, avisa.
+- **Reservar** un trabajo: `node scripts/estado.mjs reservar <asistente> "<tema>"` crea una rama desde la demo con un commit vacío y la sube. El CI solo se ejecuta en PR y en la rama de la demo, así que **reservar no gasta minutos** (el cupo gratuito de GitHub es de 2.000 al mes).
+- **Obligar a leerlo:** aviso al principio de `CLAUDE.md` (lo cargan solas todas las sesiones de Claude), en `AGENTS.md` (Codex y los demás) y en las instrucciones de Copilot.
+
+**Qué se hizo:** los archivos anteriores, la regla 12 de `EQUIPO.md`, una fila en `DESARROLLO.md`, un aviso en `TRASLADO.md` y 4 pruebas (`tests/documentacion/estado.test.mjs`, que el CI ya ejecuta). Versión 0.12.2.
+
+**Qué salió mal:**
+- La primera versión del script enseñaba 19 ramas y 30 solapes falsos (ramas de hace una semana con el PR ya cerrado, y ramas apiladas que comparten ficheros por construcción). Ahora solo cuenta las de los últimos 3 días con el PR abierto, y no cruza ramas apiladas.
+- Una prueba mía destapó un fallo de la lógica: dos ramas apiladas más una independiente no avisaban del solape. Corregido.
+- `gh pr list` usa un canal que las sesiones de la nube tienen bloqueado; el script usa la API normal.
+
+**Límites que conviene decir con honestidad:** funciona **si cada sesión sigue las instrucciones**; no hay forma técnica de obligarlas. El estado solo fluye cuando se sube al repositorio. Y no sustituye al diario, que sigue siendo el archivo completo.
+
+**Estado y próximos pasos:** PR con CI. Cuando se fusione, el fundador solo tiene que hacer `git pull` en el portátil: la sesión de Claude Code leerá el aviso de `CLAUDE.md` por sí sola. Queda pendiente que quien tenga el encargo de los paneles lo suba.
+
 ## 2026-10-14 — Versión real gratuita en lonaclub.es: investigación y código (Claude)
 
 **Qué se pidió:**

@@ -1,5 +1,7 @@
 # Traslado del proyecto a Claude Code (en tu ordenador)
 
+> **Estado vivo (14 de octubre de 2026): empieza por [ESTADO.md](ESTADO.md) y `node scripts/estado.mjs`.** Este traslado es histórico: lo que sigue puede estar anticuado.
+
 > **Relevo al portátil (6 de octubre de 2026): empieza por [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md)** — comprobaciones, cuentas que crear (Neon, Cloudflare R2, Sentry, UptimeRobot, dominio, Resend), orden de trabajo y qué no hacer sin el fundador. Herramientas aprobadas: [ADR-003](decisiones/ADR-003-proveedores-fase-0.md). Pruebas de ingreso para los demás asistentes: [PRUEBA-DE-INGRESO.md](PRUEBA-DE-INGRESO.md) y [PRUEBA-ESCALERA.md](PRUEBA-ESCALERA.md).
 
 > **Relevo vigente (3 de octubre de 2026):** empezar por [PULIDO-FUNCIONAL.md](PULIDO-FUNCIONAL.md) y el cierre de [APORTACIONES-CODEX.md](APORTACIONES-CODEX.md). El fundador considera la composición actual desorganizada y saturada; el diseño es provisional y se retoma al final. No iniciar otro rediseño ni integrar automáticamente la propuesta móvil #13.

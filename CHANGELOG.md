@@ -25,6 +25,14 @@ PR de Claude: preparación de la versión real en lonaclub.es (ADR-005).
 ### Cambiado
 - La actualización de noticias cada 6 horas también llega a la versión real cuando tiene dirección (variable `PROD_URL`). Cada destino usa su propia clave.
 - La demo de Render no cambia: sigue arrancando con `next start` y sus datos de ejemplo.
+- **La base de la demo pasa de Render a Neon** (`lona-demo`, Fráncfort), porque la de Render caducaba el 1-11-2026. Se copió entera (30 tablas con los mismos recuentos). `render.yaml` ya no enlaza la base de Render: `DATABASE_URL` se pega en el panel.
+
+## [0.12.2] — 2026-10-14
+
+PR de Claude (nube). Si se fusiona antes que #56, ese PR (0.12.2) pasa a 0.12.3.
+
+### Añadido
+- **Relevo entre sesiones** (petición del fundador): [`docs/ESTADO.md`](docs/ESTADO.md), una página corta con cómo está todo, qué hay en curso, qué ha dicho ya el fundador y qué está reservado, y `scripts/estado.mjs`, que enseña en directo la demo, las ramas y PR en curso y los ficheros que dos trabajos tocan a la vez. Reservar un trabajo (`node scripts/estado.mjs reservar <asistente> "<tema>"`) sube una rama vacía y no gasta minutos de pruebas. `CLAUDE.md`, `AGENTS.md` y las instrucciones de Copilot mandan leerlo al empezar.
 
 ## [0.12.1] — 2026-10-14
 
