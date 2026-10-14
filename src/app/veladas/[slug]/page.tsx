@@ -12,6 +12,7 @@ import { eventDayReached, todayMadrid } from "../../../lib/common/dates";
 import { getUser } from "../../../lib/accounts/auth";
 import { REG_STATUS_LABEL, claveCategoria, inscripcionAbierta, ocupacion } from "../../../lib/events/registrations";
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
+import { recordHidden } from "../../../lib/fighters/privacy";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { createReport } from "../../actions/community";
 
@@ -96,8 +97,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <tbody>
           {e.bouts.map((b) => {
             const enRevision = b.verification === "DISPUTED"; // un combate rechazado no se muestra como un hecho
-            // El resultado se presenta con su respaldo; confirmar es opcional.
-            const oculto = enRevision;
+            const recordAmateurOculto = !!b.result && e.level === "AMATEUR" && (
+              recordHidden(e.level, b.fighterA.recordPublic, false) ||
+              recordHidden(e.level, b.fighterB.recordPublic, false)
+            );
+            // El resultado amateur no revela un récord que alguno de los peleadores mantiene privado.
+            const oculto = enRevision || recordAmateurOculto;
             const ganador = oculto ? null : b.result === "A_WIN" ? publicFighterName(b.fighterA) : b.result === "B_WIN" ? publicFighterName(b.fighterB) : null;
             return (
               <tr key={b.id}>
@@ -107,6 +112,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <td data-label="Categoría">{[categoryLabel(e.discipline, e.level, b.divisionId, b.weightClass), b.rounds ? `${b.rounds} asaltos` : null].filter(Boolean).join(" · ")}</td>
                 <td data-label="Resultado">
                   {enRevision ? <span className="mut">Resultado en revisión</span>
+                    : recordAmateurOculto ? <span className="mut">Resultado oculto por privacidad del récord amateur</span>
                     : !b.result ? <span className="mut">{eventDayReached(e.date) ? "Resultado por anotar" : "Próximo combate"}</span>
                     : b.result === "DRAW" ? "Empate"
                     : b.result === "NO_CONTEST" ? "Sin decisión"

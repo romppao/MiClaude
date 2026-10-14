@@ -122,6 +122,7 @@ await fan.getByRole("button", { name: /Dar aura a Pepe.*Velada Claim Test/ }).cl
 await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
 check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "Has dado aura" }).count() === 1);
 await fan.reload();
+await fan.getByRole("link", { name: "Récord", exact: true }).click();
 check("el aura queda registrada y suma en la ficha", await fan.locator("body").innerText().then((t) => t.includes("1 aura recibida") && t.includes("Increíble, alucinante")));
 await fan.getByRole("button", { name: /Quitar mi aura del combate de Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
@@ -186,6 +187,13 @@ await org.locator(".notice-ok", { hasText: "resultado se ha guardado" }).waitFor
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
 const t = await fan.locator("body").innerText();
 check("el cartel oculta el resultado amateur privado", t.includes("Resultado oculto por privacidad del récord amateur") && !t.includes(`Gana Pepe Uno${rnd}`));
+await pepe.goto(B + "/mi-ficha");
+await pepe.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await pepe.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
+await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
+check("el cartel muestra el resultado cuando el peleador publica su récord amateur", (await fan.locator("main").innerText()).includes(`Gana Pepe Uno${rnd}`));
+await pepe.getByRole("switch", { name: "Ocultar mi récord amateur completo" }).click();
+await pepe.locator(".notice-ok", { hasText: "Tu récord amateur vuelve a ser privado" }).waitFor();
 
 // 5b) La organizadora corrige, cancela y reactiva su velada y quita un combate del cartel
 await org.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
@@ -241,7 +249,7 @@ await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor()
 await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 // Para comprobar la vista pública con récord habilitado, madura ambos combates declarados de prueba.
-await dbDiagnostico.bout.updateMany({ where: { event: { name: { in: [`Velada Vet ${rnd}`, `Velada MMA Vet ${rnd}`] } } }, data: { createdAt: new Date(Date.now() - 25 * 60 * 60 * 1000) } });
+execSync(`psql "${process.env.DATABASE_URL}" -c "update \"Bout\" b set \"createdAt\" = now() - interval '25 hours' from \"Event\" e where b.\"eventId\" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')"`);
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
 const privada = await anon.locator("body").innerText();
