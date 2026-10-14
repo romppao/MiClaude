@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **380 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **382 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -119,15 +119,15 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
 | [.env.example](../../.env.example) | Plantilla de nombres y significado de variables, sin credenciales reales; punto de partida para configuración local/producción. | [Contexto](OPERACION.md) | — | `3c0ba6e567352581` |
-| [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `a96a101f9495f4ee` |
+| [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `5fee685a3e0aae5b` |
 | [.github/dependabot.yml](../../.github/dependabot.yml) | Configura actualización de dependencias y evita saltos mayores automáticos no planificados. | [Contexto](OPERACION.md) | — | `d3d8f5a4368d2cb4` |
 | [.github/workflows/actualizar-noticias.yml](../../.github/workflows/actualizar-noticias.yml) | Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza. | [Contexto](OPERACION.md) | — | `2d00f5ce8fad3416` |
-| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `4c4b63a29de6543a` |
+| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `9b7918e96f145d14` |
 | [.github/workflows/mantener-demo-despierta.yml](../../.github/workflows/mantener-demo-despierta.yml) | Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub. | [Contexto](OPERACION.md) | — | `cf2d035c95075c65` |
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `06cfb5f10f2bb270` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `7c2af99ba83c7572` |
-| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `d3a807a358eb2cb8` |
-| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `d793e776fa87154e` |
+| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `77d46f231c5a56f9` |
+| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `71d136a1cd302751` |
 | [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `bffb3e96a472f47f` |
 | [shaders.config.ts](../../shaders.config.ts) | Configura la integración React de shaders sin activar autenticación ni telemetría. | [Contexto](../EXPERIENCIA-ELITE.md) | — | `6d3e8e67ca01ad01` |
 | [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `33b5f6dc12863e5b` |
@@ -378,6 +378,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [tests/browser/optimizacion.mjs](../../tests/browser/optimizacion.mjs) | Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos. | [Contexto](../OPTIMIZACION-PANTALLAS.md) | — | `76023afd404e8ee1` |
 | [tests/browser/responsive.mjs](../../tests/browser/responsive.mjs) | Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad. | [Contexto](../REVISION-RESPONSIVE-20261013.md) | — | `b49b3b718acae186` |
 | [tests/documentacion/catalogo.test.mjs](../../tests/documentacion/catalogo.test.mjs) | Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar. | [Contexto](README.md) | — | `ff080db8dc7e3bc8` |
+| [tests/documentacion/estado.test.mjs](../../tests/documentacion/estado.test.mjs) | Pruebas de scripts/estado.mjs: solapes entre ramas (con ramas apiladas y ficheros de registro), días transcurridos y nombre de la rama reservada. | [Contexto](OPERACION.md) | — | `fa475c6f5acd39a4` |
 
 ## Pruebas de navegador
 
@@ -482,6 +483,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [scripts/corregir-escalera.sh](../../scripts/corregir-escalera.sh) | Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto. | [Contexto](OPERACION.md) | — | `f39d6ef23d821f8a` |
 | [scripts/demo.sh](../../scripts/demo.sh) | Prepara/prueba una demostración local con base ficticia y comprobaciones de entorno. | [Contexto](OPERACION.md) | — | `8f3041505f3e1d30` |
 | [scripts/entorno-aislado.sh](../../scripts/entorno-aislado.sh) | Gestiona base y servidor propios por nombre/puerto para que asistentes no compartan datos de pruebas. | [Contexto](OPERACION.md) | — | `e5d3605c8894ae1e` |
+| [scripts/estado.mjs](../../scripts/estado.mjs) | Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md. | [Contexto](OPERACION.md) | `RAMA_DEMO`, `esRegistro`, `solapes`, `diasDesde`, `nombreDeRama` | `56a709dd52948eb8` |
 | [scripts/generar-catalogo.mjs](../../scripts/generar-catalogo.mjs) | Contrasta cada archivo mantenido con explicación individual y guía, genera índice determinista con huellas y rechaza cobertura/salida desactualizada. | [Contexto](README.md) | `MANIFEST`, `OUTPUT`, `maintainedFiles`, `validateCatalog`, `renderCatalog`, `run` | `72132bbe41376409` |
 | [scripts/generar-logo-lona.py](../../scripts/generar-logo-lona.py) | Genera el logotipo oficial de Lona (dirección B · Cuadrilátero) en SVG con las letras convertidas en trazados, y los símbolos e icono, en public/brand/lona. | [Contexto](OPERACION.md) | — | `3f14f95f4215ab4c` |
 | [scripts/generar-mapa.mjs](../../scripts/generar-mapa.mjs) | Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada. | [Contexto](OPERACION.md) | — | `210037e5b96ee20d` |
