@@ -13,9 +13,9 @@ await crear.getByRole("button", { name: "Crear mi ficha", exact: true }).click()
 await p.getByRole("link", { name: "Ver mi ficha pública", exact: true }).waitFor();
 const publica = await p.getByRole("link", { name: "Ver mi ficha pública", exact: true }).getAttribute("href");
 
-async function combate(sufijo, dias, resultado = "WIN") {
+async function combate(sufijo, dias, resultado = "WIN", nivel = "AMATEUR") {
   const evento = `Trayectoria ${sufijo} ${rnd}`;
-  await registrar(p, { disciplina: "BOXEO", evento, fecha: enDias(dias), rivalNombre: "Rival", rivalApellidos: `${sufijo}${rnd}`, resultado, metodo: resultado === "NC" ? null : "UD" });
+  await registrar(p, { disciplina: "BOXEO", nivel, evento, fecha: enDias(dias), rivalNombre: "Rival", rivalApellidos: `${sufijo}${rnd}`, resultado, metodo: resultado === "NC" ? null : "UD" });
   // La fila nueva distingue este envío de un aviso que siga visible del anterior.
   await p.locator("main table tbody tr", { hasText: evento }).waitFor();
 }
@@ -39,8 +39,8 @@ await p.goto(B + "/mi-ficha");
 await p.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
 await p.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
 await categoria("PRO", "Wélter");
-await combate("Profesional", -30);
-await combate("SinDecision", -10, "NC");
+await combate("Profesional", -30, "WIN", "PRO");
+await combate("SinDecision", -10, "NC", "PRO");
 
 const visitante = await (await browser.newContext()).newPage();
 async function comprobar(page, contexto, nivelActual) {

@@ -413,3 +413,5 @@ Confirmar el SHA live del despliegue antes de corregir una copia local. Que git 
 - A7 retiró el nivel por defecto, pero algunos datos de prueba seguían suponiéndolo. Elegirlo explícitamente; al registrar, conservar el nivel ya elegido (incluido profesional), salvo que el caso pida otro.
 - 0.9.1 no se publicó: sus notas pertenecen a 0.10.0. Para un fondo var(--acc), el texto usa var(--acc-ink), no --inv-ink (blanco en tema claro).
 - Los comandos de red requieren el permiso de red del entorno; el fallo inicial del proxy se resolvió así, sin modificar la política ni quitar el proxy. npm necesitó una caché dentro de /workspace, porque su ubicación por defecto no era escribible. No cambiar dependencias para arreglar permisos del entorno.
+
+14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
