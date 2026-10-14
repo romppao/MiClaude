@@ -57,7 +57,12 @@ await axe(visita, "Buscar clases");
 const fan = await newUser("Aficion", "FAN");
 await fan.p.goto(B + "/mi-panel");
 const accFan = await acciones(fan.p);
-check("el panel del aficionado empieza por «Buscar clases» y tiene «Mis reservas»", accFan[0] === "Buscar clases" && accFan.includes("Mis reservas"));
+check("el aficionado sin reservas ve Buscar clases y no un acceso vacío a Mis reservas", accFan[0] === "Buscar clases" && !accFan.includes("Mis reservas") && accFan.length <= 4);
+const fanUser = await db.user.findUniqueOrThrow({ where: { email: fan.email } });
+const offeredClass = await db.trainingClass.findFirstOrThrow({ where: { title: `Clinch ${rnd}` } });
+await db.classRequest.create({ data: { classId: offeredClass.id, userId: fanUser.id, preferred: "Por acordar", status: "PENDING" } });
+await fan.p.reload();
+check("cuando tiene una solicitud, Mis reservas aparece entre sus accesos", (await acciones(fan.p)).includes("Mis reservas"));
 
 // 4) Retos y sparring entre dos peleadores.
 const ana = await peleador("Ana");
