@@ -1,0 +1,86 @@
+name: Desplegar la versión real (Cloud Run)
+
+# Versión real de Lona en Google Cloud Run (ADR-005, docs/PRODUCCION.md). Se lanza a mano desde la pestaña Actions
+# («Run workflow»), eligiendo la etiqueta o rama a publicar. No se despliega sola al fusionar: la versión real cambia
+# solo cuando alguien lo decide, después de probar en la demo.
+#
+# Sin claves guardadas en GitHub: la autenticación con Google es por Workload Identity Federation.
+# Variables del repositorio (Settings → Secrets and variables → Actions → Variables):
+#   GCP_PROJECT_ID, GCP_REGION (europe-west1), GCP_WIF_PROVIDER, GCP_DEPLOY_SA
+# Secreto del repositorio:
+#   PROD_DATABASE_URL_DIRECT  (conexión DIRECTA de Neon, sin «-pooler»; solo para aplicar las migraciones)
+# Las variables de la aplicación viven en Cloud Run y en Secret Manager, no aquí (docs/PRODUCCION.md).
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Etiqueta o rama a publicar (por ejemplo v0.13.0)"
+        required: true
+
+concurrency:
+  group: produccion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: produccion
+    env:
+      REGION: ${{ vars.GCP_REGION }}
+      PROYECTO: ${{ vars.GCP_PROJECT_ID }}
+      IMAGEN: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/lona/web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Compilar y subir la imagen
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build --build-arg GIT_COMMIT="$(git rev-parse HEAD)" -t "$IMAGEN:$(git rev-parse --short HEAD)" .
+          docker push "$IMAGEN:$(git rev-parse --short HEAD)"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Aplicar las migraciones
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL_DIRECT }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "::error::Falta el secreto PROD_DATABASE_URL_DIRECT"; exit 1; fi
+          npm ci --include=dev
+          npx prisma migrate deploy
+
+      - name: Publicar en Cloud Run
+        run: |
+          gcloud run deploy lona \
+            --project "$PROYECTO" --region "$REGION" \
+            --image "$IMAGEN:$(git rev-parse --short HEAD)" \
+            --min-instances 0 --max-instances 2 --memory 512Mi --cpu 1 --cpu-throttling \
+            --concurrency 40 --timeout 60 --allow-unauthenticated --quiet
+
+      - name: Comprobar /salud
+        run: |
+          URL=$(gcloud run services describe lona --project "$PROYECTO" --region "$REGION" --format 'value(status.url)')
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 60 "$URL/salud" || echo "000")
+            echo "Intento $i: $STATUS"
+            [ "$STATUS" = "200" ] && exit 0
+            sleep 10
+          done
+          echo "::error::La versión publicada no responde bien en /salud"; exit 1

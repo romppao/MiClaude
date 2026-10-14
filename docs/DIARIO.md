@@ -1934,3 +1934,35 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Límites que conviene decir con honestidad:** funciona **si cada sesión sigue las instrucciones**; no hay forma técnica de obligarlas. El estado solo fluye cuando se sube al repositorio. Y no sustituye al diario, que sigue siendo el archivo completo.
 
 **Estado y próximos pasos:** PR con CI. Cuando se fusione, el fundador solo tiene que hacer `git pull` en el portátil: la sesión de Claude Code leerá el aviso de `CLAUDE.md` por sí sola. Queda pendiente que quien tenga el encargo de los paneles lo suba.
+
+## 2026-10-14 — Versión real gratuita en lonaclub.es: investigación y código (Claude)
+
+**Qué se pidió:**
+- El fundador compró lonaclub.es y avisó de que Render «tiene un periodo de prueba».
+- Pidió investigar «profundamente y al más mínimo detalle» si las herramientas eran las mejores para funcionar gratis, sin contar Apple.
+- Después pidió que la versión real esté «completamente virgen», solo con los gimnasios reales de España menos Cataluña.
+
+**Qué se decidió y por qué:**
+- Cloud Run (`europe-west1`) para la versión real, con Neon Free y copias en R2 (ADR-005).
+- Render prohíbe producción en su plan gratuito y sus 750 h al mes ya las gasta la demo.
+- Neon subió a 1 GB por proyecto.
+- Madrid no admite la asignación de dominio de Cloud Run.
+
+**Qué se hizo:**
+- `Dockerfile`, `desplegar-produccion.yml`, `copia-diaria.yml`.
+- Noticias también para la versión real.
+- `docs/PRODUCCION.md` y ADR-005.
+- Compilación *standalone* comprobada en local: arranca; `/salud` da 503 sin base, como se esperaba, y `/privacidad` da 200.
+
+**Qué salió mal:**
+- El sistema de permisos de Claude Code bloqueó varios pasos, que pasan al fundador con guía:
+  - conceder acceso a otra cuenta en Google Cloud;
+  - fusionar sin revisión;
+  - cambios de DNS;
+  - leer variables secretas de Render.
+- `mantener-demo-despierta.yml` gasta unos 4.300 minutos de Actions al mes, más de los 2.000 gratuitos del repositorio privado.
+
+**Estado y próximos pasos:**
+- El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
+- Claude monta y comprueba el primer despliegue.
+- Bloque D (gimnasios reales desde OpenStreetMap) para Codex.

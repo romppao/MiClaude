@@ -1,3 +1,5 @@
+> **14 de octubre de 2026:** el alojamiento de la versión real pasa a Google Cloud Run, gratis ([ADR-005](ADR-005-alojamiento-cloud-run.md)). El resto de este documento sigue vigente; Neon ya da 1 GB por proyecto.
+
 # ADR-003 — Proveedores para la fase 0: gastar casi nada, poder crecer y poder cambiar
 
 **Estado:** **APROBADA por el fundador el 6 de octubre de 2026** («todas esas herramientas las apruebo», con la condición de que Claude las vuelva a verificar: hecho en la «Segunda verificación» de abajo). Los precios siguen sin leerse en las páginas oficiales: se comprueban al crear cada cuenta.  

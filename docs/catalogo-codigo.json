@@ -1908,5 +1908,20 @@
     "path": "tests/unit/paneles-fallos.test.ts",
     "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "Dockerfile",
+    "purpose": "Imagen de la versión real para Google Cloud Run: compila con salida standalone y arranca con node server.js, sin migrar al arrancar (ADR-005).",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
+    "path": ".github/workflows/desplegar-produccion.yml",
+    "purpose": "Despliegue manual de la versión real: compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud.",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
+    "path": ".github/workflows/copia-diaria.yml",
+    "purpose": "Copia nocturna de la base real con pg_dump a un cubo de Cloudflare R2 con jurisdicción UE.",
+    "guide": "docs/PRODUCCION.md"
   }
 ]
