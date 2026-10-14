@@ -44,7 +44,7 @@ PR de Claude sobre #52.
 
 ## [0.10.0] — 2026-10-13
 
-PR #48; incluye el trabajo responsive de #47, que no se publicó como 0.9.1.
+PR #48 (incluye el trabajo responsive de #47, que no se publicó como 0.9.1). Fusión: `d5842b4`.
 
 ### Añadido
 - **Diagnóstico de fuentes de noticias** en `/moderacion/noticias`: cada fuente muestra si responde, si devuelve un canal válido y cuántos titulares aporta.

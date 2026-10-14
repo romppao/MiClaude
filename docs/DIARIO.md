@@ -1831,4 +1831,6 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
   - `veladas-pasadas.mjs` buscaba «Pasada aprobada» sin la parte única del nombre, así que encontraba veladas de otras ejecuciones. Además, comprobaba que el texto no estuviera en la página, y la página repite lo buscado («No hemos encontrado nada para «…»»). Ahora usa nombres únicos y comprueba que no hay enlace a la velada.
   - Se comprobó a mano que la búsqueda pública **no** muestra veladas pendientes ni rechazadas: la regla B1 se cumple.
 
+- La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.
+
 **Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.
