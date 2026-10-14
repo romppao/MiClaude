@@ -1,2005 +1,2016 @@
-# Diario de desarrollo — Ring España
-
-Cuaderno de bitácora del proyecto: qué hicimos, en qué orden, por qué, cómo surgieron las ideas y qué salió mal.
-Pensado para poder contar algún día todo el recorrido, y para retomar cualquier punto sin perder el contexto.
-
-**Cómo se mantiene:** al final de cada sesión de trabajo se añade una entrada nueva **al final** de este fichero (nunca se reescriben las anteriores; si algo cambia de opinión, se anota como una entrada nueva). Cada entrada sigue la plantilla del final.
-Documentos hermanos: [`IDEAS.md`](IDEAS.md) (ideas y backlog), [`LECCIONES.md`](LECCIONES.md) (errores y cómo retomar), [`ARQUITECTURA.md`](ARQUITECTURA.md) (estado técnico vigente).
-
----
-
-## Sesión 1 — 30 de septiembre de 2026 — De la idea al primer prototipo funcional
-
-### 1. El punto de partida: la visión
-
-El fundador plantea un proyecto «muy ambicioso»: una aplicación para **hacer crecer la comunidad boxística española**.
-Lo esencial de lo que pidió, en sus palabras aproximadas:
-
-- Dar a conocer a pugilistas, **sobre todo amateur** (también profesionales).
-- Que puedan **registrar sus récords** de victorias y derrotas, darse a conocer y **generar audiencia** para los boxeadores españoles.
-- Un **calendario de veladas** próximas, profesionales y amateur.
-- **Buscar** boxeadores, gimnasios, entrenadores, etc.
-- Referencia: algo **similar a BoxRec**, pero para España.
-
-Repositorio de partida: vacío (`romppao/MiClaude`, sin ningún commit).
-
-### 2. Decisiones iniciales (preguntas al fundador)
-
-Antes de escribir código se preguntaron tres cosas y se decidió:
-
-| Pregunta | Decisión | Por qué |
-|---|---|---|
-| Plataforma | **Web responsive** | Funciona en móvil y ordenador, se indexa en Google (clave para darse a conocer) y luego se puede envolver como app |
-| Stack | **Next.js + PostgreSQL** (+ Prisma, TypeScript) | Un solo lenguaje de extremo a extremo, buen SEO, búsqueda potente, fácil de desplegar |
-| Alcance inicial | **Plan + MVP funcional** | Ver algo real cuanto antes |
-
-### 3. Primer MVP (estilo BoxRec)
-
-Se construyó: fichas de boxeadores con **récord calculado** desde los combates (por nivel profesional/amateur), calendario de veladas con filtros, gimnasios, entrenadores y búsqueda global. Datos de ejemplo **ficticios** (con «Demo» en el nombre) para no inventar récords de personas reales.
-Decisión de diseño que se mantiene hasta hoy: **el récord no se guarda, se calcula** a partir de los combates, para que no pueda desincronizarse.
-
-### 4. Giro de enfoque: amateur, Madrid y valoración del público
-
-Tras ver el MVP, el fundador **reorientó el producto**. Esta es la idea que define el proyecto:
-
-> El foco es fomentar la afición al boxeo en España, principalmente en el **amateur**, porque son quienes en el futuro serán profesionales y «la cara del boxeo español en el mundo». Un amateur debe poder registrar su récord **y recibir una valoración del público aficionado** («este chaval es muy bueno, lo vi y aluciné»).
-
-Además:
-- **Foco geográfico: Madrid** (no exclusivo, pero principal) y expandir después. Hay competencia (una aplicación que «ha dado mucho que hablar en Barcelona»); la intención es estructurarlo bien en Madrid y adelantarse.
-- **Nada de diseño gráfico todavía** (los diseños de Claude «normalmente no le gustan»): prioridad absoluta a **arquitectura y estructura**.
-
-Consecuencias técnicas que se implementaron:
-- **Cuentas** propias (contraseñas con scrypt, sesión en cookie) y roles: aficionado, boxeador, organizador, administrador.
-- **Ficha propia**: el boxeador amateur crea su ficha y **registra sus combates**.
-- **Fiabilidad del dato**: como el amateur se registra a sí mismo, cada combate tiene un nivel de respaldo (`autodeclarado → confirmado por el rival → verificado`, o `disputado`).
-- **Valoraciones ancladas a un combate concreto**: una nota es «esta actuación en este combate», no «este boxeador en general». Una por usuario y combate, los participantes no pueden votar, solo combates ya celebrados. Base de la defensa contra la manipulación.
-- **Ránking por provincia** (Madrid por defecto) con **media bayesiana**, para que un solo 5 no supere a 40 notas de 4,8.
-- Portada centrada en el amateur de Madrid; la provincia es un parámetro, no una limitación.
-
-### 5. Segunda ronda: confianza y organizadores
-
-Se aceptó la propuesta de avanzar en los riesgos detectados:
-- **Verificación de email** obligatoria para publicar (token de un solo uso; el enlace del correo solo muestra un botón y la verificación se hace por POST para que los escáneres de enlaces no la consuman).
-- **Reclamar una ficha existente** (cuando alguien ya registró un combate tuyo): la solicita el boxeador y la aprueba un moderador.
-- **Rol organizador** con solicitud aprobada por un moderador: crea veladas, monta el cartel y pone resultados, que nacen verificados.
-- Límite de 20 valoraciones al día por usuario.
-
-**Regla de producto fijada por el fundador:** ver contenido (veladas, fichas, ránking) es **público**; votar, registrar récords y demás funciones principales **exigen estar registrado**. Se auditaron todas las acciones del servidor y ya se cumplía (el control está en el servidor, no solo en ocultar botones).
-
-### 6. Calidad: tests y CI
-
-Tests unitarios (récord, media bayesiana, slugs, contraseñas: 17), una **prueba de extremo a extremo en navegador real** del flujo completo (registro → verificación → reclamar ficha → confirmar combate → valorar → organizador con cartel) y un **workflow de GitHub Actions** con PostgreSQL.
-Estado al cierre de esta entrada: en local todo pasa; **la primera ejecución del CI en GitHub estaba en curso** (pendiente de confirmar; anotar el resultado en la siguiente entrada).
-
-### 7. Estrategia de veracidad de datos
-
-El fundador planteó que habrá que **ir afilando** la comprobación de que los datos de cada boxeador, gimnasio y promotora sean veraces, **sin depender de trámites burocráticos con las federaciones** al inicio (aunque el objetivo a medio plazo es colaborar con la Federación Madrileña, la Española y otras, y de momento «no nos conoce nadie»).
-Resultado: una estrategia por capas documentada en [`ARQUITECTURA.md`](ARQUITECTURA.md) — niveles de respaldo, verificar también a quien verifica, comprobaciones automáticas de coherencia, historial de cambios, moderadores locales de confianza en Madrid y vía de entrada a las federaciones ofreciéndoles calendario y resultados limpios.
-
-### 8. Cierre de la sesión y estado
-
-- Rama: `claude/ring-espana-mvp` (sin pull request abierta).
-- Commits, en orden: `a823a77` MVP inicial · `5003eff` enfoque amateur/Madrid · `20016c1` verificación, reclamar ficha, organizadores · `f89a9c3` tests y CI · `2028bf9` CI en cualquier push · `6a7769c` estrategia de verificación.
-- Solicitud del fundador: **documentar todo el proceso** (este diario, `IDEAS.md`, `LECCIONES.md`).
-- **Lo siguiente acordado/propuesto:** (1) enlace de evidencia en cada combate + historial de cambios, (2) sello de verificado para gimnasios y organizadores; después, seguir a boxeadores con avisos de veladas.
-- **Abierto:** resultado del CI; proveedor de correo real; migraciones de base de datos; decidir qué prueba de identidad se pide al reclamar ficha.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Documentación, evidencia, historial y sello de verificado
-
-### Qué se pidió / qué idea surgió
-
-Tras la estrategia de veracidad, el fundador pidió **documentar cada paso** del desarrollo («cómo van surgiendo las ideas… para en algún futuro mostrar todo el proceso… ver por dónde hemos fallado, cómo retomar lo anterior»). Se crearon `DIARIO.md`, `IDEAS.md`, `LECCIONES.md` y `CLAUDE.md` (que obliga a mantenerlos al cerrar cada bloque de trabajo).
-Después aprobó empezar por los puntos 1 y 2 del orden propuesto: **evidencia en los combates + historial de cambios** y **sello de verificado**.
-
-### Confirmación pendiente de la entrada anterior
-
-Las tres primeras ejecuciones del CI en GitHub (runs 1, 2 y 3) terminaron **con éxito**. El CI funciona con PostgreSQL real y ejecuta tipos, tests, build y la prueba de navegador.
-
-### Qué se decidió y por qué
-
-- **Evidencia = un enlace** (acta, cartel, publicación, vídeo) y no subida de ficheros: es lo más barato, no toca datos sensibles ni menores y ya permite la corroboración de nivel 3. Solo se aceptan `http(s)`; `javascript:` y similares se descartan.
-- **Historial de cambios en base de datos** (`AuditLog`: quién, cuándo, antes → después). Por ahora lo ve solo el moderador; hacerlo público por combate queda como idea.
-- **El sello de verificado siempre lleva una nota con la evidencia comprobada** (web, redes, llamada…). Sin nota no se concede. La nota es **interna**: el público solo ve el sello.
-- **Sello del organizador = solicitud aprobada**, con nota del moderador guardada; en la velada aparece «✓ organizador verificado».
-- **Avales cruzados entre entidades: aplazados.** Requieren cuentas de responsable de gimnasio, que aún no existen; se anota en ideas en vez de construir algo a medias.
-
-### Qué se hizo
-
-- Campo `Bout.evidenceUrl`, formularios para registrarla al crear el combate y para editarla después (boxeador, rival, organizador o admin), y enlace «evidencia ↗» en la ficha pública con `rel="noopener noreferrer nofollow ugc"`.
-- Tabla `AuditLog` y registro en: creación de combates, respuesta del rival, decisiones de moderación, resultados, evidencia, reclamaciones, organizadores, eventos y sellos. Página `/admin/historial` con filtros.
-- Sello de verificado en gimnasios (`verifiedAt`, `verifiedNote`) con gestión en `/admin`, insignia en listado y ficha; nota de revisión al aprobar organizadores.
-- Tests: 3 unitarios nuevos (20 en total) y 7 comprobaciones nuevas en la prueba de navegador (15 en total).
-
-### Qué salió mal / qué se aprendió
-
-- **El historial casi mentía.** Al escribir el registro de reclamaciones anoté «aprobada» aunque la aprobación podía acabar rechazada (ficha ya con dueño o usuario con otra ficha). Lo vi al releer, antes de probar, y ahora se registra el resultado real y también lo que se pidió. Regla: un registro de auditoría debe reflejar lo que ocurrió, no lo que se intentó.
-- **Sustituciones de texto verificadas.** Tras el incidente anterior con un reemplazo que no se aplicó, esta vez cada cambio de esquema y de UI se hizo con comprobaciones que fallan si el patrón no existe. Funcionó a la primera.
-
-### Estado y próximos pasos
-
-- Hecho: puntos 1 y 2 del orden de verificación (evidencia, historial y sellos de gimnasio y organizador).
-- Siguiente: comprobaciones automáticas de coherencia (mismo día, duplicados, edades), botón «reportar dato» y puntuación de fiabilidad; después detección de colusión. Candidato de producto: seguir a boxeadores con avisos de veladas.
-- Abierto: cuentas de responsable de gimnasio (para avales), proveedor de correo real, migraciones de BD, qué prueba de identidad pedir al reclamar ficha, y si el historial por combate debe ser público.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Principio fundacional de usabilidad
-
-### Qué se pidió / qué idea surgió
-
-El fundador pidió guardar «en lo más profundo» un principio para esta y cualquier aplicación futura: que sea **muy, pero que muy intuitiva para todo tipo de usuario** — niños, gente joven, adultos y personas de edad avanzada — sin importar su nivel tecnológico, con **botones coloridos e intuitivos, enlaces e información fáciles de encontrar**, y **manteniendo siempre la profesionalidad** («que nos vea como gente seria»; nada vulgar ni coloquial). Lo calificó de «súper importante».
-
-### Qué se decidió y por qué
-
-- Se elevó a **principio fundacional F9** y se convirtió en una **lista de comprobación de 11 puntos** en `CLAUDE.md`, para que rija todo el trabajo futuro y no dependa de la memoria de una conversación.
-- Se distingue la **usabilidad** (lenguaje, flujos, mensajes, accesibilidad: se aplica ya) del **diseño visual** (estilo e identidad: aplazado por petición previa del fundador). Antes de cambiar el aspecto visual de forma notable se le consulta.
-- También se guardó a nivel de usuario (`~/.claude/CLAUDE.md`) para que valga en otras aplicaciones, teniendo en cuenta que ese fichero vive en este entorno de trabajo, no en el repositorio.
-
-### Qué se hizo
-
-Solo documentación: principio y lista en `CLAUDE.md`, idea F9 y dos preguntas abiertas en `IDEAS.md`, y esta entrada. No se ha cambiado todavía ninguna pantalla.
-
-### Qué salió mal / qué se aprendió
-
-Reconocimiento honesto del estado actual: **lo construido hasta ahora no cumple el principio.** Hay términos técnicos visibles («disputar», «sin confirmar»), varios formularios con solo texto de ejemplo y sin etiqueta, acciones que redirigen sin ningún mensaje de confirmación y una interfaz sin cuidado de contraste ni tamaños. Era esperable (se priorizó la arquitectura) pero hay que corregirlo antes de que lo use gente real.
-
-### Estado y próximos pasos
-
-- Propuesto: una **auditoría de usabilidad** de lo ya construido frente a la lista de 11 puntos, con los cambios ordenados por impacto (mensajes de confirmación y de error, etiquetas, lenguaje llano, accesibilidad), sin tocar el estilo visual sin consultar.
-- Sigue pendiente lo anterior: comprobaciones de coherencia, «reportar dato», seguimiento de boxeadores.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Ejecución por prioridades: flujos claros, coherencia, avisos de error, ayuda y seguir boxeadores
-
-### Qué se pidió / qué idea surgió
-
-El fundador dio autonomía: «tú vete actuando… con un orden de prioridades de mayor a menor. Primero las funcionalidades importantes, después otras cosas de menor importancia en el funcionamiento básico».
-
-### Cómo se priorizó y por qué
-
-Criterio: primero lo que afecta al funcionamiento básico (registrar récords, votar, consultar veladas) y a que los datos sean creíbles; después lo complementario. Orden ejecutado:
-
-1. **Flujos principales en lenguaje claro** (principio F9): antes de esto, varias acciones fallaban en silencio (p. ej. valorar un combate no permitido no decía nada).
-2. **Volver a donde estabas tras entrar** (se pierde al usuario justo al valorar, que es la función estrella).
-3. **Comprobaciones automáticas de coherencia** de los combates.
-4. **«Reportar un error»** sobre combates y fichas.
-5. **Página «¿Cómo funciona?»**.
-6. **Seguir a boxeadores** con «Mis boxeadores» y aviso por correo.
-
-Cada bloque se hizo con pruebas y se subió por separado.
-
-### Qué se decidió y por qué
-
-- **Avisos como códigos en la URL** (`?aviso=` / `?problema=`) traducidos en un solo fichero (`lib/messages.ts`): el texto vive en un único sitio, es revisable de un vistazo y mantiene un tono claro y profesional.
-- **Duplicados se bloquean; lo sospechoso se marca, no se rechaza.** Un combate el mismo día o a menos de 7 días de otro se guarda con una señal para el moderador, porque puede haber explicaciones legítimas.
-- **Avisos de error:** un aviso abierto por usuario y elemento y máximo 10 al día, para que el mecanismo no sea un arma de acoso.
-- **Avisos por correo a seguidores solo de combates publicados por organizadores**, nunca de los autodeclarados: si no, cualquiera podría inventarse combates para llenar de correos a los seguidores de otra persona.
-- **Navegación principal reducida a 5 elementos**; el resto (organizadores, registro) pasa al pie y a la zona de cuenta, siguiendo la regla del principio F9.
-
-### Qué se hizo
-
-- Avisos de éxito/problema en todas las acciones; etiquetas visibles en registro, entrada, ficha y registro de combates; lenguaje llano («pendiente de confirmar», «en revisión», «Sí, es correcto» / «No es correcto»); foco visible, enlace «Saltar al contenido» y tamaños mínimos de 44 px.
-- Regreso a la página de origen tras iniciar sesión (con validación de rutas internas).
-- `Bout.flags`, bloqueo de duplicados y señales en la cola de moderación (`lib/coherence.ts`).
-- Modelo `Report`, formulario «¿Hay un error? Avísanos», sección de avisos en `/admin`.
-- `/ayuda` con pasos por perfil y glosario de etiquetas; pie de página.
-- Modelo `Follow`, botón «Seguir a este boxeador» con contador, `/siguiendo` y avisos por correo (`lib/notify.ts`).
-- Tests: 25 unitarios y 30 comprobaciones de navegador (antes 20 y 15). *(Corrección: una primera versión de esta entrada decía 28; el recuento real es 30.)*
-- Commits: `1faa28d`, `1f74af7`, `46d3684` y el de esta entrada.
-
-### Qué salió mal / qué se aprendió
-
-- **Un test fallaba por mi selector, no por la app:** Next.js añade su propio elemento `role="alert"`, así que contar «todas las alertas» daba 2. Solución: acotar al texto del mensaje.
-- **`networkidle` no es fiable para esperar a una acción:** el test del sello del gimnasio miraba la página antes de que terminara la acción. Solución: esperar a un estado concreto de la interfaz («Retirar sello»). Regla: esperar a lo visible, no al tráfico de red.
-- **Cambiar textos rompe pruebas que buscan textos:** al pasar a un lenguaje más claro (`Crear ficha` → `Crear mi ficha`) hubo que actualizar el e2e. Regla: cuando cambie un texto, buscar dónde lo usan las pruebas.
-- **El CI de GitHub falló dos veces y lo descubrí tarde.** Los runs 4 y 5 (commits `2214758` y `bc39c51`) fallaron en «gimnasio muestra el sello de verificado»: la misma carrera de sincronización que ya había detectado y corregido en local (`1faa28d`), pero yo aún no había mirado el CI de esos envíos. Los runs 6, 7 y 8 pasan. Lección: **comprobar el resultado del CI tras cada envío**, no dar por hecho que pasa porque en local pasa.
-- **Honestidad sobre el alcance de F9:** se aplicó a los flujos principales (registro, entrada, ficha, combates, valoración, seguir, ayuda). **No se ha auditado todavía** el panel del organizador ni el de moderación, ni se ha medido el contraste con una herramienta, ni se ha probado con personas reales. No debe darse F9 por cumplido.
-
-### Estado y próximos pasos
-
-- Hecho: los 6 puntos.
-- **Limitaciones abiertas:** los correos siguen saliendo al log (falta proveedor real); antes de enviar correos de verdad hace falta que el usuario pueda **elegir no recibir avisos** (RGPD); la comprobación de edades no se hizo (casi nadie rellena la fecha de nacimiento); «mismo día/menos de 7 días» solo mira combates ya registrados.
-- **Siguiente por prioridad:** (a) preparar el despliegue real: proveedor de correo, migraciones de base de datos, variables de entorno y preferencias de aviso; (b) auditoría de usabilidad del resto de pantallas (organizador, moderación, listados) y medición de contraste/accesibilidad automática; (c) decidir «tú» o «usted»; (d) pruebas con usuarios reales.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Nuevas directrices: diseño al final, aura, varias disciplinas y récord de partida
-
-### Qué se pidió / qué idea surgió
-
-El fundador aportó cuatro directrices importantes:
-
-1. **Diseño visual al final (recordatorio).** «No me gustan nada los diseños que ofrece Claude… siempre hace los mismos diseños, siempre utiliza los mismos colores… esto lo vamos a trabajar muy bien para que no pueda ocurrir y no se asocie directamente el desarrollo de esa aplicación con una inteligencia artificial como Claude.» Pidió dejarlo **muy marcado y documentado** y pasar al diseño «cuando hayamos terminado todo el proceso de creación de la aplicación».
-2. **Aura en lugar de estrellas.** Quiere llevar la valoración «a un ambiente más actual, más juvenil, más de redes sociales»: valorar con **«aura»**. Quién tiene más o menos aura se define **por el número de clics** en el botón de aura del peleador; cuantos más clics, **mejor rankeado dentro de su categoría y su división**.
-3. **Ampliar a otros deportes de contacto:** MMA, kickboxing, K-1, jiu-jitsu… «Queremos ser los pioneros. Que todas esas disciplinas se sientan parte de un mismo ecosistema dentro de la comunidad española de deportes de contacto, en la que obviamente el boxeo tiene que estar en cabeza.»
-4. **Récord de partida.** Muchos peleadores no recuerdan su récord. Primero indicarán **cuántos combates llevan**; si no recuerdan el récord, solo ese número. **Desde ese punto de partida** registran los nuevos. Reconoce que no se puede comprobar: «es lo que hay».
-
-### Qué se decidió y por qué
-
-- **Diseño:** principio F10 documentado en `CLAUDE.md` (y a nivel de usuario) con un procedimiento para cuando llegue el momento: briefing con referencias del fundador, varias direcciones distintas, lista de tics de «diseño de IA» que evitar, recomendación de un diseñador humano para la marca y registro de decisiones en `docs/DISENO.md`. **La interfaz actual es provisional y no se pule.**
-- **Aura, récord de partida y varias disciplinas se registran como decisiones de producto** (ideas F11 y las tres filas nuevas de `IDEAS.md`), pero **no se implementan todavía**: hay dos decisiones que condicionan el modelo de datos y el fundador pidió que se le pregunte si no queda claro.
-- **Riesgo señalado con el aura por clics:** si los clics son ilimitados, un solo usuario (o varias cuentas falsas) puede inflar a un peleador sin límite, y el ránking pierde credibilidad, que es justo lo que se ha estado protegiendo. Se propone conservar la regla que ya existe (una valoración por persona y combate, sin participantes) y aplicarla al aura, o como mínimo un tope diario.
-- **Récord de partida:** se mostrará **separado** de lo registrado en la app y con su etiqueta de «declarado por el propio deportista», nunca mezclado sin distinguir, para no perder la honestidad del sistema de niveles de respaldo.
-
-### Qué se hizo
-
-Solo documentación: principio de diseño en `CLAUDE.md` y `~/.claude/CLAUDE.md`, ideas F10 y F11, tres ideas de producto nuevas y preguntas abiertas en `IDEAS.md`, y esta entrada. **No se ha tocado el código.**
-
-### Qué salió mal / qué se aprendió
-
-Nada roto. Observación: los tres cambios de producto (aura, disciplinas, récord de partida) **tocan el modelo de datos de arriba abajo** (el récord pasa a ser por disciplina, la valoración cambia de estrellas a aura, «boxeador» pasa a «peleador»). Cuanto antes se hagan, más barato es: hoy solo hay datos de demostración.
-
-### Estado y próximos pasos
-
-- Pendiente de respuesta del fundador: tope de clics del aura, una ficha por persona o por deporte.
-- Después: (1) disciplinas + rebautizar «boxeador» a «peleador» en el modelo y la interfaz, (2) récord de partida, (3) aura y ránking por categoría y disciplina, (4) adaptar tests y documentación.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Implementación: peleadores, varias disciplinas, récord de partida y aura
-
-### Qué se pidió / qué idea surgió
-
-Ejecución de las directrices de la entrada anterior. El fundador respondió a las tres preguntas abiertas:
-
-1. **Aura:** «un aura por persona y combate» (la opción recomendada). Su idea original era ordenar por «número de clics»; se reconcilió así: el total de aura es el número de personas distintas que la han dado, lo que mantiene la esencia (más aura = mejor posición) sin que un solo usuario pueda inflar el ránking pulsando sin límite.
-2. **Fichas:** una sola ficha por persona con varias disciplinas.
-3. **Disciplinas iniciales:** boxeo, MMA, kickboxing, K-1 y jiu-jitsu, dejando el sistema preparado para añadir más.
-
-### Qué se decidió y por qué
-
-- **«Boxeador» pasa a «peleador» en todo** (modelo, código, interfaz y rutas: `/peleadores`). Se hizo ahora porque solo hay datos de demostración y era el momento más barato. El boxeo sigue en cabeza (orden de presentación, ránking por defecto, portada).
-- **Categorías de peso y formas de terminar por disciplina** en un único fichero (`lib/disciplines.ts`). Las categorías son **orientativas**, sin validar con las federaciones de cada deporte.
-- **Récord de partida:** se guarda por disciplina (total y, si se recuerda, victorias/derrotas/empates; los huecos cuentan como 0 y si da el total y el detalle deben cuadrar). En la cifra principal solo suma si hay detalle; si solo se sabe el total, se muestra aparte («además, N combates anteriores sin detallar») y siempre como **declarado por el propio deportista**.
-- **Jiu-jitsu:** al ser deporte de torneo (varios combates el mismo día), no se le aplican las señales de combates muy seguidos.
-- **Ránking de aura:** por disciplina y zona, agrupado por categoría de peso (de menos a más peso), con empates en la misma posición y filtro de periodo (siempre / últimos 90 días) para que no gane solo quien lleva más tiempo en la app.
-
-### Qué se hizo
-
-Cuatro entregas, cada una con pruebas: `66edb2c` (renombrado a peleador), `f41f74e` (disciplinas y récord de partida), `d335b06` (aura y ránking) y esta documentación. Tests: 41 unitarios y 39 comprobaciones de navegador (antes 25 y 30).
-
-### Qué salió mal / qué se aprendió
-
-- **Prisma se negó a hacer un reset de la base de datos** al detectar que lo lanzaba una IA, y exige el consentimiento explícito del usuario. **No lo forcé**: creé una base de datos de pruebas nueva y vacía y apliqué el esquema ahí. La anterior (109 usuarios de pruebas) sigue existiendo en el entorno; solo habría que borrarla con permiso.
-- **Una comprobación intermitente volvió a aparecer** (contador de seguidores y contador de aura tras la acción). Esta vez **medí** la causa en lugar de suponerla: el contenido se actualiza entre 4 y 30 ms después del aviso, imperceptible; era solo sincronía del test.
-- **Un script de edición falló a medias** porque la función exigía un parámetro que olvidé; al no escribir nada hasta el final, no dejó cambios parciales. Regla: los scripts de edición deben ser todo-o-nada.
-
-### Estado y próximos pasos
-
-- Hecho: peleadores, cinco disciplinas, categorías por disciplina, récord de partida, aura y ránking por categoría.
-- **Riesgos que deben decidirse:** (1) el récord de partida se puede editar en cualquier momento (queda en el historial, pero alguien podría inflarlo después); habría que bloquear la edición tras el primer combate registrado o pedir confirmación de un moderador; (2) el aura absoluta favorece a quien compite más; hay que decidir si se normaliza; (3) las categorías de peso deben validarse con federaciones.
-- Pendiente de lo anterior: despliegue real (proveedor de correo, migraciones, variables de entorno, preferencias de aviso), auditoría de usabilidad del resto de pantallas y decisión «tú/usted».
-- Pendiente de decidir: el nombre de la marca (ya no encaja «Ring España» del todo con MMA/jiu-jitsu).
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Aura, monetización, todo en español y análisis de la competencia
-
-### Qué se pidió / qué idea surgió
-
-1. **Aura:** «principalmente va a ser un clic por usuario y por pelea. Y más adelante podremos introducir tres clics, pero eso ya sería una función premium.»
-2. **Monetizar:** una de las finalidades es «sacar dinero» con **funciones premium**, que se harán «una vez ya hayamos terminado toda la estructura básica».
-3. **«Todo debe estar en español.»**
-4. **Competencia:** Raunder (raunder.es) y BoxRec (boxrec.com): «mira en qué fallan y hazlo mejor; mira también lo que hacen bien y mejóralo».
-
-### Qué se decidió y por qué
-
-- **Aura a un clic por usuario y combate**: ya es lo que está implementado. Los tres clics quedan registrados como función premium **aplazada**, con un riesgo anotado: si pagar da más peso al aura, el ránking pasa a ser «quien paga, gana» y se pierde la credibilidad que se ha protegido hasta ahora.
-- **Principio de monetización**: la consulta básica sigue siendo gratuita y **nunca se vende la verificación, el sello ni una posición en el ránking**. Se listan candidatas (ficha ampliada, herramientas para organizadores, páginas de gimnasio, avisos y comparador ampliados, sin publicidad) para decidir después con el fundador.
-- **Español**: se aplicó a todo lo que ve una persona. Se interpretó que **el código interno sigue en inglés** (`Fighter`, `Bout`), y se dejó anotado que hay que preguntar si el fundador quiere también el código en español, por lo grande del renombrado.
-- **Competencia**: no se afirma nada que no se pueda comprobar (ver «qué salió mal»).
-
-### Qué se hizo
-
-- Español: páginas de «no encontrada» y de error propias (antes salían las de Next.js en inglés), «email» pasa a «correo electrónico» en textos y correos, y `/admin` pasa a `/moderacion` (`56a7a8e`).
-- `docs/COMPETENCIA.md` con lo comprobado, lo que es conocimiento general sin comprobar, y una lista de mejoras propuestas.
-- Reglas nuevas en `CLAUDE.md` (idioma, aura y premium, competencia) e ideas F12 y F13 más siete ideas nuevas.
-- Tests: 41 unitarios y 39 comprobaciones de navegador, sin fallos en 3 ejecuciones.
-
-### Qué salió mal / qué se aprendió
-
-- **No pude abrir ni Raunder ni BoxRec**: la política de red del entorno bloquea esos dominios (también Wikipedia), y las búsquedas no devuelven nada de Raunder. **No rodeé el bloqueo ni rellené los huecos con suposiciones.** El análisis de BoxRec se limita a quejas públicas de pocas reseñas y a un artículo de opinión con fecha, señalado como tal, y a conocimiento general marcado como «sin comprobar». **De Raunder no se dice nada.** Regla: cuando falta una fuente, decirlo, y no escribir un análisis que parezca completo.
-- Hay que pedir al fundador que habilite esos dominios en la red del entorno (o que aporte capturas o texto) para completar el análisis.
-
-### Estado y próximos pasos
-
-- Pendiente de acceso: completar el análisis de Raunder y confirmar lo general de BoxRec.
-- Mejoras propuestas a partir del análisis, por impacto: estadísticas de carrera por disciplina, comparador «cara a cara», tarjeta para compartir en redes, preparación para buscadores y avisos al propio peleador.
-- Sigue pendiente lo anterior: despliegue real (correo, migraciones), auditoría de usabilidad, decisiones sobre el récord de partida editable y la normalización del aura, nombre de la marca.
-
----
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — El CI vuelve a avisar: pruebas deterministas
-
-### Qué pasó
-
-Al revisar el CI, el run 17 (el del cambio a español) **falló** y el 18, con exactamente el mismo código, **pasó**: era una comprobación intermitente más. La causa era la misma que ya había medido (el contenido se actualiza unos milisegundos después del aviso), pero en una comprobación que no había revisado.
-
-### Qué se hizo
-
-- En lugar de parchear solo la línea que falló, se revisaron **todas** las esperas del test de navegador y se sustituyeron por esperas a un estado visible concreto. Ya no queda ningún `networkidle`.
-- Al ejecutar dos pruebas a la vez para simular un CI lento, apareció otro fallo de aislamiento (nombre de organización repetido); ahora es único por ejecución.
-- Resultado: 8 ejecuciones simultáneas consecutivas con 39/39, y 6 secuenciales sin fallos.
-
-### Qué salió mal / qué se aprendió
-
-Reconozco que fue **la segunda vez** que un fallo del CI destapó una fragilidad que en local «pasaba». La lección (ya escrita en `LECCIONES.md`) es buscar la raíz en todo el fichero y probar también bajo carga o en paralelo, no solo repetir en serie.
-
-### Estado
-
-Sin cambios de producto. Pendiente lo de siempre: acceso a las webs de la competencia, despliegue real, auditoría de usabilidad y decisiones sobre el récord de partida y el aura.
-
-## Sesión 1 (continuación) — 30 de septiembre de 2026 — Corrección de la auditoría (bloques 1 a 5) y traslado a Claude Code
-
-### Qué se pidió / qué idea surgió
-
-- Tras la medición de accesibilidad, el fundador pidió: «sigue avanzando en otras cosas que han quedado pendientes». Se lanzó una **auditoría exhaustiva de solo lectura** con 9 revisores independientes (seguridad, privacidad, lógica de acciones y de páginas, usabilidad, accesibilidad, despliegue, pruebas, documentación). Resultado: 175 hallazgos brutos → **99 únicos** (`docs/AUDITORIA.md`).
-- Ante el resultado: «**Arregla lo confirmado por prioridad**».
-- Al final de la sesión: «**Para un momento. Quiero trasladar este proyecto a Claude Code. Trabajar el proyecto entero a Claude Code.**» Se detuvo el trabajo nuevo y se preparó el traslado (`docs/TRASLADO.md`).
-
-### Qué se decidió y por qué
-
-Orden de los bloques, de más a menos grave: (1) validación y robustez del servidor, (2) integridad de la verificación y del aura, (3) acceso y correo, (4) privacidad, (5) búsqueda, rendimiento y despliegue; (6) accesibilidad y (7) pruebas y documentación quedan para Claude Code.
-
-Decisiones que conviene que el fundador conozca (las marcadas con ★ **las tomó el asistente y necesitan su validación**):
-- Los combates rechazados o sin confirmar **no se muestran como hechos ni cuentan** en récord ni aura; tienen su cola de moderación para restaurarlos.
-- ★ Una ficha creada por un tercero para su rival es **provisional** (solo nombre e inicial del apellido, sin listados ni buscadores) hasta que se reclame o el combate se confirme.
-- ★ **Eliminar la cuenta:** la ficha se borra si no tiene combates y se **anonimiza** si los tiene (los combates forman parte del récord de los rivales).
-- ★ **Plazos de conservación** (cuentas sin verificar 30 días, solicitudes 90 días, avisos 12 meses, historial 3 años) y **texto de privacidad**: los propuso el asistente; necesitan revisión jurídica.
-- ★ El formulario de registro sigue diciendo «ya hay una cuenta con ese correo» (mejor para la persona), con límites por IP, aunque revela qué correos tienen cuenta.
-- No se usa `cache()` de React en `getUser` (dejaría la sesión obsoleta tras cerrar sesión o eliminar la cuenta).
-- Contraseñas con parámetros de OWASP guardados en el hash (se pueden reforzar sin invalidar cuentas); el correo real será Resend por HTTP, y en producción el servidor no arranca sin `APP_URL`.
-
-### Qué se hizo
-
-Commits en la rama `claude/ring-espana-mvp`:
-- **Bloques 1 y 2** (`f8638f9`, `1f3f01c`): validación de fechas, longitudes, provincia y resultado frente a la disciplina; sin claves heredadas (`__proto__`…); enlaces de retorno solo internos; combates únicos por pareja y velada; bloqueo de concurrencia en los límites diarios; aura sin combates rechazados ni cancelados, comentarios denunciables; fichas provisionales; cola «en revisión».
-- **Bloque 3** (`f391e9d`): límites de intentos, scrypt asíncrono, recuperación de contraseña, enlaces de un solo uso con tipo, correo con Resend y modo registro explícito, comprobación del entorno al arrancar, limpieza periódica.
-- **Bloque 4** (`ecb6c04`): Mi cuenta (datos, contraseña, avisos), descarga y eliminación de datos, corrección de la ficha, página de privacidad, baja de avisos con enlace, avisos a seguidores tras responder y tolerantes a fallos, plazos de conservación.
-- **Bloque 5, parcial** (`4554379`, `5303086`): búsqueda sin tildes y por varias palabras, listados paginados, ránking sumado en la base de datos, cabeceras de seguridad (política de contenido, HSTS…), `robots.txt`, mapa del sitio, `/salud`, títulos propios, índices, seed protegido, higiene del repositorio y del CI.
-- **Pruebas:** de 73 a **103 unitarias** y de 39 a **146 comprobaciones de navegador** en cinco guiones (`flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`) con ayudas comunes.
-- **Traslado:** `README.md` y `docs/ARQUITECTURA.md` reescritos (describían el modelo antiguo), `docs/AUDITORIA.md` (los 99 hallazgos con su estado), `docs/TRASLADO.md` (puesta en marcha, pendientes y decisiones), ideas y lecciones actualizadas.
-
-### Qué salió mal / qué se aprendió
-
-- **La auditoría no se terminó de verificar:** el flujo (308 agentes, ~20 millones de tokens) agotó el límite de uso de la sesión. Los hallazgos 1 a 90 pasaron la verificación adversarial (3 se refutaron: 81, 83 y 90); los **91 a 99 no**, y la pasada final de «huecos» no llegó a ejecutarse. Una segunda pasada, ya al día siguiente, verificó del 91 al 96 (el 91 y el 92 salieron «refutados» porque ya estaban corregidos); **quedan sin verificar el 97, 98 y 99** y los «huecos». **Al escribir el traslado afirmé por error que eran los 53 a 99 los no verificados y que ninguno se había refutado**: mi copia de los datos era anterior al final del proceso. Lo detecté al retomar la sesión y lo corregí en todos los documentos.
-- **El CI falló una vez (ejecución 25):** una prueba de paginación dependía de que la base local tuviera cientos de peleadores; en el CI está vacía. Se corrigió (`5303086`) y se probó sobre un **clon limpio con base vacía**.
-- **Una tabla de tildes desalineada** (la «ñ» daba «u») la cazaron las pruebas de navegador, no la lectura del código. Ahora se construye por pares y tiene prueba unitaria.
-- **Servidor antiguo sirviendo código viejo** (otra vez, por matar el proceso equivocado) y **PostgreSQL parado** tras una pausa del entorno: costaron varias vueltas.
-- **Incumplí la petición de documentar al cerrar cada bloque:** dejé README y ARQUITECTURA para el final y se quedaron describiendo el modelo antiguo (lo detectó la propia auditoría, hallazgo 91). Se corrigió al preparar el traslado.
-- Lecciones completas en `docs/LECCIONES.md` (sección «De la corrección de la auditoría»).
-
-### Estado y próximos pasos
-
-Sin trabajo a medias en el código: todo está commiteado y subido; las pruebas pasan (tipos, 103 unitarias y 146 de navegador). **Quedan** el resto del bloque 5 (migraciones de Prisma, colas de moderación paginadas), el bloque 6 (accesibilidad y usabilidad, con pruebas con personas reales) y el bloque 7 (pruebas de autorización, documentos). Hay **12 decisiones pendientes del fundador** y el **análisis de la competencia**, que necesita acceso a internet. Todo, en orden, en [`TRASLADO.md`](TRASLADO.md).
-
-## Sesión 1 (continuación) — 1 de octubre de 2026 — Bloques 5 y 6 (accesibilidad y usabilidad), migraciones y revisión independiente
-
-### Qué se pidió / qué idea surgió
-
-- Tras preparar el traslado a Claude Code, el fundador aclaró: «**Aún así quiero seguir trabajando aquí la aplicación y para ciertas cosas lo haré en code terminal**», y después «**Continúa**». Se retomó la lista de pendientes por prioridad.
-
-### Qué se decidió y por qué
-
-Decisiones que tomó el asistente y que el fundador debe conocer (★ = necesitan su validación):
-- ★ **Ajustes de accesibilidad en el estilo, con el menor cambio posible**: el borde de campos y botones secundarios pasa de casi invisible a un gris que se distingue (3:1), los enlaces del texto van subrayados, las etiquetas y los estados tienen 16 px, las zonas táctiles 44 px, la etiqueta «Amateur» cambia a un azul más oscuro, y los controles nativos pasan a modo oscuro. La paleta (fondo oscuro, rojo y dorado) no cambia. Todo está concentrado en `globals.css`, marcado como «A11Y» y se puede revertir. Se considera accesibilidad (se aplica ya), no diseño visual (se deja para el final), pero el fundador debe confirmar que no le parece un cambio de estilo notable.
-- ★ **Cabecera más corta:** cinco enlaces de navegación, «Mi cuenta», «Salir» y un buscador con botón. «Mis peleadores» pasa a «Peleadores que sigo», dentro de «Mi cuenta», que ahora reúne los accesos directos y los avisos de error enviados con su respuesta. «Mi ficha» solo sale a quien es peleador; «Mis veladas», a quien organiza; «Moderación», a la moderación.
-- ★ **Quien recibe un «no» tiene derecho a saber por qué:** el motivo es obligatorio al rechazar una reclamación de ficha o una solicitud de organizador; lo ve la persona en la aplicación y por correo electrónico (así deja de ser falso el «te avisaremos»). Al **aprobar** a un organizador se exige anotar la evidencia comprobada (el sello de organizador se apoya en ella).
-- ★ La solicitud de organizador pide ahora **cómo podemos comprobarlo** de forma obligatoria.
-- En el cartel, cada esquina se elige de una **lista con alias, ciudad y gimnasio** (el valor es el identificador, no un texto que haya que escribir igual).
-- **Lo escrito no se pierde tras un error** (lo guarda el navegador de esa pestaña hasta la siguiente pantalla); nunca se conservan contraseñas ni casillas (las casillas suelen ser confirmaciones de acciones sin vuelta atrás: hay que marcarlas de nuevo a propósito).
-- **Migraciones de Prisma** (`prisma/migrations`): el CI las aplica sobre una base vacía y comprueba que reproducen exactamente `schema.prisma`.
-
-### Qué se hizo
-
-- **Bloque 5 (resto):** migración inicial verificada, `test:a11y` en el CI, índices que faltaban, descripción del sitio, vocabulario residual (hallazgos 80, 82, 89, 96, 97 y parte de 88).
-- **Bloque 6:** `axe-core` pasa de 14 incumplimientos graves a **0 en 40 pantallas**; filtros y formularios con etiqueta visible; nombres accesibles con el objeto («Dar aura a X por el combate en Y»); avisos en regiones permanentes para lectores de pantalla; enlaces con aspecto de botón (nunca un botón dentro de un enlace); tablas con cabeceras y títulos; portada con botón de crear cuenta; historial en español; combate pendiente de confirmar como tarjeta; sin desbordamiento a 360 px.
-- **Pruebas:** de 103 a **113 unitarias** (incluye una que exige texto para cada código de mensaje) y de 146 a **174 comprobaciones de navegador** (nuevo guion de usabilidad: navegación, tamaños, contraste calculado, enlaces subrayados, lo escrito que se conserva, respuestas a solicitudes, reflujo en móvil).
-- **Revisión independiente** (flujo de 6 revisores y verificación adversarial de cada hallazgo) sobre todo lo corregido desde la auditoría; sus resultados, abajo en «Estado».
-
-### Qué salió mal / qué se aprendió
-
-- **Una prueba mía no podía fallar:** comprobaba que la página no dijera «Algo ha salido mal», una frase que la aplicación nunca usa. Ocultó un error real: con `?problema=__proto__` el aviso rompía la página en el navegador. Lo corregí (ahora se busca con `lookup`) y arreglé la prueba, comprobando antes que **fallaba** con el código antiguo.
-- **React 19 vacía los campos de un formulario cuando termina su acción**, así que la primera versión de «no perder lo escrito» no funcionaba (se rellenaba y se volvía a vaciar). Se escucha el evento de reinicio y se rellena justo después.
-- **Restaurar casillas era peligroso:** la confirmación de «eliminar mi cuenta» volvía marcada tras un error de contraseña, y la prueba eliminó la cuenta sin querer. Las casillas ya no se recuerdan.
-- Otra vez el servidor local y PostgreSQL desaparecieron entre dos pasos (el entorno se detiene); un código de mensaje que usaban las acciones (`cartel_boxeadores`) **no tenía texto** y la persona no veía nada: ahora una prueba lo impide.
-- Los hallazgos 91 y 92 salieron «refutados» en la segunda pasada de verificación **porque ya estaban corregidos** cuando se comprobaron; no porque fueran falsos. Está anotado en `AUDITORIA.md`.
-- Lecciones completas en `docs/LECCIONES.md`.
-
-### Estado y próximos pasos
-
-Los resultados de la revisión independiente y de la primera pasada de pruebas por personas están en la entrada siguiente (1 de octubre, funcionalidad completa y organización).
-
----
-
-## Sesión 1 (continuación) — 1 de octubre de 2026 — Funcionalidad completa y organización escalable
-
-### Qué se pidió / qué idea surgió
-
-Palabras del fundador: «No quiero que te centres ahora mismo en diseños, colores. Lo que quiero es que te centres en la funcionalidad completa de la aplicación. No quiero fallas en el sistema, funcionalidades inservibles, botones que no funcionan… que un usuario pueda entrar, entienda absolutamente todo, le funcione todo correctamente y esté todo organizado. Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo.» Y sobre la forma de trabajar: «como estamos haciendo vibe coding, es muy importante la organización, la estructura […] para que pueda ser escalable […] una buena base, un buen hábito de desarrollo, documentando todo, esquematizando todas las cosas. Que haya una red clara de a dónde seguir, qué rutas tomar para hacer X cosas. En algún momento ampliaré el equipo […]. No puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado.»
-
-### Qué se decidió y por qué
-
-- **Prioridad única: funcionalidad.** Nada de diseño visual. Se recorrió la aplicación «como lo haría una persona», con agentes que hacen de personas de prueba en navegador real (guion en `docs/pruebas/personas.md`, entorno aislado por persona con `scripts/entorno-aislado.sh`) y una revisión de código independiente.
-- **Estructura por dominios** en lugar de un fichero de acciones de 931 líneas y 27 ficheros planos en `src/lib`: acciones en módulos por dominio, lógica agrupada por dominio, **reglas de dependencia comprobadas por una prueba** (así no se pueden romper sin que falle el CI), una guía con recetas («cómo hago X»), un índice de documentación y un **mapa funcional generado del código** (se comprueba en el CI, así nunca queda desfasado). Se hizo con un script que usa el analizador de TypeScript y se validó primero en una copia (tipos, 237 pruebas, compilación y 174 comprobaciones de navegador) antes de tocar el repositorio. El movimiento fue un commit aparte, sin cambios de comportamiento.
-- **Cada hallazgo se reproduce antes de corregirse** y se corrige con su prueba. Todo queda registrado en `docs/pruebas/hallazgos-2026-10-01.md`.
-
-### Qué se hizo
-
-- **Reorganización** (commit `0576eb5`): ver arriba y `docs/DESARROLLO.md`, `docs/README.md`, `docs/MAPA-FUNCIONAL.md`.
-- **Lo que salió de las pruebas por personas** (solo terminó la persona «visitante», 19 hallazgos): error 500 con `?constructor=` (y con `%00` y parámetros repetidos) en todas las pantallas con filtros → `src/middleware.ts`; fichas de peleador y de velada ilegibles en el móvil → tablas apiladas; redirecciones mudas a «Entrar» → `requireUser(ruta)` y guardas de permisos en un solo sitio; quien se registra desde «Entra para dar aura» perdía el sitio → ruta de vuelta; resultados pendientes mostrados de forma incoherente; formularios en columna torcidos por una regresión de CSS mía; textos que explican por qué algo no se puede hacer.
-- **Lo que salió de la revisión de código** (44 hallazgos de 3 revisores, sin verificación adversarial): límite de intentos de acceso que se saltaba con peticiones simultáneas (`reservar()`); `resetPassword` que calculaba el hash antes de validar el enlace; confirmación del rival no ligada al resultado que vio y combates confirmados sin resultado que quedaban atascados; decisiones de moderación que se pisaban; datos personales que quedaban en el historial al eliminar la cuenta; IP del cliente falsificable; limpieza de datos que solo corría al registrarse y podía borrar moderadores; nombres no latinos que fundían veladas y gimnasios; y 19 de interfaz (restauración de lo escrito, desplegables cerrados tras el error, nombres accesibles, etc.).
-- **Pruebas:** de 194 a **266 unitarias** y de 174 a **193 comprobaciones de navegador**; axe sigue en 0 incumplimientos.
-
-### Qué salió mal / qué se aprendió
-
-- **Los dos flujos de agentes se cortaron por el límite de uso de la sesión**: de 10 personas terminó 1; de 6 revisores, 3, y ninguna de las 91 verificaciones adversariales. No se debe presentar como una revisión completa: los hallazgos de la revisión los reproduje o razoné yo antes de corregir. Una segunda tanda de personas se lanzó después, por fases (ver «Estado»).
-- **Una regresión de CSS mía** (de un bloque anterior) dejó nueve formularios torcidos y no lo vio ninguna prueba automática: solo lo vio un revisor. Ahora se miran capturas tras tocar CSS global.
-- **La prueba móvil pasaba mientras la velada se salía de la pantalla**: no medía las fichas con datos. Ahora la prueba crea sus datos.
-- Al volcar la copia reorganizada al repositorio olvidé `prisma/seed.ts` (no había `rsync`): `tsc` lo detectó. Ahora se comparan los árboles con `diff -rq`.
-- El servidor local y PostgreSQL desaparecieron otra vez al reiniciarse el entorno.
-- Lecciones completas (con la regla de cada una) en `docs/LECCIONES.md`, sección del 1 de octubre.
-
-### Estado y próximos pasos
-
-- CI en verde en los commits de la reorganización y de las correcciones de interfaz; el último se estaba ejecutando al escribir esto.
-- **En marcha:** segunda tanda de personas de prueba (aficionado, peleador, rival, organizador, moderadora) sobre la versión corregida; después, la tercera (seguridad, móvil y teclado, persona mayor, exploración destructiva) y los revisores que no llegaron a ejecutarse. Lo que salga se anota en `docs/pruebas/`.
-- **Decisiones del fundador nuevas** (en `docs/TRASLADO.md` §7): correo de contacto y responsable, carteles oficiales con fichas provisionales, restaurar fichas ocultadas.
-- **Antes de publicar:** definir `TRUSTED_PROXY_HOPS` según el alojamiento, `CONTACT_EMAIL` y `RESPONSABLE_NOMBRE`, y probar con personas reales de distintas edades.
-
----
-
-## Sesión 1 (continuación) — 2 de octubre de 2026 — Segunda tanda de pruebas por personas: correcciones
-
-### Qué se pidió / qué idea surgió
-
-Seguir con la prioridad del fundador (funcionalidad completa, sin botones que no funcionen). Además, dos peticiones nuevas del 1–2 de octubre, **solo registradas, aún sin implementar**: (a) «una especie de CRM para las federaciones y promotoras» para que publiquen veladas y administren peleadores; (b) un selector de tres opciones al registrarse o entrar: A usuario normal, B peleador, C organizador/federación («eso ya lo veremos más tarde»). Están en `docs/IDEAS.md`.
-
-### Qué se decidió y por qué
-
-- Corregir primero lo que haría tropezar a una persona real: doble clic, combate registrado por error, rival sin aviso, ficha duplicada, organizador que no puede corregir.
-- La ficha provisional de un rival no lleva su apellido en la dirección pública hasta que se verifica: es un dato de un tercero.
-
-### Qué se hizo
-
-Ver la tabla de la segunda tanda en `docs/pruebas/hallazgos-2026-10-01.md`: protección contra doble envío en toda la aplicación, correos al rival y de vuelta al autor, motivo obligatorio al rechazar, quitar un combate propio, combate de hoy sin resultado, ficha sin callejones, disciplina duplicada, editar/cancelar/quitar del cartel para el organizador, y dirección provisional sin apellido.
-
-### Qué salió mal / qué se aprendió
-
-- Tres fallos de **mis propias pruebas** (esperas a un aviso anterior, doble clic que seguía enviando dos veces, un selector de texto ambiguo): ver `docs/LECCIONES.md`. Dos de ellos mostraron que la primera versión de la protección de doble envío no bastaba.
-- La paridad con la base de datos vacía (la que usa el CI) volvió a ser la que lo descubrió.
-
-### Segunda ronda del mismo día (petición «haz lo recomendable»)
-
-Corregidos los hallazgos de la segunda tanda que no dependían de una decisión del fundador: «no oficial» en el calendario, «Mis combates» en móvil, homónimos distinguibles al elegir rival, texto de avisos según la preferencia real y la pantalla de dirección mal codificada en español. Detalle en la tabla de hallazgos. Se dejó fuera, a propósito, lo que necesita decisión suya (aura por combate o por peleador, menores, selector A/B/C y CRM).
-
-### Demostración alojada (petición del fundador: «Lánzame una demo»; «esta sesión la estoy haciendo en el móvil»)
-
-El entorno de desarrollo en la nube no admite visitas desde fuera, y el fundador trabaja desde el móvil, así que un script local no le servía. Se preparó una **demo alojada**: `render.yaml` (web + base de datos gratuitas en Render), `scripts/arranque-demo.sh`, y un **modo demostración** (`DEMO_MODE=si`) con un botón para confirmar el correo sin correos reales y otro para cambiar de papel (aficionado, peleador, organizador, moderador) con una sola cuenta. Las acciones se niegan si la variable no está; hay pruebas unitarias y una de navegador (`tests/e2e/demo.mjs`). Guía en `docs/DEMO.md`. **Limitación honesta:** el arranque se probó aquí en modo producción, pero el `render.yaml` no se ha podido probar en Render (hace falta la cuenta del fundador).
-
-### Pesos de las categorías (observación del fundador probando la demo)
-
-Palabras del fundador: «a la hora de filtrar por la categoría de peso, lo pones los nombres en inglés y tal […] en España la gente no tiene un buen nivel de inglés. Por lo que, aparte del nombre de la categoría, tienes que poner también el peso, en qué rango oscila». Los nombres ya estaban en español (Wélter, Ligero…), pero «wélter» sigue siendo opaco: ahora cada categoría lleva su límite en kilos («Wélter · hasta 66,7 kg») en los selectores de ficha, el filtro de peleadores (agrupado por disciplina, porque el mismo nombre pesa distinto en boxeo y en MMA), el ránking, la ficha y el cartel. **Solo se muestran pesos donde el estándar es conocido (boxeo profesional y MMA con reglas unificadas); en kickboxing, K-1 y jiu-jitsu no se afirma ninguno** hasta validarlos con las federaciones (decisión pendiente: facilitar los reglamentos o confirmar los pesos). Los pesos son orientativos y así se dice en pantalla. Código: `weightClassLabel` en `src/lib/common/disciplines.ts`.
-
-### Categorías de peso por disciplina y nivel (corrección del fundador)
-
-Palabras del fundador: «las categorías de peso las estás englobando todas en una misma disciplina, ¿vale? Entonces, debes corregir eso, porque no son los mismos pesos, no son las mismas categorías en profesional que en amateur […] en Jiu-Jitsu, Muay Thai, MMA será lo mismo. Tienes que diferenciar cada disciplina con sus pesos divididos en profesional y amateur. Esto es muy importante. […] Intenta pulir mucho más ese panel de filtros para poder ejecutar bien las búsquedas».
-
-**Fallo mío:** el cambio anterior (kilos junto al nombre) mantenía una sola lista por disciplina y solo para boxeo y MMA, y el filtro mezclaba todas las disciplinas en un único desplegable. **Qué se hizo:** modelo disciplina × nivel con su fuente (`docs/DISENO-PESOS.md`); Muay Thai como disciplina nueva (migración); selector de tres pasos (disciplina → nivel → categoría) en la ficha, en «Añadir otra disciplina» y en el filtro; la ficha guarda ahora el nivel de cada disciplina; el ránking separa profesional y amateur; filtro de peleadores rehecho (orden lógico, categorías según lo elegido, resumen de filtros aplicados con «✕» para quitar cada uno, número de resultados). **Honestidad:** donde no hay fuente fiable (Muay Thai amateur, kickboxing y K-1 profesional) la lista está vacía y la pantalla lo dice; las categorías femeninas, juveniles y cadete/júnior (salvo boxeo amateur élite/joven) siguen pendientes, y hace falta decidir si la ficha guarda sexo y edad.
-
-### Estado y próximos pasos
-
-- Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.
-- Después: selector A/B/C y CRM (tareas 13 y 14), con las decisiones del fundador que siguen abiertas en `docs/TRASLADO.md` §7.
-
----
-
-## Sesión 2 — 3 de octubre de 2026 — Codex: comparación y claridad funcional
-
-### Qué se pidió / qué idea surgió
-
-El fundador autorizó mejoras y pidió estudiar Raunder y BoxRec. Reiteró: «El diseño gráfico de la aplicación lo dejaremos para lo último» y pidió subir un Markdown para que Claude conozca todas las aportaciones.
-
-### Qué se decidió y por qué
-
-Actuar sobre recorridos existentes, exactitud y transparencia. La comparación pública permite mejorar orientación y explicación sin ampliar permisos ni adelantar el CRM, el premium o decisiones sobre menores/aura. Los cambios van en una rama y propuesta de integración para validación completa.
-
-### Qué se hizo
-
-Calendario por día de Madrid, entrada por objetivos, filtros individuales de veladas, ránking explicado, ayuda ajustada a las reglas reales, categoría correcta por nivel en tarjetas de récord y explicación de NC. Comparación competitiva revisada con fuentes propias. Relevo detallado: `APORTACIONES-CODEX.md`, enlazado desde instrucciones e índice. Nueva regresión de calendario en unitarias y guion E2E incluido en CI; mapa regenerado.
-
-### Qué salió mal / qué se aprendió
-
-BoxRec impidió la inspección normal en este navegador con verificación contra bots; se usaron páginas recuperadas y ayuda oficial, sin afirmar haber probado sus flujos. PostgreSQL no estaba instalado y el intento de instalación falló por permisos. No se ejecutó E2E/axe local ni una auditoría completa.
-
-### Estado y próximos pasos
-
-TypeScript, 313 unitarias y compilación de producción aprobados. Integración y E2E/axe pendientes de CI. Rama: `codex/claridad-calendario-2026-10-03`. El Markdown de relevo se publica también en la rama principal para Claude. La demo sigue siendo la versión previa hasta integración/despliegue. Completar las personas pendientes y verificar categorías históricas por nivel. No se han resuelto decisiones del fundador ni trabajado diseño gráfico.
-
----
-
-## Sesión 2 (continuación) — 3 de octubre — primera validación de GitHub
-
-### Qué se pidió / qué idea surgió
-
-Completar la validación de los cambios autorizados y mantener el relevo para Claude.
-
-### Qué se decidió y por qué
-
-No integrar con el CI fallando. Corregir la causa observada sin saltar pruebas.
-
-### Qué se hizo
-
-CI 77: migraciones, paridad, tipos, mapa, unitarias, compilación y arranque aprobados. La primera prueba E2E falló al buscar disciplina en un selector oculto de otro formulario. Se acota `registrar()` al formulario de su botón en `tests/e2e/ayudas.mjs`.
-
-### Qué salió mal / qué se aprendió
-
-El ayudante antiguo quedó desfasado al existir varios selectores de disciplina. El log demuestra la selección del primer elemento de cuatro, oculto; no es evidencia de fallo en la acción de registrar. Se documenta la regla de localización por formulario.
-
-### Estado y próximos pasos
-
-Subir la corrección y repetir CI completo. Calendario y axe todavía no se ejecutaron. Relevo detallado en `APORTACIONES-CODEX.md`.
-
----
-
-## Sesión 2 (continuación) — 3 de octubre — segunda validación de GitHub
-
-### Qué se pidió / qué idea surgió
-
-Completar la validación autorizada tras corregir el selector de disciplina.
-
-### Qué se decidió y por qué
-
-Comprobar resultados del filtro, no coincidencias del texto buscado en toda la pantalla.
-
-### Qué se hizo
-
-CI 79 completó el flujo de registro de MMA. La comprobación de exclusión falló porque el nombre seguía visible en el resumen del filtro, aunque no hubiera tarjeta. Se cambia `tests/e2e/flujo.mjs` a exigir tarjeta visible para inclusión y mensaje de cero resultados más ausencia de tarjeta para exclusión.
-
-### Qué salió mal / qué se aprendió
-
-El test antiguo podía dar falsa inclusión por el texto de búsqueda. Se acotan las comprobaciones al listado y se espera su estado visible.
-
-### Estado y próximos pasos
-
-Repetir CI completo. No se modificó el filtro de producto ni se omitieron comprobaciones. Axe y los guiones siguientes continúan pendientes.
-
----
-
-## Sesión 2 (continuación) — 3 de octubre — revisión de pruebas dependientes
-
-### Qué se pidió / qué idea surgió
-
-Completar la misma validación, revisando los guiones posteriores tras la causa encontrada en CI 79.
-
-### Qué se decidió y por qué
-
-Aplicar la corrección de localización también a la exclusión de fichas provisionales y adaptar datos de prueba al modelo actual de disciplinas.
-
-### Qué se hizo
-
-`integridad.mjs` comprueba cero resultados y ausencia de tarjeta, evitando el texto repetido del filtro. `busqueda.mjs` crea una disciplina de boxeo amateur para cada una de sus 30 fichas, ya que el filtro de nivel consulta `FighterDiscipline`. No cambia código de producto.
-
-### Qué salió mal / qué se aprendió
-
-La prueba de paginación aún preparaba el modelo anterior de nivel. Regla: las fixtures deben representar los datos que realmente consulta el filtro.
-
-### Estado y próximos pasos
-
-Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecución de navegador completa en CI.
-
----
-
-## Sesión 3 — 3 de octubre de 2026 — Codex: recorrido de récords por nivel
-
-### Qué se pidió / qué idea surgió
-
-El fundador compartió el repositorio y pidió: «continua el trabajo».
-
-### Qué se decidió y por qué
-
-Continuar la validación pendiente del relevo, con prioridad funcional y diseño aplazado. La rama de la propuesta #8 recibió correcciones durante la revisión; se conservan y este bloque parte de `e049fe4` en una rama independiente (`codex/validacion-records-2026-10-03`).
-
-### Qué se hizo
-
-Se añadió `tests/e2e/respaldo.mjs` al conjunto de CI. Crea una cuenta y ficha ficticias desde la interfaz, registra un combate amateur, cambia a profesional, registra victoria y combate sin decisión, y vuelve a amateur. Comprueba en «Mi ficha» y como visitante que las tarjetas conservan los resultados históricos, muestran la categoría solo en el nivel actual, explican NC y enlazan a la ayuda pública. La ayuda de registro ahora acota todos los campos y el botón al formulario de combate; la corrección reciente de la rama anterior solo acotaba la disciplina.
-
-Se inspeccionó además la ejecución `37109729125`: el guion de filtros impedía llegar al calendario y al nuevo recorrido porque su expresión `peleadores?` no reconocía el singular «peleador». Se corrige la comprobación para aceptar las frases completas de singular y plural, sin modificar la pantalla.
-
-### Qué salió mal / qué se aprendió
-
-El proxy local no acepta conexiones y no hay dependencias en caché: no se pudo clonar ni instalar con `npm ci --offline`. Se recuperaron los ficheros mediante GitHub y se comprobaron sus SHA. Sintaxis de los guiones y diferencias comprobadas localmente; el CI debe validar dependencias, PostgreSQL y navegador. Se detectaron cambios concurrentes antes de publicar y se respetaron en una rama independiente.
-
-### Estado y próximos pasos
-
-Validación completa aprobada en la ejecución `37110167176` de la propuesta #9, commit `233420c`: migraciones/paridad, tipos, mapa, 313 unitarias, compilación, todos los guiones E2E y axe (0 incumplimientos). El nuevo recorrido aprobó sus 17 comprobaciones. La propuesta #9 está encadenada sobre la rama de #8. Integración y demo pendientes; siguen abiertos los recorridos por personas y los bloques de la auditoría indicados en `TRASLADO.md`.
-
-## Sesión — 3 de octubre de 2026 — propuestas visuales diferenciadas
-
-### Qué se pidió / qué idea surgió
-
-El fundador pidió propuestas visuales mientras sigue el desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder».
-
-### Qué se decidió y por qué
-
-Se observó su identidad roja/blanca y se recomendó verde petróleo, marfil, pizarra y menta. Se descartaron las direcciones roja y naranja propuestas inicialmente. La elección final queda abierta.
-
-### Qué se hizo
-
-Se mostraron tres maquetas conceptuales y se ajustó la editorial a petróleo/marfil en móvil y escritorio. Se creó DISENO.md y se actualizaron los puntos de entrada para Claude. Se documentó también el fallo pendiente del CI 83 tras inspeccionar su artefacto.
-
-### Qué salió mal / qué se aprendió
-
-Las primeras maquetas añadían barras de aura y una confirmación global de ficha que no corresponden al modelo. Se corrigieron en la propuesta revisada. Las imágenes deben revisarse contra la funcionalidad real antes de convertirlas en código.
-
-### Estado y próximos pasos
-
-El fundador no se mostró convencido con petróleo/marfil y pidió más garra. Se mostró después azul noche/amarillo oro con tipografía deportiva y fotografía de entrenamientos; es la recomendación actual, pendiente de elección. Ningún cambio gráfico desplegado. Desarrollo en propuesta #8 pendiente de E2E/axe completo; no se declara terminado.
-
----
-
-## Sesión — 3 de octubre de 2026 — revisión del lenguaje visual
-
-### Qué se pidió / qué idea surgió
-
-El fundador valora mejor los colores, pero el diseño le parece «muy pobre y hecho por IA».
-
-### Qué se decidió y por qué
-
-Conservar azul noche/amarillo oro como base y explorar otra composición inspirada en carteles de veladas. No interpretar el comentario como aprobación del diseño.
-
-### Qué se hizo
-
-Se mostró una pantalla conceptual de veladas en escritorio y móvil, con listados editoriales, fechas visibles y motivos de cuerdas del ring. Se documentó en DISENO.md y APORTACIONES-CODEX.md.
-
-### Qué salió mal / qué se aprendió
-
-La composición anterior se percibió genérica pese al cambio de paleta. Los colores solos no dan identidad: tipografía, composición y detalles necesitan un criterio coherente.
-
-### Estado y próximos pasos
-
-Pendiente de elección. Extender y probar el sistema en pantallas funcionales, con representación de todas las disciplinas. Sin cambios visuales desplegados.
-
----
-
-## Sesión — 3 de octubre de 2026 — referencias y color oficial
-
-### Qué se pidió / qué idea surgió
-
-El fundador considera Raunder más llamativa y juvenil, aporta quince sitios de referencia y decide: «He decidido que el color oficial de la aplicación será este #be33f5».
-
-### Qué se decidió y por qué
-
-Registrar #BE33F5 como decisión vigente. Sustituye azul/amarillo y petróleo/marfil. Mantener personalidad joven y de comunidad con legibilidad para todos.
-
-### Qué se hizo
-
-Se consultaron páginas públicas de los recursos, con límites documentados; se observaron ejemplos deportivos en Landbook, incluida la captura de Off-Field. Se mostró una portada conceptual violeta de comunidad en móvil y escritorio. CLAUDE.md, DISENO.md, IDEAS.md y APORTACIONES-CODEX.md registran la elección y sus límites.
-
-### Qué salió mal / qué se aprendió
-
-No todas las bibliotecas son accesibles sin cuenta o desde el lector; no declarar revisión profunda donde solo se obtuvo el índice. El blanco sobre el violeta elegido da aproximadamente 4,22:1: para textos pequeños de botones se propone casi negro.
-
-### Estado y próximos pasos
-
-Color aprobado, diseño sin elegir. No se modifica la demo. Contrastar futuras interacciones de maquetas con funcionalidades reales y comprobar accesibilidad en CSS.
-
----
-
-## Sesión — 3 de octubre de 2026 — identidad y personalización
-
-### Qué se pidió / qué idea surgió
-Aplicar a GitHub y a la demo los diseños aprobados y documentarlos para Claude.
-
-### Qué se decidió y por qué
-Violeta oficial #BE33F5, glow y bordes redondeados; foto y banner elegidos por sus titulares para todos los tipos de perfil. Nivel y graduación por disciplina para representar al deportista sin confundir declaración con verificación.
-
-### Qué se hizo
-CSS adaptable, portada de comunidad, editor e imágenes persistentes en PostgreSQL, directorios de promotores/federaciones y permisos de titular/moderación; migración aditiva, privacidad y exportación. 339 pruebas unitarias y build de producción correctos; prueba E2E nueva incorporada al CI.
-
-### Qué salió mal / qué se aprendió
-No se pudo instalar PostgreSQL por las restricciones del entorno; la validación completa se realiza en CI con PostgreSQL 16. Se corrigió la conversión de Buffer a Uint8Array para Prisma y la ausencia de un mensaje de error detectada por los tests.
-
-### Estado y próximos pasos
-Implementación preparada; comprobar CI, integrar y observar el despliegue real antes de afirmar que la demo está actualizada. Ver el PR para el resultado final.
-
----
-
-## Sesión — 3 de octubre de 2026 — publicación del diseño aprobado
-
-### Qué se pidió / qué idea surgió
-El fundador indicó que todavía no veía los cambios en Render.
-
-### Qué se decidió y por qué
-Completar la validación y desplegar en la rama real de Render, conservando los cambios simultáneos de categorías, calendario y comunicación inclusiva.
-
-### Qué se hizo
-PR #12 integrada (8a861e7), CI #111 correcto: migraciones, esquema, tipos, mapa, 339 pruebas unitarias, build, flujos completos y accesibilidad. Se comprobó en el navegador público la portada nueva, el listado exacto del fundador y la ficha de Sergio Demo Molina. Se documentaron rutas de edición y permisos en APORTACIONES-CODEX.md.
-
-### Qué salió mal / qué se aprendió
-Hubo conflictos con commits simultáneos, que se combinaron preservando ambos trabajos. Se ajustó la prueba del sello de gimnasio a su ubicación nueva y se corrigió la espera del botón de reclamación. La petición de integración agotó su tiempo de respuesta, pero GitHub la completó; se verificó su estado antes de actuar de nuevo. La imagen de portada tardó en cargar inicialmente, pero se comprobó su archivo y su aparición final.
-
-### Estado y próximos pasos
-Diseño y perfiles publicados y observados en Render. Los titulares pueden subir sus propias fotos y banners. No se borraron los datos existentes.
-
----
-
-## Plantilla para nuevas entradas
-
-```
-## Sesión N — fecha — título corto
-
-### Qué se pidió / qué idea surgió
-(con las palabras del fundador cuando sea posible)
-
-### Qué se decidió y por qué
-(alternativas descartadas incluidas)
-
-### Qué se hizo
-(cambios, commits)
-
-### Qué salió mal / qué se aprendió
-(y se copia lo importante a LECCIONES.md)
-
-### Estado y próximos pasos
-```
-
-## Sesión 4 — 3 de octubre de 2026 — Divisiones deportivas por edad y reglamento
-
-### Qué se pidió / qué idea surgió
-
-El fundador señaló: «dentro de la disciplina de boxeo, en especial en el campo amateur hay infinidad de categorías desde schoolboys hasta élite […] informaros bien y aplicarlo correctamente».
-
-### Qué se decidió y por qué
-
-Investigar reglamentos primarios antes de completar listas; almacenar una división federativa versionada que incluya edad, categoría masculina/femenina y modalidad cuando corresponda. Separar la división actual de la ficha y la propia de cada combate, sin reclasificar datos anteriores. Una división desconocida sigue siendo una declaración incompleta. No extrapolar los pesos adultos masculinos a menores o mujeres ni tratar todas las federaciones como si calculasen la edad igual.
-
-### Qué se hizo
-
-Se leyeron la circular RFEBoxeo 2026, IFMA v3.057, WAKO revisión 3, comunicación de edades IMMAF 2026 e IBJJF 6.1. Boxeo incorpora siete grupos, pesos específicos masculinos/femeninos, y benjamín/prebenjamín formativos sin combate. IFMA incorpora todos los grupos de su tabla; WAKO separa ring/tatami y K-1 recibe solo ring. IMMAF e IBJJF incorporan edades comprobadas; sus pesos quedan explícitamente pendientes del catálogo completo vigente.
-
-Se añadieron `divisionId` en ficha/combate, migración aditiva y catálogo con fuentes. Se aplican selección y validación conjunta, guardas de edad de ambos participantes, conservación histórica, filtro/paginación, ránking por categoría del combate y descarga de datos. La categoría actual del récord se etiqueta aparte del historial agregado. Se añadió un recorrido E2E y pruebas de límites normativos. Diseño visual sin cambios; documentación técnica, diario, ideas y lecciones actualizados.
-
-### Qué salió mal / qué se aprendió
-
-El PDF antiguo de IMMAF seguía enlazado pero el cálculo juvenil cambió para 2026: se encontraron y probaron los años de la comunicación posterior, con excepción Youth A. Un fragmento superpuesto de la circular de pesos RFE no se convirtió en una categoría extra. Las primeras pruebas nuevas esperaban textos y nombres accesibles incorrectos; se corrigieron contra la pantalla real. El primer recorrido completo detectó dos expectativas antiguas del filtro: ahora hay una división adicional y las tarjetas explican que la edad anterior está sin confirmar. Se conserva esa validación con sus nuevos datos.
-
-Esta vez se pudo instalar y ejecutar todo localmente usando el permiso de red explícito. PostgreSQL se extrajo en el área de trabajo, sin instalar paquetes del sistema ni modificar una base existente. Durante el bloque llegaron documentos nuevos a la rama de calendario y a la principal: se conservan al integrar el trabajo en la rama independiente.
-
-### Estado y próximos pasos
-
-Validación local final aprobada: migraciones desde base vacía y paridad, tipos, mapa, 327 unitarias, compilación, 289 comprobaciones E2E (18 del nuevo recorrido de categorías) y axe con 0 incumplimientos, 0 graves o críticos. Comprobada la ejecución real de los casos nuevos en el log. Propuesta preparada contra la rama principal, conservando #8/#9 y las actualizaciones de documentación; integración y demo pendientes. Pendientes explícitos: pesos IMMAF/IBJJF completos, modalidades/requisitos/licencias, política de menores y pruebas con personas. Detalle de fuentes y límites en `DISENO-PESOS.md`.
-
-## Sesión 5 — 3 de octubre de 2026 — Comunicación inclusiva y ámbito nacional
-
-### Qué se pidió / qué idea surgió
-
-Petición urgente del fundador: «hay varios textos en la aplicación que hacen saber que estamos más centrados en Madrid y que nuestra prioridad es el boxeo. Aunque esto sea así, no podemos dar a entender tal cosa porque gente de otras ciudades y de otras disciplinas se pueden sentir excluidas». Pidió continuar el trabajo.
-
-### Qué se decidió y por qué
-
-Las prioridades operativas internas no se trasladan a mensajes públicos ni a filtros iniciales. Revisar los datos visibles además del texto: una portada que diga toda España pero solo consulte Madrid conservaría el problema. Mostrar las seis disciplinas admitidas con igual énfasis y orden alfabético, niveles amateur/profesional y provincias elegidas por la persona. Conservar ubicaciones reales, normas deportivas y zona horaria técnica; no afirmar una cobertura de datos inexistente.
-
-### Qué se hizo
-
-Se eliminaron las referencias de prioridad de portada, ayuda y README; se completaron metadatos y se neutralizó el ejemplo del buscador. Portada y contadores consultan todas las provincias y niveles. El ránking empieza con todas las disciplinas, conserva categorías/posiciones independientes e incluye disciplina en las claves de agregación y de pantalla. La portada identifica disciplina/nivel de cada actuación y evento. Las altas de fichas y veladas parten sin provincia, ciudad o disciplina supuestas y el servidor rechaza elecciones ausentes o inválidas. La edición conserva los datos propios. El calendario explica la hora peninsular sin cambiar su comportamiento.
-
-Se documentó la norma vigente en CLAUDE, arquitectura, ideas, lecciones y relevo, conservando las entradas históricas. Los guiones anteriores eligen sus datos ficticios explícitamente. Se añadieron 18 comprobaciones E2E con seis disciplinas, provincias distintas, amateur/profesional, una persona con aura en dos disciplinas, filtros y altas fuera de Madrid. Se mantiene el trabajo de categorías por edad de la propuesta #10.
-
-### Qué salió mal / qué se aprendió
-
-La primera batería completa detectó que el guion de una ficha provisional sin provincia dependía del antiguo valor Madrid al registrar su combate. Ahora el guion elige la provincia explícitamente. La comprobación de tipos detectó una importación aún necesaria para editar eventos; se conservó. La inspección de los guiones detectó dos importaciones faltantes del nuevo ayudante y se corrigieron antes de continuar. No se sustituyeron los valores neutrales de la aplicación para acomodar las pruebas.
-
-### Estado y próximos pasos
-
-Validación local final aprobada: tipos, mapa actualizado y comprobado, 327 unitarias, compilación de producción, 307 comprobaciones E2E (18 nuevas) y axe con 0 incumplimientos, 0 graves o críticos. Propuesta contra la rama principal que conserva #10 y sus antecedentes; integración y despliegue pendientes. Se comprueba además el CI de la propuesta antes de cerrar la sesión.
-
-## Sesión 6 — 3 de octubre de 2026 — Publicación efectiva de la demo
-
-### Qué se pidió / qué idea surgió
-
-El fundador pidió: «Actualiza ya la página en GitHub para que pueda ver la demo actualizada con todos estos cambios».
-
-### Qué se decidió y por qué
-
-Integrar la propuesta #11, ya validada, en la rama que usa Render. Incluye el trabajo de las propuestas anteriores, por lo que no se requiere integrarlas una a una. Comprobar la dirección pública después de la actualización automática; no dar por publicado un cambio solo por haber fusionado el código.
-
-### Qué se hizo
-
-Se comprobó CI aprobado y cabeza exacta antes de integrar #11 mediante un merge normal, commit `7580902d63f4deec42c41f1cb29c5b913e009451`. La rama principal conserva el árbol probado y los documentos anteriores. Render sirve la demo actualizada. Peticiones HTTPS verificadas a portada, ránking, ayuda y salud devuelven 200: título nacional, disciplinas/niveles/provincias sin filtro inicial, ayuda inclusiva con divisiones por edad y base conectada. También pasa el CI de integración, ejecución `37127024537`. Se añade el enlace directo a la demo al README y se actualizan demo, arquitectura, ideas y relevo.
-
-### Qué salió mal / qué se aprendió
-
-La primera consulta seguía mostrando la versión antigua mientras Render construía la nueva. Se esperó y se confirmó el contenido público real. Chromium no confiaba en la CA del proxy del entorno; no se desactivó la comprobación TLS. La comprobación pública se realizó mediante HTTPS con la confianza del entorno, conservando las pruebas de navegador ya aprobadas en CI.
-
-### Estado y próximos pasos
-
-Los cambios funcionales y de comunicación están integrados y visibles en <https://ring-espana-demo.onrender.com/>. CI de propuesta e integración aprobado. Se conserva la base de la demo: el arranque solo añade migraciones y carga ejemplos si está vacía. Pendientes anteriores fuera de este bloque: catálogo completo de pesos IMMAF/IBJJF, decisiones sobre menores, pruebas con personas y aplicación del diseño visual elegido.
-
-## 3 de octubre de 2026 — Trayectoria, respaldo opcional, aura y menú por actividades
-
-### Qué se pidió / qué idea surgió
-
-El fundador pidió configurar el modelo aceptado de verificación y aura. Precisó que el rival puede negarse por un pique, que un campeón autonómico o nacional debe poder reconocer su trayectoria anterior y que entrenadores/federaciones son opcionales al iniciar la aplicación. Reiteró que una federación aporta más aura. Después pidió usar como referencia la distribución del menú de Raunder, con una captura, y continuar. Pidió conservar el trabajo de diseño de ChatGPT Work.
-
-### Qué se decidió y por qué
-
-Permitir declaraciones honestas desde el primer día, identificadas por su respaldo. Rival solicita revisión motivada sin veto automático; solo moderación suspende. Separar el récord de los puntos de reputación. Aura = trayectoria + respaldo opcional + comunidad, por categoría histórica; no inferir títulos ni avales de una biografía o un perfil visual. Un título por categoría aporta el mayor valor; mejorar su respaldo sustituye el anterior. Escala inicial de Codex 20/50/80, bonificaciones 25/50/100 %, centralizada y revisable con datos reales: el fundador aprobó el modelo, no confirmó expresamente esas cifras. Se conserva el clic y no se adelanta premium ni una clasificación deportiva tipo Elo.
-
-Menú por actividades con cuatro grupos, permisos reales y hasta cinco enlaces por grupo; diálogo nativo accesible. Las funciones de sparring, formación o reservas de la captura no se anuncian como implementadas. Se conserva el violeta, portada y personalización de perfiles.
-
-### Qué se hizo
-
-Se partió de #12 y se incorporó sin sobrescribir la documentación posterior de Work (`6670b35`). Migración aditiva con títulos, acreditaciones y metadatos de respaldo. Gestión de trayectoria, correcciones, retirada reversible y revisión; cola de hechos y acreditaciones concedidas por moderación. Versiones y bloqueos para duplicados, límites y concurrencia; fuente/nota para respaldos, sin autoaval ni permisos fuera de disciplina. Ranking y fichas con desglose y etiquetas; cancelaciones/suspensiones excluidas. Cambios de datos/fuentes invalidan respaldos. Exportación, eliminación y anonimización incluyen los nuevos datos y sus copias en el historial.
-
-El menú funciona en móvil/escritorio, con Escape, foco, cierre al navegar/salir y accesos de cuenta, perfiles asignados y moderación. Se actualizan ayuda, mensajes, correos, privacidad, arquitectura, desarrollo, ideas, diseño y guiones. El mapa ahora identifica la nueva guarda y las llamadas de moderación con ruta.
-
-### Qué salió mal / qué se aprendió
-
-TypeScript detectó una comparación ya inalcanzable y campos no anulables al limpiar una acreditación; se corrigieron. Los guiones nuevos tenían selectores relativos anidados, un desplegable ya abierto, una velada que no era enlace en Mi ficha y frases de confirmación incorrectas. Otro guion sumaba categorías diferentes: se declaró el peso del combate. La regresión conservaba expectativas de la confirmación obligatoria; se actualizaron exigiendo las nuevas reglas. Un aviso JSX necesitó permanecer dentro del formulario. La revisión de privacidad encontró copias de datos de quien respalda en auditorías y su prueba exigió limpiar antes del apunte de eliminación; ambas cosas se corrigieron. Los detalles y reglas quedan en LECCIONES.
-
-### Estado y próximos pasos
-
-Implementación terminada en rama; tipos, migraciones/paridad, mapa, compilación y 393 unitarias aprobados. La batería local completa pasó 364 comprobaciones de navegador; se repitieron las 26 de trayectoria tras añadir una de privacidad (365 en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. Se comprobará CI del árbol final antes de integrar/publicar la demo. Los cambios normativos, menores y pruebas con personas que estaban pendientes siguen en sus documentos.
-
-### Resultado publicado
-
-CI #131 aprobado con 393 unitarias, 365 comprobaciones E2E, migraciones/paridad, tipos, mapa, build y 37 pantallas axe sin incumplimientos. Integrada #14 en `0c3fde6`, con el mismo árbol probado. Render muestra el nuevo acceso Menú y la fórmula y explicación de aura; portada, ranking, ayuda y salud responden 200. Se conserva la base y el diseño publicado de Work. Se documenta el solapamiento con la propuesta móvil #13, que sigue abierta. Una frase de ayuda se precisa para distinguir el voto por combate del aura total con títulos.
-
-## 3 de octubre de 2026 — Pulido funcional antes del rediseño
-
-### Qué se pidió / qué idea surgió
-
-El fundador preguntó qué queda y pidió «pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El aspecto actual deja de considerarse definitivo; este bloque se centra en funciones, errores, claridad y el relevo entre entornos.
-
-### Qué se decidió y por qué
-
-Revalidar pendientes con el código actual antes de repetir tareas resueltas. Cerrar cortes de registros, decisiones que pisan datos cambiados y etiquetas que no reflejan el respaldo efectivo. Conservar el diseño provisional y los datos de la demo. Las categorías deportivas incompletas, herramientas de entidades, servicio real, menores/privacidad y pruebas con personas se mantienen en una hoja vigente, sin declararlos resueltos por una batería verde.
-
-### Qué se hizo
-
-Paginación de todas las colas de moderación, respaldos, acreditaciones e historial: ventanas de 50, totales reales, orden estable y páginas independientes. Búsqueda de acreditaciones, estado vacío y limpieza del filtro. Las acciones conservan consulta/página y respuesta visible con enlace a su sección; `returnTo` limita el destino. La revisión muestra categoría y grado efectivo. La última fuente de cada título se obtiene sin que las solicitudes de otro la desplacen.
-
-Huella del resultado al verificar y condición sobre los hechos leídos; reserva de un aviso pendiente antes de actuar sobre el dato; edición de evidencia condicionada a estado/resultado/fuente/respaldo. Opciones desconocidas dejan de interpretarse como decisiones destructivas. Se actualizan auditoría, traslado y mapa; PULIDO-FUNCIONAL reúne lo que queda. No hay migración ni cambio de escala de aura.
-
-### Qué salió mal / qué se aprendió
-
-El primer usuario sintético generó un correo con tilde y la validación nativa impidió enviar. Unos checks leían una fila antes de completar su actualización; se esperan los controles finales. Next perdió el fragmento de las redirecciones: se conserva como sección validada en consulta y enlace tras el mensaje. TypeScript detectó un diccionario opcional pasado a lookup; se añade el caso vacío. Los datos históricos de volumen usan fechas relativas para no depender de evitar la limpieza. Las reglas concretas se registran en LECCIONES.
-
-### Estado y próximos pasos
-
-405 unitarias, compilación y 26 comprobaciones nuevas de volumen/decisiones aprobadas. La regresión completa, axe y CI se comprueban antes de integrar; publicación efectiva se anota al final de este bloque. El rediseño sigue aplazado y se retomará con un briefing al final de la fase funcional. La propuesta móvil #13 sigue abierta: conciliar layout/menú antes de incorporarla.
-
-
-### Cierre de validación local
-
-El árbol final aprueba 406 unitarias y compilación de producción. Recorridos repetidos sobre el build final: 28 checks nuevos de volumen/integridad, 26 de trayectoria y 49 de usabilidad; axe en 37 pantallas, 0 incumplimientos. La regresión anterior pasó 389 de 391 y detectó dos mensajes de organizador bloqueados por validación nativa; los recorridos afectados pasan tras corregirlo. CI ejecutará la batería completa final (393 comprobaciones) antes de integrar. No se presenta la pasada anterior como completamente verde.
-
-También se protege la restauración de títulos: solo procede para uno excluido y no puede retirar el respaldo de uno activo. La prueba de volumen ahora consulta los totales y el orden reales antes de comprobar la tercera página: funciona también al reutilizar la base con datos de otros guiones. La publicación y su comprobación pública se registran después de CI.
-
-
-### Integración comprobada
-
-Integrada [PR #15](https://github.com/romppao/MiClaude/pull/15) en `claude/ring-espana-mvp`, merge `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. [CI #137](https://github.com/romppao/MiClaude/actions/runs/37158841984) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, 393 comprobaciones de navegador y axe en 37 pantallas: 0 incumplimientos, 0 graves o críticos. Árbol probado e integrado idéntico: `812da937097a5362123cbb3bd8b73c9b3008f0b7`; head revisado `cc2e17987f56037f88b574f1b8740ab16c4fd247`, base `dbecb53281f9c265081749acbbb71fd232c486df`, ambos comprobados antes de fusionar. La prueba completa final supera también los dos recorridos que habían fallado en la regresión local anterior.
-
-
-### Comprobación pública del primer despliegue
-
-Render sirve el pulido #15: portada, ayuda, ránking y `/salud` responden 200 por HTTPS con verificación TLS. El bundle compartido cambia de `layout-c9e2e3184aacfcf6.js` a `layout-febc489e998a92be.js` y contiene sección, foco y enlace de vuelta; SHA-256 `ba2162b7780bac81eed6ff191289b1e7a6acc11b5fb2ac6d8a2a47ab60f1c473`. Es una comprobación de despliegue, no una prueba autenticada de las colas públicas; esas acciones se recorrieron en local/CI. Los datos de volumen no se subieron a Render.
-
-La comprobación de acceso privado descubrió un detalle adicional: `/respaldar` pedía sesión sin recordar la ruta de vuelta, al contrario de las páginas de moderación. Se transmite la ruta a través de las guardas de sesión verificada y respaldo, sin conceder permisos. Dos checks nuevos comprueban el mensaje/destino y el regreso real tras entrar con una cuenta autorizada; tipos, unitarias, build, navegador y CI se vuelven a comprobar por este cambio de código.
-
-Validación local del retorno: 406 unitarias, build de producción y 30 checks del guion de pulido aprobados; el guion también mide axe sobre las colas pobladas sin incumplimientos. CI comprobará el árbol completo con 395 comprobaciones de navegador antes de integrar esta continuación.
-
-
-### Validación e integración final del retorno
-
-[PR #16](https://github.com/romppao/MiClaude/pull/16) integrada con merge `d9fba959cfe79da379adab9f42237c7b2d73322c`. [CI #142](https://github.com/romppao/MiClaude/actions/runs/37159831793) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, **395 comprobaciones de navegador** y axe en **37 pantallas, 0 incumplimientos**. Árbol comprobado e integrado `ae120c766bfc5761298bd9fa835e62c93a31915c`. Antes de fusionar se verificaron el head `0e094d62c95ee6e320f30280cec49cb8731ff823` y la base `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. Las dos comprobaciones nuevas de acceso completan las 393 de #15; no se omiten ni sustituyen recorridos.
-
-
-### Demo final comprobada
-
-El 3 de octubre a las 23:03 UTC, Render sirve también #16: `/respaldar` sin sesión lleva a `/entrar?next=%2Frespaldar&problema=sin_sesion`; portada, ayuda y salud responden 200 por HTTPS con verificación TLS. El regreso autenticado se recorrió en navegador local y en CI; no se crearon cuentas ni fixtures en la demo para esta comprobación. Los datos existentes se conservan. Esta continuación de cierre modifica solo documentación.
-
-Siguiente trabajo: resolver solapamientos del historial/registro inicial y catálogos IMMAF/IBJJF; herramientas de entidades; errores y recorridos con personas; preparación de correo, copias y privacidad/menores. No se declaran cerrados por las pruebas automatizadas. Diseño provisional, a retomar al final mediante briefing con el fundador; #13 sigue abierta, sin sobrescribir el trabajo de Work.
-
-
-## 6 de octubre de 2026 — Revisión del trabajo de Codex y limpieza de enlaces muertos
-
-### Qué se pidió
-Tras una semana sin créditos, el fundador pidió comprobar todo lo que hicieron Codex y otros asistentes y dar una opinión honesta (resultado abajo), y recordó su regla: «no puede haber botones ni enlaces inservibles; todo lo que sea inservible, mejor quítalo».
-
-### Qué se comprobó
-Ejecutado por Claude desde cero con base de datos vacía: tipos, 406 unitarias, compilación, 16 guiones de navegador y accesibilidad, todo correcto (coincide con el CI #144). Valoración: trabajo serio y bien documentado; defectos que ninguna prueba cubría: cabecera de escritorio con los enlaces apilados, enlaces que no hacen nada y texto técnico en la ficha.
-
-### Qué se hizo
-- **Cabecera de escritorio y tableta:** los cinco enlaces principales ya no se encogen ni se apilan; la cuenta y el buscador pasan a una segunda línea si no caben (`globals.css`, comprobado a 1440, 1024, 900, 800 y 700 px).
-- **Enlaces muertos:** «Quitar filtros» ya solo aparece cuando hay filtros (y se llama «Quitar todos los filtros»); el aviso de ránking vacío solo ofrece «Quitar el nivel, la zona y el periodo» si la consulta es más estrecha que la general.
-- **Auditoría automática** `tests/e2e/enlaces.mjs` (ahora dentro de `test:e2e`): recorre la aplicación como sin cuenta, aficionado, peleador, organizador y moderador y falla si hay enlaces vacíos o a «#», anclas inexistentes, enlaces que llevan a la misma pantalla, botones sueltos sin formulario, elementos con cursor de mano que no son enlaces ni botones, o destinos que dan error.
-- **Textos:** «Grupo de edad y categoría sin confirmar» pasa a «Edad y categoría sin indicar» y la opción del selector a «Prefiero indicarlo más tarde».
-
-### Qué salió mal
-Dos enlaces muertos reales llevaban semanas en la aplicación (uno de ellos introducido en el bloque de Codex) porque ninguna prueba medía «¿este enlace hace algo?». El fallo de «seguir» que describió el fundador no se pudo reproducir: el enlace «Entra para seguir a este peleador» funciona sin cuenta; queda pendiente de que el fundador indique en qué pantalla y papel le pasó.
-
-### Estado y próximos pasos
-Pendiente: seguir puliendo funcionalidades según los fallos que anote el fundador; después, escalabilidad (fotos fuera de la base de datos, caché de páginas públicas, base de datos gestionada, cola de correos, prueba de carga); paneles A/B/C al registrarse (decisión de formato del fundador); cerrar propuestas de Dependabot (saltos mayores que fallan el CI) y la #9 duplicada.
-
-
-## 6 de octubre de 2026 (tarde) — Probar como personas reales, desde el móvil
-
-### Qué se pidió
-«Cuando tú compruebes cosas de la aplicación, hazlo como si fueras uno de los usuarios […] como si fueses peleador, o un usuario, o una promotora, o una federación; un escenario ficticio de casos de uso de cada tipo de usuario» y «nos tenemos que enfocar al mil por mil en cómo funciona la aplicación en dispositivos móviles, tanto iOS como Android […] el objetivo es publicarla en App Store o Google Play». Además: documentar todo para el resto de asistentes (Antigravity, Codex, Open Code, GitHub Copilot).
-
-### Qué se hizo
-- **Colaboración:** `docs/EQUIPO.md` (protocolo común, ramas por asistente, plantilla de relevo), `AGENTS.md` y `.github/copilot-instructions.md` apuntando a él, `docs/APORTACIONES-CLAUDE.md` (mi registro), enlace en `CLAUDE.md` y en `docs/README.md`.
-- **Móvil:** `docs/MOVIL.md` (reglas, límites de las pruebas y camino a las tiendas) y `tests/e2e/movil.mjs` (iPhone SE, iPhone 14, Pixel 7 y Android de 360 px; cuatro papeles).
-- **Escenarios por persona:** `tests/e2e/escenarios.mjs` (visitante, aficionado, peleador, promotora, federación) con capturas.
-- **Correcciones** (detalle en `APORTACIONES-CLAUDE.md`): cabecera de escritorio, enlaces muertos, índice de «Mi ficha», formulario de combate más corto, margen para la barra fija, zonas táctiles de 44 px, letra de 16 px.
-
-### Qué salió mal
-La primera versión de mis auditorías daba falsos positivos (botones del menú que abren un diálogo; enlaces de una frase) y hubo que afinarla. El fallo de «seguir» que describió el fundador no se pudo reproducir como error: el enlace funcionaba, pero era una línea de texto de 26 px que no parecía pulsable.
-
-### Estado y próximos pasos
-Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y Android reales, conciliar la PR #13 (móvil) con `NavigationMenu`, paneles A/B/C al registrarse, escalabilidad antes del diseño, más personas en los escenarios.
-
-
-## 6 de octubre de 2026 (noche) — Claude, líder técnico del equipo
-
-**Pedido por el fundador:** «te pongo a ti como el líder del equipo […] idealices el plan, la arquitectura y los métodos a seguir, dando también la posibilidad de que las otras herramientas debatan y puedan sacar una mejor opinión […] las demás son las que ejecutan las instrucciones […] para ahorrar tokens y delegar funciones […] pauta por pauta, detalle a detalle, para que no se vayan por las ramas.»
-**Qué se hizo:** gobierno del equipo (`EQUIPO.md`, `decisiones/ADR-001`), cómo se discrepa con evidencia (`decisiones/README.md`, plantilla de propuestas RFC), lista de revisión de PR (`REVISION.md`), **plan maestro** (`PLAN.md`: principios de arquitectura, fases F0–F5, definición de «hecho») y **12 fichas de tarea** exactas (`tareas/T-001…T-012`): conciliar la PR del móvil, Dependabot, PWA, imágenes fuera de la base de datos, caché de lecturas públicas, índices, prueba de carga, cola de correos, ampliar escenarios, observabilidad, registro por tres paneles A/B/C (con las palabras del fundador) y base de datos gestionada. `CLAUDE.md` y `AGENTS.md` lo recogen.
-**Decisiones de Claude que el fundador puede revocar:** el acceso (`/entrar`) sigue siendo un formulario único porque las credenciales ya identifican a la persona (los tres paneles van en el registro); una federación aprobada recibe su perfil y titularidad automáticamente.
-**Límites honestos:** los asistentes solo actúan cuando el fundador los lanza (no se mensajean entre sí; la comunicación es el repositorio); las sugerencias de reparto («sugerida a») se basan en lo observado de Codex y deben calibrarse con los demás; Claude puede equivocarse y sus decisiones son discutibles por RFC.
-
-
-## 6 de octubre de 2026 (noche) — Rangos del equipo
-
-**Pedido por el fundador:** designar el orden de rango entre las herramientas «bajo tu criterio y resultados que te hayan dado en una primera toma de contacto»: Claude primero; después Codex, Antigravity, GitHub Copilot y Open Code (modelos Ollama y Qwen); «es muy importante que sepas elegir cuál va a ser el segundo al que vamos a colocarle esa gran función».
-**Qué se decidió:** orden 1 Claude · 2 Codex · 3 Antigravity · 4 Copilot · 5 Open Code local (`docs/RANGOS.md`, ADR-002). **Honestidad:** solo Codex tiene trabajo en el repositorio (9 PR); los puestos 3–5 son hipótesis previas, no resultados, por lo que entran en periodo de prueba con una prueba de ingreso objetiva (T-002, y T-009/T-003), puntuación por criterios y reglas de ascenso y descenso (se desciende de inmediato por afirmar algo no ejecutado). Se añaden niveles de tarea N1–N4 a las fichas. Registro de rendimiento con la primera evaluación de Codex.
-**Pendiente del fundador:** decir qué modelo ejecuta cada herramienta y si Codex tiene PostgreSQL y navegador locales; el orden de 3–5 puede cambiar mucho con eso.
-
-**Corrección posterior (mismo día):** el fundador aclaró que el orden de los puestos 3–5 debe decidirlo Claude **cuando tenga pruebas** del trabajo de las otras herramientas: «ahora todavía no hace falta». Se retira el orden a priori de `RANGOS.md` y `ADR-002`; solo quedan Claude (1) y Codex (2, con evidencia); Antigravity, Copilot y Open Code, sin ordenar y en periodo de prueba.
-
-
-## 6 de octubre de 2026 (noche) — Prueba de ingreso de los asistentes
-
-**Pedido por el fundador:** un documento que **exija a cada herramienta una aportación a máximo nivel y también a nivel medio** (bajo consumo de tokens), que les **pregunte primero qué es lo que mejor se les da** y después les ponga una **prueba común de exigencia máxima**; el fundador vio resultados buenos de diseño frontend de Antigravity con *skills* instaladas y quiere comparar «de verdad».
-**Qué se hizo:** `docs/PRUEBA-DE-INGRESO.md` (protocolo y reglas; Parte 0 autodeclaración, Parte 1 especialidad a elección —con propuesta de diseño aislada para quien la elija—, Parte 2 prueba común máxima = T-011, Parte 3 prueba común media = T-003, Parte 4 revisión a ciegas de un PR con 12 defectos plantados; puntuación de 100 puntos con calibración y eficiencia), plantilla de autodeclaración, tabla `docs/ingreso/RESULTADOS.md`, `revision-ciega/CAMBIO.md` y su clave. **Límite honesto:** la clave de la revisión a ciegas está en el repositorio (no hay forma de ocultarla en un repositorio compartido); se apoya en la norma de no leerla, y el fundador o Claude pueden contrastar con el historial de acceso si hay dudas. Las pruebas comunes generan trabajo duplicado a propósito; solo se integra lo mejor.
-
-
-## 6 de octubre de 2026 (noche) — Corrección de lo que Claude señaló de Codex y del CI
-
-**Pedido por el fundador:** «también corrige todo lo que me dijiste que hizo mal Codex, en caso de que no lo hayas hecho». Se repasó punto por punto la lista de la revisión (`APORTACIONES-CLAUDE.md`).
-**Estado de cada punto:** (1) cabecera de escritorio, (2) barra inferior que tapaba texto y (3) «Quitar filtros» ya estaban corregidos antes; (4) textos técnicos: quedaban «división sin confirmar» en dos pantallas y en la ayuda del ránking → reescritos en lenguaje llano; (6) PRs: cerrados #1–#7 (Dependabot, saltos mayores con el CI en rojo) y #9 (ya integrado entero), y `dependabot.yml` ya no propone saltos de versión mayor; #13 cerrado tras portar lo útil (barra móvil con iconos y página activa, perfil adaptable) sin su `HeaderMenu`, que duplicaba el menú; (7) `CLAUDE.md` ya no dice a la vez que el diseño está aprobado y pendiente (queda: color decidido y aplicado, resto provisional); (8) paneles A/B/C: hechos (T-011, abajo); «seguir» sin respuesta: ya corregido antes.
-**Paneles A/B/C (T-011), hecho por Claude:** `/registro` muestra tres paneles (Usuario · Peleador · Promotora o federación) y cada uno lleva a su formulario; sin desplegable ni frases antiguas. El panel C crea la cuenta y la solicitud en la misma transacción (migración aditiva `OrganizerRequest.kind` y `website`). Al aprobar una federación se crea su perfil en el directorio con la solicitante como titular. Función única de aterrizaje por papel (`src/lib/accounts/landing.ts`): peleador → Mi ficha, organizadora → Mis veladas, moderación → Moderación. Decisión de Claude que el fundador puede revocar: `/entrar` sigue siendo un único formulario.
-**Fallo del CI (run 150):** la auditoría móvil encontró enlaces de 26 px («Página anterior/siguiente») y de 43 px (nombres largos en tablas) que mi base local, casi vacía, no mostraba. Corregido (ver LECCIONES).
-**Imágenes (punto 5), solo en parte:** la ruta sirve ahora con ETag y responde 304 sin leer los bytes de la base; **sigue pendiente** sacarlas de PostgreSQL (T-004 parte 2), que necesita que el fundador elija proveedor.
-**Estado y próximos pasos:** pendiente de confirmar el CI de esta tanda; después fase 1 del plan (T-001, T-002, T-009) y, cuando el fundador lo decida, T-004 parte 2 (proveedor de almacenamiento) y el resto de F2.
-
-
-## 6 de octubre de 2026 (noche, 2) — Fase 1 del plan: cierre y escenarios por persona
-
-**Pedido por el fundador:** «he continuado con el plan, perfecto, continúa».
-**Qué se hizo:** el CI de `490cfd2` (paneles A/B/C) quedó en verde. Como Claude hizo T-001, T-002 y T-011, **la prueba de ingreso dejaba de ser válida** (usaba T-011 como prueba común máxima y T-002 como tarea de entrada de nivel 1): se sustituyen por **T-005** (caché de lecturas públicas) y una tarea nueva **T-013** (todo enlace que abre otra pestaña lo avisa; hay un caso real sin avisar en `SelectorCategoria.tsx`). Actualizados `PRUEBA-DE-INGRESO.md`, `RANGOS.md`, `PLAN.md` y la plantilla de autodeclaración. Se pasó `escenarios.mjs` con datos de ejemplo: las cinco personas (visitante, aficionado, peleador, promotora, federación) completan sus recorridos; el escenario de la federación usa ahora el panel «Promotora o federación» de punta a punta (solicitud, aprobación con tipo y web visibles, perfil creado sin pasos manuales). Al mirar las capturas se vio que los tres paneles **no parecían pulsables**: se añadió «Elegir esta cuenta →» dentro de cada uno.
-**Qué salió mal:** mi guion buscaba el panel por el texto «Peleador», que también aparece en la descripción del panel «Usuario» («Sigue a peleadores…»): se localiza por la dirección del enlace. Lección: localizar enlaces por destino, no por una palabra que puede repetirse.
-**Estado y próximos pasos:** F1 completa salvo T-009 (más escenarios) y T-013; ambas están para la prueba de ingreso de los otros asistentes. Siguen necesitando al fundador: proveedor de almacenamiento de imágenes (T-004 parte 2), base de datos gestionada (T-012), correo (T-008), errores (T-010), dominio y menores.
-
-
-## 6 de octubre de 2026 (noche, 3) — Proveedores de la fase 0 con el mínimo coste
-
-**Pedido por el fundador:** «no tengo ni idea de qué hacer en esos cinco puntos […] quiero utilizar el mínimo capital posible […] herramientas gratuitas o de mínimo coste, muy top, fiables, escalables y fáciles de modificar […] que lo hagas tú de la mejor manera».
-**Qué se hizo:** cuatro investigaciones en paralelo (base de datos y alojamiento; imágenes; correo y errores; menores y RGPD). Resultado en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md): Neon Free + copia nocturna a R2, Render (gratis para la demo, Starter de 7 $ al abrir), Cloudflare R2 (UE) para imágenes servidas por la aplicación, Resend gratis (ya programado) con dominio propio, Sentry gratis (UE) y UptimeRobot; borrador de política de menores con la edad como parámetro. Fichas T-004, T-008, T-010 y T-012 ajustadas; nueva T-014.
-**Hallazgos importantes:** la base de datos gratuita de la demo en Render **caduca a los 30 días**; sin dominio propio **no se pueden enviar correos reales** (ni verificar cuentas); Vercel no vale para una aplicación que se monetice (su plan gratis es no comercial).
-**Qué salió mal / límite honesto:** el entorno bloquea las páginas oficiales de los proveedores, así que **ninguna cifra se leyó en la fuente**: todas salen de resúmenes de búsqueda y hay una lista de comprobación en el ADR. Lo jurídico es un borrador que debe confirmar una persona cualificada.
-**Estado y próximos pasos:** el fundador aprueba (o corrige) el ADR y responde a dos preguntas de producto sobre menores; después, T-012 (Neon y copias) es lo primero, por la caducidad de la base de la demo.
-
-
-## 6 de octubre de 2026 (noche, 4) — Documentación completa de la jornada
-
-**Pedido por el fundador:** «Documenta todo».
-**Qué se hizo:** repaso de toda la documentación frente a lo hecho hoy y actualización de lo desfasado: `README.md` (índice, fila de proveedores), `TRASLADO.md` (estado, aviso de caducidad de la base de la demo, decisiones 4, 11 y nueva 17), `DEMO.md` (aviso de caducidad), `MOVIL.md` (PR #13 conciliado, fallo del CI, paneles, escenarios), `pruebas/personas.md` (persona 14: registro por paneles), `ARQUITECTURA.md` (infraestructura prevista y cambios técnicos), `CLAUDE.md` y `AGENTS.md` (principio de presupuesto mínimo y regla de no contratar sin aprobación), `IDEAS.md`, `LECCIONES.md` y `APORTACIONES-CLAUDE.md`.
-**Qué salió mal:** nada nuevo; se anotó como lección que los precios no se pudieron leer en la fuente.
-**Estado y próximos pasos:** a la espera del visto bueno del fundador al ADR-003 y de sus respuestas sobre menores; después, T-012 (migrar la base de la demo a Neon con copia nocturna).
-
-
-## 6 de octubre de 2026 (noche, 5) — Herramientas aprobadas, menores y segunda prueba de ingreso
-
-**Pedido por el fundador:** (1) «lo de Render, ¿ya no voy a poder utilizar esa demo? ¿Cuándo se caduca?»; (2) «todas esas herramientas las apruebo, pero verifícame otra vez que son las mejores»; (3) «genera otra prueba de ingreso […] para medir bien el nivel de nuestros ayudantes»; (4) menores: «no pongas fecha de nacimiento [en el alta]; en la ficha sí, para la categoría; no quiero impedir a los pequeños usar la app; limitaremos alguna cosilla, pero será el último punto, después del diseño»; (5) «déjalo todo bien documentado para que Claude Code en el portátil tome el control».
-**Qué se hizo:**
-- **Render:** la web gratuita no caduca (se duerme sin visitas); la **base de datos** sí: 30 días desde su creación + 14 de gracia y luego se borra. `render.yaml` se subió el 2 de octubre, así que debería caducar **hacia el 1–2 de noviembre** (fecha real: la confirma el fundador en su panel). Sin base la demo no funciona: se migra a Neon antes (T-012).
-- **Segunda verificación de las herramientas** (búsquedas web; las páginas oficiales siguen bloqueadas desde aquí): se mantienen las seis piezas con **dos correcciones** (Neon gratis tiene **0,5 GB**, no 1 GB; Resend gratis llega a **100 correos al día**, con Brevo —300 al día, UE— como recambio antes de pagar) y **una prioridad nueva**: sacar las imágenes de la base antes de abrir (T-004). Detalle en el ADR-003, aprobado.
-- **Menores:** decisiones del fundador anotadas en ADR-003, T-014 y TRASLADO. El alta no pide edad; la ficha sí la fecha de nacimiento (el campo ya existe, opcional); las limitaciones, al final.
-- **Prueba de ingreso 2, «La escalera»** ([PRUEBA-ESCALERA.md](PRUEBA-ESCALERA.md)): la primera prueba ya se había rehecho (T-005, T-003 y revisión a ciegas) pero la puntúo yo a juicio. La nueva es **objetiva**: cuatro retos de nivel 1 a 4 (`recortarTexto`, `calcularRecord`, `duracionEnMinutos` con cambios de hora de España y Canarias, `crearLimitador`) con **37 pruebas ocultas** en la rama `claude/clave-escalera` (probadas contra una solución de referencia y contra versiones ingenuas, que fallan), **dos trampas de honestidad** (una función imposible y un encargo que vende el sello de verificado) y **calibración** (predecir el resultado antes). Corrección con `scripts/corregir-escalera.sh`.
-- **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
-**Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
-**Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
-
-
-## 8 de octubre de 2026 — Diseño móvil v3 (negro y lima), fase 1: implementación en la aplicación
-
-**Pedido por el fundador (Claude Design, 7 de octubre):** diseñar la aplicación móvil con la segunda referencia («me gusta esta segunda referencia negro lima, vamos a desarrollarlo más»); «a la hora de registrarte, da igual de qué cómo lo hagas que la aplicación tiene el mismo aspecto y las mismas funcionalidades, y esto no puede ser»; cuatro registros (aficionado, peleador, entrenador, promotora/federación/club); récord amateur visible solo como número de combates salvo que el peleador lo publique; highlights en cada ficha; en boxeo no puede aparecer la sumisión. Después pidió pasar la entrega a Claude Code. Antes de empezar se le preguntó y eligió: implementarlo en este repositorio, **con backend completo**, **por fases (primero el núcleo)** y **mantener por ahora la lista de formas de terminar del repositorio**, ocultando solo las que no corresponden a la disciplina.
-**Qué se decidió y por qué:**
-- El prototipo HTML es una referencia, no código: se rehízo en Next.js con los patrones del proyecto (acciones con guardas, reglas puras en `lib`, mensajes por código, pruebas).
-- Fase 1 = tokens visuales, barra inferior por papel, bienvenida y acceso, registro por pasos de los cuatro tipos, inicio por papel y ficha de peleador con highlights y récord privado. Quedan para la fase 2 las propuestas de combate y sparring, las reservas de clases, las inscripciones a veladas, la multimedia del público, el aura a promotoras y clubes, la plantilla del club y la portada de cada disciplina (ver `PLAN.md`).
-- **La cuenta se crea en el paso «datos»** y el último paso de cada tipo es opcional («Lo haré después»). Crear una ficha o un perfil público exige el correo confirmado (regla vigente), así que el paso «Crea tu ficha» y el del entrenador **guardan lo elegido** (`User.onboarding`) y «Mi ficha» / el inicio del entrenador lo traen rellenado: nunca se publica nada sin confirmar el correo.
-- Highlights: un vídeo es **un enlace** (YouTube, Instagram, TikTok…) y una foto se sube normalizada; los vídeos no se guardan en la base de datos (las imágenes ya están pendientes de salir de PostgreSQL, T-004).
-- Récord amateur privado **por defecto también para las fichas existentes** (es la dirección prudente con la privacidad y lo que pidió el fundador). Afecta a la ficha, al inicio y a las tarjetas; los carteles y resultados de las veladas siguen siendo públicos.
-- Clases de entrenador: precio por persona y sesión, sin pagos ni reservas en la aplicación (se dice con claridad en el perfil).
-- Fuente Archivo alojada en el repositorio (licencia OFL), sin depender de Google Fonts.
-**Qué se hizo:** migración aditiva `20261008090000_diseno_movil_v3` (rol `TRAINER`, `Trainer.userId` y datos del perfil, `TrainingClass`, `Highlight`, `Fighter.recordPublic`, `User.interests` y `User.onboarding`; `OrganizerRequest.kind` admite `CLUB`); `globals.css` reescrito con los tokens v3 conservando todas las clases; nuevas pantallas `/bienvenida`, `/registro/{intereses,ficha,perfil,clase}`, `/mis-clases` e inicio por papel (`src/app/_inicio/`); ficha de peleador y «Mi ficha» rehechas; acciones nuevas (`trainers.ts`; récord público y highlights en `fighters.ts`; pasos del registro en `accounts.ts`); «Cómo terminó» filtrado por disciplina; descarga y borrado de datos ampliados; nuevo guion `tests/e2e/diseno.mjs` (46 comprobaciones) y pruebas unitarias de reglas y autorización.
-**Qué ejecuté yo:** tipos, 461 unitarias, compilación, paridad de migraciones, los 19 guiones de navegador con base vacía (486 comprobaciones, 0 fallos) y axe en 53 pantallas (0 incumplimientos); recorrido con capturas de los cuatro tipos de cuenta en un iPhone emulado. **No ejecutado:** CI de GitHub (se verá en el PR), Safari real y aparatos reales.
-**Qué salió mal:** usé dos veces `pkill -f` con un patrón que aparecía en mi propia orden y maté mi terminal (la regla ya estaba en `CLAUDE.md`); varias pruebas leían la ficha pública como tabla y hubo que adaptarlas a tarjetas; un estilo en línea anulaba la regla que oculta los campos de clase colectiva; un `aria-label` en un `div` (axe). Todo corregido; ver `LECCIONES.md`.
-**Estado y próximos pasos:** PR con la fase 1. Decisiones abiertas para el fundador en `TRASLADO.md` §7 (18–22). Siguiente: fase 2 del diseño v3.
-
-
-## 8 de octubre de 2026 (2) — Revisión en escritorio del diseño v3 y preparación de la demo
-
-**Pedido por el fundador:** «Recuerda documentar todo en el repositorio de GitHub. Una vez esté todo correcto, tanto para móvil como para escritorio, mándame una demo para poder probar todo».
-**Qué se hizo:** capturas a 1280 px de portada, bienvenida, registro, acceso, ficha de peleador, inicio del peleador y «Mi ficha». Se corrigieron cuatro fallos que solo se veían en escritorio: el gráfico de aura quedaba encogido en el centro (el SVG conservaba su proporción; ahora ocupa el ancho y el punto final es un elemento HTML que no se deforma), las pestañas Récord · Combates · Público parecían enlaces subrayados, «¿Qué quieres hacer?» se partía en dos columnas (la regla general de `nav` era flexible) y el botón «Entrar» de la portada se duplicaba con el de la cabecera (ahora solo en móvil). En pantallas grandes la columna central pasa de 640 a 720 px y las disciplinas se muestran en tres columnas.
-**Qué ejecuté yo:** compilación, los 19 guiones de navegador (486 comprobaciones, 0 fallos) y axe en 53 pantallas (0 incumplimientos) tras los cambios. El CI de GitHub del primer envío de la rama terminó en verde.
-**Demo:** la demo pública de Render se construye desde `claude/ring-espana-mvp`; para que el fundador la pruebe hay que integrar esta rama en esa (PR). Cómo probar cada tipo de cuenta en `DEMO.md`.
-
-
-## 8 de octubre de 2026 — Transferencia del conocimiento a programadores humanos (Codex)
-
-**Qué se pidió:** «absolutamente todo el código […] bien explicado», arquitectura, decisiones y procesos documentados para trabajar sin asistentes de IA. El fundador pidió coordinar con Claude mediante el repositorio.
-**Qué se decidió y por qué:** completar las guías existentes con contratos y flujos reales y un catálogo individual comprobable; explicar intención/restricciones en comentarios, sin repetir cada línea ni inventar decisiones históricas. Cobertura estructural y calidad humana se evalúan por separado. La solicitud directa permite el bloque documental, sin ampliar funcionalidades ni reestructurar el producto.
-**Qué se hizo:** manual de mantenimiento, catálogo de 226 archivos, generador y nueve pruebas Node, control en CI, contratos en seis archivos de código, correcciones de arquitectura/desarrollo y criterio de revisión en AGENTS/REVISION. Base y rama en APORTACIONES-CODEX. Se dejaron explícitos los PR funcionales abiertos que todavía no forman parte de la versión revisada.
-**Qué salió mal:** clon fallido por proxy y recuperación de archivos vía conector a SHA fijo; contexto incompleto en dos parches, corregido antes de aplicar; referencia de función corregida tras comprobar export. La evaluación previa de avisos se precisó: los correos a seguidores ya existen al añadir cartel desde organización.
-**Comprobaciones:** nueve casos de la herramienta ejecutados directamente y comprobación del catálogo local. Batería del producto pendiente del CI por falta de dependencias/PostgreSQL/navegador locales. Resultados finales y enlace PR se añaden al cierre del registro.
-**Estado y próximos pasos:** propuesta documental para revisión de Claude, sin integración/despliegue. Revisar contratos, adaptar tras PR funcionales e intentar transferencia con programador independiente; esa validación humana y la capacidad bajo carga no se dan por hechas.
-
-
-## 8 de octubre de 2026 (3) — Diseño v3, fase 2a: portada común con noticias, menú por tipo de cuenta, entrenador organizador y vídeos del público
-
-**Pedido por el fundador:** (1) «después de iniciar sesión a todos los usuarios les aparece la misma pantalla de inicio», con noticias actuales de la escena de los deportes de contacto de fuentes fiables y variadas («canales de YouTube, periódicos, federaciones»), y «una subpantalla de inicio específica de cada disciplina» elegida; (2) «en el menú solo te pueden aparecer las opciones del usuario», salvo el entrenador, que tiene las de entrenador, club y promotora; (3) espacios en la ficha para los mejores highlights y combates (ya existían); (4) un espacio para que el aficionado suba lo grabado o fotografiado en la velada, «para que los peleadores puedan obtener contenido de sus combates». Al preguntarle: «el entrenador podrá crear veladas e interclubs» y «subir los vídeos en la app de verdad y, si no es viable, mediante enlaces».
-**Qué se decidió y por qué:**
-- **Portada común + «Mi panel».** La portada (`/`) es la misma para todos con sesión: saludo, acceso a «Mi panel», sus disciplinas (las elegidas primero) → `/disciplinas/<disciplina>`, actualidad y próximas veladas. Los inicios por papel de la fase 1 no se tiraron: pasan a `/mi-panel`, que tiene pestaña propia en la barra inferior. Tras entrar, todos van a `/` (moderación, a su cola).
-- **Noticias sin dependencias ni servidor de tareas:** un lector RSS/Atom propio (`lib/news`) que se lanza en segundo plano cuando alguien abre la portada y una fuente lleva más de media hora sin leerse. Fuentes iniciales: canales de vídeo de UFC, ONE y GLORY (identificadores comprobados por búsqueda), una búsqueda de **Google Noticias en español por disciplina** (reúne muchos medios distintos) y otra de federaciones. Solo se guarda titular, medio, fecha y la miniatura del vídeo; cada noticia se abre en su web. Moderación ve el estado de cada fuente, añade otras y oculta titulares en `/moderacion/noticias`. Un medio no puede acaparar la portada (como mucho dos seguidas arriba).
-- **Menú por tipo de cuenta** desde una sola fuente (`lib/accounts/menu.ts`): «Explorar» (consultar lo público) es igual para todos y el resto es solo de su tipo. El entrenador tiene tres bloques: Entrenador, Club y Promotora. Máximo cinco enlaces por bloque.
-- **Entrenador organizador sin aprobación previa** (decisión del fundador): `requireOrganizer` acepta `TRAINER`. Cada evento es **velada** o **interclub** (`Event.kind`), visible en la página pública.
-- **Vídeos de verdad con R2** (ya aprobado en el ADR-003): el navegador sube el vídeo directamente a Cloudflare R2 con una dirección firmada (firma S3 propia, probada con el ejemplo oficial de AWS); sin R2, en desarrollo y en la demo se guarda en el disco; en producción sin R2, solo enlaces. Las fotos, normalizadas en WebP como las de los perfiles. Consentimiento obligatorio en cada envío, avisos con el motivo «Aparezco yo y no doy permiso», retirada por moderación, borrado por quien lo subió y con su cuenta. Se ven en la velada y, si se indica el combate, en la ficha de los dos peleadores con «Descargar». Los highlights también admiten vídeo subido.
-**Qué se hizo:** migración aditiva `20261008180000_noticias_multimedia` (`Event.kind`, `NewsSource`, `NewsItem`, `MediaItem`, `Highlight.videoKey/videoType`); dominios nuevos `lib/news` y `lib/media`; pantallas `/mi-panel`, `/noticias`, `/disciplinas/[slug]`, `/compartir`, `/moderacion/noticias`; rutas `/subidas`, `/medios/[id]/video|imagen`, `/highlights/[id]/video`; acciones `news.ts` y `media.ts`; menú, barra inferior, cabecera, pie y «Mi cuenta» por tipo de cuenta; política de contenido ampliada; guía para el fundador [`VIDEOS.md`](VIDEOS.md); nuevo guion `tests/e2e/fase2a.mjs` (33 comprobaciones) y pruebas unitarias del lector, la firma S3, el almacén, las reglas y el menú.
-**Qué ejecuté yo:** `npm run typecheck`, `npm test` (527), `npm run build`, paridad de migraciones, los 20 guiones de navegador con base vacía (**520 comprobaciones, 0 fallos**, incluido el nuevo `fase2a.mjs`), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos), `npm run mapa` y la comprobación del catálogo de Codex (257 archivos, 9/9 pruebas); capturas en iPhone emulado.
-**Qué salió mal / límite honesto:** desde el entorno de desarrollo **no se pudo abrir ninguna fuente de noticias** (la red no lo permite): el lector está probado con canales de ejemplo, pero las fuentes reales se comprueban en la demo. Repetí un error ya anotado (un estilo en línea anulaba la regla que oculta el vídeo al elegir «Foto»); una imagen diferida sin tamaño no «se veía»; el foco salía del menú con Mayús+Tab; un `id` de ancla estaba en el título. Corregido y anotado en `LECCIONES.md`. **No ejecutado:** subida real a R2 (no hay cubo todavía), Safari real y aparatos reales.
-**Coordinación con Codex:** mientras trabajaba, Codex abrió #28 (manual de mantenimiento y catálogo comprobado en el CI) y #29 (estudio de monetización). Integré #28 en esta rama y añadí al catálogo los 31 archivos nuevos (sin eso el CI fallaría al integrar las dos), y dejé mi revisión en ambas: #28 aprobada con dos cambios menores (el generador cuenta `next-env.d.ts`, que es generado; actualizar el manual con la fase 2a), #29 aprobada como documento de trabajo, con los hechos técnicos que cambian (coste de almacenamiento de vídeos, entrenadores organizadores).
-**Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo pública, así que se pide permiso al fundador. Después: el fundador crea el cubo de R2 (`VIDEOS.md`) y revisa las fuentes en la demo; decisiones en `TRASLADO.md` §7.23–25. Resto de la fase 2 en `PLAN.md`.
-
-## 8 de octubre de 2026 (4) — Cómo publicar en App Store y Google Play, web frente a app y costes con 500 usuarios
-
-**Pedido por el fundador:** «Me gustaría que me indicases el proceso para publicar la aplicación oficialmente al mercado […] cómo subirlo tanto a Apple Store como a Google Store para que los aficionados la puedan descargar. También limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación. […] Partimos de una base de 500 clientes como máximo en esta primera etapa. ¿Es sostenible? ¿Voy a necesitar pagar algo?» Antes dijo que estudiará las propuestas y las compartirá con los otros asistentes.
-**Qué se decidió y por qué:** es una propuesta, no se ha contratado nada. Camino recomendado: **Capacitor** (un solo código; la web dentro de una app nativa) con funciones del teléfono que Apple exige para no rechazarla por la norma 4.2 (avisos, cámara, compartir, enlaces que abren la app, pantalla sin conexión). **No cerrar la consulta pública en la web** (es lo que se comparte y lo que encuentra Google; regla vigente «ver contenido es público»): reservar a la app los avisos y la subida desde la cámara, y dejar al fundador decidir si dar aura pasa a ser solo de la app (ventaja: comprobación de dispositivo contra cuentas falsas).
-**Qué se hizo:** guía [`PUBLICACION.md`](PUBLICACION.md): trámites del fundador, trabajo técnico pendiente, paso a paso en cada tienda, propuesta web/app, costes y calendario (6–10 semanas). Revisado lo que piden las tiendas contra el código: **falta «bloquear a un usuario»** (obligatorio en Apple, norma 1.2), unas **condiciones de uso** y un filtro de palabras; ya existen avisos y moderación, borrado de cuenta y página de privacidad.
-**Costes estimados (búsquedas, sin verificar en páginas oficiales):** unos 130 € el primer año (Apple ~99 €/año, Google 25 $ una vez, dominio ~7 €/año) y **unos 10–30 € al mes** con 500 usuarios (Render Starter 7 $, Neon gratis o por uso, R2 casi gratis, Firebase, Sentry y Codemagic gratis). Hallazgos nuevos: desde el 1 de agosto de 2026 el plan gratuito de Render incluye solo **5 GB de tráfico al mes** (0,15 $/GB adicional; los vídeos no cuentan porque salen de R2); Google exige a las cuentas personales una **prueba cerrada con 12 personas durante 14 días**; el límite de 100 correos al día de Resend **bloquearía un día de lanzamiento**.
-**Qué salió mal / límite honesto:** no se pudo abrir ninguna página oficial de precios; las fuentes no coinciden en algunas cifras (número de probadores de Google, comisión de Apple en la UE desde el 1 de octubre, plan gratis de R2). Todo queda en la lista «comprobar» de la guía.
-**Estado y próximos pasos:** el fundador estudia la guía con el equipo y decide: persona física o empresa, qué se reserva a la app, y cuándo empezar. Después Claude escribe las fichas (bloquear usuarios, condiciones de uso, Capacitor, avisos) en `docs/tareas/`.
-
-## 8 de octubre de 2026 (5) — Fase 2a y manual de Codex, fusionados en la demo
-
-**Pedido por el fundador:** «Sí, fusiónalo, perfecto. […] Estoy muy contento con cómo está quedando este proyecto. Me gustaría que pudiésemos ir escalándolo poco a poco. […] Ahora chequeo la demo, voy a ver qué es lo que está bien, qué es lo que falla, qué cosas pondría, qué cosas no. También falta por revisar las propuestas de monetización.»
-**Qué se decidió y por qué:** fusionar primero la #28 de Codex (manual de mantenimiento y catálogo comprobado) y después la #30 (fase 2a y guía de publicación), que ya la incluía, con «merge commit» como en las anteriores. Solo se fusiona con las pruebas del CI en verde.
-**Qué se hizo:** fusionadas #28 y #30 en `claude/ring-espana-mvp`, lo que actualiza la demo de Render.
-**Qué salió mal / límite honesto:** nada nuevo. Siguen sin probar en real la subida a R2 (falta el cubo), las fuentes de noticias (no se pudieron abrir desde el entorno de desarrollo) y los aparatos físicos.
-**Estado y próximos pasos:** el fundador revisa la demo y anota qué falla y qué cambiaría; revisa el estudio de monetización de Codex (#29, abierta como documento de trabajo) y la guía `PUBLICACION.md`. Pendiente suyo: crear el cubo de R2 (`VIDEOS.md`), mirar `/moderacion/noticias` en la demo y decidir `TRASLADO.md` §7.23–26. Con sus notas, Claude prioriza y escribe fichas en `docs/tareas/` para escalar por partes.
-
-## 8 de octubre de 2026 (6) — Portada con selector de deporte y cuenta del creador
-
-**Pedido por el fundador:** «No veo lo que te he dicho sobre la pantalla inicial […] la primera pantalla que le sale a todo el mundo […] con todas las noticias, todo generalizado […] de los distintos periódicos, el canal de YouTube o federaciones oficiales, sobre todos los deportes. Después, al seleccionar el deporte que tú quieres, tiene que haber otra pantalla como la inicial, pero exclusivamente de esa disciplina.» Y: «tener un usuario especial, yo como creador de la aplicación, en caso de que no tenga a mi disposición mi ordenador o mi móvil, poder entrar desde cualquier sitio con esa clave, con ese usuario, para poder modificar cualquier aspecto y gestionar cualquier aspecto dentro de la aplicación».
-**Qué se decidió y por qué:**
-- **Portada.** No la veía porque la fase 2a estaba en un PR sin fusionar. Se fusionaron #28 y #30 en cuanto el CI estuvo en verde. Además, para que se parezca más a lo que describe, la portada común y la de cada disciplina pasan a ser **la misma pantalla** (`_inicio/Portada.tsx`):
-  - un selector «Todos / Boxeo / Jiu-jitsu…» en una fila que se desliza;
-  - la **noticia más reciente en grande**, el resto en lista;
-  - después, veladas y aura de ese deporte.
-  - El visitante también ve la actualidad nada más entrar, con la noticia destacada.
-- **Cuenta del creador.** Se reconoce por su correo (`CREADOR_CORREO`, que se pone en el panel de Render y nunca en el código) **con el correo verificado**. Tiene todos los permisos de moderación y, solo ella, «Administración»: buscar cualquier cuenta, cambiar su tipo, nombrar o quitar moderadores y cerrar sesiones.
-  - **Segundo paso obligatorio (decisión de Claude, revisable por el fundador):** es la cuenta que más interesa robar. Para que funcione «sin el ordenador ni el móvil», el segundo paso admite un código de la aplicación de códigos **o uno de diez códigos de emergencia en papel**.
-  - Sin dependencias nuevas: los códigos siguen la RFC 6238, probada con sus vectores oficiales.
-**Qué se hizo:**
-- Migración aditiva `20261008200000_cuenta_creador`.
-- `lib/accounts/totp.ts` y `creador.ts`, `requireCreador`.
-- Pantallas `/entrar/segundo-paso` y `/moderacion/usuarios`; acciones `creador.ts`.
-- «Administración» en el menú.
-- Aviso de arranque si falta `CREADOR_CORREO`.
-- Guía para el fundador [`CREADOR.md`](CREADOR.md).
-- Pruebas `tests/unit/creador.test.ts` y `tests/e2e/creador.mjs`, esta última con accesibilidad de las pantallas nuevas.
-**Qué ejecuté yo:** `npm run typecheck`, `npm test` (542), `npm run build`, paridad de migraciones, los 21 guiones de navegador con base vacía (**564 comprobaciones, 0 fallos**, incluido el nuevo `creador.mjs` con 44), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos) y las 4 pantallas nuevas analizadas dentro de `creador.mjs`, `npm run mapa` y el catálogo (267 archivos, 9/9 pruebas); captura en iPhone emulado.
-**Qué salió mal / límite honesto:**
-- Mi primer diseño dejaba un hueco: una sesión abierta **antes** de confirmar el correo habría heredado los poderes del creador sin el segundo paso. Lo encontré al escribir la prueba y lo corregí: ahora se comprueba en cada petición que esa sesión hizo el segundo paso.
-- Tres fallos de la propia prueba, anotados en `LECCIONES.md`.
-- Desde aquí no se puede abrir la demo, así que no he visto el despliegue de #30 en Render.
-**Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo, así que se pide permiso. Después, el fundador pone `CREADOR_CORREO` en Render y activa su cuenta siguiendo `CREADOR.md`. Decisiones en `TRASLADO.md` §7.27.
-
-## 8 de octubre de 2026 (7) — Iconos de cada deporte y noticias solo en español y de su disciplina
-
-**Pedido por el fundador** (tras revisar la demo, que ya tenía #30 y #31):
-- «El panel […] que indica qué disciplinas hay está muy soso […] intenta añadir imágenes o iconos que indiquen qué deporte es».
-- «Las noticias están en inglés la mayoría. No quiero noticias en inglés. Quiero noticias completamente en español para la gente de España.»
-- «He entrado en la pestaña de boxeo y me aparecían noticias sobre MMA y sobre kickboxing. No […] Única y exclusivamente contenido de cada disciplina especializada en su pantalla […] Infórmate, busca bien las fuentes de cada disciplina.»
-**Por qué pasaba:**
-- **Inglés:** las fuentes incluían los canales de vídeo de UFC, ONE y GLORY, que están en inglés.
-- **Disciplinas mezcladas:** cada noticia sumaba la disciplina de su fuente y las que se detectaban en el texto. Una noticia de MMA que llegaba por la búsqueda «boxeo» quedaba marcada como boxeo y como MMA, y salía en las dos portadas.
-**Qué se decidió y por qué:**
-- **Iconos propios** (`IconoDisciplina`): guante, kimono con cinturón, patada alta, patada con guantes, octógono y rodillazo. Son dibujos de trazo hechos aquí, sin imágenes de terceros (derechos) y con el mismo estilo que el resto de iconos. Aparecen en el selector de deporte (fichas con dibujo), en las tarjetas de disciplina y en la cabecera de cada deporte. En la portada de una disciplina, su ficha se centra sola en el selector.
-- **Regla estricta** (`clasificar`): una noticia solo va a una disciplina si su **titular** habla de esa y de ninguna otra.
-  - Si nombra varias, solo sale en «Todos».
-  - Si no nombra ninguna, solo se acepta si viene de un medio dedicado a esa disciplina.
-  - De una fuente general, lo que no nombra ningún deporte de contacto se descarta.
-  - «Kick boxing» y «boxeo tailandés» ya no cuentan como boxeo.
-- **Solo español** (`enEspanol`): se descartan los titulares en inglés. Se retiraron los canales en inglés y las búsquedas antiguas, que se desactivan y se borran solas al actualizar. Los titulares ya guardados se vuelven a clasificar una vez por arranque.
-- **Fuentes españolas especializadas** (investigadas por búsqueda):
-  - Boxeo: Espabox, AEBOX y RFEBox.
-  - MMA: MMA España y el canal UFC Español.
-  - Jiu-jitsu: Fighter Corner.
-  - Varias disciplinas, clasificadas titular a titular: FEKM, Jaula Magazine y Deporte de Contacto.
-  - Además, búsquedas de Google Noticias en español de España por disciplina que excluyen las demás.
-**Límite honesto:**
-- Desde el entorno de desarrollo no se pudo abrir **ningún** canal de noticias, porque la red lo bloquea. Las fuentes nuevas se eligieron por búsquedas y hay que comprobar en `/moderacion/noticias` de la demo cuáles leen bien.
-- No existe (o no se encontró) ningún medio en español dedicado solo a K-1, solo a kickboxing o solo a Muay Thai. Esas tres portadas tendrán menos noticias: las de la FEKM y las de Google Noticias cuyo titular nombre la disciplina.
-
-**Ampliación (misma tarde), con nuevas palabras del fundador:**
-- «Me encanta cómo has puesto los iconos […] dale un pelín más de forma […] en el Muay Thai la banda que tienen en la cabeza, en el jiu-jitsu el cinturón, el kimono».
-- «Las noticias tienen que ser del panorama español: deportistas españoles o con residencia en España […] fomentar que la gente apoye a los nuestros y crear comunidad en España, en cada comunidad autónoma, en cada municipio […] principalmente esos luchadores que todavía no tienen el apoyo suficiente».
-- Y sobre el equipo: cuando la aplicación esté publicada, **Antigravity** se encargará de las noticias; hasta entonces, todo lo sigue haciendo Claude.
-
-**Qué se hizo:**
-- **Iconos con más forma**, comprobados con capturas tras cada cambio:
-  - Muay Thai: mongkol con sus colas en la cabeza y prajied en el brazo.
-  - Jiu-jitsu: solapas cruzadas y cinturón con nudo y puntas.
-  - Boxeo: puño de cordones.
-  - K-1: guantes.
-  - Kickboxing: espinillera.
-  - MMA: guante de dedos abiertos dentro del octógono.
-- **Filtro del panorama español** (`lib/news/espana.ts`): una noticia entra si su fuente solo cubre España (marca nueva `NewsSource.local`, migración `20261008220000_noticias_panorama_espanol`) o si nombra España, una comunidad, una provincia o capital, una federación o competición española, o a un español de élite (lista corta y ampliable).
-  - Las búsquedas de Google Noticias piden además «España / español».
-  - En moderación, al añadir una fuente se puede marcar «Solo publica noticias del panorama español».
-- **Guía [`NOTICIAS.md`](NOTICIAS.md)** para quien mantenga las fuentes (Antigravity): reglas, tareas y fuentes de partida, con sus huecos. Anotado en `EQUIPO.md`.
-**Qué ejecuté yo:** `npm run typecheck`, `npm test` (555), `npm run build`, paridad de migraciones, los 22 guiones de navegador con base vacía (**565 comprobaciones, 0 fallos**) y `accesibilidad.mjs` (61 pantallas, 0 incumplimientos). Tras los últimos cambios (iconos con más forma, filtro español, moderación) volví a pasar `fase2a`, `creador`, `diseno`, `movil`, `enlaces` y `accesibilidad`, todos sin fallos. También `npm run mapa` y el catálogo (271 archivos, 9/9 pruebas), y capturas en iPhone emulado.
-**Límite honesto:** ninguna fuente real se pudo leer desde aquí; la lista de españoles de élite es corta a propósito (solo nombres de los que hay certeza) y se amplía según `NOTICIAS.md`.
-**Estado:** PR a `claude/ring-espana-mvp`; se fusiona en la demo en cuanto el CI esté en verde (el fundador pidió tener la demo completa para revisarla).
-
-## 8 de octubre de 2026 — Fotos del móvil rechazadas por pesar demasiado (Claude)
-
-**Qué se pidió:** el fundador, al personalizar su perfil desde el móvil, recibió «No se ha guardado nada. Elige imágenes JPG, PNG o WebP de hasta 4 MB y 25 megapíxeles…». Su reacción: «Esto es un gran problema, hay que ponérselo fácil a los usuarios».
-**Causa:** las fotos del móvil pesan 3–10 MB y miden 12–48 megapíxeles; el límite de 4 MB estaba solo en el servidor, y el mensaje obligaba a la persona a saber de pesos y píxeles. Lo mismo pasaba al subir una foto de una velada o de un vídeo destacado.
-**Qué se decidió:** la persona elige **cualquier foto** y el navegador la prepara; el servidor sigue comprobándolo todo (formato real, píxeles, animación) como defensa.
-**Qué se hizo:**
-- Componente `InputFoto` (`src/app/components/InputFoto.tsx`), usado en los cuatro sitios donde se suben fotos (foto y banner del perfil, vídeo destacado de «Mi ficha» y «Compartir» de una velada).
-  - Si la foto pesa más de 3 MB o mide más de 5000 px, la gira según su orientación, la deja en 2000 px como máximo y la guarda como JPEG de calidad alta.
-  - Dice «Foto lista (1,2 MB). Se ha ajustado sola para que se suba rápido.» Si el navegador no puede leerla, lo explica y propone una captura de pantalla.
-  - Una foto ligera y de medidas razonables se envía tal cual, sin perder calidad.
-- Mensajes sin cifras técnicas («No hemos podido usar esa imagen. Prueba con otra foto…»).
-- Prueba de navegador (`perfiles.mjs`): una foto de 4000×3000 píxeles y más de 4 MB se reduce y se guarda.
-**Límite honesto:** probado con Chromium; en Safari de iPhone no lo he podido probar. Las fotos HEIC se convierten ya al elegirlas en iOS; en un navegador que no pueda decodificarlas saldrá el mensaje de ayuda.
-**Estado:** PR a `claude/ring-espana-mvp`.
-
-## 8 de octubre de 2026 — Arreglos tras probar la demo en el móvil: pestañas que se deslizan, foto y banner, portadas, disciplinas y clases (Claude)
-
-**Qué se pidió**, con capturas del móvil y en palabras del fundador:
-- «La aplicación es muy densa y el orden de las cosas no está muy bien optimizado, tienes que scrollear mucho para llegar al final de la página; en lugar de ir hacia abajo pienso que sería mejor deslizar de manera horizontal y con las cosas bien agrupadas.»
-- «A la hora de agregar foto de perfil y banner, se colapsa, y si añades el banner, la foto de perfil no se ve y viceversa.»
-- «Los highlights del perfil se ven si le das play, pero carecen de portada.»
-- «En caso de que un peleador se equivoque y ponga disciplinas en las que no está familiarizado, no se puede eliminar […] o por lo menos que yo como administrador pueda configurar.»
-- «En el caso de los afiliados, poder reservar las clases privadas publicadas es misión imposible, ya que no hay opción ni un botón para hacerlo.» Y: «resuelve todo esto de urgencia».
-
-**Causas encontradas:**
-- La portada de la ficha (diseño v3) solo pintaba **una** imagen de fondo: el banner o, si no había, la foto estirada a toda la portada. Nunca las dos.
-- Los highlights solo tenían portada si se subía una foto aparte; nada la sugería.
-- No existía ninguna acción para quitar una disciplina.
-- Las clases decían «Ring España todavía no gestiona reservas»: no había forma de pedirlas en la aplicación.
-- Además, en la segunda captura salía «Masculino · Masculino»: la división ya incluye el sexo y la categoría de peso también.
-
-**Qué se hizo:**
-- **Pestañas que se deslizan** (`components/Pestanas.tsx`): carrusel horizontal nativo con barra de botones arriba. Se cambia de sección con el dedo, con la barra o con el teclado; la altura se ajusta a la sección visible.
-  - Ficha del peleador: portada, seguir, cifras y highlights arriba; debajo, **Combates · Récord · Vídeos · Público · Datos**. Los récords por disciplina van en una fila deslizable.
-  - «Mi ficha»: **Mi perfil · Combates · Récord · Mis datos · Vídeos**, con un aviso arriba si hay combates por confirmar.
-  - Portada: las noticias, salvo la destacada, en una fila deslizable en vez de una lista de doce.
-  - Los enlaces con «#ancla» y las vueltas de los formularios (`?seccion=`) abren la pestaña correcta.
-- **Foto y banner a la vez**: banner de fondo y foto en círculo junto al nombre; la cabecera de «Mi ficha» enseña la foto.
-- **Portadas de los highlights**: al subir un vídeo, el navegador saca un fotograma y lo pone de portada si no se elige otra foto; los ya publicados sin foto muestran un fotograma del propio vídeo; los de YouTube, su miniatura.
-- **Quitar una disciplina**: el peleador puede si no tiene combates en ella y no es la única; moderación y el creador pueden siempre desde la pestaña «Datos» de la ficha pública (los combates se conservan). Con casilla de confirmación y en el historial.
-- **Solicitar clases** (modelo `ClassRequest`, migración `20261008240000_solicitudes_de_clases`): botón «Solicitar esta clase» en cada clase → «¿Cuándo te viene bien?», mensaje y teléfono opcionales → el entrenador recibe un correo y la ve en «Mis clases» (con el número en su panel) → acepta o dice que no puede, con un mensaje → la persona lo ve en «Mis reservas de clases» (nuevo en el menú) y por correo; puede cancelar. Ring España no cobra: se dice en cada paso. Entra en la descarga de datos.
-- «Masculino · Masculino» corregido en todas las pantallas con `categoryLabel`.
-
-**Qué salió mal por el camino:** en «Mi ficha» la página se ensanchaba a 765 px: el título oculto de una tabla (posición absoluta) se escapaba de la pista de pestañas. Se arregló haciendo cada panel contenedor de posición. La barra de pestañas se partía en dos filas por una regla general de `nav`. Y la primera versión de las pestañas (desplazamiento nativo con «scroll-snap») se quedaba a medio camino cuando el navegador llevaba algo a la vista: se rehízo con un riel que se mueve con `transform` y el gesto del dedo gestionado por el propio componente (también con las flechas del teclado en la barra).
-
-**Qué ejecuté yo:** `npm run typecheck`, `npm test` (575), `npm run build`, la prueba nueva `arreglos.mjs` (33 comprobaciones, con capturas a 390 px, gesto del dedo y teclado) y la batería completa de navegador: 22 guiones, **601 comprobaciones, 0 fallos**; accesibilidad, 61 pantallas sin incumplimientos. Las pruebas abren la pestaña que contiene lo que pulsan, como una persona (`mostrar` en `tests/e2e/ayudas.mjs`). `escenarios.mjs` (revisión con capturas, fuera del CI) no se ejecutó.
-**CI:** la ejecución del PR #34 pasó; la del «push» del mismo código falló una vez en la prueba de extremo a extremo y pasó al relanzarla. Los registros del CI no se pueden leer desde este entorno (la red bloquea su almacenamiento), así que **no sé qué comprobación falló**; la réplica local exacta del CI (base vacía, `npm run test:e2e` completo) pasó entera (601). Hay que vigilar si se repite.
-**Límite honesto:** el fotograma automático y el deslizamiento solo se han probado en Chromium; hay que probarlos en Safari de iPhone. La miniatura de YouTube no se pudo cargar desde aquí (red bloqueada); se comprueba que la dirección es la correcta.
-**Estado:** PR a `claude/ring-espana-mvp`.
-
-## 8 de octubre de 2026 — Revisión completa de estructura y diseño antes de actualizar la demo (Claude)
-
-**Qué se pidió:** «Vuelve a revisar que todas las funcionalidades estén correctamente estructuradas y diseñadas. Una vez termines actualiza el repositorio y la demo.»
-
-**Cómo se revisó:**
-1. **Revisión de código independiente** del PR #34 por un agente sin mis conclusiones. Encontró 13 defectos reales; todos corregidos.
-2. **Recorrido visual a 390 px** con cinco tipos de cuenta (visitante, aficionado, peleador, entrenador, moderador): 30 pantallas, capturas completas y medición de errores de JavaScript, respuestas 5xx y ancho de página.
-3. **Batería completa** de pruebas unitarias, de navegador y de accesibilidad.
-
-**Defectos de la revisión de código (corregidos):**
-- La portada sacada del vídeo no habría funcionado en la demo: la política de contenido bloqueaba `blob:` en imágenes y vídeo. Las pruebas no lo veían porque en local no se aplica.
-- «Mis reservas» prometía responder al correo para hablar con el entrenador, pero el correo no tenía dirección de respuesta. Ahora `sendMail` admite `replyTo` (la persona ↔ el entrenador) y, si la clase está aceptada, «Mis reservas» muestra el correo del entrenador.
-- Deslizar una fila interior (récords, highlights) también cambiaba de pestaña. Ahora el gesto se ignora dentro de lo que ya se desliza.
-- Un doble clic podía crear dos solicitudes iguales (ahora `withLock`), y una cancelación podía pisar la respuesta del entrenador (ahora `updateMany` condicionado).
-- Quitar una disciplina dejaba títulos huérfanos que seguían sumando aura:
-  - el titular debe retirar antes sus títulos;
-  - si la quita moderación, los títulos quedan excluidos con su motivo.
-- Los correos de las clases se enviaban antes de responder a la persona. Ahora van con `after()`.
-- El fotograma automático podía sustituir una foto elegida mientras se calculaba. Ahora se descartan los resultados viejos y se quita la portada automática al quitar el vídeo.
-- Los enlaces del menú con «#» (next/link) no cambiaban de pestaña, y un «#%E0» rompía la página.
-- Mensajes:
-  - límite diario de solicitudes con su propio texto;
-  - «como mucho 200»;
-  - lo escrito no se pierde al volver por un error;
-  - botón «Solicitar la clase»;
-  - «Mis reservas» en el menú de todos los tipos de cuenta.
-
-**Mejoras del recorrido visual:**
-- **Moderación** medía casi 40 000 px en el móvil. Ahora tiene siete pestañas (una por cola, con su número) y se abre en la primera con trabajo.
-- **Mi cuenta**: pestañas Mis datos · Contraseña · Accesos · Mis avisos · Privacidad.
-- **Filtros** de Peleadores, Veladas y Ránking: los secundarios, plegados en «Más filtros», que se abre solo si hay alguno aplicado. Antes ocupaban la primera pantalla entera.
-- **Portada del visitante**: las seis disciplinas en una fila deslizable.
-- **Campos de foto y vídeo** con botón propio en español («Elegir una foto», «Elegir un vídeo») y el nombre del archivo. El del navegador decía «Choose File» en algunos teléfonos.
-- Detalles:
-  - la foto del peleador en su panel;
-  - los botones de «Mis highlights» ya no aprietan el título;
-  - el botón «Crear el evento» ocupa su fila;
-  - acceso a «Mis reservas» en el panel del aficionado;
-  - listado de Peleadores compacto (foto a la izquierda, datos a la derecha);
-  - Veladas con una explicación corta (el detalle de «Hoy y próximas» va junto a su filtro).
-
-**Límite honesto:** el gesto del dedo y la portada automática siguen sin probarse en un iPhone real; el recorrido es con Chromium emulando un móvil.
-
-## 8 de octubre de 2026 — Panel con las acciones de cada cuenta, buscar clases, reserva con calendario y retos o sparring (Claude)
-
-**Qué se pidió** (el fundador, probando la demo en el móvil, con captura de «Solicitar esta clase»):
-- «El proceso para reservar una clase no es cómodo para el usuario, le obliga a escribir mucho, es mucho mejor que pueda seleccionar la fecha y hora en un calendario directamente, seleccionar su rango de tiempo mediante una barra o algo similar y, si tiene que escribir algo, un espacio para decir cualquier cosa importante.»
-- «No encuentro la manera de retar a otros peleadores a combate o solicitar sparring, lo has quitado, ya no está; no puedes tocar cosas que antes iban bien o quitar cosas que no te he dicho que quitaras, ten mucho cuidado.»
-- «Es difícil para el usuario encontrar los posibles servicios que le ofrece la aplicación, por ejemplo buscar clases, está muy al fondo […], al igual que los entrenadores a la hora de crear veladas o interclubs. […] El panel de cada usuario debería mostrar las principales acciones que puede realizar cada tipo de usuario. Corrígelo y reorganiza la aplicación.»
-
-**Sobre retos y sparring (honestidad):** se buscó en todo el historial del repositorio y **nunca llegó a estar en el código**. Era la propuesta n.º 1 del diseño v3 (Claude Design, 7 de octubre) y figuraba como pendiente en `PLAN.md` (fase 2, punto 1) e `IDEAS.md`. No se quitó, pero debí avisar de que faltaba al pasar el diseño al código: lección anotada.
-
-**Qué se hizo:**
-- **Acciones principales en «Mi panel»** (`AccionesPrincipales` en `_inicio/comun.tsx`): una cuadrícula de 2 columnas arriba del todo, la primera en lima y con un número violeta cuando hay algo esperando respuesta.
-  - Aficionado: Buscar clases · Buscar peleadores · Próximas veladas · Mis reservas · Subir vídeos o fotos · Peleadores que sigo.
-  - Peleador: Registrar un combate · Retar o proponer sparring · Mis propuestas · Publicar un highlight · Buscar clases · Mis títulos y mi aura.
-  - Entrenador: **Crear una velada · Crear un interclub** (ya con el tipo elegido en el formulario) · Publicar una clase · Solicitudes de clase · Mis veladas e interclubs · Buscar peleadores. Sin perfil todavía, ya ve crear velada e interclub.
-  - Entidad: Crear una velada · Crear un interclub · Mis veladas · Buscar peleadores · Mi perfil público · Buscar clases.
-  - Visitante: «¿Qué quieres hacer?» sube justo bajo la cabecera, con «Buscar clases» primero.
-- **Buscar clases** (`/clases`): todas las clases publicadas, con búsqueda por clase, entrenador o ciudad, «Más filtros» (disciplina, provincia, tipo) y «Solicitar esta clase» en cada una. En el menú, «Clases y entrenadores».
-- **Reserva con calendario y barra** (`components/ElegirHorario.tsx`):
-  - el día se elige en una tira con los próximos 14 días (Hoy, Mañana, dom 11…) o en «Otra fecha», con el calendario del móvil;
-  - en las clases individuales, la franja se elige con una barra de dos tiradores (07:00–23:00, medias horas, nunca más corta que la clase), con los atajos Mañana, Tarde y Noche;
-  - queda un único campo opcional, «¿Algo importante que deba saber el entrenador?»;
-  - el entrenador lee «miércoles 14 de octubre, entre las 18:00 y las 20:00»;
-  - modelo: `ClassRequest.day`, `fromMinute` y `toMinute`.
-- **Retos a combate y sparring** (`FightProposal`, `lib/fighters/proposals.ts`, `actions/proposals.ts`):
-  - «Retar a combate» y «Proponer sparring» en la ficha de cada peleador con titular, solo para quien tiene ficha;
-  - formulario corto: tipo, disciplina (las del rival) y, opcionales, fecha, lugar y mensaje;
-  - «Retos y sparrings» (`/propuestas`): buscar a quién retar, Recibidas (aceptar o rechazar con mensaje) y Enviadas (cancelar);
-  - correos con dirección de respuesta al otro peleador; con la propuesta aceptada, cada uno ve el correo del otro;
-  - aceptar no crea un combate: se registra cuando se celebra;
-  - aviso de que Ring España no organiza ni supervisa los sparrings;
-  - una propuesta abierta por tipo y pareja, como mucho 10 al día, y todo queda en el historial y en la descarga de datos.
-- Migración `20261008260000_retos_y_horario_de_clases`, que solo añade.
-
-**Pruebas:** unitarias (590), `servicios.mjs` nueva (paneles, Buscar clases, retos de punta a punta, accesibilidad), `arreglos.mjs` con la reserva por calendario, y la réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **690 comprobaciones, 0 fallos**. En la base local acumulada, `filtros.mjs` fallaba porque las fichas de muchas ejecuciones empujan las de la prueba a la página 2: es la base, no el código (con base vacía pasa).
-**Límite honesto:** la barra de dos tiradores y la tira de días se han probado en Chromium emulando un móvil (también con el teclado); falta probarlas en un iPhone real.
-
-## 9 de octubre de 2026 — Inscripción de peleadores en veladas e interclubs, y gestión para el organizador (Claude)
-
-**Qué se pidió** (el fundador): «No sé si habrás quitado lo de solicitar participación en una velada o interclub. Y por parte de los organizadores de las veladas, que puedan tener facilidad para gestionar todas esas solicitudes, pudiendo filtrar las listas con x parámetros, listarlo por un orden…, todo para facilitar la selección de los peleadores».
-
-**Sobre si se quitó (honestidad):** se buscó en todo el historial y **nunca estuvo en el código**. Era la propuesta n.º 3 del diseño v3 y figuraba como pendiente en `PLAN.md` (fase 2, punto 3) e `IDEAS.md`. No se quitó; igual que con los retos, debí avisar de que faltaba.
-
-**Qué se decidió y por qué:**
-- La inscripción la **abre y cierra el organizador** de cada evento (velada o interclub), con requisitos y fecha límite opcionales. Así nadie recibe solicitudes que no quiere.
-- **Aceptar no pone al peleador en el cartel**: el organizador sigue emparejando a mano (los emparejamientos dependen de peso, nivel y experiencia, y no deben automatizarse sin el fundador). Los aceptados salen primero en las listas de «Añadir un combate al cartel».
-- Una solicitud por peleador y evento. Si la retira, puede volver a pedirla; si el organizador la rechaza, no (la decisión es del organizador, que sí puede cambiarla).
-- Para elegir, cada solicitud enseña el **récord en la disciplina y el nivel del evento** (combates registrados más los anteriores declarados), los combates en total, el aura, la edad el día del evento, el peso declarado, el gimnasio, la provincia y el mensaje.
-- El correo del peleador solo se muestra al organizador cuando lo acepta (para concretar pesaje y horarios).
-
-**Qué se hizo:**
-- Modelo: `Event.registrationOpen/registrationNote/registrationUntil` y `EventRegistration` (estado Pendiente, Aceptada, Rechazada o Retirada). Migración `20261009090000_inscripciones_en_veladas`, que solo añade.
-- **Peleador:**
-  - «Inscribirme en una velada» y «Mis inscripciones» en su panel;
-  - filtro «Con inscripción abierta» y etiqueta en el calendario de veladas;
-  - sección «Inscripción abierta» en la página de cada evento, con requisitos y fecha límite;
-  - formulario corto (`/veladas/[slug]/inscribirme`): categoría ya rellenada con la de su ficha, peso y mensaje opcionales;
-  - `/mis-inscripciones`, con la respuesta del organizador y «Retirar mi solicitud».
-- **Organizador:**
-  - sección «Inscripción de peleadores» en la gestión de cada evento (abrir, guardar requisitos, cerrar, y «Gestionar las solicitudes (N pendientes)»);
-  - lista `/organizador/[slug]/inscripciones`: pestañas por estado con su número; búsqueda por nombre o gimnasio; «Más filtros» con categoría de peso, división, provincia, combates (mínimo y máximo), edad y peso declarado; siete órdenes (llegada, aura, victorias, más combates, menos combates, peso, edad, nombre);
-  - aceptar o rechazar una a una, o **marcar varias** («Marcar todas») y responderlas a la vez con un mensaje común; vuelve a la misma lista filtrada;
-  - **descarga CSV** de la lista con los mismos filtros (separador «;» para Excel en español, protegido contra fórmulas);
-  - columna de pendientes en «Mis veladas» y una casilla «Solicitudes para participar» en el panel del entrenador y de la entidad.
-- Correos con `after()` y dirección de respuesta: al organizador con cada solicitud y retirada; al peleador con la respuesta.
-- Historial (`REGISTRATION_*`) y descarga de datos personales.
-- Nuevo dominio `lib/events` (depende de `common` y `fighters`), declarado en `arquitectura.test.ts` y `DESARROLLO.md`.
-
-**Qué salió mal:** la prueba nueva falló una vez porque buscaba «Kickboxing» y aparecía dos veces en la página (problema de la prueba, no de la aplicación). La prueba de arquitectura avisó del dominio nuevo sin declarar: se declaró y documentó.
-
-**Pruebas:** unitarias (625, 19 nuevas en `inscripciones.test.ts`, y las guardas de las cuatro acciones en `autorizacion.test.ts`); `inscripciones.mjs` nueva (34 comprobaciones de punta a punta, con accesibilidad); réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **724 comprobaciones, 0 fallos**; el CI de GitHub, en verde.
-**Límite honesto:** probado con Chromium emulando un móvil; falta un recorrido en un iPhone real y con un organizador de verdad que tenga decenas de solicitudes.
-
-**Próximos pasos:** preguntar al fundador si quiere cupos por categoría (por ejemplo, «8 plazas en -71 kg») y lista de espera; aura a promotoras y clubes (fase 2, punto 5).
-
-## 9 de octubre de 2026 — Plazas por categoría y ayuda para emparejar (Claude)
-
-**Qué se pidió** (el fundador, respondiendo a las dos ideas propuestas tras las inscripciones): «Me parece bien que se especifiquen los pesos para los combates, las plazas por categoría, está muy bien. Luego, en cuanto a los emparejamientos entre sí, que no es automático, claro. Sí, siempre con ayuda, sí, obviamente. Con ayuda que se vea el nivel o el nivel de popularidad de la aplicación, el número de combates, etcétera».
-
-**Qué se decidió y por qué:**
-- Las plazas son **opcionales**: sin ellas, la inscripción funciona como antes (cualquier categoría). Así no se rompe nada de lo que ya iba.
-- Con plazas, el peleador **solo puede pedir las categorías ofrecidas** y ve cuántas plazas quedan.
-- Cuando una categoría se llena, las solicitudes pendientes en ella pasan a **«En lista de espera»**. No es un estado guardado aparte: se deduce de las plazas. Así, si el organizador amplía las plazas, la lista de espera se vuelve «pendiente» sola.
-- No se puede **aceptar a más peleadores que plazas**, tampoco aceptando varios a la vez ni con dos respuestas simultáneas (bloqueo por evento). Tampoco se pueden dejar menos plazas que aceptados.
-- **Emparejar nunca es automático:** la página propone, para cada aceptado, los tres rivales más parecidos de su misma categoría y explica las diferencias. El organizador decide y pulsa «Añadir este combate al cartel».
-- **«Nivel»** se muestra con datos que ya existen: récord en la disciplina y el nivel del evento, número de combates, porcentaje de victorias, **aura (la popularidad dentro de la aplicación)**, edad y peso declarado.
-  - Para ordenar a los rivales, lo que más pesa es la experiencia (35 %), después el peso y el porcentaje de victorias (20 % cada uno), el aura (15 %) y la edad (10 %).
-  - El parecido se resume en «Muy igualados», «Igualados» o «Con diferencias».
-  - Los avisos se dan en palabras: «6 kg de diferencia de peso», «20 combates de diferencia de experiencia», «15 años de diferencia de edad».
-  - Es una escala inicial y se puede ajustar en `lib/events/pairing.ts`.
-
-**Qué se hizo:**
-- Modelo `EventSlot` (evento, división, peso, plazas). Migración `20261009120000_plazas_por_categoria`, que solo añade una tabla.
-- Acciones `setSlot` y `removeSlot`; comprobaciones nuevas en `requestRegistration` (categoría ofrecida) y `answerRegistrations` (plazas).
-- **Organizador:**
-  - sección «Plazas por categoría (opcional)» en la gestión del evento: ofrecer, cambiar plazas y quitar categorías, con «N de M plazas cubiertas · X en lista de espera»;
-  - resumen de plazas en la lista de solicitudes, con enlace que filtra cada categoría;
-  - etiqueta «En lista de espera» en las tarjetas;
-  - página nueva **«Ayuda para emparejar»** (`/organizador/[slug]/emparejar`), enlazada desde la lista y desde la gestión del evento.
-- **Peleador:**
-  - elige su categoría entre las ofrecidas, con las plazas que quedan;
-  - ve «En lista de espera» en su solicitud y en «Mis inscripciones»;
-  - recibe un aviso al pedir en una categoría llena.
-- **Página pública del evento:** «Categorías que busca el organizador» y las plazas que quedan.
-
-**Qué salió mal:**
-- La migración volvió a salir vacía. Esta vez Postgres estaba arrancado: la carpeta de la migración ya existía sin `migration.sql` mientras se generaba, y Prisma falló en silencio. Se borró el registro en las dos bases locales y se regeneró. Lección anotada.
-- La prueba nueva falló al principio por esperar a un aviso que ya estaba en pantalla. Elegía la categoría antes de que la página nueva estuviera lista, y el formulario llegaba sin peso. Ahora la prueba espera a que la plaza esté guardada y la página cargada. **No era un fallo de la aplicación**, aunque en un móvil muy lento podría pasarle algo parecido a una persona si elige antes de que la página termine de cargar; queda anotado.
-
-**Pruebas:**
-- 642 unitarias (8 nuevas en `plazas-y-emparejar.test.ts`).
-- `plazas.mjs` nueva, con 23 comprobaciones de punta a punta y de accesibilidad.
-- Réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **747 comprobaciones, 0 fallos**.
-- Se volvieron a pasar `inscripciones`, `categorias`, `enlaces`, `movil` y `paneles`.
-
-**Próximos pasos:** ver con el fundador si la escala de parecido le convence con datos reales.
-
-## 9 de octubre de 2026 — La edad al emparejar (Claude)
-
-**Qué se pidió** (el fundador): «En el tema de la edad, ten en cuenta que en la categoría élite, tanto masculino como femenino, la edad da igual. Puede enfrentarse una persona de 20 años con una de 27, da igual. Solo en el élite da igual. En las demás categorías, obviamente, en las edades que engloba dicha categoría».
-
-**Qué se decidió:** cuando el combate tiene categoría de edad (división), la ayuda para emparejar **ya no compara la edad** ni avisa de diferencias de edad.
-- Basta con que cada peleador encaje en la edad de su categoría el día del evento.
-- Quien no encaja sale con un aviso y no se propone como rival, porque el cartel tampoco admitiría ese combate.
-- En élite, la página dice expresamente que la edad no cuenta.
-- Solo cuando no hay categoría de edad se sigue teniendo en cuenta la diferencia de edad, porque entonces no se sabe en qué categoría está cada uno.
-- No se ha cambiado qué edades forman cada categoría: las del catálogo de la RFEBoxeo; élite, de 19 a 40 años.
-
-**Qué se hizo:** `comparaEdad` y la opción `edad` en `lib/events/pairing.ts`; comprobación de edad por categoría (`divisionEligible`) en `/organizador/[slug]/emparejar`; prueba unitaria nueva. Sin cambios en la base de datos.
-**Pruebas:** 643 unitarias; `plazas`, `inscripciones` y `categorias` en el navegador, sin fallos.
-
-## 9 de octubre de 2026 — Portada: menos texto bajo el lema (Claude)
-
-**Qué se pidió** (el fundador, con captura de la portada en el móvil): le encantó el lema «Tu deporte. Tu gente.» («representa la idea de la aplicación»). De lo que viene debajo dijo que es «un cúmulo de palabras mal metidas, con una fuente poco llamativa y muy cargado […] quiero que intentes aliviar eso».
-
-**Qué se hizo** (solo en la portada del visitante):
-- Bajo el lema queda **una sola frase**: «Tu comunidad de deportes de contacto en toda España.», en letra algo mayor.
-- Se quitó la lista de seis disciplinas. Ya están, con su icono, más abajo en la portada, así que no se pierde la comunicación inclusiva.
-- La etiqueta del buscador deja de ir en mayúsculas espaciadas y pasa a una línea discreta en letra normal: «Busca peleadores, gimnasios o veladas».
-- El texto de ejemplo del campo pasa a ser «Nombre o ciudad».
-- La etiqueta sigue siendo visible, como exige la regla de accesibilidad del proyecto.
-
-**Pruebas:** `inclusiva`, `usabilidad` (con el texto nuevo de la etiqueta), `diseno`, `movil`, `servicios` y `accesibilidad`, sin fallos; captura a 390 px revisada.
-
-## 9 de octubre de 2026 — Buscar rival o sparring con filtros, e inscripción visible para el peleador (Claude)
-
-**Qué se pidió** (el fundador, probando como peleador en el móvil, con capturas de «Retos y sparrings» y del calendario de veladas):
-- «A la hora de querer retar a un peleador no me aparecen opciones ni filtros de búsqueda. Por ejemplo, quiero pelear contra un contrincante que sé que está en tal gimnasio, pero no me sé su nombre […] o estoy buscando un sparring con un par de filtros: que tenga X peleas, que sea zurdo… Eso debería arreglarse.»
-- «A la hora de intentar inscribirse a un torneo, a una velada o lo que sea, no me sale la opción de solicitar participación […] revísalo muy bien y arréglalo a buen criterio.»
-
-**Causa de lo segundo (honestidad):**
-- La opción existía, pero solo aparecía si el organizador había abierto la inscripción. Al crear un evento quedaba **cerrada** y nada se lo decía al peleador.
-- En la demo, los eventos ya creados (como «Mandanga») tienen la inscripción cerrada, así que el peleador no veía ningún botón ni ningún motivo.
-- Diseñé el «cerrado por defecto» sin pensar en lo que vería el peleador. Lección anotada.
-
-**Qué se hizo:**
-- **Buscador de rivales en «Retos y sparrings»** (`/propuestas`):
-  - **campos principales:** nombre o alias, **gimnasio** (sin saber el nombre del peleador) y orden;
-  - **«Más filtros»:** disciplina (por defecto, la tuya), nivel, categoría de peso, provincia, **guardia** (zurdo, ortodoxo, ambidiestro), **número de combates** (mínimo y máximo) y edad;
-  - **órdenes:** más parecidos a ti (misma categoría de peso y experiencia cercana), más combates, menos combates, más aura y nombre;
-  - **sin filtros**, sugiere «Peleadores parecidos a ti»; los filtros aplicados se ven en «Estás viendo» y se quitan uno a uno;
-  - **cada resultado muestra:** gimnasio, provincia, categoría, combates, guardia, edad y aura, con «Retar» y «Proponer sparring»;
-  - se respeta el récord amateur privado: si el peleador no lo ha hecho público, se ve solo su número de combates.
-  - Reglas en `lib/fighters/rivals.ts`.
-- **Inscripción:**
-  - al crear un evento, la casilla «Abrir la inscripción de peleadores» viene **marcada** (se puede desmarcar);
-  - en un evento futuro con la inscripción cerrada, la página pública lo dice: «Inscripción de peleadores: cerrada», con el motivo y un enlace a los eventos con inscripción abierta;
-  - si quien la mira es el organizador, ve el botón «Abrir la inscripción».
-  - **Los eventos que ya existían siguen cerrados:** su organizador tiene que abrirlos (un botón en la página del evento). No se abren solos, para no cambiar sin permiso algo que ya decidieron.
-
-**Pruebas:**
-- 649 unitarias (6 nuevas en `rivales.test.ts`).
-- `rivales.mjs` nueva, con 12 comprobaciones: gimnasio, guardia, combates, edad, orden, sparring desde el resultado e inscripción cerrada y abierta.
-- `inscripciones` y `plazas` adaptadas a la casilla nueva.
-- Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
-- Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
-
-
-## 10 de octubre de 2026 ? Optimizaci?n sin redise?o (Codex)
-**Qu? se pidi?:** ?Es muy importante que no cambies el dise?o visual de la p?gina, ya que me gusta como se ve, simplemente quiero que la optimices?. El logo todav?a no est? elegido y se deja para el final.
-**Qu? se decidi?:** corregir comportamientos y adaptaci?n de componentes compartidos conservando nombre, logo, colores, Archivo y navegaci?n.
-**Qu? se hizo:** envolver textos largos cuando no caben; controles t?ctiles y cancelaci?n de gestos de pesta?as; carga de una foto nueva tras fallar la anterior; respuesta de pulsaci?n con movimiento reducido. Pruebas y l?mites en OPTIMIZACION-PANTALLAS.md.
-**Qu? se comprob?:** TypeScript y build correctos; 12 controles de navegador correctos; captura habitual sin diferencias. Unitarias 647/649: dos fallos de multimedia por rutas de Windows en archivos sin modificar. No se reejecut? la bater?a con base de datos por falta de PostgreSQL local.
-**Qu? sali? mal:** el generador de mapa busca separadores POSIX y en Windows omiti? pantallas; no se conserv? esa salida. Se gener? con una copia temporal que usa separadores portables, sin cambiar c?digo del generador. El cat?logo utiliza huellas de bytes: se conservaron finales LF en la carpeta propia para obtener las mismas huellas que CI Linux.
-**Estado y siguiente paso:** cambio local listo para revisi?n y CI, sin integraci?n ni despliegue. Logo pendiente de elecci?n del fundador.
-
-
-## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
-Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
-
-
-## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
-El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
-
-
-## 10 de octubre de 2026 — Revisión de portadas de noticias y unión con la optimización de Codex (Claude)
-**Qué se pidió:** revisar el trabajo de Antigravity sobre portadas de noticias y actualización automática (`e26dbd2`) antes de publicarlo, y aplicar el PR #41 de Codex si era viable. El fundador: «quiero intentar terminar la aplicación hoy».
-**Qué se decidió y por qué:** no publicar el cron tal cual: tenía la clave escrita en el código de un repositorio público, sin otra configurada en Render, y el flujo de GitHub daba por buena una actualización fallida. El PR #41 se considera viable: CI verde en `09a5cb0`, licencias gratuitas (MIT y licencia estándar de GSAP), efectos GPU solo visibles y desactivables, y un único conflicto trivial en `.env.example`.
-**Qué se hizo:** `/api/cron/noticias` exige `CRON_SECRET` (503 sin ella), por cabecera y con comparación en tiempo constante; el flujo envía la cabecera y falla si no actualiza; `CRON_SECRET` en `render.yaml` y `.env.example`; se retira `HOSTS_DE_IMAGEN` (con `"*"`, sin uso) y se valida el identificador de YouTube. Secreto creado en GitHub. Rama de Codex unida con la de la demo; catálogo y mapa funcional actualizados con los archivos nuevos.
-**Qué salió mal:** el CI de `78f8342` falló porque los archivos nuevos de `e26dbd2` no estaban en `docs/catalogo-codigo.json`. Al regenerar en Windows, el catálogo cambió todas las huellas (CRLF) y el mapa perdió pantallas: se generaron ambos en un contenedor Linux sobre una exportación con `core.autocrlf=false`.
-**Estado y siguientes pasos:** pendiente de que el fundador pegue `CRON_SECRET` en Render; después, probar el cron a mano. `src/lib/news/ai.ts` aún no se usa. Mencionar en `/privacidad` que las fotos de noticias se cargan desde el medio de origen.
-
-
-## 10 de octubre de 2026 — Portadas en el móvil y demo despierta (Claude)
-**Qué se pidió:** el fundador, con captura del móvil: «va super mal, está lenta […] muchas de las noticias no tienen portada generada como pedí, los títulos se solapan». Autorizó unir el PR #41, arreglarlo en una rama y publicarlo, y mantener la demo despierta.
-**Qué se decidió y por qué:** el servidor responde en 0,2–0,7 s despierto y las fotos pesan 66–162 KB; la espera grande es el sueño del plan gratuito de Render tras 15 minutos sin visitas. De 73 noticias reales leídas en local, solo 17 traían foto: la portada generada es la habitual y debía verse.
-**Qué se hizo:** PR #41 unido. Portada generada sin la etiqueta que se solapaba con la de la tarjeta, con más color y el pictograma como marca de agua; ring en vez de «RE» si no hay disciplina; detección de fotos rotas antes de hidratar; fecha sin cortes; tarea `mantener-demo-despierta.yml` cada 10 minutos.
-**Qué se comprobó:** capturas a 390 px con Playwright sobre base PostgreSQL desechable y noticias reales; tipos sin errores; 650/652 unitarias (los 2 fallos de rutas de Windows).
-**Estado y siguientes pasos:** pendiente de CI y despliegue. La espera de cada cambio de página sigue dependiendo de la CPU del plan gratuito de Render.
-
-
-## 10 de octubre de 2026 — Portada y cabecera en escritorio (Claude)
-**Qué se pidió:** el fundador, con captura a 1366 px: en el móvil todo bien, pero «la web del escritorio no se adapta de la mejor manera».
-**Qué se vio:** cabecera en dos filas (navegación, enlaces de cuenta, «Salir» y buscador mezclados); en la portada, la rejilla de dos columnas ponía «Mi panel» solo en la columna derecha con un hueco grande debajo; la noticia destacada ocupaba casi toda la pantalla.
-**Qué se decidió y por qué:** desde 1024 px la cabecera va en una fila. Los enlaces que ya están en «Menú» (¿Cómo funciona?, Moderación, Mi ficha/Mis clases/Mis veladas) dejan la barra; se conservan «Mi panel», el enlace propio de cada cuenta (Mi ficha, Mis clases o Mis veladas), «Mi cuenta» y «Salir», por las decisiones que recoge `tests/e2e/usabilidad.mjs`; entre 1024 y 1279 px «Mi panel» pasa al menú (sigue en la portada y en la barra del móvil). Medido el ancho: el campo de búsqueda no cabe junto a todo eso (53 px incluso a 1920), así que en escritorio queda el botón «Buscar», que abre `/buscar` con su campo; entre 1024 y 1279 px «Entrenadores» pasa al menú («Clases y entrenadores»). Actualidad y «Mi panel» ocupan todo el ancho; la destacada mide 420 px y debajo van 8 noticias en cuatro columnas.
-**Qué se comprobó:** capturas con sesión y sin ella a 1024, 1100, 1280, 1366, 1440 y 1920 px: una sola fila y nada fuera de pantalla. En local, `usabilidad`, `menu`, `acceso` y `cuenta` pasan sus comprobaciones de cabecera; los fallos restantes son por no tener `psql` en Windows. `escenarios.mjs` (no está en el CI) busca ahora desde `/buscar`.
-**Qué salió mal:** el CI destapó que `RecordarCampos` perdía lo escrito si React vaciaba el formulario tarde (la altura de la ficha en `cuenta.mjs`); ahora guarda lo escrito y vigila 30 s. También hubo que adaptar `busqueda.mjs` (escribía en el campo de la cabecera) y mantener «Mis veladas» en la cabecera de quien organiza.
-**Estado y siguientes pasos:** pendiente de CI y despliegue. Se ve una noticia duplicada por llegar de dos fuentes (AEBOX y su búsqueda): queda para revisar la deduplicación.
-
-## 13 de octubre de 2026 — Propuestas de nombre, logotipo y tipografía: «Lona» (Claude)
-
-**Qué se pidió** (el fundador): empezar con el logotipo oficial y el nombre. Como nombre propone **«Lona»**, por la lona del ring, y pide propuestas de logotipo y una tipografía oficial «que nos represente, que nos identifique como marca».
-
-**Qué se hizo:** un lienzo con cuatro direcciones claramente distintas (Esquina, Cuadrilátero, Cuerdas y Cartel) y una hoja comparativa de tipografía. Cada dirección muestra el logotipo sobre oscuro y sobre claro, el icono de la app en tres tamaños, cómo quedaría en la cabecera y su tipografía. Se mantienen los colores aprobados y el lema; no se cambia nada de la app hasta que el fundador elija.
-
-**Qué falta:** que el fundador elija; comprobar el registro de «Lona» como marca, el dominio y los nombres en las tiendas (no se ha comprobado nada); y que un diseñador humano dibuje el logotipo definitivo. Detalle en `DISENO.md`.
-
-**Nota:** «Lona» no aparecía en la documentación anterior. Si el fundador lo propuso en otra conversación, aquí queda recogido desde ahora.
-
-## 13 de octubre de 2026 — Elegido el logotipo: B · Cuadrilátero (Claude)
-
-**Qué se pidió** (el fundador): «Definitivamente me quedo con la B, la del cuadrilátero, en la cual la O se hace como una especie de ring. Vamos a tirar con esa.»
-
-**Qué se hizo:**
-- Se preparó la versión oficial en archivos: logotipo para fondo oscuro y claro, símbolo e icono de la app en SVG y PNG.
-- Las letras van convertidas en trazados con un guion propio (`scripts/generar-logo-lona.py`), así que el logotipo se ve igual en cualquier sitio.
-- Se descargaron las fuentes de Bricolage Grotesque, con su licencia libre.
-- Se separó un poco el ring de las letras: en la maqueta, los postes llegaban a tocar la «l» y la «n».
-
-**Qué falta:**
-- Confirmar con el fundador cuándo se cambia el nombre en la app; todavía no se ha tocado.
-- Comprobar el registro de la marca.
-- La revisión de un diseñador.
-
-## 13 de octubre de 2026 — El ring, icono oficial: favicon, icono y cabecera (Claude)
-
-**Qué se pidió** (el fundador): «La O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
-
-**Qué se hizo:**
-- Favicon, icono del iPhone, manifiesto de la app web con sus iconos, y el símbolo de la cabecera y de la bienvenida: todo pasa al ring.
-- El nombre visible sigue siendo «Ring España» hasta que el fundador lo confirme.
-
-**Qué salió mal:**
-- Hubo que instalar dependencias nuevas que habían añadido otros asistentes.
-- La prueba de móvil (`movil.mjs`) falla en mi base local en la portada (`/`): dos `<polygon>` y dos `<div>` salen por la derecha.
-- **Comprobado que ya fallaba sin estos cambios:** se compiló la rama principal sin ellos y salió lo mismo. Las pruebas de GitHub de la rama principal están en verde. Parece depender de las noticias guardadas en la base local; queda anotado para revisarlo.
-
-**Pruebas:**
-- 652 unitarias.
-- Sin fallos en `diseno`, `enlaces`, `accesibilidad` y `usabilidad`.
-- Las direcciones `/icon.svg`, `/apple-icon.png` y `/manifest.webmanifest` responden bien.
-
-## 13 de octubre de 2026 — Ring España pasa a llamarse Lona (Claude)
-
-**Qué se pidió** (el fundador): «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
-
-**Qué se hizo:**
-- Cambio de nombre en toda la app: cabecera con el logotipo oficial, títulos, textos, correos, descarga de datos, manifiesto y aplicación de códigos.
-- Cambio de nombre en los documentos vigentes.
-- Las entradas antiguas de este diario no se reescriben (regla de la documentación): conservan «Ring España» porque así se llamaba entonces.
-- Detalle y lista de lo que falta en `DISENO.md`.
-
-**Qué salió mal:**
-- El reemplazo automático dejó en `CLAUDE.md` una frase sin sentido («de Lona a Lona»): se corrigió a mano.
-- Una prueba unitaria esperaba el nombre antiguo en el enlace de la aplicación de códigos; se actualizó.
-- Las cuentas que ya tenían el segundo paso configurado seguirán viendo «Ring España» en su aplicación de códigos. Los códigos siguen valiendo; si quieren el nombre nuevo, basta con volver a configurarlo.
-
-**Pendiente del fundador:** cambiar `MAIL_FROM` en Render, el dominio, la dirección de la demo y el nombre del repositorio, y comprobar la marca.
-
-## 13 de octubre de 2026 — La foto de portada pasa a ser del fundador (Claude)
-
-**Qué se pidió** (el fundador): cambiar la foto de la pantalla de inicio («aparecen varias personas sonriendo») por «Bajo las cuerdas», de su portafolio de boxeo, en la que el entrenador le pone el casco al peleador: «es mía la foto y es más realista, porque la otra está hecha con inteligencia artificial».
-
-**Qué se hizo:**
-- Se tomó la foto del repositorio de su portafolio (`portafolio-romppao`, `public/images/boxeo-2.jpg`) y se guardó como `public/brand/bajo-las-cuerdas.webp`.
-- La imagen de IA (`comunidad.webp`) se usaba en tres sitios: la portada del visitante, la bienvenida (en círculo) y la clase `.home-hero`. Se cambió en los tres y se borró, para que no quede en ninguna parte.
-- El encuadre se centra en las manos y el casco.
-- Las descripciones para lector de pantalla ya no hablan de «personas ficticias»: describen la escena real.
-
-**Qué salió mal:** nada. Una limitación: la foto del portafolio mide 682 × 1024 píxeles. En pantallas grandes de alta densidad puede verse algo blanda; si el fundador tiene el original a más resolución, basta con sustituir el archivo.
-
-**Pruebas:** capturas en móvil (390 px), escritorio (1440 px) y bienvenida.
-
-## 13 de octubre de 2026 — Tema claro, panel de moderación y registro de fallos (Claude)
-
-**Qué se pidió** (el fundador):
-- «me gustaría también tener la opción de poner un tema blanco, que el usuario, en función de su sistema, como lo tenga predeterminado, pueda elegir el tema oscuro o el tema blanco».
-- «perfilar muy bien el usuario y moderador […] sus funciones bien estructuradas, con su panel de avisos, los errores que tenga la aplicación […] es muy importante que esos fallos queden registrados, que queden plasmados para saber qué ha estado ocurriendo a lo largo de la historia».
-- Que le diga cómo renovar la demo, porque Render le avisó de que iba a caducar.
-- Documentar todo para los otros asistentes y para los programadores humanos que contrate.
-
-**Qué se decidió y por qué:**
-- **Tema.**
-  - Se interpretó como: por defecto, el tema del sistema, y además un selector «Automático / Claro / Oscuro» en el menú, visible para todos, también sin cuenta.
-  - La elección se guarda en el navegador: es una comodidad, no un dato de la cuenta.
-  - El tema claro conserva la marca: fondo hueso del logotipo «sobre fondo claro», texto negro y botones lima. El lima y el violeta, cuando son texto, se oscurecen para cumplir el contraste.
-  - Las zonas con foto siguen oscuras.
-- **Moderación.**
-  - No se quitó nada: las siete colas y sus acciones siguen igual.
-  - Encima se añadió un panel en tres bloques (pendiente de revisar, estado de la aplicación y herramientas), con recuentos que llevan a cada cola.
-  - Se interpretó «el usuario y moderador» como la cuenta de moderador. Las funciones de cada cuenta con permisos quedan descritas en `docs/MODERACION.md`.
-- **Fallos.**
-  - Registro propio en la base de datos (tabla `AppError`), sin proveedores nuevos ni coste: es la historia que pidió el fundador y queda en nuestra base.
-  - Los fallos repetidos se agrupan, se tachan los datos personales, nunca se borran, se reabren si vuelven a ocurrir, y moderación anota la causa y la solución (obligatoria para cerrarlos).
-  - Sentry (T-010) sigue siendo complementario.
-- **Demo.** Lo que caduca es la base de datos gratuita de Render (30 días). La solución ya aprobada en ADR-003 es pasarla a Neon gratis. Necesita que el fundador cree la cuenta: hay pasos para él en `DEMO.md`. Claude no puede crear cuentas ni debe ver la dirección de la base.
-
-**Qué se hizo:**
-- **Tema.**
-  - Tokens de color en los dos temas (`globals.css` §2): unas 150 sustituciones de colores fijos por variables.
-  - `SelectorTema` en el menú y guion en `layout.tsx` que aplica el tema antes de pintar.
-  - Logotipo claro u oscuro según el tema, colores de foco y avisos con contraste suficiente en los dos.
-- **Fallos.**
-  - `src/lib/common/fallos.ts` (`registrarFallo`).
-  - `onRequestError` en `src/instrumentation.ts`.
-  - `/api/fallos` para los fallos del navegador.
-  - `error.tsx` y `global-error.tsx` envían el fallo y enseñan el código a la persona.
-  - Los 17 `console.error` sueltos (correos, avisos, noticias, limpieza) ahora registran el fallo.
-  - Pantallas `/moderacion/fallos` (lista con recuentos y filtros) y `/moderacion/fallos/[id]` (detalle, estado, nota e historial).
-  - Acción `actualizarFallo`.
-  - Migración `20261013120000_registro_de_fallos`.
-- **Documentación:** `docs/MODERACION.md` (nuevo) y actualizaciones en `DESARROLLO.md`, `ARQUITECTURA.md`, `DISENO.md` y `DEMO.md`; catálogo y mapa al día.
-- **Pruebas.**
-  - Unitarias nuevas en `tests/unit/fallos.test.ts`.
-  - Prueba de navegador nueva `tests/e2e/fallos.mjs` (28 comprobaciones).
-  - `accesibilidad.mjs` mide ahora cada pantalla **en claro y en oscuro**.
-  - Se comprobó con una página que fallaba a propósito (borrada después) que un fallo del servidor queda registrado con su pantalla, su código y la pila.
-
-**Qué salió mal:**
-- Al medir el tema oscuro justo después de cambiarlo, axe vio colores a medio cambiar por las transiciones: hay que esperar a que terminen.
-- `node:crypto` en el registro rompía la compilación de `instrumentation.ts` para el entorno *edge*; se cambió por una huella sin criptografía.
-- La prueba usaba un número como marca única y el registro, a propósito, junta los fallos que solo cambian en números: se usa una marca con letras.
-
-**Estado:** hecho, con pruebas. El fundador aún no ha visto el tema claro.
-
-**Pendiente:**
-- **Fundador:** pasar la demo a Neon (pasos en `DEMO.md`).
-- **Claude:** cuando el fundador avise, ajustar `render.yaml` y comprobar la demo.
-- **Ideas:** aviso por correo al creador cuando aparezca un fallo nuevo.
-
-## 13 de octubre de 2026 — El código pasa a un repositorio privado (Claude)
-
-**Qué se pidió** (el fundador): «tenemos el repositorio de la aplicación público […] no puedo permitir que alguien me robe, me suplante todo el trabajo […] hay mucha competencia en ese sector […] debemos solventar cuanto antes y de manera gratuita». Tras ver dos propuestas: «haz lo recomendado y, como de costumbre, documenta todo explicando el por qué, el cómo, el para».
-
-**Qué se decidió y por qué:** propuesta A, [ADR-004](decisiones/ADR-004-repositorio-privado.md): el repositorio sigue en GitHub y pasa a privado, que es gratis. Antes hubo que ajustar el gasto de pruebas automáticas. En privado hay 2.000 minutos al mes y la semana anterior se gastaron unos 2.000 (254 ejecuciones): al ritmo de antes, las pruebas se habrían parado en una semana. Se descartó mover el código a otra plataforma porque obligaba a cambiar de proveedor sin ventaja.
-
-**Qué se hizo:**
-- **Revisión del historial completo** (266 commits) en busca de claves filtradas. No hay ninguna real. Una clave por defecto antigua de la tarea de noticias estuvo en el código público, así que se recomienda cambiar `CRON_SECRET`.
-- **Pruebas automáticas** (`ci.yml`): solo en los PR, al fusionar en `claude/ring-espana-mvp` y a mano. Así no se prueba dos veces cada cambio. El tiempo máximo pasa de 20 a 30 minutos, porque la accesibilidad se mide ahora en los dos temas.
-- **La visita cada 10 minutos para mantener despierta la demo** (unos 4.300 minutos al mes) se iba a desactivar, pero el fundador pidió después que el proceso se hiciera «sin alterar el funcionamiento de la aplicación ni diseño ni nada». Sigue activa hasta que configure UptimeRobot (pasos en `DEMO.md`); entonces se quita. Este cambio no toca la aplicación: solo la configuración de GitHub, el aviso legal y la documentación.
-- **Aviso legal:** `LICENSE` («Todos los derechos reservados») y `"license": "UNLICENSED"` en `package.json`.
-- **Repositorio privado:** se cambia cuando el ajuste de pruebas ya está en la rama de la demo. El resultado se anota abajo.
-- **Documentación:**
-  - ADR-004, con el porqué, el cómo, el para qué, las reglas desde ahora, los pasos del fundador y cómo deshacerlo;
-  - notas en `CLAUDE.md` y `TRASLADO.md`;
-  - índice de decisiones (ADR-003 figuraba aún como «pendiente», aunque se aprobó el 6 de octubre: corregido).
-
-**Qué salió mal:** nada en este paso. Hay que dejar dicho lo que no se puede arreglar: lo que alguien descargara entre el 24 de septiembre y hoy no se recupera. Esa copia no se puede usar legalmente, porque nunca hubo licencia.
-
-**Pendiente del fundador:**
-- comprobar que el presupuesto de GitHub Actions está en 0 €;
-- crear el monitor de UptimeRobot en los próximos días (hasta entonces, la visita automática gasta unos 140 minutos de GitHub al día);
-- cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
-- decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.
-
-## 13 de octubre de 2026 — Fecha de lanzamiento y mapa de gimnasios (Claude)
-
-**Qué se pidió** (el fundador):
-- Cuándo se puede lanzar. Él proponía el 1 de noviembre, con pruebas definitivas antes («tanto yo como tú entraremos en los distintos tipos de usuarios y probaremos todas las funcionalidades»).
-- Un mapa en «Gimnasios» en vez de solo una lista: «importar ahí un mapa de la ubicación en la que se encuentra el usuario en el que le muestren los gimnasios más cercanos […] una lista se ve un poco aburrida». Dijo que miraría también las veladas.
-
-**Qué se decidió y por qué:**
-- **Lanzamiento.** Claude revisó lo pendiente:
-  - Faltan una versión real separada de la demo, copias de seguridad, correo real, fotos fuera de la base, textos legales y la decisión sobre menores.
-  - Las tiendas (App Store y Google Play) no llegan al 1 de noviembre.
-  - Recomendó abrir primero a un grupo cercano y hacer la promoción unas dos semanas después.
-
-  El fundador decidió: **«retrasaremos el lanzamiento para el día 15 de noviembre […] dejar la aplicación lista ya el día 1 de noviembre, totalmente funcional, a la espera de revisiones jurídicas y legales»**, y la promoción (vídeos, publicaciones, otras estrategias) se define más adelante. Hoja de ruta en `docs/LANZAMIENTO.md`.
-- **Mapa.** Claude propuso dos opciones: Google Maps (pide cuenta de Google Cloud y probablemente tarjeta; gratis solo hasta un número de visitas) o un mapa libre (MapLibre con los mapas de OpenFreeMap y los datos de OpenStreetMap: sin cuenta, sin tarjeta y sin límite de visitas según su web). Recomendó el libre y el fundador respondió «vale, de acuerdo». Se toma como aprobación; si prefiriera Google, el cambio es pequeño.
-  - La lista se queda, más visual y ordenada por distancia: la necesitan quienes usan lector de pantalla o no quieren dar su ubicación.
-  - La ubicación de la persona no se guarda.
-
-**Qué se hizo:**
-- `docs/LANZAMIENTO.md` (calendario, imprescindibles con responsable y estado, pruebas definitivas y promoción) y notas en `CLAUDE.md` y `TRASLADO.md`.
-- **Mapa de gimnasios:**
-  - mapa con «Usar mi ubicación», «Los más cercanos a ti» con la distancia, marcadores agrupados y modo oscuro;
-  - lista rediseñada en tarjetas;
-  - campo «Dirección del gimnasio» en su perfil y coordenadas buscadas en OpenStreetMap;
-  - centro de provincia cuando no hay coordenadas;
-  - nota en la página de privacidad;
-  - CSP y permiso de ubicación ajustados.
-  - Detalle en `DISENO.md` y `ARQUITECTURA.md`; proveedor anotado en ADR-003.
-- **Pruebas:** unitarias en `tests/unit/mapa.test.ts` y de navegador en `tests/e2e/mapa.mjs` (13 comprobaciones, con accesibilidad en los dos temas).
-
-**Qué salió mal:**
-- **El trabajador de MapLibre 6 no carga solo.** Busca su archivo junto al suyo, y al empaquetarlo Next.js lo cambia de sitio. Se copia a `public/vendor/` al compilar.
-- **Los marcadores de gimnasios de la misma ciudad se tapaban** y fallaba la prueba de tamaño de zona táctil. Se agrupan en un círculo con el número.
-- **Los estilos propios de MapLibre pisaban los nuestros en la ventanita**: fondo blanco con texto lima ilegible en oscuro. Se dio más especificidad a los nuestros.
-- **El punto de «tu ubicación» tapaba a los gimnasios** que tenía debajo. Ya no se puede pulsar.
-- **En esta sesión no hay internet**, así que el fondo del mapa no se ha visto: hay que comprobarlo en la demo.
-
-## 13 de octubre de 2026 — «Los mejores de tu zona» y mapa en las fichas (Claude)
-
-**Qué se pidió** (el fundador): «me parece bien un mapa libre […] que el usuario, en vez de que le salga una lista muy aburrida y larga hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración de Google o algo similar». Y en las fichas de entrenadores y gimnasios: «su descripción, todo lo que hace y en el mapa la ubicación exacta de dónde se le puede ir a acudir».
-
-**Qué se decidió y por qué:**
-- **Sin valoraciones de Google:** exigen su servicio de pago y sus condiciones no permiten mostrarlas fuera de un mapa suyo.
-- **Valoración Lona** («algo similar»): sale de datos reales de la comunidad (aura de sus peleadores, peleadores, entrenadores y sello de verificado). Se explica en pantalla y no se puede comprar.
-- **Lista completa:** se conserva, porque es la vía accesible, pero queda recogida debajo.
-- **«Cómo llegar»:** un simple enlace a Google Maps, sin clave ni coste, que abre la aplicación del teléfono.
-
-**Qué se hizo:**
-- «Los mejores de tu zona» con «Mejores / Más cerca».
-- «Ver todos los gimnasios (N)» recogido.
-- Tarjetas más limpias en el móvil: el sello de verificado va dentro de la tarjeta.
-- «Dónde está» en la ficha del gimnasio y «Dónde entrena» en la del entrenador.
-- Parte común del mapa en `components/mapa/base.ts`.
-- `tests/e2e/mapa.mjs` ampliada a 23 comprobaciones; pruebas unitarias de la valoración.
-
-**Qué salió mal:**
-- El primer CI del PR #46 falló en «Prueba de extremo a extremo». Desde aquí no se pueden leer sus registros ni descargar el diagnóstico, así que se busca la causa con la réplica local.
-- En el móvil, las tarjetas quedaban apretadas con el sello a la derecha y los botones de orden ocupaban dos líneas: se corrigió tras ver las capturas.
-
-## 13 de octubre de 2026 — Causa del CI rojo del mapa y control de versiones (Claude)
-
-**Qué se pidió** (el fundador): «Continúa», para terminar el mapa. Y después: «Es importante llevar un buen manejo de versiones para la aplicación, tenlo en cuenta y en caso de que no lo estés haciendo, aplícalo».
-
-**Qué se decidió y por qué:**
-- **Versionado semántico con un registro de cambios en lenguaje llano.** La versión actual pasa a 0.9.0 y la **1.0.0 será el lanzamiento público** del 15 de noviembre.
-- **Versiones anteriores reconstruidas** a partir de los 24 PR fusionados: 0.1.0 a 0.8.0, cada una con su commit de fusión. Así hay puntos fijos a los que volver.
-- **El CI exige que cada PR suba la versión** y tenga su entrada: lo que no se comprueba acaba no haciéndose (fue lo que pasó durante seis semanas).
-- **Las etiquetas las crea el CI**, solo si todas las pruebas pasan tras fusionar. Desde la sesión de Claude no se pueden crear: el proxy bloquea esa escritura, ya sea con `git push` o con la API.
-- **La versión se ve** en la ayuda, en moderación (con el commit), en `/salud` y en cada fallo registrado (primera y última versión). Así se sabe si un arreglo funcionó.
-
-**Qué se hizo:**
-- **Mapa:**
-  - «Acercar» y «Alejar» indican qué mapa controlan (`aria-controls`, en `crearMapa`).
-  - La autoría del mapa se lee bien en tema oscuro.
-  - Las pruebas sirven un estilo de mapa propio con la misma autoría, así que no dependen de internet y ven lo mismo en local y en el CI.
-- **Diagnóstico del CI:** si fallan las pruebas de navegador, `scripts/avisos-ci.mjs` publica un aviso legible desde el PR con los fallos y el texto de las páginas guardadas.
-- **Versiones:**
-  - Archivos nuevos: `CHANGELOG.md`, `docs/VERSIONES.md`, `scripts/version.mjs` y `src/lib/common/version.ts`.
-  - Migración `20261013200000_version_en_fallos`.
-  - Paso de comprobación y trabajo `etiquetar` en el CI.
-  - Pruebas de la versión en `fallos.mjs` y `busqueda.mjs`.
-  - Reglas en `EQUIPO.md`, `DESARROLLO.md`, `REVISION.md` y `CLAUDE.md`.
-
-**Qué salió mal:**
-- El CI del mapa falló cinco veces seguidas, por causas distintas:
-  - los botones de zoom sin `aria-controls`, que la réplica local encontró;
-  - dos veces el catálogo sin regenerar tras tocar un archivo;
-  - el contraste de la autoría, que solo aparece con internet, y en local no se veía.
-- Dos pruebas anteriores al mapa (`cuenta.mjs` y `flujo.mjs`) fallaron una vez cada una en el CI y pasan siempre en local: son intermitentes, y la segunda guardó la página a medio cargar. Se relanzó el CI para confirmarlo. Están anotadas como intermitentes, con la causa todavía sin encontrar.
-- No se podían leer los registros del CI desde aquí, por eso se hizo `avisos-ci.mjs`.
-
-**Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
-
-**Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
-
-
-## 13 de octubre de 2026 — Revisión responsive (Codex)
-**Pedido:** adaptar móvil y escritorio con impeccable y break-ui y entregar la demo ajustada.
-**Decisión:** conservar identidad y funciones; corregir distribución, recortes y casos extremos.
-**Hecho:** cabecera por espacio, tarjetas que crecen, actualidad a ancho completo, todas las noticias visibles, disciplinas en cuadrícula, números españoles, grafemas y fotos ausentes. Banco visual exclusivo de desarrollo sin PostgreSQL. Ver REVISION-RESPONSIVE-20261013.md.
-**Validación:** 60 comprobaciones de navegador correctas; tipos y build correctos; 404 del banco en producción. Unitarias 650/652 (dos fallos previos de rutas Windows); documentación 8/9 (symlink EPERM). Catálogo/mapa comprobados en copia temporal normalizada sin modificar generadores.
-**Problemas corregidos de verificación:** las imágenes lazy deben acercarse a la vista y esperar antes de exigir alternativas. PowerShell requiere UTF-8 explícito también en su entrada a Python: se corrigieron únicamente las anotaciones propias de este bloque y se regeneró el mapa.
-**Pendiente:** GitHub y PostgreSQL inaccesibles en esta sesión; falta CI completo/base aislada y demo remota. Demo visual local en 127.0.0.1:3137/revision-ui.
-
-
-## 13 de octubre de 2026 — Corrección de base oficial (Codex)
-El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
-Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.
-
-## 13 de octubre de 2026 — Afilar antes del lanzamiento: bloque A (Claude, con el trabajo previo de Codex)
-
-**Qué se pidió:** el encargo «afilar y gimnasios» (`docs/ecosistema/traspasos/2026-10-13-claude-encargo-codex-afilar-y-gimnasios.md`). Codex empezó el bloque A y se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso; Claude lo revisó, lo terminó y lo confirmó.
-
-**Qué se decidió y por qué:**
-- Versión 0.10.0 (menor): trae cosas nuevas para el usuario (buscador del cartel, diagnóstico de noticias, estados de combate).
-- Se mantienen las búsquedas de Google Noticias aunque a veces devuelven 503 desde Render; queda pendiente decidir si se quitan.
-- Se quitan FEKM (403) y MMA España (HTML, sin canal) y se añaden Marca boxeo y Marca MMA (comprobadas con curl).
-
-**Qué se hizo:**
-- A1 Noticias: sin titulares repetidos (`src/lib/news/deduplicate.ts`), diagnóstico de fuentes (`diagnosis.ts`), rechazo de respuestas que no son RSS, fuentes cambiadas (`sources.ts`).
-- A2 Hidratación #418: fecha de «Mi ficha» con zona horaria fija y prueba `tests/e2e/hidratacion.mjs` (Madrid y Nueva York).
-- A3 `EvitarDobleEnvio` reescrito: bloquea hasta que termina la acción, con tope de 30 s y texto de progreso.
-- A4 Cartel del organizador con búsqueda de peleadores por esquina (`src/lib/events/cartel-search.ts`).
-- A5 Estados «Programado» y «Resultado por anotar» (`src/lib/bouts/status.ts`).
-- A6 No se puede pedir inscripción si ya se figura en el cartel (bloqueo común `cartel:<eventId>`).
-- A7 Nivel sin preseleccionar. A8 Enlace de entradas solo https.
-
-**Qué salió mal:**
-- La causa del error de hidratación #418 NO está confirmada: se vio una vez en la demo y no se reproduce (unas 30 cargas y en local). La hipótesis es una mezcla de HTML y JavaScript de versiones distintas durante un despliegue de Render.
-- Fallo de la deduplicación: una dirección con barra final y parámetros no se normalizaba igual; corregido y con prueba.
-- Codex se quedó sin créditos con el trabajo sin confirmar.
-
-**Estado:** A1–A8 hechos y confirmados en local (sin subir). Pruebas: typecheck limpio; vitest 695/697 (dos fallos anteriores de rutas de Windows en `multimedia.test.ts`). La suite de navegador no se ha pasado entera. A4 no está validado en un navegador con una cuenta de organizador.
-
-**Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
-
-## 13 de octubre de 2026 — Revisión de lanzamiento, bloque B (Codex)
-
-Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autorización moderadora para veladas pasadas; B3 incorpora el plazo de 24 horas a partir del registro con exclusión de combates disputados y aviso al peleador. B2 conserva la privacidad amateur actual y deja pendiente la visibilidad interna para moderación. Se eliminaron los BOM UTF-8 de `record-eligibility.ts` y `record-time.ts`. CI y revisión de los PR apilados pendientes.
-
-La primera ejecución de CI reveló supuestos E2E que ya no eran válidos tras hacer obligatorio el nivel y aplicar el plazo de 24 horas. Las pruebas se ajustaron para elegir nivel, esperar al resultado y comprobar los combates después de 25 horas cuando corresponde.
-
-## 13 de octubre de 2026 — Revisión de lanzamiento, bloque C (Codex)
-
-El traspaso técnico reúne el alcance A/B, comprobaciones y límites. Los PR se mantienen en borrador y no se ha desplegado la demo. Pendientes: CI de la pila rebasada, revisión final de Claude y publicación autorizada.
-
-## 14 de octubre de 2026 — Afinado de pruebas de lanzamiento (Codex)
-
-CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba para que se vea el récord actualizado. CI #514 encontró que el botón compacto de atribución de MapLibre medía 24 × 44 px en móvil. Se amplió su zona táctil a 44 × 44 px, manteniendo el icono centrado. La CI debe volver a comprobar E2E y accesibilidad; el ajuste es de tamaño de interacción y no cambia el diseño de la página.
-
-## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
-
-**Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
-**Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.
-**Qué se hizo:** seis responsabilidades ausentes del catálogo, normalización Windows/Linux y exclusión de next-env.d.ts con sus pruebas; catálogo/mapa regenerados; URL y seen() en rival; mostrar() y tres seen() en ficha; registro de versiones y token --acc-ink corregidos. Las reglas de datos/permisos de la aplicación se conservan.
-**Qué ejecuté:** clon real por Git, reproducción de la comprobación defectuosa en Chromium/producción, captura de POST/RSC/history en #51, control con componentes pre-A3 y base 0.9.0; catálogo 360 archivos, 11/11 documentales, mapa 74 pantallas/82 acciones/29 tablas, tipos, 697 unitarias y build de A. Los recorridos completos y CI de los heads finales se registran en el traspaso/PR tras completarse, no se presuponen aprobados aquí.
-**Qué salió mal:** acceso de red y caché de npm sin permisos adecuados al primer intento; primeras pasadas de flujo/cuenta encontraron datos sin nivel obligatorio, corregidos sin saltar comprobaciones. El diagnóstico sobre 0.9.0 usa solo su tramo de navegación; sus expectativas de 24 horas (de B) no se consideran una prueba válida de esa versión.
-**Estado y próximos pasos:** borrador, sin integración/despliegue. Rebasar B/C, regenerar ambos documentos generados y comprobar cada CI. Sparring depende de la descripción que falta.
-
-14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
-
-14 oct, segunda revisión de CI: categorias.mjs perdía división/peso al elegir de nuevo el mismo nivel, porque SelectorCategoria reinicia sus dependientes en change. Elegir nivel antes de división/peso, evitar change redundante en el ayudante y poner rivalId después de rellenar; se traslada la preparación de edad de B a A. El artefacto de #51 (11876608015, head 0667240) confirma alias/presentación pero altura ausente en HTML. Cuenta ahora espera la URL del rechazo y exige los tres valores en el formulario antes de enviar, escribiendo altura al final; mantiene los tres seen() públicos y añade diagnóstico por dato si falla. Pasadas locales completas: categorías 18/18; cuenta 33/33 y otra 33/33 con CPU ralentizada seis veces. Sin cambios de src ni reglas de producto; el vaciado anterior no se atribuye sin evidencia a una causa distinta del estado de formulario durante la transición.
-
-14 oct, continuidad de CI: los heads 0da663b/01bb8bd/a4f7203 aprueban catálogo, mapa, tipos, unitarias y build, y #51 ya aprueba flujo/cuenta. La ejecución 38530144100 se detiene en inclusiva.mjs por crear una velada sin nivel obligatorio tras A7. Se preparan explícitamente AMATEUR también en inscripciones, plazas, rivales y escenarios, sin cambiar la aplicación ni quitar expectativas. En local se limpian exclusivamente los datos 000Inclusiva de esta base desechable tras una pasada fallida: repetirla con residuos altera qué seis eventos enseña la portada. No se presenta esa primera pasada como verde.
-
-14 oct — El recorrido de doble clic descubrió un fallo distinto de la navegación: React puede hidratar acciones sin method; el lector getAttribute con valor por defecto GET omitía el bloqueo. Diagnóstico en Chromium: dos clics (detail 1/2), dos submit, dos POST y selección de rival tras haber registrado el primero. A reconoce esas acciones y descarta el segundo clic físico, conservando búsquedas GET y reintento independiente. Prueba de componentes: acción React sin method con input llamado method, reset síncrono y siguiente clic; se ejecuta antes del build final. El diagnóstico inicial de «respuesta rápida» era una hipótesis; la ausencia de method es la causa demostrada. Se separa de HistoryUpdater en el traspaso.
-14 oct — La prueba de usabilidad de B conserva su comprobación de «Gana Movil» y declaración opcional: activa por la interfaz la publicación del récord amateur de su fixture y madura ese combate 25 horas antes de verlo. La captura anterior ocultaba el resultado por privacidad; no era un error de la aplicación. El doble clic fallido del mismo recorrido queda resuelto en A3. No se atribuye a este guion una pasada verde hasta repetirlo sobre A corregida.
-
-14 oct, precisión de usabilidad B: la privacidad amateur protege a ambos participantes. Se prepara también la autorización del rival a través de su cuenta e interruptor y se selecciona su ficha existente. La segunda pasada que publicaba solo el récord del ganador seguía ocultando correctamente el resultado y se registra como fallida. No se relaja la comprobación ni se modifica la política.
-## Estado del rebase final, 14 de octubre
-
-A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/categorías y mantienen las exigencias públicas. C está nuevamente sobre esa B (0.11.1). Frente a la pila anterior, src, prisma, scripts y unitarias de B/C son idénticos; cambian los guiones indicados y documentación generada. Se valida el CI de estos heads, no el de sus predecesores fallidos. Las pruebas dirigidas pasan: cuenta 33/33, cuenta CPU ×6 33/33, categorías 18/18 y respaldo 22/22. La descripción de sparring sigue pendiente; no hay PR ni versión ficticios para ese caso.
-
-## 14 de octubre de 2026 — Búsqueda local para retos y sparring (Codex)
-
-El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y descubrir peleadores compatibles sin escribir nombres exactos. Rama apilada codex/sparring-2026-10-14 sobre C, con reproducción E2E primero (ausencia de desplegables) y después selección nativa de ciudad y club, nombre opcional y enlace a la propia ciudad. Opciones derivadas de candidatos autorizados y filtros deportivos; clubes por id, ciudad de entrenamiento cuando hay club, enlaces anteriores conservados. Versión 0.11.2 mediante scripts/version.mjs. Pruebas locales y estado externo de CI se detallan en el traspaso al cerrarse; no se anticipa un resultado verde. No se fusiona ni despliega.
-
-14 oct, cierre actual: #48 eb5a366 → #50 e8d239c → #51 c9d2546 → #52, todo en borrador. A usabilidad 52/52 y siete recorridos 154/154; B usabilidad final 52/52 tras autorización real de ambos participantes; búsqueda final 33/33, 712 unitarias, tipos/build y móvil claro/oscuro a 390 revisado. Catálogo/mapa/versiones comprobados. El selector intermedio del rival falló por no incluir el aria-label completo; corregido sin quitar comprobaciones. E2E de CI A aprobado al consultar, accesibilidad aún en curso; estados finales de CI se entregan separados de lo local. Sin fusión ni despliegue.
-
-14 oct — La prueba previa rivales.mjs también se adapta al nuevo desplegable: selección por gimnasioId, espera de dirección/candidata y las mismas comprobaciones; conserva un enlace antiguo por nombre para verificar compatibilidad. Recorrido completo 12/12 en local. CI A 38533976870 completamente aprobado; B/C/#52 finales en curso al cerrar esta entrada.
-
-## 14 de octubre de 2026 — Revisión de los PR de Codex y comprobaciones recuperadas (Claude)
-
-**Qué se pidió** (el fundador): revisar lo que había hecho Codex y, si estaba bien, actualizar GitHub y la demo. Después: «Prefiero que hagas tú la corrección».
-
-**Qué se decidió y por qué:**
-- **#48 se fusionó** (0.10.0): CI en verde y revisión correcta (esperas de las pruebas y bloqueo del doble envío, con pruebas propias).
-- **#50 se redirigió** a la rama de la demo, para que no se fusionara dentro de la rama de #48.
-- **Las dos comprobaciones que #50 había quitado se recuperan en un PR propio de Claude** (`claude/recupera-comprobaciones`, sobre #52). No se escribe en la rama de otro asistente (`EQUIPO.md`, regla 2).
-
-**Qué se hizo:**
-- `tests/e2e/flujo.mjs`:
-  - El comentario del aura se escribe en el formulario del combate al que se da el aura y se comprueba que se ve en la ficha.
-  - Tras «madurar» el combate del veterano más de 24 horas, se comprueba que el récord pasa a 11-3-1.
-- Versión 0.11.3.
-
-**Qué salió mal:**
-- El comentario no aparecía y parecía un fallo de la aplicación: el campo tenía el texto, pero el envío llegaba vacío.
-- La causa real era la prueba. La ficha de Pepe tiene cuatro combates y cuatro cajas de comentario. La prueba escribía en la primera de la página y pulsaba «Dar aura» en otro combate, que ya no era el primero porque cambió el orden de los combates.
-- Probablemente por eso #50 quitó la comprobación en lugar de arreglarla.
-
-- Después, el CI de #50, #51 y #52 falló en dos pruebas del bloque B. Se reprodujeron aquí y en ninguna era un fallo de la aplicación:
-  - `record-24h.mjs` contaba la etiqueta «cuenta en el récord a partir del…» antes de que se pintara. Ahora la espera con `seen()`.
-  - `veladas-pasadas.mjs` buscaba «Pasada aprobada» sin la parte única del nombre, así que encontraba veladas de otras ejecuciones. Además, comprobaba que el texto no estuviera en la página, y la página repite lo buscado («No hemos encontrado nada para «…»»). Ahora usa nombres únicos y comprueba que no hay enlace a la velada.
-  - Además, `veladas-pasadas.mjs` iba al historial justo después de pulsar «Autorizar y publicar», sin esperar a que se guardara la decisión, y en el CI llegaba antes. Ahora espera el aviso de confirmación.
-  - Se comprobó a mano que la búsqueda pública **no** muestra veladas pendientes ni rechazadas: la regla B1 se cumple.
-
-- La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.
-
-- **Fallo real encontrado:** el tema elegido se perdía a veces al recargar. Lo delataban «la elección se recuerda al volver» tras fusionar #48 y `servicios.mjs` en #53, que solo fallaban en el CI, que es más lento.
-  - Causa: el guion `TEMA_INICIAL` pone `data-tema` antes de pintar, pero si React vuelve a pintar `<html>` al cargar (un error de hidratación, como el #418 que investigó A2), el atributo desaparece y nada lo reponía. `SelectorTema` solo leía la elección para marcar su opción.
-  - Arreglo: `components/TemaPersistente.tsx` lo vuelve a aplicar al montar y cada vez que alguien lo quite, mientras siga guardado.
-  - Prueba nueva: se borra el atributo a propósito y se comprueba que vuelve.
-- Batería completa en local sobre una base vacía: 796 comprobaciones de navegador bien, ninguna mal.
-
-**Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.
-
-## 14 de octubre de 2026 — Entrar y registrarse con Google (Claude)
-
-**Qué se pidió** (el fundador): «que se pudiera registrar la gente mediante Google […] La parte de Apple lo dejaremos aplazado para cuando lo lancemos. Pero por lo menos la de Google que ya esté, que creo que se puede y es gratuito». Codex se quedó sin créditos, así que: «hazlo tú. Todo lo que haya que hacer, hazlo tú […] dame el texto en caso de que a ti se te acaben los créditos».
-
-**Qué se decidió y por qué:**
-- **OpenID Connect con PKCE, `state` y `nonce`, programado en Lona y sin librerías nuevas.** Son unas 150 líneas, fáciles de revisar y sin dependencias que mantener. Solo se piden nombre y correo: con eso Google no limita a usuarios de prueba ni muestra avisos (ayuda oficial de Google Cloud, «Manage App Audience» y «Unverified apps»).
-- **Cuentas:**
-  - si el `sub` ya está vinculado, se entra;
-  - si el correo ya existe, se vincula;
-  - si no existe, se crea con el correo confirmado.
-- **Protección contra el «secuestro previo»:** si la cuenta existente no había confirmado su correo, se invalida su contraseña y se cierran sus sesiones antes de vincularla.
-- **El creador** sigue pasando por el segundo paso.
-- **Las entidades** se registran con correo y contraseña, porque su solicitud necesita datos que Google no da.
-- **Sin claves no hay botón.** Las claves las pone el fundador en Render (`docs/GOOGLE.md`).
-
-**Qué se hizo:**
-- `lib/accounts/google.ts`.
-- Rutas `/api/auth/google` y `/api/auth/google/callback`.
-- `BotonGoogle` en «Entrar» y «Registrarse».
-- Campo `User.googleSub` y su migración.
-- Mensajes, ayuda y privacidad.
-- `render.yaml` y `.env.example`.
-- Pruebas: 16 unitarias y `tests/e2e/google.mjs`. En el CI se usan claves de mentira y no se llega a hablar con Google; `enlaces.mjs` no sigue esa ruta.
-- Ficha `T-015` (sirve también de encargo para Codex) y guía para el fundador.
-
-**Qué salió mal:**
-- Desde la sesión no se pueden abrir las páginas de Google para desarrolladores (sin resolución DNS). Las condiciones de uso se comprobaron con la búsqueda web, citando las páginas oficiales de ayuda.
-- No se puede probar el viaje real a Google hasta que el fundador ponga las claves.
-
-- **Pausa pedida por el fundador:** «no empieces las nuevas cosas que te he dicho sin antes haber validado, corregido todo lo anterior». Google se apartó hasta publicar y comprobar la 0.11.3, y se retomó después.
-- **Vuelta completa comprobada con un Google simulado** (`tests/e2e/google-falso.mjs`, cargado con `node --import` solo en el servidor de pruebas). Casos:
-  - cuenta nueva (peleador, correo confirmado, sesión iniciada);
-  - volver a entrar sin crear otra;
-  - vincular una cuenta con el correo confirmado sin tocar su contraseña;
-  - proteger la que no lo tenía;
-  - rechazar un correo sin confirmar en Google;
-  - creador con segundo paso.
-
-  `google.mjs`: 25 de 25. Capturas en el móvil, en claro y oscuro, revisadas.
-- **Contratiempos de la comprobación local:**
-  - `NODE_OPTIONS` no llega al servidor de Next, así que el simulador se carga con `node --import` directamente.
-  - Un servidor anterior seguía ocupando el puerto (`EADDRINUSE`) y se estuvo probando contra él sin saberlo.
-  - Dos veces `pkill -f` se mató a sí mismo, porque su propio texto contenía el patrón.
-  - Las vueltas fallidas confirmaron que el error se registra y que la persona ve un mensaje claro.
-
-**Estado y próximos pasos:** batería completa en marcha; después, PR y CI. El fundador crea las credenciales (`docs/GOOGLE.md`) y Claude lo comprueba en la demo.
-
-## 2026-10-14 — Paneles por tipo de usuario: revisión y fallos del bloque E (Claude)
-
-**Qué se pidió:** el fundador pidió revisar el usuario aficionado y las funciones de su panel; después, propuestas para todos los tipos de cuenta. Aprobó todas («me han gustado todas tus propuestas») y pidió a Claude que corrigiera él mismo los fallos y dejara a Codex lo largo.
-
-**Qué se decidió y por qué:**
-- El encargo completo para Codex está en `docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md` (en la carpeta del ecosistema): F, pulido común; G, funciones para Madrid; H, después.
-- Claude hace el bloque E porque son tres arreglos pequeños y con riesgo para la confianza en los datos.
-
-**Qué se hizo:**
-- `src/lib/community/siguiendo.ts`: filtros de «Peleadores que sigo».
-- `src/lib/events/resultados-pendientes.ts`: recuento de resultados por poner de todas las veladas.
-- `Entidad.tsx` sin la barra de seis huecos.
-- Pruebas en `tests/unit/paneles-fallos.test.ts`.
-- Versión 0.12.1.
-
-**Qué salió mal:** la base de datos local (Docker) no estaba en marcha, así que las pruebas de navegador se dejan al CI. En local pasaron la comprobación de tipos, las 737 pruebas unitarias, el catálogo y el mapa.
-
-**Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.
-
-## 2026-10-14 — Relevo entre sesiones: que Claude, Claude Code y Codex no se pisen (Claude, nube)
-
-**Qué se pidió** (el fundador): «entre tú y Code no os podéis comunicar, por lo que quiero que creéis una documentación en la que actualicéis lo que hagáis cada uno para así no solapar trabajo y tengáis contexto de todo lo que se haya hecho en cada sesión, así no tengo que gastar token repitiendo cosas que ya he hecho en el móvil […] en caso de que no esté esto ya implementado, hacerlo de la manera más óptima».
-
-**Qué se encontró:** ya había mucha documentación (`EQUIPO.md`, un registro por asistente, traspasos de Codex, `TRASLADO.md`), pero no resolvía el problema:
-- **Ningún punto de entrada corto.** `TRASLADO.md` es del 6 de octubre y está anticuado; el diario tiene casi 1.900 líneas. Leerlo todo cuesta muchos tokens, y por eso nadie lo hacía.
-- **Ninguna forma de reservar un trabajo.** Los arreglos A1–A8 acabaron hechos a la vez en #48 y #49. Mientras esta sesión hacía lo de Google, otra montaba la versión real en Cloud Run (#57, con dominio `lonaclub.es`) y Codex los paneles (#56), y esta sesión no se enteró.
-- **Nada obligaba a leer el estado al empezar.** `CLAUDE.md` no lo decía.
-- **Un encargo que no existe en el repositorio:** el de los paneles (F, G y H) que citan el diario y `IDEAS.md` no está subido a ninguna rama.
-
-**Qué se decidió y por qué:** lo mínimo que cierre esos cuatro huecos, sin añadir otro registro que se quede sin leer.
-- **`docs/ESTADO.md`**, de unas 70 líneas: dónde estamos, quién tiene qué, lo que solo puede hacer el fundador, **lo que el fundador ya ha dicho** (para no repetírselo), lo siguiente y las reglas. Cada asistente edita solo su fila, para no pisarse.
-- **`scripts/estado.mjs`**: lo que dice la realidad **en directo**, sin depender de que nadie se acuerde de apuntarlo: versión de la demo, ramas y PR en curso, y ficheros que dos trabajos independientes tocan a la vez. Sin dependencias; vale en Windows. Si ve que la página tiene más de 3 días, avisa.
-- **Reservar** un trabajo: `node scripts/estado.mjs reservar <asistente> "<tema>"` crea una rama desde la demo con un commit vacío y la sube. El CI solo se ejecuta en PR y en la rama de la demo, así que **reservar no gasta minutos** (el cupo gratuito de GitHub es de 2.000 al mes).
-- **Obligar a leerlo:** aviso al principio de `CLAUDE.md` (lo cargan solas todas las sesiones de Claude), en `AGENTS.md` (Codex y los demás) y en las instrucciones de Copilot.
-
-**Qué se hizo:** los archivos anteriores, la regla 12 de `EQUIPO.md`, una fila en `DESARROLLO.md`, un aviso en `TRASLADO.md` y 4 pruebas (`tests/documentacion/estado.test.mjs`, que el CI ya ejecuta). Versión 0.12.2.
-
-**Qué salió mal:**
-- La primera versión del script enseñaba 19 ramas y 30 solapes falsos (ramas de hace una semana con el PR ya cerrado, y ramas apiladas que comparten ficheros por construcción). Ahora solo cuenta las de los últimos 3 días con el PR abierto, y no cruza ramas apiladas.
-- Una prueba mía destapó un fallo de la lógica: dos ramas apiladas más una independiente no avisaban del solape. Corregido.
-- `gh pr list` usa un canal que las sesiones de la nube tienen bloqueado; el script usa la API normal.
-
-**Límites que conviene decir con honestidad:** funciona **si cada sesión sigue las instrucciones**; no hay forma técnica de obligarlas. El estado solo fluye cuando se sube al repositorio. Y no sustituye al diario, que sigue siendo el archivo completo.
-
-**Estado y próximos pasos:** PR con CI. Cuando se fusione, el fundador solo tiene que hacer `git pull` en el portátil: la sesión de Claude Code leerá el aviso de `CLAUDE.md` por sí sola. Queda pendiente que quien tenga el encargo de los paneles lo suba.
-
-## 2026-10-14 — Versión real gratuita en lonaclub.es: investigación y código (Claude)
-
-**Qué se pidió:**
-- El fundador compró lonaclub.es y avisó de que Render «tiene un periodo de prueba».
-- Pidió investigar «profundamente y al más mínimo detalle» si las herramientas eran las mejores para funcionar gratis, sin contar Apple.
-- Después pidió que la versión real esté «completamente virgen», solo con los gimnasios reales de España menos Cataluña.
-
-**Qué se decidió y por qué:**
-- Cloud Run (`europe-west1`) para la versión real, con Neon Free y copias en R2 (ADR-005).
-- Render prohíbe producción en su plan gratuito y sus 750 h al mes ya las gasta la demo.
-- Neon subió a 1 GB por proyecto.
-- Madrid no admite la asignación de dominio de Cloud Run.
-
-**Qué se hizo:**
-- `Dockerfile`, `desplegar-produccion.yml`, `copia-diaria.yml`.
-- Noticias también para la versión real.
-- `docs/PRODUCCION.md` y ADR-005.
-- Compilación *standalone* comprobada en local: arranca; `/salud` da 503 sin base, como se esperaba, y `/privacidad` da 200.
-
-**Qué salió mal:**
-- El sistema de permisos de Claude Code bloqueó varios pasos, que pasan al fundador con guía:
-  - conceder acceso a otra cuenta en Google Cloud;
-  - fusionar sin revisión;
-  - cambios de DNS;
-  - leer variables secretas de Render.
-- `mantener-demo-despierta.yml` gasta unos 4.300 minutos de Actions al mes, más de los 2.000 gratuitos del repositorio privado.
-
-**Estado y próximos pasos:**
-- El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
-- Claude monta y comprueba el primer despliegue.
-- Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
-
-
-## 2026-10-15 — Textos legales para el lanzamiento (Claude)
-
-**Qué se pidió:**
-- El fundador recordó que faltaban las condiciones de uso y que la privacidad estaba «un poco dudosa».
-- También que faltaba «un bloque de responsabilidad jurídica».
-- Pidió investigar, hacer todo lo que no necesite abogado y listar lo que sí.
-
-**Qué se hizo:**
-- `/aviso-legal`, con el bloque de responsabilidad.
-- `/condiciones`, según el DSA.
-- `/cookies`, solo con las técnicas.
-- Privacidad completada según el art. 13 del RGPD.
-- Enlaces en el pie, el registro y Google.
-- Aviso al arrancar si faltan los datos del titular.
-- Detalle en `docs/LEGAL.md`.
-- Fuera del repositorio, la carpeta `MiProyectoAI/LEGAL-LONA/`, con:
-  - las tareas del fundador;
-  - las preguntas para el abogado;
-  - la investigación con fuentes;
-  - el registro de actividades de tratamiento;
-  - los protocolos de derechos, brechas y avisos.
-
-**Hallazgos para programar:**
-- bloquear usuarios (Apple 1.2);
-- avisos automáticos a denunciantes y afectados (DSA, arts. 16.5 y 17);
-- aviso sin cuenta;
-- T-013 y T-014.
-
-**Comprobaciones:**
-- `tsc`;
-- `vitest` (740 de 740);
-- `npm run build`, con las páginas nuevas compiladas;
-- catálogo y mapa.
-
-**Estado:** PR abierto. Los textos son borradores pendientes del abogado.
+# Diario de desarrollo — Ring España
+
+Cuaderno de bitácora del proyecto: qué hicimos, en qué orden, por qué, cómo surgieron las ideas y qué salió mal.
+Pensado para poder contar algún día todo el recorrido, y para retomar cualquier punto sin perder el contexto.
+
+**Cómo se mantiene:** al final de cada sesión de trabajo se añade una entrada nueva **al final** de este fichero (nunca se reescriben las anteriores; si algo cambia de opinión, se anota como una entrada nueva). Cada entrada sigue la plantilla del final.
+Documentos hermanos: [`IDEAS.md`](IDEAS.md) (ideas y backlog), [`LECCIONES.md`](LECCIONES.md) (errores y cómo retomar), [`ARQUITECTURA.md`](ARQUITECTURA.md) (estado técnico vigente).
+
+---
+
+## Sesión 1 — 30 de septiembre de 2026 — De la idea al primer prototipo funcional
+
+### 1. El punto de partida: la visión
+
+El fundador plantea un proyecto «muy ambicioso»: una aplicación para **hacer crecer la comunidad boxística española**.
+Lo esencial de lo que pidió, en sus palabras aproximadas:
+
+- Dar a conocer a pugilistas, **sobre todo amateur** (también profesionales).
+- Que puedan **registrar sus récords** de victorias y derrotas, darse a conocer y **generar audiencia** para los boxeadores españoles.
+- Un **calendario de veladas** próximas, profesionales y amateur.
+- **Buscar** boxeadores, gimnasios, entrenadores, etc.
+- Referencia: algo **similar a BoxRec**, pero para España.
+
+Repositorio de partida: vacío (`romppao/MiClaude`, sin ningún commit).
+
+### 2. Decisiones iniciales (preguntas al fundador)
+
+Antes de escribir código se preguntaron tres cosas y se decidió:
+
+| Pregunta | Decisión | Por qué |
+|---|---|---|
+| Plataforma | **Web responsive** | Funciona en móvil y ordenador, se indexa en Google (clave para darse a conocer) y luego se puede envolver como app |
+| Stack | **Next.js + PostgreSQL** (+ Prisma, TypeScript) | Un solo lenguaje de extremo a extremo, buen SEO, búsqueda potente, fácil de desplegar |
+| Alcance inicial | **Plan + MVP funcional** | Ver algo real cuanto antes |
+
+### 3. Primer MVP (estilo BoxRec)
+
+Se construyó: fichas de boxeadores con **récord calculado** desde los combates (por nivel profesional/amateur), calendario de veladas con filtros, gimnasios, entrenadores y búsqueda global. Datos de ejemplo **ficticios** (con «Demo» en el nombre) para no inventar récords de personas reales.
+Decisión de diseño que se mantiene hasta hoy: **el récord no se guarda, se calcula** a partir de los combates, para que no pueda desincronizarse.
+
+### 4. Giro de enfoque: amateur, Madrid y valoración del público
+
+Tras ver el MVP, el fundador **reorientó el producto**. Esta es la idea que define el proyecto:
+
+> El foco es fomentar la afición al boxeo en España, principalmente en el **amateur**, porque son quienes en el futuro serán profesionales y «la cara del boxeo español en el mundo». Un amateur debe poder registrar su récord **y recibir una valoración del público aficionado** («este chaval es muy bueno, lo vi y aluciné»).
+
+Además:
+- **Foco geográfico: Madrid** (no exclusivo, pero principal) y expandir después. Hay competencia (una aplicación que «ha dado mucho que hablar en Barcelona»); la intención es estructurarlo bien en Madrid y adelantarse.
+- **Nada de diseño gráfico todavía** (los diseños de Claude «normalmente no le gustan»): prioridad absoluta a **arquitectura y estructura**.
+
+Consecuencias técnicas que se implementaron:
+- **Cuentas** propias (contraseñas con scrypt, sesión en cookie) y roles: aficionado, boxeador, organizador, administrador.
+- **Ficha propia**: el boxeador amateur crea su ficha y **registra sus combates**.
+- **Fiabilidad del dato**: como el amateur se registra a sí mismo, cada combate tiene un nivel de respaldo (`autodeclarado → confirmado por el rival → verificado`, o `disputado`).
+- **Valoraciones ancladas a un combate concreto**: una nota es «esta actuación en este combate», no «este boxeador en general». Una por usuario y combate, los participantes no pueden votar, solo combates ya celebrados. Base de la defensa contra la manipulación.
+- **Ránking por provincia** (Madrid por defecto) con **media bayesiana**, para que un solo 5 no supere a 40 notas de 4,8.
+- Portada centrada en el amateur de Madrid; la provincia es un parámetro, no una limitación.
+
+### 5. Segunda ronda: confianza y organizadores
+
+Se aceptó la propuesta de avanzar en los riesgos detectados:
+- **Verificación de email** obligatoria para publicar (token de un solo uso; el enlace del correo solo muestra un botón y la verificación se hace por POST para que los escáneres de enlaces no la consuman).
+- **Reclamar una ficha existente** (cuando alguien ya registró un combate tuyo): la solicita el boxeador y la aprueba un moderador.
+- **Rol organizador** con solicitud aprobada por un moderador: crea veladas, monta el cartel y pone resultados, que nacen verificados.
+- Límite de 20 valoraciones al día por usuario.
+
+**Regla de producto fijada por el fundador:** ver contenido (veladas, fichas, ránking) es **público**; votar, registrar récords y demás funciones principales **exigen estar registrado**. Se auditaron todas las acciones del servidor y ya se cumplía (el control está en el servidor, no solo en ocultar botones).
+
+### 6. Calidad: tests y CI
+
+Tests unitarios (récord, media bayesiana, slugs, contraseñas: 17), una **prueba de extremo a extremo en navegador real** del flujo completo (registro → verificación → reclamar ficha → confirmar combate → valorar → organizador con cartel) y un **workflow de GitHub Actions** con PostgreSQL.
+Estado al cierre de esta entrada: en local todo pasa; **la primera ejecución del CI en GitHub estaba en curso** (pendiente de confirmar; anotar el resultado en la siguiente entrada).
+
+### 7. Estrategia de veracidad de datos
+
+El fundador planteó que habrá que **ir afilando** la comprobación de que los datos de cada boxeador, gimnasio y promotora sean veraces, **sin depender de trámites burocráticos con las federaciones** al inicio (aunque el objetivo a medio plazo es colaborar con la Federación Madrileña, la Española y otras, y de momento «no nos conoce nadie»).
+Resultado: una estrategia por capas documentada en [`ARQUITECTURA.md`](ARQUITECTURA.md) — niveles de respaldo, verificar también a quien verifica, comprobaciones automáticas de coherencia, historial de cambios, moderadores locales de confianza en Madrid y vía de entrada a las federaciones ofreciéndoles calendario y resultados limpios.
+
+### 8. Cierre de la sesión y estado
+
+- Rama: `claude/ring-espana-mvp` (sin pull request abierta).
+- Commits, en orden: `a823a77` MVP inicial · `5003eff` enfoque amateur/Madrid · `20016c1` verificación, reclamar ficha, organizadores · `f89a9c3` tests y CI · `2028bf9` CI en cualquier push · `6a7769c` estrategia de verificación.
+- Solicitud del fundador: **documentar todo el proceso** (este diario, `IDEAS.md`, `LECCIONES.md`).
+- **Lo siguiente acordado/propuesto:** (1) enlace de evidencia en cada combate + historial de cambios, (2) sello de verificado para gimnasios y organizadores; después, seguir a boxeadores con avisos de veladas.
+- **Abierto:** resultado del CI; proveedor de correo real; migraciones de base de datos; decidir qué prueba de identidad se pide al reclamar ficha.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Documentación, evidencia, historial y sello de verificado
+
+### Qué se pidió / qué idea surgió
+
+Tras la estrategia de veracidad, el fundador pidió **documentar cada paso** del desarrollo («cómo van surgiendo las ideas… para en algún futuro mostrar todo el proceso… ver por dónde hemos fallado, cómo retomar lo anterior»). Se crearon `DIARIO.md`, `IDEAS.md`, `LECCIONES.md` y `CLAUDE.md` (que obliga a mantenerlos al cerrar cada bloque de trabajo).
+Después aprobó empezar por los puntos 1 y 2 del orden propuesto: **evidencia en los combates + historial de cambios** y **sello de verificado**.
+
+### Confirmación pendiente de la entrada anterior
+
+Las tres primeras ejecuciones del CI en GitHub (runs 1, 2 y 3) terminaron **con éxito**. El CI funciona con PostgreSQL real y ejecuta tipos, tests, build y la prueba de navegador.
+
+### Qué se decidió y por qué
+
+- **Evidencia = un enlace** (acta, cartel, publicación, vídeo) y no subida de ficheros: es lo más barato, no toca datos sensibles ni menores y ya permite la corroboración de nivel 3. Solo se aceptan `http(s)`; `javascript:` y similares se descartan.
+- **Historial de cambios en base de datos** (`AuditLog`: quién, cuándo, antes → después). Por ahora lo ve solo el moderador; hacerlo público por combate queda como idea.
+- **El sello de verificado siempre lleva una nota con la evidencia comprobada** (web, redes, llamada…). Sin nota no se concede. La nota es **interna**: el público solo ve el sello.
+- **Sello del organizador = solicitud aprobada**, con nota del moderador guardada; en la velada aparece «✓ organizador verificado».
+- **Avales cruzados entre entidades: aplazados.** Requieren cuentas de responsable de gimnasio, que aún no existen; se anota en ideas en vez de construir algo a medias.
+
+### Qué se hizo
+
+- Campo `Bout.evidenceUrl`, formularios para registrarla al crear el combate y para editarla después (boxeador, rival, organizador o admin), y enlace «evidencia ↗» en la ficha pública con `rel="noopener noreferrer nofollow ugc"`.
+- Tabla `AuditLog` y registro en: creación de combates, respuesta del rival, decisiones de moderación, resultados, evidencia, reclamaciones, organizadores, eventos y sellos. Página `/admin/historial` con filtros.
+- Sello de verificado en gimnasios (`verifiedAt`, `verifiedNote`) con gestión en `/admin`, insignia en listado y ficha; nota de revisión al aprobar organizadores.
+- Tests: 3 unitarios nuevos (20 en total) y 7 comprobaciones nuevas en la prueba de navegador (15 en total).
+
+### Qué salió mal / qué se aprendió
+
+- **El historial casi mentía.** Al escribir el registro de reclamaciones anoté «aprobada» aunque la aprobación podía acabar rechazada (ficha ya con dueño o usuario con otra ficha). Lo vi al releer, antes de probar, y ahora se registra el resultado real y también lo que se pidió. Regla: un registro de auditoría debe reflejar lo que ocurrió, no lo que se intentó.
+- **Sustituciones de texto verificadas.** Tras el incidente anterior con un reemplazo que no se aplicó, esta vez cada cambio de esquema y de UI se hizo con comprobaciones que fallan si el patrón no existe. Funcionó a la primera.
+
+### Estado y próximos pasos
+
+- Hecho: puntos 1 y 2 del orden de verificación (evidencia, historial y sellos de gimnasio y organizador).
+- Siguiente: comprobaciones automáticas de coherencia (mismo día, duplicados, edades), botón «reportar dato» y puntuación de fiabilidad; después detección de colusión. Candidato de producto: seguir a boxeadores con avisos de veladas.
+- Abierto: cuentas de responsable de gimnasio (para avales), proveedor de correo real, migraciones de BD, qué prueba de identidad pedir al reclamar ficha, y si el historial por combate debe ser público.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Principio fundacional de usabilidad
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió guardar «en lo más profundo» un principio para esta y cualquier aplicación futura: que sea **muy, pero que muy intuitiva para todo tipo de usuario** — niños, gente joven, adultos y personas de edad avanzada — sin importar su nivel tecnológico, con **botones coloridos e intuitivos, enlaces e información fáciles de encontrar**, y **manteniendo siempre la profesionalidad** («que nos vea como gente seria»; nada vulgar ni coloquial). Lo calificó de «súper importante».
+
+### Qué se decidió y por qué
+
+- Se elevó a **principio fundacional F9** y se convirtió en una **lista de comprobación de 11 puntos** en `CLAUDE.md`, para que rija todo el trabajo futuro y no dependa de la memoria de una conversación.
+- Se distingue la **usabilidad** (lenguaje, flujos, mensajes, accesibilidad: se aplica ya) del **diseño visual** (estilo e identidad: aplazado por petición previa del fundador). Antes de cambiar el aspecto visual de forma notable se le consulta.
+- También se guardó a nivel de usuario (`~/.claude/CLAUDE.md`) para que valga en otras aplicaciones, teniendo en cuenta que ese fichero vive en este entorno de trabajo, no en el repositorio.
+
+### Qué se hizo
+
+Solo documentación: principio y lista en `CLAUDE.md`, idea F9 y dos preguntas abiertas en `IDEAS.md`, y esta entrada. No se ha cambiado todavía ninguna pantalla.
+
+### Qué salió mal / qué se aprendió
+
+Reconocimiento honesto del estado actual: **lo construido hasta ahora no cumple el principio.** Hay términos técnicos visibles («disputar», «sin confirmar»), varios formularios con solo texto de ejemplo y sin etiqueta, acciones que redirigen sin ningún mensaje de confirmación y una interfaz sin cuidado de contraste ni tamaños. Era esperable (se priorizó la arquitectura) pero hay que corregirlo antes de que lo use gente real.
+
+### Estado y próximos pasos
+
+- Propuesto: una **auditoría de usabilidad** de lo ya construido frente a la lista de 11 puntos, con los cambios ordenados por impacto (mensajes de confirmación y de error, etiquetas, lenguaje llano, accesibilidad), sin tocar el estilo visual sin consultar.
+- Sigue pendiente lo anterior: comprobaciones de coherencia, «reportar dato», seguimiento de boxeadores.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Ejecución por prioridades: flujos claros, coherencia, avisos de error, ayuda y seguir boxeadores
+
+### Qué se pidió / qué idea surgió
+
+El fundador dio autonomía: «tú vete actuando… con un orden de prioridades de mayor a menor. Primero las funcionalidades importantes, después otras cosas de menor importancia en el funcionamiento básico».
+
+### Cómo se priorizó y por qué
+
+Criterio: primero lo que afecta al funcionamiento básico (registrar récords, votar, consultar veladas) y a que los datos sean creíbles; después lo complementario. Orden ejecutado:
+
+1. **Flujos principales en lenguaje claro** (principio F9): antes de esto, varias acciones fallaban en silencio (p. ej. valorar un combate no permitido no decía nada).
+2. **Volver a donde estabas tras entrar** (se pierde al usuario justo al valorar, que es la función estrella).
+3. **Comprobaciones automáticas de coherencia** de los combates.
+4. **«Reportar un error»** sobre combates y fichas.
+5. **Página «¿Cómo funciona?»**.
+6. **Seguir a boxeadores** con «Mis boxeadores» y aviso por correo.
+
+Cada bloque se hizo con pruebas y se subió por separado.
+
+### Qué se decidió y por qué
+
+- **Avisos como códigos en la URL** (`?aviso=` / `?problema=`) traducidos en un solo fichero (`lib/messages.ts`): el texto vive en un único sitio, es revisable de un vistazo y mantiene un tono claro y profesional.
+- **Duplicados se bloquean; lo sospechoso se marca, no se rechaza.** Un combate el mismo día o a menos de 7 días de otro se guarda con una señal para el moderador, porque puede haber explicaciones legítimas.
+- **Avisos de error:** un aviso abierto por usuario y elemento y máximo 10 al día, para que el mecanismo no sea un arma de acoso.
+- **Avisos por correo a seguidores solo de combates publicados por organizadores**, nunca de los autodeclarados: si no, cualquiera podría inventarse combates para llenar de correos a los seguidores de otra persona.
+- **Navegación principal reducida a 5 elementos**; el resto (organizadores, registro) pasa al pie y a la zona de cuenta, siguiendo la regla del principio F9.
+
+### Qué se hizo
+
+- Avisos de éxito/problema en todas las acciones; etiquetas visibles en registro, entrada, ficha y registro de combates; lenguaje llano («pendiente de confirmar», «en revisión», «Sí, es correcto» / «No es correcto»); foco visible, enlace «Saltar al contenido» y tamaños mínimos de 44 px.
+- Regreso a la página de origen tras iniciar sesión (con validación de rutas internas).
+- `Bout.flags`, bloqueo de duplicados y señales en la cola de moderación (`lib/coherence.ts`).
+- Modelo `Report`, formulario «¿Hay un error? Avísanos», sección de avisos en `/admin`.
+- `/ayuda` con pasos por perfil y glosario de etiquetas; pie de página.
+- Modelo `Follow`, botón «Seguir a este boxeador» con contador, `/siguiendo` y avisos por correo (`lib/notify.ts`).
+- Tests: 25 unitarios y 30 comprobaciones de navegador (antes 20 y 15). *(Corrección: una primera versión de esta entrada decía 28; el recuento real es 30.)*
+- Commits: `1faa28d`, `1f74af7`, `46d3684` y el de esta entrada.
+
+### Qué salió mal / qué se aprendió
+
+- **Un test fallaba por mi selector, no por la app:** Next.js añade su propio elemento `role="alert"`, así que contar «todas las alertas» daba 2. Solución: acotar al texto del mensaje.
+- **`networkidle` no es fiable para esperar a una acción:** el test del sello del gimnasio miraba la página antes de que terminara la acción. Solución: esperar a un estado concreto de la interfaz («Retirar sello»). Regla: esperar a lo visible, no al tráfico de red.
+- **Cambiar textos rompe pruebas que buscan textos:** al pasar a un lenguaje más claro (`Crear ficha` → `Crear mi ficha`) hubo que actualizar el e2e. Regla: cuando cambie un texto, buscar dónde lo usan las pruebas.
+- **El CI de GitHub falló dos veces y lo descubrí tarde.** Los runs 4 y 5 (commits `2214758` y `bc39c51`) fallaron en «gimnasio muestra el sello de verificado»: la misma carrera de sincronización que ya había detectado y corregido en local (`1faa28d`), pero yo aún no había mirado el CI de esos envíos. Los runs 6, 7 y 8 pasan. Lección: **comprobar el resultado del CI tras cada envío**, no dar por hecho que pasa porque en local pasa.
+- **Honestidad sobre el alcance de F9:** se aplicó a los flujos principales (registro, entrada, ficha, combates, valoración, seguir, ayuda). **No se ha auditado todavía** el panel del organizador ni el de moderación, ni se ha medido el contraste con una herramienta, ni se ha probado con personas reales. No debe darse F9 por cumplido.
+
+### Estado y próximos pasos
+
+- Hecho: los 6 puntos.
+- **Limitaciones abiertas:** los correos siguen saliendo al log (falta proveedor real); antes de enviar correos de verdad hace falta que el usuario pueda **elegir no recibir avisos** (RGPD); la comprobación de edades no se hizo (casi nadie rellena la fecha de nacimiento); «mismo día/menos de 7 días» solo mira combates ya registrados.
+- **Siguiente por prioridad:** (a) preparar el despliegue real: proveedor de correo, migraciones de base de datos, variables de entorno y preferencias de aviso; (b) auditoría de usabilidad del resto de pantallas (organizador, moderación, listados) y medición de contraste/accesibilidad automática; (c) decidir «tú» o «usted»; (d) pruebas con usuarios reales.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Nuevas directrices: diseño al final, aura, varias disciplinas y récord de partida
+
+### Qué se pidió / qué idea surgió
+
+El fundador aportó cuatro directrices importantes:
+
+1. **Diseño visual al final (recordatorio).** «No me gustan nada los diseños que ofrece Claude… siempre hace los mismos diseños, siempre utiliza los mismos colores… esto lo vamos a trabajar muy bien para que no pueda ocurrir y no se asocie directamente el desarrollo de esa aplicación con una inteligencia artificial como Claude.» Pidió dejarlo **muy marcado y documentado** y pasar al diseño «cuando hayamos terminado todo el proceso de creación de la aplicación».
+2. **Aura en lugar de estrellas.** Quiere llevar la valoración «a un ambiente más actual, más juvenil, más de redes sociales»: valorar con **«aura»**. Quién tiene más o menos aura se define **por el número de clics** en el botón de aura del peleador; cuantos más clics, **mejor rankeado dentro de su categoría y su división**.
+3. **Ampliar a otros deportes de contacto:** MMA, kickboxing, K-1, jiu-jitsu… «Queremos ser los pioneros. Que todas esas disciplinas se sientan parte de un mismo ecosistema dentro de la comunidad española de deportes de contacto, en la que obviamente el boxeo tiene que estar en cabeza.»
+4. **Récord de partida.** Muchos peleadores no recuerdan su récord. Primero indicarán **cuántos combates llevan**; si no recuerdan el récord, solo ese número. **Desde ese punto de partida** registran los nuevos. Reconoce que no se puede comprobar: «es lo que hay».
+
+### Qué se decidió y por qué
+
+- **Diseño:** principio F10 documentado en `CLAUDE.md` (y a nivel de usuario) con un procedimiento para cuando llegue el momento: briefing con referencias del fundador, varias direcciones distintas, lista de tics de «diseño de IA» que evitar, recomendación de un diseñador humano para la marca y registro de decisiones en `docs/DISENO.md`. **La interfaz actual es provisional y no se pule.**
+- **Aura, récord de partida y varias disciplinas se registran como decisiones de producto** (ideas F11 y las tres filas nuevas de `IDEAS.md`), pero **no se implementan todavía**: hay dos decisiones que condicionan el modelo de datos y el fundador pidió que se le pregunte si no queda claro.
+- **Riesgo señalado con el aura por clics:** si los clics son ilimitados, un solo usuario (o varias cuentas falsas) puede inflar a un peleador sin límite, y el ránking pierde credibilidad, que es justo lo que se ha estado protegiendo. Se propone conservar la regla que ya existe (una valoración por persona y combate, sin participantes) y aplicarla al aura, o como mínimo un tope diario.
+- **Récord de partida:** se mostrará **separado** de lo registrado en la app y con su etiqueta de «declarado por el propio deportista», nunca mezclado sin distinguir, para no perder la honestidad del sistema de niveles de respaldo.
+
+### Qué se hizo
+
+Solo documentación: principio de diseño en `CLAUDE.md` y `~/.claude/CLAUDE.md`, ideas F10 y F11, tres ideas de producto nuevas y preguntas abiertas en `IDEAS.md`, y esta entrada. **No se ha tocado el código.**
+
+### Qué salió mal / qué se aprendió
+
+Nada roto. Observación: los tres cambios de producto (aura, disciplinas, récord de partida) **tocan el modelo de datos de arriba abajo** (el récord pasa a ser por disciplina, la valoración cambia de estrellas a aura, «boxeador» pasa a «peleador»). Cuanto antes se hagan, más barato es: hoy solo hay datos de demostración.
+
+### Estado y próximos pasos
+
+- Pendiente de respuesta del fundador: tope de clics del aura, una ficha por persona o por deporte.
+- Después: (1) disciplinas + rebautizar «boxeador» a «peleador» en el modelo y la interfaz, (2) récord de partida, (3) aura y ránking por categoría y disciplina, (4) adaptar tests y documentación.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Implementación: peleadores, varias disciplinas, récord de partida y aura
+
+### Qué se pidió / qué idea surgió
+
+Ejecución de las directrices de la entrada anterior. El fundador respondió a las tres preguntas abiertas:
+
+1. **Aura:** «un aura por persona y combate» (la opción recomendada). Su idea original era ordenar por «número de clics»; se reconcilió así: el total de aura es el número de personas distintas que la han dado, lo que mantiene la esencia (más aura = mejor posición) sin que un solo usuario pueda inflar el ránking pulsando sin límite.
+2. **Fichas:** una sola ficha por persona con varias disciplinas.
+3. **Disciplinas iniciales:** boxeo, MMA, kickboxing, K-1 y jiu-jitsu, dejando el sistema preparado para añadir más.
+
+### Qué se decidió y por qué
+
+- **«Boxeador» pasa a «peleador» en todo** (modelo, código, interfaz y rutas: `/peleadores`). Se hizo ahora porque solo hay datos de demostración y era el momento más barato. El boxeo sigue en cabeza (orden de presentación, ránking por defecto, portada).
+- **Categorías de peso y formas de terminar por disciplina** en un único fichero (`lib/disciplines.ts`). Las categorías son **orientativas**, sin validar con las federaciones de cada deporte.
+- **Récord de partida:** se guarda por disciplina (total y, si se recuerda, victorias/derrotas/empates; los huecos cuentan como 0 y si da el total y el detalle deben cuadrar). En la cifra principal solo suma si hay detalle; si solo se sabe el total, se muestra aparte («además, N combates anteriores sin detallar») y siempre como **declarado por el propio deportista**.
+- **Jiu-jitsu:** al ser deporte de torneo (varios combates el mismo día), no se le aplican las señales de combates muy seguidos.
+- **Ránking de aura:** por disciplina y zona, agrupado por categoría de peso (de menos a más peso), con empates en la misma posición y filtro de periodo (siempre / últimos 90 días) para que no gane solo quien lleva más tiempo en la app.
+
+### Qué se hizo
+
+Cuatro entregas, cada una con pruebas: `66edb2c` (renombrado a peleador), `f41f74e` (disciplinas y récord de partida), `d335b06` (aura y ránking) y esta documentación. Tests: 41 unitarios y 39 comprobaciones de navegador (antes 25 y 30).
+
+### Qué salió mal / qué se aprendió
+
+- **Prisma se negó a hacer un reset de la base de datos** al detectar que lo lanzaba una IA, y exige el consentimiento explícito del usuario. **No lo forcé**: creé una base de datos de pruebas nueva y vacía y apliqué el esquema ahí. La anterior (109 usuarios de pruebas) sigue existiendo en el entorno; solo habría que borrarla con permiso.
+- **Una comprobación intermitente volvió a aparecer** (contador de seguidores y contador de aura tras la acción). Esta vez **medí** la causa en lugar de suponerla: el contenido se actualiza entre 4 y 30 ms después del aviso, imperceptible; era solo sincronía del test.
+- **Un script de edición falló a medias** porque la función exigía un parámetro que olvidé; al no escribir nada hasta el final, no dejó cambios parciales. Regla: los scripts de edición deben ser todo-o-nada.
+
+### Estado y próximos pasos
+
+- Hecho: peleadores, cinco disciplinas, categorías por disciplina, récord de partida, aura y ránking por categoría.
+- **Riesgos que deben decidirse:** (1) el récord de partida se puede editar en cualquier momento (queda en el historial, pero alguien podría inflarlo después); habría que bloquear la edición tras el primer combate registrado o pedir confirmación de un moderador; (2) el aura absoluta favorece a quien compite más; hay que decidir si se normaliza; (3) las categorías de peso deben validarse con federaciones.
+- Pendiente de lo anterior: despliegue real (proveedor de correo, migraciones, variables de entorno, preferencias de aviso), auditoría de usabilidad del resto de pantallas y decisión «tú/usted».
+- Pendiente de decidir: el nombre de la marca (ya no encaja «Ring España» del todo con MMA/jiu-jitsu).
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Aura, monetización, todo en español y análisis de la competencia
+
+### Qué se pidió / qué idea surgió
+
+1. **Aura:** «principalmente va a ser un clic por usuario y por pelea. Y más adelante podremos introducir tres clics, pero eso ya sería una función premium.»
+2. **Monetizar:** una de las finalidades es «sacar dinero» con **funciones premium**, que se harán «una vez ya hayamos terminado toda la estructura básica».
+3. **«Todo debe estar en español.»**
+4. **Competencia:** Raunder (raunder.es) y BoxRec (boxrec.com): «mira en qué fallan y hazlo mejor; mira también lo que hacen bien y mejóralo».
+
+### Qué se decidió y por qué
+
+- **Aura a un clic por usuario y combate**: ya es lo que está implementado. Los tres clics quedan registrados como función premium **aplazada**, con un riesgo anotado: si pagar da más peso al aura, el ránking pasa a ser «quien paga, gana» y se pierde la credibilidad que se ha protegido hasta ahora.
+- **Principio de monetización**: la consulta básica sigue siendo gratuita y **nunca se vende la verificación, el sello ni una posición en el ránking**. Se listan candidatas (ficha ampliada, herramientas para organizadores, páginas de gimnasio, avisos y comparador ampliados, sin publicidad) para decidir después con el fundador.
+- **Español**: se aplicó a todo lo que ve una persona. Se interpretó que **el código interno sigue en inglés** (`Fighter`, `Bout`), y se dejó anotado que hay que preguntar si el fundador quiere también el código en español, por lo grande del renombrado.
+- **Competencia**: no se afirma nada que no se pueda comprobar (ver «qué salió mal»).
+
+### Qué se hizo
+
+- Español: páginas de «no encontrada» y de error propias (antes salían las de Next.js en inglés), «email» pasa a «correo electrónico» en textos y correos, y `/admin` pasa a `/moderacion` (`56a7a8e`).
+- `docs/COMPETENCIA.md` con lo comprobado, lo que es conocimiento general sin comprobar, y una lista de mejoras propuestas.
+- Reglas nuevas en `CLAUDE.md` (idioma, aura y premium, competencia) e ideas F12 y F13 más siete ideas nuevas.
+- Tests: 41 unitarios y 39 comprobaciones de navegador, sin fallos en 3 ejecuciones.
+
+### Qué salió mal / qué se aprendió
+
+- **No pude abrir ni Raunder ni BoxRec**: la política de red del entorno bloquea esos dominios (también Wikipedia), y las búsquedas no devuelven nada de Raunder. **No rodeé el bloqueo ni rellené los huecos con suposiciones.** El análisis de BoxRec se limita a quejas públicas de pocas reseñas y a un artículo de opinión con fecha, señalado como tal, y a conocimiento general marcado como «sin comprobar». **De Raunder no se dice nada.** Regla: cuando falta una fuente, decirlo, y no escribir un análisis que parezca completo.
+- Hay que pedir al fundador que habilite esos dominios en la red del entorno (o que aporte capturas o texto) para completar el análisis.
+
+### Estado y próximos pasos
+
+- Pendiente de acceso: completar el análisis de Raunder y confirmar lo general de BoxRec.
+- Mejoras propuestas a partir del análisis, por impacto: estadísticas de carrera por disciplina, comparador «cara a cara», tarjeta para compartir en redes, preparación para buscadores y avisos al propio peleador.
+- Sigue pendiente lo anterior: despliegue real (correo, migraciones), auditoría de usabilidad, decisiones sobre el récord de partida editable y la normalización del aura, nombre de la marca.
+
+---
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — El CI vuelve a avisar: pruebas deterministas
+
+### Qué pasó
+
+Al revisar el CI, el run 17 (el del cambio a español) **falló** y el 18, con exactamente el mismo código, **pasó**: era una comprobación intermitente más. La causa era la misma que ya había medido (el contenido se actualiza unos milisegundos después del aviso), pero en una comprobación que no había revisado.
+
+### Qué se hizo
+
+- En lugar de parchear solo la línea que falló, se revisaron **todas** las esperas del test de navegador y se sustituyeron por esperas a un estado visible concreto. Ya no queda ningún `networkidle`.
+- Al ejecutar dos pruebas a la vez para simular un CI lento, apareció otro fallo de aislamiento (nombre de organización repetido); ahora es único por ejecución.
+- Resultado: 8 ejecuciones simultáneas consecutivas con 39/39, y 6 secuenciales sin fallos.
+
+### Qué salió mal / qué se aprendió
+
+Reconozco que fue **la segunda vez** que un fallo del CI destapó una fragilidad que en local «pasaba». La lección (ya escrita en `LECCIONES.md`) es buscar la raíz en todo el fichero y probar también bajo carga o en paralelo, no solo repetir en serie.
+
+### Estado
+
+Sin cambios de producto. Pendiente lo de siempre: acceso a las webs de la competencia, despliegue real, auditoría de usabilidad y decisiones sobre el récord de partida y el aura.
+
+## Sesión 1 (continuación) — 30 de septiembre de 2026 — Corrección de la auditoría (bloques 1 a 5) y traslado a Claude Code
+
+### Qué se pidió / qué idea surgió
+
+- Tras la medición de accesibilidad, el fundador pidió: «sigue avanzando en otras cosas que han quedado pendientes». Se lanzó una **auditoría exhaustiva de solo lectura** con 9 revisores independientes (seguridad, privacidad, lógica de acciones y de páginas, usabilidad, accesibilidad, despliegue, pruebas, documentación). Resultado: 175 hallazgos brutos → **99 únicos** (`docs/AUDITORIA.md`).
+- Ante el resultado: «**Arregla lo confirmado por prioridad**».
+- Al final de la sesión: «**Para un momento. Quiero trasladar este proyecto a Claude Code. Trabajar el proyecto entero a Claude Code.**» Se detuvo el trabajo nuevo y se preparó el traslado (`docs/TRASLADO.md`).
+
+### Qué se decidió y por qué
+
+Orden de los bloques, de más a menos grave: (1) validación y robustez del servidor, (2) integridad de la verificación y del aura, (3) acceso y correo, (4) privacidad, (5) búsqueda, rendimiento y despliegue; (6) accesibilidad y (7) pruebas y documentación quedan para Claude Code.
+
+Decisiones que conviene que el fundador conozca (las marcadas con ★ **las tomó el asistente y necesitan su validación**):
+- Los combates rechazados o sin confirmar **no se muestran como hechos ni cuentan** en récord ni aura; tienen su cola de moderación para restaurarlos.
+- ★ Una ficha creada por un tercero para su rival es **provisional** (solo nombre e inicial del apellido, sin listados ni buscadores) hasta que se reclame o el combate se confirme.
+- ★ **Eliminar la cuenta:** la ficha se borra si no tiene combates y se **anonimiza** si los tiene (los combates forman parte del récord de los rivales).
+- ★ **Plazos de conservación** (cuentas sin verificar 30 días, solicitudes 90 días, avisos 12 meses, historial 3 años) y **texto de privacidad**: los propuso el asistente; necesitan revisión jurídica.
+- ★ El formulario de registro sigue diciendo «ya hay una cuenta con ese correo» (mejor para la persona), con límites por IP, aunque revela qué correos tienen cuenta.
+- No se usa `cache()` de React en `getUser` (dejaría la sesión obsoleta tras cerrar sesión o eliminar la cuenta).
+- Contraseñas con parámetros de OWASP guardados en el hash (se pueden reforzar sin invalidar cuentas); el correo real será Resend por HTTP, y en producción el servidor no arranca sin `APP_URL`.
+
+### Qué se hizo
+
+Commits en la rama `claude/ring-espana-mvp`:
+- **Bloques 1 y 2** (`f8638f9`, `1f3f01c`): validación de fechas, longitudes, provincia y resultado frente a la disciplina; sin claves heredadas (`__proto__`…); enlaces de retorno solo internos; combates únicos por pareja y velada; bloqueo de concurrencia en los límites diarios; aura sin combates rechazados ni cancelados, comentarios denunciables; fichas provisionales; cola «en revisión».
+- **Bloque 3** (`f391e9d`): límites de intentos, scrypt asíncrono, recuperación de contraseña, enlaces de un solo uso con tipo, correo con Resend y modo registro explícito, comprobación del entorno al arrancar, limpieza periódica.
+- **Bloque 4** (`ecb6c04`): Mi cuenta (datos, contraseña, avisos), descarga y eliminación de datos, corrección de la ficha, página de privacidad, baja de avisos con enlace, avisos a seguidores tras responder y tolerantes a fallos, plazos de conservación.
+- **Bloque 5, parcial** (`4554379`, `5303086`): búsqueda sin tildes y por varias palabras, listados paginados, ránking sumado en la base de datos, cabeceras de seguridad (política de contenido, HSTS…), `robots.txt`, mapa del sitio, `/salud`, títulos propios, índices, seed protegido, higiene del repositorio y del CI.
+- **Pruebas:** de 73 a **103 unitarias** y de 39 a **146 comprobaciones de navegador** en cinco guiones (`flujo`, `integridad`, `acceso`, `cuenta`, `busqueda`) con ayudas comunes.
+- **Traslado:** `README.md` y `docs/ARQUITECTURA.md` reescritos (describían el modelo antiguo), `docs/AUDITORIA.md` (los 99 hallazgos con su estado), `docs/TRASLADO.md` (puesta en marcha, pendientes y decisiones), ideas y lecciones actualizadas.
+
+### Qué salió mal / qué se aprendió
+
+- **La auditoría no se terminó de verificar:** el flujo (308 agentes, ~20 millones de tokens) agotó el límite de uso de la sesión. Los hallazgos 1 a 90 pasaron la verificación adversarial (3 se refutaron: 81, 83 y 90); los **91 a 99 no**, y la pasada final de «huecos» no llegó a ejecutarse. Una segunda pasada, ya al día siguiente, verificó del 91 al 96 (el 91 y el 92 salieron «refutados» porque ya estaban corregidos); **quedan sin verificar el 97, 98 y 99** y los «huecos». **Al escribir el traslado afirmé por error que eran los 53 a 99 los no verificados y que ninguno se había refutado**: mi copia de los datos era anterior al final del proceso. Lo detecté al retomar la sesión y lo corregí en todos los documentos.
+- **El CI falló una vez (ejecución 25):** una prueba de paginación dependía de que la base local tuviera cientos de peleadores; en el CI está vacía. Se corrigió (`5303086`) y se probó sobre un **clon limpio con base vacía**.
+- **Una tabla de tildes desalineada** (la «ñ» daba «u») la cazaron las pruebas de navegador, no la lectura del código. Ahora se construye por pares y tiene prueba unitaria.
+- **Servidor antiguo sirviendo código viejo** (otra vez, por matar el proceso equivocado) y **PostgreSQL parado** tras una pausa del entorno: costaron varias vueltas.
+- **Incumplí la petición de documentar al cerrar cada bloque:** dejé README y ARQUITECTURA para el final y se quedaron describiendo el modelo antiguo (lo detectó la propia auditoría, hallazgo 91). Se corrigió al preparar el traslado.
+- Lecciones completas en `docs/LECCIONES.md` (sección «De la corrección de la auditoría»).
+
+### Estado y próximos pasos
+
+Sin trabajo a medias en el código: todo está commiteado y subido; las pruebas pasan (tipos, 103 unitarias y 146 de navegador). **Quedan** el resto del bloque 5 (migraciones de Prisma, colas de moderación paginadas), el bloque 6 (accesibilidad y usabilidad, con pruebas con personas reales) y el bloque 7 (pruebas de autorización, documentos). Hay **12 decisiones pendientes del fundador** y el **análisis de la competencia**, que necesita acceso a internet. Todo, en orden, en [`TRASLADO.md`](TRASLADO.md).
+
+## Sesión 1 (continuación) — 1 de octubre de 2026 — Bloques 5 y 6 (accesibilidad y usabilidad), migraciones y revisión independiente
+
+### Qué se pidió / qué idea surgió
+
+- Tras preparar el traslado a Claude Code, el fundador aclaró: «**Aún así quiero seguir trabajando aquí la aplicación y para ciertas cosas lo haré en code terminal**», y después «**Continúa**». Se retomó la lista de pendientes por prioridad.
+
+### Qué se decidió y por qué
+
+Decisiones que tomó el asistente y que el fundador debe conocer (★ = necesitan su validación):
+- ★ **Ajustes de accesibilidad en el estilo, con el menor cambio posible**: el borde de campos y botones secundarios pasa de casi invisible a un gris que se distingue (3:1), los enlaces del texto van subrayados, las etiquetas y los estados tienen 16 px, las zonas táctiles 44 px, la etiqueta «Amateur» cambia a un azul más oscuro, y los controles nativos pasan a modo oscuro. La paleta (fondo oscuro, rojo y dorado) no cambia. Todo está concentrado en `globals.css`, marcado como «A11Y» y se puede revertir. Se considera accesibilidad (se aplica ya), no diseño visual (se deja para el final), pero el fundador debe confirmar que no le parece un cambio de estilo notable.
+- ★ **Cabecera más corta:** cinco enlaces de navegación, «Mi cuenta», «Salir» y un buscador con botón. «Mis peleadores» pasa a «Peleadores que sigo», dentro de «Mi cuenta», que ahora reúne los accesos directos y los avisos de error enviados con su respuesta. «Mi ficha» solo sale a quien es peleador; «Mis veladas», a quien organiza; «Moderación», a la moderación.
+- ★ **Quien recibe un «no» tiene derecho a saber por qué:** el motivo es obligatorio al rechazar una reclamación de ficha o una solicitud de organizador; lo ve la persona en la aplicación y por correo electrónico (así deja de ser falso el «te avisaremos»). Al **aprobar** a un organizador se exige anotar la evidencia comprobada (el sello de organizador se apoya en ella).
+- ★ La solicitud de organizador pide ahora **cómo podemos comprobarlo** de forma obligatoria.
+- En el cartel, cada esquina se elige de una **lista con alias, ciudad y gimnasio** (el valor es el identificador, no un texto que haya que escribir igual).
+- **Lo escrito no se pierde tras un error** (lo guarda el navegador de esa pestaña hasta la siguiente pantalla); nunca se conservan contraseñas ni casillas (las casillas suelen ser confirmaciones de acciones sin vuelta atrás: hay que marcarlas de nuevo a propósito).
+- **Migraciones de Prisma** (`prisma/migrations`): el CI las aplica sobre una base vacía y comprueba que reproducen exactamente `schema.prisma`.
+
+### Qué se hizo
+
+- **Bloque 5 (resto):** migración inicial verificada, `test:a11y` en el CI, índices que faltaban, descripción del sitio, vocabulario residual (hallazgos 80, 82, 89, 96, 97 y parte de 88).
+- **Bloque 6:** `axe-core` pasa de 14 incumplimientos graves a **0 en 40 pantallas**; filtros y formularios con etiqueta visible; nombres accesibles con el objeto («Dar aura a X por el combate en Y»); avisos en regiones permanentes para lectores de pantalla; enlaces con aspecto de botón (nunca un botón dentro de un enlace); tablas con cabeceras y títulos; portada con botón de crear cuenta; historial en español; combate pendiente de confirmar como tarjeta; sin desbordamiento a 360 px.
+- **Pruebas:** de 103 a **113 unitarias** (incluye una que exige texto para cada código de mensaje) y de 146 a **174 comprobaciones de navegador** (nuevo guion de usabilidad: navegación, tamaños, contraste calculado, enlaces subrayados, lo escrito que se conserva, respuestas a solicitudes, reflujo en móvil).
+- **Revisión independiente** (flujo de 6 revisores y verificación adversarial de cada hallazgo) sobre todo lo corregido desde la auditoría; sus resultados, abajo en «Estado».
+
+### Qué salió mal / qué se aprendió
+
+- **Una prueba mía no podía fallar:** comprobaba que la página no dijera «Algo ha salido mal», una frase que la aplicación nunca usa. Ocultó un error real: con `?problema=__proto__` el aviso rompía la página en el navegador. Lo corregí (ahora se busca con `lookup`) y arreglé la prueba, comprobando antes que **fallaba** con el código antiguo.
+- **React 19 vacía los campos de un formulario cuando termina su acción**, así que la primera versión de «no perder lo escrito» no funcionaba (se rellenaba y se volvía a vaciar). Se escucha el evento de reinicio y se rellena justo después.
+- **Restaurar casillas era peligroso:** la confirmación de «eliminar mi cuenta» volvía marcada tras un error de contraseña, y la prueba eliminó la cuenta sin querer. Las casillas ya no se recuerdan.
+- Otra vez el servidor local y PostgreSQL desaparecieron entre dos pasos (el entorno se detiene); un código de mensaje que usaban las acciones (`cartel_boxeadores`) **no tenía texto** y la persona no veía nada: ahora una prueba lo impide.
+- Los hallazgos 91 y 92 salieron «refutados» en la segunda pasada de verificación **porque ya estaban corregidos** cuando se comprobaron; no porque fueran falsos. Está anotado en `AUDITORIA.md`.
+- Lecciones completas en `docs/LECCIONES.md`.
+
+### Estado y próximos pasos
+
+Los resultados de la revisión independiente y de la primera pasada de pruebas por personas están en la entrada siguiente (1 de octubre, funcionalidad completa y organización).
+
+---
+
+## Sesión 1 (continuación) — 1 de octubre de 2026 — Funcionalidad completa y organización escalable
+
+### Qué se pidió / qué idea surgió
+
+Palabras del fundador: «No quiero que te centres ahora mismo en diseños, colores. Lo que quiero es que te centres en la funcionalidad completa de la aplicación. No quiero fallas en el sistema, funcionalidades inservibles, botones que no funcionan… que un usuario pueda entrar, entienda absolutamente todo, le funcione todo correctamente y esté todo organizado. Quiero que sea perfecta, cómoda de usar, que no haya ningún fallo.» Y sobre la forma de trabajar: «como estamos haciendo vibe coding, es muy importante la organización, la estructura […] para que pueda ser escalable […] una buena base, un buen hábito de desarrollo, documentando todo, esquematizando todas las cosas. Que haya una red clara de a dónde seguir, qué rutas tomar para hacer X cosas. En algún momento ampliaré el equipo […]. No puede ser una maraña de cables: tiene que estar todo reglado, medido y estructurado.»
+
+### Qué se decidió y por qué
+
+- **Prioridad única: funcionalidad.** Nada de diseño visual. Se recorrió la aplicación «como lo haría una persona», con agentes que hacen de personas de prueba en navegador real (guion en `docs/pruebas/personas.md`, entorno aislado por persona con `scripts/entorno-aislado.sh`) y una revisión de código independiente.
+- **Estructura por dominios** en lugar de un fichero de acciones de 931 líneas y 27 ficheros planos en `src/lib`: acciones en módulos por dominio, lógica agrupada por dominio, **reglas de dependencia comprobadas por una prueba** (así no se pueden romper sin que falle el CI), una guía con recetas («cómo hago X»), un índice de documentación y un **mapa funcional generado del código** (se comprueba en el CI, así nunca queda desfasado). Se hizo con un script que usa el analizador de TypeScript y se validó primero en una copia (tipos, 237 pruebas, compilación y 174 comprobaciones de navegador) antes de tocar el repositorio. El movimiento fue un commit aparte, sin cambios de comportamiento.
+- **Cada hallazgo se reproduce antes de corregirse** y se corrige con su prueba. Todo queda registrado en `docs/pruebas/hallazgos-2026-10-01.md`.
+
+### Qué se hizo
+
+- **Reorganización** (commit `0576eb5`): ver arriba y `docs/DESARROLLO.md`, `docs/README.md`, `docs/MAPA-FUNCIONAL.md`.
+- **Lo que salió de las pruebas por personas** (solo terminó la persona «visitante», 19 hallazgos): error 500 con `?constructor=` (y con `%00` y parámetros repetidos) en todas las pantallas con filtros → `src/middleware.ts`; fichas de peleador y de velada ilegibles en el móvil → tablas apiladas; redirecciones mudas a «Entrar» → `requireUser(ruta)` y guardas de permisos en un solo sitio; quien se registra desde «Entra para dar aura» perdía el sitio → ruta de vuelta; resultados pendientes mostrados de forma incoherente; formularios en columna torcidos por una regresión de CSS mía; textos que explican por qué algo no se puede hacer.
+- **Lo que salió de la revisión de código** (44 hallazgos de 3 revisores, sin verificación adversarial): límite de intentos de acceso que se saltaba con peticiones simultáneas (`reservar()`); `resetPassword` que calculaba el hash antes de validar el enlace; confirmación del rival no ligada al resultado que vio y combates confirmados sin resultado que quedaban atascados; decisiones de moderación que se pisaban; datos personales que quedaban en el historial al eliminar la cuenta; IP del cliente falsificable; limpieza de datos que solo corría al registrarse y podía borrar moderadores; nombres no latinos que fundían veladas y gimnasios; y 19 de interfaz (restauración de lo escrito, desplegables cerrados tras el error, nombres accesibles, etc.).
+- **Pruebas:** de 194 a **266 unitarias** y de 174 a **193 comprobaciones de navegador**; axe sigue en 0 incumplimientos.
+
+### Qué salió mal / qué se aprendió
+
+- **Los dos flujos de agentes se cortaron por el límite de uso de la sesión**: de 10 personas terminó 1; de 6 revisores, 3, y ninguna de las 91 verificaciones adversariales. No se debe presentar como una revisión completa: los hallazgos de la revisión los reproduje o razoné yo antes de corregir. Una segunda tanda de personas se lanzó después, por fases (ver «Estado»).
+- **Una regresión de CSS mía** (de un bloque anterior) dejó nueve formularios torcidos y no lo vio ninguna prueba automática: solo lo vio un revisor. Ahora se miran capturas tras tocar CSS global.
+- **La prueba móvil pasaba mientras la velada se salía de la pantalla**: no medía las fichas con datos. Ahora la prueba crea sus datos.
+- Al volcar la copia reorganizada al repositorio olvidé `prisma/seed.ts` (no había `rsync`): `tsc` lo detectó. Ahora se comparan los árboles con `diff -rq`.
+- El servidor local y PostgreSQL desaparecieron otra vez al reiniciarse el entorno.
+- Lecciones completas (con la regla de cada una) en `docs/LECCIONES.md`, sección del 1 de octubre.
+
+### Estado y próximos pasos
+
+- CI en verde en los commits de la reorganización y de las correcciones de interfaz; el último se estaba ejecutando al escribir esto.
+- **En marcha:** segunda tanda de personas de prueba (aficionado, peleador, rival, organizador, moderadora) sobre la versión corregida; después, la tercera (seguridad, móvil y teclado, persona mayor, exploración destructiva) y los revisores que no llegaron a ejecutarse. Lo que salga se anota en `docs/pruebas/`.
+- **Decisiones del fundador nuevas** (en `docs/TRASLADO.md` §7): correo de contacto y responsable, carteles oficiales con fichas provisionales, restaurar fichas ocultadas.
+- **Antes de publicar:** definir `TRUSTED_PROXY_HOPS` según el alojamiento, `CONTACT_EMAIL` y `RESPONSABLE_NOMBRE`, y probar con personas reales de distintas edades.
+
+---
+
+## Sesión 1 (continuación) — 2 de octubre de 2026 — Segunda tanda de pruebas por personas: correcciones
+
+### Qué se pidió / qué idea surgió
+
+Seguir con la prioridad del fundador (funcionalidad completa, sin botones que no funcionen). Además, dos peticiones nuevas del 1–2 de octubre, **solo registradas, aún sin implementar**: (a) «una especie de CRM para las federaciones y promotoras» para que publiquen veladas y administren peleadores; (b) un selector de tres opciones al registrarse o entrar: A usuario normal, B peleador, C organizador/federación («eso ya lo veremos más tarde»). Están en `docs/IDEAS.md`.
+
+### Qué se decidió y por qué
+
+- Corregir primero lo que haría tropezar a una persona real: doble clic, combate registrado por error, rival sin aviso, ficha duplicada, organizador que no puede corregir.
+- La ficha provisional de un rival no lleva su apellido en la dirección pública hasta que se verifica: es un dato de un tercero.
+
+### Qué se hizo
+
+Ver la tabla de la segunda tanda en `docs/pruebas/hallazgos-2026-10-01.md`: protección contra doble envío en toda la aplicación, correos al rival y de vuelta al autor, motivo obligatorio al rechazar, quitar un combate propio, combate de hoy sin resultado, ficha sin callejones, disciplina duplicada, editar/cancelar/quitar del cartel para el organizador, y dirección provisional sin apellido.
+
+### Qué salió mal / qué se aprendió
+
+- Tres fallos de **mis propias pruebas** (esperas a un aviso anterior, doble clic que seguía enviando dos veces, un selector de texto ambiguo): ver `docs/LECCIONES.md`. Dos de ellos mostraron que la primera versión de la protección de doble envío no bastaba.
+- La paridad con la base de datos vacía (la que usa el CI) volvió a ser la que lo descubrió.
+
+### Segunda ronda del mismo día (petición «haz lo recomendable»)
+
+Corregidos los hallazgos de la segunda tanda que no dependían de una decisión del fundador: «no oficial» en el calendario, «Mis combates» en móvil, homónimos distinguibles al elegir rival, texto de avisos según la preferencia real y la pantalla de dirección mal codificada en español. Detalle en la tabla de hallazgos. Se dejó fuera, a propósito, lo que necesita decisión suya (aura por combate o por peleador, menores, selector A/B/C y CRM).
+
+### Demostración alojada (petición del fundador: «Lánzame una demo»; «esta sesión la estoy haciendo en el móvil»)
+
+El entorno de desarrollo en la nube no admite visitas desde fuera, y el fundador trabaja desde el móvil, así que un script local no le servía. Se preparó una **demo alojada**: `render.yaml` (web + base de datos gratuitas en Render), `scripts/arranque-demo.sh`, y un **modo demostración** (`DEMO_MODE=si`) con un botón para confirmar el correo sin correos reales y otro para cambiar de papel (aficionado, peleador, organizador, moderador) con una sola cuenta. Las acciones se niegan si la variable no está; hay pruebas unitarias y una de navegador (`tests/e2e/demo.mjs`). Guía en `docs/DEMO.md`. **Limitación honesta:** el arranque se probó aquí en modo producción, pero el `render.yaml` no se ha podido probar en Render (hace falta la cuenta del fundador).
+
+### Pesos de las categorías (observación del fundador probando la demo)
+
+Palabras del fundador: «a la hora de filtrar por la categoría de peso, lo pones los nombres en inglés y tal […] en España la gente no tiene un buen nivel de inglés. Por lo que, aparte del nombre de la categoría, tienes que poner también el peso, en qué rango oscila». Los nombres ya estaban en español (Wélter, Ligero…), pero «wélter» sigue siendo opaco: ahora cada categoría lleva su límite en kilos («Wélter · hasta 66,7 kg») en los selectores de ficha, el filtro de peleadores (agrupado por disciplina, porque el mismo nombre pesa distinto en boxeo y en MMA), el ránking, la ficha y el cartel. **Solo se muestran pesos donde el estándar es conocido (boxeo profesional y MMA con reglas unificadas); en kickboxing, K-1 y jiu-jitsu no se afirma ninguno** hasta validarlos con las federaciones (decisión pendiente: facilitar los reglamentos o confirmar los pesos). Los pesos son orientativos y así se dice en pantalla. Código: `weightClassLabel` en `src/lib/common/disciplines.ts`.
+
+### Categorías de peso por disciplina y nivel (corrección del fundador)
+
+Palabras del fundador: «las categorías de peso las estás englobando todas en una misma disciplina, ¿vale? Entonces, debes corregir eso, porque no son los mismos pesos, no son las mismas categorías en profesional que en amateur […] en Jiu-Jitsu, Muay Thai, MMA será lo mismo. Tienes que diferenciar cada disciplina con sus pesos divididos en profesional y amateur. Esto es muy importante. […] Intenta pulir mucho más ese panel de filtros para poder ejecutar bien las búsquedas».
+
+**Fallo mío:** el cambio anterior (kilos junto al nombre) mantenía una sola lista por disciplina y solo para boxeo y MMA, y el filtro mezclaba todas las disciplinas en un único desplegable. **Qué se hizo:** modelo disciplina × nivel con su fuente (`docs/DISENO-PESOS.md`); Muay Thai como disciplina nueva (migración); selector de tres pasos (disciplina → nivel → categoría) en la ficha, en «Añadir otra disciplina» y en el filtro; la ficha guarda ahora el nivel de cada disciplina; el ránking separa profesional y amateur; filtro de peleadores rehecho (orden lógico, categorías según lo elegido, resumen de filtros aplicados con «✕» para quitar cada uno, número de resultados). **Honestidad:** donde no hay fuente fiable (Muay Thai amateur, kickboxing y K-1 profesional) la lista está vacía y la pantalla lo dice; las categorías femeninas, juveniles y cadete/júnior (salvo boxeo amateur élite/joven) siguen pendientes, y hace falta decidir si la ficha guarda sexo y edad.
+
+### Estado y próximos pasos
+
+- Pendiente de la segunda tanda: lo marcado «pendiente» en la tabla de hallazgos; falta la persona moderadora y las de seguridad, móvil, persona mayor y exploración destructiva.
+- Después: selector A/B/C y CRM (tareas 13 y 14), con las decisiones del fundador que siguen abiertas en `docs/TRASLADO.md` §7.
+
+---
+
+## Sesión 2 — 3 de octubre de 2026 — Codex: comparación y claridad funcional
+
+### Qué se pidió / qué idea surgió
+
+El fundador autorizó mejoras y pidió estudiar Raunder y BoxRec. Reiteró: «El diseño gráfico de la aplicación lo dejaremos para lo último» y pidió subir un Markdown para que Claude conozca todas las aportaciones.
+
+### Qué se decidió y por qué
+
+Actuar sobre recorridos existentes, exactitud y transparencia. La comparación pública permite mejorar orientación y explicación sin ampliar permisos ni adelantar el CRM, el premium o decisiones sobre menores/aura. Los cambios van en una rama y propuesta de integración para validación completa.
+
+### Qué se hizo
+
+Calendario por día de Madrid, entrada por objetivos, filtros individuales de veladas, ránking explicado, ayuda ajustada a las reglas reales, categoría correcta por nivel en tarjetas de récord y explicación de NC. Comparación competitiva revisada con fuentes propias. Relevo detallado: `APORTACIONES-CODEX.md`, enlazado desde instrucciones e índice. Nueva regresión de calendario en unitarias y guion E2E incluido en CI; mapa regenerado.
+
+### Qué salió mal / qué se aprendió
+
+BoxRec impidió la inspección normal en este navegador con verificación contra bots; se usaron páginas recuperadas y ayuda oficial, sin afirmar haber probado sus flujos. PostgreSQL no estaba instalado y el intento de instalación falló por permisos. No se ejecutó E2E/axe local ni una auditoría completa.
+
+### Estado y próximos pasos
+
+TypeScript, 313 unitarias y compilación de producción aprobados. Integración y E2E/axe pendientes de CI. Rama: `codex/claridad-calendario-2026-10-03`. El Markdown de relevo se publica también en la rama principal para Claude. La demo sigue siendo la versión previa hasta integración/despliegue. Completar las personas pendientes y verificar categorías históricas por nivel. No se han resuelto decisiones del fundador ni trabajado diseño gráfico.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — primera validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación de los cambios autorizados y mantener el relevo para Claude.
+
+### Qué se decidió y por qué
+
+No integrar con el CI fallando. Corregir la causa observada sin saltar pruebas.
+
+### Qué se hizo
+
+CI 77: migraciones, paridad, tipos, mapa, unitarias, compilación y arranque aprobados. La primera prueba E2E falló al buscar disciplina en un selector oculto de otro formulario. Se acota `registrar()` al formulario de su botón en `tests/e2e/ayudas.mjs`.
+
+### Qué salió mal / qué se aprendió
+
+El ayudante antiguo quedó desfasado al existir varios selectores de disciplina. El log demuestra la selección del primer elemento de cuatro, oculto; no es evidencia de fallo en la acción de registrar. Se documenta la regla de localización por formulario.
+
+### Estado y próximos pasos
+
+Subir la corrección y repetir CI completo. Calendario y axe todavía no se ejecutaron. Relevo detallado en `APORTACIONES-CODEX.md`.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — segunda validación de GitHub
+
+### Qué se pidió / qué idea surgió
+
+Completar la validación autorizada tras corregir el selector de disciplina.
+
+### Qué se decidió y por qué
+
+Comprobar resultados del filtro, no coincidencias del texto buscado en toda la pantalla.
+
+### Qué se hizo
+
+CI 79 completó el flujo de registro de MMA. La comprobación de exclusión falló porque el nombre seguía visible en el resumen del filtro, aunque no hubiera tarjeta. Se cambia `tests/e2e/flujo.mjs` a exigir tarjeta visible para inclusión y mensaje de cero resultados más ausencia de tarjeta para exclusión.
+
+### Qué salió mal / qué se aprendió
+
+El test antiguo podía dar falsa inclusión por el texto de búsqueda. Se acotan las comprobaciones al listado y se espera su estado visible.
+
+### Estado y próximos pasos
+
+Repetir CI completo. No se modificó el filtro de producto ni se omitieron comprobaciones. Axe y los guiones siguientes continúan pendientes.
+
+---
+
+## Sesión 2 (continuación) — 3 de octubre — revisión de pruebas dependientes
+
+### Qué se pidió / qué idea surgió
+
+Completar la misma validación, revisando los guiones posteriores tras la causa encontrada en CI 79.
+
+### Qué se decidió y por qué
+
+Aplicar la corrección de localización también a la exclusión de fichas provisionales y adaptar datos de prueba al modelo actual de disciplinas.
+
+### Qué se hizo
+
+`integridad.mjs` comprueba cero resultados y ausencia de tarjeta, evitando el texto repetido del filtro. `busqueda.mjs` crea una disciplina de boxeo amateur para cada una de sus 30 fichas, ya que el filtro de nivel consulta `FighterDiscipline`. No cambia código de producto.
+
+### Qué salió mal / qué se aprendió
+
+La prueba de paginación aún preparaba el modelo anterior de nivel. Regla: las fixtures deben representar los datos que realmente consulta el filtro.
+
+### Estado y próximos pasos
+
+Cambios de guiones preparados con comprobación de sintaxis. Pendiente la ejecución de navegador completa en CI.
+
+---
+
+## Sesión 3 — 3 de octubre de 2026 — Codex: recorrido de récords por nivel
+
+### Qué se pidió / qué idea surgió
+
+El fundador compartió el repositorio y pidió: «continua el trabajo».
+
+### Qué se decidió y por qué
+
+Continuar la validación pendiente del relevo, con prioridad funcional y diseño aplazado. La rama de la propuesta #8 recibió correcciones durante la revisión; se conservan y este bloque parte de `e049fe4` en una rama independiente (`codex/validacion-records-2026-10-03`).
+
+### Qué se hizo
+
+Se añadió `tests/e2e/respaldo.mjs` al conjunto de CI. Crea una cuenta y ficha ficticias desde la interfaz, registra un combate amateur, cambia a profesional, registra victoria y combate sin decisión, y vuelve a amateur. Comprueba en «Mi ficha» y como visitante que las tarjetas conservan los resultados históricos, muestran la categoría solo en el nivel actual, explican NC y enlazan a la ayuda pública. La ayuda de registro ahora acota todos los campos y el botón al formulario de combate; la corrección reciente de la rama anterior solo acotaba la disciplina.
+
+Se inspeccionó además la ejecución `37109729125`: el guion de filtros impedía llegar al calendario y al nuevo recorrido porque su expresión `peleadores?` no reconocía el singular «peleador». Se corrige la comprobación para aceptar las frases completas de singular y plural, sin modificar la pantalla.
+
+### Qué salió mal / qué se aprendió
+
+El proxy local no acepta conexiones y no hay dependencias en caché: no se pudo clonar ni instalar con `npm ci --offline`. Se recuperaron los ficheros mediante GitHub y se comprobaron sus SHA. Sintaxis de los guiones y diferencias comprobadas localmente; el CI debe validar dependencias, PostgreSQL y navegador. Se detectaron cambios concurrentes antes de publicar y se respetaron en una rama independiente.
+
+### Estado y próximos pasos
+
+Validación completa aprobada en la ejecución `37110167176` de la propuesta #9, commit `233420c`: migraciones/paridad, tipos, mapa, 313 unitarias, compilación, todos los guiones E2E y axe (0 incumplimientos). El nuevo recorrido aprobó sus 17 comprobaciones. La propuesta #9 está encadenada sobre la rama de #8. Integración y demo pendientes; siguen abiertos los recorridos por personas y los bloques de la auditoría indicados en `TRASLADO.md`.
+
+## Sesión — 3 de octubre de 2026 — propuestas visuales diferenciadas
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió propuestas visuales mientras sigue el desarrollo y añadió: «Debemos tener una gama de colores opuesta a la competencia que es Raunder».
+
+### Qué se decidió y por qué
+
+Se observó su identidad roja/blanca y se recomendó verde petróleo, marfil, pizarra y menta. Se descartaron las direcciones roja y naranja propuestas inicialmente. La elección final queda abierta.
+
+### Qué se hizo
+
+Se mostraron tres maquetas conceptuales y se ajustó la editorial a petróleo/marfil en móvil y escritorio. Se creó DISENO.md y se actualizaron los puntos de entrada para Claude. Se documentó también el fallo pendiente del CI 83 tras inspeccionar su artefacto.
+
+### Qué salió mal / qué se aprendió
+
+Las primeras maquetas añadían barras de aura y una confirmación global de ficha que no corresponden al modelo. Se corrigieron en la propuesta revisada. Las imágenes deben revisarse contra la funcionalidad real antes de convertirlas en código.
+
+### Estado y próximos pasos
+
+El fundador no se mostró convencido con petróleo/marfil y pidió más garra. Se mostró después azul noche/amarillo oro con tipografía deportiva y fotografía de entrenamientos; es la recomendación actual, pendiente de elección. Ningún cambio gráfico desplegado. Desarrollo en propuesta #8 pendiente de E2E/axe completo; no se declara terminado.
+
+---
+
+## Sesión — 3 de octubre de 2026 — revisión del lenguaje visual
+
+### Qué se pidió / qué idea surgió
+
+El fundador valora mejor los colores, pero el diseño le parece «muy pobre y hecho por IA».
+
+### Qué se decidió y por qué
+
+Conservar azul noche/amarillo oro como base y explorar otra composición inspirada en carteles de veladas. No interpretar el comentario como aprobación del diseño.
+
+### Qué se hizo
+
+Se mostró una pantalla conceptual de veladas en escritorio y móvil, con listados editoriales, fechas visibles y motivos de cuerdas del ring. Se documentó en DISENO.md y APORTACIONES-CODEX.md.
+
+### Qué salió mal / qué se aprendió
+
+La composición anterior se percibió genérica pese al cambio de paleta. Los colores solos no dan identidad: tipografía, composición y detalles necesitan un criterio coherente.
+
+### Estado y próximos pasos
+
+Pendiente de elección. Extender y probar el sistema en pantallas funcionales, con representación de todas las disciplinas. Sin cambios visuales desplegados.
+
+---
+
+## Sesión — 3 de octubre de 2026 — referencias y color oficial
+
+### Qué se pidió / qué idea surgió
+
+El fundador considera Raunder más llamativa y juvenil, aporta quince sitios de referencia y decide: «He decidido que el color oficial de la aplicación será este #be33f5».
+
+### Qué se decidió y por qué
+
+Registrar #BE33F5 como decisión vigente. Sustituye azul/amarillo y petróleo/marfil. Mantener personalidad joven y de comunidad con legibilidad para todos.
+
+### Qué se hizo
+
+Se consultaron páginas públicas de los recursos, con límites documentados; se observaron ejemplos deportivos en Landbook, incluida la captura de Off-Field. Se mostró una portada conceptual violeta de comunidad en móvil y escritorio. CLAUDE.md, DISENO.md, IDEAS.md y APORTACIONES-CODEX.md registran la elección y sus límites.
+
+### Qué salió mal / qué se aprendió
+
+No todas las bibliotecas son accesibles sin cuenta o desde el lector; no declarar revisión profunda donde solo se obtuvo el índice. El blanco sobre el violeta elegido da aproximadamente 4,22:1: para textos pequeños de botones se propone casi negro.
+
+### Estado y próximos pasos
+
+Color aprobado, diseño sin elegir. No se modifica la demo. Contrastar futuras interacciones de maquetas con funcionalidades reales y comprobar accesibilidad en CSS.
+
+---
+
+## Sesión — 3 de octubre de 2026 — identidad y personalización
+
+### Qué se pidió / qué idea surgió
+Aplicar a GitHub y a la demo los diseños aprobados y documentarlos para Claude.
+
+### Qué se decidió y por qué
+Violeta oficial #BE33F5, glow y bordes redondeados; foto y banner elegidos por sus titulares para todos los tipos de perfil. Nivel y graduación por disciplina para representar al deportista sin confundir declaración con verificación.
+
+### Qué se hizo
+CSS adaptable, portada de comunidad, editor e imágenes persistentes en PostgreSQL, directorios de promotores/federaciones y permisos de titular/moderación; migración aditiva, privacidad y exportación. 339 pruebas unitarias y build de producción correctos; prueba E2E nueva incorporada al CI.
+
+### Qué salió mal / qué se aprendió
+No se pudo instalar PostgreSQL por las restricciones del entorno; la validación completa se realiza en CI con PostgreSQL 16. Se corrigió la conversión de Buffer a Uint8Array para Prisma y la ausencia de un mensaje de error detectada por los tests.
+
+### Estado y próximos pasos
+Implementación preparada; comprobar CI, integrar y observar el despliegue real antes de afirmar que la demo está actualizada. Ver el PR para el resultado final.
+
+---
+
+## Sesión — 3 de octubre de 2026 — publicación del diseño aprobado
+
+### Qué se pidió / qué idea surgió
+El fundador indicó que todavía no veía los cambios en Render.
+
+### Qué se decidió y por qué
+Completar la validación y desplegar en la rama real de Render, conservando los cambios simultáneos de categorías, calendario y comunicación inclusiva.
+
+### Qué se hizo
+PR #12 integrada (8a861e7), CI #111 correcto: migraciones, esquema, tipos, mapa, 339 pruebas unitarias, build, flujos completos y accesibilidad. Se comprobó en el navegador público la portada nueva, el listado exacto del fundador y la ficha de Sergio Demo Molina. Se documentaron rutas de edición y permisos en APORTACIONES-CODEX.md.
+
+### Qué salió mal / qué se aprendió
+Hubo conflictos con commits simultáneos, que se combinaron preservando ambos trabajos. Se ajustó la prueba del sello de gimnasio a su ubicación nueva y se corrigió la espera del botón de reclamación. La petición de integración agotó su tiempo de respuesta, pero GitHub la completó; se verificó su estado antes de actuar de nuevo. La imagen de portada tardó en cargar inicialmente, pero se comprobó su archivo y su aparición final.
+
+### Estado y próximos pasos
+Diseño y perfiles publicados y observados en Render. Los titulares pueden subir sus propias fotos y banners. No se borraron los datos existentes.
+
+---
+
+## Plantilla para nuevas entradas
+
+```
+## Sesión N — fecha — título corto
+
+### Qué se pidió / qué idea surgió
+(con las palabras del fundador cuando sea posible)
+
+### Qué se decidió y por qué
+(alternativas descartadas incluidas)
+
+### Qué se hizo
+(cambios, commits)
+
+### Qué salió mal / qué se aprendió
+(y se copia lo importante a LECCIONES.md)
+
+### Estado y próximos pasos
+```
+
+## Sesión 4 — 3 de octubre de 2026 — Divisiones deportivas por edad y reglamento
+
+### Qué se pidió / qué idea surgió
+
+El fundador señaló: «dentro de la disciplina de boxeo, en especial en el campo amateur hay infinidad de categorías desde schoolboys hasta élite […] informaros bien y aplicarlo correctamente».
+
+### Qué se decidió y por qué
+
+Investigar reglamentos primarios antes de completar listas; almacenar una división federativa versionada que incluya edad, categoría masculina/femenina y modalidad cuando corresponda. Separar la división actual de la ficha y la propia de cada combate, sin reclasificar datos anteriores. Una división desconocida sigue siendo una declaración incompleta. No extrapolar los pesos adultos masculinos a menores o mujeres ni tratar todas las federaciones como si calculasen la edad igual.
+
+### Qué se hizo
+
+Se leyeron la circular RFEBoxeo 2026, IFMA v3.057, WAKO revisión 3, comunicación de edades IMMAF 2026 e IBJJF 6.1. Boxeo incorpora siete grupos, pesos específicos masculinos/femeninos, y benjamín/prebenjamín formativos sin combate. IFMA incorpora todos los grupos de su tabla; WAKO separa ring/tatami y K-1 recibe solo ring. IMMAF e IBJJF incorporan edades comprobadas; sus pesos quedan explícitamente pendientes del catálogo completo vigente.
+
+Se añadieron `divisionId` en ficha/combate, migración aditiva y catálogo con fuentes. Se aplican selección y validación conjunta, guardas de edad de ambos participantes, conservación histórica, filtro/paginación, ránking por categoría del combate y descarga de datos. La categoría actual del récord se etiqueta aparte del historial agregado. Se añadió un recorrido E2E y pruebas de límites normativos. Diseño visual sin cambios; documentación técnica, diario, ideas y lecciones actualizados.
+
+### Qué salió mal / qué se aprendió
+
+El PDF antiguo de IMMAF seguía enlazado pero el cálculo juvenil cambió para 2026: se encontraron y probaron los años de la comunicación posterior, con excepción Youth A. Un fragmento superpuesto de la circular de pesos RFE no se convirtió en una categoría extra. Las primeras pruebas nuevas esperaban textos y nombres accesibles incorrectos; se corrigieron contra la pantalla real. El primer recorrido completo detectó dos expectativas antiguas del filtro: ahora hay una división adicional y las tarjetas explican que la edad anterior está sin confirmar. Se conserva esa validación con sus nuevos datos.
+
+Esta vez se pudo instalar y ejecutar todo localmente usando el permiso de red explícito. PostgreSQL se extrajo en el área de trabajo, sin instalar paquetes del sistema ni modificar una base existente. Durante el bloque llegaron documentos nuevos a la rama de calendario y a la principal: se conservan al integrar el trabajo en la rama independiente.
+
+### Estado y próximos pasos
+
+Validación local final aprobada: migraciones desde base vacía y paridad, tipos, mapa, 327 unitarias, compilación, 289 comprobaciones E2E (18 del nuevo recorrido de categorías) y axe con 0 incumplimientos, 0 graves o críticos. Comprobada la ejecución real de los casos nuevos en el log. Propuesta preparada contra la rama principal, conservando #8/#9 y las actualizaciones de documentación; integración y demo pendientes. Pendientes explícitos: pesos IMMAF/IBJJF completos, modalidades/requisitos/licencias, política de menores y pruebas con personas. Detalle de fuentes y límites en `DISENO-PESOS.md`.
+
+## Sesión 5 — 3 de octubre de 2026 — Comunicación inclusiva y ámbito nacional
+
+### Qué se pidió / qué idea surgió
+
+Petición urgente del fundador: «hay varios textos en la aplicación que hacen saber que estamos más centrados en Madrid y que nuestra prioridad es el boxeo. Aunque esto sea así, no podemos dar a entender tal cosa porque gente de otras ciudades y de otras disciplinas se pueden sentir excluidas». Pidió continuar el trabajo.
+
+### Qué se decidió y por qué
+
+Las prioridades operativas internas no se trasladan a mensajes públicos ni a filtros iniciales. Revisar los datos visibles además del texto: una portada que diga toda España pero solo consulte Madrid conservaría el problema. Mostrar las seis disciplinas admitidas con igual énfasis y orden alfabético, niveles amateur/profesional y provincias elegidas por la persona. Conservar ubicaciones reales, normas deportivas y zona horaria técnica; no afirmar una cobertura de datos inexistente.
+
+### Qué se hizo
+
+Se eliminaron las referencias de prioridad de portada, ayuda y README; se completaron metadatos y se neutralizó el ejemplo del buscador. Portada y contadores consultan todas las provincias y niveles. El ránking empieza con todas las disciplinas, conserva categorías/posiciones independientes e incluye disciplina en las claves de agregación y de pantalla. La portada identifica disciplina/nivel de cada actuación y evento. Las altas de fichas y veladas parten sin provincia, ciudad o disciplina supuestas y el servidor rechaza elecciones ausentes o inválidas. La edición conserva los datos propios. El calendario explica la hora peninsular sin cambiar su comportamiento.
+
+Se documentó la norma vigente en CLAUDE, arquitectura, ideas, lecciones y relevo, conservando las entradas históricas. Los guiones anteriores eligen sus datos ficticios explícitamente. Se añadieron 18 comprobaciones E2E con seis disciplinas, provincias distintas, amateur/profesional, una persona con aura en dos disciplinas, filtros y altas fuera de Madrid. Se mantiene el trabajo de categorías por edad de la propuesta #10.
+
+### Qué salió mal / qué se aprendió
+
+La primera batería completa detectó que el guion de una ficha provisional sin provincia dependía del antiguo valor Madrid al registrar su combate. Ahora el guion elige la provincia explícitamente. La comprobación de tipos detectó una importación aún necesaria para editar eventos; se conservó. La inspección de los guiones detectó dos importaciones faltantes del nuevo ayudante y se corrigieron antes de continuar. No se sustituyeron los valores neutrales de la aplicación para acomodar las pruebas.
+
+### Estado y próximos pasos
+
+Validación local final aprobada: tipos, mapa actualizado y comprobado, 327 unitarias, compilación de producción, 307 comprobaciones E2E (18 nuevas) y axe con 0 incumplimientos, 0 graves o críticos. Propuesta contra la rama principal que conserva #10 y sus antecedentes; integración y despliegue pendientes. Se comprueba además el CI de la propuesta antes de cerrar la sesión.
+
+## Sesión 6 — 3 de octubre de 2026 — Publicación efectiva de la demo
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió: «Actualiza ya la página en GitHub para que pueda ver la demo actualizada con todos estos cambios».
+
+### Qué se decidió y por qué
+
+Integrar la propuesta #11, ya validada, en la rama que usa Render. Incluye el trabajo de las propuestas anteriores, por lo que no se requiere integrarlas una a una. Comprobar la dirección pública después de la actualización automática; no dar por publicado un cambio solo por haber fusionado el código.
+
+### Qué se hizo
+
+Se comprobó CI aprobado y cabeza exacta antes de integrar #11 mediante un merge normal, commit `7580902d63f4deec42c41f1cb29c5b913e009451`. La rama principal conserva el árbol probado y los documentos anteriores. Render sirve la demo actualizada. Peticiones HTTPS verificadas a portada, ránking, ayuda y salud devuelven 200: título nacional, disciplinas/niveles/provincias sin filtro inicial, ayuda inclusiva con divisiones por edad y base conectada. También pasa el CI de integración, ejecución `37127024537`. Se añade el enlace directo a la demo al README y se actualizan demo, arquitectura, ideas y relevo.
+
+### Qué salió mal / qué se aprendió
+
+La primera consulta seguía mostrando la versión antigua mientras Render construía la nueva. Se esperó y se confirmó el contenido público real. Chromium no confiaba en la CA del proxy del entorno; no se desactivó la comprobación TLS. La comprobación pública se realizó mediante HTTPS con la confianza del entorno, conservando las pruebas de navegador ya aprobadas en CI.
+
+### Estado y próximos pasos
+
+Los cambios funcionales y de comunicación están integrados y visibles en <https://ring-espana-demo.onrender.com/>. CI de propuesta e integración aprobado. Se conserva la base de la demo: el arranque solo añade migraciones y carga ejemplos si está vacía. Pendientes anteriores fuera de este bloque: catálogo completo de pesos IMMAF/IBJJF, decisiones sobre menores, pruebas con personas y aplicación del diseño visual elegido.
+
+## 3 de octubre de 2026 — Trayectoria, respaldo opcional, aura y menú por actividades
+
+### Qué se pidió / qué idea surgió
+
+El fundador pidió configurar el modelo aceptado de verificación y aura. Precisó que el rival puede negarse por un pique, que un campeón autonómico o nacional debe poder reconocer su trayectoria anterior y que entrenadores/federaciones son opcionales al iniciar la aplicación. Reiteró que una federación aporta más aura. Después pidió usar como referencia la distribución del menú de Raunder, con una captura, y continuar. Pidió conservar el trabajo de diseño de ChatGPT Work.
+
+### Qué se decidió y por qué
+
+Permitir declaraciones honestas desde el primer día, identificadas por su respaldo. Rival solicita revisión motivada sin veto automático; solo moderación suspende. Separar el récord de los puntos de reputación. Aura = trayectoria + respaldo opcional + comunidad, por categoría histórica; no inferir títulos ni avales de una biografía o un perfil visual. Un título por categoría aporta el mayor valor; mejorar su respaldo sustituye el anterior. Escala inicial de Codex 20/50/80, bonificaciones 25/50/100 %, centralizada y revisable con datos reales: el fundador aprobó el modelo, no confirmó expresamente esas cifras. Se conserva el clic y no se adelanta premium ni una clasificación deportiva tipo Elo.
+
+Menú por actividades con cuatro grupos, permisos reales y hasta cinco enlaces por grupo; diálogo nativo accesible. Las funciones de sparring, formación o reservas de la captura no se anuncian como implementadas. Se conserva el violeta, portada y personalización de perfiles.
+
+### Qué se hizo
+
+Se partió de #12 y se incorporó sin sobrescribir la documentación posterior de Work (`6670b35`). Migración aditiva con títulos, acreditaciones y metadatos de respaldo. Gestión de trayectoria, correcciones, retirada reversible y revisión; cola de hechos y acreditaciones concedidas por moderación. Versiones y bloqueos para duplicados, límites y concurrencia; fuente/nota para respaldos, sin autoaval ni permisos fuera de disciplina. Ranking y fichas con desglose y etiquetas; cancelaciones/suspensiones excluidas. Cambios de datos/fuentes invalidan respaldos. Exportación, eliminación y anonimización incluyen los nuevos datos y sus copias en el historial.
+
+El menú funciona en móvil/escritorio, con Escape, foco, cierre al navegar/salir y accesos de cuenta, perfiles asignados y moderación. Se actualizan ayuda, mensajes, correos, privacidad, arquitectura, desarrollo, ideas, diseño y guiones. El mapa ahora identifica la nueva guarda y las llamadas de moderación con ruta.
+
+### Qué salió mal / qué se aprendió
+
+TypeScript detectó una comparación ya inalcanzable y campos no anulables al limpiar una acreditación; se corrigieron. Los guiones nuevos tenían selectores relativos anidados, un desplegable ya abierto, una velada que no era enlace en Mi ficha y frases de confirmación incorrectas. Otro guion sumaba categorías diferentes: se declaró el peso del combate. La regresión conservaba expectativas de la confirmación obligatoria; se actualizaron exigiendo las nuevas reglas. Un aviso JSX necesitó permanecer dentro del formulario. La revisión de privacidad encontró copias de datos de quien respalda en auditorías y su prueba exigió limpiar antes del apunte de eliminación; ambas cosas se corrigieron. Los detalles y reglas quedan en LECCIONES.
+
+### Estado y próximos pasos
+
+Implementación terminada en rama; tipos, migraciones/paridad, mapa, compilación y 393 unitarias aprobados. La batería local completa pasó 364 comprobaciones de navegador; se repitieron las 26 de trayectoria tras añadir una de privacidad (365 en la batería actual). Axe final: 0 incumplimientos, 0 graves o críticos. Se comprobará CI del árbol final antes de integrar/publicar la demo. Los cambios normativos, menores y pruebas con personas que estaban pendientes siguen en sus documentos.
+
+### Resultado publicado
+
+CI #131 aprobado con 393 unitarias, 365 comprobaciones E2E, migraciones/paridad, tipos, mapa, build y 37 pantallas axe sin incumplimientos. Integrada #14 en `0c3fde6`, con el mismo árbol probado. Render muestra el nuevo acceso Menú y la fórmula y explicación de aura; portada, ranking, ayuda y salud responden 200. Se conserva la base y el diseño publicado de Work. Se documenta el solapamiento con la propuesta móvil #13, que sigue abierta. Una frase de ayuda se precisa para distinguir el voto por combate del aura total con títulos.
+
+## 3 de octubre de 2026 — Pulido funcional antes del rediseño
+
+### Qué se pidió / qué idea surgió
+
+El fundador preguntó qué queda y pidió «pulamos la aplicación hasta el más mínimo detalle, luego al final volveremos al diseño […] se ve muy desorganizado y saturado». El aspecto actual deja de considerarse definitivo; este bloque se centra en funciones, errores, claridad y el relevo entre entornos.
+
+### Qué se decidió y por qué
+
+Revalidar pendientes con el código actual antes de repetir tareas resueltas. Cerrar cortes de registros, decisiones que pisan datos cambiados y etiquetas que no reflejan el respaldo efectivo. Conservar el diseño provisional y los datos de la demo. Las categorías deportivas incompletas, herramientas de entidades, servicio real, menores/privacidad y pruebas con personas se mantienen en una hoja vigente, sin declararlos resueltos por una batería verde.
+
+### Qué se hizo
+
+Paginación de todas las colas de moderación, respaldos, acreditaciones e historial: ventanas de 50, totales reales, orden estable y páginas independientes. Búsqueda de acreditaciones, estado vacío y limpieza del filtro. Las acciones conservan consulta/página y respuesta visible con enlace a su sección; `returnTo` limita el destino. La revisión muestra categoría y grado efectivo. La última fuente de cada título se obtiene sin que las solicitudes de otro la desplacen.
+
+Huella del resultado al verificar y condición sobre los hechos leídos; reserva de un aviso pendiente antes de actuar sobre el dato; edición de evidencia condicionada a estado/resultado/fuente/respaldo. Opciones desconocidas dejan de interpretarse como decisiones destructivas. Se actualizan auditoría, traslado y mapa; PULIDO-FUNCIONAL reúne lo que queda. No hay migración ni cambio de escala de aura.
+
+### Qué salió mal / qué se aprendió
+
+El primer usuario sintético generó un correo con tilde y la validación nativa impidió enviar. Unos checks leían una fila antes de completar su actualización; se esperan los controles finales. Next perdió el fragmento de las redirecciones: se conserva como sección validada en consulta y enlace tras el mensaje. TypeScript detectó un diccionario opcional pasado a lookup; se añade el caso vacío. Los datos históricos de volumen usan fechas relativas para no depender de evitar la limpieza. Las reglas concretas se registran en LECCIONES.
+
+### Estado y próximos pasos
+
+405 unitarias, compilación y 26 comprobaciones nuevas de volumen/decisiones aprobadas. La regresión completa, axe y CI se comprueban antes de integrar; publicación efectiva se anota al final de este bloque. El rediseño sigue aplazado y se retomará con un briefing al final de la fase funcional. La propuesta móvil #13 sigue abierta: conciliar layout/menú antes de incorporarla.
+
+
+### Cierre de validación local
+
+El árbol final aprueba 406 unitarias y compilación de producción. Recorridos repetidos sobre el build final: 28 checks nuevos de volumen/integridad, 26 de trayectoria y 49 de usabilidad; axe en 37 pantallas, 0 incumplimientos. La regresión anterior pasó 389 de 391 y detectó dos mensajes de organizador bloqueados por validación nativa; los recorridos afectados pasan tras corregirlo. CI ejecutará la batería completa final (393 comprobaciones) antes de integrar. No se presenta la pasada anterior como completamente verde.
+
+También se protege la restauración de títulos: solo procede para uno excluido y no puede retirar el respaldo de uno activo. La prueba de volumen ahora consulta los totales y el orden reales antes de comprobar la tercera página: funciona también al reutilizar la base con datos de otros guiones. La publicación y su comprobación pública se registran después de CI.
+
+
+### Integración comprobada
+
+Integrada [PR #15](https://github.com/romppao/MiClaude/pull/15) en `claude/ring-espana-mvp`, merge `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. [CI #137](https://github.com/romppao/MiClaude/actions/runs/37158841984) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, 393 comprobaciones de navegador y axe en 37 pantallas: 0 incumplimientos, 0 graves o críticos. Árbol probado e integrado idéntico: `812da937097a5362123cbb3bd8b73c9b3008f0b7`; head revisado `cc2e17987f56037f88b574f1b8740ab16c4fd247`, base `dbecb53281f9c265081749acbbb71fd232c486df`, ambos comprobados antes de fusionar. La prueba completa final supera también los dos recorridos que habían fallado en la regresión local anterior.
+
+
+### Comprobación pública del primer despliegue
+
+Render sirve el pulido #15: portada, ayuda, ránking y `/salud` responden 200 por HTTPS con verificación TLS. El bundle compartido cambia de `layout-c9e2e3184aacfcf6.js` a `layout-febc489e998a92be.js` y contiene sección, foco y enlace de vuelta; SHA-256 `ba2162b7780bac81eed6ff191289b1e7a6acc11b5fb2ac6d8a2a47ab60f1c473`. Es una comprobación de despliegue, no una prueba autenticada de las colas públicas; esas acciones se recorrieron en local/CI. Los datos de volumen no se subieron a Render.
+
+La comprobación de acceso privado descubrió un detalle adicional: `/respaldar` pedía sesión sin recordar la ruta de vuelta, al contrario de las páginas de moderación. Se transmite la ruta a través de las guardas de sesión verificada y respaldo, sin conceder permisos. Dos checks nuevos comprueban el mensaje/destino y el regreso real tras entrar con una cuenta autorizada; tipos, unitarias, build, navegador y CI se vuelven a comprobar por este cambio de código.
+
+Validación local del retorno: 406 unitarias, build de producción y 30 checks del guion de pulido aprobados; el guion también mide axe sobre las colas pobladas sin incumplimientos. CI comprobará el árbol completo con 395 comprobaciones de navegador antes de integrar esta continuación.
+
+
+### Validación e integración final del retorno
+
+[PR #16](https://github.com/romppao/MiClaude/pull/16) integrada con merge `d9fba959cfe79da379adab9f42237c7b2d73322c`. [CI #142](https://github.com/romppao/MiClaude/actions/runs/37159831793) aprueba migraciones/paridad, tipos, mapa, 406 unitarias, compilación, **395 comprobaciones de navegador** y axe en **37 pantallas, 0 incumplimientos**. Árbol comprobado e integrado `ae120c766bfc5761298bd9fa835e62c93a31915c`. Antes de fusionar se verificaron el head `0e094d62c95ee6e320f30280cec49cb8731ff823` y la base `0bf5b9399bb9f06f62a0e4fdf5e6c582c27a5634`. Las dos comprobaciones nuevas de acceso completan las 393 de #15; no se omiten ni sustituyen recorridos.
+
+
+### Demo final comprobada
+
+El 3 de octubre a las 23:03 UTC, Render sirve también #16: `/respaldar` sin sesión lleva a `/entrar?next=%2Frespaldar&problema=sin_sesion`; portada, ayuda y salud responden 200 por HTTPS con verificación TLS. El regreso autenticado se recorrió en navegador local y en CI; no se crearon cuentas ni fixtures en la demo para esta comprobación. Los datos existentes se conservan. Esta continuación de cierre modifica solo documentación.
+
+Siguiente trabajo: resolver solapamientos del historial/registro inicial y catálogos IMMAF/IBJJF; herramientas de entidades; errores y recorridos con personas; preparación de correo, copias y privacidad/menores. No se declaran cerrados por las pruebas automatizadas. Diseño provisional, a retomar al final mediante briefing con el fundador; #13 sigue abierta, sin sobrescribir el trabajo de Work.
+
+
+## 6 de octubre de 2026 — Revisión del trabajo de Codex y limpieza de enlaces muertos
+
+### Qué se pidió
+Tras una semana sin créditos, el fundador pidió comprobar todo lo que hicieron Codex y otros asistentes y dar una opinión honesta (resultado abajo), y recordó su regla: «no puede haber botones ni enlaces inservibles; todo lo que sea inservible, mejor quítalo».
+
+### Qué se comprobó
+Ejecutado por Claude desde cero con base de datos vacía: tipos, 406 unitarias, compilación, 16 guiones de navegador y accesibilidad, todo correcto (coincide con el CI #144). Valoración: trabajo serio y bien documentado; defectos que ninguna prueba cubría: cabecera de escritorio con los enlaces apilados, enlaces que no hacen nada y texto técnico en la ficha.
+
+### Qué se hizo
+- **Cabecera de escritorio y tableta:** los cinco enlaces principales ya no se encogen ni se apilan; la cuenta y el buscador pasan a una segunda línea si no caben (`globals.css`, comprobado a 1440, 1024, 900, 800 y 700 px).
+- **Enlaces muertos:** «Quitar filtros» ya solo aparece cuando hay filtros (y se llama «Quitar todos los filtros»); el aviso de ránking vacío solo ofrece «Quitar el nivel, la zona y el periodo» si la consulta es más estrecha que la general.
+- **Auditoría automática** `tests/e2e/enlaces.mjs` (ahora dentro de `test:e2e`): recorre la aplicación como sin cuenta, aficionado, peleador, organizador y moderador y falla si hay enlaces vacíos o a «#», anclas inexistentes, enlaces que llevan a la misma pantalla, botones sueltos sin formulario, elementos con cursor de mano que no son enlaces ni botones, o destinos que dan error.
+- **Textos:** «Grupo de edad y categoría sin confirmar» pasa a «Edad y categoría sin indicar» y la opción del selector a «Prefiero indicarlo más tarde».
+
+### Qué salió mal
+Dos enlaces muertos reales llevaban semanas en la aplicación (uno de ellos introducido en el bloque de Codex) porque ninguna prueba medía «¿este enlace hace algo?». El fallo de «seguir» que describió el fundador no se pudo reproducir: el enlace «Entra para seguir a este peleador» funciona sin cuenta; queda pendiente de que el fundador indique en qué pantalla y papel le pasó.
+
+### Estado y próximos pasos
+Pendiente: seguir puliendo funcionalidades según los fallos que anote el fundador; después, escalabilidad (fotos fuera de la base de datos, caché de páginas públicas, base de datos gestionada, cola de correos, prueba de carga); paneles A/B/C al registrarse (decisión de formato del fundador); cerrar propuestas de Dependabot (saltos mayores que fallan el CI) y la #9 duplicada.
+
+
+## 6 de octubre de 2026 (tarde) — Probar como personas reales, desde el móvil
+
+### Qué se pidió
+«Cuando tú compruebes cosas de la aplicación, hazlo como si fueras uno de los usuarios […] como si fueses peleador, o un usuario, o una promotora, o una federación; un escenario ficticio de casos de uso de cada tipo de usuario» y «nos tenemos que enfocar al mil por mil en cómo funciona la aplicación en dispositivos móviles, tanto iOS como Android […] el objetivo es publicarla en App Store o Google Play». Además: documentar todo para el resto de asistentes (Antigravity, Codex, Open Code, GitHub Copilot).
+
+### Qué se hizo
+- **Colaboración:** `docs/EQUIPO.md` (protocolo común, ramas por asistente, plantilla de relevo), `AGENTS.md` y `.github/copilot-instructions.md` apuntando a él, `docs/APORTACIONES-CLAUDE.md` (mi registro), enlace en `CLAUDE.md` y en `docs/README.md`.
+- **Móvil:** `docs/MOVIL.md` (reglas, límites de las pruebas y camino a las tiendas) y `tests/e2e/movil.mjs` (iPhone SE, iPhone 14, Pixel 7 y Android de 360 px; cuatro papeles).
+- **Escenarios por persona:** `tests/e2e/escenarios.mjs` (visitante, aficionado, peleador, promotora, federación) con capturas.
+- **Correcciones** (detalle en `APORTACIONES-CLAUDE.md`): cabecera de escritorio, enlaces muertos, índice de «Mi ficha», formulario de combate más corto, margen para la barra fija, zonas táctiles de 44 px, letra de 16 px.
+
+### Qué salió mal
+La primera versión de mis auditorías daba falsos positivos (botones del menú que abren un diálogo; enlaces de una frase) y hubo que afinarla. El fallo de «seguir» que describió el fundador no se pudo reproducir como error: el enlace funcionaba, pero era una línea de texto de 26 px que no parecía pulsable.
+
+### Estado y próximos pasos
+Pendiente: PWA (manifiesto, iconos, página sin conexión), pruebas en iPhone y Android reales, conciliar la PR #13 (móvil) con `NavigationMenu`, paneles A/B/C al registrarse, escalabilidad antes del diseño, más personas en los escenarios.
+
+
+## 6 de octubre de 2026 (noche) — Claude, líder técnico del equipo
+
+**Pedido por el fundador:** «te pongo a ti como el líder del equipo […] idealices el plan, la arquitectura y los métodos a seguir, dando también la posibilidad de que las otras herramientas debatan y puedan sacar una mejor opinión […] las demás son las que ejecutan las instrucciones […] para ahorrar tokens y delegar funciones […] pauta por pauta, detalle a detalle, para que no se vayan por las ramas.»
+**Qué se hizo:** gobierno del equipo (`EQUIPO.md`, `decisiones/ADR-001`), cómo se discrepa con evidencia (`decisiones/README.md`, plantilla de propuestas RFC), lista de revisión de PR (`REVISION.md`), **plan maestro** (`PLAN.md`: principios de arquitectura, fases F0–F5, definición de «hecho») y **12 fichas de tarea** exactas (`tareas/T-001…T-012`): conciliar la PR del móvil, Dependabot, PWA, imágenes fuera de la base de datos, caché de lecturas públicas, índices, prueba de carga, cola de correos, ampliar escenarios, observabilidad, registro por tres paneles A/B/C (con las palabras del fundador) y base de datos gestionada. `CLAUDE.md` y `AGENTS.md` lo recogen.
+**Decisiones de Claude que el fundador puede revocar:** el acceso (`/entrar`) sigue siendo un formulario único porque las credenciales ya identifican a la persona (los tres paneles van en el registro); una federación aprobada recibe su perfil y titularidad automáticamente.
+**Límites honestos:** los asistentes solo actúan cuando el fundador los lanza (no se mensajean entre sí; la comunicación es el repositorio); las sugerencias de reparto («sugerida a») se basan en lo observado de Codex y deben calibrarse con los demás; Claude puede equivocarse y sus decisiones son discutibles por RFC.
+
+
+## 6 de octubre de 2026 (noche) — Rangos del equipo
+
+**Pedido por el fundador:** designar el orden de rango entre las herramientas «bajo tu criterio y resultados que te hayan dado en una primera toma de contacto»: Claude primero; después Codex, Antigravity, GitHub Copilot y Open Code (modelos Ollama y Qwen); «es muy importante que sepas elegir cuál va a ser el segundo al que vamos a colocarle esa gran función».
+**Qué se decidió:** orden 1 Claude · 2 Codex · 3 Antigravity · 4 Copilot · 5 Open Code local (`docs/RANGOS.md`, ADR-002). **Honestidad:** solo Codex tiene trabajo en el repositorio (9 PR); los puestos 3–5 son hipótesis previas, no resultados, por lo que entran en periodo de prueba con una prueba de ingreso objetiva (T-002, y T-009/T-003), puntuación por criterios y reglas de ascenso y descenso (se desciende de inmediato por afirmar algo no ejecutado). Se añaden niveles de tarea N1–N4 a las fichas. Registro de rendimiento con la primera evaluación de Codex.
+**Pendiente del fundador:** decir qué modelo ejecuta cada herramienta y si Codex tiene PostgreSQL y navegador locales; el orden de 3–5 puede cambiar mucho con eso.
+
+**Corrección posterior (mismo día):** el fundador aclaró que el orden de los puestos 3–5 debe decidirlo Claude **cuando tenga pruebas** del trabajo de las otras herramientas: «ahora todavía no hace falta». Se retira el orden a priori de `RANGOS.md` y `ADR-002`; solo quedan Claude (1) y Codex (2, con evidencia); Antigravity, Copilot y Open Code, sin ordenar y en periodo de prueba.
+
+
+## 6 de octubre de 2026 (noche) — Prueba de ingreso de los asistentes
+
+**Pedido por el fundador:** un documento que **exija a cada herramienta una aportación a máximo nivel y también a nivel medio** (bajo consumo de tokens), que les **pregunte primero qué es lo que mejor se les da** y después les ponga una **prueba común de exigencia máxima**; el fundador vio resultados buenos de diseño frontend de Antigravity con *skills* instaladas y quiere comparar «de verdad».
+**Qué se hizo:** `docs/PRUEBA-DE-INGRESO.md` (protocolo y reglas; Parte 0 autodeclaración, Parte 1 especialidad a elección —con propuesta de diseño aislada para quien la elija—, Parte 2 prueba común máxima = T-011, Parte 3 prueba común media = T-003, Parte 4 revisión a ciegas de un PR con 12 defectos plantados; puntuación de 100 puntos con calibración y eficiencia), plantilla de autodeclaración, tabla `docs/ingreso/RESULTADOS.md`, `revision-ciega/CAMBIO.md` y su clave. **Límite honesto:** la clave de la revisión a ciegas está en el repositorio (no hay forma de ocultarla en un repositorio compartido); se apoya en la norma de no leerla, y el fundador o Claude pueden contrastar con el historial de acceso si hay dudas. Las pruebas comunes generan trabajo duplicado a propósito; solo se integra lo mejor.
+
+
+## 6 de octubre de 2026 (noche) — Corrección de lo que Claude señaló de Codex y del CI
+
+**Pedido por el fundador:** «también corrige todo lo que me dijiste que hizo mal Codex, en caso de que no lo hayas hecho». Se repasó punto por punto la lista de la revisión (`APORTACIONES-CLAUDE.md`).
+**Estado de cada punto:** (1) cabecera de escritorio, (2) barra inferior que tapaba texto y (3) «Quitar filtros» ya estaban corregidos antes; (4) textos técnicos: quedaban «división sin confirmar» en dos pantallas y en la ayuda del ránking → reescritos en lenguaje llano; (6) PRs: cerrados #1–#7 (Dependabot, saltos mayores con el CI en rojo) y #9 (ya integrado entero), y `dependabot.yml` ya no propone saltos de versión mayor; #13 cerrado tras portar lo útil (barra móvil con iconos y página activa, perfil adaptable) sin su `HeaderMenu`, que duplicaba el menú; (7) `CLAUDE.md` ya no dice a la vez que el diseño está aprobado y pendiente (queda: color decidido y aplicado, resto provisional); (8) paneles A/B/C: hechos (T-011, abajo); «seguir» sin respuesta: ya corregido antes.
+**Paneles A/B/C (T-011), hecho por Claude:** `/registro` muestra tres paneles (Usuario · Peleador · Promotora o federación) y cada uno lleva a su formulario; sin desplegable ni frases antiguas. El panel C crea la cuenta y la solicitud en la misma transacción (migración aditiva `OrganizerRequest.kind` y `website`). Al aprobar una federación se crea su perfil en el directorio con la solicitante como titular. Función única de aterrizaje por papel (`src/lib/accounts/landing.ts`): peleador → Mi ficha, organizadora → Mis veladas, moderación → Moderación. Decisión de Claude que el fundador puede revocar: `/entrar` sigue siendo un único formulario.
+**Fallo del CI (run 150):** la auditoría móvil encontró enlaces de 26 px («Página anterior/siguiente») y de 43 px (nombres largos en tablas) que mi base local, casi vacía, no mostraba. Corregido (ver LECCIONES).
+**Imágenes (punto 5), solo en parte:** la ruta sirve ahora con ETag y responde 304 sin leer los bytes de la base; **sigue pendiente** sacarlas de PostgreSQL (T-004 parte 2), que necesita que el fundador elija proveedor.
+**Estado y próximos pasos:** pendiente de confirmar el CI de esta tanda; después fase 1 del plan (T-001, T-002, T-009) y, cuando el fundador lo decida, T-004 parte 2 (proveedor de almacenamiento) y el resto de F2.
+
+
+## 6 de octubre de 2026 (noche, 2) — Fase 1 del plan: cierre y escenarios por persona
+
+**Pedido por el fundador:** «he continuado con el plan, perfecto, continúa».
+**Qué se hizo:** el CI de `490cfd2` (paneles A/B/C) quedó en verde. Como Claude hizo T-001, T-002 y T-011, **la prueba de ingreso dejaba de ser válida** (usaba T-011 como prueba común máxima y T-002 como tarea de entrada de nivel 1): se sustituyen por **T-005** (caché de lecturas públicas) y una tarea nueva **T-013** (todo enlace que abre otra pestaña lo avisa; hay un caso real sin avisar en `SelectorCategoria.tsx`). Actualizados `PRUEBA-DE-INGRESO.md`, `RANGOS.md`, `PLAN.md` y la plantilla de autodeclaración. Se pasó `escenarios.mjs` con datos de ejemplo: las cinco personas (visitante, aficionado, peleador, promotora, federación) completan sus recorridos; el escenario de la federación usa ahora el panel «Promotora o federación» de punta a punta (solicitud, aprobación con tipo y web visibles, perfil creado sin pasos manuales). Al mirar las capturas se vio que los tres paneles **no parecían pulsables**: se añadió «Elegir esta cuenta →» dentro de cada uno.
+**Qué salió mal:** mi guion buscaba el panel por el texto «Peleador», que también aparece en la descripción del panel «Usuario» («Sigue a peleadores…»): se localiza por la dirección del enlace. Lección: localizar enlaces por destino, no por una palabra que puede repetirse.
+**Estado y próximos pasos:** F1 completa salvo T-009 (más escenarios) y T-013; ambas están para la prueba de ingreso de los otros asistentes. Siguen necesitando al fundador: proveedor de almacenamiento de imágenes (T-004 parte 2), base de datos gestionada (T-012), correo (T-008), errores (T-010), dominio y menores.
+
+
+## 6 de octubre de 2026 (noche, 3) — Proveedores de la fase 0 con el mínimo coste
+
+**Pedido por el fundador:** «no tengo ni idea de qué hacer en esos cinco puntos […] quiero utilizar el mínimo capital posible […] herramientas gratuitas o de mínimo coste, muy top, fiables, escalables y fáciles de modificar […] que lo hagas tú de la mejor manera».
+**Qué se hizo:** cuatro investigaciones en paralelo (base de datos y alojamiento; imágenes; correo y errores; menores y RGPD). Resultado en [ADR-003](decisiones/ADR-003-proveedores-fase-0.md): Neon Free + copia nocturna a R2, Render (gratis para la demo, Starter de 7 $ al abrir), Cloudflare R2 (UE) para imágenes servidas por la aplicación, Resend gratis (ya programado) con dominio propio, Sentry gratis (UE) y UptimeRobot; borrador de política de menores con la edad como parámetro. Fichas T-004, T-008, T-010 y T-012 ajustadas; nueva T-014.
+**Hallazgos importantes:** la base de datos gratuita de la demo en Render **caduca a los 30 días**; sin dominio propio **no se pueden enviar correos reales** (ni verificar cuentas); Vercel no vale para una aplicación que se monetice (su plan gratis es no comercial).
+**Qué salió mal / límite honesto:** el entorno bloquea las páginas oficiales de los proveedores, así que **ninguna cifra se leyó en la fuente**: todas salen de resúmenes de búsqueda y hay una lista de comprobación en el ADR. Lo jurídico es un borrador que debe confirmar una persona cualificada.
+**Estado y próximos pasos:** el fundador aprueba (o corrige) el ADR y responde a dos preguntas de producto sobre menores; después, T-012 (Neon y copias) es lo primero, por la caducidad de la base de la demo.
+
+
+## 6 de octubre de 2026 (noche, 4) — Documentación completa de la jornada
+
+**Pedido por el fundador:** «Documenta todo».
+**Qué se hizo:** repaso de toda la documentación frente a lo hecho hoy y actualización de lo desfasado: `README.md` (índice, fila de proveedores), `TRASLADO.md` (estado, aviso de caducidad de la base de la demo, decisiones 4, 11 y nueva 17), `DEMO.md` (aviso de caducidad), `MOVIL.md` (PR #13 conciliado, fallo del CI, paneles, escenarios), `pruebas/personas.md` (persona 14: registro por paneles), `ARQUITECTURA.md` (infraestructura prevista y cambios técnicos), `CLAUDE.md` y `AGENTS.md` (principio de presupuesto mínimo y regla de no contratar sin aprobación), `IDEAS.md`, `LECCIONES.md` y `APORTACIONES-CLAUDE.md`.
+**Qué salió mal:** nada nuevo; se anotó como lección que los precios no se pudieron leer en la fuente.
+**Estado y próximos pasos:** a la espera del visto bueno del fundador al ADR-003 y de sus respuestas sobre menores; después, T-012 (migrar la base de la demo a Neon con copia nocturna).
+
+
+## 6 de octubre de 2026 (noche, 5) — Herramientas aprobadas, menores y segunda prueba de ingreso
+
+**Pedido por el fundador:** (1) «lo de Render, ¿ya no voy a poder utilizar esa demo? ¿Cuándo se caduca?»; (2) «todas esas herramientas las apruebo, pero verifícame otra vez que son las mejores»; (3) «genera otra prueba de ingreso […] para medir bien el nivel de nuestros ayudantes»; (4) menores: «no pongas fecha de nacimiento [en el alta]; en la ficha sí, para la categoría; no quiero impedir a los pequeños usar la app; limitaremos alguna cosilla, pero será el último punto, después del diseño»; (5) «déjalo todo bien documentado para que Claude Code en el portátil tome el control».
+**Qué se hizo:**
+- **Render:** la web gratuita no caduca (se duerme sin visitas); la **base de datos** sí: 30 días desde su creación + 14 de gracia y luego se borra. `render.yaml` se subió el 2 de octubre, así que debería caducar **hacia el 1–2 de noviembre** (fecha real: la confirma el fundador en su panel). Sin base la demo no funciona: se migra a Neon antes (T-012).
+- **Segunda verificación de las herramientas** (búsquedas web; las páginas oficiales siguen bloqueadas desde aquí): se mantienen las seis piezas con **dos correcciones** (Neon gratis tiene **0,5 GB**, no 1 GB; Resend gratis llega a **100 correos al día**, con Brevo —300 al día, UE— como recambio antes de pagar) y **una prioridad nueva**: sacar las imágenes de la base antes de abrir (T-004). Detalle en el ADR-003, aprobado.
+- **Menores:** decisiones del fundador anotadas en ADR-003, T-014 y TRASLADO. El alta no pide edad; la ficha sí la fecha de nacimiento (el campo ya existe, opcional); las limitaciones, al final.
+- **Prueba de ingreso 2, «La escalera»** ([PRUEBA-ESCALERA.md](PRUEBA-ESCALERA.md)): la primera prueba ya se había rehecho (T-005, T-003 y revisión a ciegas) pero la puntúo yo a juicio. La nueva es **objetiva**: cuatro retos de nivel 1 a 4 (`recortarTexto`, `calcularRecord`, `duracionEnMinutos` con cambios de hora de España y Canarias, `crearLimitador`) con **37 pruebas ocultas** en la rama `claude/clave-escalera` (probadas contra una solución de referencia y contra versiones ingenuas, que fallan), **dos trampas de honestidad** (una función imposible y un encargo que vende el sello de verificado) y **calibración** (predecir el resultado antes). Corrección con `scripts/corregir-escalera.sh`.
+- **Relevo al portátil:** [RELEVO-PORTATIL.md](RELEVO-PORTATIL.md) con la frase de arranque, las comprobaciones, las cuentas (Neon, R2, Sentry, UptimeRobot, dominio, Resend) y el orden de trabajo.
+**Qué salió mal / límite honesto:** el entorno sigue sin poder abrir las páginas oficiales, así que los precios siguen sin leerse en la fuente (lista de comprobación en el ADR y en el relevo). Las pruebas ocultas están en una rama del mismo repositorio: **se confía en la palabra de los aspirantes** de no leerla; es parte de lo que se mide.
+**Estado y próximos pasos:** el fundador crea las cuentas en el portátil y lanza las dos pruebas a los demás asistentes; Claude Code del portátil hace T-012 (urgente), T-004, T-010 y T-008 y corrige las pruebas.
+
+
+## 8 de octubre de 2026 — Diseño móvil v3 (negro y lima), fase 1: implementación en la aplicación
+
+**Pedido por el fundador (Claude Design, 7 de octubre):** diseñar la aplicación móvil con la segunda referencia («me gusta esta segunda referencia negro lima, vamos a desarrollarlo más»); «a la hora de registrarte, da igual de qué cómo lo hagas que la aplicación tiene el mismo aspecto y las mismas funcionalidades, y esto no puede ser»; cuatro registros (aficionado, peleador, entrenador, promotora/federación/club); récord amateur visible solo como número de combates salvo que el peleador lo publique; highlights en cada ficha; en boxeo no puede aparecer la sumisión. Después pidió pasar la entrega a Claude Code. Antes de empezar se le preguntó y eligió: implementarlo en este repositorio, **con backend completo**, **por fases (primero el núcleo)** y **mantener por ahora la lista de formas de terminar del repositorio**, ocultando solo las que no corresponden a la disciplina.
+**Qué se decidió y por qué:**
+- El prototipo HTML es una referencia, no código: se rehízo en Next.js con los patrones del proyecto (acciones con guardas, reglas puras en `lib`, mensajes por código, pruebas).
+- Fase 1 = tokens visuales, barra inferior por papel, bienvenida y acceso, registro por pasos de los cuatro tipos, inicio por papel y ficha de peleador con highlights y récord privado. Quedan para la fase 2 las propuestas de combate y sparring, las reservas de clases, las inscripciones a veladas, la multimedia del público, el aura a promotoras y clubes, la plantilla del club y la portada de cada disciplina (ver `PLAN.md`).
+- **La cuenta se crea en el paso «datos»** y el último paso de cada tipo es opcional («Lo haré después»). Crear una ficha o un perfil público exige el correo confirmado (regla vigente), así que el paso «Crea tu ficha» y el del entrenador **guardan lo elegido** (`User.onboarding`) y «Mi ficha» / el inicio del entrenador lo traen rellenado: nunca se publica nada sin confirmar el correo.
+- Highlights: un vídeo es **un enlace** (YouTube, Instagram, TikTok…) y una foto se sube normalizada; los vídeos no se guardan en la base de datos (las imágenes ya están pendientes de salir de PostgreSQL, T-004).
+- Récord amateur privado **por defecto también para las fichas existentes** (es la dirección prudente con la privacidad y lo que pidió el fundador). Afecta a la ficha, al inicio y a las tarjetas; los carteles y resultados de las veladas siguen siendo públicos.
+- Clases de entrenador: precio por persona y sesión, sin pagos ni reservas en la aplicación (se dice con claridad en el perfil).
+- Fuente Archivo alojada en el repositorio (licencia OFL), sin depender de Google Fonts.
+**Qué se hizo:** migración aditiva `20261008090000_diseno_movil_v3` (rol `TRAINER`, `Trainer.userId` y datos del perfil, `TrainingClass`, `Highlight`, `Fighter.recordPublic`, `User.interests` y `User.onboarding`; `OrganizerRequest.kind` admite `CLUB`); `globals.css` reescrito con los tokens v3 conservando todas las clases; nuevas pantallas `/bienvenida`, `/registro/{intereses,ficha,perfil,clase}`, `/mis-clases` e inicio por papel (`src/app/_inicio/`); ficha de peleador y «Mi ficha» rehechas; acciones nuevas (`trainers.ts`; récord público y highlights en `fighters.ts`; pasos del registro en `accounts.ts`); «Cómo terminó» filtrado por disciplina; descarga y borrado de datos ampliados; nuevo guion `tests/e2e/diseno.mjs` (46 comprobaciones) y pruebas unitarias de reglas y autorización.
+**Qué ejecuté yo:** tipos, 461 unitarias, compilación, paridad de migraciones, los 19 guiones de navegador con base vacía (486 comprobaciones, 0 fallos) y axe en 53 pantallas (0 incumplimientos); recorrido con capturas de los cuatro tipos de cuenta en un iPhone emulado. **No ejecutado:** CI de GitHub (se verá en el PR), Safari real y aparatos reales.
+**Qué salió mal:** usé dos veces `pkill -f` con un patrón que aparecía en mi propia orden y maté mi terminal (la regla ya estaba en `CLAUDE.md`); varias pruebas leían la ficha pública como tabla y hubo que adaptarlas a tarjetas; un estilo en línea anulaba la regla que oculta los campos de clase colectiva; un `aria-label` en un `div` (axe). Todo corregido; ver `LECCIONES.md`.
+**Estado y próximos pasos:** PR con la fase 1. Decisiones abiertas para el fundador en `TRASLADO.md` §7 (18–22). Siguiente: fase 2 del diseño v3.
+
+
+## 8 de octubre de 2026 (2) — Revisión en escritorio del diseño v3 y preparación de la demo
+
+**Pedido por el fundador:** «Recuerda documentar todo en el repositorio de GitHub. Una vez esté todo correcto, tanto para móvil como para escritorio, mándame una demo para poder probar todo».
+**Qué se hizo:** capturas a 1280 px de portada, bienvenida, registro, acceso, ficha de peleador, inicio del peleador y «Mi ficha». Se corrigieron cuatro fallos que solo se veían en escritorio: el gráfico de aura quedaba encogido en el centro (el SVG conservaba su proporción; ahora ocupa el ancho y el punto final es un elemento HTML que no se deforma), las pestañas Récord · Combates · Público parecían enlaces subrayados, «¿Qué quieres hacer?» se partía en dos columnas (la regla general de `nav` era flexible) y el botón «Entrar» de la portada se duplicaba con el de la cabecera (ahora solo en móvil). En pantallas grandes la columna central pasa de 640 a 720 px y las disciplinas se muestran en tres columnas.
+**Qué ejecuté yo:** compilación, los 19 guiones de navegador (486 comprobaciones, 0 fallos) y axe en 53 pantallas (0 incumplimientos) tras los cambios. El CI de GitHub del primer envío de la rama terminó en verde.
+**Demo:** la demo pública de Render se construye desde `claude/ring-espana-mvp`; para que el fundador la pruebe hay que integrar esta rama en esa (PR). Cómo probar cada tipo de cuenta en `DEMO.md`.
+
+
+## 8 de octubre de 2026 — Transferencia del conocimiento a programadores humanos (Codex)
+
+**Qué se pidió:** «absolutamente todo el código […] bien explicado», arquitectura, decisiones y procesos documentados para trabajar sin asistentes de IA. El fundador pidió coordinar con Claude mediante el repositorio.
+**Qué se decidió y por qué:** completar las guías existentes con contratos y flujos reales y un catálogo individual comprobable; explicar intención/restricciones en comentarios, sin repetir cada línea ni inventar decisiones históricas. Cobertura estructural y calidad humana se evalúan por separado. La solicitud directa permite el bloque documental, sin ampliar funcionalidades ni reestructurar el producto.
+**Qué se hizo:** manual de mantenimiento, catálogo de 226 archivos, generador y nueve pruebas Node, control en CI, contratos en seis archivos de código, correcciones de arquitectura/desarrollo y criterio de revisión en AGENTS/REVISION. Base y rama en APORTACIONES-CODEX. Se dejaron explícitos los PR funcionales abiertos que todavía no forman parte de la versión revisada.
+**Qué salió mal:** clon fallido por proxy y recuperación de archivos vía conector a SHA fijo; contexto incompleto en dos parches, corregido antes de aplicar; referencia de función corregida tras comprobar export. La evaluación previa de avisos se precisó: los correos a seguidores ya existen al añadir cartel desde organización.
+**Comprobaciones:** nueve casos de la herramienta ejecutados directamente y comprobación del catálogo local. Batería del producto pendiente del CI por falta de dependencias/PostgreSQL/navegador locales. Resultados finales y enlace PR se añaden al cierre del registro.
+**Estado y próximos pasos:** propuesta documental para revisión de Claude, sin integración/despliegue. Revisar contratos, adaptar tras PR funcionales e intentar transferencia con programador independiente; esa validación humana y la capacidad bajo carga no se dan por hechas.
+
+
+## 8 de octubre de 2026 (3) — Diseño v3, fase 2a: portada común con noticias, menú por tipo de cuenta, entrenador organizador y vídeos del público
+
+**Pedido por el fundador:** (1) «después de iniciar sesión a todos los usuarios les aparece la misma pantalla de inicio», con noticias actuales de la escena de los deportes de contacto de fuentes fiables y variadas («canales de YouTube, periódicos, federaciones»), y «una subpantalla de inicio específica de cada disciplina» elegida; (2) «en el menú solo te pueden aparecer las opciones del usuario», salvo el entrenador, que tiene las de entrenador, club y promotora; (3) espacios en la ficha para los mejores highlights y combates (ya existían); (4) un espacio para que el aficionado suba lo grabado o fotografiado en la velada, «para que los peleadores puedan obtener contenido de sus combates». Al preguntarle: «el entrenador podrá crear veladas e interclubs» y «subir los vídeos en la app de verdad y, si no es viable, mediante enlaces».
+**Qué se decidió y por qué:**
+- **Portada común + «Mi panel».** La portada (`/`) es la misma para todos con sesión: saludo, acceso a «Mi panel», sus disciplinas (las elegidas primero) → `/disciplinas/<disciplina>`, actualidad y próximas veladas. Los inicios por papel de la fase 1 no se tiraron: pasan a `/mi-panel`, que tiene pestaña propia en la barra inferior. Tras entrar, todos van a `/` (moderación, a su cola).
+- **Noticias sin dependencias ni servidor de tareas:** un lector RSS/Atom propio (`lib/news`) que se lanza en segundo plano cuando alguien abre la portada y una fuente lleva más de media hora sin leerse. Fuentes iniciales: canales de vídeo de UFC, ONE y GLORY (identificadores comprobados por búsqueda), una búsqueda de **Google Noticias en español por disciplina** (reúne muchos medios distintos) y otra de federaciones. Solo se guarda titular, medio, fecha y la miniatura del vídeo; cada noticia se abre en su web. Moderación ve el estado de cada fuente, añade otras y oculta titulares en `/moderacion/noticias`. Un medio no puede acaparar la portada (como mucho dos seguidas arriba).
+- **Menú por tipo de cuenta** desde una sola fuente (`lib/accounts/menu.ts`): «Explorar» (consultar lo público) es igual para todos y el resto es solo de su tipo. El entrenador tiene tres bloques: Entrenador, Club y Promotora. Máximo cinco enlaces por bloque.
+- **Entrenador organizador sin aprobación previa** (decisión del fundador): `requireOrganizer` acepta `TRAINER`. Cada evento es **velada** o **interclub** (`Event.kind`), visible en la página pública.
+- **Vídeos de verdad con R2** (ya aprobado en el ADR-003): el navegador sube el vídeo directamente a Cloudflare R2 con una dirección firmada (firma S3 propia, probada con el ejemplo oficial de AWS); sin R2, en desarrollo y en la demo se guarda en el disco; en producción sin R2, solo enlaces. Las fotos, normalizadas en WebP como las de los perfiles. Consentimiento obligatorio en cada envío, avisos con el motivo «Aparezco yo y no doy permiso», retirada por moderación, borrado por quien lo subió y con su cuenta. Se ven en la velada y, si se indica el combate, en la ficha de los dos peleadores con «Descargar». Los highlights también admiten vídeo subido.
+**Qué se hizo:** migración aditiva `20261008180000_noticias_multimedia` (`Event.kind`, `NewsSource`, `NewsItem`, `MediaItem`, `Highlight.videoKey/videoType`); dominios nuevos `lib/news` y `lib/media`; pantallas `/mi-panel`, `/noticias`, `/disciplinas/[slug]`, `/compartir`, `/moderacion/noticias`; rutas `/subidas`, `/medios/[id]/video|imagen`, `/highlights/[id]/video`; acciones `news.ts` y `media.ts`; menú, barra inferior, cabecera, pie y «Mi cuenta» por tipo de cuenta; política de contenido ampliada; guía para el fundador [`VIDEOS.md`](VIDEOS.md); nuevo guion `tests/e2e/fase2a.mjs` (33 comprobaciones) y pruebas unitarias del lector, la firma S3, el almacén, las reglas y el menú.
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (527), `npm run build`, paridad de migraciones, los 20 guiones de navegador con base vacía (**520 comprobaciones, 0 fallos**, incluido el nuevo `fase2a.mjs`), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos), `npm run mapa` y la comprobación del catálogo de Codex (257 archivos, 9/9 pruebas); capturas en iPhone emulado.
+**Qué salió mal / límite honesto:** desde el entorno de desarrollo **no se pudo abrir ninguna fuente de noticias** (la red no lo permite): el lector está probado con canales de ejemplo, pero las fuentes reales se comprueban en la demo. Repetí un error ya anotado (un estilo en línea anulaba la regla que oculta el vídeo al elegir «Foto»); una imagen diferida sin tamaño no «se veía»; el foco salía del menú con Mayús+Tab; un `id` de ancla estaba en el título. Corregido y anotado en `LECCIONES.md`. **No ejecutado:** subida real a R2 (no hay cubo todavía), Safari real y aparatos reales.
+**Coordinación con Codex:** mientras trabajaba, Codex abrió #28 (manual de mantenimiento y catálogo comprobado en el CI) y #29 (estudio de monetización). Integré #28 en esta rama y añadí al catálogo los 31 archivos nuevos (sin eso el CI fallaría al integrar las dos), y dejé mi revisión en ambas: #28 aprobada con dos cambios menores (el generador cuenta `next-env.d.ts`, que es generado; actualizar el manual con la fase 2a), #29 aprobada como documento de trabajo, con los hechos técnicos que cambian (coste de almacenamiento de vídeos, entrenadores organizadores).
+**Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo pública, así que se pide permiso al fundador. Después: el fundador crea el cubo de R2 (`VIDEOS.md`) y revisa las fuentes en la demo; decisiones en `TRASLADO.md` §7.23–25. Resto de la fase 2 en `PLAN.md`.
+
+## 8 de octubre de 2026 (4) — Cómo publicar en App Store y Google Play, web frente a app y costes con 500 usuarios
+
+**Pedido por el fundador:** «Me gustaría que me indicases el proceso para publicar la aplicación oficialmente al mercado […] cómo subirlo tanto a Apple Store como a Google Store para que los aficionados la puedan descargar. También limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación. […] Partimos de una base de 500 clientes como máximo en esta primera etapa. ¿Es sostenible? ¿Voy a necesitar pagar algo?» Antes dijo que estudiará las propuestas y las compartirá con los otros asistentes.
+**Qué se decidió y por qué:** es una propuesta, no se ha contratado nada. Camino recomendado: **Capacitor** (un solo código; la web dentro de una app nativa) con funciones del teléfono que Apple exige para no rechazarla por la norma 4.2 (avisos, cámara, compartir, enlaces que abren la app, pantalla sin conexión). **No cerrar la consulta pública en la web** (es lo que se comparte y lo que encuentra Google; regla vigente «ver contenido es público»): reservar a la app los avisos y la subida desde la cámara, y dejar al fundador decidir si dar aura pasa a ser solo de la app (ventaja: comprobación de dispositivo contra cuentas falsas).
+**Qué se hizo:** guía [`PUBLICACION.md`](PUBLICACION.md): trámites del fundador, trabajo técnico pendiente, paso a paso en cada tienda, propuesta web/app, costes y calendario (6–10 semanas). Revisado lo que piden las tiendas contra el código: **falta «bloquear a un usuario»** (obligatorio en Apple, norma 1.2), unas **condiciones de uso** y un filtro de palabras; ya existen avisos y moderación, borrado de cuenta y página de privacidad.
+**Costes estimados (búsquedas, sin verificar en páginas oficiales):** unos 130 € el primer año (Apple ~99 €/año, Google 25 $ una vez, dominio ~7 €/año) y **unos 10–30 € al mes** con 500 usuarios (Render Starter 7 $, Neon gratis o por uso, R2 casi gratis, Firebase, Sentry y Codemagic gratis). Hallazgos nuevos: desde el 1 de agosto de 2026 el plan gratuito de Render incluye solo **5 GB de tráfico al mes** (0,15 $/GB adicional; los vídeos no cuentan porque salen de R2); Google exige a las cuentas personales una **prueba cerrada con 12 personas durante 14 días**; el límite de 100 correos al día de Resend **bloquearía un día de lanzamiento**.
+**Qué salió mal / límite honesto:** no se pudo abrir ninguna página oficial de precios; las fuentes no coinciden en algunas cifras (número de probadores de Google, comisión de Apple en la UE desde el 1 de octubre, plan gratis de R2). Todo queda en la lista «comprobar» de la guía.
+**Estado y próximos pasos:** el fundador estudia la guía con el equipo y decide: persona física o empresa, qué se reserva a la app, y cuándo empezar. Después Claude escribe las fichas (bloquear usuarios, condiciones de uso, Capacitor, avisos) en `docs/tareas/`.
+
+## 8 de octubre de 2026 (5) — Fase 2a y manual de Codex, fusionados en la demo
+
+**Pedido por el fundador:** «Sí, fusiónalo, perfecto. […] Estoy muy contento con cómo está quedando este proyecto. Me gustaría que pudiésemos ir escalándolo poco a poco. […] Ahora chequeo la demo, voy a ver qué es lo que está bien, qué es lo que falla, qué cosas pondría, qué cosas no. También falta por revisar las propuestas de monetización.»
+**Qué se decidió y por qué:** fusionar primero la #28 de Codex (manual de mantenimiento y catálogo comprobado) y después la #30 (fase 2a y guía de publicación), que ya la incluía, con «merge commit» como en las anteriores. Solo se fusiona con las pruebas del CI en verde.
+**Qué se hizo:** fusionadas #28 y #30 en `claude/ring-espana-mvp`, lo que actualiza la demo de Render.
+**Qué salió mal / límite honesto:** nada nuevo. Siguen sin probar en real la subida a R2 (falta el cubo), las fuentes de noticias (no se pudieron abrir desde el entorno de desarrollo) y los aparatos físicos.
+**Estado y próximos pasos:** el fundador revisa la demo y anota qué falla y qué cambiaría; revisa el estudio de monetización de Codex (#29, abierta como documento de trabajo) y la guía `PUBLICACION.md`. Pendiente suyo: crear el cubo de R2 (`VIDEOS.md`), mirar `/moderacion/noticias` en la demo y decidir `TRASLADO.md` §7.23–26. Con sus notas, Claude prioriza y escribe fichas en `docs/tareas/` para escalar por partes.
+
+## 8 de octubre de 2026 (6) — Portada con selector de deporte y cuenta del creador
+
+**Pedido por el fundador:** «No veo lo que te he dicho sobre la pantalla inicial […] la primera pantalla que le sale a todo el mundo […] con todas las noticias, todo generalizado […] de los distintos periódicos, el canal de YouTube o federaciones oficiales, sobre todos los deportes. Después, al seleccionar el deporte que tú quieres, tiene que haber otra pantalla como la inicial, pero exclusivamente de esa disciplina.» Y: «tener un usuario especial, yo como creador de la aplicación, en caso de que no tenga a mi disposición mi ordenador o mi móvil, poder entrar desde cualquier sitio con esa clave, con ese usuario, para poder modificar cualquier aspecto y gestionar cualquier aspecto dentro de la aplicación».
+**Qué se decidió y por qué:**
+- **Portada.** No la veía porque la fase 2a estaba en un PR sin fusionar. Se fusionaron #28 y #30 en cuanto el CI estuvo en verde. Además, para que se parezca más a lo que describe, la portada común y la de cada disciplina pasan a ser **la misma pantalla** (`_inicio/Portada.tsx`):
+  - un selector «Todos / Boxeo / Jiu-jitsu…» en una fila que se desliza;
+  - la **noticia más reciente en grande**, el resto en lista;
+  - después, veladas y aura de ese deporte.
+  - El visitante también ve la actualidad nada más entrar, con la noticia destacada.
+- **Cuenta del creador.** Se reconoce por su correo (`CREADOR_CORREO`, que se pone en el panel de Render y nunca en el código) **con el correo verificado**. Tiene todos los permisos de moderación y, solo ella, «Administración»: buscar cualquier cuenta, cambiar su tipo, nombrar o quitar moderadores y cerrar sesiones.
+  - **Segundo paso obligatorio (decisión de Claude, revisable por el fundador):** es la cuenta que más interesa robar. Para que funcione «sin el ordenador ni el móvil», el segundo paso admite un código de la aplicación de códigos **o uno de diez códigos de emergencia en papel**.
+  - Sin dependencias nuevas: los códigos siguen la RFC 6238, probada con sus vectores oficiales.
+**Qué se hizo:**
+- Migración aditiva `20261008200000_cuenta_creador`.
+- `lib/accounts/totp.ts` y `creador.ts`, `requireCreador`.
+- Pantallas `/entrar/segundo-paso` y `/moderacion/usuarios`; acciones `creador.ts`.
+- «Administración» en el menú.
+- Aviso de arranque si falta `CREADOR_CORREO`.
+- Guía para el fundador [`CREADOR.md`](CREADOR.md).
+- Pruebas `tests/unit/creador.test.ts` y `tests/e2e/creador.mjs`, esta última con accesibilidad de las pantallas nuevas.
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (542), `npm run build`, paridad de migraciones, los 21 guiones de navegador con base vacía (**564 comprobaciones, 0 fallos**, incluido el nuevo `creador.mjs` con 44), `accesibilidad.mjs` (61 pantallas, 0 incumplimientos) y las 4 pantallas nuevas analizadas dentro de `creador.mjs`, `npm run mapa` y el catálogo (267 archivos, 9/9 pruebas); captura en iPhone emulado.
+**Qué salió mal / límite honesto:**
+- Mi primer diseño dejaba un hueco: una sesión abierta **antes** de confirmar el correo habría heredado los poderes del creador sin el segundo paso. Lo encontré al escribir la prueba y lo corregí: ahora se comprueba en cada petición que esa sesión hizo el segundo paso.
+- Tres fallos de la propia prueba, anotados en `LECCIONES.md`.
+- Desde aquí no se puede abrir la demo, así que no he visto el despliegue de #30 en Render.
+**Estado y próximos pasos:** PR a `claude/ring-espana-mvp` **sin fusionar**: fusionarlo actualiza la demo, así que se pide permiso. Después, el fundador pone `CREADOR_CORREO` en Render y activa su cuenta siguiendo `CREADOR.md`. Decisiones en `TRASLADO.md` §7.27.
+
+## 8 de octubre de 2026 (7) — Iconos de cada deporte y noticias solo en español y de su disciplina
+
+**Pedido por el fundador** (tras revisar la demo, que ya tenía #30 y #31):
+- «El panel […] que indica qué disciplinas hay está muy soso […] intenta añadir imágenes o iconos que indiquen qué deporte es».
+- «Las noticias están en inglés la mayoría. No quiero noticias en inglés. Quiero noticias completamente en español para la gente de España.»
+- «He entrado en la pestaña de boxeo y me aparecían noticias sobre MMA y sobre kickboxing. No […] Única y exclusivamente contenido de cada disciplina especializada en su pantalla […] Infórmate, busca bien las fuentes de cada disciplina.»
+**Por qué pasaba:**
+- **Inglés:** las fuentes incluían los canales de vídeo de UFC, ONE y GLORY, que están en inglés.
+- **Disciplinas mezcladas:** cada noticia sumaba la disciplina de su fuente y las que se detectaban en el texto. Una noticia de MMA que llegaba por la búsqueda «boxeo» quedaba marcada como boxeo y como MMA, y salía en las dos portadas.
+**Qué se decidió y por qué:**
+- **Iconos propios** (`IconoDisciplina`): guante, kimono con cinturón, patada alta, patada con guantes, octógono y rodillazo. Son dibujos de trazo hechos aquí, sin imágenes de terceros (derechos) y con el mismo estilo que el resto de iconos. Aparecen en el selector de deporte (fichas con dibujo), en las tarjetas de disciplina y en la cabecera de cada deporte. En la portada de una disciplina, su ficha se centra sola en el selector.
+- **Regla estricta** (`clasificar`): una noticia solo va a una disciplina si su **titular** habla de esa y de ninguna otra.
+  - Si nombra varias, solo sale en «Todos».
+  - Si no nombra ninguna, solo se acepta si viene de un medio dedicado a esa disciplina.
+  - De una fuente general, lo que no nombra ningún deporte de contacto se descarta.
+  - «Kick boxing» y «boxeo tailandés» ya no cuentan como boxeo.
+- **Solo español** (`enEspanol`): se descartan los titulares en inglés. Se retiraron los canales en inglés y las búsquedas antiguas, que se desactivan y se borran solas al actualizar. Los titulares ya guardados se vuelven a clasificar una vez por arranque.
+- **Fuentes españolas especializadas** (investigadas por búsqueda):
+  - Boxeo: Espabox, AEBOX y RFEBox.
+  - MMA: MMA España y el canal UFC Español.
+  - Jiu-jitsu: Fighter Corner.
+  - Varias disciplinas, clasificadas titular a titular: FEKM, Jaula Magazine y Deporte de Contacto.
+  - Además, búsquedas de Google Noticias en español de España por disciplina que excluyen las demás.
+**Límite honesto:**
+- Desde el entorno de desarrollo no se pudo abrir **ningún** canal de noticias, porque la red lo bloquea. Las fuentes nuevas se eligieron por búsquedas y hay que comprobar en `/moderacion/noticias` de la demo cuáles leen bien.
+- No existe (o no se encontró) ningún medio en español dedicado solo a K-1, solo a kickboxing o solo a Muay Thai. Esas tres portadas tendrán menos noticias: las de la FEKM y las de Google Noticias cuyo titular nombre la disciplina.
+
+**Ampliación (misma tarde), con nuevas palabras del fundador:**
+- «Me encanta cómo has puesto los iconos […] dale un pelín más de forma […] en el Muay Thai la banda que tienen en la cabeza, en el jiu-jitsu el cinturón, el kimono».
+- «Las noticias tienen que ser del panorama español: deportistas españoles o con residencia en España […] fomentar que la gente apoye a los nuestros y crear comunidad en España, en cada comunidad autónoma, en cada municipio […] principalmente esos luchadores que todavía no tienen el apoyo suficiente».
+- Y sobre el equipo: cuando la aplicación esté publicada, **Antigravity** se encargará de las noticias; hasta entonces, todo lo sigue haciendo Claude.
+
+**Qué se hizo:**
+- **Iconos con más forma**, comprobados con capturas tras cada cambio:
+  - Muay Thai: mongkol con sus colas en la cabeza y prajied en el brazo.
+  - Jiu-jitsu: solapas cruzadas y cinturón con nudo y puntas.
+  - Boxeo: puño de cordones.
+  - K-1: guantes.
+  - Kickboxing: espinillera.
+  - MMA: guante de dedos abiertos dentro del octógono.
+- **Filtro del panorama español** (`lib/news/espana.ts`): una noticia entra si su fuente solo cubre España (marca nueva `NewsSource.local`, migración `20261008220000_noticias_panorama_espanol`) o si nombra España, una comunidad, una provincia o capital, una federación o competición española, o a un español de élite (lista corta y ampliable).
+  - Las búsquedas de Google Noticias piden además «España / español».
+  - En moderación, al añadir una fuente se puede marcar «Solo publica noticias del panorama español».
+- **Guía [`NOTICIAS.md`](NOTICIAS.md)** para quien mantenga las fuentes (Antigravity): reglas, tareas y fuentes de partida, con sus huecos. Anotado en `EQUIPO.md`.
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (555), `npm run build`, paridad de migraciones, los 22 guiones de navegador con base vacía (**565 comprobaciones, 0 fallos**) y `accesibilidad.mjs` (61 pantallas, 0 incumplimientos). Tras los últimos cambios (iconos con más forma, filtro español, moderación) volví a pasar `fase2a`, `creador`, `diseno`, `movil`, `enlaces` y `accesibilidad`, todos sin fallos. También `npm run mapa` y el catálogo (271 archivos, 9/9 pruebas), y capturas en iPhone emulado.
+**Límite honesto:** ninguna fuente real se pudo leer desde aquí; la lista de españoles de élite es corta a propósito (solo nombres de los que hay certeza) y se amplía según `NOTICIAS.md`.
+**Estado:** PR a `claude/ring-espana-mvp`; se fusiona en la demo en cuanto el CI esté en verde (el fundador pidió tener la demo completa para revisarla).
+
+## 8 de octubre de 2026 — Fotos del móvil rechazadas por pesar demasiado (Claude)
+
+**Qué se pidió:** el fundador, al personalizar su perfil desde el móvil, recibió «No se ha guardado nada. Elige imágenes JPG, PNG o WebP de hasta 4 MB y 25 megapíxeles…». Su reacción: «Esto es un gran problema, hay que ponérselo fácil a los usuarios».
+**Causa:** las fotos del móvil pesan 3–10 MB y miden 12–48 megapíxeles; el límite de 4 MB estaba solo en el servidor, y el mensaje obligaba a la persona a saber de pesos y píxeles. Lo mismo pasaba al subir una foto de una velada o de un vídeo destacado.
+**Qué se decidió:** la persona elige **cualquier foto** y el navegador la prepara; el servidor sigue comprobándolo todo (formato real, píxeles, animación) como defensa.
+**Qué se hizo:**
+- Componente `InputFoto` (`src/app/components/InputFoto.tsx`), usado en los cuatro sitios donde se suben fotos (foto y banner del perfil, vídeo destacado de «Mi ficha» y «Compartir» de una velada).
+  - Si la foto pesa más de 3 MB o mide más de 5000 px, la gira según su orientación, la deja en 2000 px como máximo y la guarda como JPEG de calidad alta.
+  - Dice «Foto lista (1,2 MB). Se ha ajustado sola para que se suba rápido.» Si el navegador no puede leerla, lo explica y propone una captura de pantalla.
+  - Una foto ligera y de medidas razonables se envía tal cual, sin perder calidad.
+- Mensajes sin cifras técnicas («No hemos podido usar esa imagen. Prueba con otra foto…»).
+- Prueba de navegador (`perfiles.mjs`): una foto de 4000×3000 píxeles y más de 4 MB se reduce y se guarda.
+**Límite honesto:** probado con Chromium; en Safari de iPhone no lo he podido probar. Las fotos HEIC se convierten ya al elegirlas en iOS; en un navegador que no pueda decodificarlas saldrá el mensaje de ayuda.
+**Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Arreglos tras probar la demo en el móvil: pestañas que se deslizan, foto y banner, portadas, disciplinas y clases (Claude)
+
+**Qué se pidió**, con capturas del móvil y en palabras del fundador:
+- «La aplicación es muy densa y el orden de las cosas no está muy bien optimizado, tienes que scrollear mucho para llegar al final de la página; en lugar de ir hacia abajo pienso que sería mejor deslizar de manera horizontal y con las cosas bien agrupadas.»
+- «A la hora de agregar foto de perfil y banner, se colapsa, y si añades el banner, la foto de perfil no se ve y viceversa.»
+- «Los highlights del perfil se ven si le das play, pero carecen de portada.»
+- «En caso de que un peleador se equivoque y ponga disciplinas en las que no está familiarizado, no se puede eliminar […] o por lo menos que yo como administrador pueda configurar.»
+- «En el caso de los afiliados, poder reservar las clases privadas publicadas es misión imposible, ya que no hay opción ni un botón para hacerlo.» Y: «resuelve todo esto de urgencia».
+
+**Causas encontradas:**
+- La portada de la ficha (diseño v3) solo pintaba **una** imagen de fondo: el banner o, si no había, la foto estirada a toda la portada. Nunca las dos.
+- Los highlights solo tenían portada si se subía una foto aparte; nada la sugería.
+- No existía ninguna acción para quitar una disciplina.
+- Las clases decían «Ring España todavía no gestiona reservas»: no había forma de pedirlas en la aplicación.
+- Además, en la segunda captura salía «Masculino · Masculino»: la división ya incluye el sexo y la categoría de peso también.
+
+**Qué se hizo:**
+- **Pestañas que se deslizan** (`components/Pestanas.tsx`): carrusel horizontal nativo con barra de botones arriba. Se cambia de sección con el dedo, con la barra o con el teclado; la altura se ajusta a la sección visible.
+  - Ficha del peleador: portada, seguir, cifras y highlights arriba; debajo, **Combates · Récord · Vídeos · Público · Datos**. Los récords por disciplina van en una fila deslizable.
+  - «Mi ficha»: **Mi perfil · Combates · Récord · Mis datos · Vídeos**, con un aviso arriba si hay combates por confirmar.
+  - Portada: las noticias, salvo la destacada, en una fila deslizable en vez de una lista de doce.
+  - Los enlaces con «#ancla» y las vueltas de los formularios (`?seccion=`) abren la pestaña correcta.
+- **Foto y banner a la vez**: banner de fondo y foto en círculo junto al nombre; la cabecera de «Mi ficha» enseña la foto.
+- **Portadas de los highlights**: al subir un vídeo, el navegador saca un fotograma y lo pone de portada si no se elige otra foto; los ya publicados sin foto muestran un fotograma del propio vídeo; los de YouTube, su miniatura.
+- **Quitar una disciplina**: el peleador puede si no tiene combates en ella y no es la única; moderación y el creador pueden siempre desde la pestaña «Datos» de la ficha pública (los combates se conservan). Con casilla de confirmación y en el historial.
+- **Solicitar clases** (modelo `ClassRequest`, migración `20261008240000_solicitudes_de_clases`): botón «Solicitar esta clase» en cada clase → «¿Cuándo te viene bien?», mensaje y teléfono opcionales → el entrenador recibe un correo y la ve en «Mis clases» (con el número en su panel) → acepta o dice que no puede, con un mensaje → la persona lo ve en «Mis reservas de clases» (nuevo en el menú) y por correo; puede cancelar. Ring España no cobra: se dice en cada paso. Entra en la descarga de datos.
+- «Masculino · Masculino» corregido en todas las pantallas con `categoryLabel`.
+
+**Qué salió mal por el camino:** en «Mi ficha» la página se ensanchaba a 765 px: el título oculto de una tabla (posición absoluta) se escapaba de la pista de pestañas. Se arregló haciendo cada panel contenedor de posición. La barra de pestañas se partía en dos filas por una regla general de `nav`. Y la primera versión de las pestañas (desplazamiento nativo con «scroll-snap») se quedaba a medio camino cuando el navegador llevaba algo a la vista: se rehízo con un riel que se mueve con `transform` y el gesto del dedo gestionado por el propio componente (también con las flechas del teclado en la barra).
+
+**Qué ejecuté yo:** `npm run typecheck`, `npm test` (575), `npm run build`, la prueba nueva `arreglos.mjs` (33 comprobaciones, con capturas a 390 px, gesto del dedo y teclado) y la batería completa de navegador: 22 guiones, **601 comprobaciones, 0 fallos**; accesibilidad, 61 pantallas sin incumplimientos. Las pruebas abren la pestaña que contiene lo que pulsan, como una persona (`mostrar` en `tests/e2e/ayudas.mjs`). `escenarios.mjs` (revisión con capturas, fuera del CI) no se ejecutó.
+**CI:** la ejecución del PR #34 pasó; la del «push» del mismo código falló una vez en la prueba de extremo a extremo y pasó al relanzarla. Los registros del CI no se pueden leer desde este entorno (la red bloquea su almacenamiento), así que **no sé qué comprobación falló**; la réplica local exacta del CI (base vacía, `npm run test:e2e` completo) pasó entera (601). Hay que vigilar si se repite.
+**Límite honesto:** el fotograma automático y el deslizamiento solo se han probado en Chromium; hay que probarlos en Safari de iPhone. La miniatura de YouTube no se pudo cargar desde aquí (red bloqueada); se comprueba que la dirección es la correcta.
+**Estado:** PR a `claude/ring-espana-mvp`.
+
+## 8 de octubre de 2026 — Revisión completa de estructura y diseño antes de actualizar la demo (Claude)
+
+**Qué se pidió:** «Vuelve a revisar que todas las funcionalidades estén correctamente estructuradas y diseñadas. Una vez termines actualiza el repositorio y la demo.»
+
+**Cómo se revisó:**
+1. **Revisión de código independiente** del PR #34 por un agente sin mis conclusiones. Encontró 13 defectos reales; todos corregidos.
+2. **Recorrido visual a 390 px** con cinco tipos de cuenta (visitante, aficionado, peleador, entrenador, moderador): 30 pantallas, capturas completas y medición de errores de JavaScript, respuestas 5xx y ancho de página.
+3. **Batería completa** de pruebas unitarias, de navegador y de accesibilidad.
+
+**Defectos de la revisión de código (corregidos):**
+- La portada sacada del vídeo no habría funcionado en la demo: la política de contenido bloqueaba `blob:` en imágenes y vídeo. Las pruebas no lo veían porque en local no se aplica.
+- «Mis reservas» prometía responder al correo para hablar con el entrenador, pero el correo no tenía dirección de respuesta. Ahora `sendMail` admite `replyTo` (la persona ↔ el entrenador) y, si la clase está aceptada, «Mis reservas» muestra el correo del entrenador.
+- Deslizar una fila interior (récords, highlights) también cambiaba de pestaña. Ahora el gesto se ignora dentro de lo que ya se desliza.
+- Un doble clic podía crear dos solicitudes iguales (ahora `withLock`), y una cancelación podía pisar la respuesta del entrenador (ahora `updateMany` condicionado).
+- Quitar una disciplina dejaba títulos huérfanos que seguían sumando aura:
+  - el titular debe retirar antes sus títulos;
+  - si la quita moderación, los títulos quedan excluidos con su motivo.
+- Los correos de las clases se enviaban antes de responder a la persona. Ahora van con `after()`.
+- El fotograma automático podía sustituir una foto elegida mientras se calculaba. Ahora se descartan los resultados viejos y se quita la portada automática al quitar el vídeo.
+- Los enlaces del menú con «#» (next/link) no cambiaban de pestaña, y un «#%E0» rompía la página.
+- Mensajes:
+  - límite diario de solicitudes con su propio texto;
+  - «como mucho 200»;
+  - lo escrito no se pierde al volver por un error;
+  - botón «Solicitar la clase»;
+  - «Mis reservas» en el menú de todos los tipos de cuenta.
+
+**Mejoras del recorrido visual:**
+- **Moderación** medía casi 40 000 px en el móvil. Ahora tiene siete pestañas (una por cola, con su número) y se abre en la primera con trabajo.
+- **Mi cuenta**: pestañas Mis datos · Contraseña · Accesos · Mis avisos · Privacidad.
+- **Filtros** de Peleadores, Veladas y Ránking: los secundarios, plegados en «Más filtros», que se abre solo si hay alguno aplicado. Antes ocupaban la primera pantalla entera.
+- **Portada del visitante**: las seis disciplinas en una fila deslizable.
+- **Campos de foto y vídeo** con botón propio en español («Elegir una foto», «Elegir un vídeo») y el nombre del archivo. El del navegador decía «Choose File» en algunos teléfonos.
+- Detalles:
+  - la foto del peleador en su panel;
+  - los botones de «Mis highlights» ya no aprietan el título;
+  - el botón «Crear el evento» ocupa su fila;
+  - acceso a «Mis reservas» en el panel del aficionado;
+  - listado de Peleadores compacto (foto a la izquierda, datos a la derecha);
+  - Veladas con una explicación corta (el detalle de «Hoy y próximas» va junto a su filtro).
+
+**Límite honesto:** el gesto del dedo y la portada automática siguen sin probarse en un iPhone real; el recorrido es con Chromium emulando un móvil.
+
+## 8 de octubre de 2026 — Panel con las acciones de cada cuenta, buscar clases, reserva con calendario y retos o sparring (Claude)
+
+**Qué se pidió** (el fundador, probando la demo en el móvil, con captura de «Solicitar esta clase»):
+- «El proceso para reservar una clase no es cómodo para el usuario, le obliga a escribir mucho, es mucho mejor que pueda seleccionar la fecha y hora en un calendario directamente, seleccionar su rango de tiempo mediante una barra o algo similar y, si tiene que escribir algo, un espacio para decir cualquier cosa importante.»
+- «No encuentro la manera de retar a otros peleadores a combate o solicitar sparring, lo has quitado, ya no está; no puedes tocar cosas que antes iban bien o quitar cosas que no te he dicho que quitaras, ten mucho cuidado.»
+- «Es difícil para el usuario encontrar los posibles servicios que le ofrece la aplicación, por ejemplo buscar clases, está muy al fondo […], al igual que los entrenadores a la hora de crear veladas o interclubs. […] El panel de cada usuario debería mostrar las principales acciones que puede realizar cada tipo de usuario. Corrígelo y reorganiza la aplicación.»
+
+**Sobre retos y sparring (honestidad):** se buscó en todo el historial del repositorio y **nunca llegó a estar en el código**. Era la propuesta n.º 1 del diseño v3 (Claude Design, 7 de octubre) y figuraba como pendiente en `PLAN.md` (fase 2, punto 1) e `IDEAS.md`. No se quitó, pero debí avisar de que faltaba al pasar el diseño al código: lección anotada.
+
+**Qué se hizo:**
+- **Acciones principales en «Mi panel»** (`AccionesPrincipales` en `_inicio/comun.tsx`): una cuadrícula de 2 columnas arriba del todo, la primera en lima y con un número violeta cuando hay algo esperando respuesta.
+  - Aficionado: Buscar clases · Buscar peleadores · Próximas veladas · Mis reservas · Subir vídeos o fotos · Peleadores que sigo.
+  - Peleador: Registrar un combate · Retar o proponer sparring · Mis propuestas · Publicar un highlight · Buscar clases · Mis títulos y mi aura.
+  - Entrenador: **Crear una velada · Crear un interclub** (ya con el tipo elegido en el formulario) · Publicar una clase · Solicitudes de clase · Mis veladas e interclubs · Buscar peleadores. Sin perfil todavía, ya ve crear velada e interclub.
+  - Entidad: Crear una velada · Crear un interclub · Mis veladas · Buscar peleadores · Mi perfil público · Buscar clases.
+  - Visitante: «¿Qué quieres hacer?» sube justo bajo la cabecera, con «Buscar clases» primero.
+- **Buscar clases** (`/clases`): todas las clases publicadas, con búsqueda por clase, entrenador o ciudad, «Más filtros» (disciplina, provincia, tipo) y «Solicitar esta clase» en cada una. En el menú, «Clases y entrenadores».
+- **Reserva con calendario y barra** (`components/ElegirHorario.tsx`):
+  - el día se elige en una tira con los próximos 14 días (Hoy, Mañana, dom 11…) o en «Otra fecha», con el calendario del móvil;
+  - en las clases individuales, la franja se elige con una barra de dos tiradores (07:00–23:00, medias horas, nunca más corta que la clase), con los atajos Mañana, Tarde y Noche;
+  - queda un único campo opcional, «¿Algo importante que deba saber el entrenador?»;
+  - el entrenador lee «miércoles 14 de octubre, entre las 18:00 y las 20:00»;
+  - modelo: `ClassRequest.day`, `fromMinute` y `toMinute`.
+- **Retos a combate y sparring** (`FightProposal`, `lib/fighters/proposals.ts`, `actions/proposals.ts`):
+  - «Retar a combate» y «Proponer sparring» en la ficha de cada peleador con titular, solo para quien tiene ficha;
+  - formulario corto: tipo, disciplina (las del rival) y, opcionales, fecha, lugar y mensaje;
+  - «Retos y sparrings» (`/propuestas`): buscar a quién retar, Recibidas (aceptar o rechazar con mensaje) y Enviadas (cancelar);
+  - correos con dirección de respuesta al otro peleador; con la propuesta aceptada, cada uno ve el correo del otro;
+  - aceptar no crea un combate: se registra cuando se celebra;
+  - aviso de que Ring España no organiza ni supervisa los sparrings;
+  - una propuesta abierta por tipo y pareja, como mucho 10 al día, y todo queda en el historial y en la descarga de datos.
+- Migración `20261008260000_retos_y_horario_de_clases`, que solo añade.
+
+**Pruebas:** unitarias (590), `servicios.mjs` nueva (paneles, Buscar clases, retos de punta a punta, accesibilidad), `arreglos.mjs` con la reserva por calendario, y la réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **690 comprobaciones, 0 fallos**. En la base local acumulada, `filtros.mjs` fallaba porque las fichas de muchas ejecuciones empujan las de la prueba a la página 2: es la base, no el código (con base vacía pasa).
+**Límite honesto:** la barra de dos tiradores y la tira de días se han probado en Chromium emulando un móvil (también con el teclado); falta probarlas en un iPhone real.
+
+## 9 de octubre de 2026 — Inscripción de peleadores en veladas e interclubs, y gestión para el organizador (Claude)
+
+**Qué se pidió** (el fundador): «No sé si habrás quitado lo de solicitar participación en una velada o interclub. Y por parte de los organizadores de las veladas, que puedan tener facilidad para gestionar todas esas solicitudes, pudiendo filtrar las listas con x parámetros, listarlo por un orden…, todo para facilitar la selección de los peleadores».
+
+**Sobre si se quitó (honestidad):** se buscó en todo el historial y **nunca estuvo en el código**. Era la propuesta n.º 3 del diseño v3 y figuraba como pendiente en `PLAN.md` (fase 2, punto 3) e `IDEAS.md`. No se quitó; igual que con los retos, debí avisar de que faltaba.
+
+**Qué se decidió y por qué:**
+- La inscripción la **abre y cierra el organizador** de cada evento (velada o interclub), con requisitos y fecha límite opcionales. Así nadie recibe solicitudes que no quiere.
+- **Aceptar no pone al peleador en el cartel**: el organizador sigue emparejando a mano (los emparejamientos dependen de peso, nivel y experiencia, y no deben automatizarse sin el fundador). Los aceptados salen primero en las listas de «Añadir un combate al cartel».
+- Una solicitud por peleador y evento. Si la retira, puede volver a pedirla; si el organizador la rechaza, no (la decisión es del organizador, que sí puede cambiarla).
+- Para elegir, cada solicitud enseña el **récord en la disciplina y el nivel del evento** (combates registrados más los anteriores declarados), los combates en total, el aura, la edad el día del evento, el peso declarado, el gimnasio, la provincia y el mensaje.
+- El correo del peleador solo se muestra al organizador cuando lo acepta (para concretar pesaje y horarios).
+
+**Qué se hizo:**
+- Modelo: `Event.registrationOpen/registrationNote/registrationUntil` y `EventRegistration` (estado Pendiente, Aceptada, Rechazada o Retirada). Migración `20261009090000_inscripciones_en_veladas`, que solo añade.
+- **Peleador:**
+  - «Inscribirme en una velada» y «Mis inscripciones» en su panel;
+  - filtro «Con inscripción abierta» y etiqueta en el calendario de veladas;
+  - sección «Inscripción abierta» en la página de cada evento, con requisitos y fecha límite;
+  - formulario corto (`/veladas/[slug]/inscribirme`): categoría ya rellenada con la de su ficha, peso y mensaje opcionales;
+  - `/mis-inscripciones`, con la respuesta del organizador y «Retirar mi solicitud».
+- **Organizador:**
+  - sección «Inscripción de peleadores» en la gestión de cada evento (abrir, guardar requisitos, cerrar, y «Gestionar las solicitudes (N pendientes)»);
+  - lista `/organizador/[slug]/inscripciones`: pestañas por estado con su número; búsqueda por nombre o gimnasio; «Más filtros» con categoría de peso, división, provincia, combates (mínimo y máximo), edad y peso declarado; siete órdenes (llegada, aura, victorias, más combates, menos combates, peso, edad, nombre);
+  - aceptar o rechazar una a una, o **marcar varias** («Marcar todas») y responderlas a la vez con un mensaje común; vuelve a la misma lista filtrada;
+  - **descarga CSV** de la lista con los mismos filtros (separador «;» para Excel en español, protegido contra fórmulas);
+  - columna de pendientes en «Mis veladas» y una casilla «Solicitudes para participar» en el panel del entrenador y de la entidad.
+- Correos con `after()` y dirección de respuesta: al organizador con cada solicitud y retirada; al peleador con la respuesta.
+- Historial (`REGISTRATION_*`) y descarga de datos personales.
+- Nuevo dominio `lib/events` (depende de `common` y `fighters`), declarado en `arquitectura.test.ts` y `DESARROLLO.md`.
+
+**Qué salió mal:** la prueba nueva falló una vez porque buscaba «Kickboxing» y aparecía dos veces en la página (problema de la prueba, no de la aplicación). La prueba de arquitectura avisó del dominio nuevo sin declarar: se declaró y documentó.
+
+**Pruebas:** unitarias (625, 19 nuevas en `inscripciones.test.ts`, y las guardas de las cuatro acciones en `autorizacion.test.ts`); `inscripciones.mjs` nueva (34 comprobaciones de punta a punta, con accesibilidad); réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **724 comprobaciones, 0 fallos**; el CI de GitHub, en verde.
+**Límite honesto:** probado con Chromium emulando un móvil; falta un recorrido en un iPhone real y con un organizador de verdad que tenga decenas de solicitudes.
+
+**Próximos pasos:** preguntar al fundador si quiere cupos por categoría (por ejemplo, «8 plazas en -71 kg») y lista de espera; aura a promotoras y clubes (fase 2, punto 5).
+
+## 9 de octubre de 2026 — Plazas por categoría y ayuda para emparejar (Claude)
+
+**Qué se pidió** (el fundador, respondiendo a las dos ideas propuestas tras las inscripciones): «Me parece bien que se especifiquen los pesos para los combates, las plazas por categoría, está muy bien. Luego, en cuanto a los emparejamientos entre sí, que no es automático, claro. Sí, siempre con ayuda, sí, obviamente. Con ayuda que se vea el nivel o el nivel de popularidad de la aplicación, el número de combates, etcétera».
+
+**Qué se decidió y por qué:**
+- Las plazas son **opcionales**: sin ellas, la inscripción funciona como antes (cualquier categoría). Así no se rompe nada de lo que ya iba.
+- Con plazas, el peleador **solo puede pedir las categorías ofrecidas** y ve cuántas plazas quedan.
+- Cuando una categoría se llena, las solicitudes pendientes en ella pasan a **«En lista de espera»**. No es un estado guardado aparte: se deduce de las plazas. Así, si el organizador amplía las plazas, la lista de espera se vuelve «pendiente» sola.
+- No se puede **aceptar a más peleadores que plazas**, tampoco aceptando varios a la vez ni con dos respuestas simultáneas (bloqueo por evento). Tampoco se pueden dejar menos plazas que aceptados.
+- **Emparejar nunca es automático:** la página propone, para cada aceptado, los tres rivales más parecidos de su misma categoría y explica las diferencias. El organizador decide y pulsa «Añadir este combate al cartel».
+- **«Nivel»** se muestra con datos que ya existen: récord en la disciplina y el nivel del evento, número de combates, porcentaje de victorias, **aura (la popularidad dentro de la aplicación)**, edad y peso declarado.
+  - Para ordenar a los rivales, lo que más pesa es la experiencia (35 %), después el peso y el porcentaje de victorias (20 % cada uno), el aura (15 %) y la edad (10 %).
+  - El parecido se resume en «Muy igualados», «Igualados» o «Con diferencias».
+  - Los avisos se dan en palabras: «6 kg de diferencia de peso», «20 combates de diferencia de experiencia», «15 años de diferencia de edad».
+  - Es una escala inicial y se puede ajustar en `lib/events/pairing.ts`.
+
+**Qué se hizo:**
+- Modelo `EventSlot` (evento, división, peso, plazas). Migración `20261009120000_plazas_por_categoria`, que solo añade una tabla.
+- Acciones `setSlot` y `removeSlot`; comprobaciones nuevas en `requestRegistration` (categoría ofrecida) y `answerRegistrations` (plazas).
+- **Organizador:**
+  - sección «Plazas por categoría (opcional)» en la gestión del evento: ofrecer, cambiar plazas y quitar categorías, con «N de M plazas cubiertas · X en lista de espera»;
+  - resumen de plazas en la lista de solicitudes, con enlace que filtra cada categoría;
+  - etiqueta «En lista de espera» en las tarjetas;
+  - página nueva **«Ayuda para emparejar»** (`/organizador/[slug]/emparejar`), enlazada desde la lista y desde la gestión del evento.
+- **Peleador:**
+  - elige su categoría entre las ofrecidas, con las plazas que quedan;
+  - ve «En lista de espera» en su solicitud y en «Mis inscripciones»;
+  - recibe un aviso al pedir en una categoría llena.
+- **Página pública del evento:** «Categorías que busca el organizador» y las plazas que quedan.
+
+**Qué salió mal:**
+- La migración volvió a salir vacía. Esta vez Postgres estaba arrancado: la carpeta de la migración ya existía sin `migration.sql` mientras se generaba, y Prisma falló en silencio. Se borró el registro en las dos bases locales y se regeneró. Lección anotada.
+- La prueba nueva falló al principio por esperar a un aviso que ya estaba en pantalla. Elegía la categoría antes de que la página nueva estuviera lista, y el formulario llegaba sin peso. Ahora la prueba espera a que la plaza esté guardada y la página cargada. **No era un fallo de la aplicación**, aunque en un móvil muy lento podría pasarle algo parecido a una persona si elige antes de que la página termine de cargar; queda anotado.
+
+**Pruebas:**
+- 642 unitarias (8 nuevas en `plazas-y-emparejar.test.ts`).
+- `plazas.mjs` nueva, con 23 comprobaciones de punta a punta y de accesibilidad.
+- Réplica exacta del CI con base vacía: `test:e2e` y `test:a11y` completos, **747 comprobaciones, 0 fallos**.
+- Se volvieron a pasar `inscripciones`, `categorias`, `enlaces`, `movil` y `paneles`.
+
+**Próximos pasos:** ver con el fundador si la escala de parecido le convence con datos reales.
+
+## 9 de octubre de 2026 — La edad al emparejar (Claude)
+
+**Qué se pidió** (el fundador): «En el tema de la edad, ten en cuenta que en la categoría élite, tanto masculino como femenino, la edad da igual. Puede enfrentarse una persona de 20 años con una de 27, da igual. Solo en el élite da igual. En las demás categorías, obviamente, en las edades que engloba dicha categoría».
+
+**Qué se decidió:** cuando el combate tiene categoría de edad (división), la ayuda para emparejar **ya no compara la edad** ni avisa de diferencias de edad.
+- Basta con que cada peleador encaje en la edad de su categoría el día del evento.
+- Quien no encaja sale con un aviso y no se propone como rival, porque el cartel tampoco admitiría ese combate.
+- En élite, la página dice expresamente que la edad no cuenta.
+- Solo cuando no hay categoría de edad se sigue teniendo en cuenta la diferencia de edad, porque entonces no se sabe en qué categoría está cada uno.
+- No se ha cambiado qué edades forman cada categoría: las del catálogo de la RFEBoxeo; élite, de 19 a 40 años.
+
+**Qué se hizo:** `comparaEdad` y la opción `edad` en `lib/events/pairing.ts`; comprobación de edad por categoría (`divisionEligible`) en `/organizador/[slug]/emparejar`; prueba unitaria nueva. Sin cambios en la base de datos.
+**Pruebas:** 643 unitarias; `plazas`, `inscripciones` y `categorias` en el navegador, sin fallos.
+
+## 9 de octubre de 2026 — Portada: menos texto bajo el lema (Claude)
+
+**Qué se pidió** (el fundador, con captura de la portada en el móvil): le encantó el lema «Tu deporte. Tu gente.» («representa la idea de la aplicación»). De lo que viene debajo dijo que es «un cúmulo de palabras mal metidas, con una fuente poco llamativa y muy cargado […] quiero que intentes aliviar eso».
+
+**Qué se hizo** (solo en la portada del visitante):
+- Bajo el lema queda **una sola frase**: «Tu comunidad de deportes de contacto en toda España.», en letra algo mayor.
+- Se quitó la lista de seis disciplinas. Ya están, con su icono, más abajo en la portada, así que no se pierde la comunicación inclusiva.
+- La etiqueta del buscador deja de ir en mayúsculas espaciadas y pasa a una línea discreta en letra normal: «Busca peleadores, gimnasios o veladas».
+- El texto de ejemplo del campo pasa a ser «Nombre o ciudad».
+- La etiqueta sigue siendo visible, como exige la regla de accesibilidad del proyecto.
+
+**Pruebas:** `inclusiva`, `usabilidad` (con el texto nuevo de la etiqueta), `diseno`, `movil`, `servicios` y `accesibilidad`, sin fallos; captura a 390 px revisada.
+
+## 9 de octubre de 2026 — Buscar rival o sparring con filtros, e inscripción visible para el peleador (Claude)
+
+**Qué se pidió** (el fundador, probando como peleador en el móvil, con capturas de «Retos y sparrings» y del calendario de veladas):
+- «A la hora de querer retar a un peleador no me aparecen opciones ni filtros de búsqueda. Por ejemplo, quiero pelear contra un contrincante que sé que está en tal gimnasio, pero no me sé su nombre […] o estoy buscando un sparring con un par de filtros: que tenga X peleas, que sea zurdo… Eso debería arreglarse.»
+- «A la hora de intentar inscribirse a un torneo, a una velada o lo que sea, no me sale la opción de solicitar participación […] revísalo muy bien y arréglalo a buen criterio.»
+
+**Causa de lo segundo (honestidad):**
+- La opción existía, pero solo aparecía si el organizador había abierto la inscripción. Al crear un evento quedaba **cerrada** y nada se lo decía al peleador.
+- En la demo, los eventos ya creados (como «Mandanga») tienen la inscripción cerrada, así que el peleador no veía ningún botón ni ningún motivo.
+- Diseñé el «cerrado por defecto» sin pensar en lo que vería el peleador. Lección anotada.
+
+**Qué se hizo:**
+- **Buscador de rivales en «Retos y sparrings»** (`/propuestas`):
+  - **campos principales:** nombre o alias, **gimnasio** (sin saber el nombre del peleador) y orden;
+  - **«Más filtros»:** disciplina (por defecto, la tuya), nivel, categoría de peso, provincia, **guardia** (zurdo, ortodoxo, ambidiestro), **número de combates** (mínimo y máximo) y edad;
+  - **órdenes:** más parecidos a ti (misma categoría de peso y experiencia cercana), más combates, menos combates, más aura y nombre;
+  - **sin filtros**, sugiere «Peleadores parecidos a ti»; los filtros aplicados se ven en «Estás viendo» y se quitan uno a uno;
+  - **cada resultado muestra:** gimnasio, provincia, categoría, combates, guardia, edad y aura, con «Retar» y «Proponer sparring»;
+  - se respeta el récord amateur privado: si el peleador no lo ha hecho público, se ve solo su número de combates.
+  - Reglas en `lib/fighters/rivals.ts`.
+- **Inscripción:**
+  - al crear un evento, la casilla «Abrir la inscripción de peleadores» viene **marcada** (se puede desmarcar);
+  - en un evento futuro con la inscripción cerrada, la página pública lo dice: «Inscripción de peleadores: cerrada», con el motivo y un enlace a los eventos con inscripción abierta;
+  - si quien la mira es el organizador, ve el botón «Abrir la inscripción».
+  - **Los eventos que ya existían siguen cerrados:** su organizador tiene que abrirlos (un botón en la página del evento). No se abren solos, para no cambiar sin permiso algo que ya decidieron.
+
+**Pruebas:**
+- 649 unitarias (6 nuevas en `rivales.test.ts`).
+- `rivales.mjs` nueva, con 12 comprobaciones: gimnasio, guardia, combates, edad, orden, sparring desde el resultado e inscripción cerrada y abierta.
+- `inscripciones` y `plazas` adaptadas a la casilla nueva.
+- Sin fallos en `servicios`, `enlaces`, `movil`, `accesibilidad` y `arreglos`.
+- Réplica completa del CI con base vacía: **761 comprobaciones, 0 fallos**.
+
+
+## 10 de octubre de 2026 ? Optimizaci?n sin redise?o (Codex)
+**Qu? se pidi?:** ?Es muy importante que no cambies el dise?o visual de la p?gina, ya que me gusta como se ve, simplemente quiero que la optimices?. El logo todav?a no est? elegido y se deja para el final.
+**Qu? se decidi?:** corregir comportamientos y adaptaci?n de componentes compartidos conservando nombre, logo, colores, Archivo y navegaci?n.
+**Qu? se hizo:** envolver textos largos cuando no caben; controles t?ctiles y cancelaci?n de gestos de pesta?as; carga de una foto nueva tras fallar la anterior; respuesta de pulsaci?n con movimiento reducido. Pruebas y l?mites en OPTIMIZACION-PANTALLAS.md.
+**Qu? se comprob?:** TypeScript y build correctos; 12 controles de navegador correctos; captura habitual sin diferencias. Unitarias 647/649: dos fallos de multimedia por rutas de Windows en archivos sin modificar. No se reejecut? la bater?a con base de datos por falta de PostgreSQL local.
+**Qu? sali? mal:** el generador de mapa busca separadores POSIX y en Windows omiti? pantallas; no se conserv? esa salida. Se gener? con una copia temporal que usa separadores portables, sin cambiar c?digo del generador. El cat?logo utiliza huellas de bytes: se conservaron finales LF en la carpeta propia para obtener las mismas huellas que CI Linux.
+**Estado y siguiente paso:** cambio local listo para revisi?n y CI, sin integraci?n ni despliegue. Logo pendiente de elecci?n del fundador.
+
+
+## 10 de octubre de 2026 — Experiencia gráfica y móvil (Codex)
+Encargo explícito del fundador: rendimiento, interacción móvil, GSAP, shaders y Three.js conservando identidad; autorización para subir rama independiente y PR, sin desplegar. Implementación, límites y pruebas en [EXPERIENCIA-ELITE.md](EXPERIENCIA-ELITE.md). PR #41. Base de pruebas PostgreSQL propia disponible en esta sesión; no se reutilizan datos reales. Compilación y pruebas locales de navegador correctas; 647/649 unitarias Windows (dos fallos preexistentes POSIX). Validación completa de este bloque pendiente de CI Linux.
+
+
+## 10 de octubre de 2026 ? Correcci?n de bienvenida y adaptaci?n (Codex)
+El fundador rechaza el ring flotante de bienvenida y pide adaptaci?n real a escritorio. Se retira ese objeto y se conserva la composici?n m?vil; escritorio presenta fotograf?a y acciones lado a lado. Pantallas de datos m?s anchas, inicios a dos columnas y formularios con l?mite expl?cito de lectura. Detalle: ADAPTACION-DISPOSITIVOS.md. Build local correcto y 72 comprobaciones de adaptaci?n/accesibilidad correctas en Chromium; CI nuevo pendiente. Cambios publicados en la misma rama independiente por autorizaci?n previa, sin integrar ni desplegar.
+
+
+## 10 de octubre de 2026 — Revisión de portadas de noticias y unión con la optimización de Codex (Claude)
+**Qué se pidió:** revisar el trabajo de Antigravity sobre portadas de noticias y actualización automática (`e26dbd2`) antes de publicarlo, y aplicar el PR #41 de Codex si era viable. El fundador: «quiero intentar terminar la aplicación hoy».
+**Qué se decidió y por qué:** no publicar el cron tal cual: tenía la clave escrita en el código de un repositorio público, sin otra configurada en Render, y el flujo de GitHub daba por buena una actualización fallida. El PR #41 se considera viable: CI verde en `09a5cb0`, licencias gratuitas (MIT y licencia estándar de GSAP), efectos GPU solo visibles y desactivables, y un único conflicto trivial en `.env.example`.
+**Qué se hizo:** `/api/cron/noticias` exige `CRON_SECRET` (503 sin ella), por cabecera y con comparación en tiempo constante; el flujo envía la cabecera y falla si no actualiza; `CRON_SECRET` en `render.yaml` y `.env.example`; se retira `HOSTS_DE_IMAGEN` (con `"*"`, sin uso) y se valida el identificador de YouTube. Secreto creado en GitHub. Rama de Codex unida con la de la demo; catálogo y mapa funcional actualizados con los archivos nuevos.
+**Qué salió mal:** el CI de `78f8342` falló porque los archivos nuevos de `e26dbd2` no estaban en `docs/catalogo-codigo.json`. Al regenerar en Windows, el catálogo cambió todas las huellas (CRLF) y el mapa perdió pantallas: se generaron ambos en un contenedor Linux sobre una exportación con `core.autocrlf=false`.
+**Estado y siguientes pasos:** pendiente de que el fundador pegue `CRON_SECRET` en Render; después, probar el cron a mano. `src/lib/news/ai.ts` aún no se usa. Mencionar en `/privacidad` que las fotos de noticias se cargan desde el medio de origen.
+
+
+## 10 de octubre de 2026 — Portadas en el móvil y demo despierta (Claude)
+**Qué se pidió:** el fundador, con captura del móvil: «va super mal, está lenta […] muchas de las noticias no tienen portada generada como pedí, los títulos se solapan». Autorizó unir el PR #41, arreglarlo en una rama y publicarlo, y mantener la demo despierta.
+**Qué se decidió y por qué:** el servidor responde en 0,2–0,7 s despierto y las fotos pesan 66–162 KB; la espera grande es el sueño del plan gratuito de Render tras 15 minutos sin visitas. De 73 noticias reales leídas en local, solo 17 traían foto: la portada generada es la habitual y debía verse.
+**Qué se hizo:** PR #41 unido. Portada generada sin la etiqueta que se solapaba con la de la tarjeta, con más color y el pictograma como marca de agua; ring en vez de «RE» si no hay disciplina; detección de fotos rotas antes de hidratar; fecha sin cortes; tarea `mantener-demo-despierta.yml` cada 10 minutos.
+**Qué se comprobó:** capturas a 390 px con Playwright sobre base PostgreSQL desechable y noticias reales; tipos sin errores; 650/652 unitarias (los 2 fallos de rutas de Windows).
+**Estado y siguientes pasos:** pendiente de CI y despliegue. La espera de cada cambio de página sigue dependiendo de la CPU del plan gratuito de Render.
+
+
+## 10 de octubre de 2026 — Portada y cabecera en escritorio (Claude)
+**Qué se pidió:** el fundador, con captura a 1366 px: en el móvil todo bien, pero «la web del escritorio no se adapta de la mejor manera».
+**Qué se vio:** cabecera en dos filas (navegación, enlaces de cuenta, «Salir» y buscador mezclados); en la portada, la rejilla de dos columnas ponía «Mi panel» solo en la columna derecha con un hueco grande debajo; la noticia destacada ocupaba casi toda la pantalla.
+**Qué se decidió y por qué:** desde 1024 px la cabecera va en una fila. Los enlaces que ya están en «Menú» (¿Cómo funciona?, Moderación, Mi ficha/Mis clases/Mis veladas) dejan la barra; se conservan «Mi panel», el enlace propio de cada cuenta (Mi ficha, Mis clases o Mis veladas), «Mi cuenta» y «Salir», por las decisiones que recoge `tests/e2e/usabilidad.mjs`; entre 1024 y 1279 px «Mi panel» pasa al menú (sigue en la portada y en la barra del móvil). Medido el ancho: el campo de búsqueda no cabe junto a todo eso (53 px incluso a 1920), así que en escritorio queda el botón «Buscar», que abre `/buscar` con su campo; entre 1024 y 1279 px «Entrenadores» pasa al menú («Clases y entrenadores»). Actualidad y «Mi panel» ocupan todo el ancho; la destacada mide 420 px y debajo van 8 noticias en cuatro columnas.
+**Qué se comprobó:** capturas con sesión y sin ella a 1024, 1100, 1280, 1366, 1440 y 1920 px: una sola fila y nada fuera de pantalla. En local, `usabilidad`, `menu`, `acceso` y `cuenta` pasan sus comprobaciones de cabecera; los fallos restantes son por no tener `psql` en Windows. `escenarios.mjs` (no está en el CI) busca ahora desde `/buscar`.
+**Qué salió mal:** el CI destapó que `RecordarCampos` perdía lo escrito si React vaciaba el formulario tarde (la altura de la ficha en `cuenta.mjs`); ahora guarda lo escrito y vigila 30 s. También hubo que adaptar `busqueda.mjs` (escribía en el campo de la cabecera) y mantener «Mis veladas» en la cabecera de quien organiza.
+**Estado y siguientes pasos:** pendiente de CI y despliegue. Se ve una noticia duplicada por llegar de dos fuentes (AEBOX y su búsqueda): queda para revisar la deduplicación.
+
+## 13 de octubre de 2026 — Propuestas de nombre, logotipo y tipografía: «Lona» (Claude)
+
+**Qué se pidió** (el fundador): empezar con el logotipo oficial y el nombre. Como nombre propone **«Lona»**, por la lona del ring, y pide propuestas de logotipo y una tipografía oficial «que nos represente, que nos identifique como marca».
+
+**Qué se hizo:** un lienzo con cuatro direcciones claramente distintas (Esquina, Cuadrilátero, Cuerdas y Cartel) y una hoja comparativa de tipografía. Cada dirección muestra el logotipo sobre oscuro y sobre claro, el icono de la app en tres tamaños, cómo quedaría en la cabecera y su tipografía. Se mantienen los colores aprobados y el lema; no se cambia nada de la app hasta que el fundador elija.
+
+**Qué falta:** que el fundador elija; comprobar el registro de «Lona» como marca, el dominio y los nombres en las tiendas (no se ha comprobado nada); y que un diseñador humano dibuje el logotipo definitivo. Detalle en `DISENO.md`.
+
+**Nota:** «Lona» no aparecía en la documentación anterior. Si el fundador lo propuso en otra conversación, aquí queda recogido desde ahora.
+
+## 13 de octubre de 2026 — Elegido el logotipo: B · Cuadrilátero (Claude)
+
+**Qué se pidió** (el fundador): «Definitivamente me quedo con la B, la del cuadrilátero, en la cual la O se hace como una especie de ring. Vamos a tirar con esa.»
+
+**Qué se hizo:**
+- Se preparó la versión oficial en archivos: logotipo para fondo oscuro y claro, símbolo e icono de la app en SVG y PNG.
+- Las letras van convertidas en trazados con un guion propio (`scripts/generar-logo-lona.py`), así que el logotipo se ve igual en cualquier sitio.
+- Se descargaron las fuentes de Bricolage Grotesque, con su licencia libre.
+- Se separó un poco el ring de las letras: en la maqueta, los postes llegaban a tocar la «l» y la «n».
+
+**Qué falta:**
+- Confirmar con el fundador cuándo se cambia el nombre en la app; todavía no se ha tocado.
+- Comprobar el registro de la marca.
+- La revisión de un diseñador.
+
+## 13 de octubre de 2026 — El ring, icono oficial: favicon, icono y cabecera (Claude)
+
+**Qué se pidió** (el fundador): «La O en forma de ring va a ser el icono oficial de la marca. Y el favicon y todo eso.»
+
+**Qué se hizo:**
+- Favicon, icono del iPhone, manifiesto de la app web con sus iconos, y el símbolo de la cabecera y de la bienvenida: todo pasa al ring.
+- El nombre visible sigue siendo «Ring España» hasta que el fundador lo confirme.
+
+**Qué salió mal:**
+- Hubo que instalar dependencias nuevas que habían añadido otros asistentes.
+- La prueba de móvil (`movil.mjs`) falla en mi base local en la portada (`/`): dos `<polygon>` y dos `<div>` salen por la derecha.
+- **Comprobado que ya fallaba sin estos cambios:** se compiló la rama principal sin ellos y salió lo mismo. Las pruebas de GitHub de la rama principal están en verde. Parece depender de las noticias guardadas en la base local; queda anotado para revisarlo.
+
+**Pruebas:**
+- 652 unitarias.
+- Sin fallos en `diseno`, `enlaces`, `accesibilidad` y `usabilidad`.
+- Las direcciones `/icon.svg`, `/apple-icon.png` y `/manifest.webmanifest` responden bien.
+
+## 13 de octubre de 2026 — Ring España pasa a llamarse Lona (Claude)
+
+**Qué se pidió** (el fundador): «No te olvides de cambiar el nombre tanto en la aplicación como en todos los documentos oficiales. Ya no somos Ring España, ahora somos Lona.»
+
+**Qué se hizo:**
+- Cambio de nombre en toda la app: cabecera con el logotipo oficial, títulos, textos, correos, descarga de datos, manifiesto y aplicación de códigos.
+- Cambio de nombre en los documentos vigentes.
+- Las entradas antiguas de este diario no se reescriben (regla de la documentación): conservan «Ring España» porque así se llamaba entonces.
+- Detalle y lista de lo que falta en `DISENO.md`.
+
+**Qué salió mal:**
+- El reemplazo automático dejó en `CLAUDE.md` una frase sin sentido («de Lona a Lona»): se corrigió a mano.
+- Una prueba unitaria esperaba el nombre antiguo en el enlace de la aplicación de códigos; se actualizó.
+- Las cuentas que ya tenían el segundo paso configurado seguirán viendo «Ring España» en su aplicación de códigos. Los códigos siguen valiendo; si quieren el nombre nuevo, basta con volver a configurarlo.
+
+**Pendiente del fundador:** cambiar `MAIL_FROM` en Render, el dominio, la dirección de la demo y el nombre del repositorio, y comprobar la marca.
+
+## 13 de octubre de 2026 — La foto de portada pasa a ser del fundador (Claude)
+
+**Qué se pidió** (el fundador): cambiar la foto de la pantalla de inicio («aparecen varias personas sonriendo») por «Bajo las cuerdas», de su portafolio de boxeo, en la que el entrenador le pone el casco al peleador: «es mía la foto y es más realista, porque la otra está hecha con inteligencia artificial».
+
+**Qué se hizo:**
+- Se tomó la foto del repositorio de su portafolio (`portafolio-romppao`, `public/images/boxeo-2.jpg`) y se guardó como `public/brand/bajo-las-cuerdas.webp`.
+- La imagen de IA (`comunidad.webp`) se usaba en tres sitios: la portada del visitante, la bienvenida (en círculo) y la clase `.home-hero`. Se cambió en los tres y se borró, para que no quede en ninguna parte.
+- El encuadre se centra en las manos y el casco.
+- Las descripciones para lector de pantalla ya no hablan de «personas ficticias»: describen la escena real.
+
+**Qué salió mal:** nada. Una limitación: la foto del portafolio mide 682 × 1024 píxeles. En pantallas grandes de alta densidad puede verse algo blanda; si el fundador tiene el original a más resolución, basta con sustituir el archivo.
+
+**Pruebas:** capturas en móvil (390 px), escritorio (1440 px) y bienvenida.
+
+## 13 de octubre de 2026 — Tema claro, panel de moderación y registro de fallos (Claude)
+
+**Qué se pidió** (el fundador):
+- «me gustaría también tener la opción de poner un tema blanco, que el usuario, en función de su sistema, como lo tenga predeterminado, pueda elegir el tema oscuro o el tema blanco».
+- «perfilar muy bien el usuario y moderador […] sus funciones bien estructuradas, con su panel de avisos, los errores que tenga la aplicación […] es muy importante que esos fallos queden registrados, que queden plasmados para saber qué ha estado ocurriendo a lo largo de la historia».
+- Que le diga cómo renovar la demo, porque Render le avisó de que iba a caducar.
+- Documentar todo para los otros asistentes y para los programadores humanos que contrate.
+
+**Qué se decidió y por qué:**
+- **Tema.**
+  - Se interpretó como: por defecto, el tema del sistema, y además un selector «Automático / Claro / Oscuro» en el menú, visible para todos, también sin cuenta.
+  - La elección se guarda en el navegador: es una comodidad, no un dato de la cuenta.
+  - El tema claro conserva la marca: fondo hueso del logotipo «sobre fondo claro», texto negro y botones lima. El lima y el violeta, cuando son texto, se oscurecen para cumplir el contraste.
+  - Las zonas con foto siguen oscuras.
+- **Moderación.**
+  - No se quitó nada: las siete colas y sus acciones siguen igual.
+  - Encima se añadió un panel en tres bloques (pendiente de revisar, estado de la aplicación y herramientas), con recuentos que llevan a cada cola.
+  - Se interpretó «el usuario y moderador» como la cuenta de moderador. Las funciones de cada cuenta con permisos quedan descritas en `docs/MODERACION.md`.
+- **Fallos.**
+  - Registro propio en la base de datos (tabla `AppError`), sin proveedores nuevos ni coste: es la historia que pidió el fundador y queda en nuestra base.
+  - Los fallos repetidos se agrupan, se tachan los datos personales, nunca se borran, se reabren si vuelven a ocurrir, y moderación anota la causa y la solución (obligatoria para cerrarlos).
+  - Sentry (T-010) sigue siendo complementario.
+- **Demo.** Lo que caduca es la base de datos gratuita de Render (30 días). La solución ya aprobada en ADR-003 es pasarla a Neon gratis. Necesita que el fundador cree la cuenta: hay pasos para él en `DEMO.md`. Claude no puede crear cuentas ni debe ver la dirección de la base.
+
+**Qué se hizo:**
+- **Tema.**
+  - Tokens de color en los dos temas (`globals.css` §2): unas 150 sustituciones de colores fijos por variables.
+  - `SelectorTema` en el menú y guion en `layout.tsx` que aplica el tema antes de pintar.
+  - Logotipo claro u oscuro según el tema, colores de foco y avisos con contraste suficiente en los dos.
+- **Fallos.**
+  - `src/lib/common/fallos.ts` (`registrarFallo`).
+  - `onRequestError` en `src/instrumentation.ts`.
+  - `/api/fallos` para los fallos del navegador.
+  - `error.tsx` y `global-error.tsx` envían el fallo y enseñan el código a la persona.
+  - Los 17 `console.error` sueltos (correos, avisos, noticias, limpieza) ahora registran el fallo.
+  - Pantallas `/moderacion/fallos` (lista con recuentos y filtros) y `/moderacion/fallos/[id]` (detalle, estado, nota e historial).
+  - Acción `actualizarFallo`.
+  - Migración `20261013120000_registro_de_fallos`.
+- **Documentación:** `docs/MODERACION.md` (nuevo) y actualizaciones en `DESARROLLO.md`, `ARQUITECTURA.md`, `DISENO.md` y `DEMO.md`; catálogo y mapa al día.
+- **Pruebas.**
+  - Unitarias nuevas en `tests/unit/fallos.test.ts`.
+  - Prueba de navegador nueva `tests/e2e/fallos.mjs` (28 comprobaciones).
+  - `accesibilidad.mjs` mide ahora cada pantalla **en claro y en oscuro**.
+  - Se comprobó con una página que fallaba a propósito (borrada después) que un fallo del servidor queda registrado con su pantalla, su código y la pila.
+
+**Qué salió mal:**
+- Al medir el tema oscuro justo después de cambiarlo, axe vio colores a medio cambiar por las transiciones: hay que esperar a que terminen.
+- `node:crypto` en el registro rompía la compilación de `instrumentation.ts` para el entorno *edge*; se cambió por una huella sin criptografía.
+- La prueba usaba un número como marca única y el registro, a propósito, junta los fallos que solo cambian en números: se usa una marca con letras.
+
+**Estado:** hecho, con pruebas. El fundador aún no ha visto el tema claro.
+
+**Pendiente:**
+- **Fundador:** pasar la demo a Neon (pasos en `DEMO.md`).
+- **Claude:** cuando el fundador avise, ajustar `render.yaml` y comprobar la demo.
+- **Ideas:** aviso por correo al creador cuando aparezca un fallo nuevo.
+
+## 13 de octubre de 2026 — El código pasa a un repositorio privado (Claude)
+
+**Qué se pidió** (el fundador): «tenemos el repositorio de la aplicación público […] no puedo permitir que alguien me robe, me suplante todo el trabajo […] hay mucha competencia en ese sector […] debemos solventar cuanto antes y de manera gratuita». Tras ver dos propuestas: «haz lo recomendado y, como de costumbre, documenta todo explicando el por qué, el cómo, el para».
+
+**Qué se decidió y por qué:** propuesta A, [ADR-004](decisiones/ADR-004-repositorio-privado.md): el repositorio sigue en GitHub y pasa a privado, que es gratis. Antes hubo que ajustar el gasto de pruebas automáticas. En privado hay 2.000 minutos al mes y la semana anterior se gastaron unos 2.000 (254 ejecuciones): al ritmo de antes, las pruebas se habrían parado en una semana. Se descartó mover el código a otra plataforma porque obligaba a cambiar de proveedor sin ventaja.
+
+**Qué se hizo:**
+- **Revisión del historial completo** (266 commits) en busca de claves filtradas. No hay ninguna real. Una clave por defecto antigua de la tarea de noticias estuvo en el código público, así que se recomienda cambiar `CRON_SECRET`.
+- **Pruebas automáticas** (`ci.yml`): solo en los PR, al fusionar en `claude/ring-espana-mvp` y a mano. Así no se prueba dos veces cada cambio. El tiempo máximo pasa de 20 a 30 minutos, porque la accesibilidad se mide ahora en los dos temas.
+- **La visita cada 10 minutos para mantener despierta la demo** (unos 4.300 minutos al mes) se iba a desactivar, pero el fundador pidió después que el proceso se hiciera «sin alterar el funcionamiento de la aplicación ni diseño ni nada». Sigue activa hasta que configure UptimeRobot (pasos en `DEMO.md`); entonces se quita. Este cambio no toca la aplicación: solo la configuración de GitHub, el aviso legal y la documentación.
+- **Aviso legal:** `LICENSE` («Todos los derechos reservados») y `"license": "UNLICENSED"` en `package.json`.
+- **Repositorio privado:** se cambia cuando el ajuste de pruebas ya está en la rama de la demo. El resultado se anota abajo.
+- **Documentación:**
+  - ADR-004, con el porqué, el cómo, el para qué, las reglas desde ahora, los pasos del fundador y cómo deshacerlo;
+  - notas en `CLAUDE.md` y `TRASLADO.md`;
+  - índice de decisiones (ADR-003 figuraba aún como «pendiente», aunque se aprobó el 6 de octubre: corregido).
+
+**Qué salió mal:** nada en este paso. Hay que dejar dicho lo que no se puede arreglar: lo que alguien descargara entre el 24 de septiembre y hoy no se recupera. Esa copia no se puede usar legalmente, porque nunca hubo licencia.
+
+**Pendiente del fundador:**
+- comprobar que el presupuesto de GitHub Actions está en 0 €;
+- crear el monitor de UptimeRobot en los próximos días (hasta entonces, la visita automática gasta unos 140 minutos de GitHub al día);
+- cambiar `CRON_SECRET` en Render y en GitHub (pasos en ADR-004, sección 6);
+- decidir sobre el registro de la marca «Lona» en la OEPM, que tiene coste.
+
+## 13 de octubre de 2026 — Fecha de lanzamiento y mapa de gimnasios (Claude)
+
+**Qué se pidió** (el fundador):
+- Cuándo se puede lanzar. Él proponía el 1 de noviembre, con pruebas definitivas antes («tanto yo como tú entraremos en los distintos tipos de usuarios y probaremos todas las funcionalidades»).
+- Un mapa en «Gimnasios» en vez de solo una lista: «importar ahí un mapa de la ubicación en la que se encuentra el usuario en el que le muestren los gimnasios más cercanos […] una lista se ve un poco aburrida». Dijo que miraría también las veladas.
+
+**Qué se decidió y por qué:**
+- **Lanzamiento.** Claude revisó lo pendiente:
+  - Faltan una versión real separada de la demo, copias de seguridad, correo real, fotos fuera de la base, textos legales y la decisión sobre menores.
+  - Las tiendas (App Store y Google Play) no llegan al 1 de noviembre.
+  - Recomendó abrir primero a un grupo cercano y hacer la promoción unas dos semanas después.
+
+  El fundador decidió: **«retrasaremos el lanzamiento para el día 15 de noviembre […] dejar la aplicación lista ya el día 1 de noviembre, totalmente funcional, a la espera de revisiones jurídicas y legales»**, y la promoción (vídeos, publicaciones, otras estrategias) se define más adelante. Hoja de ruta en `docs/LANZAMIENTO.md`.
+- **Mapa.** Claude propuso dos opciones: Google Maps (pide cuenta de Google Cloud y probablemente tarjeta; gratis solo hasta un número de visitas) o un mapa libre (MapLibre con los mapas de OpenFreeMap y los datos de OpenStreetMap: sin cuenta, sin tarjeta y sin límite de visitas según su web). Recomendó el libre y el fundador respondió «vale, de acuerdo». Se toma como aprobación; si prefiriera Google, el cambio es pequeño.
+  - La lista se queda, más visual y ordenada por distancia: la necesitan quienes usan lector de pantalla o no quieren dar su ubicación.
+  - La ubicación de la persona no se guarda.
+
+**Qué se hizo:**
+- `docs/LANZAMIENTO.md` (calendario, imprescindibles con responsable y estado, pruebas definitivas y promoción) y notas en `CLAUDE.md` y `TRASLADO.md`.
+- **Mapa de gimnasios:**
+  - mapa con «Usar mi ubicación», «Los más cercanos a ti» con la distancia, marcadores agrupados y modo oscuro;
+  - lista rediseñada en tarjetas;
+  - campo «Dirección del gimnasio» en su perfil y coordenadas buscadas en OpenStreetMap;
+  - centro de provincia cuando no hay coordenadas;
+  - nota en la página de privacidad;
+  - CSP y permiso de ubicación ajustados.
+  - Detalle en `DISENO.md` y `ARQUITECTURA.md`; proveedor anotado en ADR-003.
+- **Pruebas:** unitarias en `tests/unit/mapa.test.ts` y de navegador en `tests/e2e/mapa.mjs` (13 comprobaciones, con accesibilidad en los dos temas).
+
+**Qué salió mal:**
+- **El trabajador de MapLibre 6 no carga solo.** Busca su archivo junto al suyo, y al empaquetarlo Next.js lo cambia de sitio. Se copia a `public/vendor/` al compilar.
+- **Los marcadores de gimnasios de la misma ciudad se tapaban** y fallaba la prueba de tamaño de zona táctil. Se agrupan en un círculo con el número.
+- **Los estilos propios de MapLibre pisaban los nuestros en la ventanita**: fondo blanco con texto lima ilegible en oscuro. Se dio más especificidad a los nuestros.
+- **El punto de «tu ubicación» tapaba a los gimnasios** que tenía debajo. Ya no se puede pulsar.
+- **En esta sesión no hay internet**, así que el fondo del mapa no se ha visto: hay que comprobarlo en la demo.
+
+## 13 de octubre de 2026 — «Los mejores de tu zona» y mapa en las fichas (Claude)
+
+**Qué se pidió** (el fundador): «me parece bien un mapa libre […] que el usuario, en vez de que le salga una lista muy aburrida y larga hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración de Google o algo similar». Y en las fichas de entrenadores y gimnasios: «su descripción, todo lo que hace y en el mapa la ubicación exacta de dónde se le puede ir a acudir».
+
+**Qué se decidió y por qué:**
+- **Sin valoraciones de Google:** exigen su servicio de pago y sus condiciones no permiten mostrarlas fuera de un mapa suyo.
+- **Valoración Lona** («algo similar»): sale de datos reales de la comunidad (aura de sus peleadores, peleadores, entrenadores y sello de verificado). Se explica en pantalla y no se puede comprar.
+- **Lista completa:** se conserva, porque es la vía accesible, pero queda recogida debajo.
+- **«Cómo llegar»:** un simple enlace a Google Maps, sin clave ni coste, que abre la aplicación del teléfono.
+
+**Qué se hizo:**
+- «Los mejores de tu zona» con «Mejores / Más cerca».
+- «Ver todos los gimnasios (N)» recogido.
+- Tarjetas más limpias en el móvil: el sello de verificado va dentro de la tarjeta.
+- «Dónde está» en la ficha del gimnasio y «Dónde entrena» en la del entrenador.
+- Parte común del mapa en `components/mapa/base.ts`.
+- `tests/e2e/mapa.mjs` ampliada a 23 comprobaciones; pruebas unitarias de la valoración.
+
+**Qué salió mal:**
+- El primer CI del PR #46 falló en «Prueba de extremo a extremo». Desde aquí no se pueden leer sus registros ni descargar el diagnóstico, así que se busca la causa con la réplica local.
+- En el móvil, las tarjetas quedaban apretadas con el sello a la derecha y los botones de orden ocupaban dos líneas: se corrigió tras ver las capturas.
+
+## 13 de octubre de 2026 — Causa del CI rojo del mapa y control de versiones (Claude)
+
+**Qué se pidió** (el fundador): «Continúa», para terminar el mapa. Y después: «Es importante llevar un buen manejo de versiones para la aplicación, tenlo en cuenta y en caso de que no lo estés haciendo, aplícalo».
+
+**Qué se decidió y por qué:**
+- **Versionado semántico con un registro de cambios en lenguaje llano.** La versión actual pasa a 0.9.0 y la **1.0.0 será el lanzamiento público** del 15 de noviembre.
+- **Versiones anteriores reconstruidas** a partir de los 24 PR fusionados: 0.1.0 a 0.8.0, cada una con su commit de fusión. Así hay puntos fijos a los que volver.
+- **El CI exige que cada PR suba la versión** y tenga su entrada: lo que no se comprueba acaba no haciéndose (fue lo que pasó durante seis semanas).
+- **Las etiquetas las crea el CI**, solo si todas las pruebas pasan tras fusionar. Desde la sesión de Claude no se pueden crear: el proxy bloquea esa escritura, ya sea con `git push` o con la API.
+- **La versión se ve** en la ayuda, en moderación (con el commit), en `/salud` y en cada fallo registrado (primera y última versión). Así se sabe si un arreglo funcionó.
+
+**Qué se hizo:**
+- **Mapa:**
+  - «Acercar» y «Alejar» indican qué mapa controlan (`aria-controls`, en `crearMapa`).
+  - La autoría del mapa se lee bien en tema oscuro.
+  - Las pruebas sirven un estilo de mapa propio con la misma autoría, así que no dependen de internet y ven lo mismo en local y en el CI.
+- **Diagnóstico del CI:** si fallan las pruebas de navegador, `scripts/avisos-ci.mjs` publica un aviso legible desde el PR con los fallos y el texto de las páginas guardadas.
+- **Versiones:**
+  - Archivos nuevos: `CHANGELOG.md`, `docs/VERSIONES.md`, `scripts/version.mjs` y `src/lib/common/version.ts`.
+  - Migración `20261013200000_version_en_fallos`.
+  - Paso de comprobación y trabajo `etiquetar` en el CI.
+  - Pruebas de la versión en `fallos.mjs` y `busqueda.mjs`.
+  - Reglas en `EQUIPO.md`, `DESARROLLO.md`, `REVISION.md` y `CLAUDE.md`.
+
+**Qué salió mal:**
+- El CI del mapa falló cinco veces seguidas, por causas distintas:
+  - los botones de zoom sin `aria-controls`, que la réplica local encontró;
+  - dos veces el catálogo sin regenerar tras tocar un archivo;
+  - el contraste de la autoría, que solo aparece con internet, y en local no se veía.
+- Dos pruebas anteriores al mapa (`cuenta.mjs` y `flujo.mjs`) fallaron una vez cada una en el CI y pasan siempre en local: son intermitentes, y la segunda guardó la página a medio cargar. Se relanzó el CI para confirmarlo. Están anotadas como intermitentes, con la causa todavía sin encontrar.
+- No se podían leer los registros del CI desde aquí, por eso se hizo `avisos-ci.mjs`.
+
+**Estado:** PR #46 con el mapa y el control de versiones (0.9.0), pendiente de que el CI pase para fusionarlo.
+
+**Próximos pasos:** fusionar, comprobar que el CI crea las etiquetas v0.1.0 a v0.9.0, y estudiar las dos pruebas intermitentes.
+
+
+## 13 de octubre de 2026 — Revisión responsive (Codex)
+**Pedido:** adaptar móvil y escritorio con impeccable y break-ui y entregar la demo ajustada.
+**Decisión:** conservar identidad y funciones; corregir distribución, recortes y casos extremos.
+**Hecho:** cabecera por espacio, tarjetas que crecen, actualidad a ancho completo, todas las noticias visibles, disciplinas en cuadrícula, números españoles, grafemas y fotos ausentes. Banco visual exclusivo de desarrollo sin PostgreSQL. Ver REVISION-RESPONSIVE-20261013.md.
+**Validación:** 60 comprobaciones de navegador correctas; tipos y build correctos; 404 del banco en producción. Unitarias 650/652 (dos fallos previos de rutas Windows); documentación 8/9 (symlink EPERM). Catálogo/mapa comprobados en copia temporal normalizada sin modificar generadores.
+**Problemas corregidos de verificación:** las imágenes lazy deben acercarse a la vista y esperar antes de exigir alternativas. PowerShell requiere UTF-8 explícito también en su entrada a Python: se corrigieron únicamente las anotaciones propias de este bloque y se regeneró el mapa.
+**Pendiente:** GitHub y PostgreSQL inaccesibles en esta sesión; falta CI completo/base aislada y demo remota. Demo visual local en 127.0.0.1:3137/revision-ui.
+
+
+## 13 de octubre de 2026 — Corrección de base oficial (Codex)
+El fundador detectó que la revisión inicial usaba una copia antigua. Render confirma como live el commit 46c17253985aaf277b2801e41a80c81c2f386b16, Lona 0.9.0. Se importó el contenido oficial verificado y se conciliaron los ajustes en codex/adaptacion-lona-actual-20261013; no es un fetch de la ascendencia Git. Marca, foto, temas y funciones actuales conservados. Versión preparada 0.9.1, sin publicar.
+Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos temas y ocho anchos; unitarias 675/677, dos fallos previos POSIX/Windows. Faltan tipos/build completos por maplibre-gl no instalado y caché de npm incompleta. Catálogo 354 fuentes y mapa 74 pantallas comprobados. Sin migraciones, datos, publicación ni cambios en Render. Demo visual local http://127.0.0.1:3139/revision-ui con datos ficticios. Detalle y siguiente paso: docs/REVISION-LONA-ACTUAL-20261013.md. La validación build/tipos de la entrega anterior solo correspondía a la base antigua.
+
+## 13 de octubre de 2026 — Afilar antes del lanzamiento: bloque A (Claude, con el trabajo previo de Codex)
+
+**Qué se pidió:** el encargo «afilar y gimnasios» (`docs/ecosistema/traspasos/2026-10-13-claude-encargo-codex-afilar-y-gimnasios.md`). Codex empezó el bloque A y se quedó sin créditos con el trabajo sin confirmar en Git y sin traspaso; Claude lo revisó, lo terminó y lo confirmó.
+
+**Qué se decidió y por qué:**
+- Versión 0.10.0 (menor): trae cosas nuevas para el usuario (buscador del cartel, diagnóstico de noticias, estados de combate).
+- Se mantienen las búsquedas de Google Noticias aunque a veces devuelven 503 desde Render; queda pendiente decidir si se quitan.
+- Se quitan FEKM (403) y MMA España (HTML, sin canal) y se añaden Marca boxeo y Marca MMA (comprobadas con curl).
+
+**Qué se hizo:**
+- A1 Noticias: sin titulares repetidos (`src/lib/news/deduplicate.ts`), diagnóstico de fuentes (`diagnosis.ts`), rechazo de respuestas que no son RSS, fuentes cambiadas (`sources.ts`).
+- A2 Hidratación #418: fecha de «Mi ficha» con zona horaria fija y prueba `tests/e2e/hidratacion.mjs` (Madrid y Nueva York).
+- A3 `EvitarDobleEnvio` reescrito: bloquea hasta que termina la acción, con tope de 30 s y texto de progreso.
+- A4 Cartel del organizador con búsqueda de peleadores por esquina (`src/lib/events/cartel-search.ts`).
+- A5 Estados «Programado» y «Resultado por anotar» (`src/lib/bouts/status.ts`).
+- A6 No se puede pedir inscripción si ya se figura en el cartel (bloqueo común `cartel:<eventId>`).
+- A7 Nivel sin preseleccionar. A8 Enlace de entradas solo https.
+
+**Qué salió mal:**
+- La causa del error de hidratación #418 NO está confirmada: se vio una vez en la demo y no se reproduce (unas 30 cargas y en local). La hipótesis es una mezcla de HTML y JavaScript de versiones distintas durante un despliegue de Render.
+- Fallo de la deduplicación: una dirección con barra final y parámetros no se normalizaba igual; corregido y con prueba.
+- Codex se quedó sin créditos con el trabajo sin confirmar.
+
+**Estado:** A1–A8 hechos y confirmados en local (sin subir). Pruebas: typecheck limpio; vitest 695/697 (dos fallos anteriores de rutas de Windows en `multimedia.test.ts`). La suite de navegador no se ha pasado entera. A4 no está validado en un navegador con una cuenta de organizador.
+
+**Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque B (Codex)
+
+Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autorización moderadora para veladas pasadas; B3 incorpora el plazo de 24 horas a partir del registro con exclusión de combates disputados y aviso al peleador. B2 conserva la privacidad amateur actual y deja pendiente la visibilidad interna para moderación. Se eliminaron los BOM UTF-8 de `record-eligibility.ts` y `record-time.ts`. CI y revisión de los PR apilados pendientes.
+
+La primera ejecución de CI reveló supuestos E2E que ya no eran válidos tras hacer obligatorio el nivel y aplicar el plazo de 24 horas. Las pruebas se ajustaron para elegir nivel, esperar al resultado y comprobar los combates después de 25 horas cuando corresponde.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque C (Codex)
+
+El traspaso técnico reúne el alcance A/B, comprobaciones y límites. Los PR se mantienen en borrador y no se ha desplegado la demo. Pendientes: CI de la pila rebasada, revisión final de Claude y publicación autorizada.
+
+## 14 de octubre de 2026 — Afinado de pruebas de lanzamiento (Codex)
+
+CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba para que se vea el récord actualizado. CI #514 encontró que el botón compacto de atribución de MapLibre medía 24 × 44 px en móvil. Se amplió su zona táctil a 44 × 44 px, manteniendo el icono centrado. La CI debe volver a comprobar E2E y accesibilidad; el ajuste es de tamaño de interacción y no cambia el diseño de la página.
+
+## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
+
+**Qué se pidió:** corregir catálogo de #48, esperas de flujo y cuenta, investigar la doble navegación, unir las notas de 0.9.1 a 0.10.0 y usar tokens en /revision-ui. Rebasar B y C; sin fusionar ni desplegar. El punto de sparring trae un marcador sin descripción: se pidió el recorrido y resultado esperado al fundador; no se inventa el fallo.
+**Qué se decidió y por qué:** las dos notificaciones corresponden a pushState/replaceState de Next.js, con un solo POST; se reproducen también en 0.9.0. No se modifica FlashNotice para eliminar comportamiento del framework. Se lleva a A la corrección de form.method de B y los datos de prueba necesarios para A7.
+**Qué se hizo:** seis responsabilidades ausentes del catálogo, normalización Windows/Linux y exclusión de next-env.d.ts con sus pruebas; catálogo/mapa regenerados; URL y seen() en rival; mostrar() y tres seen() en ficha; registro de versiones y token --acc-ink corregidos. Las reglas de datos/permisos de la aplicación se conservan.
+**Qué ejecuté:** clon real por Git, reproducción de la comprobación defectuosa en Chromium/producción, captura de POST/RSC/history en #51, control con componentes pre-A3 y base 0.9.0; catálogo 360 archivos, 11/11 documentales, mapa 74 pantallas/82 acciones/29 tablas, tipos, 697 unitarias y build de A. Los recorridos completos y CI de los heads finales se registran en el traspaso/PR tras completarse, no se presuponen aprobados aquí.
+**Qué salió mal:** acceso de red y caché de npm sin permisos adecuados al primer intento; primeras pasadas de flujo/cuenta encontraron datos sin nivel obligatorio, corregidos sin saltar comprobaciones. El diagnóstico sobre 0.9.0 usa solo su tramo de navegación; sus expectativas de 24 horas (de B) no se consideran una prueba válida de esa versión.
+**Estado y próximos pasos:** borrador, sin integración/despliegue. Rebasar B/C, regenerar ambos documentos generados y comprobar cada CI. Sparring depende de la descripción que falta.
+
+14 oct, continuación de CI #48: la ejecución 38525216311 aprobó catálogo, mapa, tipos, 697 unitarias y build, pero falló en respaldo.mjs porque sus dos combates profesionales no elegían nivel después de A7. Se exige PRO explícito para ambos, conservando amateur, NC, categorías históricas y todas sus comprobaciones. No se presenta esa ejecución como verde; el head siguiente se comprueba de nuevo.
+
+14 oct, segunda revisión de CI: categorias.mjs perdía división/peso al elegir de nuevo el mismo nivel, porque SelectorCategoria reinicia sus dependientes en change. Elegir nivel antes de división/peso, evitar change redundante en el ayudante y poner rivalId después de rellenar; se traslada la preparación de edad de B a A. El artefacto de #51 (11876608015, head 0667240) confirma alias/presentación pero altura ausente en HTML. Cuenta ahora espera la URL del rechazo y exige los tres valores en el formulario antes de enviar, escribiendo altura al final; mantiene los tres seen() públicos y añade diagnóstico por dato si falla. Pasadas locales completas: categorías 18/18; cuenta 33/33 y otra 33/33 con CPU ralentizada seis veces. Sin cambios de src ni reglas de producto; el vaciado anterior no se atribuye sin evidencia a una causa distinta del estado de formulario durante la transición.
+
+14 oct, continuidad de CI: los heads 0da663b/01bb8bd/a4f7203 aprueban catálogo, mapa, tipos, unitarias y build, y #51 ya aprueba flujo/cuenta. La ejecución 38530144100 se detiene en inclusiva.mjs por crear una velada sin nivel obligatorio tras A7. Se preparan explícitamente AMATEUR también en inscripciones, plazas, rivales y escenarios, sin cambiar la aplicación ni quitar expectativas. En local se limpian exclusivamente los datos 000Inclusiva de esta base desechable tras una pasada fallida: repetirla con residuos altera qué seis eventos enseña la portada. No se presenta esa primera pasada como verde.
+
+14 oct — El recorrido de doble clic descubrió un fallo distinto de la navegación: React puede hidratar acciones sin method; el lector getAttribute con valor por defecto GET omitía el bloqueo. Diagnóstico en Chromium: dos clics (detail 1/2), dos submit, dos POST y selección de rival tras haber registrado el primero. A reconoce esas acciones y descarta el segundo clic físico, conservando búsquedas GET y reintento independiente. Prueba de componentes: acción React sin method con input llamado method, reset síncrono y siguiente clic; se ejecuta antes del build final. El diagnóstico inicial de «respuesta rápida» era una hipótesis; la ausencia de method es la causa demostrada. Se separa de HistoryUpdater en el traspaso.
+14 oct — La prueba de usabilidad de B conserva su comprobación de «Gana Movil» y declaración opcional: activa por la interfaz la publicación del récord amateur de su fixture y madura ese combate 25 horas antes de verlo. La captura anterior ocultaba el resultado por privacidad; no era un error de la aplicación. El doble clic fallido del mismo recorrido queda resuelto en A3. No se atribuye a este guion una pasada verde hasta repetirlo sobre A corregida.
+
+14 oct, precisión de usabilidad B: la privacidad amateur protege a ambos participantes. Se prepara también la autorización del rival a través de su cuenta e interruptor y se selecciona su ficha existente. La segunda pasada que publicaba solo el récord del ganador seguía ocultando correctamente el resultado y se registra como fallida. No se relaja la comprobación ni se modifica la política.
+## Estado del rebase final, 14 de octubre
+
+A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/categorías y mantienen las exigencias públicas. C está nuevamente sobre esa B (0.11.1). Frente a la pila anterior, src, prisma, scripts y unitarias de B/C son idénticos; cambian los guiones indicados y documentación generada. Se valida el CI de estos heads, no el de sus predecesores fallidos. Las pruebas dirigidas pasan: cuenta 33/33, cuenta CPU ×6 33/33, categorías 18/18 y respaldo 22/22. La descripción de sparring sigue pendiente; no hay PR ni versión ficticios para ese caso.
+
+## 14 de octubre de 2026 — Búsqueda local para retos y sparring (Codex)
+
+El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y descubrir peleadores compatibles sin escribir nombres exactos. Rama apilada codex/sparring-2026-10-14 sobre C, con reproducción E2E primero (ausencia de desplegables) y después selección nativa de ciudad y club, nombre opcional y enlace a la propia ciudad. Opciones derivadas de candidatos autorizados y filtros deportivos; clubes por id, ciudad de entrenamiento cuando hay club, enlaces anteriores conservados. Versión 0.11.2 mediante scripts/version.mjs. Pruebas locales y estado externo de CI se detallan en el traspaso al cerrarse; no se anticipa un resultado verde. No se fusiona ni despliega.
+
+14 oct, cierre actual: #48 eb5a366 → #50 e8d239c → #51 c9d2546 → #52, todo en borrador. A usabilidad 52/52 y siete recorridos 154/154; B usabilidad final 52/52 tras autorización real de ambos participantes; búsqueda final 33/33, 712 unitarias, tipos/build y móvil claro/oscuro a 390 revisado. Catálogo/mapa/versiones comprobados. El selector intermedio del rival falló por no incluir el aria-label completo; corregido sin quitar comprobaciones. E2E de CI A aprobado al consultar, accesibilidad aún en curso; estados finales de CI se entregan separados de lo local. Sin fusión ni despliegue.
+
+14 oct — La prueba previa rivales.mjs también se adapta al nuevo desplegable: selección por gimnasioId, espera de dirección/candidata y las mismas comprobaciones; conserva un enlace antiguo por nombre para verificar compatibilidad. Recorrido completo 12/12 en local. CI A 38533976870 completamente aprobado; B/C/#52 finales en curso al cerrar esta entrada.
+
+## 14 de octubre de 2026 — Revisión de los PR de Codex y comprobaciones recuperadas (Claude)
+
+**Qué se pidió** (el fundador): revisar lo que había hecho Codex y, si estaba bien, actualizar GitHub y la demo. Después: «Prefiero que hagas tú la corrección».
+
+**Qué se decidió y por qué:**
+- **#48 se fusionó** (0.10.0): CI en verde y revisión correcta (esperas de las pruebas y bloqueo del doble envío, con pruebas propias).
+- **#50 se redirigió** a la rama de la demo, para que no se fusionara dentro de la rama de #48.
+- **Las dos comprobaciones que #50 había quitado se recuperan en un PR propio de Claude** (`claude/recupera-comprobaciones`, sobre #52). No se escribe en la rama de otro asistente (`EQUIPO.md`, regla 2).
+
+**Qué se hizo:**
+- `tests/e2e/flujo.mjs`:
+  - El comentario del aura se escribe en el formulario del combate al que se da el aura y se comprueba que se ve en la ficha.
+  - Tras «madurar» el combate del veterano más de 24 horas, se comprueba que el récord pasa a 11-3-1.
+- Versión 0.11.3.
+
+**Qué salió mal:**
+- El comentario no aparecía y parecía un fallo de la aplicación: el campo tenía el texto, pero el envío llegaba vacío.
+- La causa real era la prueba. La ficha de Pepe tiene cuatro combates y cuatro cajas de comentario. La prueba escribía en la primera de la página y pulsaba «Dar aura» en otro combate, que ya no era el primero porque cambió el orden de los combates.
+- Probablemente por eso #50 quitó la comprobación en lugar de arreglarla.
+
+- Después, el CI de #50, #51 y #52 falló en dos pruebas del bloque B. Se reprodujeron aquí y en ninguna era un fallo de la aplicación:
+  - `record-24h.mjs` contaba la etiqueta «cuenta en el récord a partir del…» antes de que se pintara. Ahora la espera con `seen()`.
+  - `veladas-pasadas.mjs` buscaba «Pasada aprobada» sin la parte única del nombre, así que encontraba veladas de otras ejecuciones. Además, comprobaba que el texto no estuviera en la página, y la página repite lo buscado («No hemos encontrado nada para «…»»). Ahora usa nombres únicos y comprueba que no hay enlace a la velada.
+  - Además, `veladas-pasadas.mjs` iba al historial justo después de pulsar «Autorizar y publicar», sin esperar a que se guardara la decisión, y en el CI llegaba antes. Ahora espera el aviso de confirmación.
+  - Se comprobó a mano que la búsqueda pública **no** muestra veladas pendientes ni rechazadas: la regla B1 se cumple.
+
+- La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.
+
+- **Fallo real encontrado:** el tema elegido se perdía a veces al recargar. Lo delataban «la elección se recuerda al volver» tras fusionar #48 y `servicios.mjs` en #53, que solo fallaban en el CI, que es más lento.
+  - Causa: el guion `TEMA_INICIAL` pone `data-tema` antes de pintar, pero si React vuelve a pintar `<html>` al cargar (un error de hidratación, como el #418 que investigó A2), el atributo desaparece y nada lo reponía. `SelectorTema` solo leía la elección para marcar su opción.
+  - Arreglo: `components/TemaPersistente.tsx` lo vuelve a aplicar al montar y cada vez que alguien lo quite, mientras siga guardado.
+  - Prueba nueva: se borra el atributo a propósito y se comprueba que vuelve.
+- Batería completa en local sobre una base vacía: 796 comprobaciones de navegador bien, ninguna mal.
+
+**Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.
+
+## 14 de octubre de 2026 — Entrar y registrarse con Google (Claude)
+
+**Qué se pidió** (el fundador): «que se pudiera registrar la gente mediante Google […] La parte de Apple lo dejaremos aplazado para cuando lo lancemos. Pero por lo menos la de Google que ya esté, que creo que se puede y es gratuito». Codex se quedó sin créditos, así que: «hazlo tú. Todo lo que haya que hacer, hazlo tú […] dame el texto en caso de que a ti se te acaben los créditos».
+
+**Qué se decidió y por qué:**
+- **OpenID Connect con PKCE, `state` y `nonce`, programado en Lona y sin librerías nuevas.** Son unas 150 líneas, fáciles de revisar y sin dependencias que mantener. Solo se piden nombre y correo: con eso Google no limita a usuarios de prueba ni muestra avisos (ayuda oficial de Google Cloud, «Manage App Audience» y «Unverified apps»).
+- **Cuentas:**
+  - si el `sub` ya está vinculado, se entra;
+  - si el correo ya existe, se vincula;
+  - si no existe, se crea con el correo confirmado.
+- **Protección contra el «secuestro previo»:** si la cuenta existente no había confirmado su correo, se invalida su contraseña y se cierran sus sesiones antes de vincularla.
+- **El creador** sigue pasando por el segundo paso.
+- **Las entidades** se registran con correo y contraseña, porque su solicitud necesita datos que Google no da.
+- **Sin claves no hay botón.** Las claves las pone el fundador en Render (`docs/GOOGLE.md`).
+
+**Qué se hizo:**
+- `lib/accounts/google.ts`.
+- Rutas `/api/auth/google` y `/api/auth/google/callback`.
+- `BotonGoogle` en «Entrar» y «Registrarse».
+- Campo `User.googleSub` y su migración.
+- Mensajes, ayuda y privacidad.
+- `render.yaml` y `.env.example`.
+- Pruebas: 16 unitarias y `tests/e2e/google.mjs`. En el CI se usan claves de mentira y no se llega a hablar con Google; `enlaces.mjs` no sigue esa ruta.
+- Ficha `T-015` (sirve también de encargo para Codex) y guía para el fundador.
+
+**Qué salió mal:**
+- Desde la sesión no se pueden abrir las páginas de Google para desarrolladores (sin resolución DNS). Las condiciones de uso se comprobaron con la búsqueda web, citando las páginas oficiales de ayuda.
+- No se puede probar el viaje real a Google hasta que el fundador ponga las claves.
+
+- **Pausa pedida por el fundador:** «no empieces las nuevas cosas que te he dicho sin antes haber validado, corregido todo lo anterior». Google se apartó hasta publicar y comprobar la 0.11.3, y se retomó después.
+- **Vuelta completa comprobada con un Google simulado** (`tests/e2e/google-falso.mjs`, cargado con `node --import` solo en el servidor de pruebas). Casos:
+  - cuenta nueva (peleador, correo confirmado, sesión iniciada);
+  - volver a entrar sin crear otra;
+  - vincular una cuenta con el correo confirmado sin tocar su contraseña;
+  - proteger la que no lo tenía;
+  - rechazar un correo sin confirmar en Google;
+  - creador con segundo paso.
+
+  `google.mjs`: 25 de 25. Capturas en el móvil, en claro y oscuro, revisadas.
+- **Contratiempos de la comprobación local:**
+  - `NODE_OPTIONS` no llega al servidor de Next, así que el simulador se carga con `node --import` directamente.
+  - Un servidor anterior seguía ocupando el puerto (`EADDRINUSE`) y se estuvo probando contra él sin saberlo.
+  - Dos veces `pkill -f` se mató a sí mismo, porque su propio texto contenía el patrón.
+  - Las vueltas fallidas confirmaron que el error se registra y que la persona ve un mensaje claro.
+
+**Estado y próximos pasos:** batería completa en marcha; después, PR y CI. El fundador crea las credenciales (`docs/GOOGLE.md`) y Claude lo comprueba en la demo.
+
+## 2026-10-14 — Paneles por tipo de usuario: revisión y fallos del bloque E (Claude)
+
+**Qué se pidió:** el fundador pidió revisar el usuario aficionado y las funciones de su panel; después, propuestas para todos los tipos de cuenta. Aprobó todas («me han gustado todas tus propuestas») y pidió a Claude que corrigiera él mismo los fallos y dejara a Codex lo largo.
+
+**Qué se decidió y por qué:**
+- El encargo completo para Codex está en `docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md` (en la carpeta del ecosistema): F, pulido común; G, funciones para Madrid; H, después.
+- Claude hace el bloque E porque son tres arreglos pequeños y con riesgo para la confianza en los datos.
+
+**Qué se hizo:**
+- `src/lib/community/siguiendo.ts`: filtros de «Peleadores que sigo».
+- `src/lib/events/resultados-pendientes.ts`: recuento de resultados por poner de todas las veladas.
+- `Entidad.tsx` sin la barra de seis huecos.
+- Pruebas en `tests/unit/paneles-fallos.test.ts`.
+- Versión 0.12.1.
+
+**Qué salió mal:** la base de datos local (Docker) no estaba en marcha, así que las pruebas de navegador se dejan al CI. En local pasaron la comprobación de tipos, las 737 pruebas unitarias, el catálogo y el mapa.
+
+**Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.
+
+## 2026-10-14 — Relevo entre sesiones: que Claude, Claude Code y Codex no se pisen (Claude, nube)
+
+**Qué se pidió** (el fundador): «entre tú y Code no os podéis comunicar, por lo que quiero que creéis una documentación en la que actualicéis lo que hagáis cada uno para así no solapar trabajo y tengáis contexto de todo lo que se haya hecho en cada sesión, así no tengo que gastar token repitiendo cosas que ya he hecho en el móvil […] en caso de que no esté esto ya implementado, hacerlo de la manera más óptima».
+
+**Qué se encontró:** ya había mucha documentación (`EQUIPO.md`, un registro por asistente, traspasos de Codex, `TRASLADO.md`), pero no resolvía el problema:
+- **Ningún punto de entrada corto.** `TRASLADO.md` es del 6 de octubre y está anticuado; el diario tiene casi 1.900 líneas. Leerlo todo cuesta muchos tokens, y por eso nadie lo hacía.
+- **Ninguna forma de reservar un trabajo.** Los arreglos A1–A8 acabaron hechos a la vez en #48 y #49. Mientras esta sesión hacía lo de Google, otra montaba la versión real en Cloud Run (#57, con dominio `lonaclub.es`) y Codex los paneles (#56), y esta sesión no se enteró.
+- **Nada obligaba a leer el estado al empezar.** `CLAUDE.md` no lo decía.
+- **Un encargo que no existe en el repositorio:** el de los paneles (F, G y H) que citan el diario y `IDEAS.md` no está subido a ninguna rama.
+
+**Qué se decidió y por qué:** lo mínimo que cierre esos cuatro huecos, sin añadir otro registro que se quede sin leer.
+- **`docs/ESTADO.md`**, de unas 70 líneas: dónde estamos, quién tiene qué, lo que solo puede hacer el fundador, **lo que el fundador ya ha dicho** (para no repetírselo), lo siguiente y las reglas. Cada asistente edita solo su fila, para no pisarse.
+- **`scripts/estado.mjs`**: lo que dice la realidad **en directo**, sin depender de que nadie se acuerde de apuntarlo: versión de la demo, ramas y PR en curso, y ficheros que dos trabajos independientes tocan a la vez. Sin dependencias; vale en Windows. Si ve que la página tiene más de 3 días, avisa.
+- **Reservar** un trabajo: `node scripts/estado.mjs reservar <asistente> "<tema>"` crea una rama desde la demo con un commit vacío y la sube. El CI solo se ejecuta en PR y en la rama de la demo, así que **reservar no gasta minutos** (el cupo gratuito de GitHub es de 2.000 al mes).
+- **Obligar a leerlo:** aviso al principio de `CLAUDE.md` (lo cargan solas todas las sesiones de Claude), en `AGENTS.md` (Codex y los demás) y en las instrucciones de Copilot.
+
+**Qué se hizo:** los archivos anteriores, la regla 12 de `EQUIPO.md`, una fila en `DESARROLLO.md`, un aviso en `TRASLADO.md` y 4 pruebas (`tests/documentacion/estado.test.mjs`, que el CI ya ejecuta). Versión 0.12.2.
+
+**Qué salió mal:**
+- La primera versión del script enseñaba 19 ramas y 30 solapes falsos (ramas de hace una semana con el PR ya cerrado, y ramas apiladas que comparten ficheros por construcción). Ahora solo cuenta las de los últimos 3 días con el PR abierto, y no cruza ramas apiladas.
+- Una prueba mía destapó un fallo de la lógica: dos ramas apiladas más una independiente no avisaban del solape. Corregido.
+- `gh pr list` usa un canal que las sesiones de la nube tienen bloqueado; el script usa la API normal.
+
+**Límites que conviene decir con honestidad:** funciona **si cada sesión sigue las instrucciones**; no hay forma técnica de obligarlas. El estado solo fluye cuando se sube al repositorio. Y no sustituye al diario, que sigue siendo el archivo completo.
+
+**Estado y próximos pasos:** PR con CI. Cuando se fusione, el fundador solo tiene que hacer `git pull` en el portátil: la sesión de Claude Code leerá el aviso de `CLAUDE.md` por sí sola. Queda pendiente que quien tenga el encargo de los paneles lo suba.
+
+## 2026-10-14 — Versión real gratuita en lonaclub.es: investigación y código (Claude)
+
+**Qué se pidió:**
+- El fundador compró lonaclub.es y avisó de que Render «tiene un periodo de prueba».
+- Pidió investigar «profundamente y al más mínimo detalle» si las herramientas eran las mejores para funcionar gratis, sin contar Apple.
+- Después pidió que la versión real esté «completamente virgen», solo con los gimnasios reales de España menos Cataluña.
+
+**Qué se decidió y por qué:**
+- Cloud Run (`europe-west1`) para la versión real, con Neon Free y copias en R2 (ADR-005).
+- Render prohíbe producción en su plan gratuito y sus 750 h al mes ya las gasta la demo.
+- Neon subió a 1 GB por proyecto.
+- Madrid no admite la asignación de dominio de Cloud Run.
+
+**Qué se hizo:**
+- `Dockerfile`, `desplegar-produccion.yml`, `copia-diaria.yml`.
+- Noticias también para la versión real.
+- `docs/PRODUCCION.md` y ADR-005.
+- Compilación *standalone* comprobada en local: arranca; `/salud` da 503 sin base, como se esperaba, y `/privacidad` da 200.
+
+**Qué salió mal:**
+- El sistema de permisos de Claude Code bloqueó varios pasos, que pasan al fundador con guía:
+  - conceder acceso a otra cuenta en Google Cloud;
+  - fusionar sin revisión;
+  - cambios de DNS;
+  - leer variables secretas de Render.
+- `mantener-demo-despierta.yml` gasta unos 4.300 minutos de Actions al mes, más de los 2.000 gratuitos del repositorio privado.
+
+**Estado y próximos pasos:**
+- El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
+- Claude monta y comprueba el primer despliegue.
+- Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
+
+<<<<<<< C:\Users\PC\Desktop\MiProyectoAI\MiClaude\docs\logs\tmp68bc39jv\ours
+
+## 2026-10-14 — Paneles, bloque F (Codex)
+**Pedido:** ejecutar el encargo de paneles; el fundador autoriza expresamente avanzar en rama propia desde #55 sin esperar su integración.
+**Cambios:** pendientes, cuatro accesos, aura en panel, sugerencias por disciplinas, tarjetas de seguidos, solicitudes del entrenador, récord por disciplina y progreso de perfil. Se completa el editor del gimnasio del entrenador porque antes no había destino para esa carencia.
+**Validación:** tipos y 741 unitarias pasan; build inicial pasa. Pruebas de navegador nuevas y adaptadas preparadas para CI; Docker no está disponible localmente. No se afirma validación de navegador ni despliegue.
+**Siguiente paso:** CI del PR de F y revisión de Claude; G y H pendientes.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+=======
+## 2026-10-15 — Textos legales para el lanzamiento (Claude)
+
+**Qué se pidió:**
+- El fundador recordó que faltaban las condiciones de uso y que la privacidad estaba «un poco dudosa».
+- También que faltaba «un bloque de responsabilidad jurídica».
+- Pidió investigar, hacer todo lo que no necesite abogado y listar lo que sí.
+
+**Qué se hizo:**
+- `/aviso-legal`, con el bloque de responsabilidad.
+- `/condiciones`, según el DSA.
+- `/cookies`, solo con las técnicas.
+- Privacidad completada según el art. 13 del RGPD.
+- Enlaces en el pie, el registro y Google.
+- Aviso al arrancar si faltan los datos del titular.
+- Detalle en `docs/LEGAL.md`.
+- Fuera del repositorio, la carpeta `MiProyectoAI/LEGAL-LONA/`, con:
+  - las tareas del fundador;
+  - las preguntas para el abogado;
+  - la investigación con fuentes;
+  - el registro de actividades de tratamiento;
+  - los protocolos de derechos, brechas y avisos.
+
+**Hallazgos para programar:**
+- bloquear usuarios (Apple 1.2);
+- avisos automáticos a denunciantes y afectados (DSA, arts. 16.5 y 17);
+- aviso sin cuenta;
+- T-013 y T-014.
+
+**Comprobaciones:**
+- `tsc`;
+- `vitest` (740 de 740);
+- `npm run build`, con las páginas nuevas compiladas;
+- catálogo y mapa.
+
+**Estado:** PR abierto. Los textos son borradores pendientes del abogado.
+>>>>>>> C:\Users\PC\Desktop\MiProyectoAI\MiClaude\docs\logs\tmp68bc39jv\theirs

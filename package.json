@@ -1,3 +1,59 @@
-{
-  "name": "ring-espana",
-  "version": "0.14.0",
+{
+  "name": "ring-espana",
+<<<<<<< C:\Users\PC\Desktop\MiProyectoAI\MiClaude\docs\logs\tmp0tckrnvq\ours
+  "version": "0.13.2",
+=======
+  "version": "0.14.0",
+>>>>>>> C:\Users\PC\Desktop\MiProyectoAI\MiClaude\docs\logs\tmp0tckrnvq\theirs
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "predev": "node scripts/copiar-maplibre.mjs",
+    "prebuild": "node scripts/copiar-maplibre.mjs",
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "mapa": "node scripts/generar-mapa.mjs",
+    "mapa:comprobar": "node scripts/generar-mapa.mjs --comprobar",
+    "db:migrate": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e/pulido.mjs && node tests/e2e/menu.mjs && node tests/e2e/trayectoria.mjs && node tests/e2e/perfiles.mjs && node tests/e2e/flujo.mjs && node tests/e2e/integridad.mjs && node tests/e2e/acceso.mjs && node tests/e2e/paneles.mjs && node tests/e2e/paneles-pulido.mjs && node tests/e2e/cuenta.mjs && node tests/e2e/busqueda.mjs && node tests/e2e/filtros.mjs && node tests/e2e/enlaces.mjs && node tests/e2e/movil.mjs && node tests/e2e/calendario.mjs && node tests/e2e/respaldo.mjs && node tests/e2e/categorias.mjs && node tests/e2e/inclusiva.mjs && node tests/e2e/usabilidad.mjs && node tests/e2e/diseno.mjs && node tests/e2e/fase2a.mjs && node tests/e2e/creador.mjs && node tests/e2e/arreglos.mjs && node tests/e2e/servicios.mjs && node tests/e2e/inscripciones.mjs && node tests/e2e/plazas.mjs && node tests/e2e/rivales.mjs && node tests/e2e/fallos.mjs && node tests/e2e/mapa.mjs && node tests/e2e/hidratacion.mjs && node tests/e2e/record-24h.mjs && node tests/e2e/veladas-pasadas.mjs && node tests/e2e/google.mjs",
+    "test:escenarios": "node tests/e2e/escenarios.mjs",
+    "test:a11y": "node tests/e2e/accesibilidad.mjs"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@prisma/client": "^6.19.3",
+    "gsap": "^3.15.0",
+    "maplibre-gl": "6.11.2",
+    "next": "^15.5.26",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "shaders": "^4.0.4",
+    "sharp": "^0.34.5",
+    "sonner": "^2.0.8",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "playwright-core": "^1.63.0",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.2",
+    "wait-on": "^9.5.1"
+  }
+}
