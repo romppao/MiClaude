@@ -8,7 +8,7 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 
 | Pieza | Dónde | Notas |
 |---|---|---|
-| Web | Cloud Run, servicio `lona`, `europe-west1`, proyecto `lona-511613` | Imagen del `Dockerfile` (salida *standalone*). |
+| Web | Cloud Run, servicio `lona`, `europe-west1`, proyecto `lona-511614` | Imagen del `Dockerfile` (salida *standalone*). |
 | Base | Neon, proyecto `lona-produccion` (Fráncfort) | Conexión *pooled* para la app y directa para las migraciones y las copias. |
 | Copias | R2, cubo de copias con jurisdicción UE | `.github/workflows/copia-diaria.yml`, a las 02:30 UTC. Se conservan 30 días. |
 | Correo | Resend, dominio lonaclub.es | Remitente `Lona <avisos@lonaclub.es>`; las respuestas van a info@lonaclub.es. |
@@ -89,8 +89,8 @@ La versión real empieza **vacía**: sin peleadores, veladas ni cuentas de ejemp
 | Servicio | Cuenta | Para qué |
 |---|---|---|
 | Infomaniak | Del fundador | Dominio lonaclub.es, zona DNS y buzón info@lonaclub.es |
-| Google Cloud | Proyecto `lona-511613`, creado con la cuenta de Gmail del fundador; info@lonaclub.es como propietaria | Cloud Run, Secret Manager, «Entrar con Google» (cliente OAuth «Lona web») |
-| Neon | info@lonaclub.es | Bases `lona-produccion` y `lona-demo` |
+| Google Cloud | Proyecto **`lona-511614`**, de **info@lonaclub.es** | Cloud Run, Secret Manager, «Entrar con Google» (cliente OAuth «Lona web»). El proyecto `lona-511613`, de la cuenta de Gmail del fundador, está **en desuso** y hay que borrarlo: su secreto quedó expuesto |
+| Neon | info@lonaclub.es, organización «Lona Club» (`org-shiny-sky-35660821`) | Base real `lona-produccion` (`solitary-morning-87085163`, Fráncfort `aws-eu-central-1`, PostgreSQL 18), creada el 14-10-2026 con todas las migraciones y vacía. Falta `lona-demo` |
 | Cloudflare | info@lonaclub.es | R2: copias y vídeos |
 | Resend | info@lonaclub.es | Correos de la aplicación |
 | Sentry | info@lonaclub.es | Errores |
@@ -124,3 +124,10 @@ Las claves de cada servicio solo están en Secret Manager o en los secretos de G
 | GitHub Actions deja de ejecutarse a final de mes | Se agotaron los 2.000 minutos gratuitos (repositorio privado) | `mantener-demo-despierta.yml` gasta unos 4.300 al mes: sustituirlo por UptimeRobot o Better Stack |
 | La demo deja de funcionar a primeros de noviembre de 2026 | Caducó la base gratuita de Render (creada el 2-10-2026) | Pasar la demo a Neon (`lona-demo`) antes del 1-11. Render la borra 14 días después de caducar |
 | Algo extraño en la app | — | Moderación → «Fallos de la aplicación» (`/moderacion/fallos`) y, cuando esté, Sentry |
+
+## Herramientas de Neon para asistentes (instaladas el 14-10-2026)
+- Skills `neon` y `neon-postgres` a nivel de usuario, para Claude Code (`neon skills --global`).
+- Servidor MCP «Neon» (`https://mcp.neon.tech/mcp`) en la configuración de usuario de Claude Code, en modo OAuth: no guarda claves en archivos y pide iniciar sesión al primer uso.
+- Copia de la configuración anterior: `~/.claude.json.antes-neon-20261014`.
+- Para usar la base desde la terminal sin ver la clave, pasarla directamente de Neon al programa, por ejemplo:
+  `DATABASE_URL="$(npx neon@latest connection-string --project-id solitary-morning-87085163)" npx prisma migrate deploy`.
