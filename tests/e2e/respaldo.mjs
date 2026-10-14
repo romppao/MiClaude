@@ -45,6 +45,8 @@ await p.locator(".notice-ok", { hasText: "Tu récord completo ya es público" })
 await categoria("PRO", "Wélter");
 await combate("Profesional", -30, "WIN", "PRO");
 await combate("SinDecision", -10, "NC", "PRO");
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Trayectoria Profesional ${rnd}', 'Trayectoria SinDecision ${rnd}')`);
+await p.goto(B + "/mi-ficha");
 
 const visitante = await (await browser.newContext()).newPage();
 async function comprobar(page, contexto, nivelActual) {
