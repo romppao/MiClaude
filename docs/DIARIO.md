@@ -1829,6 +1829,7 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - Después, el CI de #50, #51 y #52 falló en dos pruebas del bloque B. Se reprodujeron aquí y en ninguna era un fallo de la aplicación:
   - `record-24h.mjs` contaba la etiqueta «cuenta en el récord a partir del…» antes de que se pintara. Ahora la espera con `seen()`.
   - `veladas-pasadas.mjs` buscaba «Pasada aprobada» sin la parte única del nombre, así que encontraba veladas de otras ejecuciones. Además, comprobaba que el texto no estuviera en la página, y la página repite lo buscado («No hemos encontrado nada para «…»»). Ahora usa nombres únicos y comprueba que no hay enlace a la velada.
+  - Además, `veladas-pasadas.mjs` iba al historial justo después de pulsar «Autorizar y publicar», sin esperar a que se guardara la decisión, y en el CI llegaba antes. Ahora espera el aviso de confirmación.
   - Se comprobó a mano que la búsqueda pública **no** muestra veladas pendientes ni rechazadas: la regla B1 se cumple.
 
 - La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.

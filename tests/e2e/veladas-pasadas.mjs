@@ -41,6 +41,8 @@ await mod.p.goto(B + "/moderacion/veladas");
 const card = mod.p.locator("section", { hasText: nombreAprobada });
 await card.locator("textarea[name=note]").fill("Fecha y cartel revisados");
 await card.getByRole("button", { name: "Autorizar y publicar" }).click();
+// Se espera a que la decisión quede guardada antes de ir al historial (en el CI, más lento, se llegaba antes de que existiera).
+await seen(mod.p.locator("[role=status]", { hasText: "Velada autorizada y publicada" }));
 await mod.p.goto(B + "/moderacion/historial");
 const historial = mod.p.locator("tr", { hasText: "velada pasada autorizada" }).first();
 await historial.getByText("Ver el detalle técnico").click();
@@ -56,6 +58,7 @@ await mod.p.goto(B + "/moderacion/veladas");
 const cardRechazo = mod.p.locator("section", { hasText: nombreRechazada });
 await cardRechazo.locator("textarea[name=note]").fill("No se pudo comprobar la fecha");
 await cardRechazo.getByRole("button", { name: "Rechazar" }).click();
+await seen(mod.p.locator("[role=status]", { hasText: "Velada rechazada" }));
 check("el rechazo también se notifica y la velada sigue oculta", await esperarCorreo(organizador.email, "Tu velada pasada no se ha autorizado") && (await anon.goto(B + `/veladas/${rechazada}`))?.status() === 404);
 
 await terminarDiagnosticos();
