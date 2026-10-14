@@ -1966,3 +1966,39 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
 - Claude monta y comprueba el primer despliegue.
 - Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
+
+## 2026-10-15 — Textos legales para el lanzamiento (Claude)
+
+**Qué se pidió:**
+- El fundador recordó que faltaban las condiciones de uso y que la privacidad estaba «un poco dudosa».
+- También que faltaba «un bloque de responsabilidad jurídica».
+- Pidió investigar, hacer todo lo que no necesite abogado y listar lo que sí.
+
+**Qué se hizo:**
+- `/aviso-legal`, con el bloque de responsabilidad.
+- `/condiciones`, según el DSA.
+- `/cookies`, solo con las técnicas.
+- Privacidad completada según el art. 13 del RGPD.
+- Enlaces en el pie, el registro y Google.
+- Aviso al arrancar si faltan los datos del titular.
+- Detalle en `docs/LEGAL.md`.
+- Fuera del repositorio, la carpeta `MiProyectoAI/LEGAL-LONA/`, con:
+  - las tareas del fundador;
+  - las preguntas para el abogado;
+  - la investigación con fuentes;
+  - el registro de actividades de tratamiento;
+  - los protocolos de derechos, brechas y avisos.
+
+**Hallazgos para programar:**
+- bloquear usuarios (Apple 1.2);
+- avisos automáticos a denunciantes y afectados (DSA, arts. 16.5 y 17);
+- aviso sin cuenta;
+- T-013 y T-014.
+
+**Comprobaciones:**
+- `tsc`;
+- `vitest` (740 de 740);
+- `npm run build`, con las páginas nuevas compiladas;
+- catálogo y mapa.
+
+**Estado:** PR abierto. Los textos son borradores pendientes del abogado.

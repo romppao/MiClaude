@@ -25,6 +25,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/copia-diaria.yml",
+    "purpose": "Copia nocturna de la base real con pg_dump a un cubo de Cloudflare R2 con jurisdicción UE.",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
+    "path": ".github/workflows/desplegar-produccion.yml",
+    "purpose": "Despliegue manual de la versión real: compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud.",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
     "path": ".github/workflows/mantener-demo-despierta.yml",
     "purpose": "Visita /salud de la demo cada 10 minutos; se quitará la ejecución automática cuando funcione UptimeRobot (ADR-004), para no gastar minutos de GitHub.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -33,6 +43,11 @@
     "path": ".gitignore",
     "purpose": "Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "Dockerfile",
+    "purpose": "Imagen de la versión real para Google Cloud Run: compila con salida standalone y arranca con node server.js, sin migrar al arrancar (ADR-005).",
+    "guide": "docs/PRODUCCION.md"
   },
   {
     "path": "next.config.mjs",
@@ -135,6 +150,21 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261013210000_bout_registered_at/migration.sql",
+    "purpose": "Añade la fecha de registro de cada combate y la rellena desde el historial cuando existe, para aplicar el plazo de 24 horas a declaraciones nuevas sin retrasar combates históricos.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261013220000_past_event_authorization/migration.sql",
+    "purpose": "Añade estados para veladas pasadas pendientes de autorización o rechazadas por moderación, sin reescribir eventos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261014120000_entrar_con_google/migration.sql",
+    "purpose": "Migración: identificador de la cuenta de Google vinculada (User.googleSub, único).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -165,18 +195,8 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
-    "path": "scripts/estado.mjs",
-    "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
     "path": "scripts/copiar-maplibre.mjs",
     "purpose": "Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "scripts/version.mjs",
-    "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -195,6 +215,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/estado.mjs",
+    "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "scripts/generar-catalogo.mjs",
     "purpose": "Contrasta cada archivo mantenido con explicación individual y guía, genera índice determinista con huellas y rechaza cobertura/salida desactualizada.",
     "guide": "docs/mantenimiento/README.md"
@@ -207,6 +232,11 @@
   {
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/version.mjs",
+    "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -355,6 +385,16 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/api/auth/google/callback/route.ts",
+    "purpose": "Vuelta de Google: comprueba el viaje, canjea el código, valida la identidad y entra, vincula o crea la cuenta; el creador pasa por el segundo paso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/api/auth/google/route.ts",
+    "purpose": "Inicio de «Continuar con Google»: guarda el viaje en una cookie de 10 minutos y redirige a Google con PKCE; sin claves vuelve a «Entrar» con un aviso.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/api/cron/noticias/route.ts",
     "purpose": "Endpoint del cron de noticias: exige CRON_SECRET (503 si falta) en la cabecera x-cron-secret con comparación en tiempo constante y fuerza la actualización de fuentes.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -365,19 +405,14 @@
     "guide": "docs/MODERACION.md"
   },
   {
-    "path": "src/app/api/auth/google/route.ts",
-    "purpose": "Inicio de «Continuar con Google»: guarda el viaje en una cookie de 10 minutos y redirige a Google con PKCE; sin claves vuelve a «Entrar» con un aviso.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
-    "path": "src/app/api/auth/google/callback/route.ts",
-    "purpose": "Vuelta de Google: comprueba el viaje, canjea el código, valida la identidad y entra, vincula o crea la cuenta; el creador pasa por el segundo paso.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
     "path": "src/app/apple-icon.png",
     "purpose": "Icono de la marca (ring de Lona) para la pantalla de inicio del iPhone, 180 px.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/aviso-legal/page.tsx",
+    "purpose": "Aviso legal (LSSI art. 10 y 16): titular desde variables de entorno y bloque de responsabilidad; borrador pendiente de revisión jurídica (docs/LEGAL.md).",
+    "guide": "docs/LEGAL.md"
   },
   {
     "path": "src/app/ayuda/page.tsx",
@@ -415,13 +450,13 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
-    "path": "src/app/components/BotonGoogle.tsx",
-    "purpose": "Botón «Continuar con Google» (enlace a /api/auth/google); solo aparece si el alojamiento tiene las claves de Google.",
+    "path": "src/app/components/AuraBreakdown.tsx",
+    "purpose": "Presenta desglose de trayectoria, respaldo y comunidad por categoría histórica con los datos calculados del ránking.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
-    "path": "src/app/components/AuraBreakdown.tsx",
-    "purpose": "Presenta desglose de trayectoria, respaldo y comunidad por categoría histórica con los datos calculados del ránking.",
+    "path": "src/app/components/BotonGoogle.tsx",
+    "purpose": "Botón «Continuar con Google» (enlace a /api/auth/google); solo aparece si el alojamiento tiene las claves de Google.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -595,11 +630,6 @@
     "guide": "docs/DISENO.md"
   },
   {
-    "path": "src/app/components/TemaPersistente.tsx",
-    "purpose": "Mantiene el tema elegido en <html data-tema>: lo vuelve a aplicar al cargar y si React lo borra al volver a pintar la página.",
-    "guide": "docs/DISENO.md"
-  },
-  {
     "path": "src/app/components/SubirVideo.tsx",
     "purpose": "Componente de cliente que pide dónde subir (/subidas), sube con progreso, deja la clave en videoKey e impide enviar el formulario a medio subir.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -608,6 +638,11 @@
     "path": "src/app/components/Tarjetas.tsx",
     "purpose": "Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/TemaPersistente.tsx",
+    "purpose": "Mantiene el tema elegido en <html data-tema>: lo vuelve a aplicar al cargar y si React lo borra al volver a pintar la página.",
+    "guide": "docs/DISENO.md"
   },
   {
     "path": "src/app/components/TrajectoryList.tsx",
@@ -668,6 +703,16 @@
     "path": "src/app/components/mapa/base.ts",
     "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor.",
     "guide": "docs/DISENO.md"
+  },
+  {
+    "path": "src/app/condiciones/page.tsx",
+    "purpose": "Condiciones de uso (DSA arts. 14, 16, 17 y 20): normas, licencia del contenido, avisos, moderación y reclamaciones; borrador pendiente de revisión jurídica.",
+    "guide": "docs/LEGAL.md"
+  },
+  {
+    "path": "src/app/cookies/page.tsx",
+    "purpose": "Política de cookies con el inventario real de cookies y almacenamiento local; si se añade alguno hay que actualizar la tabla.",
+    "guide": "docs/LEGAL.md"
   },
   {
     "path": "src/app/disciplinas/[slug]/page.tsx",
@@ -860,6 +905,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/moderacion/veladas/page.tsx",
+    "purpose": "Cola de veladas pasadas pendientes de autorizaci?n, con datos de revisi?n y formularios para autorizar o rechazar con nota.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/not-found.tsx",
     "purpose": "Pantalla en español para recurso no encontrado con destinos válidos de regreso.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -983,6 +1033,16 @@
     "path": "src/app/respaldar/page.tsx",
     "purpose": "Panel de cuenta acreditada/moderación para revisar y respaldar títulos/combates en disciplinas autorizadas.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/revision-ui/datos.ts",
+    "purpose": "Fixtures ficticias de revisión visual; estados ejemplo, extremo, vacío, uno y mil; sin consultas ni escrituras.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
+  },
+  {
+    "path": "src/app/revision-ui/page.tsx",
+    "purpose": "Banco visual exclusivo de desarrollo, con vista real y selector en URL; devuelve 404 en producción.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   },
   {
     "path": "src/app/robots.ts",
@@ -1125,6 +1185,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/bouts/status.ts",
+    "purpose": "Determina la etiqueta pública del combate según fecha, resultado y estado de verificación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "src/lib/common/apariencia.ts",
     "purpose": "Deriva tinte por disciplina, alfa e iniciales del diseño v3 desde datos; evita repetir estas reglas visuales en pantallas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1210,13 +1275,18 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
-    "path": "src/lib/common/safe.ts",
-    "purpose": "Consulta solo claves propias y normaliza parámetros de URL; evita aceptar propiedades heredadas o parámetros repetidos.",
+    "path": "src/lib/common/record-eligibility.ts",
+    "purpose": "Filtro compartido de base de datos para r?cord, aura y r?nking; incluye declaraciones tras 24 horas y excluye disputas y veladas no autorizadas.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
-    "path": "src/lib/common/version.ts",
-    "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
+    "path": "src/lib/common/record-time.ts",
+    "purpose": "Constante y c?lculo del plazo de 24 horas para incorporar al r?cord una declaraci?n propia.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/safe.ts",
+    "purpose": "Consulta solo claves propias y normaliza parámetros de URL; evita aceptar propiedades heredadas o parámetros repetidos.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1230,8 +1300,18 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/titular.ts",
+    "purpose": "Datos del titular para el aviso legal y la privacidad, leídos de variables de entorno, y la lista de los que faltan para el aviso de arranque.",
+    "guide": "docs/LEGAL.md"
+  },
+  {
     "path": "src/lib/common/url.ts",
     "purpose": "Normaliza enlaces HTTP(S) admitidos y rechaza esquemas peligrosos; admitir un enlace no verifica la evidencia que contiene.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/version.ts",
+    "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1243,6 +1323,16 @@
     "path": "src/lib/community/reports.ts",
     "purpose": "Catálogo de motivos de aviso por entidad (incluida MEDIA con «Aparezco yo y no doy permiso») y límite diario; separa solicitud de revisión de decisión moderadora.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/siguiendo.ts",
+    "purpose": "Filtros de «Peleadores que sigo»: próximos combates solo de veladas públicas y resultados que cuentan en el récord.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/cartel-search.ts",
+    "purpose": "Normaliza y limita la búsqueda GET de peleadores para el cartel por nombre, alias, gimnasio y ciudad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "src/lib/events/pairing.ts",
@@ -1257,6 +1347,11 @@
   {
     "path": "src/lib/events/registrations.ts",
     "purpose": "Reglas de la inscripción: cuándo está abierta, validación del peso y los requisitos, filtros y órdenes de la lista del organizador.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/resultados-pendientes.ts",
+    "purpose": "Veladas celebradas de un organizador con combates sin resultado y resumen para su panel (total, tres visibles y resto).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1330,6 +1425,16 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/news/deduplicate.ts",
+    "purpose": "Fusiona titulares repetidos por URL o título normalizados sin perder disciplinas ni imágenes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "src/lib/news/diagnosis.ts",
+    "purpose": "Traduce fallos observados en fuentes RSS a diagnósticos prudentes para moderación.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "src/lib/news/espana.ts",
     "purpose": "Panorama español de las noticias: señales de España (comunidades, provincias, federaciones, españoles de élite) y regla delPanoramaEspanol según la fuente.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1398,6 +1503,11 @@
     "path": "tests/browser/optimizacion.mjs",
     "purpose": "Comprueba en Chrome el CSS compartido con datos largos, gestos de pesta?as, carga de fotos y movimiento reducido, sin base de datos.",
     "guide": "docs/OPTIMIZACION-PANTALLAS.md"
+  },
+  {
+    "path": "tests/browser/responsive.mjs",
+    "purpose": "Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad.",
+    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   },
   {
     "path": "tests/documentacion/catalogo.test.mjs",
@@ -1495,6 +1605,21 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/google-falso.mjs",
+    "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/google.mjs",
+    "purpose": "Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad, accesibilidad y, con el Google simulado, la vuelta completa (crear, entrar, vincular, proteger, creador).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/hidratacion.mjs",
+    "purpose": "Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/inclusiva.mjs",
     "purpose": "Comprueba cobertura y vocabulario públicos sin priorizar una ciudad o disciplina.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1512,16 +1637,6 @@
   {
     "path": "tests/e2e/mapa.mjs",
     "purpose": "Prueba de navegador del mapa de gimnasios: marcadores, ubicación, más cercanos ordenados, sin permiso, dirección en el perfil y accesibilidad en los dos temas.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/e2e/google.mjs",
-    "purpose": "Prueba de navegador de «Continuar con Google» sin salir a internet: botón, redirección con PKCE, vueltas rechazadas, registro, privacidad, accesibilidad y, con el Google simulado, la vuelta completa (crear, entrar, vincular, proteger, creador).",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/e2e/google-falso.mjs",
-    "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1555,6 +1670,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/record-24h.mjs",
+    "purpose": "Comprueba de extremo a extremo el aviso de espera, el r?cord antes del plazo y su inclusi?n al alcanzar las 24 horas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/respaldo.mjs",
     "purpose": "Recorre resultado/evidencia/confirmación y presentación del respaldo de combates.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1580,8 +1700,18 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/veladas-pasadas.mjs",
+    "purpose": "Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/acciones-ayudantes.test.ts",
     "purpose": "Comprueba lectura y restricciones de ayudantes de acciones para no publicar utilidades como endpoints.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/afilar-revision.test.ts",
+    "purpose": "Prueba deduplicación, diagnósticos, filtros del cartel y estados de combates programados.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1650,6 +1780,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/google.test.ts",
+    "purpose": "Pruebas unitarias de entrar con Google: viaje, dirección de autorización con PKCE, validación del id_token y decisión de cuenta.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/inscripciones.test.ts",
     "purpose": "Pruebas unitarias de las reglas de inscripción, filtros y órdenes.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1672,11 +1807,6 @@
   {
     "path": "tests/unit/mapa.test.ts",
     "purpose": "Pruebas unitarias de los cálculos del mapa: centros de provincia, distancias, textos y ubicación aproximada.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/unit/google.test.ts",
-    "purpose": "Pruebas unitarias de entrar con Google: viaje, dirección de autorización con PKCE, validación del id_token y decisión de cuenta.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1715,6 +1845,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/paneles-fallos.test.ts",
+    "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/password.test.ts",
     "purpose": "Prueba scrypt, hashes antiguos, comprobación y refuerzo de parámetros sin convertirlos en texto público.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1750,13 +1885,13 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
-    "path": "tests/unit/record.test.ts",
-    "purpose": "Prueba cálculo de récord por disciplina/nivel, perspectiva de esquinas, exclusiones y antecedentes detallados.",
+    "path": "tests/unit/record-eligibility.test.ts",
+    "purpose": "Prueba el filtro de persistencia para el récord en el límite de 24 horas y excluye disputas y veladas pendientes.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
-    "path": "tests/unit/record-eligibility.test.ts",
-    "purpose": "Prueba el filtro de persistencia para el récord en el límite de 24 horas y excluye disputas y veladas pendientes.",
+    "path": "tests/unit/record.test.ts",
+    "purpose": "Prueba cálculo de récord por disciplina/nivel, perspectiva de esquinas, exclusiones y antecedentes detallados.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1808,120 +1943,5 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/app/revision-ui/datos.ts",
-    "purpose": "Fixtures ficticias de revisión visual; estados ejemplo, extremo, vacío, uno y mil; sin consultas ni escrituras.",
-    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
-  },
-  {
-    "path": "src/app/revision-ui/page.tsx",
-    "purpose": "Banco visual exclusivo de desarrollo, con vista real y selector en URL; devuelve 404 en producción.",
-    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
-  },
-  {
-    "path": "tests/browser/responsive.mjs",
-    "purpose": "Regresión responsive en Chromium local con datos extremos, recortes, menú, fotos ausentes y accesibilidad.",
-    "guide": "docs/REVISION-RESPONSIVE-20261013.md"
-  },
-  {
-    "path": "prisma/migrations/20261013210000_bout_registered_at/migration.sql",
-    "purpose": "Añade la fecha de registro de cada combate y la rellena desde el historial cuando existe, para aplicar el plazo de 24 horas a declaraciones nuevas sin retrasar combates históricos.",
-    "guide": "docs/mantenimiento/DATOS.md"
-  },
-  {
-    "path": "prisma/migrations/20261013220000_past_event_authorization/migration.sql",
-    "purpose": "Añade estados para veladas pasadas pendientes de autorización o rechazadas por moderación, sin reescribir eventos existentes.",
-    "guide": "docs/mantenimiento/DATOS.md"
-  },
-  {
-    "path": "prisma/migrations/20261014120000_entrar_con_google/migration.sql",
-    "purpose": "Migración: identificador de la cuenta de Google vinculada (User.googleSub, único).",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/lib/bouts/status.ts",
-    "purpose": "Determina la etiqueta pública del combate según fecha, resultado y estado de verificación.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/lib/events/cartel-search.ts",
-    "purpose": "Normaliza y limita la búsqueda GET de peleadores para el cartel por nombre, alias, gimnasio y ciudad.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/lib/news/deduplicate.ts",
-    "purpose": "Fusiona titulares repetidos por URL o título normalizados sin perder disciplinas ni imágenes.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/lib/news/diagnosis.ts",
-    "purpose": "Traduce fallos observados en fuentes RSS a diagnósticos prudentes para moderación.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/e2e/hidratacion.mjs",
-    "purpose": "Vigila errores de hidratación en rutas de noticias y fichas con navegador en dos zonas horarias.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/unit/afilar-revision.test.ts",
-    "purpose": "Prueba deduplicación, diagnósticos, filtros del cartel y estados de combates programados.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/app/moderacion/veladas/page.tsx",
-    "purpose": "Cola de veladas pasadas pendientes de autorizaci?n, con datos de revisi?n y formularios para autorizar o rechazar con nota.",
-    "guide": "docs/mantenimiento/FLUJOS.md"
-  },
-  {
-    "path": "tests/e2e/record-24h.mjs",
-    "purpose": "Comprueba de extremo a extremo el aviso de espera, el r?cord antes del plazo y su inclusi?n al alcanzar las 24 horas.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "tests/e2e/veladas-pasadas.mjs",
-    "purpose": "Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "src/lib/common/record-time.ts",
-    "purpose": "Constante y c?lculo del plazo de 24 horas para incorporar al r?cord una declaraci?n propia.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
-    "path": "src/lib/common/record-eligibility.ts",
-    "purpose": "Filtro compartido de base de datos para r?cord, aura y r?nking; incluye declaraciones tras 24 horas y excluye disputas y veladas no autorizadas.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
-    "path": "src/lib/community/siguiendo.ts",
-    "purpose": "Filtros de «Peleadores que sigo»: próximos combates solo de veladas públicas y resultados que cuentan en el récord.",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
-    "path": "src/lib/events/resultados-pendientes.ts",
-    "purpose": "Veladas celebradas de un organizador con combates sin resultado y resumen para su panel (total, tres visibles y resto).",
-    "guide": "docs/mantenimiento/MODULOS.md"
-  },
-  {
-    "path": "tests/unit/paneles-fallos.test.ts",
-    "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "Dockerfile",
-    "purpose": "Imagen de la versión real para Google Cloud Run: compila con salida standalone y arranca con node server.js, sin migrar al arrancar (ADR-005).",
-    "guide": "docs/PRODUCCION.md"
-  },
-  {
-    "path": ".github/workflows/desplegar-produccion.yml",
-    "purpose": "Despliegue manual de la versión real: compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud.",
-    "guide": "docs/PRODUCCION.md"
-  },
-  {
-    "path": ".github/workflows/copia-diaria.yml",
-    "purpose": "Copia nocturna de la base real con pg_dump a un cubo de Cloudflare R2 con jurisdicción UE.",
-    "guide": "docs/PRODUCCION.md"
   }
 ]
