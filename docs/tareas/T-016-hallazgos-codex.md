@@ -77,6 +77,50 @@ Revisión de solo lectura de la aplicación: los arreglos se deciden y se entreg
 
 **Lo revisado sin otro fallo demostrado:** categorías y medidas validadas; ficha y clases protegidas por titular; guardas y cambio condicional de respuestas de clases/propuestas; filtros por ciudad/gimnasio; cálculo compartido del récord que excluye declaraciones menores de 24 h y veladas no autorizadas; amateur privado por defecto en el modelo. Las pruebas unitarias de la frontera de 24 h, privacidad, categorías, rivales y autorización pasan. Rangos/escalera del equipo son herramientas de desarrollo, no permisos públicos de las cuentas. El pulido de paneles sigue en #56 y no se considera integrado.
 
-## Parte 5 — Gimnasios, organizadores y veladas
+## Parte 5 — Gimnasios, organizadores y veladas (revisada)
 
-Pendiente de revisión.
+### C5-01 — Un organizador elude la autorización de veladas pasadas
+
+- **Gravedad:** BLOQUEA EL LANZAMIENTO.
+- **Archivo:línea:** `src/app/actions/events.ts:149`, `src/app/actions/events.ts:175`, `src/app/actions/events.ts:195`; `src/app/actions/shared.ts:120`.
+- **Qué falla y reproducción:** con una entidad autorizada que sea titular de la velada, sin ser moderador:
+  1. `setBoutResult` sobre un combate de una velada `PENDING_AUTHORIZATION` o `REJECTED` cambia siempre la velada a `COMPLETED`.
+  2. Cancelar una velada pendiente y volverla a abrir cambia `PENDING_AUTHORIZATION → CANCELLED → COMPLETED`, perdiendo la obligación de autorización.
+  3. Corregir una velada futura `SCHEDULED` y poner una fecha pasada conserva `SCHEDULED`: el control de `updateEvent` solo recalcula el estado si ya era pendiente/rechazada.
+- **Arreglo:** centralizar y proteger en la transacción todas las transiciones de fecha/estado, manteniendo la autorización pendiente hasta una decisión moderadora, incluso tras cancelar/reabrir.
+- **Estado:** **comprobado** ejecutando las acciones reales con un organizador y almacenamiento simulado: guardar resultado desde pendiente y rechazada termina `COMPLETED`; cancelar/reabrir termina `COMPLETED`; mover futura a pasada conserva `SCHEDULED`. La guarda `ownEvent` comprueba titularidad, pero no autorización de la velada. Las pruebas existentes de veladas pasadas cubren alta/decisión/visibilidad, no estas transiciones.
+
+### C5-02 — No se aplica la exclusión de gimnasios de Cataluña
+
+- **Gravedad:** BLOQUEA EL LANZAMIENTO según el requisito expreso de T-016.
+- **Archivo:línea:** `src/app/gimnasios/page.tsx:29`, `src/lib/common/search.ts:23`, `src/app/actions/fighters.ts:62`, `src/app/actions/trainers.ts:46`, `src/app/gimnasios/[slug]/page.tsx:17`.
+- **Qué falla y reproducción:** registrar una ficha/entrenador con gimnasio y provincia Barcelona, Girona, Lleida o Tarragona. Las acciones permiten crear ese gimnasio, y las consultas de lista, mapa, búsqueda y ficha no excluyen esas provincias. El selector también las ofrece. En la base oficial vacía no hay todavía ninguno, pero el código deja introducirlos y publicarlos.
+- **Arreglo:** aplicar el criterio territorial común a las altas y a todas las lecturas/importaciones de gimnasios, con pruebas para las cuatro provincias antes de cargar datos de OpenStreetMap.
+- **Estado:** **comprobado por lectura** de acciones, catálogo de provincias y consultas. No se han consultado ni borrado gimnasios reales; no se afirma que hoy existan en la base oficial/demo.
+
+### C5-03 — La valoración de gimnasios suma aura de combates que no cuentan
+
+- **Gravedad:** IMPORTANTE.
+- **Archivo:línea:** `src/app/gimnasios/page.tsx:38`, `src/lib/common/mapa.ts:74`.
+- **Qué falla y reproducción:** dar aura a un combate válido y cancelar después su velada, o ponerlo en revisión. La suma del mapa solo une Aura y Fighter: no consulta Bout/Event, estado ni plazo de 24 h. Esa aura sigue aumentando la valoración y el orden de «Los mejores de tu zona», aunque deja de contar en el ránking deportivo.
+- **Arreglo:** usar el criterio común `boutsQueCuentan` al agregar aura por gimnasio, conservando también el filtro de comentarios ocultos.
+- **Estado:** **comprobado por lectura** de la consulta y la fórmula; falta ejecución con PostgreSQL para cuantificar la diferencia en un conjunto real.
+
+### C5-04 — El cartel de una velada sin autorizar publica fichas provisionales
+
+- **Gravedad:** IMPORTANTE, vinculada a privacidad y a C5-01.
+- **Archivo:línea:** `src/app/actions/events.ts:115`, `src/app/actions/shared.ts:139`.
+- **Qué falla y reproducción:** añadir dos fichas provisionales a una velada pasada todavía pendiente. `addCartelBout` llama a `listFighters` sin comprobar el estado de la velada: marca las fichas `listed=true` y genera su URL con apellido completo. Aunque la velada aún está oculta, las fichas pasan a búsquedas/directorio/sitemap antes de que moderación autorice el hecho que las hace públicas.
+- **Arreglo:** diferir la publicación derivada del cartel hasta que la velada sea pública y haya pasado la autorización correspondiente.
+- **Estado:** **comprobado por lectura** de la llamada incondicional y sus escrituras; falta recorrido con PostgreSQL/navegador de fichas provisionales.
+
+**Lo revisado sin otro fallo demostrado:** creación y edición de cartel/resultados comprueban titularidad; moderación es la única que usa la acción de autorización explícita; las inscripciones solo aceptan veladas programadas abiertas y validan disciplina/categoría y plazas; las fichas públicas de velada respetan el récord amateur privado; asignar edición de gimnasio/entrenador/federación corresponde a moderación y no concede permiso deportivo para respaldar. No existe importador OpenStreetMap ni recorrido autónomo de reclamación de gimnasio en esta base: el gimnasio se crea por ficha/entrenador y su edición se asigna manualmente por moderación. El bloque D y su recuento provincial previo siguen pendientes; no se han cargado datos reales.
+
+## Resumen para decidir antes de la oficial
+
+- **Bloquean:** tres vías de publicar veladas pasadas sin autorización; tres recorridos que revelan datos privados (seguidos, galerías y sparring mixto); política de menores y condiciones de uso pendientes; exclusión de gimnasios de Cataluña sin aplicar.
+- **Importantes:** fechas inexistentes en solicitudes; listas de clases sin acceso a más de 50; valoración de gimnasios con aura excluida; publicación de fichas desde carteles pendientes.
+- **Puede esperar a revisión/validación siguiente:** pulido F del PR #56 y G/D/H; comprobar en navegador los casos señalados como lectura, correos reales y tráfico de terceros. No equivale a autorizar el lanzamiento.
+- **Restos de demo:** no se encontró marca antigua en textos públicos normales ni datos de seed incrustados en esos recorridos. Sí queda el agente de noticias `RingEspana/1.0` (`src/lib/news/refresh.ts:65`) y un ejemplo antiguo de dominio en el diagnóstico de entorno (`src/lib/common/env.ts:11`): menores, visibles solo en cabeceras/diagnóstico técnico. Las claves internas de base/navegador retiradas de la marca son excepciones técnicas ya aprobadas.
+
+Las tres partes se han guardado y publicado por separado antes de seguir. Los hallazgos son propuestas de corrección; este PR no cambia producto, permisos ni datos.
