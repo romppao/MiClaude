@@ -39,8 +39,9 @@ await yo.p.goto(B + "/propuestas");
 check("sin filtros, sugiere «Peleadores parecidos a ti»", await seen(yo.p.getByRole("heading", { name: "Peleadores parecidos a ti" })));
 await axe(yo.p, "Buscar rival o sparring");
 // 2) Por gimnasio, sin saber el nombre.
-await yo.p.fill("#proponer [name=gimnasio]", gimnasio);
-await yo.p.getByRole("button", { name: "Aplicar filtros" }).click(); await yo.p.waitForURL("**gimnasio=**");
+await yo.p.selectOption("#proponer select[name=gimnasioId]", `gym${rnd}`);
+await yo.p.getByRole("button", { name: "Aplicar filtros" }).click(); await yo.p.waitForURL(u => u.searchParams.get("gimnasioId") === `gym${rnd}`);
+await yo.p.locator("#proponer article", { hasText: `Zurda ${apellido}` }).waitFor();
 check("busca por gimnasio sin saber el nombre", JSON.stringify(await nombres()) === JSON.stringify(["Diestra", "Zurda"]));
 // 3) Gimnasio + guardia zurda (en «Más filtros»).
 await yo.p.locator("summary", { hasText: "Más filtros" }).click();
