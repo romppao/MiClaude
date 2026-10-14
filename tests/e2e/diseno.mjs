@@ -74,7 +74,7 @@ check("el perfil público muestra sus disciplinas, años y clases activas con pr
 await v.goto(`${B}/entrenadores?q=${encodeURIComponent(`Rosa Entrena${rnd}`)}`);
 check("y el listado de entrenadores cuenta sus clases", await seen(v.locator("main .card", { hasText: `Rosa Entrena${rnd}` }).filter({ hasText: "1 clase" })));
 await e.goto(B + "/mi-panel");
-check("su panel muestra sus clases publicadas", await seen(e.getByText("Clases publicadas")) && await seen(e.locator("main .fila", { hasText: "Grupo de competición" })));
+check("su panel muestra sus clases publicadas", await seen(e.getByRole("heading", { name: "Tus clases", exact: true })) && await seen(e.locator("main .fila", { hasText: "Grupo de competición" })));
 
 // 3) Peleador: ficha rellenada desde el registro, inicio propio, highlights y récord amateur privado
 const pel = await newUser("Diseno", "FIGHTER");
@@ -146,6 +146,7 @@ const correoF = `aficionada${rnd}@test.es`;
 await alta(fan, "usuario", "Laura Diseño", correoF);
 await fan.waitForURL("**/registro/intereses**");
 await fan.locator("label.chip", { hasText: "Muay Thai" }).click(); await fan.locator("label.chip", { hasText: "Boxeo" }).click();
+await btn(fan, "Continuar"); await fan.waitForURL("**/registro/intereses?paso=seguir");
 await btn(fan, "Terminar"); await fan.waitForURL("**/verificar**");
 check("sus disciplinas se guardan", consulta(`select interests from "User" where email='${correoF}'`) === "{BOXEO,MUAYTHAI}");
 await fan.goto(B + publica);

@@ -37,6 +37,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
       titulo: "Tu carrera",
       enlaces: [PANEL, { href: "/mi-ficha", texto: "Mi ficha y trayectoria" }, { href: "/propuestas", texto: "Retos y sparrings" }, RESERVAS, SIGUIENDO],
     });
+    propias.push({ titulo: "Competiciones", enlaces: [{ href: "/mis-inscripciones", texto: "Mis inscripciones" }, { href: "/mi-ficha/trayectoria", texto: "Mis títulos y mi aura" }] });
   } else if (papel === "entrenador") {
     propias.push({ titulo: "Entrenador", enlaces: [PANEL, { href: "/mis-clases", texto: "Mis clases y solicitudes" }, RESERVAS, ...(x.entrenador ? [{ href: `/entrenadores/${x.entrenador}`, texto: "Mi perfil de entrenador" }] : [])] });
     propias.push({

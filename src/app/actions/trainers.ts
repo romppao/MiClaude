@@ -132,7 +132,7 @@ export async function requestClass(f: FormData) {
 /** El entrenador acepta o rechaza una solicitud de sus clases, con un mensaje para la persona (lugar, hora, qué traer…). */
 export async function answerClassRequest(f: FormData) {
   const user = await requireVerifiedUser("/mis-clases");
-  const back = "/mis-clases#solicitudes";
+  const back = str(f, "back") === "/mi-panel" ? "/mi-panel" : "/mis-clases#solicitudes";
   const r = await db.classRequest.findFirst({ where: { id: str(f, "requestId"), class: { trainer: { userId: user.id } } }, include: { class: { include: { trainer: true } }, user: true } });
   if (!r) go(back, { problema: "no_existe" });
   if (!puedeResponder(r.status)) go(back, { problema: "solicitud_ya_respondida" });

@@ -41,8 +41,9 @@ await nueva.locator("[name=title]").fill(`Clinch ${rnd}`); await nueva.locator("
 await nueva.getByRole("button", { name: "Publicar la clase" }).click(); await ent.p.locator(".notice-ok", { hasText: "Clase publicada" }).waitFor();
 await ent.p.goto(B + "/mi-panel");
 const accEnt = await acciones(ent.p);
-check("el panel del entrenador empieza por crear velada e interclub, publicar clase y solicitudes", ["Crear una velada", "Crear un interclub", "Publicar una clase", "Solicitudes de clase"].every((t, i) => accEnt[i] === t));
-await ent.p.locator(".accion-principal", { hasText: "Crear un interclub" }).click(); await ent.p.waitForURL("**/organizador**");
+check("el panel del entrenador empieza por crear velada e interclub, publicar clase y solicitudes", ["Publicar una clase", "Crear una velada o interclub", "Mis clases", "Mis veladas"].every((t, i) => accEnt[i] === t));
+await ent.p.locator(".accion-principal", { hasText: "Crear una velada o interclub" }).click(); await ent.p.waitForURL("**/organizador**");
+await ent.p.locator("input[name=kind][value=INTERCLUB]").check();
 check("«Crear un interclub» lleva al formulario con «Interclub» ya elegido", await ent.p.locator("input[name=kind][value=INTERCLUB]").isChecked());
 await visita.goto(B + `/clases?q=${encodeURIComponent(`Clinch ${rnd}`)}`);
 check("«Buscar clases» encuentra la clase con su entrenador y precio", await seen(visita.locator("main section", { hasText: `Clinch ${rnd}` }).getByText("30 €")));
@@ -98,7 +99,7 @@ for (const tema of ["claro", "oscuro"]) {
   await ana.p.screenshot({ path: `test-results/sparring-${tema}.png`, fullPage: true });
 }
 await ana.p.goto(B + "/mi-panel");
-check("el panel del peleador tiene «Retar o proponer sparring» y «Mis propuestas»", (await acciones(ana.p)).includes("Retar o proponer sparring") && (await acciones(ana.p)).includes("Mis propuestas"));
+check("el panel del peleador tiene «Retar o proponer sparring» y «Mis propuestas»", (await acciones(ana.p)).includes("Retos y sparrings") && (await acciones(ana.p)).length === 4);
 await fan.p.goto(B + `/peleadores/${bea.f.slug}`);
 check("un aficionado (sin ficha) no ve los botones de retar", await fan.p.getByRole("link", { name: "Retar a combate" }).count() === 0);
 await ana.p.goto(B + `/peleadores/${bea.f.slug}`);
@@ -118,7 +119,7 @@ for (let i = 0; i < 2; i++) {
 }
 check("no se puede enviar dos veces el mismo tipo mientras espera respuesta", await seen(ana.p.locator(".notice-bad", { hasText: "Ya tienes una propuesta de ese tipo" })) && (await db.fightProposal.count({ where: { fromId: ana.f.id, toId: bea.f.id, kind: "SPARRING" } })) === 1);
 await bea.p.goto(B + "/mi-panel");
-check("el panel de quien la recibe cuenta las propuestas pendientes", (await bea.p.locator(".accion-principal", { hasText: "Mis propuestas" }).locator(".aviso-accion").innerText()).startsWith("2"));
+check("el panel de quien la recibe cuenta las propuestas pendientes", (await bea.p.locator(".accion-principal", { hasText: "Retos y sparrings" }).locator(".aviso-accion").innerText()).startsWith("2"));
 await bea.p.goto(B + "/propuestas");
 await axe(bea.p, "Mis propuestas");
 const reto = bea.p.locator("#pestana-recibidas article", { hasText: "Reto a combate" });

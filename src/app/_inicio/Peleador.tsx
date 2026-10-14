@@ -1,4 +1,6 @@
 import Link from "next/link";
+import TeToca from "./TeToca";
+import CompletaPerfil from "./CompletaPerfil";
 import type { CSSProperties } from "react";
 import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
@@ -19,11 +21,12 @@ import { CUENTA } from "./datos";
  * Inicio del peleador (diseño v3, «homeFighter»): su foto a sangre con récord y aura, la cuenta atrás de su próximo combate,
  * los combates que otros declaran con él, su gráfico de aura y los accesos a registrar combates y a sus títulos.
  */
-export default async function InicioPeleador({ user }: { user: User & { fighter: { id: string } | null } }) {
+export default async function InicioPeleador({ user, disciplina }: { user: User & { fighter: { id: string } | null }; disciplina?: string }) {
   if (!user.fighter) {
     return (
       <div className="pantalla inicio-adaptable">
         <Saludo kicker="Mi panel" nombre={user.name} sub="Peleador" />
+        <TeToca pendientes={[{ texto: "Crear mi ficha", href: "/mi-ficha", cantidad: 1 }]} />
         <div className="tarjeta tarjeta-acc anillo" style={{ padding: 22 }}>
           <h2 style={{ font: "800 24px/1.1 var(--font)" }}>Crea tu ficha</h2>
           <p style={{ margin: 0, fontWeight: 500 }}>{user.emailVerifiedAt ? "Revisa los datos que elegiste al registrarte y publica tu ficha para registrar tus combates." : "Primero confirma tu correo electrónico con el enlace que te enviamos; después podrás publicar tu ficha."}</p>
@@ -43,8 +46,12 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
   // Retos y sparrings recibidos que esperan respuesta.
   const propuestas = await db.fightProposal.count({ where: { toId: me.id, status: "PENDING" } });
   // Inscripciones aceptadas en eventos que aún no se han celebrado.
-  const inscripciones = await db.eventRegistration.count({ where: { fighterId: me.id, status: "ACCEPTED", event: { date: { gte: calendarDayStart() } } } });
-  const principal = me.disciplines[0];
+  const inscripciones = await db.eventRegistration.count({ where: { fighterId: me.id, status: { in: ["ACCEPTED", "DECLINED"] }, event: { date: { gte: calendarDayStart() } } } });
+  const [perfil, totalPorConfirmar] = await Promise.all([
+    db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: me.id } }, select: { hasAvatar: true } }),
+    db.bout.count({ where: { fighterBId: me.id, verification: "SELF_REPORTED", result: { not: null } } }),
+  ]);
+  const principal = me.disciplines.find((d) => d.discipline === disciplina) ?? me.disciplines[0];
   const tally = principal ? computeRecords(me.id, bouts)[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
   const rec = combinedRecord(tally, principal ? { total: principal.priorTotal, wins: principal.priorWins, losses: principal.priorLosses, draws: principal.priorDraws } : null);
   const serie = monthlySeries(auras.map((a) => a.createdAt), 7);
@@ -72,15 +79,24 @@ export default async function InicioPeleador({ user }: { user: User & { fighter:
           <span style={{ marginLeft: "auto", textAlign: "right" }} aria-hidden="true"><span style={{ font: "800 30px/1 var(--font)", color: "var(--acc2-text)" }}>{auras.length}</span><span className="meta" style={{ display: "block", color: "rgba(var(--ink),.75)" }}>de aura</span></span>
         </div>
       </section>
+      <TeToca pendientes={[
+        { texto: "Combates por confirmar", href: "/mi-ficha#por-confirmar", cantidad: totalPorConfirmar },
+        { texto: "Retos y sparrings pendientes", href: "/propuestas", cantidad: propuestas },
+        { texto: "Respuestas de inscripción", href: "/mis-inscripciones", cantidad: inscripciones },
+      ]} />
+      {me.disciplines.length > 1 && <nav aria-label="Disciplina del récord" className="chips">{me.disciplines.map((d) => <Link key={d.discipline} href={`/mi-panel?disciplina=${d.discipline}`} className="chip" aria-current={principal?.discipline === d.discipline ? "page" : undefined}>{DISCIPLINE_LABEL[d.discipline]}</Link>)}</nav>}
+      <CompletaPerfil campos={[
+        { texto: "Añadir foto", completo: !!perfil?.hasAvatar, href: `/perfiles/peleador/${me.id}/editar` },
+        { texto: "Indicar gimnasio", completo: !!me.gymId, href: "/mi-ficha" },
+        { texto: "Indicar provincia", completo: !!me.province, href: "/mi-ficha" },
+        { texto: "Elegir categoría de peso", completo: me.disciplines.length > 0 && me.disciplines.every((d) => !!d.weightClass), href: "/mi-ficha" },
+        { texto: "Añadir alias", completo: !!me.alias, href: "/mi-ficha" },
+      ]} />
       <AccionesPrincipales acciones={[
         { href: "/mi-ficha#registrar-combate", titulo: "Registrar un combate", detalle: "Suma a tu récord", icono: "mas" },
-        { href: "/propuestas#proponer", titulo: "Retar o proponer sparring", detalle: "A otro peleador", icono: "reto" },
-        { href: "/propuestas", titulo: "Mis propuestas", detalle: "Retos y sparrings", icono: "bandeja", aviso: propuestas },
+        { href: "/propuestas", titulo: "Retos y sparrings", detalle: "Retos y sparrings", icono: "bandeja", aviso: propuestas },
         { href: "/veladas?inscripcion=abierta", titulo: "Inscribirme en una velada", detalle: "Veladas e interclubs que buscan peleadores", icono: "enviar" },
-        { href: "/mis-inscripciones", titulo: "Mis inscripciones", detalle: "Lo que responde cada organizador", icono: "check", aviso: inscripciones },
         { href: "/mi-ficha#publicar-highlight", titulo: "Publicar un highlight", detalle: "Tu mejor vídeo o foto", icono: "camara" },
-        { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "calendario" },
-        { href: "/mi-ficha/trayectoria", titulo: "Mis títulos y mi aura", detalle: "Tu trayectoria", icono: "trofeo" },
       ]} />
       {principal?.level === "AMATEUR" && !me.recordPublic && <p className="mut" style={{ margin: 0 }}>Tu récord amateur es privado: el público solo ve cuántos combates llevas. <Link href="/mi-ficha#privacidad">Cambiarlo</Link></p>}
 

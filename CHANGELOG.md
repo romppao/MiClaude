@@ -11,6 +11,18 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.12.2] — 2026-10-14
+
+### Mejorado
+- Los cuatro paneles reúnen sus pendientes en «Te toca» y reducen los accesos rápidos a cuatro como máximo.
+- El aficionado puede dar y quitar aura a ambos participantes desde su panel; las recomendaciones respetan sus disciplinas y el registro separa disciplinas y sugerencias.
+- El entrenador responde solicitudes desde el panel y ve solicitudes del mes, clases aceptadas y alumnos que repiten.
+- Récord por disciplina en el panel del peleador, progreso del perfil y tarjetas adaptables en «Peleadores que sigo».
+- El entrenador puede completar su gimnasio desde la edición de su perfil.
+
+
+## [0.12.2] — 2026-10-14
+
 ## [0.12.1] — 2026-10-14
 
 PR de Claude (bloque E del encargo de paneles por tipo de usuario: fallos de la revisión del 14 de octubre).

@@ -452,3 +452,7 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 ## 2026-10-14 — Una pantalla con su propio filtro de combates se salta las reglas nuevas
 **Qué pasó:** al aprobar las veladas pasadas con autorización (bloque B), el filtro común `boutsQueCuentan()` se actualizó, pero «Peleadores que sigo» tenía su propio filtro (solo excluía las canceladas) y siguió enseñando veladas pendientes y rechazadas. El panel de la entidad contaba los resultados pendientes con `take: 1` y su cifra se quedaba corta.
 **Regla:** toda lista de combates o veladas visible al público usa los filtros compartidos (`boutsQueCuentan`, `VELADAS_NO_PUBLICAS`). Una cifra de un panel se calcula sobre todos los elementos, no sobre el primero que se muestra.
+
+
+## 2026-10-14 — Pruebas de componentes y codificación en Windows
+La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba una prueba `.test.tsx` nueva. Se amplió el patrón y se configuró JSX en Oxc, el transformador instalado; las 4 pruebas nuevas ya pasan. La tubería de PowerShell a Python sustituyó inicialmente algunas tildes: corregidas y fijada salida UTF-8 antes de nuevas escrituras. Revisar siempre el diff y el recuento de pruebas.

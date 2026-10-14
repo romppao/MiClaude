@@ -97,6 +97,7 @@ export async function saveInterests(f: FormData) {
     db.follow.createMany({ data: fichas.map((x) => ({ userId: user.id, fighterId: x.id })), skipDuplicates: true }),
   ]);
   revalidatePath("/", "layout");
+  if (str(f, "paso") === "disciplinas") go("/registro/intereses?paso=seguir");
   go(user.emailVerifiedAt ? "/" : "/verificar", { aviso: fichas.length ? "intereses_y_seguidos" : "intereses_guardados" });
 }
 

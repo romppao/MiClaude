@@ -1,3 +1,3 @@
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({ test: { include: ["tests/unit/**/*.test.ts"] } });
+export default defineConfig({ oxc: { jsx: { runtime: "automatic" } }, test: { include: ["tests/unit/**/*.test.{ts,tsx}"] } });

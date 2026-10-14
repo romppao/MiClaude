@@ -62,7 +62,7 @@
 | `/peleadores` | Peleadores | Pública | — | Fighter |
 | `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow`, `fighters.removeDiscipline` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, MediaItem, Profile |
 | `/peleadores/:slug/proponer` | Retar o proponer sparring | Pública (cambia lo que ve según la cuenta) | `proposals.proposeFight` | Fighter, FighterDiscipline |
-| `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | Gym, User |
+| `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | Gym, Trainer, User |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
 | `/promotores` | Promotores | Pública | — | User |
 | `/promotores/:id` | (ficha individual: el título depende del elemento) | Pública | — | Event, User |
@@ -211,7 +211,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `createFederation` | Cuenta con correo verificado | AuditLog, Profile | PROFILE: FEDERATION_CREATED | — | — |
-| `saveProfile` | Cuenta con correo verificado | AppError, AuditLog, Gym, Profile | PROFILE: PROFILE_UPDATED | — | perfil_guardado |
+| `saveProfile` | Cuenta con correo verificado | AppError, AuditLog, Gym, Profile, Trainer | PROFILE: PROFILE_UPDATED, TRAINER: PROFILE_UPDATED | — | perfil_guardado |
 
 ### `proposals`
 
@@ -260,7 +260,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Tabla | Acciones que escriben |
 |---|---|
 | Gym | `fighters.createMyFighter`, `fighters.updateMyFighter`, `moderation.setGymVerified`, `profiles.saveProfile`, `trainers.createMyTrainer` |
-| Trainer | `accounts.deleteAccount`, `trainers.createMyTrainer` |
+| Trainer | `accounts.deleteAccount`, `profiles.saveProfile`, `trainers.createMyTrainer` |
 | TrainingClass | `trainers.createMyTrainer`, `trainers.createClass`, `trainers.toggleClass` |
 | ClassRequest | `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | EventSlot | `registrations.setSlot`, `registrations.removeSlot` |

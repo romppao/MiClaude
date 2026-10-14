@@ -397,3 +397,7 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
   - panel propio de federación.
 - **Visitante:** «Esta semana en Madrid» con cambio de provincia.
 - **Moderación:** bandeja única ordenada por urgencia.
+
+
+### Seguimiento del bloque F (Codex, 14 oct 2026)
+Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.

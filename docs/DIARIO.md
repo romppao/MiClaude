@@ -1907,3 +1907,10 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Qué salió mal:** la base de datos local (Docker) no estaba en marcha, así que las pruebas de navegador se dejan al CI. En local pasaron la comprobación de tipos, las 737 pruebas unitarias, el catálogo y el mapa.
 
 **Estado y próximos pasos:** PR y CI. Después, Codex empieza por el bloque F.
+
+
+## 2026-10-14 — Paneles, bloque F (Codex)
+**Pedido:** ejecutar el encargo de paneles; el fundador autoriza expresamente avanzar en rama propia desde #55 sin esperar su integración.
+**Cambios:** pendientes, cuatro accesos, aura en panel, sugerencias por disciplinas, tarjetas de seguidos, solicitudes del entrenador, récord por disciplina y progreso de perfil. Se completa el editor del gimnasio del entrenador porque antes no había destino para esa carencia.
+**Validación:** tipos y 741 unitarias pasan; build inicial pasa. Pruebas de navegador nuevas y adaptadas preparadas para CI; Docker no está disponible localmente. No se afirma validación de navegador ni despliegue.
+**Siguiente paso:** CI del PR de F y revisión de Claude; G y H pendientes.

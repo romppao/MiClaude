@@ -31,6 +31,8 @@ await v.fill("[name=name]", "Panel Usuario"); await v.fill("[name=email]", corre
 await btn(v, "Crear mi cuenta"); await v.waitForURL("**/registro/intereses**");
 check("después ofrece elegir disciplinas y peleadores para seguir, y se puede dejar para después", await seen(v.getByRole("heading", { name: "¿Qué te gusta ver?" })) && await v.locator("main input[name=disciplina]").count() === 6 && await v.getByRole("link", { name: "Lo haré después" }).count() === 1);
 await v.locator("label.chip", { hasText: "Muay Thai" }).click(); await v.locator("label.chip", { hasText: "K-1" }).click();
+await btn(v, "Continuar"); await v.waitForURL("**/registro/intereses?paso=seguir");
+check("el segundo paso conserva las disciplinas elegidas", await v.locator("input[type=hidden][name=disciplina]").count() === 2);
 await btn(v, "Terminar"); await v.waitForURL("**/verificar**");
 check("las disciplinas elegidas se guardan en la cuenta", consulta(`select interests from "User" where email='${correoUsuario}'`) === "{K1,MUAYTHAI}");
 check("la cuenta de usuario tiene el papel de usuario y ninguna solicitud", consulta(`select role from "User" where email='${correoUsuario}'`) === "FAN" && consulta(`select count(*) from "OrganizerRequest" r join "User" u on u.id=r."userId" where u.email='${correoUsuario}'`) === "0");
