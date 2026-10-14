@@ -33,7 +33,7 @@ export default async function GymPage({ params }: { params: Promise<{ slug: stri
       <DondeEsta titulo="Dónde está" nombre={gym.name} direccion={[gym.address, gym.city, gym.province].filter(Boolean).join(", ")} punto={puntoDeGimnasio(gym)} />
       {gym.website && <p><a href={gym.website} rel="noopener noreferrer nofollow">{gym.website}</a></p>}
       {gym.isFictional && <p className="notice notice-info">Gimnasio ficticio de la demo.</p>}
-      {gym.sourceLicense === "ODbL-1.0" && <p className="meta"><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">© colaboradores de OpenStreetMap · datos ODbL</a>{gym.sourceRef && <> · <a href={`https://www.openstreetmap.org/${gym.sourceRef}`} rel="noopener noreferrer nofollow">Ver origen</a></>}</p>}
+      {gym.sourceLicense === "ODbL-1.0" && <p className="meta" style={{ fontSize: 16 }}><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">© colaboradores de OpenStreetMap · datos ODbL</a>{gym.sourceRef && <> · <a href={`https://www.openstreetmap.org/${gym.sourceRef}`} rel="noopener noreferrer nofollow">Ver origen</a></>}</p>}
       {!gym.ownerUserId && <p>Perfil creado con datos públicos ({gym.source === "OSM" ? "OpenStreetMap" : gym.source === "FEDERACION" ? "federación" : "alta manual"}). <Link href={`/mis-gimnasios?q=${encodeURIComponent(gym.name)}`}>¿Es tu gimnasio? Reclámalo</Link></p>}
       {gym.phone && <p>Teléfono profesional: <a href={`tel:${gym.phone.replace(/[^+\d]/g, "")}`}>{gym.phone}</a></p>}
       {gym.email && <p>Correo profesional: <a href={`mailto:${gym.email}`}>{gym.email}</a></p>}

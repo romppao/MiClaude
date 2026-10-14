@@ -255,7 +255,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
           )}
         </> },
         { id: "pestana-gimnasios", titulo: `Gimnasios (${nSinSello})`, contenido: <>
-          <Link href="/moderacion/gimnasios">Altas, importaciones y reclamaciones de gimnasio</Link>
+          <Link className="btn secondary" href="/moderacion/gimnasios">Altas, importaciones y reclamaciones de gimnasio</Link>
           <h2 id="gimnasios">Gimnasios ({nGimnasios}; {nSinSello} sin sello)</h2>
           {paging("gimnasios", ["gimnasio", "gimnasios"], "gimnasios")}
           <p className="mut">Primero aparecen los que aún no tienen el sello de verificado.</p>

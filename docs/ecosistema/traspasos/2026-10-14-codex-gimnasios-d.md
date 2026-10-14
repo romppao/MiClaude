@@ -9,3 +9,5 @@ Validación local: 785 unitarias y tipos; esquema y migración generada con diff
 Archivos: schema/migración, acciones/área privada/moderación, filtros de directorio/perfiles, importador, privacidad/exportación y pruebas. Limitaciones: sin inventario OSM comprobado, sin carga real ni demo, sin fusión o despliegue. Siguiente: CI y revisión de Claude; obtener recuento comparado con la base real y presentarlo al fundador antes de ejecutar.
 
 Compilación final local aprobada, tipos y 785 unitarias aprobados, catálogo 413 y mapa 80/90/31 regenerados. La guarda real se ejecutó sin activar confirmaciones y rechazó la carga antes de conectar/escribir. Navegador y paridad real de migración todavía pendientes de CI.
+
+CI 38620776664: migración vacía/paridad, tipos, unitarias y build pasan; pruebas móviles detectan los enlaces pequeños heredados de G y el acceso nuevo de moderación. Se incorpora la corrección G y se da tamaño táctil a los accesos D, sin relajar pruebas. La prueba local de tipos de G al cambiar de rama encontró tipos generados .next de D; no se interpreta como fallo del código G.
