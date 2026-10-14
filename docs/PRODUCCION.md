@@ -33,9 +33,8 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 
 ## Puesta en marcha (una sola vez)
 1. **Proyecto y facturación.**
-   - Vincular `lona-511613` a la cuenta de facturación y poner una alerta de presupuesto de 1 €.
+   - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación y poner una alerta de presupuesto de 1 €.
    - Activar Cloud Run, Artifact Registry, Secret Manager e IAM Credentials.
-   - Hacer propietario a info@lonaclub.es.
 2. **Repositorio de imágenes:** Artifact Registry `lona` (Docker) en `europe-west1`.
 3. **Cuenta de servicio para desplegar** (`desplegar-lona@…`), con los roles:
    - Cloud Run Admin;
