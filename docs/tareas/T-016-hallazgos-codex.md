@@ -54,7 +54,7 @@ Revisión de solo lectura de la aplicación: los arreglos se deciden y se entreg
 ### C4-02 — Política de menores pendiente en los recorridos reales
 
 - **Gravedad:** BLOQUEA EL LANZAMIENTO.
-- **Archivo:línea:** `src/app/actions/accounts.ts:33`, `src/app/actions/fighters.ts:95`, `src/app/peleadores/[slug]/page.tsx:108`; referencia `docs/tareas/T-014-politica-de-menores.md:14` y `docs/LANZAMIENTO.md:32`.
+- **Archivo:línea:** `src/app/actions/accounts.ts:41`, `src/app/actions/fighters.ts:95`, `src/app/peleadores/[slug]/page.tsx:108`; referencia `docs/tareas/T-014-politica-de-menores.md:14` y `docs/LANZAMIENTO.md:32`.
 - **Qué falla y reproducción:** el alta no solicita edad (decisión vigente) y la fecha de nacimiento de la ficha es opcional. Se puede indicar nacimiento de menor, publicar foto/banner, nombre y ciudad, recibir aura/comentarios y proponer sparring sin una política aplicada por edad. T-014 ordena no abrir a menores reales hasta resolverlo; no hay todavía una separación que permita cumplir esa apertura en el producto.
 - **Arreglo:** cerrar la decisión del fundador y revisión jurídica de T-014 y aplicar sus restricciones de forma compartida en alta, ficha, imágenes, búsqueda y acciones antes de abrir la oficial.
 - **Estado:** **comprobado por lectura** de guardas y flujos; no se han creado perfiles reales de menores. Es una condición de lanzamiento ya conocida, no una decisión nueva de Codex sobre la edad mínima.
@@ -121,6 +121,6 @@ Revisión de solo lectura de la aplicación: los arreglos se deciden y se entreg
 - **Bloquean:** tres vías de publicar veladas pasadas sin autorización; tres recorridos que revelan datos privados (seguidos, galerías y sparring mixto); política de menores y condiciones de uso pendientes; exclusión de gimnasios de Cataluña sin aplicar.
 - **Importantes:** fechas inexistentes en solicitudes; listas de clases sin acceso a más de 50; valoración de gimnasios con aura excluida; publicación de fichas desde carteles pendientes.
 - **Puede esperar a revisión/validación siguiente:** pulido F del PR #56 y G/D/H; comprobar en navegador los casos señalados como lectura, correos reales y tráfico de terceros. No equivale a autorizar el lanzamiento.
-- **Restos de demo:** no se encontró marca antigua en textos públicos normales ni datos de seed incrustados en esos recorridos. Sí queda el agente de noticias `RingEspana/1.0` (`src/lib/news/refresh.ts:65`) y un ejemplo antiguo de dominio en el diagnóstico de entorno (`src/lib/common/env.ts:11`): menores, visibles solo en cabeceras/diagnóstico técnico. Las claves internas de base/navegador retiradas de la marca son excepciones técnicas ya aprobadas.
+- **Restos de demo:** no se encontró marca antigua en textos públicos normales ni datos de seed incrustados en esos recorridos. Sí queda el agente de noticias `RingEspana/1.0` (`src/lib/news/refresh.ts:61`) y un ejemplo antiguo de dominio en el diagnóstico de entorno (`src/lib/common/env.ts:11`): menores, visibles solo en cabeceras/diagnóstico técnico. Las claves internas de base/navegador retiradas de la marca son excepciones técnicas ya aprobadas.
 
 Las tres partes se han guardado y publicado por separado antes de seguir. Los hallazgos son propuestas de corrección; este PR no cambia producto, permisos ni datos.

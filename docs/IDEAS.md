@@ -398,3 +398,7 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Visitante:** «Esta semana en Madrid» con cambio de provincia.
 - **Moderación:** bandeja única ordenada por urgencia.
 - **Relevo entre sesiones sin repetir contexto** (fundador, 14 oct). Estado: **hecho** (0.12.2): `docs/ESTADO.md` y `scripts/estado.mjs`. Mejoras posibles: un aviso automático en el PR cuando toca ficheros de una rama ajena (cuesta minutos de CI: solo si hace falta); una pantalla de «Estado del equipo» para el fundador dentro de moderación.
+
+
+### Revisión antes de la oficial (Codex, 14 oct)
+Partes 3–5 de T-016 revisadas y documentadas en tareas/T-016-hallazgos-codex.md. Hallazgos pendientes de decisión y corrección en PR separado. No se declara lista la oficial.

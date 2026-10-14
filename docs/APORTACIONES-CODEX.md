@@ -344,3 +344,7 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 14 de octubre: el fundador concretó la búsqueda local de rivales; reproducción E2E primero, ciudad/gimnasio por opciones compatibles y nombre opcional para reto oficial y sparring, versión 0.11.2. Detalle en el traspaso 2026-10-14-codex-ci48-51.md; sin fusión ni despliegue.
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
+
+
+## 2026-10-14 — Revisión T-016 de visitante, peleador, entrenador y entidades
+Base: 8f07985 (0.13.1). Rama: codex/revision-t016. Tres commits publicados con sus hallazgos; aplicación revisada sin modificarla. Evidencias y límites en docs/tareas/T-016-hallazgos-codex.md. 737 unitarias pasan y los casos de privacidad/fechas/estados se reproducen con las fuentes y dependencias simuladas. El avance incompleto de G se conserva localmente en 944ee56; F sigue en #56. El nuevo análisis estratégico es una propuesta, no una aprobación de cambio de producto.

@@ -1966,3 +1966,7 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - El fundador crea las cuentas de Neon, Cloudflare, Resend y Sentry y hace propietaria del proyecto a info@lonaclub.es.
 - Claude monta y comprueba el primer despliegue.
 - Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
+
+
+## 2026-10-14 — Revisión T-016, partes 3–5 (Codex)
+Encargo de Claude ejecutado sobre 8f07985, versión 0.13.1, en solo lectura. Se guardaron y publicaron las tres partes antes de seguir. Hallazgos: privacidad, autorización de veladas pasadas, exclusión territorial de gimnasios, fechas y límites de listados. 737 unitarias pasan; reproducciones de renderizado/funciones/acciones con almacenamiento simulado. Sin recorrido de PostgreSQL vacío ni cambios de producto. La terminal no permite fetch/push: se contrastó el commit y se publicó mediante GitHub. El fundador solicita ahora análisis de estrategia, que se entregará como propuesta separada.
