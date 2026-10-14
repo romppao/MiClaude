@@ -41,9 +41,41 @@ Revisión de solo lectura de la aplicación: los arreglos se deciden y se entreg
 
 **Lo revisado sin otro fallo demostrado:** estados vacíos explícitos de portada, noticias, búsqueda, seguidos y panel; búsqueda parametrizada con exclusión de fichas ocultas y veladas no públicas; acceso, recuperación y verificación con guardas y pruebas existentes; límites de aura y avisos en servidor; banner/acciones de demo condicionados a `DEMO_MODE=si`. No se ha comprobado entrega de correos reales ni funcionamiento del mapa en dispositivo.
 
-## Parte 4 — Peleador y entrenador
+## Parte 4 — Peleador y entrenador (revisada)
 
-Pendiente de revisión.
+### C4-01 — Sparring publica detalle amateur privado al mezclar disciplinas
+
+- **Gravedad:** BLOQUEA EL LANZAMIENTO.
+- **Archivo:línea:** `src/app/propuestas/page.tsx:64`, `src/app/propuestas/page.tsx:67`.
+- **Qué falla y reproducción:** una ficha con boxeo profesional como primera disciplina y MMA amateur privada; buscarla sin filtro de disciplina/nivel. `nivelDe` suma las victorias/derrotas de ambas, pero decide la privacidad solo por la primera disciplina. Una derrota amateur privada entra en el resultado público.
+- **Arreglo:** calcular y ocultar el detalle por cada disciplina/nivel antes de construir una cifra agregada.
+- **Estado:** **comprobado** ejecutando la función real con una victoria profesional y una derrota amateur, `recordPublic=false`: publica `1-1-0`.
+
+### C4-02 — Política de menores pendiente en los recorridos reales
+
+- **Gravedad:** BLOQUEA EL LANZAMIENTO.
+- **Archivo:línea:** `src/app/actions/accounts.ts:33`, `src/app/actions/fighters.ts:95`, `src/app/peleadores/[slug]/page.tsx:108`; referencia `docs/tareas/T-014-politica-de-menores.md:14` y `docs/LANZAMIENTO.md:32`.
+- **Qué falla y reproducción:** el alta no solicita edad (decisión vigente) y la fecha de nacimiento de la ficha es opcional. Se puede indicar nacimiento de menor, publicar foto/banner, nombre y ciudad, recibir aura/comentarios y proponer sparring sin una política aplicada por edad. T-014 ordena no abrir a menores reales hasta resolverlo; no hay todavía una separación que permita cumplir esa apertura en el producto.
+- **Arreglo:** cerrar la decisión del fundador y revisión jurídica de T-014 y aplicar sus restricciones de forma compartida en alta, ficha, imágenes, búsqueda y acciones antes de abrir la oficial.
+- **Estado:** **comprobado por lectura** de guardas y flujos; no se han creado perfiles reales de menores. Es una condición de lanzamiento ya conocida, no una decisión nueva de Codex sobre la edad mínima.
+
+### C4-03 — Clase y sparring aceptan días inexistentes y cambian la fecha
+
+- **Gravedad:** IMPORTANTE.
+- **Archivo:línea:** `src/lib/trainers/requests.ts:57`, `src/lib/fighters/proposals.ts:36`.
+- **Qué falla y reproducción:** enviar `day=2026-11-31` con un día actual de 14-10-2026. Ambos validadores comprueban formato y `Date.parse`, que normaliza esa fecha; aceptan la solicitud y guardan `2026-12-01`. En una clase, el texto también cambia a «martes 1 de diciembre».
+- **Arreglo:** comprobar que la fecha interpretada conserva exactamente el día enviado antes de validar el intervalo.
+- **Estado:** **comprobado** ejecutando ambos validadores reales con datos ficticios; los dos devuelven `ok=true` y el 1 de diciembre. El selector normal reduce la probabilidad, pero el servidor debe rechazar un envío alterado.
+
+### C4-04 — Las solicitudes de clases se cortan en 50 sin acceso al resto
+
+- **Gravedad:** IMPORTANTE.
+- **Archivo:línea:** `src/app/mis-clases/page.tsx:21`, `src/app/mis-clases/page.tsx:28`.
+- **Qué falla y reproducción:** con más de 50 solicitudes pendientes del entrenador, la consulta devuelve solo 50, el aviso cuenta esas filas y no hay paginación ni enlace para llegar a las demás. Al responder algunas pueden aparecer otras, pero no se puede consultar directamente todo el trabajo pendiente ni su cifra real.
+- **Arreglo:** paginar con recuento completo y orden estable conservando el acceso y respuesta de todas las solicitudes.
+- **Estado:** **comprobado por lectura** de límite, recuento e interfaz; falta reproducción con PostgreSQL/navegador de 51 solicitudes.
+
+**Lo revisado sin otro fallo demostrado:** categorías y medidas validadas; ficha y clases protegidas por titular; guardas y cambio condicional de respuestas de clases/propuestas; filtros por ciudad/gimnasio; cálculo compartido del récord que excluye declaraciones menores de 24 h y veladas no autorizadas; amateur privado por defecto en el modelo. Las pruebas unitarias de la frontera de 24 h, privacidad, categorías, rivales y autorización pasan. Rangos/escalera del equipo son herramientas de desarrollo, no permisos públicos de las cuentas. El pulido de paneles sigue en #56 y no se considera integrado.
 
 ## Parte 5 — Gimnasios, organizadores y veladas
 
