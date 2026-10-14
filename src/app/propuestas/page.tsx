@@ -64,7 +64,8 @@ async function nivelDe(fichas: FichaConDisciplinas[], f: FiltrosRival) {
       combates += r.w + r.l + r.d + t.nc + (r.priorDetailed ? 0 : r.priorTotal); w += r.w; l += r.l; dr += r.d;
     }
     const principal = propias[0];
-    const oculto = !principal || recordHidden(principal.level, x.recordPublic, false);
+    // Si cualquiera de las disciplinas sumadas tiene el récord oculto, solo se muestra el número de combates (T-016, C4-01).
+    const oculto = !principal || propias.some((d) => recordHidden(d.level, x.recordPublic, false));
     return [x.id, {
       combates, aura: auraDe.get(x.id) ?? 0, edad: edadHoy(x.birthDate), peso: principal?.weightClass ?? null,
       record: oculto ? `${combates} ${combates === 1 ? "combate" : "combates"}` : shownRecord({ w, l, d: dr }, false),

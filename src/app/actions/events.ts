@@ -111,8 +111,9 @@ export async function addCartelBout(f: FormData) {
   const created = await guard(back, () =>
     db.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`cartel:${event.id}`}))`;
-      // Aparecer en un cartel oficial hace pública la ficha del peleador.
-      await listFighters(tx, [a.id, b.id]);
+      // Aparecer en un cartel oficial hace pública la ficha del peleador. En una velada pendiente de autorizar (o rechazada) todavía no:
+      // se publican cuando moderación la autoriza (decidirVeladaPasada) (T-016, C5-04).
+      if (!VELADA_SIN_AUTORIZAR.includes(event.status)) await listFighters(tx, [a.id, b.id]);
       await Promise.all([ensureDiscipline(tx, a.id, event.discipline), ensureDiscipline(tx, b.id, event.discipline)]);
       const flags = await coherenceFlagsFor(tx, event.date, event.discipline, [a.id, b.id]);
       const order = await tx.bout.count({ where: { eventId: event.id } });
@@ -146,8 +147,9 @@ export async function setBoutResult(f: FormData) {
   const verification = user.role === "ADMIN" || bout.createdById === user.id ? "VERIFIED" : bout.verification;
   await db.$transaction(async (tx) => {
     await tx.bout.update({ where: { id: bout.id }, data: { ...WITHOUT_BOUT_BACKING, result: v.result, method: v.method, endRound: v.endRound, verification } });
-    await tx.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } });
-    if (verification === "VERIFIED") await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
+    // Solo una velada programada pasa a celebrada al poner un resultado: una pendiente de autorizar, rechazada o cancelada conserva su estado (T-016, C5-01).
+    if (event.status === "SCHEDULED") await tx.event.update({ where: { id: event.id }, data: { status: "COMPLETED" } });
+    if (verification === "VERIFIED" && !VELADA_SIN_AUTORIZAR.includes(event.status)) await listFighters(tx, [bout.fighterAId, bout.fighterBId]);
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification } }, tx);
   });
   revalidatePath("/", "layout");
@@ -171,8 +173,13 @@ export async function updateEvent(f: FormData) {
   const disciplineRaw = str(f, "discipline");
   const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
   const kind = parseEventKind(str(f, "kind")) ?? event.kind;
+  // Llevar a una fecha pasada una velada que aún no se había celebrado equivale a dar de alta una velada pasada: necesita autorización (T-016, C5-01).
+  const pasaAPasada = user.role !== "ADMIN" && dayKey(date) < todayMadrid() && !eventDayReached(event.date);
+  const status = ["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status)
+    ? (dayKey(date) < todayMadrid() ? "PENDING_AUTHORIZATION" as const : "SCHEDULED" as const)
+    : pasaAPasada && event.status !== "CANCELLED" ? "PENDING_AUTHORIZATION" as const : undefined;
   const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl,
-    ...(["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status) ? { status: dayKey(date) < todayMadrid() ? "PENDING_AUTHORIZATION" as const : "SCHEDULED" as const } : {}) };
+    ...(status && { status }) };
   await guard(back, () => db.$transaction(async (tx) => {
     // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
@@ -180,10 +187,26 @@ export async function updateEvent(f: FormData) {
     if (bouts.some(b => !knownBoxingAgeEligible(event.discipline,event.level,b.fighterA.birthDate,date) || !knownBoxingAgeEligible(event.discipline,event.level,b.fighterB.birthDate,date) || (b.divisionId !== null && (!divisionEligible(b.divisionId, b.fighterA.birthDate, date) || !divisionEligible(b.divisionId, b.fighterB.birthDate, date))))) throw new Rechazo("categoria_edad_combate");
     if (dayKey(date) !== dayKey(event.date) || name !== event.name) await tx.bout.updateMany({ where: { eventId: event.id }, data: WITHOUT_BOUT_BACKING });
     await tx.event.update({ where: { id: event.id }, data });
+    if (pasaAPasada) await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "PAST_EVENT_AUTHORIZATION_REQUESTED", after: { status: status ?? event.status, date } }, tx);
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, kind: event.kind, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, kind, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));
   revalidatePath("/", "layout");
   go(back, { aviso: "velada_actualizada" });
+}
+
+/** Estados de una velada pasada que moderación aún no ha autorizado: no es pública ni publica las fichas de su cartel. */
+const VELADA_SIN_AUTORIZAR: string[] = ["PENDING_AUTHORIZATION", "REJECTED"];
+
+/**
+ * ¿Esta velada pidió alguna vez autorización (velada pasada) sin que moderación la haya concedido después? Se lee del historial,
+ * porque el estado se pierde al cancelarla: cuenta la más reciente entre petición, autorización y rechazo.
+ */
+async function faltaAutorizacion(eventId: string): Promise<boolean> {
+  const ultima = await db.auditLog.findFirst({
+    where: { entity: "EVENT", entityId: eventId, action: { in: ["PAST_EVENT_AUTHORIZATION_REQUESTED", "PAST_EVENT_APPROVED", "PAST_EVENT_REJECTED"] } },
+    orderBy: { createdAt: "desc" }, select: { action: true },
+  });
+  return !!ultima && ultima.action !== "PAST_EVENT_APPROVED";
 }
 
 /** Cancela una velada propia (sigue visible, marcada como cancelada, y sus combates dejan de contar) o la vuelve a abrir. */
@@ -193,7 +216,10 @@ export async function setEventStatus(f: FormData) {
   const back = `/organizador/${event.slug}`;
   const cancelar = str(f, "decision") === "cancel";
   if (["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status) && !cancelar) go(back, { problema: "velada_pendiente_autorizacion" });
-  const status = cancelar ? "CANCELLED" : eventDayReached(event.date) ? "COMPLETED" : "SCHEDULED";
+  // Reabrir una velada pasada cuya autorización no consta vuelve a «pendiente de autorizar»: cancelar y reabrir no se salta a moderación (T-016, C5-01).
+  const status = cancelar ? "CANCELLED"
+    : !eventDayReached(event.date) ? "SCHEDULED"
+    : user.role !== "ADMIN" && (await faltaAutorizacion(event.id)) ? "PENDING_AUTHORIZATION" : "COMPLETED";
   if (status === event.status) go(back, { problema: "moderacion_estado" });
   await db.$transaction([
     db.event.update({ where: { id: event.id }, data: { status } }),
