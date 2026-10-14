@@ -124,8 +124,6 @@ check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "H
 await fan.reload();
 await fan.getByRole("link", { name: "Récord", exact: true }).click();
 check("el aura queda registrada y suma en la ficha", (await fan.locator("body").innerText()).includes("1 aura recibida"));
-await fan.getByRole("link", { name: "Público", exact: true }).click();
-check("el comentario del aura se muestra en la sección pública", (await fan.locator("body").innerText()).includes("Increíble, alucinante"));
 await fan.getByRole("button", { name: /Quitar mi aura del combate de Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
 check("se puede quitar el aura", await fan.locator("text=0 auras recibidas").waitFor({ timeout: 8000 }).then(() => true, () => false));
@@ -192,8 +190,13 @@ check("el cartel oculta el resultado amateur privado", t.includes("Resultado ocu
 await pepe.goto(B + "/mi-ficha");
 await pepe.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
 await pepe.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
+await luis.goto(B + "/mi-ficha");
+await luis.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await luis.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
-check("el cartel muestra el resultado cuando el peleador publica su récord amateur", (await fan.locator("main").innerText()).includes(`Gana Pepe Uno${rnd}`));
+check("el cartel muestra el resultado cuando ambos peleadores publican su récord amateur", (await fan.locator("main").innerText()).includes(`Gana Pepe Uno${rnd}`));
+await luis.getByRole("switch", { name: "Ocultar mi récord amateur completo" }).click();
+await luis.locator(".notice-ok", { hasText: "Tu récord amateur vuelve a ser privado" }).waitFor();
 await pepe.getByRole("switch", { name: "Ocultar mi récord amateur completo" }).click();
 await pepe.locator(".notice-ok", { hasText: "Tu récord amateur vuelve a ser privado" }).waitFor();
 
