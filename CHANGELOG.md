@@ -34,6 +34,11 @@ PR de Claude: textos legales para el lanzamiento (petición del fundador). Son b
 - **Pie de página:** enlaces a Condiciones, Privacidad, Cookies y Aviso legal.
 - **Consentimiento al crear la cuenta:** el registro y «Continuar con Google» mencionan también las condiciones de uso.
 
+### Corregido (recorrido de Antigravity por la demo, 14-10-2026)
+- **Noticias:** las búsquedas de Google Noticias colaban en la portada común titulares ajenos a los deportes de contacto (fundas de móvil, camiones, vela, fútbol). Ahora, si el titular no nombra ninguna disciplina, se descarta. Las ya guardadas se borran al reiniciar el servidor.
+- **Privacidad:** los dos avisos sobre fotos y highlights iban encima del título; ahora van debajo.
+- **Veladas:** la etiqueta «no oficial» pasa a escribirse con mayúscula inicial, como las demás.
+
 ## [0.13.1] — 2026-10-14
 
 PR de Claude: solo documentación.

@@ -176,7 +176,10 @@ export function detectarDisciplinas(texto: string): Discipline[] {
  * - nombra varias (por ejemplo, «velada de boxeo y MMA») → ninguna: solo sale en la portada común («Todos»);
  * - no nombra ninguna → la de la fuente, pero solo si es un medio dedicado a una sola disciplina (no una búsqueda en Google Noticias,
  *   que trae noticias que solo la mencionan de pasada) y el resumen no habla de otra.
- * Devuelve null si la noticia no es de deportes de contacto (una fuente general cuyo titular no nombra ninguna): se descarta.
+ * Devuelve null si la noticia no es de deportes de contacto, y se descarta:
+ * - una fuente general cuyo titular no nombra ninguna disciplina;
+ * - una búsqueda de Google Noticias (AGREGADOR) cuyo titular no nombra ninguna. Antes iba a la portada común y colaba fundas de móvil,
+ *   camiones, vela o fútbol (recorrido de Antigravity, 14-10-2026).
  */
 export function clasificar(fuente: { disciplines: Discipline[]; kind: string }, e: Pick<EntradaNoticia, "title" | "summary">): Discipline[] | null {
   const titular = detectarDisciplinas(e.title);
@@ -187,6 +190,7 @@ export function clasificar(fuente: { disciplines: Discipline[]; kind: string }, 
     const resumen = detectarDisciplinas(e.summary ?? "");
     return resumen.every((d) => d === fuente.disciplines[0]) ? fuente.disciplines : [];
   }
+  if (fuente.kind === "AGREGADOR") return null;
   return fuente.disciplines.length > 0 ? [] : null;
 }
 

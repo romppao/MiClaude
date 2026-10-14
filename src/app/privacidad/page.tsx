@@ -11,14 +11,16 @@ export default function Privacy() {
   const contacto = t.contacto;
   return (
     <>
-      <p className="notice notice-info">Las fotos, banners y graduaciones que publiques forman parte de tu perfil público. Las imágenes se optimizan y se retiran sus metadatos. Puedes cambiarlas o quitarlas; al borrar tu cuenta se retiran tus imágenes. Moderación puede autorizar a titulares de gimnasios, entrenadores y federaciones a gestionar esos perfiles.</p>
-      <p className="notice notice-info">Si eres peleador, tus highlights (enlaces a vídeos y fotos que publicas) son públicos en tu ficha y puedes retirarlos cuando quieras; en amateur, tu récord completo solo se muestra si lo activas. Si eres entrenador, tu perfil y tus clases son públicos. Todo ello se incluye en la descarga de tus datos y se borra al eliminar tu cuenta.</p><h1>Privacidad y tus datos</h1>
+      <h1>Privacidad y tus datos</h1>
       <p className="mut">Última actualización: {LEGAL_ACTUALIZADO}. Explicado con palabras sencillas. {contacto ? "Si algo no queda claro, escríbenos y te lo aclaramos." : "Si algo no queda claro, consulta «¿Cómo funciona?» o avísanos desde el botón «¿Hay un error? Avísanos» de cualquier ficha."}</p>
+      <p className="notice notice-info">Las fotos, banners y graduaciones que publiques forman parte de tu perfil público. Las imágenes se optimizan y se retiran sus metadatos. Puedes cambiarlas o quitarlas; al borrar tu cuenta se retiran tus imágenes. Moderación puede autorizar a titulares de gimnasios, entrenadores y federaciones a gestionar esos perfiles.</p>
+      <p className="notice notice-info">Si eres peleador, tus highlights (enlaces a vídeos y fotos que publicas) son públicos en tu ficha y puedes retirarlos cuando quieras; en amateur, tu récord completo solo se muestra si lo activas. Si eres entrenador, tu perfil y tus clases son públicos. Todo ello se incluye en la descarga de tus datos y se borra al eliminar tu cuenta.</p>
 
       {(responsable || contacto) && (
         <>
           <h2>Quién es el responsable</h2>
           <p>{responsable && <>El responsable de tus datos es <strong>{responsable}</strong>{t.nif && <>, con NIF {t.nif}</>}{t.domicilio && <> y domicilio en {t.domicilio}</>}. </>}{contacto && <>Puedes escribirnos a <a href={`mailto:${contacto}`}>{contacto}</a>.</>} Más datos en el <Link href="/aviso-legal">aviso legal</Link>. Lona no tiene obligación de nombrar un delegado de protección de datos; para cualquier cuestión sobre tus datos, usa este mismo contacto.</p>
+
         </>
       )}
 
