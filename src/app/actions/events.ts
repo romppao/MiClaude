@@ -71,12 +71,14 @@ export async function createEvent(f: FormData) {
         promoter: str(f, "promoter") || null, ticketUrl, organizerId: user.id, createdById: user.id,
         // Inscripción de peleadores abierta desde el principio si el organizador lo deja marcado (y el evento aún no se ha celebrado).
         registrationOpen: str(f, "inscripcion") === "1" && dayKey(date) >= todayMadrid(),
+        status: dayKey(date) < todayMadrid() && user.role !== "ADMIN" ? "PENDING_AUTHORIZATION" : "SCHEDULED",
       },
     });
   });
   await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "CREATED", after: { name, kind, date, level, discipline } });
+  if (created.status === "PENDING_AUTHORIZATION") await audit({ userId: user.id, entity: "EVENT", entityId: created.id, action: "PAST_EVENT_AUTHORIZATION_REQUESTED", after: { status: created.status, date } });
   revalidatePath("/", "layout");
-  go(`/organizador/${created.slug}`, { aviso: kind === "INTERCLUB" ? "interclub_creado" : "velada_creada" });
+  go(`/organizador/${created.slug}`, { aviso: created.status === "PENDING_AUTHORIZATION" ? "velada_pasada_pendiente" : kind === "INTERCLUB" ? "interclub_creado" : "velada_creada" });
 }
 
 /** Añade un combate al cartel. Lo introduce el organizador del evento, así que nace VERIFIED. */
@@ -169,7 +171,8 @@ export async function updateEvent(f: FormData) {
   const disciplineRaw = str(f, "discipline");
   const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
   const kind = parseEventKind(str(f, "kind")) ?? event.kind;
-  const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl };
+  const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl,
+    ...(["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status) ? { status: dayKey(date) < todayMadrid() ? "PENDING_AUTHORIZATION" as const : "SCHEDULED" as const } : {}) };
   await guard(back, () => db.$transaction(async (tx) => {
     // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
@@ -189,6 +192,7 @@ export async function setEventStatus(f: FormData) {
   const event = await ownEvent(str(f, "eventId"), user);
   const back = `/organizador/${event.slug}`;
   const cancelar = str(f, "decision") === "cancel";
+  if (["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status) && !cancelar) go(back, { problema: "velada_pendiente_autorizacion" });
   const status = cancelar ? "CANCELLED" : eventDayReached(event.date) ? "COMPLETED" : "SCHEDULED";
   if (status === event.status) go(back, { problema: "moderacion_estado" });
   await db.$transaction([

@@ -32,7 +32,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
         db.fighter.findMany({ where: { id: { in: (fighterIds ?? []).slice(0, POR_GRUPO) } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }] }),
         db.gym.findMany({ where: { id: { in: (gymIds ?? []).slice(0, POR_GRUPO) } }, orderBy: { name: "asc" } }),
         db.trainer.findMany({ where: { id: { in: (trainerIds ?? []).slice(0, POR_GRUPO) } }, orderBy: { name: "asc" } }),
-        db.event.findMany({ where: { id: { in: (eventIds ?? []).slice(0, POR_GRUPO) } }, orderBy: { date: "desc" } }),
+        db.event.findMany({ where: { id: { in: (eventIds ?? []).slice(0, POR_GRUPO) }, status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } }, orderBy: { date: "desc" } }),
       ])
     : [[], [], [], []];
   const enlace = (ruta: string) => `${ruta}?q=${encodeURIComponent(q)}`;

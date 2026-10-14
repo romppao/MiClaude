@@ -12,6 +12,7 @@ import { eventDayReached, todayMadrid } from "../../../lib/common/dates";
 import { getUser } from "../../../lib/accounts/auth";
 import { REG_STATUS_LABEL, claveCategoria, inscripcionAbierta, ocupacion } from "../../../lib/events/registrations";
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
+import { recordHidden } from "../../../lib/fighters/privacy";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { createReport } from "../../actions/community";
 
@@ -32,12 +33,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const ahora = new Date();
   const e = await getEvent(slug);
   if (!e) notFound();
   const org = e.organizer?.organizerRequest;
   const oficial = !!e.organizerId && org?.status === "APPROVED";
   const entrenador = e.organizer?.role === "TRAINER" ? e.organizer.trainer : null;
   const [user, medios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  if ((e.status === "PENDING_AUTHORIZATION" || e.status === "REJECTED") && user?.id !== e.organizerId && user?.role !== "ADMIN") notFound();
   // Plazas por categoría que ofrece el organizador, con las que quedan libres.
   const plazas = e.registrationOpen ? await db.eventSlot.findMany({ where: { eventId: e.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] }) : [];
   const ocupPlazas = plazas.length ? ocupacion(plazas, await db.eventRegistration.findMany({ where: { eventId: e.id }, select: { status: true, divisionId: true, weightClass: true } })) : new Map();
@@ -94,8 +97,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <tbody>
           {e.bouts.map((b) => {
             const enRevision = b.verification === "DISPUTED"; // un combate rechazado no se muestra como un hecho
-            // El resultado se presenta con su respaldo; confirmar es opcional.
-            const oculto = enRevision;
+            const recordAmateurOculto = !!b.result && e.level === "AMATEUR" && (
+              recordHidden(e.level, b.fighterA.recordPublic, false) ||
+              recordHidden(e.level, b.fighterB.recordPublic, false)
+            );
+            // El resultado amateur no revela un récord que alguno de los peleadores mantiene privado.
+            const oculto = enRevision || recordAmateurOculto;
             const ganador = oculto ? null : b.result === "A_WIN" ? publicFighterName(b.fighterA) : b.result === "B_WIN" ? publicFighterName(b.fighterB) : null;
             return (
               <tr key={b.id}>
@@ -105,12 +112,13 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <td data-label="Categoría">{[categoryLabel(e.discipline, e.level, b.divisionId, b.weightClass), b.rounds ? `${b.rounds} asaltos` : null].filter(Boolean).join(" · ")}</td>
                 <td data-label="Resultado">
                   {enRevision ? <span className="mut">Resultado en revisión</span>
+                    : recordAmateurOculto ? <span className="mut">Resultado oculto por privacidad del récord amateur</span>
                     : !b.result ? <span className="mut">{eventDayReached(e.date) ? "Resultado por anotar" : "Próximo combate"}</span>
                     : b.result === "DRAW" ? "Empate"
                     : b.result === "NO_CONTEST" ? "Sin decisión"
                     : <>Gana {ganador}{b.method ? ` (${METHOD_LABEL[b.method]}${b.endRound ? `, asalto ${b.endRound}` : ""})` : ""}</>}
                 </td>
-                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag bout={{ result: b.result, event: { date: e.date } }} verification={b.verification} backing={b} /> : <span className="mut">—</span>}</td>
+                <td data-label="Respaldo">{b.result || oculto ? <VerificationTag bout={{ result: b.result, event: { date: e.date } }} verification={b.verification} backing={b} now={ahora} recordCreatedAt={b.createdAt} /> : <span className="mut">—</span>}</td>
               </tr>
             );
           })}

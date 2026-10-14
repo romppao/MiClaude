@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { join, resolve } from "node:path";
 import { CONSENTIMIENTO, nombreDeDescarga, parseMedio, veladaAbiertaAlPublico } from "../../src/lib/media/rules";
 import { almacenDeVideos, carpetaEnDisco, claveDe, nuevaClave, rutaEnDisco, tipoDeClave } from "../../src/lib/media/storage";
 import { validateEnv } from "../../src/lib/common/env";
@@ -26,6 +27,8 @@ describe("vídeos y fotos del público: qué se admite", () => {
     expect(veladaAbiertaAlPublico(v("2026-10-08"), "2026-10-08")).toBe("ok");
     expect(veladaAbiertaAlPublico(v("2026-10-09"), "2026-10-08")).toBe("futura");
     expect(veladaAbiertaAlPublico(v("2026-10-01", "CANCELLED"), "2026-10-08")).toBe("cancelada");
+    expect(veladaAbiertaAlPublico(v("2026-10-01", "PENDING_AUTHORIZATION"), "2026-10-08")).toBe("pendiente");
+    expect(veladaAbiertaAlPublico(v("2026-10-01", "REJECTED"), "2026-10-08")).toBe("pendiente");
     expect(veladaAbiertaAlPublico(v("2026-06-01"), "2026-10-08")).toBe("antigua");
   });
   it("nombre de descarga limpio", () => {
@@ -44,8 +47,9 @@ describe("almacén de vídeos", () => {
     expect(tipoDeClave(k)).toBe("video/quicktime");
   });
   it("la ruta en disco nunca se sale de su carpeta", () => {
-    expect(rutaEnDisco("/datos", "videos/clxyz12345abc/0f8fad5b-d9cb-469f-a165-70867728950e.mp4")).toBe("/datos/videos/clxyz12345abc/0f8fad5b-d9cb-469f-a165-70867728950e.mp4");
-    expect(rutaEnDisco("/datos", "../fuera.mp4")).toBeNull();
+    const carpeta = resolve("/datos");
+    expect(rutaEnDisco(carpeta, "videos/clxyz12345abc/0f8fad5b-d9cb-469f-a165-70867728950e.mp4")).toBe(resolve(join(carpeta, "videos/clxyz12345abc/0f8fad5b-d9cb-469f-a165-70867728950e.mp4")));
+    expect(rutaEnDisco(carpeta, "../fuera.mp4")).toBeNull();
   });
   it("elige R2 si está configurado; si no, el disco fuera de producción o en la demo; en producción sin R2, solo enlaces", () => {
     const r2 = { R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "b", NODE_ENV: "production" } as unknown as NodeJS.ProcessEnv;
@@ -56,7 +60,7 @@ describe("almacén de vídeos", () => {
     expect(almacenDeVideos({ NODE_ENV: "development" } as NodeJS.ProcessEnv)?.tipo).toBe("disco");
     expect(almacenDeVideos({ NODE_ENV: "production", DEMO_MODE: "si" } as unknown as NodeJS.ProcessEnv)?.tipo).toBe("disco");
     expect(almacenDeVideos({ NODE_ENV: "production" } as NodeJS.ProcessEnv)).toBeNull();
-    expect(carpetaEnDisco({ NODE_ENV: "production", MEDIA_DIR: "/datos/videos" } as unknown as NodeJS.ProcessEnv)).toBe("/datos/videos");
+    expect(carpetaEnDisco({ NODE_ENV: "production", MEDIA_DIR: "/datos/videos" } as unknown as NodeJS.ProcessEnv)).toBe(resolve("/datos/videos"));
   });
   it("avisa si la configuración de R2 está a medias", () => {
     const env = { NODE_ENV: "production", DATABASE_URL: "x", APP_URL: "https://ring.es", MAIL_TRANSPORT: "log", CONTACT_EMAIL: "a@b.es", R2_BUCKET: "b" } as unknown as NodeJS.ProcessEnv;

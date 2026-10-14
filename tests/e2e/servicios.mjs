@@ -61,6 +61,42 @@ check("el panel del aficionado empieza por «Buscar clases» y tiene «Mis reser
 // 4) Retos y sparring entre dos peleadores.
 const ana = await peleador("Ana");
 const bea = await peleador("Bea");
+// El fundador no conoce el nombre: elige ciudad y gimnasio y encuentra a quien encaja.
+const gym = await db.gym.create({ data: { name: `Turia filtros ${rnd}`, slug: `turia-filtros-${rnd}`, city: "Valencia", province: "Valencia" } });
+await db.fighter.update({ where: { id: bea.f.id }, data: { gymId: gym.id, city: "Valencia", stance: "ZURDO" } });
+// Clubes sin un perfil reclamado, ocultos o de otra disciplina/guardia no deben ofrecerse.
+const descartados = [];
+for (const caso of ["sin-titular", "oculto", "otra-disciplina", "otra-guardia"]) {
+  const club = await db.gym.create({ data: { name: `Descartado ${caso} ${rnd}`, slug: `${caso}-${rnd}`, city: "Valencia", province: "Valencia" } });
+  descartados.push(club.id);
+  const titular = caso === "sin-titular" ? null : await db.user.create({ data: { name: caso, email: `${caso}-${rnd}@test.es`, passwordHash: "sin-acceso", role: "FIGHTER" } });
+  await db.fighter.create({ data: { slug: `filtro-${caso}-${rnd}`, firstName: "Descartado", lastName: caso, city: "Valencia", province: "Valencia", gymId: club.id, userId: titular?.id, hiddenAt: caso === "oculto" ? new Date() : null, stance: caso === "otra-guardia" ? "ORTODOXO" : "ZURDO", disciplines: { create: { discipline: caso === "otra-disciplina" ? "MMA" : "BOXEO", level: "AMATEUR" } } } });
+}
+await ana.p.goto(B + "/propuestas?provincia=Valencia&guardia=ZURDO");
+const busqueda = ana.p.getByRole("search", { name: "Buscar rival o sparring" });
+check("se puede elegir ciudad y gimnasio sin escribir sus nombres", await seen(busqueda.locator("select[name=ciudad]")) && await seen(busqueda.locator("select[name=gimnasioId]")));
+const opcionesGym = await busqueda.locator("select[name=gimnasioId] option").evaluateAll(xs => xs.map(x => x.value));
+check("los gimnasios ofrecidos excluyen fichas sin titular, ocultas o incompatibles", opcionesGym.includes(gym.id) && descartados.every(id => !opcionesGym.includes(id)));
+await busqueda.locator("select[name=ciudad]").selectOption("Valencia");
+await busqueda.getByRole("button", { name: "Aplicar filtros" }).click(); await ana.p.waitForURL(u => u.searchParams.get("ciudad") === "Valencia");
+await busqueda.locator("select[name=gimnasioId]").selectOption(gym.id);
+await busqueda.getByRole("button", { name: "Aplicar filtros" }).click(); await ana.p.waitForURL(u => u.searchParams.get("gimnasioId") === gym.id);
+const candidata = ana.p.locator("#proponer article", { hasText: `Bea Servicios${rnd}` });
+check("sin nombre escrito aparecen candidatos de la ciudad, gimnasio y guardia elegidos", await seen(candidata) && await busqueda.locator("[name=q]").inputValue() === "");
+for (const [tipo, nombre] of [["FIGHT", `Retar a Bea Servicios${rnd}`], ["SPARRING", `Proponer un sparring a Bea Servicios${rnd}`]]) {
+  await candidata.getByRole("link", { name: nombre, exact: true }).click();
+  await ana.p.waitForURL(u => u.pathname.endsWith("/proponer") && u.searchParams.get("tipo") === tipo);
+  check(`el candidato elegido permite abrir ${tipo === "FIGHT" ? "reto oficial" : "sparring"}`, await seen(ana.p.locator(`input[name=kind][value=${tipo}]`)) && await ana.p.locator(`input[name=kind][value=${tipo}]`).isChecked());
+  await ana.p.goto(B + `/propuestas?provincia=Valencia&guardia=ZURDO&ciudad=Valencia&gimnasioId=${gym.id}`); await ana.p.waitForURL(u => u.searchParams.get("gimnasioId") === gym.id);
+}
+// Revisión de la búsqueda en móvil real, con los dos temas y filtros abiertos.
+for (const tema of ["claro", "oscuro"]) {
+  await ana.p.evaluate(t => localStorage.setItem("lona:tema", t), tema); await ana.p.reload();
+  await ana.p.waitForFunction(t => document.documentElement.dataset.tema === t, tema);
+  check(`búsqueda a 390 px en tema ${tema} conserva los controles y no desborda`, await seen(busqueda.locator("select[name=ciudad]")) && await seen(busqueda.locator("select[name=gimnasioId]")) && await ana.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await axe(ana.p, `Búsqueda móvil ${tema}`);
+  await ana.p.screenshot({ path: `test-results/sparring-${tema}.png`, fullPage: true });
+}
 await ana.p.goto(B + "/mi-panel");
 check("el panel del peleador tiene «Retar o proponer sparring» y «Mis propuestas»", (await acciones(ana.p)).includes("Retar o proponer sparring") && (await acciones(ana.p)).includes("Mis propuestas"));
 await fan.p.goto(B + `/peleadores/${bea.f.slug}`);

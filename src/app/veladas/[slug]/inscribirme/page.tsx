@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function Inscribirme({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const e = await db.event.findUnique({ where: { slug } });
-  if (!e) notFound();
+  if (!e || ["PENDING_AUTHORIZATION", "REJECTED"].includes(e.status)) notFound();
   const user = await getUser();
   const me = user?.fighter ?? null;
   const [mia, ficha] = me ? await Promise.all([

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filtrarYOrdenarRivales, hayFiltrosRival, parseFiltrosRival, type Candidato } from "../../src/lib/fighters/rivals";
+import { coincideLocalRival, opcionesLocalesRival, filtrarYOrdenarRivales, hayFiltrosRival, parseFiltrosRival, type Candidato } from "../../src/lib/fighters/rivals";
 
 describe("filtros para buscar rival o sparring", () => {
   it("sin disciplina en la dirección usa la del peleador; «todas» la quita; valores desconocidos se ignoran", () => {
@@ -33,5 +33,25 @@ describe("ordenar rivales", () => {
     expect(n(filtrarYOrdenarRivales(lista, parseFiltrosRival({ orden: "combates" }), yo))[0]).toBe("Cris");
     expect(n(filtrarYOrdenarRivales(lista, parseFiltrosRival({ orden: "experiencia" }), yo))[0]).toBe("Dani");
     expect(n(filtrarYOrdenarRivales(lista, parseFiltrosRival({ orden: "aura" }), yo))[0]).toBe("Cris");
+  });
+});
+
+
+describe("descubrir candidatos por ciudad y gimnasio", () => {
+  const gym = (id: string, city: string) => ({ id, name: "Club compartido", city, province: "Valencia" });
+  const a = { city: "Otra residencia", gym: gym("a", "Valencia") };
+  const b = { city: "Gandía", gym: gym("b", "Gandía") };
+  const sinClub = { city: "Valencia", gym: null };
+  it("conserva clubes homónimos, deduplica y usa la ciudad de entrenamiento", () => {
+    expect(opcionesLocalesRival([a, a, b, sinClub]).ciudades).toEqual(["Gandía", "Valencia"]);
+    expect(opcionesLocalesRival([a, a, b, sinClub]).gimnasios.map(g => g.id)).toEqual(["a", "b"]);
+    expect(opcionesLocalesRival([a, b], "Valencia").gimnasios.map(g => g.id)).toEqual(["a"]);
+  });
+  it("ciudad e id de gimnasio se combinan, y los enlaces antiguos siguen funcionando", () => {
+    expect(coincideLocalRival(a, parseFiltrosRival({ ciudad: "Valencia", gimnasioId: "a" }))).toBe(true);
+    expect(coincideLocalRival(b, parseFiltrosRival({ ciudad: "Valencia", gimnasioId: "a" }))).toBe(false);
+    expect(coincideLocalRival(sinClub, parseFiltrosRival({ gimnasioId: "a" }))).toBe(false);
+    expect(coincideLocalRival(a, parseFiltrosRival({ gimnasio: "COMPARTIDO" }))).toBe(true);
+    expect(hayFiltrosRival(parseFiltrosRival({ ciudad: "Valencia" }))).toBe(true);
   });
 });

@@ -84,6 +84,8 @@ enum EventStatus {
   SCHEDULED
   COMPLETED
   CANCELLED
+  PENDING_AUTHORIZATION
+  REJECTED
 }
 
 model Gym {
@@ -381,6 +383,7 @@ model Event {
 
 model Bout {
   id                     String                @id @default(cuid())
+  createdAt              DateTime              @default(now())
   eventId                String
   event                  Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
   order                  Int                   @default(0)
@@ -419,6 +422,7 @@ model Bout {
   @@index([eventId])
   @@index([fighterAId])
   @@index([fighterBId])
+  @@index([createdAt])
 }
 
 model User {

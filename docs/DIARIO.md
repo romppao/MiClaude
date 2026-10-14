@@ -1761,6 +1761,19 @@ Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos t
 
 **Próximos pasos:** validar A4 y A2 con sesión; B1–B3, bloque C y bloque D (gimnasios reales); decidir Google Noticias. Detalle en `docs/ecosistema/traspasos/2026-10-13-claude-a-codex-continuar-afilar.md`.
 
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque B (Codex)
+
+Rebasado sobre el PR #48, que ya incluye responsive y A1–A8. B1 añade autorización moderadora para veladas pasadas; B3 incorpora el plazo de 24 horas a partir del registro con exclusión de combates disputados y aviso al peleador. B2 conserva la privacidad amateur actual y deja pendiente la visibilidad interna para moderación. Se eliminaron los BOM UTF-8 de `record-eligibility.ts` y `record-time.ts`. CI y revisión de los PR apilados pendientes.
+
+La primera ejecución de CI reveló supuestos E2E que ya no eran válidos tras hacer obligatorio el nivel y aplicar el plazo de 24 horas. Las pruebas se ajustaron para elegir nivel, esperar al resultado y comprobar los combates después de 25 horas cuando corresponde.
+
+## 13 de octubre de 2026 — Revisión de lanzamiento, bloque C (Codex)
+
+El traspaso técnico reúne el alcance A/B, comprobaciones y límites. Los PR se mantienen en borrador y no se ha desplegado la demo. Pendientes: CI de la pila rebasada, revisión final de Claude y publicación autorizada.
+
+## 14 de octubre de 2026 — Afinado de pruebas de lanzamiento (Codex)
+
+CI #513 confirmó que la ficha debe recargarse tras madurar el combate de prueba para que se vea el récord actualizado. CI #514 encontró que el botón compacto de atribución de MapLibre medía 24 × 44 px en móvil. Se amplió su zona táctil a 44 × 44 px, manteniendo el icono centrado. La CI debe volver a comprobar E2E y accesibilidad; el ajuste es de tamaño de interacción y no cambia el diseño de la página.
 
 ## 14 de octubre de 2026 — Corregir pruebas y trámites de la pila #48/#50/#51 (Codex)
 
@@ -1778,3 +1791,53 @@ Validación nueva: 106 comprobaciones visuales/interacción correctas en ambos t
 14 oct, continuidad de CI: los heads 0da663b/01bb8bd/a4f7203 aprueban catálogo, mapa, tipos, unitarias y build, y #51 ya aprueba flujo/cuenta. La ejecución 38530144100 se detiene en inclusiva.mjs por crear una velada sin nivel obligatorio tras A7. Se preparan explícitamente AMATEUR también en inscripciones, plazas, rivales y escenarios, sin cambiar la aplicación ni quitar expectativas. En local se limpian exclusivamente los datos 000Inclusiva de esta base desechable tras una pasada fallida: repetirla con residuos altera qué seis eventos enseña la portada. No se presenta esa primera pasada como verde.
 
 14 oct — El recorrido de doble clic descubrió un fallo distinto de la navegación: React puede hidratar acciones sin method; el lector getAttribute con valor por defecto GET omitía el bloqueo. Diagnóstico en Chromium: dos clics (detail 1/2), dos submit, dos POST y selección de rival tras haber registrado el primero. A reconoce esas acciones y descarta el segundo clic físico, conservando búsquedas GET y reintento independiente. Prueba de componentes: acción React sin method con input llamado method, reset síncrono y siguiente clic; se ejecuta antes del build final. El diagnóstico inicial de «respuesta rápida» era una hipótesis; la ausencia de method es la causa demostrada. Se separa de HistoryUpdater en el traspaso.
+14 oct — La prueba de usabilidad de B conserva su comprobación de «Gana Movil» y declaración opcional: activa por la interfaz la publicación del récord amateur de su fixture y madura ese combate 25 horas antes de verlo. La captura anterior ocultaba el resultado por privacidad; no era un error de la aplicación. El doble clic fallido del mismo recorrido queda resuelto en A3. No se atribuye a este guion una pasada verde hasta repetirlo sobre A corregida.
+
+14 oct, precisión de usabilidad B: la privacidad amateur protege a ambos participantes. Se prepara también la autorización del rival a través de su cuenta e interruptor y se selecciona su ficha existente. La segunda pasada que publicaba solo el récord del ganador seguía ocultando correctamente el resultado y se registra como fallida. No se relaja la comprobación ni se modifica la política.
+## Estado del rebase final, 14 de octubre
+
+A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/categorías y mantienen las exigencias públicas. C está nuevamente sobre esa B (0.11.1). Frente a la pila anterior, src, prisma, scripts y unitarias de B/C son idénticos; cambian los guiones indicados y documentación generada. Se valida el CI de estos heads, no el de sus predecesores fallidos. Las pruebas dirigidas pasan: cuenta 33/33, cuenta CPU ×6 33/33, categorías 18/18 y respaldo 22/22. La descripción de sparring sigue pendiente; no hay PR ni versión ficticios para ese caso.
+
+## 14 de octubre de 2026 — Búsqueda local para retos y sparring (Codex)
+
+El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y descubrir peleadores compatibles sin escribir nombres exactos. Rama apilada codex/sparring-2026-10-14 sobre C, con reproducción E2E primero (ausencia de desplegables) y después selección nativa de ciudad y club, nombre opcional y enlace a la propia ciudad. Opciones derivadas de candidatos autorizados y filtros deportivos; clubes por id, ciudad de entrenamiento cuando hay club, enlaces anteriores conservados. Versión 0.11.2 mediante scripts/version.mjs. Pruebas locales y estado externo de CI se detallan en el traspaso al cerrarse; no se anticipa un resultado verde. No se fusiona ni despliega.
+
+14 oct, cierre actual: #48 eb5a366 → #50 e8d239c → #51 c9d2546 → #52, todo en borrador. A usabilidad 52/52 y siete recorridos 154/154; B usabilidad final 52/52 tras autorización real de ambos participantes; búsqueda final 33/33, 712 unitarias, tipos/build y móvil claro/oscuro a 390 revisado. Catálogo/mapa/versiones comprobados. El selector intermedio del rival falló por no incluir el aria-label completo; corregido sin quitar comprobaciones. E2E de CI A aprobado al consultar, accesibilidad aún en curso; estados finales de CI se entregan separados de lo local. Sin fusión ni despliegue.
+
+14 oct — La prueba previa rivales.mjs también se adapta al nuevo desplegable: selección por gimnasioId, espera de dirección/candidata y las mismas comprobaciones; conserva un enlace antiguo por nombre para verificar compatibilidad. Recorrido completo 12/12 en local. CI A 38533976870 completamente aprobado; B/C/#52 finales en curso al cerrar esta entrada.
+
+## 14 de octubre de 2026 — Revisión de los PR de Codex y comprobaciones recuperadas (Claude)
+
+**Qué se pidió** (el fundador): revisar lo que había hecho Codex y, si estaba bien, actualizar GitHub y la demo. Después: «Prefiero que hagas tú la corrección».
+
+**Qué se decidió y por qué:**
+- **#48 se fusionó** (0.10.0): CI en verde y revisión correcta (esperas de las pruebas y bloqueo del doble envío, con pruebas propias).
+- **#50 se redirigió** a la rama de la demo, para que no se fusionara dentro de la rama de #48.
+- **Las dos comprobaciones que #50 había quitado se recuperan en un PR propio de Claude** (`claude/recupera-comprobaciones`, sobre #52). No se escribe en la rama de otro asistente (`EQUIPO.md`, regla 2).
+
+**Qué se hizo:**
+- `tests/e2e/flujo.mjs`:
+  - El comentario del aura se escribe en el formulario del combate al que se da el aura y se comprueba que se ve en la ficha.
+  - Tras «madurar» el combate del veterano más de 24 horas, se comprueba que el récord pasa a 11-3-1.
+- Versión 0.11.3.
+
+**Qué salió mal:**
+- El comentario no aparecía y parecía un fallo de la aplicación: el campo tenía el texto, pero el envío llegaba vacío.
+- La causa real era la prueba. La ficha de Pepe tiene cuatro combates y cuatro cajas de comentario. La prueba escribía en la primera de la página y pulsaba «Dar aura» en otro combate, que ya no era el primero porque cambió el orden de los combates.
+- Probablemente por eso #50 quitó la comprobación en lugar de arreglarla.
+
+- Después, el CI de #50, #51 y #52 falló en dos pruebas del bloque B. Se reprodujeron aquí y en ninguna era un fallo de la aplicación:
+  - `record-24h.mjs` contaba la etiqueta «cuenta en el récord a partir del…» antes de que se pintara. Ahora la espera con `seen()`.
+  - `veladas-pasadas.mjs` buscaba «Pasada aprobada» sin la parte única del nombre, así que encontraba veladas de otras ejecuciones. Además, comprobaba que el texto no estuviera en la página, y la página repite lo buscado («No hemos encontrado nada para «…»»). Ahora usa nombres únicos y comprueba que no hay enlace a la velada.
+  - Además, `veladas-pasadas.mjs` iba al historial justo después de pulsar «Autorizar y publicar», sin esperar a que se guardara la decisión, y en el CI llegaba antes. Ahora espera el aviso de confirmación.
+  - Se comprobó a mano que la búsqueda pública **no** muestra veladas pendientes ni rechazadas: la regla B1 se cumple.
+
+- La prueba de GitHub tras fusionar #48 (0.10.0) falló en «la elección se recuerda al volver» (tema). En local pasa 4 de 4: es intermitente. Por eso no se creó la etiqueta v0.10.0, y se añade su línea «Fusión» al registro para que el CI la cree en la siguiente fusión con todo en verde. Pista que conviene vigilar: tras #48 la pantalla navega dos veces seguidas en algunos envíos. Si una segunda navegación vuelve a pintar `<html>` sin `data-tema`, el tema elegido se perdería hasta recargar.
+
+- **Fallo real encontrado:** el tema elegido se perdía a veces al recargar. Lo delataban «la elección se recuerda al volver» tras fusionar #48 y `servicios.mjs` en #53, que solo fallaban en el CI, que es más lento.
+  - Causa: el guion `TEMA_INICIAL` pone `data-tema` antes de pintar, pero si React vuelve a pintar `<html>` al cargar (un error de hidratación, como el #418 que investigó A2), el atributo desaparece y nada lo reponía. `SelectorTema` solo leía la elección para marcar su opción.
+  - Arreglo: `components/TemaPersistente.tsx` lo vuelve a aplicar al montar y cada vez que alguien lo quite, mientras siga guardado.
+  - Prueba nueva: se borra el atributo a propósito y se comprueba que vuelve.
+- Batería completa en local sobre una base vacía: 796 comprobaciones de navegador bien, ninguna mal.
+
+**Estado y próximos pasos:** el PR #53 apunta a la rama de la demo e incluye #50, #51 y #52. Con su CI en verde se fusiona todo junto.

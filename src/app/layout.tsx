@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import FlashNotice from "./components/FlashNotice";
 import RecordarCampos from "./components/RecordarCampos";
 import EvitarDobleEnvio from "./components/EvitarDobleEnvio";
+import TemaPersistente from "./components/TemaPersistente";
 import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
 import Experience from "./components/experience/Experience";
@@ -93,7 +94,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {user && !user.emailVerifiedAt && (
           <div className="barra-aviso"><div className="notice notice-bad" style={{ margin: 0 }}><span aria-hidden="true">⚠ </span>Falta confirmar tu correo electrónico para poder dar aura y registrar combates. <Link href="/verificar">Confirmarlo ahora</Link></div></div>
         )}
-        <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense><EvitarDobleEnvio />{children}</main>
+        <main id="contenido"><Suspense fallback={null}><FlashNotice /><RecordarCampos /></Suspense><EvitarDobleEnvio /><TemaPersistente />{children}</main>
         <footer className="foot">
           <Link href="/ayuda">¿Cómo funciona?</Link>
           {(!user || puedeOrganizar(user.role)) && <Link href="/organizador">Organizar una velada</Link>}

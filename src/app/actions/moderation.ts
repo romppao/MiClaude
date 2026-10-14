@@ -186,3 +186,28 @@ export async function actualizarFallo(f: FormData) {
   }));
   go(back, { aviso: "fallo_actualizado" });
 }
+
+/** Autoriza o rechaza una velada pasada. La nota y la decisión quedan en el historial. */
+export async function decidirVeladaPasada(f: FormData) {
+  const admin = await requireAdmin();
+  const id = str(f, "eventId");
+  const back = "/moderacion/veladas";
+  const event = await db.event.findUnique({ where: { id }, include: { organizer: { select: { id: true } } } });
+  if (!event || event.status !== "PENDING_AUTHORIZATION" || !event.organizerId) go(back, { problema: "no_existe" });
+  const decision = str(f, "decision");
+  if (decision !== "approve" && decision !== "reject") go(back, { problema: "decision_no_valida" });
+  const note = str(f, "note").slice(0, LIMITS.note);
+  if (!note) go(back, { problema: "motivo_falta" });
+  const status = decision === "approve" ? "COMPLETED" : "REJECTED";
+  await guard(back, () => db.$transaction(async (tx) => {
+    const saved = await tx.event.updateMany({ where: { id: event.id, status: "PENDING_AUTHORIZATION" }, data: { status } });
+    if (!saved.count) throw new Rechazo("solicitud_cambiada");
+    await audit({ userId: admin.id, entity: "EVENT", entityId: event.id, action: decision === "approve" ? "PAST_EVENT_APPROVED" : "PAST_EVENT_REJECTED", before: { status: event.status }, after: { status, note } }, tx);
+  }));
+  revalidatePath("/", "layout");
+  after(() => notifyDecision(event.organizerId!, decision === "approve" ? "Tu velada pasada ha sido autorizada" : "Tu velada pasada no se ha autorizado",
+    decision === "approve"
+      ? `Un moderador ha autorizado la publicación de «${oneLine(event.name)}» (${event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}). Nota: ${oneLine(note)}. Ya aparece en Lona: ${APP_URL}/veladas/${event.slug}`
+      : `Un moderador ha rechazado la publicación de «${oneLine(event.name)}». Motivo: ${oneLine(note)}. Puedes corregir los datos o pedir una nueva revisión desde Mis veladas: ${APP_URL}/organizador`));
+  go(back, { aviso: decision === "approve" ? "velada_pasada_autorizada" : "velada_pasada_rechazada" });
+}

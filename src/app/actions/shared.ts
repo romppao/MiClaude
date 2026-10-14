@@ -20,7 +20,7 @@ export const intOrNull = (f: FormData, k: string) => {
 };
 
 /** Redirige a `path` añadiendo un mensaje para el usuario (aviso de éxito o problema). */
-export function go(path: string, mensaje?: { aviso?: string; problema?: string }): never {
+export function go(path: string, mensaje?: { aviso?: string; problema?: string; cuentaDesde?: Date }): never {
   if (!mensaje) redirect(path);
   const hashAt = path.indexOf("#");
   const hash = hashAt < 0 ? "" : path.slice(hashAt);
@@ -34,6 +34,7 @@ export function go(path: string, mensaje?: { aviso?: string; problema?: string }
   if (/^#[a-z][a-z0-9-]{0,39}$/.test(hash)) params.set("seccion", hash.slice(1));
   if (mensaje.aviso) { params.delete("problema"); params.set("aviso", mensaje.aviso); }
   if (mensaje.problema) { params.delete("aviso"); params.set("problema", mensaje.problema); }
+  if (mensaje.cuentaDesde) params.set("cuentaDesde", mensaje.cuentaDesde.toISOString());
   redirect(`${base}?${params.toString()}`);
 }
 

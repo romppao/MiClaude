@@ -6,6 +6,7 @@ const bout = (over: Partial<BoutForRecord> & { level?: "PRO" | "AMATEUR"; status
   result: "A_WIN",
   method: "UD",
   verification: "VERIFIED",
+  createdAt: new Date("2026-10-10T10:00:00Z"),
   ...over,
   event: { level: over.level ?? "AMATEUR", status: over.status ?? "COMPLETED", discipline: "BOXEO" },
 });
@@ -47,6 +48,11 @@ describe("computeRecords", () => {
     expect(r).toEqual({}); // nada cuenta: ni siquiera aparece la disciplina
   });
 
+  it("excluye los combates de veladas pendientes o rechazadas", () => {
+    const r = computeRecords("me", [bout({ status: "PENDING_AUTHORIZATION" }), bout({ status: "REJECTED" })]);
+    expect(r).toEqual({});
+  });
+
   it("marca como sin confirmar solo los autodeclarados", () => {
     const r = computeRecords("me", [
       bout({ verification: "SELF_REPORTED" }), bout({ verification: "CONFIRMED" }), bout({ verification: "VERIFIED" }),
@@ -67,5 +73,24 @@ describe("la confirmación del rival es opcional", () => {
     const declared = bout({ verification: "SELF_REPORTED", fighterAId: "otro", result: "A_WIN" });
     expect(computeRecords("me", [declared]).BOXEO!.AMATEUR).toMatchObject({ w: 0, l: 1, unverified: 1 });
     expect(computeRecords("otro", [declared]).BOXEO!.AMATEUR).toMatchObject({ w: 1, l: 0, unverified: 1 });
+  });
+});
+
+describe("el plazo de 24 horas para declaraciones", () => {
+  const creada = new Date("2026-10-12T10:00:00.000Z");
+  const declarada = bout({ verification: "SELF_REPORTED", createdAt: creada });
+  it("no cuenta antes de las 24 horas", () => {
+    expect(computeRecords("me", [declarada], new Date("2026-10-13T09:59:59.999Z"))).toEqual({});
+  });
+  it("cuenta justo al alcanzar las 24 horas", () => {
+    expect(computeRecords("me", [declarada], new Date("2026-10-13T10:00:00.000Z")).BOXEO?.AMATEUR).toMatchObject({ w: 1, unverified: 1 });
+  });
+  it("una confirmación o verificación temprana cuenta de inmediato", () => {
+    for (const verification of ["CONFIRMED", "VERIFIED"] as const) {
+      expect(computeRecords("me", [bout({ verification, createdAt: creada })], new Date("2026-10-12T10:01:00Z")).BOXEO?.AMATEUR).toMatchObject({ w: 1 });
+    }
+  });
+  it("una declaración disputada no cuenta aunque ya hayan pasado las 24 horas", () => {
+    expect(computeRecords("me", [bout({ verification: "DISPUTED", createdAt: creada })], new Date("2026-10-14T10:00:00.000Z"))).toEqual({});
   });
 });

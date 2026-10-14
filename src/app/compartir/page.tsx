@@ -15,7 +15,7 @@ import SubirVideo from "../components/SubirVideo";
 export const metadata: Metadata = { title: "Subir vídeos o fotos", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const MOTIVO = { futura: "Esta velada todavía no se ha celebrado: podrás compartir tus vídeos y fotos a partir del mismo día.", cancelada: "Esta velada se canceló, así que no admite vídeos ni fotos.", antigua: "Esta velada es de hace más de cuatro meses y ya no admite vídeos ni fotos nuevos." } as const;
+const MOTIVO = { futura: "Esta velada todavía no se ha celebrado: podrás compartir tus vídeos y fotos a partir del mismo día.", cancelada: "Esta velada se canceló, así que no admite vídeos ni fotos.", pendiente: "Esta velada todavía no tiene autorización para publicarse ni recibir contenido.", antigua: "Esta velada es de hace más de cuatro meses y ya no admite vídeos ni fotos nuevos." } as const;
 
 /**
  * Compartir lo grabado en una velada (petición del fundador, 8 de octubre de 2026). Paso 1: elegir la velada. Paso 2: una foto o un vídeo
@@ -24,13 +24,13 @@ const MOTIVO = { futura: "Esta velada todavía no se ha celebrado: podrás compa
 export default async function Compartir({ searchParams }: { searchParams: Promise<{ velada?: string; q?: string }> }) {
   const { velada = "", q = "" } = await searchParams;
   const user = await requireUser(`/compartir${velada ? `?velada=${encodeURIComponent(velada)}` : ""}`);
-  const e = velada ? await db.event.findUnique({ where: { slug: velada }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } }) : null;
+  const e = velada ? await db.event.findFirst({ where: { slug: velada, status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } }) : null;
 
   if (!e) {
     const desde = new Date(calendarDayStart().getTime() - DIAS_PARA_COMPARTIR * 864e5);
     const texto = q.trim().slice(0, 80);
     const veladas = await db.event.findMany({
-      where: { date: { gte: desde, lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { not: "CANCELLED" }, ...(texto && { OR: [{ name: { contains: texto, mode: "insensitive" } }, { city: { contains: texto, mode: "insensitive" } }] }) },
+      where: { date: { gte: desde, lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] }, ...(texto && { OR: [{ name: { contains: texto, mode: "insensitive" } }, { city: { contains: texto, mode: "insensitive" } }] }) },
       orderBy: [{ date: "desc" }, { id: "asc" }],
       take: 30,
     });

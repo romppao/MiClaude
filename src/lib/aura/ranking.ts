@@ -1,9 +1,10 @@
-import type { Discipline, Level } from "@prisma/client";
+import type { Discipline, Level, Prisma } from "@prisma/client";
 import { divisionsFor } from "../common/competition";
 import { DISCIPLINE_ORDER, LEVEL_ORDER, weightClassesFor } from "../common/disciplines";
 import { AURA_POLICY, auraCategoryKey, boutBackingPoints, trajectoryByCategory } from "./trajectory";
 import { calendarDayStart } from "../common/dates";
 import { db } from "../common/db";
+import { boutsQueCuentan } from "../common/record-eligibility";
 
 export type AuraEntry = { fighterId: string; name: string; slug: string; level: Level; weightClass: string | null; divisionId?: string | null; aura: number; trajectory?: number; backing?: number; community?: number; declared?: boolean };
 export type RankedEntry = AuraEntry & { position: number };
@@ -48,10 +49,10 @@ export function rankByCategory(entries: AuraEntry[], discipline: Discipline): Ca
  */
 export async function auraRanking(opts: { discipline?: Discipline; level?: Level; province?: string; sinceDays?: number; fighterId?: string } = {}): Promise<(CategoryRanking & { discipline: Discipline })[]> {
   const fighterWhere = { listed: true, hiddenAt: null, ...(opts.province && { province: opts.province }), ...(opts.fighterId && { id: opts.fighterId }) };
-  const eventWhere = { discipline: opts.discipline, level: opts.level, date: { lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { not: "CANCELLED" as const } };
+  const eventWhere: Prisma.EventWhereInput = { discipline: opts.discipline, level: opts.level, date: { lt: new Date(calendarDayStart().getTime() + 864e5) }, status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } };
   const [totals, achievements, supportedBouts] = await Promise.all([
     db.aura.groupBy({ by: ["fighterId", "boutId"], where: {
-      bout: { verification: { not: "DISPUTED" }, event: eventWhere }, fighter: fighterWhere,
+      bout: { AND: [boutsQueCuentan(), { event: eventWhere }] }, fighter: fighterWhere,
       ...(opts.sinceDays && { createdAt: { gte: new Date(Date.now() - opts.sinceDays * 864e5) } }),
     }, _count: { _all: true } }),
     db.fighterAchievement.findMany({ where: { fighter: fighterWhere, discipline: opts.discipline, level: opts.level, withdrawnAt: null, rejectedAt: null }, include: { supportAccreditation: true } }),

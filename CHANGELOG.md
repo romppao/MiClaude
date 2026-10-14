@@ -11,9 +11,41 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.11.3] — 2026-10-14
+
+PR de Claude sobre #52.
+
+### Corregido
+- Las pruebas vuelven a comprobar que el comentario de un aura se ve en la ficha del peleador y que un combate declarado suma en el récord cuando pasan sus 24 horas. Esas comprobaciones se habían perdido al adaptar las pruebas al bloque B.
+- El tema claro u oscuro elegido en el menú ya no se pierde a veces al cargar una página: si se borra, se vuelve a aplicar solo.
+- Las pruebas de veladas pasadas y del plazo de 24 horas ya no fallan a ratos. Usan nombres únicos, esperan a que la página muestre el dato y ya no confunden lo buscado, que la página repite, con un resultado.
+
+## [0.11.2] — 2026-10-14
+
+### Cambiado
+- En retos oficiales y sparring se pueden elegir ciudad y gimnasio entre los perfiles que cumplen los filtros deportivos, sin escribir nombres. El nombre o alias sigue siendo opcional. Los clubes homónimos se distinguen por su ubicación y se conservan los enlaces de búsqueda anteriores.
+
+## [0.11.1] — 2026-10-13
+
+### Cambiado
+- Se documenta el cierre de la revisión de lanzamiento, las comprobaciones locales y los pendientes para la segunda revisión.
+
+## [0.11.0] — 2026-10-13
+
+### Añadido
+- Las veladas pasadas requieren autorización de moderación antes de publicarse o contar en récords y ránquines.
+- Las declaraciones de combates entran en el récord 24 horas después si siguen sin disputarse ni estar en revisión.
+
+### Cambiado
+- El público ve solo el total de combates amateur también en el cartel cuando el récord está privado.
+- La ayuda aclara que el combate declarado aparece en ambas fichas, y el botón compacto de atribución del mapa tiene una zona táctil de 44 × 44 px.
+
+### Corregido
+- Las decisiones de autorización de veladas quedan auditadas y se notifican al organizador.
+
 ## [0.10.0] — 2026-10-13
 
-PR #48; incluye el trabajo responsive de #47, que no se publicó como 0.9.1.
+PR #48 (incluye el trabajo responsive de #47, que no se publicó como 0.9.1). Fusión: `d5842b4`.
 
 ### Añadido
 - **Diagnóstico de fuentes de noticias** en `/moderacion/noticias`: cada fuente muestra si responde, si devuelve un canal válido y cuántos titulares aporta.

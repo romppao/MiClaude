@@ -1,6 +1,6 @@
 // Recorrido de una ficha con historial amateur y profesional: categoría por nivel y explicación del récord.
 // Solo contra el servidor y la base de pruebas; datos ficticios únicos creados mediante la interfaz.
-import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos, mostrar } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, newUser, registrar, enDias, terminarDiagnosticos, mostrar, sql } from "./ayudas.mjs";
 
 const { p } = await newUser("Trayectoria", "FIGHTER");
 await p.goto(B + "/mi-ficha");
@@ -31,6 +31,12 @@ async function categoria(nivel, peso) {
 }
 
 await combate("Amateur", -90);
+// Este recorrido evalúa categorías y privacidad con un resultado que ya entra en el récord.
+// Los recién declarados y el límite exacto de 24 horas se prueban en record-24h.mjs.
+// These historical test events stand in for an already authorized card. The authorization queue has its own E2E.
+sql(`update "Event" set status = 'SCHEDULED' where name = 'Trayectoria Amateur ${rnd}'`);
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Trayectoria Amateur ${rnd}'`);
+await p.goto(B + "/mi-ficha");
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el visitante solo ve cuántos combates lleva hasta que el deportista lo publica.
 const visitantePrevio = await (await browser.newContext()).newPage();
 await visitantePrevio.goto(B + publica);
@@ -41,9 +47,14 @@ await p.locator(".notice-ok", { hasText: "Tu récord completo ya es público" })
 await categoria("PRO", "Wélter");
 await combate("Profesional", -30, "WIN", "PRO");
 await combate("SinDecision", -10, "NC", "PRO");
+sql(`update "Event" set status = 'SCHEDULED' where name in ('Trayectoria Profesional ${rnd}', 'Trayectoria SinDecision ${rnd}')`);
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Trayectoria Profesional ${rnd}', 'Trayectoria SinDecision ${rnd}')`);
+await p.goto(B + "/mi-ficha");
 
 const visitante = await (await browser.newContext()).newPage();
 async function comprobar(page, contexto, nivelActual) {
+  const nombreNavegacion = contexto.startsWith("Mi ficha") ? "Secciones de mi ficha" : "Secciones de la ficha";
+  await page.getByRole("navigation", { name: nombreNavegacion }).getByRole("link", { name: "Récord", exact: true }).click();
   const cards = page.locator("main :is(.grid, .fila-tarjetas) > .card").filter({ has: page.locator(".rec") });
   const pro = cards.filter({ hasText: "Boxeo · Profesional" });
   const amateur = cards.filter({ hasText: "Boxeo · Amateur" });

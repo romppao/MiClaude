@@ -1,7 +1,8 @@
-import { datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { mostrar, datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
+import { execFileSync, execSync } from "node:child_process";
 const futura = enDias(120); // la aplicación no admite veladas a más de un año vista
 
 // 1) email sin verificar: no puede dar aura ni crear ficha
@@ -16,8 +17,9 @@ await pepe.waitForSelector("text=Registrar un combate");
 await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}`, evidencia: "javascript:alert(1)" });
 check("un enlace peligroso se rechaza con un mensaje claro y no se guarda nada", await seen(pepe.locator(".notice-bad", { hasText: "El enlace no es válido" })));
 await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}` });
-await pepe.waitForSelector("text=1-0-0");
-check("aviso claro tras registrar el combate", await pepe.locator("[role=status]", { hasText: "Combate registrado" }).count() === 1);
+await pepe.locator("tbody tr", { hasText: "Velada Claim Test" }).waitFor();
+check("aviso claro tras registrar el combate y plazo de 24 horas", await pepe.locator("[role=status]", { hasText: "Combate registrado. Contará en tu récord a partir del" }).count() === 1);
+check("el combate recién declarado todavía no suma en el récord", !(await pepe.locator("main").innerText()).includes("1-0-0"));
 
 // Coherencia: el mismo enfrentamiento no se puede registrar dos veces en la misma velada
 await registrar(pepe, { evento: "Velada Claim Test", fecha: "2026-08-01", rivalNombre: "Luis", rivalApellidos: `Dos${rnd}` });
@@ -27,7 +29,8 @@ await btn(pepe, "Es esta persona");
 await pepe.waitForSelector("[role=alert]:has-text('ya está registrado')");
 check("combate duplicado bloqueado con mensaje claro", await pepe.locator(".notice-bad", { hasText: "ya está registrado" }).count() === 1);
 await pepe.waitForURL((u) => u.pathname === "/mi-ficha/rival" && u.searchParams.get("problema") === "combate_duplicado", { timeout: 10000 });
-check("y se vuelve a la pantalla de elegir rival con los datos escritos, no a un formulario vacío", pepe.url().includes("/mi-ficha/rival") && pepe.url().includes("eventName=Velada+Claim+Test") && await seen(pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" })));
+const pantallaRival = new URL(pepe.url());
+check("y se vuelve a la pantalla de elegir rival con los datos escritos, no a un formulario vacío", pantallaRival.pathname === "/mi-ficha/rival" && pantallaRival.searchParams.get("eventName") === "Velada Claim Test" && await seen(pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" })));
 await pepe.locator("main a.btn", { hasText: "Corregir los datos del combate" }).click();
 await pepe.waitForURL("**/mi-ficha?*");
 check("«Corregir los datos del combate» devuelve el formulario relleno para cambiar lo que haga falta", await pepe.inputValue("[name=eventName]") === "Velada Claim Test" && await pepe.inputValue("[name=oppLast]") === `Dos${rnd}` && await pepe.inputValue("[name=date]") === "2026-08-01");
@@ -115,15 +118,25 @@ check("fan sin verificar no ve el botón de dar aura", await fanU.p.locator("but
 const fanAcc = await newUser("Fandos");
 const fan = fanAcc.p;
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
-await fan.fill("input[name=comment]", "Increíble, alucinante"); await fan.click("button:has-text('Dar aura')");
+// Cada combate tiene su propio formulario de aura: el comentario se escribe en el del combate al que se da (Pepe ya tiene varios combates).
+const darAura = fan.getByRole("button", { name: /Dar aura a Pepe.*Velada Claim Test/ });
+const formAura = fan.locator("main form").filter({ has: darAura });
+await mostrar(formAura);
+await formAura.locator("input[name=comment]").fill("Increíble, alucinante");
+await darAura.click();
 await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
 check("aviso claro tras dar aura", await fan.locator(".notice-ok", { hasText: "Has dado aura" }).count() === 1);
 await fan.reload();
-check("el aura queda registrada y suma en la ficha", await fan.locator("body").innerText().then((t) => t.includes("1 aura recibida") && t.includes("Increíble, alucinante")));
-await fan.click("button:has-text('Quitar mi aura')");
+await fan.getByRole("link", { name: "Récord", exact: true }).click();
+check("el aura queda registrada y suma en la ficha", (await fan.locator("body").innerText()).includes("1 aura recibida"));
+// El comentario que acompaña al aura se ve en la ficha (comprobación recuperada el 14 de octubre de 2026: se perdió al pasar a pestañas).
+const comentarioAura = fan.locator("main").getByText("Increíble, alucinante");
+await mostrar(comentarioAura);
+check("el comentario del aura se ve en la ficha", await seen(comentarioAura));
+await fan.getByRole("button", { name: /Quitar mi aura del combate de Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has quitado tu aura" }).waitFor();
 check("se puede quitar el aura", await fan.locator("text=0 auras recibidas").waitFor({ timeout: 8000 }).then(() => true, () => false));
-await fan.click("button:has-text('Dar aura')");
+await fan.getByRole("button", { name: /Dar aura a Pepe.*Velada Claim Test/ }).click();
 await fan.locator("[role=status]", { hasText: "Has dado aura" }).waitFor();
 await fan.goto(B + "/ranking");
 const rk = await fan.locator("body").innerText();
@@ -182,7 +195,19 @@ await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("s
 await org.locator(".notice-ok", { hasText: "resultado se ha guardado" }).waitFor();
 await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
 const t = await fan.locator("body").innerText();
-check("velada pública con cartel y resultado", t.includes(`Gana Pepe Uno${rnd}`) && t.includes("KO"));
+check("el cartel oculta el resultado amateur privado", t.includes("Resultado oculto por privacidad del récord amateur") && !t.includes(`Gana Pepe Uno${rnd}`));
+await pepe.goto(B + "/mi-ficha");
+await pepe.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await pepe.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
+await luis.goto(B + "/mi-ficha");
+await luis.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
+await luis.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();
+await fan.goto(B + `/veladas/gran-velada-org-${rnd}-2026-07-20`);
+check("el cartel muestra el resultado cuando ambos peleadores publican su récord amateur", (await fan.locator("main").innerText()).includes(`Gana Pepe Uno${rnd}`));
+await luis.getByRole("switch", { name: "Ocultar mi récord amateur completo" }).click();
+await luis.locator(".notice-ok", { hasText: "Tu récord amateur vuelve a ser privado" }).waitFor();
+await pepe.getByRole("switch", { name: "Ocultar mi récord amateur completo" }).click();
+await pepe.locator(".notice-ok", { hasText: "Tu récord amateur vuelve a ser privado" }).waitFor();
 
 // 5b) La organizadora corrige, cancela y reactiva su velada y quita un combate del cartel
 await org.goto(B + `/organizador/gran-velada-org-${rnd}-2026-07-20`);
@@ -221,7 +246,7 @@ await vet.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).w
 check("el récord de partida detallado se muestra como declarado", await seen(vet.locator("text=10-3-1").first()) && await seen(vet.locator("text=Incluye 14 combates anteriores declarados por el propio deportista")));
 await registrar(vet, { evento: `Velada Vet ${rnd}`, fecha: "2026-06-01", rivalNombre: "Vet", rivalApellidos: `Rival${rnd}` });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
-check("el récord suma lo anterior más lo registrado (10-3-1 + 1-0-0)", await seen(vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first()));
+check("el combate declarado reciente aún no suma en el récord", await seen(vet.locator(".rec", { hasText: /^\s*10-3-1\s*$/ }).first()) && (await vet.locator("main").innerText()).includes("cuenta en el récord a partir del"));
 // Petición del fundador: en boxeo no se ofrece la sumisión. El servidor también la rechaza si alguien fuerza el formulario.
 const formCombate = vet.locator("main form").filter({ has: vet.getByRole("button", { name: "Registrar este combate", exact: true }) });
 check("en boxeo, «Cómo terminó» no ofrece sumisión, puntos ni ventajas", await formCombate.locator("select[name=method] option").evaluateAll((os) => os.length > 3 && !os.some((o) => ["SUBMISSION", "POINTS", "ADVANTAGE"].includes(o.value))));
@@ -237,10 +262,21 @@ await addDisc.locator("button:has-text('Añadir disciplina')").click();
 await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor();
 await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
+// Para comprobar la vista pública con récord habilitado, madura ambos combates declarados de prueba.
+execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')`]);
+// Pasadas las 24 horas, el combate declarado ya suma: 10-3-1 de partida + 1-0-0 (comprobación recuperada el 14 de octubre de 2026).
+await vet.goto(B + "/mi-ficha");
+const recordMaduro = vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first();
+await mostrar(recordMaduro);
+check("pasadas 24 horas, el combate declarado suma en el récord (10-3-1 + 1-0-0)", await seen(recordMaduro));
 await anon.goto(B + `/peleadores/vet-veterano${rnd}`);
 // Récord amateur privado por defecto (decisión del fundador, 7 oct 2026): el público solo ve cuántos combates lleva.
 const privada = await anon.locator("body").innerText();
 check("por defecto, el récord amateur no se muestra al público: solo el número de combates", privada.includes("el peleador mantiene privado su récord amateur completo") && !privada.includes("1 sumisión") && !privada.includes("Victoria ante"));
+const eventoMmaPrivado = execSync(`psql "${process.env.DATABASE_URL}" -tAc "select slug from \\"Event\\" where name='Velada MMA Vet ${rnd}'"`).toString().trim();
+await anon.goto(B + `/veladas/${eventoMmaPrivado}`);
+const cartelMmaPrivado = await anon.locator("main").innerText();
+check("el cartel público también oculta el resultado del récord amateur privado", cartelMmaPrivado.includes("Resultado oculto por privacidad del récord amateur") && !cartelMmaPrivado.includes("Gana Vet Veterano"));
 await vet.goto(B + "/mi-ficha");
 await vet.getByRole("switch", { name: "Mostrar mi récord amateur completo" }).click();
 await vet.locator(".notice-ok", { hasText: "Tu récord completo ya es público" }).waitFor();

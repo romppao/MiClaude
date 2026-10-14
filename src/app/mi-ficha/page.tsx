@@ -36,6 +36,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MyProfile({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser("/mi-ficha");
+  const ahora = new Date();
   if (!user.emailVerifiedAt) redirect("/verificar");
   const sp = await searchParams;
   const q = oneParam(sp.q)?.slice(0, 100);
@@ -273,7 +274,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
                           </details>
                         )}
                       </td>
-                      <td data-label="Estado"><VerificationTag bout={b} verification={b.verification} backing={b} /></td>
+                      <td data-label="Estado"><VerificationTag bout={b} verification={b.verification} backing={b} now={ahora} recordCreatedAt={b.createdAt} /></td>
                       <td data-label="Resultado">
                         {b.result ? <span>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : (b.result === "A_WIN") === isA ? "Victoria" : "Derrota"}</span> : <span className="mut">Sin resultado</span>}
                         {puedeCorregir && (

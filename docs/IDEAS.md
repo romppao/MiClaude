@@ -361,3 +361,7 @@ Decisi?n del fundador: retirar ring flotante sin funci?n y adaptar la composici?
 
 ## Codex, 13 octubre: regresión con datos plausibles
 Encargo aprobado: adaptar móvil/escritorio conservando el diseño. Banco dev implementado con vista real y estados ejemplo/extremo/vacío/uno/mil. Propuesta pendiente: incorporar la prueba a CI con servidor de desarrollo aislado; no se modificó CI.
+
+## 13 de octubre de 2026 — Pregunta de privacidad pendiente
+
+- **Visibilidad interna del récord amateur completo:** los organizadores lo ven en las solicitudes para participar. No se encontró una decisión clara sobre el acceso de moderación. Pendiente del fundador; no cambiar permisos.

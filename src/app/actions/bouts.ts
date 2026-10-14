@@ -20,6 +20,7 @@ import { boutQuery } from "../../lib/bouts/form";
 import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { notifyAuthorOfAnswer, notifyRivalOfBout } from "../../lib/community/notify";
 import { LIMITS } from "../../lib/common/text";
+import { fechaInicioEnRecord } from "../../lib/fighters/record";
 import { checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, readProvince, Rechazo, str, uniqueSlug } from "./shared";
 
 const MAX_BOUTS_PER_DAY = 10;
@@ -131,7 +132,9 @@ export async function addBout(f: FormData) {
   );
   revalidatePath("/", "layout");
   after(() => notifyRivalOfBout(created.id)); // el rival, si tiene cuenta, se entera de que debe responder
-  go(back, { aviso: created.result ? "combate_registrado" : "combate_registrado_futuro" });
+  go(back, created.result
+    ? { aviso: "combate_registrado", cuentaDesde: fechaInicioEnRecord(created.createdAt) }
+    : { aviso: "combate_registrado_futuro" });
 }
 
 /**

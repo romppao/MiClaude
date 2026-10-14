@@ -1,6 +1,6 @@
 // Comprobaciones de usabilidad y accesibilidad que axe no mide: navegación corta, lo escrito no se pierde, tamaños, contraste de controles,
 // enlaces reconocibles, avisos para lectores de pantalla y respuestas a las solicitudes. Requiere el servidor en marcha (ver ayudas.mjs).
-import { datosDeAlta, B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { mostrar, sql, datosDeAlta, B, rnd, browser, seen, check, btn, link, hoyMadrid, registrar, newUser, hacerAdmin, solicitarOrganizador, esperarCorreo, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 
 const cuerpo = (p) => p.locator("body").innerText();
 const nueva = async () => (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
@@ -192,8 +192,25 @@ await peleadorMovil.p.goto(B + "/mi-ficha");
 await peleadorMovil.p.fill("[name=firstName]", "Movil"); await peleadorMovil.p.fill("[name=lastName]", `Ficha${rnd}`);
 await datosDeAlta(peleadorMovil.p); await btn(peleadorMovil.p, "Crear mi ficha");
 await peleadorMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+// La prueba pública de resultado requiere que su titular autorice mostrar el récord amateur.
+const publicarRecord = peleadorMovil.p.getByRole("switch", { name: "Mostrar mi récord amateur completo", exact: true });
+await mostrar(publicarRecord); await publicarRecord.click();
+await peleadorMovil.p.getByRole("switch", { name: "Ocultar mi récord amateur completo", exact: true }).waitFor();
+// El resultado de un combate amateur solo es público si AMBOS participantes lo autorizan.
+const rivalMovil = await newUser("RivalMovil", "FIGHTER");
+await rivalMovil.p.goto(B + "/mi-ficha");
+await rivalMovil.p.fill("[name=firstName]", "Rival"); await rivalMovil.p.fill("[name=lastName]", `Movil${rnd}`);
+await datosDeAlta(rivalMovil.p); await btn(rivalMovil.p, "Crear mi ficha");
+await rivalMovil.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
+const publicarRival = rivalMovil.p.getByRole("switch", { name: "Mostrar mi récord amateur completo", exact: true });
+await mostrar(publicarRival); await publicarRival.click();
+await rivalMovil.p.getByRole("switch", { name: "Ocultar mi récord amateur completo", exact: true }).waitFor();
 await registrar(peleadorMovil.p, { evento: `Velada Movil ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Movil${rnd}` });
+await peleadorMovil.p.waitForURL(u => u.pathname === "/mi-ficha/rival");
+await peleadorMovil.p.getByRole("button", { name: `Es esta persona: Rival Movil${rnd} (ficha con titular)`, exact: true }).click();
 await peleadorMovil.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
+// Este recorrido comprueba la identificación de un resultado que ya puede mostrarse, no el periodo de espera de B3.
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada Movil ${rnd}'`);
 await movil.goto(B + `/peleadores/movil-ficha${rnd}`);
 const accionFicha = movil.locator("a", { hasText: "Entra para dar aura" }).first();
 check("en el móvil, la ficha de un peleador no se sale del ancho y «Entra para dar aura» queda a la vista", await seen(accionFicha) && await anchoDesbordado(movil) <= 1 && await accionFicha.evaluate((a) => { const r = a.getBoundingClientRect(); return r.left >= 0 && r.right <= window.innerWidth + 1 && r.width > 100; }));

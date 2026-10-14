@@ -65,7 +65,7 @@ describe("combinedRecord", () => {
 
 describe("computeRecords por disciplina", () => {
   const b = (discipline: BoutForRecord["event"]["discipline"], method: BoutForRecord["method"], result: BoutForRecord["result"] = "A_WIN"): BoutForRecord => ({
-    fighterAId: "me", result, method, verification: "VERIFIED", event: { level: "AMATEUR", status: "COMPLETED", discipline },
+    fighterAId: "me", result, method, verification: "VERIFIED", createdAt: new Date("2026-10-10T10:00:00Z"), event: { level: "AMATEUR", status: "COMPLETED", discipline },
   });
   it("separa el récord de cada disciplina", () => {
     const r = computeRecords("me", [b("BOXEO", "KO"), b("MMA", "SUBMISSION"), b("MMA", "UD", "B_WIN")]);

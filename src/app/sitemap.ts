@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [fighters, events, gyms, trainers] = await Promise.all([
     db.fighter.findMany({ where: { listed: true, hiddenAt: null }, select: { slug: true }, take: 5000 }),
-    db.event.findMany({ where: { status: { not: "CANCELLED" } }, select: { slug: true, date: true }, orderBy: { date: "desc" }, take: 5000 }),
+    db.event.findMany({ where: { status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } }, select: { slug: true, date: true }, orderBy: { date: "desc" }, take: 5000 }),
     db.gym.findMany({ select: { slug: true }, take: 2000 }),
     db.trainer.findMany({ select: { slug: true }, take: 2000 }),
   ]);

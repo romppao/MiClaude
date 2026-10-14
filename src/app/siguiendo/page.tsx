@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Following() {
   const user = await requireUser("/siguiendo");
+  const ahora = new Date();
   const follows = await db.follow.findMany({ where: { userId: user.id, fighter: { hiddenAt: null } }, include: { fighter: { include: { gym: true } } }, orderBy: { createdAt: "desc" } });
   const ids = follows.map((f) => f.fighterId);
   const bouts = ids.length
@@ -48,7 +49,7 @@ export default async function Following() {
                     <td>{fmtDate(b.event.date)}</td>
                     <td>{fights(b)}</td>
                     <td><Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link> <span className={`tag ${b.event.level}`}>{LEVEL_LABEL[b.event.level]}</span></td>
-                    <td><VerificationTag bout={b} verification={b.verification} /></td>
+                    <td><VerificationTag bout={b} verification={b.verification} now={ahora} recordCreatedAt={b.createdAt} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -67,7 +68,7 @@ export default async function Following() {
                     <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
                     <td>{fights(b)}</td>
                     <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${publicFighterName(b.result === "A_WIN" ? b.fighterA : b.fighterB)}`}{b.method && b.result !== "DRAW" && b.result !== "NO_CONTEST" ? ` (${METHOD_LABEL[b.method]})` : ""}</td>
-                    <td><VerificationTag bout={b} verification={b.verification} /></td>
+                    <td><VerificationTag bout={b} verification={b.verification} now={ahora} recordCreatedAt={b.createdAt} /></td>
                   </tr>
                 ))}
               </tbody>
