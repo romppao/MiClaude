@@ -403,3 +403,5 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.
 
 - 15-10-2026, Codex, encargo del fundador T-013: aviso de otra pestaña en reglamentos y moderación, salida visible en vídeos externos y comprobación general en la auditoría. Implementado; validación en curso. Paneles F/G/D/H reservados a la decisión de Claude Code.
+
+- 15-10-2026, Codex al ejecutar T-013 en local: quedan por revisar autoenlaces en el estado sin resultados de veladas pasadas, el atajo de ciudad de propuestas y los filtros de estado de fallos. Diez hallazgos al recorrer 414 pantallas por cinco papeles; no son defectos de aviso externo. Pendiente de una tarea propia; no se modifican esas pantallas en T-013.

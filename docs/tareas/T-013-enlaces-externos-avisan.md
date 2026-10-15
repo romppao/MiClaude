@@ -27,3 +27,7 @@ No tocar estilos; corregir también los enlaces descubiertos por la auditoría. 
 
 ## Documentar
 Entrada breve en tu registro (`docs/APORTACIONES-<NOMBRE>.md`) y en `DIARIO.md`.
+
+## Verificación y límites de esta ejecución
+
+Base final: demo 543a2a7 (#74, posterior a #73); entrega 0.16.2. Reproducción roja con selector y moderación originales: cuatro avisos agrupados ausentes. En la ejecución local posterior, las comprobaciones nuevas de pestañas pasan y la galería avisa visiblemente; el resultado global falla por diez autoenlaces previos en veladas, propuestas y filtros de fallos, sin modificar esos ficheros ni relajar la auditoría. El mapa dibujado se ha comprobado además con Chromium y software: aviso accesible y rel correctos en la autoría real. Detalle, incidencias y alcance de cada ejecución en APORTACIONES-CODEX. El CI completo de la base final está en https://github.com/romppao/MiClaude/actions/runs/38706572484.

@@ -487,3 +487,5 @@ La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en modera
 El primer guion buscaba un papel ARIA «tab» donde la aplicación usa enlaces de sección; se corrigió usando `pestanaDeMiFicha`. La reproducción siguiente agotó el tiempo del registro al compilar una ruta en desarrollo. Además, la ficha tiene tres selectores de división: se acotó al formulario «Registrar este combate». Ninguno de esos intentos demuestra la regresión: se repite contra `next build` y `next start`, manteniendo las comprobaciones.
 
 La búsqueda en TSX no incluye enlaces creados por librerías: la autoría del mapa también abre pestañas. Auditar después de que cargue y normalizar los enlaces cuando la librería renueve su contenido; no borrar ni ocultar las atribuciones.
+
+La desconexión del entorno ocurrió con cambios todavía sin commit. Se recuperaron completos y se subieron a sus ramas antes de continuar: guardar avances revisables antes de baterías largas, indicando expresamente qué pruebas siguen pendientes.
