@@ -401,3 +401,5 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Página «Próximamente» en lonaclub.es** hasta montar la versión real (Claude, 15 oct, a raíz de la separación de la demo). Estado: **aparcada** por el fundador el 15 oct («por el momento vamos a dejarlo así… todavía no tiene sentido que ya lancemos la aplicación web»): no se monta nada en lonaclub.es hasta terminar de perfilar la aplicación.
 - **Cambio de visión del proyecto** (fundador, 15 oct): «he tenido un cambio de visión que todavía no sé si aplicaremos». Estado: **pendiente** de que lo cuente; se valorará después de las correcciones.
 - **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.
+
+- 15-10-2026, Codex, encargo del fundador T-013: aviso de otra pestaña en reglamentos y moderación, salida visible en vídeos externos y comprobación general en la auditoría. Implementado; validación en curso. Paneles F/G/D/H reservados a la decisión de Claude Code.

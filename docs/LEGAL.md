@@ -35,5 +35,5 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 - **Aviso sin cuenta** (DSA, art. 16): `/avisar`, enlazado al pie de todas las páginas y en `/condiciones#avisos`. Pide la dirección dentro de Lona, el motivo, la explicación, el nombre, el correo y la declaración de buena fe (los avisos de abuso de menores se pueden enviar sin identificarse). Acusa recibo por correo y entra en la cola de avisos de moderación. Límite: 5 avisos al día por dirección IP.
 
 ## Pendiente en la app (programación)
-1. T-013, aviso al salir hacia enlaces externos.
+1. T-013, aviso al salir hacia enlaces externos: implementado en 0.16.1 (rama de Codex, pendiente de revisión e integración). Reglamentos y moderación anuncian la pestaña nueva; los vídeos externos lo avisan visiblemente y condiciones/privacidad explican la salida. `tests/e2e/enlaces.mjs` vigila el aviso y `rel` en las pantallas recorridas.
 2. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.

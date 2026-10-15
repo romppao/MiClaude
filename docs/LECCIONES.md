@@ -469,3 +469,9 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | Para bloquear «desde un comentario» parecía necesario poner el id del usuario en la página | Se pensaba en la acción («bloquear a X») en lugar de en lo que la persona ve | El formulario manda lo que se está viendo (comentario, vídeo, propuesta) y el servidor deduce la cuenta, comprobando que quien bloquea puede verlo. Así no se publican identificadores de usuario |
 | La prueba de navegador no podía marcar la casilla de la declaración | Las casillas `chip` están tapadas por su texto; Playwright no puede pulsar la casilla directamente | En las pruebas se pulsa la etiqueta, como una persona. No usar `force` para saltarse lo que vería un usuario |
 | No se pudo comprobar la demo publicada desde la nube | El proxy de esta sesión rechaza `onrender.com` | Si no se puede comprobar algo, se dice en el diario y al fundador, y se deja el comprobante para quien pueda (el portátil) en lugar de darlo por hecho |
+
+## 15-10-2026 — Auditar enlaces con contenido real (Codex, T-013)
+La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en moderación. Una cola vacía y un selector sin división no muestran esos enlaces: la auditoría debe preparar los datos y seleccionar la división antes de comprobar el aviso de otra pestaña. El script de versión exige escribir primero el contenido de «Sin publicar».
+
+## 15-10-2026 — Preparación de T-013 en navegador (Codex)
+El primer guion buscaba un papel ARIA «tab» donde la aplicación usa enlaces de sección; se corrigió usando `pestanaDeMiFicha`. La reproducción siguiente agotó el tiempo del registro al compilar una ruta en desarrollo. Además, la ficha tiene tres selectores de división: se acotó al formulario «Registrar este combate». Ninguno de esos intentos demuestra la regresión: se repite contra `next build` y `next start`, manteniendo las comprobaciones.

@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.16.1] — 2026-10-15
+
+### Corregido
+- Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La auditoría de enlaces comprueba el aviso y la protección de la pestaña de origen.
+
+### Cambiado
+- Los vídeos externos de la galería avisan visiblemente de la salida; condiciones y privacidad explican qué ocurre al abrir páginas ajenas.
+
 ## [0.16.0] — 2026-10-15
 
 PR de Claude: lo que faltaba programar de los textos legales (petición del fundador, 15-10-2026: «procede con todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano»).

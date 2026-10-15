@@ -344,3 +344,13 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 14 de octubre: el fundador concretó la búsqueda local de rivales; reproducción E2E primero, ciudad/gimnasio por opciones compatibles y nombre opcional para reto oficial y sparring, versión 0.11.2. Detalle en el traspaso 2026-10-14-codex-ci48-51.md; sin fusión ni despliegue.
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
+
+## 15 de octubre de 2026 — T-013: avisos de enlaces externos (Codex)
+
+**Encargo:** «T-013 enlaces externos»; partir de la demo con #73 fusionado; no tocar F/G/D/H (#56/#62/#64/#71), y después agrupar Dependabot en T-002. Reserva publicada con `node scripts/estado.mjs reservar codex "T-013 enlaces externos"`, desde 8c789bc (0.16.0).
+
+**Cambios:** reglamento y cuatro ramas de enlaces de moderación anuncian otra pestaña; la galería anuncia visiblemente la salida a vídeos externos. Condiciones y privacidad explican la salida y las políticas ajenas. La auditoría exige aviso y `noopener` o `noreferrer` en cada pantalla; prepara división y avisos con foto, vídeo externo, vídeo subido y página. Se actualiza la ficha histórica al encargo vigente. Archivo compartido delicado: `package.json`, solo versión 0.16.1; sin dependencias nuevas.
+
+**Validación en curso:** 21 migraciones sobre PostgreSQL 16 propio y paridad de esquema correctas; tipos y 754 unitarias correctas. Chromium local disponible. Reproducción roja, compilación y batería final se registrarán antes de entregar. No se ha comprobado Safari ni dispositivos físicos ni se ha desplegado.
+
+**Siguiente:** revisión del PR por Claude y decisión del fundador; conservar las ramas de paneles sin actualizarlas. T-002 va en otro PR.

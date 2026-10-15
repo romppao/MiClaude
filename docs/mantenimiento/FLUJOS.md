@@ -88,3 +88,7 @@ Pruebas: `tests/e2e/cuenta.mjs`, `integridad.mjs`, `trayectoria.mjs`, `perfiles.
 ## Revisar cualquier flujo nuevo
 
 Escribir desencadenante y resultado visible; enlazar pantalla, acción, guarda, regla, tablas y pruebas; explicar transacción, concurrencia, fallo de servicios externos y privacidad. Comprobar un éxito y un rechazo real con el rol afectado. No declarar implementado un flujo que solo aparece en una maqueta o en el plan.
+
+## Avisos de enlaces externos (T-013)
+
+Los enlaces con `target="_blank"` anuncian en su nombre accesible que abren otra pestaña o página web y conservan `rel="noopener"` o `noreferrer`. La galería de vídeos externos lo indica también visiblemente. No se incrustan reproductores de terceros; condiciones y privacidad explican la salida. `tests/e2e/enlaces.mjs` comprueba cada pantalla recorrida y prepara explícitamente una división deportiva y avisos de fotos, vídeo enlazado, vídeo subido y página para evitar auditar solo colas vacías. No visita los destinos externos.

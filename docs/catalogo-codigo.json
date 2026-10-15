@@ -566,7 +566,7 @@
   },
   {
     "path": "src/app/components/Multimedia.tsx",
-    "purpose": "Galería de vídeos y fotos del público con descarga y formulario de aviso (recibe la acción por props); SELECT_MEDIO define qué se consulta.",
+    "purpose": "Galería de medios públicos con descargas, avisos y bloqueo; el vídeo externo anuncia visiblemente que se abre en otra página web.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1606,7 +1606,7 @@
   },
   {
     "path": "tests/e2e/enlaces.mjs",
-    "purpose": "Audita enlaces/botones por papel y detecta destinos inservibles; considera controles de diálogo.",
+    "purpose": "Audita enlaces y botones por papel; exige aviso accesible y rel seguro al abrir pestañas, con división seleccionada y avisos de fotos, vídeos y páginas de #73.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
