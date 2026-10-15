@@ -418,3 +418,5 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Archivos compartidos:** esquema y migración aditiva; package.json conserva todos los scripts y añade el nuevo recorrido.
 **Pruebas:** autorización y recorrido real de peleador/entrenador, rechazo, cancelación, bloqueo y cesión posterior; validación en curso.
 **Siguiente:** revisión de Claude; cesión de gimnasio en PR separado. No se toca RFC-002.
+
+**Validación local de #88:** migraciones y paridad, tipos, 15 comprobaciones documentales y compilación aprobados. 849/851 unitarias pasaron en la ejecución con carga; las dos agotadas por tiempo pasan aisladas junto con autorización: 287/287. En navegador pasan invitación, duplicado, aceptación de peleador y entrenador, rechazo y cancelación. La prueba de bloqueo conserva la pantalla anterior a bloquear para verificar también la guarda del servidor, ya que la lista oculta las invitaciones bloqueadas al recargar. Resto del recorrido en validación.

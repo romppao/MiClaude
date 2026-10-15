@@ -46,8 +46,9 @@ await received(owner, cancelled.id).getByRole("button", { name: "Cancelar invita
 await received(trainerAccount, cancelled.id).getByRole("button", { name: "Aceptar vinculación", exact: true }).click(); await trainerAccount.p.locator('.notice-bad').waitFor();
 check("una pantalla antigua no acepta una invitación cancelada", (await db.trainer.findUniqueOrThrow({ where: { id: trainer.id } })).gymId === null);
 const blocked = await invite(trainer.id);
+await trainerAccount.p.goto(B + "/mis-gimnasios#invitaciones");
 await db.block.create({ data: { blockerId: entrenador.id, blockedId: titular.id } });
-await answer(trainerAccount, blocked, "Aceptar vinculación"); await trainerAccount.p.locator('.notice-bad').waitFor();
+await received(trainerAccount, blocked.id).getByRole("button", { name: "Aceptar vinculación", exact: true }).click(); await trainerAccount.p.locator('.notice-bad').waitFor();
 check("bloquear después de invitar impide aceptar", (await db.trainer.findUniqueOrThrow({ where: { id: trainer.id } })).gymId === null);
 await db.gymMemberInvitation.update({ where: { id: blocked.id }, data: { status: "CANCELLED" } });
 await search(); await candidate(trainer.id).getByRole("button", { name: "Invitar a vincularse", exact: true }).click(); await owner.p.locator('.notice-bad').waitFor();
