@@ -104,14 +104,14 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `changePassword` | Cuenta con sesión iniciada | AppError, AuditLog, RateHit, Session, User | — | Sí | contrasena_guardada |
+| `changePassword` | Cuenta con sesión iniciada | AppError, AuditLog, EmailOutbox, RateHit, Session, User | — | Sí | contrasena_guardada |
 | `deleteAccount` | Cuenta con sesión iniciada | AppError, AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | AuditLog, RateHit, Session, User | USER: CREADOR_PERMISOS | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
-| `register` | Cualquiera | AppError, AuditLog, EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
-| `requestPasswordReset` | Cualquiera | AppError, AuditLog, EmailToken, RateHit | — | Sí | recuperar_enviado |
-| `resendVerification` | Cuenta con sesión iniciada | AppError, AuditLog, EmailToken, RateHit | — | Sí | correo_reenviado |
-| `resetPassword` | Cualquiera | AppError, AuditLog, EmailToken, RateHit, Session, User | — | Sí | contrasena_cambiada |
+| `register` | Cualquiera | AppError, AuditLog, EmailOutbox, EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
+| `requestPasswordReset` | Cualquiera | AppError, AuditLog, EmailOutbox, EmailToken, RateHit | — | Sí | recuperar_enviado |
+| `resendVerification` | Cuenta con sesión iniciada | AppError, AuditLog, EmailOutbox, EmailToken, RateHit | — | Sí | correo_reenviado |
+| `resetPassword` | Cualquiera | AppError, AuditLog, EmailOutbox, EmailToken, RateHit, Session, User | — | Sí | contrasena_cambiada |
 | `saveFighterIntent` | Cuenta con sesión iniciada | User | — | — | registro_ficha_guardada |
 | `saveInterests` | Cuenta con sesión iniciada | Follow, User | — | — | — |
 | `saveTrainerClassIntent` | Cuenta con sesión iniciada | User | — | — | registro_clase_guardada |
@@ -141,7 +141,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `avisarSinCuenta` | Cualquiera | AppError, AuditLog, RateHit, Report | REPORT: CREATED | Sí | aviso_pagina_recibido |
+| `avisarSinCuenta` | Cualquiera | AppError, AuditLog, EmailOutbox, RateHit, Report | REPORT: CREATED | Sí | aviso_pagina_recibido |
 | `bloquearUsuario` | Cualquiera | AuditLog, Block, ClassRequest, FightProposal, Follow | USER: BLOCKED | — | bloqueado |
 | `createReport` | Cuenta con correo verificado | AuditLog, Report | REPORT: CREATED | — | reporte_enviado |
 | `desbloquearUsuario` | Cualquiera | AuditLog, Block | USER: UNBLOCKED | — | desbloqueado |
@@ -196,11 +196,11 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `decideGymClaim` | Moderación | AppError, AuditLog, Gym, GymClaimRequest, Profile | GYM: (varias), GYM: GYM_CLAIM_CONFLICT | Sí | — |
+| `decideGymClaim` | Moderación | AppError, AuditLog, EmailOutbox, Gym, GymClaimRequest, Profile | GYM: (varias), GYM: GYM_CLAIM_CONFLICT | Sí | — |
 | `requestGymClaim` | Cuenta con correo verificado | AuditLog, GymClaimRequest | GYM: GYM_CLAIM_REQUESTED | — | gimnasio_reclamado |
 | `saveGym` | Cuenta con correo verificado | AppError, AuditLog, Gym, GymClaimRequest | GYM: (varias) | — | gimnasio_guardado |
 | `setGymMember` | Cuenta con correo verificado | AuditLog, Fighter, Trainer | — | — | gimnasio_vinculo |
-| `transferGym` | Cuenta con correo verificado | AppError, AuditLog, Gym, Profile | GYM: GYM_TRANSFERRED | Sí | gimnasio_cedido |
+| `transferGym` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, Gym, Profile | GYM: GYM_TRANSFERRED | Sí | gimnasio_cedido |
 
 ### `media`
 
@@ -218,7 +218,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, Profile, User | ORGANIZER: (varias), PROFILE: FEDERATION_CREATED | Sí | — |
 | `decidirVeladaPasada` | Moderación | AuditLog, Event, Fighter | EVENT: (varias) | Sí | — |
-| `resolveReport` | Moderación | AppError, AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Gym, Highlight, MediaItem, Profile, Report | GYM: GYM_REMOVED_BY_REPORT, REPORT: (varias) | Sí | — |
+| `resolveReport` | Moderación | AppError, AuditLog, Aura, Bout, EmailOutbox, Fighter, FighterAchievement, FighterDiscipline, Gym, Highlight, MediaItem, Profile, Report | GYM: GYM_REMOVED_BY_REPORT, REPORT: (varias) | Sí | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
 
 ### `news`
@@ -248,30 +248,30 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerProposal` | Cuenta con correo verificado | AppError, AuditLog, FightProposal | PROPOSAL: (varias) | Sí | — |
-| `cancelProposal` | Cuenta con correo verificado | AppError, AuditLog, FightProposal | PROPOSAL: PROPOSAL_CANCELLED | Sí | propuesta_cancelada |
-| `proposeFight` | Cuenta con correo verificado | AppError, AuditLog, FightProposal, Notification, RateHit | PROPOSAL: PROPOSED | Sí | propuesta_enviada |
+| `answerProposal` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, FightProposal | PROPOSAL: (varias) | Sí | — |
+| `cancelProposal` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, FightProposal | PROPOSAL: PROPOSAL_CANCELLED | Sí | propuesta_cancelada |
+| `proposeFight` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, FightProposal, Notification, RateHit | PROPOSAL: PROPOSED | Sí | propuesta_enviada |
 
 ### `registrations`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerRegistrations` | Organizador (o moderación) con correo verificado | AppError, AuditLog, EventRegistration | EVENT: (varias) | Sí | — |
+| `answerRegistrations` | Organizador (o moderación) con correo verificado | AppError, AuditLog, EmailOutbox, EventRegistration | EVENT: (varias) | Sí | — |
 | `removeSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_REMOVED | — | plazas_quitadas |
-| `requestRegistration` | Cuenta con correo verificado | AppError, AuditLog, EventRegistration, Notification, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | — |
+| `requestRegistration` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, EventRegistration, Notification, RateHit | EVENT: REGISTRATION_REQUESTED | Sí | — |
 | `setRegistration` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
 | `setSlot` | Organizador (o moderación) con correo verificado | AuditLog, EventSlot | EVENT: REGISTRATION_SLOT_SET | — | plazas_guardadas |
-| `withdrawRegistration` | Cuenta con correo verificado | AppError, AuditLog, EventRegistration | EVENT: REGISTRATION_WITHDRAWN | Sí | inscripcion_retirada |
+| `withdrawRegistration` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, EventRegistration | EVENT: REGISTRATION_WITHDRAWN | Sí | inscripcion_retirada |
 
 ### `trainers`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `answerClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, Notification | CLASS: (varias) | Sí | — |
-| `cancelClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest | CLASS: REQUEST_CANCELLED | Sí | solicitud_cancelada |
+| `answerClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, EmailOutbox, Notification | CLASS: (varias) | Sí | — |
+| `cancelClassRequest` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, EmailOutbox | CLASS: REQUEST_CANCELLED | Sí | solicitud_cancelada |
 | `createClass` | Cuenta con correo verificado | AuditLog, TrainingClass | CLASS: CREATED | — | clase_publicada |
 | `createMyTrainer` | Cuenta con correo verificado | AuditLog, Gym, Trainer, TrainingClass, User | TRAINER: CREATED | — | — |
-| `requestClass` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, Notification, RateHit | CLASS: REQUESTED | Sí | clase_solicitada |
+| `requestClass` | Cuenta con correo verificado | AppError, AuditLog, ClassRequest, EmailOutbox, Notification, RateHit | CLASS: REQUESTED | Sí | clase_solicitada |
 | `toggleClass` | Cuenta con correo verificado | TrainingClass | — | — | — |
 
 ### `trajectory`
@@ -323,6 +323,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | NewsSource | `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource` |
 | NewsItem | `news.refreshNewsNow`, `news.toggleNewsItem` |
 | EventAttendance | `events.setAttendance` |
+| EmailOutbox | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `community.avisarSinCuenta`, `gyms.decideGymClaim`, `gyms.transferGym`, `moderation.resolveReport`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -367,6 +368,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `apariencia.ts` | `COLOR_DISCIPLINA`, `conAlfa`, `iniciales`, `nombreDePila`, `tinteDe` |
 | `audit.ts` | `audit` |
+| `cola-correo.ts` | `CorreoNuevo`, `LIMITE_DIARIO_POR_DEFECTO`, `MAX_INTENTOS`, `Prioridad`, `RESERVA_CUENTA`, `cabeHoy`, `encolarYEnviar`, `enviarDeLaCola`, `esperaTras`, `estadoDeLaCola`, `limiteDiario`, `procesarCola` |
 | `competition.ts` | `COMPETITION_DIVISIONS`, `CompetitionDivision`, `divisionAgeEligible`, `divisionById`, `divisionEligible`, `divisionLabel`, `divisionsFor`, `knownBoxingAgeEligible` |
 | `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayAndMonth`, `dayKey`, `daysUntil`, `esDiaReal`, `eventDayReached`, `haceTiempo`, `madridDayStart`, `monthlySeries`, `parseBirthDate`, `parseDay`, `todayMadrid`, `whenLabel` |
 | `db.ts` | `db` |
@@ -379,6 +381,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `gym-osm.ts` | `gymNameKey`, `osmAreaProvince`, `osmGymCandidate`, `osmProvince` |
 | `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `osmMayUpdate` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `fmtFechaHoraMadrid`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
+| `mail-transporte.ts` | `entregarCorreo`, `hayTransporte`, `logMode` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `PESOS_VALORACION`, `Punto`, `distanciaKm`, `enlaceComoLlegar`, `mejoresDeLaZona`, `puntoDeGimnasio`, `textoDistancia`, `valoracionGimnasio` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
