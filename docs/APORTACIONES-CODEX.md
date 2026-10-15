@@ -344,3 +344,13 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 14 de octubre: el fundador concretó la búsqueda local de rivales; reproducción E2E primero, ciudad/gimnasio por opciones compatibles y nombre opcional para reto oficial y sparring, versión 0.11.2. Detalle en el traspaso 2026-10-14-codex-ci48-51.md; sin fusión ni despliegue.
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
+
+## 15 de octubre de 2026 — T-002: cinco actualizaciones en un PR (Codex)
+
+**Encargo:** agrupar Dependabot #17 (Vitest 5.0.3), #18 (Sharp 0.35.5), #19 (Next 15.5.27), #65 (MapLibre 6.14.0) y #66 (tipos de Node 26.6.5), después de T-013. Reserva publicada `codex/t-002-dependabot-agrupado-20261015`, base 8c789bc. Se actualiza la ficha histórica T-002 para reflejar la autorización de actualizar dependencias.
+
+**Cambios:** cinco declaraciones y una resolución conjunta de `package-lock.json`; MapLibre sigue fijado. No se adoptan Next 16, Prisma 7 ni TypeScript 7. Archivo compartido delicado: `package.json`. Versión 0.16.2, reservada para integrar después de T-013 (0.16.1); se usó el script de versiones, sin alterar a mano el campo. No se publican versiones intermedias. No hay cambios de aplicación ni de paneles ni se cierran PR ajenos. Tras integrar, el fundador puede cerrar #17/#18/#19/#65/#66 por sustitución; #20 no forma parte de este encargo.
+
+**Incidencia de preparación:** una resolución inicial por rangos eligió Next 15.5.28 y Vitest 5.0.4. Se rehace con las versiones explícitas de los PR para que esta entrega corresponda al encargo, manteniendo los rangos originales y MapLibre fijado.
+
+**Validación parcial:** instalación reproducible con las cinco versiones exactas; 21 migraciones y paridad del esquema; tipos; 754 unitarias con `npm test -- --maxWorkers=1`; catálogo, mapa y 15 documentales correctas. Las dos pasadas simultáneas con navegador (trabajadores automáticos y dos trabajadores) terminaron con 752 correctas y dos tiempos de espera de 5 segundos en contraseñas. La pasada aislada no cambia límites, pruebas ni parámetros de seguridad. Chromium y Node 24 locales (el CI usa Node 22). Compilación y navegador pendientes de cierre. Sin integración ni despliegue. El segundo PR que se integre debe comprobar de nuevo su número frente a la demo.

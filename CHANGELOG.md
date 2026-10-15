@@ -11,6 +11,11 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.16.2] — 2026-10-15
+
+### Cambiado
+- Se agrupan las actualizaciones de Dependabot #17, #18, #19, #65 y #66: Vitest 5.0.3, Sharp 0.35.5, Next 15.5.27, MapLibre 6.14.0 y tipos de Node 26.6.5, con una única resolución de dependencias.
+
 ## [0.16.0] — 2026-10-15
 
 PR de Claude: lo que faltaba programar de los textos legales (petición del fundador, 15-10-2026: «procede con todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano»).

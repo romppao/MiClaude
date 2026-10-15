@@ -469,3 +469,8 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | Para bloquear «desde un comentario» parecía necesario poner el id del usuario en la página | Se pensaba en la acción («bloquear a X») en lugar de en lo que la persona ve | El formulario manda lo que se está viendo (comentario, vídeo, propuesta) y el servidor deduce la cuenta, comprobando que quien bloquea puede verlo. Así no se publican identificadores de usuario |
 | La prueba de navegador no podía marcar la casilla de la declaración | Las casillas `chip` están tapadas por su texto; Playwright no puede pulsar la casilla directamente | En las pruebas se pulsa la etiqueta, como una persona. No usar `force` para saltarse lo que vería un usuario |
 | No se pudo comprobar la demo publicada desde la nube | El proxy de esta sesión rechaza `onrender.com` | Si no se puede comprobar algo, se dice en el diario y al fundador, y se deja el comprobante para quien pueda (el portátil) en lugar de darlo por hecho |
+
+## 15-10-2026 — Versiones exactas de los PR de Dependabot (Codex, T-002)
+Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir una versión posterior a la solicitada. Resolver las cinco versiones explícitas y comprobar las instaladas, conservando el pin de MapLibre; las actualizaciones transitivas se revisan juntas.
+
+La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.

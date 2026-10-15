@@ -8,7 +8,7 @@
 
 ## 1. Dónde estamos
 
-- **Demo** (rama `claude/ring-espana-mvp`, https://ring-espana-demo.onrender.com/): versión **0.15.x** (mira el script). Es solo para pruebas y no sale en los buscadores. Trae el mapa de gimnasios, el control de versiones, las veladas pasadas con autorización de moderación, el récord amateur oculto, la regla de las 24 horas, la búsqueda de sparring por ciudad y gimnasio, entrar con Google (el botón solo sale cuando hay claves en Render) y los arreglos de los paneles del bloque E.
+- **Demo** (rama `claude/ring-espana-mvp`, https://ring-espana-demo.onrender.com/): versión **0.16.0** (mira el script). Es solo para pruebas y no sale en los buscadores. Trae el mapa de gimnasios, el control de versiones, las veladas pasadas con autorización de moderación, el récord amateur oculto, la regla de las 24 horas, la búsqueda de sparring por ciudad y gimnasio, entrar con Google (el botón solo sale cuando hay claves en Render) y los arreglos de los paneles del bloque E.
 - **Calendario** ([`LANZAMIENTO.md`](LANZAMIENTO.md)): aplicación lista el **1 de noviembre**, lanzamiento público el **15 de noviembre**.
 - **Repositorio:** sigue **público**. El fundador debe pasarlo a privado (Settings → Change visibility); ningún asistente puede hacerlo.
 - **Versiones:** cada PR sube la versión y apunta su cambio ([`VERSIONES.md`](VERSIONES.md)). Con varios PR abiertos a la vez, el que se fusiona después renumera.
@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **Lo legal que faltaba programar**: bloquear usuarios, aviso sin cuenta (`/avisar`) y correos con la decisión de moderación. Antes: separar la demo (0.15.1, fusionado) | `claude-nube/legal-en-la-app-bloquear-usuarios-avisos-20261015`, versión 0.16.0 | PR abierto |
 | Claude Code (portátil) | **Arreglos de T-016** (bloqueantes de las 5 partes) y, después, **relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI) | `claude/arreglos-t016`, versión 0.15.0 | en curso |
-| Codex | **Parado** por créditos (15-10-2026): todo lo suyo pasa a Claude. Ramas F (#56), G (#62), D (#64), H (local, sin subir); T-016 (#60); RFC-001 (#61) | varias | parado |
+| Codex | **T-002: Dependabot agrupado** (#17/#18/#19/#65/#66), después de T-013 en su rama propia. **F/G/D/H no se tocan** (#56/#62/#64/#71) hasta que Claude Code decida entre F/G y lo indique aquí (#69/#70). | `codex/t-002-dependabot-agrupado-20261015`, versión 0.16.2 (después de T-013, 0.16.1) | en validación |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
@@ -34,6 +34,8 @@
 5. **Decisiones:** menores (T-014: abrir solo a mayores de 18 o hacer la política), abogado para condiciones de uso y privacidad, y los gastos que falten por aprobar ([`LANZAMIENTO.md`](LANZAMIENTO.md), sección 2).
 
 ## 4. Lo que el fundador ha dicho (para no repetírselo)
+
+- **Nuevo encargo a Codex (15 oct):** «No toques los paneles F, G, D ni H (#56, #62, #64, #71)». Claude Code ha integrado F/G en #69/#70 y decide qué versión se queda; no se actualizan hasta que lo diga esta página. Codex toma T-013 desde la demo tras fusionar #73 y después agrupa Dependabot #17/#18/#19/#65/#66 en un PR con pruebas, versión y registros.
 
 - **Codex sin créditos (14 oct):** «hazlo tú, todo lo que haya que hacer, hazlo tú». Si Claude también se queda sin créditos, deja una ficha o un texto completo para que Codex lo haga cuando se le regeneren (ejemplo: [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md)). Todo se escribe en el repositorio, nunca solo en el chat.
 - **Orden de trabajo:** primero validar, corregir y publicar lo anterior; solo entonces empezar lo nuevo.

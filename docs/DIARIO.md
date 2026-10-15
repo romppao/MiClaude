@@ -2089,3 +2089,13 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - La primera prueba de navegador no marcaba la declaración: la casilla está oculta bajo su etiqueta (estilo `chip`) y hay que pulsar el texto, como haría una persona. Además, `RecordarCampos` no devuelve las casillas tras un error, a propósito: la declaración se confirma en cada envío.
 
 **Estado:** PR abierto. **Siguiente:** T-013 (aviso al salir a enlaces externos) y lo que diga el fundador sobre su cambio de visión.
+
+## 15 de octubre de 2026 — T-002: cinco actualizaciones en un PR (Codex)
+
+**Encargo:** agrupar Dependabot #17 (Vitest 5.0.3), #18 (Sharp 0.35.5), #19 (Next 15.5.27), #65 (MapLibre 6.14.0) y #66 (tipos de Node 26.6.5), después de T-013. Reserva publicada `codex/t-002-dependabot-agrupado-20261015`, base 8c789bc. Se actualiza la ficha histórica T-002 para reflejar la autorización de actualizar dependencias.
+
+**Cambios:** cinco declaraciones y una resolución conjunta de `package-lock.json`; MapLibre sigue fijado. No se adoptan Next 16, Prisma 7 ni TypeScript 7. Archivo compartido delicado: `package.json`. Versión 0.16.2, reservada para integrar después de T-013 (0.16.1); se usó el script de versiones, sin alterar a mano el campo. No se publican versiones intermedias. No hay cambios de aplicación ni de paneles ni se cierran PR ajenos. Tras integrar, el fundador puede cerrar #17/#18/#19/#65/#66 por sustitución; #20 no forma parte de este encargo.
+
+**Incidencia de preparación:** una resolución inicial por rangos eligió Next 15.5.28 y Vitest 5.0.4. Se rehace con las versiones explícitas de los PR para que esta entrega corresponda al encargo, manteniendo los rangos originales y MapLibre fijado.
+
+**Validación parcial:** instalación reproducible exacta, migraciones/paridad, tipos, 754 unitarias aisladas con un trabajador, catálogo, mapa y 15 documentales correctas. Dos pasadas simultáneas con navegador agotaron 5 segundos en dos pruebas de contraseñas (752 correctas); no se han cambiado límites ni pruebas. Compilación y navegador pendientes. Node 24 local; el CI usa Node 22. Sin integración ni despliegue. El segundo PR que se integre debe comprobar de nuevo su número frente a la demo.
