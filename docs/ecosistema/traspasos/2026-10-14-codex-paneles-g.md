@@ -12,3 +12,5 @@ Validación local: versión 0.13.3 > F 0.13.2, esquema Prisma válido, guion E2E
 CI 38617712681: migración y paridad, tipos, unitarias y build aprobados; E2E G pasa asistencia, calendario, provincia y disponibilidad. Falla agenda porque newUser no crea TRAINER: ese ayudante solo distingue FAN/FIGHTER. Se prepara explícitamente el papel TRAINER y se conserva la comprobación de orden. Se añaden provincia, asistencia y disponibilidad a descarga privada y privacidad. No se declara CI verde.
 
 CI 38620489850: los flujos G ya pasan; movil detecta enlaces de actividad local/calendario por debajo de 44 px y texto meta a 14 px. Se corrigen con botones secundarios existentes y texto a 16 px, sin cambiar las pruebas. Preparación y enlaces de agenda reciben el mismo ajuste.
+
+CI 38622823168: móvil ya pasa; calendario.mjs encuentra dos enlaces con el prefijo Buscar clases (objetivo de portada y enlace local). El enlace secundario local se llama ahora Ver clases en la provincia, manteniendo el acceso principal y su prueba sin cambios.

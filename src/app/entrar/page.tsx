@@ -36,7 +36,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       {googleDisponible() && <>
         <p className="separador-o" aria-hidden="true">o</p>
         <BotonGoogle modo="entrar" next={next} />
-        <p className="hint mut" style={{ margin: 0 }}>Si aún no tienes cuenta, se creará con tu correo de Google, ya confirmado.</p>
+        <p className="hint mut" style={{ margin: 0 }}>Si aún no tienes cuenta, se creará con tu correo de Google, ya confirmado, y aceptas las <Link href="/condiciones">condiciones de uso</Link> y la <Link href="/privacidad">política de privacidad</Link>.</p>
       </>}
       <div className="tarjeta" style={{ alignItems: "flex-start" }}>
         <h2 style={{ fontSize: 20 }}>¿Todavía no tienes cuenta?</h2>

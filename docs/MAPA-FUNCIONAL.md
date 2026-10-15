@@ -13,6 +13,7 @@
 | `/api/auth/google/callback` | (respuesta técnica, sin pantalla) | Pública | — | User |
 | `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/api/fallos` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/aviso-legal` | Aviso legal | Pública | — | — |
 | `/ayuda` | ¿Cómo funciona Lona? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
 | `/bienvenida` | Tu deporte. | Pública (cambia lo que ve según la cuenta) | — | — |
@@ -20,6 +21,8 @@
 | `/clases` | Buscar clases | Pública (cambia lo que ve según la cuenta) | — | TrainingClass |
 | `/clases/:id/solicitar` | Solicitar esta clase | Pública (cambia lo que ve según la cuenta) | `trainers.requestClass` | ClassRequest, TrainingClass |
 | `/compartir` | Subir vídeos o fotos de una velada | Cuenta con sesión iniciada | `media.shareMedia` | Event |
+| `/condiciones` | Condiciones de uso | Pública | — | — |
+| `/cookies` | Cookies | Pública | — | — |
 | `/disciplinas/:slug` | (ficha individual: el título depende del elemento) | Pública | — | — |
 | `/entrar` | Entrar en tu cuenta | Pública | `accounts.login` | — |
 | `/entrar/segundo-paso` | Protege la cuenta del creador | Pública (cambia lo que ve según la cuenta) | `accounts.logout`, `creador.activarSegundoPaso`, `creador.comprobarSegundoPaso` | — |
@@ -373,6 +376,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
+| `titular.ts` | `LEGAL_ACTUALIZADO`, `Titular`, `faltanDatosTitular`, `titular` |
 | `url.ts` | `safeHttpUrl`, `safeHttpsUrl` |
 | `version.ts` | `VERSION`, `commitDesplegado` |
 

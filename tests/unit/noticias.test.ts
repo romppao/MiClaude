@@ -88,8 +88,10 @@ describe("cada noticia, solo en su disciplina (petición del fundador)", () => {
   it("un titular que mezcla disciplinas no va a ninguna: solo a la portada común", () => {
     expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("Noche de boxeo y MMA en Valencia"))).toEqual([]);
   });
-  it("de una búsqueda, un titular que no nombra la disciplina no se asigna", () => {
-    expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio de los Deportes"))).toEqual([]);
+  it("de una búsqueda, un titular que no nombra ninguna disciplina se descarta (colaba fútbol, camiones o fundas de móvil)", () => {
+    expect(clasificar({ ...busqueda, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio de los Deportes"))).toBeNull();
+    for (const t of ["Funda De Gel Personalizada Para Xiaomi Redmi 7, Envío Desde España", "El iJAC 9.0 llega a España con hasta cinco toneladas de carga útil", "HLs: FC Augsburg vs. Bayern Munich (En Español)", "Vela: el equipo gaditano Taboga afronta en Calpe el Campeonato de España de Crucero"])
+      expect(clasificar({ ...busqueda, disciplines: ["MMA"] }, n(t)), t).toBeNull();
   });
   it("de un medio dedicado a una disciplina, se asigna aunque el titular no la nombre, salvo que el resumen hable de otra", () => {
     expect(clasificar({ ...medioDeBoxeo, disciplines: ["BOXEO"] }, n("Gran noche en el Palacio de los Deportes"))).toEqual(["BOXEO"]);

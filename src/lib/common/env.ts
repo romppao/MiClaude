@@ -1,3 +1,5 @@
+import { faltanDatosTitular, titular } from "./titular";
+
 /**
  * Comprobación del entorno al arrancar el servidor en producción: si falta algo imprescindible, el servidor
  * no arranca (mejor un fallo claro al desplegar que enlaces rotos o correos que no salen semanas después).
@@ -22,5 +24,7 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): { errors: str
   if (!env.CREADOR_CORREO?.trim()) warnings.push("No hay cuenta del creador (CREADOR_CORREO): nadie puede gestionar cuentas ni moderadores desde la aplicación (ver docs/CREADOR.md).");
   if (r2.length === 0 && !env.MEDIA_DIR && env.DEMO_MODE !== "si") warnings.push("No hay almacén de vídeos (R2_*): los vídeos solo se podrán compartir con un enlace (ver docs/VIDEOS.md).");
   if (!env.CONTACT_EMAIL) warnings.push("Falta CONTACT_EMAIL: la página de privacidad no indica ningún contacto para ejercer los derechos sobre los datos (y RESPONSABLE_NOMBRE, el responsable del tratamiento).");
+  const faltan = faltanDatosTitular(titular(env));
+  if (faltan.length && env.DEMO_MODE !== "si") warnings.push(`El aviso legal está incompleto (art. 10 LSSI): faltan ${faltan.join(", ")} (ver docs/LEGAL.md).`);
   return { errors, warnings };
 }

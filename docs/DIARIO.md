@@ -1983,3 +1983,43 @@ Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy
 ## 2026-10-14 — Gimnasios reales, bloque D
 Modelo aditivo de procedencia, contacto profesional, disciplinas, propiedad revisada, publicación y ficción. Directorio/mapa/fichas/búsqueda excluyen Cataluña con una sola constante; las altas excluidas permanecen por revisar. Reclamación, conflicto, edición, cesión, miembros y aviso de corrección quedan auditados. El titular natural del gimnasio es la fuente de permisos; se preservan los titulares anteriores del perfil visual mediante migración. El importador reutilizable hace recuento por defecto, consulta áreas OSM para provincia ausente, conserva caché y protege gimnasios corregidos/reclamados. Una carga real requiere plan comparado con esa base, hash presentado e IMPORTAR_EN_REAL=si. Nunca usa seed o crea campañas.
 Validación local: 785 unitarias y tipos; esquema y migración generada con diff sobre G. Fixture sintético del importador: Madrid 1, Valencia 1, cuatro provincias excluidas descartadas; NO es un inventario real. Consulta real de Overpass falla por EACCES de red: no hay recuento real ni carga en demo/producción. Navegador, migración vacía/paridad y revisión pendientes de CI/Claude.
+
+## 2026-10-15 — Textos legales para el lanzamiento (Claude)
+
+**Qué se pidió:**
+- El fundador recordó que faltaban las condiciones de uso y que la privacidad estaba «un poco dudosa».
+- También que faltaba «un bloque de responsabilidad jurídica».
+- Pidió investigar, hacer todo lo que no necesite abogado y listar lo que sí.
+
+**Qué se hizo:**
+- `/aviso-legal`, con el bloque de responsabilidad.
+- `/condiciones`, según el DSA.
+- `/cookies`, solo con las técnicas.
+- Privacidad completada según el art. 13 del RGPD.
+- Enlaces en el pie, el registro y Google.
+- Aviso al arrancar si faltan los datos del titular.
+- Detalle en `docs/LEGAL.md`.
+- Fuera del repositorio, la carpeta `MiProyectoAI/LEGAL-LONA/`, con:
+  - las tareas del fundador;
+  - las preguntas para el abogado;
+  - la investigación con fuentes;
+  - el registro de actividades de tratamiento;
+  - los protocolos de derechos, brechas y avisos.
+
+**Hallazgos para programar:**
+- bloquear usuarios (Apple 1.2);
+- avisos automáticos a denunciantes y afectados (DSA, arts. 16.5 y 17);
+- aviso sin cuenta;
+- T-013 y T-014.
+
+**Comprobaciones:**
+- `tsc`;
+- `vitest` (740 de 740);
+- `npm run build`, con las páginas nuevas compiladas;
+- catálogo y mapa.
+
+**Estado:** PR abierto. Los textos son borradores pendientes del abogado.
+
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.

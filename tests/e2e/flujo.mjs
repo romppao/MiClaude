@@ -299,7 +299,7 @@ let mailed = false;
 for (let i = 0; i < 20 && !mailed; i++) { mailed = readFileSync(MAIL_LOG, "utf8").includes(`to=${fanAcc.email} subject="Pepe Uno${rnd} tiene un nuevo combate"`); if (!mailed) await new Promise((r) => setTimeout(r, 250)); }
 check("el seguidor recibe un aviso por correo del nuevo combate", mailed);
 await fan.goto(B + "/siguiendo");
-check("el calendario marca como «no oficial» la velada que indicó un peleador y lo explica", await (async () => { await fan.goto(B + `/veladas?past=todas&q=${encodeURIComponent(`Velada Nuria ${rnd}`)}`); const t = await fan.locator("main").innerText(); return t.includes("no oficial") && t.includes("la indicó un peleador"); })());
+check("el calendario marca como «no oficial» la velada que indicó un peleador y lo explica", await (async () => { await fan.goto(B + `/veladas?past=todas&q=${encodeURIComponent(`Velada Nuria ${rnd}`)}`); const t = await fan.locator("main").innerText(); return t.includes("No oficial") && t.includes("la indicó un peleador"); })());
 await fan.goto(B + "/siguiendo");
 check("«Peleadores que sigo» muestra el próximo combate", await fan.locator("body").innerText().then((t) => t.includes(`Velada Futura ${rnd}`)));
 

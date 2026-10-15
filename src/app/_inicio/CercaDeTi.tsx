@@ -18,6 +18,6 @@ export default async function CercaDeTi({ province, semana = false }: { province
     <h3>Clases para solicitar{semana ? " esta semana" : ""}</h3>
     <p className="meta" style={{ fontSize: 16 }}>Acuerda el día y la hora con el entrenador al solicitar la clase.</p>
     {clases.map((c) => <Link className="fila" key={c.id} href={`/clases/${c.id}/solicitar`}>{c.title} · {c.trainer.name}</Link>)}
-    <Link className="btn secondary" href={`/clases?provincia=${encodeURIComponent(province)}`}>Buscar clases en {province}</Link>
+    <Link className="btn secondary" href={`/clases?provincia=${encodeURIComponent(province)}`}>Ver clases en {province}</Link>
   </section>;
 }
