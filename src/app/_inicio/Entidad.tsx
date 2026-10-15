@@ -39,6 +39,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc-text)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
+      <Link className="btn secondary" href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo o gestiona el tuyo</Link>
       <TeToca pendientes={[
         { texto: "Resultados por poner", href: "/organizador#mis-eventos", cantidad: porResultado.total },
         { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },

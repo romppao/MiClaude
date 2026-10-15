@@ -34,6 +34,8 @@ export default function Privacy() {
         <li><strong>Datos técnicos mínimos:</strong> una cookie necesaria para mantener tu sesión iniciada (detalle en <Link href="/cookies">Cookies</Link>) y, durante 2 días como máximo, tu dirección de conexión, solo para frenar intentos repetidos de acceso. No usamos cookies de publicidad ni de medición.</li>
       </ul>
 
+      <h2>Gimnasios y datos profesionales</h2>
+      <p>El directorio publica datos profesionales del negocio aportados por su responsable, por moderación o procedentes de OpenStreetMap. Los datos importados conservan su origen y la atribución ODbL. No se publican automáticamente contactos que parezcan personales. Puedes pedir corrección o retirada desde la ficha o escribiendo al contacto de esta página. La prueba para reclamar un gimnasio solo la ven quien la aporta y moderación: no pedimos DNI. Se vacía al decidir y las solicitudes decididas se conservan como máximo 90 días. Los gimnasios ficticios se identifican en la demo y no se publican en la versión real.</p>
       <h2>Provincia, asistencia y disponibilidad</h2>
       <p>La provincia de tu cuenta es opcional y sirve para mostrar actividad cerca de ti. Las veladas que marcas con «Voy a ir» aparecen en tu agenda; el público solo ve cuántas personas han marcado su asistencia, nunca sus nombres. Puedes quitar la marca. Si activas «Disponible para pelear», tu disponibilidad y el peso que quieras declarar se muestran durante 60 días y puedes retirarlos cuando quieras. Todo ello figura en tu descarga de datos; la asistencia se borra con tu cuenta.</p>
       <h2>Para qué los usamos</h2>

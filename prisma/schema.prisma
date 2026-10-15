@@ -88,10 +88,43 @@ enum EventStatus {
   REJECTED
 }
 
+enum GymSource {
+  OSM
+  MANUAL
+  FEDERACION
+  PROPIETARIO
+}
+enum GymStatus {
+  PUBLISHED
+  PENDING
+  REMOVED
+}
+enum GymClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CONFLICT
+}
+
 model Gym {
   id           String    @id @default(cuid())
   slug         String    @unique
   name         String
+  phone        String?
+  email        String?
+  instagram    String?
+  disciplines  Discipline[] @default([])
+  source       GymSource @default(MANUAL)
+  sourceRef    String? @unique
+  sourceLicense String?
+  importedAt   DateTime?
+  ownerUserId  String?
+  owner        User? @relation("GymOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  claimedAt    DateTime?
+  status       GymStatus @default(PUBLISHED)
+  reviewNote   String?
+  isFictional  Boolean @default(false)
+  claims       GymClaimRequest[]
   city         String
   province     String
   address      String?
@@ -109,6 +142,26 @@ model Gym {
   geocodedAt   DateTime?
 
   @@index([province])
+  @@index([status])
+  @@index([ownerUserId])
+}
+
+model GymClaimRequest {
+  id String @id @default(cuid())
+  gymId String
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation("GymClaimApplicant", fields: [userId], references: [id], onDelete: Cascade)
+  evidence String
+  evidenceUrl String?
+  status GymClaimStatus @default(PENDING)
+  note String?
+  createdAt DateTime @default(now())
+  reviewedAt DateTime?
+  reviewedById String?
+  reviewedBy User? @relation("GymClaimReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  @@index([status, createdAt])
+  @@index([gymId, userId])
 }
 
 model Trainer {
@@ -433,6 +486,9 @@ model Bout {
 }
 
 model User {
+  ownedGyms Gym[] @relation("GymOwner")
+  gymClaims GymClaimRequest[] @relation("GymClaimApplicant")
+  reviewedGymClaims GymClaimRequest[] @relation("GymClaimReviewer")
   province String?
   attendances EventAttendance[]
   id                    String                 @id @default(cuid())

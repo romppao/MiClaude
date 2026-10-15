@@ -488,5 +488,8 @@ La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba un
 
 14 oct, G: caducidad en filtros y vistas además de limpieza; DATE se interpreta como día elegido, semana según Madrid. Una oferta de clase sin fecha nunca se anuncia como reserva confirmada.
 
+14 oct, D: un recuento de fixtures comprueba reglas y nunca sustituye el inventario real; el plan de carga debe quedar ligado al destino y conservar la protección dentro de la transacción. La propiedad natural y la visual deben sincronizarse al ceder.
+
+
 ## 2026-10-15 — Conflictos y finales de línea (Codex)
 Una expresión regular de resolución con DOTALL consumió contenido posterior al marcador y el primer reintento no contempló CRLF. Recuperar siempre desde los padres originales, normalizar finales de línea, acotar cada marcador a su línea y validar los documentos antes de confirmar. No encadenar una confirmación tras un script fallido.

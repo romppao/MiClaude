@@ -7,6 +7,7 @@ import { provinciaConGimnasios } from "../../lib/common/territorio";
 import { after } from "next/server";
 import { todayMadrid } from "../../lib/common/dates";
 import { Prisma } from "@prisma/client";
+import { excludedGymProvince } from "../../lib/common/gym-policy";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { audit } from "../../lib/common/audit";

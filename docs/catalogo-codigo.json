@@ -170,6 +170,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "prisma/migrations/20261014210000_gimnasios_reales/migration.sql",
+    "purpose": "Migración aditiva D: contacto, procedencia, estado y propietario de gimnasio; reclamaciones revisadas; preserva propiedad visual y marca solo los tres seed conocidos.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "prisma/migrations/20261015090000_bloqueos_y_avisos_sin_cuenta/migration.sql",
     "purpose": "Crea la tabla Block y permite avisos sin cuenta en Report (userId opcional, nombre y correo de quien avisa).",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -253,6 +258,11 @@
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/importar-gimnasios-osm.mjs",
+    "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "scripts/version.mjs",
@@ -378,6 +388,11 @@
     "path": "src/app/actions/fighters.ts",
     "purpose": "Crea/corrige ficha propia y disciplinas, solicita reclamación, regula récord público y gestiona highlights (vídeo subido comprobado en el almacén o enlace); borra el archivo al retirar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/gyms.ts",
+    "purpose": "Acciones verificadas de alta, reclamación, revisión, cesión y miembros del gimnasio; propiedad comprobada dentro de transacciones bloqueadas y auditoría.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/app/actions/media.ts",
@@ -558,6 +573,11 @@
     "path": "src/app/components/FlashNotice.tsx",
     "purpose": "Traduce mensajes de URL, anuncia resultado accesible y ofrece retorno a sección/cola tras acción.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/FormularioGimnasio.tsx",
+    "purpose": "Formulario de contacto profesional y disciplinas compartido; recibe la acción desde la página y no publica altas por sí solo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/app/components/Foto.tsx",
@@ -910,6 +930,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/mis-gimnasios/page.tsx",
+    "purpose": "Área privada de búsqueda, reclamación y gestión del gimnasio propio, con edición, miembros, retirada y cesión de propiedad.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "src/app/mis-inscripciones/page.tsx",
     "purpose": "Pantalla del peleador con sus solicitudes para participar en veladas e interclubs y la respuesta de cada organizador.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -933,6 +958,11 @@
     "path": "src/app/moderacion/fallos/page.tsx",
     "purpose": "Lista de fallos de la aplicación con recuentos por estado, filtros por estado y origen, y paginación; solo moderación.",
     "guide": "docs/MODERACION.md"
+  },
+  {
+    "path": "src/app/moderacion/gimnasios/page.tsx",
+    "purpose": "Colas paginadas de altas/importaciones dudosas y reclamaciones de propiedad; las pruebas privadas solo llegan a moderación.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/app/moderacion/historial/page.tsx",
@@ -1293,6 +1323,21 @@
     "path": "src/lib/common/geo.ts",
     "purpose": "Coordenadas de los gimnasios con Nominatim (OpenStreetMap): una consulta por segundo, en segundo plano, desactivable con GEOCODIFICAR=no; nunca lanza.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/gym-directory.ts",
+    "purpose": "Filtro común de gimnasios publicados, territorio permitido y exclusión del seed en producción.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-osm.ts",
+    "purpose": "Transformación pura de OSM: provincia, disciplina, descartes y contactos dudosos sin publicar; sin base ni llamadas de red.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-policy.ts",
+    "purpose": "Política territorial aprobada del gimnasio, publicación, distancia para duplicados y protección frente a reimportación; compartida con script.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/lib/common/labels.ts",
@@ -1710,6 +1755,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/gimnasios-reales.mjs",
+    "purpose": "Flujo D con datos sintéticos: reclamación pendiente, aprobación, edición profesional y exclusión de alta manual en directorio/mapa/ficha.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "tests/e2e/google-falso.mjs",
     "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1908,6 +1958,11 @@
     "path": "tests/unit/fotos.test.ts",
     "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/gimnasios-reales.test.ts",
+    "purpose": "Pruebas de exclusión territorial con provincia y áreas de coordenadas, ficción, contactos, duplicados y protección del propietario.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "tests/unit/google.test.ts",

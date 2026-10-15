@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { ubicarGimnasio } from "../../lib/common/geo";
+import { excludedGymProvince } from "../../lib/common/gym-policy";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { profileKind, profileAccess } from "../../lib/profiles/profiles";
@@ -73,6 +74,7 @@ export async function saveProfile(f: FormData) {
         await tx.trainer.update({ where: { id }, data: { gymId } });
         await audit({ userId: user.id, entity: "TRAINER", entityId: id, action: "PROFILE_UPDATED", before: { gymId: trainer.gymId }, after: { gymId } }, tx);
       }
+      if (kind === "gimnasio") await tx.gym.update({ where: { id }, data: { source: user.role === "ADMIN" ? "MANUAL" : "PROPIETARIO", ...(user.role === "ADMIN" && f.has("ownerEmail") ? { ownerUserId: ownerId ?? null, claimedAt: ownerId ? new Date() : null } : {}) } });
       if (direccionCambiada) await tx.gym.update({ where: { id }, data: { address, lat: null, lng: null, geoSource: null, geocodedAt: null } });
       await tx.profile.upsert({ where: { kind_entityId: { kind, entityId: id } }, create: { kind, entityId: id, ...data }, update: data });
       await audit({ userId: user.id, entity: "PROFILE", entityId: id, action: "PROFILE_UPDATED", after: { kind, imagesUpdated: avatar !== undefined || banner !== undefined } }, tx);

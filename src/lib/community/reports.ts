@@ -12,7 +12,7 @@ export const REPORT_REASONS: Record<string, string> = {
   OTRO: "Otro motivo",
 };
 
-export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA", "PAGINA"] as const;
+export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA", "PAGINA", "GYM"] as const;
 export type ReportEntity = (typeof REPORT_ENTITIES)[number];
 
 /** Motivos que se ofrecen según lo que se avisa. */
@@ -23,6 +23,7 @@ export const REASONS_BY_ENTITY: Record<ReportEntity, string[]> = {
   MEDIA: ["MI_IMAGEN", "INAPROPIADO", "OTRO"],
   // Aviso desde /avisar, con o sin cuenta (DSA, art. 16): sobre cualquier página de Lona.
   PAGINA: ["ILEGAL", "DATOS_PERSONALES", "MI_IMAGEN", "SUPLANTACION", "INAPROPIADO", "MENORES", "OTRO"],
+  GYM: ["DATOS_PERSONALES", "OTRO"],
 };
 
 export const MAX_REPORTS_PER_DAY = 10;

@@ -1,3 +1,4 @@
+import { gymIsPublic } from "../../../lib/common/gym-policy";
 import { graduationLabel } from "../../../lib/fighters/graduation";
 import { cache } from "react";
 import type { Metadata } from "next";
@@ -192,7 +193,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
             : <BotonBloquear accion={bloquearUsuario} origen="peleador" id={fighter.id} back={back} nombre={nombre} />}
         </div>
       )}
-      {publica && fighter.gym && <Link href={`/gimnasios/${fighter.gym.slug}`} className="btn secondary" style={{ marginTop: 10 }}><Icono nombre="gimnasio" tam={18} grosor={1.9} />{fighter.gym.name}</Link>}
+      {publica && fighter.gym && gymIsPublic(fighter.gym) && <Link href={`/gimnasios/${fighter.gym.slug}`} className="btn secondary" style={{ marginTop: 10 }}><Icono nombre="gimnasio" tam={18} grosor={1.9} />{fighter.gym.name}</Link>}
 
       <div className="rejilla-3" style={{ marginTop: 16 }}>
         <div className="dato"><span className="clave">{ocultoP ? "Combates" : "Récord"}</span><span className="valor">{ocultoP ? totalP : `${recP.w}-${recP.l}-${recP.d}`}</span></div>
@@ -336,7 +337,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
                 ["Edad", age && `${age} años`], ["Altura", fighter.heightCm && `${fighter.heightCm} cm`], ["Envergadura", fighter.reachCm && `${fighter.reachCm} cm`],
                 ["Procedencia", [fighter.city, fighter.province].filter(Boolean).join(", ")],
               ].filter(([, v]) => v).map(([k, v]) => <div key={k as string}><dt>{k}</dt><dd>{v}</dd></div>)}
-              {fighter.gym && <div><dt>Gimnasio</dt><dd><Link href={`/gimnasios/${fighter.gym.slug}`}>{fighter.gym.name}</Link></dd></div>}
+              {fighter.gym && gymIsPublic(fighter.gym) && <div><dt>Gimnasio</dt><dd><Link href={`/gimnasios/${fighter.gym.slug}`}>{fighter.gym.name}</Link></dd></div>}
               {fighter.trainer && <div><dt>Entrenador</dt><dd><Link href={`/entrenadores/${fighter.trainer.slug}`}>{fighter.trainer.name}</Link></dd></div>}
             </dl>
             {fighter.bio && <p style={{ margin: 0 }}>{fighter.bio}</p>}

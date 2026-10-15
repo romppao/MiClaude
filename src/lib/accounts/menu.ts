@@ -61,6 +61,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
       ],
     });
   }
+  if (papel === "entrenador" || papel === "entidad") propias.push({ titulo: "Mis gimnasios", enlaces: [{ href: "/mis-gimnasios", texto: "Buscar, reclamar o gestionar mi gimnasio" }] });
   const cuenta: EnlaceMenu[] = [{ href: "/ayuda", texto: "¿Cómo funciona?" }];
   if (papel !== "visitante") {
     cuenta.push({ href: "/mi-cuenta", texto: "Mi cuenta" });

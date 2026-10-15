@@ -128,7 +128,7 @@ export async function setGymVerified(f: FormData) {
   const note = str(f, "note").slice(0, LIMITS.note) || null;
   if (verify && !note) go(back, { problema: "sello_sin_nota" }); // el sello siempre lleva la evidencia que lo justifica
   await db.$transaction([
-    db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null } }),
+    db.gym.update({ where: { id: gym.id }, data: { verifiedAt: verify ? new Date() : null, verifiedNote: verify ? note : null, source: "MANUAL" } }),
     audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } }, db),
   ]);
   revalidatePath("/", "layout");
@@ -162,6 +162,10 @@ export async function resolveReport(f: FormData) {
         retirados = await anonymizeFighter(tx, report.entityId);
       }
       else if (report.entity === "AURA") await tx.aura.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
+      else if (report.entity === "GYM") {
+        await tx.gym.updateMany({ where: { id: report.entityId }, data: { status: "REMOVED" } });
+        await audit({ userId: admin.id, entity: "GYM", entityId: report.entityId, action: "GYM_REMOVED_BY_REPORT", after: { reportId: report.id } }, tx);
+      }
       else if (report.entity === "MEDIA") await tx.mediaItem.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
     }
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);

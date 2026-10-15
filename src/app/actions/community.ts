@@ -30,6 +30,7 @@ export async function createReport(f: FormData) {
   const exists =
     entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } })
     : entity === "FIGHTER" ? await db.fighter.findUnique({ where: { id: entityId } })
+    : entity === "GYM" ? await db.gym.findUnique({ where: { id: entityId } })
     : entity === "MEDIA" ? await db.mediaItem.findFirst({ where: { id: entityId, hiddenAt: null } })
     : await db.aura.findFirst({ where: { id: entityId, hiddenAt: null } });
   if (!exists) go(back, { problema: "reporte_datos" });

@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+PR de Claude (nube): el bloque D de Codex (#64, directorio y reclamación de gimnasios), integrado sobre la 0.17.0 con las correcciones de su revisión.
+
+### Añadido
+- Directorio de gimnasios con procedencia OSM, contactos profesionales y disciplinas, revisión de altas, reclamación, gestión y cesión de propiedad.
+- Importador manual con recuento previo, protección de datos corregidos, duplicados por revisar y guardas de carga oficial.
+- Exclusión de Cataluña en directorio y mapa; atribución ODbL y distinción del seed ficticio.
+
 ## [0.17.0] — 2026-10-15
 
 PR de Claude (nube): los paneles F y G que preparó Codex (#56, #62), en la versión que integró Claude Code (#69, #70), actualizados sobre la 0.16.1. Sustituye a los cuatro PR.

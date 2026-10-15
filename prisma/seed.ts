@@ -37,7 +37,7 @@ async function main() {
       ["Gimnasio Demo Norte", "Bilbao", "Bizkaia"],
       ["Club Demo Vallecas", "Madrid", "Madrid"],
       ["Boxing Demo Sevilla", "Sevilla", "Sevilla"],
-    ].map(([name, city, province]) => db.gym.create({ data: { name, city, province, slug: slugify(name) } })),
+    ].map(([name, city, province]) => db.gym.create({ data: { name, city, province, slug: slugify(name), isFictional: true } })),
   );
   const trainers = await Promise.all(
     ["Entrenador Demo Uno", "Entrenador Demo Dos", "Entrenador Demo Tres"].map((name, i) =>
