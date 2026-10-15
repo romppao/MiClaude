@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 /**
  * Avisos de fallos a Sentry (T-010; ADR-003: plan gratuito, región de la UE). Sin SDK ni dependencias: se envía el «sobre» (envelope) por
  * HTTP, el formato estándar de Sentry. Así se puede cambiar de servicio sin tocar el resto (petición del fundador: fácil de modificar).
@@ -7,7 +5,7 @@ import { randomUUID } from "node:crypto";
  * Solo llega a Sentry lo que ya se guarda en «Fallos» (fallos.ts): el mensaje con los datos personales tachados, el origen, la ruta y la
  * versión. Nunca el usuario, su correo, su IP ni el cuerpo de la petición. Se avisa solo la primera vez que aparece un fallo y cuando vuelve
  * tras darse por resuelto, para no gastar el cupo gratuito con repeticiones (el recuento sigue en «Fallos»).
- * Sin SENTRY_DSN no se envía nada.
+ * Sin SENTRY_DSN no se envía nada. Usa `globalThis.crypto` (no `node:crypto`): fallos.ts también se carga fuera de Node (middleware).
  */
 export type Dsn = { endpoint: string; clave: string; dsn: string };
 
@@ -27,7 +25,7 @@ export function leerDsn(dsn: string | undefined): Dsn | null {
 export type FalloParaSentry = { mensaje: string; origen: string; ruta: string | null; huella: string; version: string; pila?: string | null };
 
 /** Construye el sobre (tres líneas JSON: cabecera, cabecera del elemento y evento). Pura, para poder probarla. */
-export function sobre(f: FalloParaSentry, d: Dsn, ahora = new Date(), id = randomUUID().replace(/-/g, "")): string {
+export function sobre(f: FalloParaSentry, d: Dsn, ahora = new Date(), id = globalThis.crypto.randomUUID().replace(/-/g, "")): string {
   const evento = {
     event_id: id,
     timestamp: ahora.toISOString(),
