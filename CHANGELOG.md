@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.9] — 2026-10-15
+
+PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.
+
+### Cambiado
+- Moderación reúne sus colas en una bandeja por urgencia, mantiene las páginas y los avisos sin cuenta/PAGINA/GYM. «Poner en revisión» envía `dispute`; se conservan notas y avisos al abrir enlaces.
+
 ## [0.18.8] — 2026-10-15
 
 PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).

@@ -132,7 +132,7 @@ await medio.getByRole("button", { name: /Enviar aviso/ }).click();
 check("se puede avisar de una foto en la que apareces", await seen(avisoBueno(fan.p, "Hemos recibido tu aviso")));
 const mod = await newUser("Modmedia"); hacerAdmin(mod.email);
 await mod.p.goto(B + "/moderacion");
-await mod.p.locator("tr", { hasText: "Cara a cara" }).getByRole("button", { name: "Resolver y retirar la foto" }).click();
+await mod.p.locator("tr, article[data-cola]", { hasText: "Cara a cara" }).getByRole("button", { name: "Resolver y retirar la foto" }).click();
 await avisoBueno(mod.p, "contenido ocultado").waitFor();
 await visita.goto(`${B}/veladas/${slugVelada}`);
 check("moderación la retira y deja de verse", !(await visita.locator("#multimedia img[alt^='Cara a cara']").count()) && await seen(visita.locator("#multimedia video")));
