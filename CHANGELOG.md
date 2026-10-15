@@ -28,6 +28,7 @@ PR de Claude Code: revisión de la lista de gimnasios reales (petición del fund
 
 ### Corregido
 - **Mapa:** si la dirección de un gimnasio no se encuentra tal cual, se prueban formas más sencillas (sin nave, local, paréntesis ni artículos) antes de ponerlo en el centro de su ciudad (`variantesDireccion`). De 13 direcciones que fallaban se recuperan 10. «ubicar» reintenta los que tenían dirección y quedaron en la ciudad.
+- Opción «lista-actualizar» del botón de la demo: pone la dirección y la ciudad corregidas de la lista en los gimnasios ya cargados desde ella que nadie ha reclamado (la carga normal nunca toca los existentes).
 - Dirección de 16 gimnasios publicados de Madrid, sacada de su web o de su bio de Instagram. Morales Box Alcalá estaba en Alcalá de Henares por error: es la calle de Alcalá, 507 (Madrid).
 
 ## [0.18.7] — 2026-10-15

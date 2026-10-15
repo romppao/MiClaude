@@ -13,11 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       accion:
-        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento o lista-cargar. Gimnasios ficticios: ficticios-recuento o ficticios-retirar. Mapa: ubicar"
+        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento, lista-cargar o lista-actualizar (direcciones). Gimnasios ficticios: ficticios-recuento o ficticios-retirar. Mapa: ubicar"
         required: true
         default: recuento
         type: choice
-        options: [recuento, cargar, lista-recuento, lista-cargar, ficticios-recuento, ficticios-retirar, ubicar]
+        options: [recuento, cargar, lista-recuento, lista-cargar, lista-actualizar, ficticios-recuento, ficticios-retirar, ubicar]
 
 permissions:
   contents: read
@@ -50,7 +50,7 @@ jobs:
       - name: Lista investigada (recuento o carga)
         if: startsWith(inputs.accion, 'lista-')
         run: |
-          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || '' }} | tee lista.txt
+          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || inputs.accion == 'lista-actualizar' && '--actualizar' || '' }} | tee lista.txt
           { echo "## Lista investigada: ${{ inputs.accion }}"; echo '```'; cat lista.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Gimnasios ficticios (recuento o retirada)
         if: startsWith(inputs.accion, 'ficticios-')
