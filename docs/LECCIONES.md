@@ -523,3 +523,5 @@ Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir u
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
 
 - 15-10-2026: si un destinatario puede registrarse después de recibir una invitación, no basta comprobar bloqueos al enviarla: deben comprobarse otra vez con la cuenta verificada al aceptar. La respuesta del remitente no revela la existencia de esa cuenta.
+
+- 15-10-2026: la comprobación automática de mensajes detectó un código de error colocado por error entre los avisos de éxito; se mueve a PROBLEMAS y se vuelve a ejecutar la prueba.
