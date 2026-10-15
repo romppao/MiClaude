@@ -87,6 +87,7 @@ export default function Privacy() {
         <li>Enlaces enviados por correo: caducan a la hora (recuperar contraseña) o a las 48 horas (confirmar correo).</li>
         <li>Solicitudes para reclamar una ficha: el texto con el que demuestras quién eres se borra en cuanto un moderador decide, y la solicitud a los 90 días.</li>
         <li>Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.</li>
+        <li>Correos que te enviamos: se guardan hasta entregarlos, para reintentarlo si falla el envío; una vez enviados se borra su contenido y a los 30 días, el registro.</li>
         <li>Avisos de la campanita: 12 meses desde su creación. Después dejan de mostrarse y se eliminan en la limpieza periódica; al eliminar tu cuenta también se borran.</li>
       </ul>
 

@@ -17,7 +17,7 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **D y H de Codex corregidos** (gimnasios reales, campanita de avisos, vídeos del público como highlights). Fusionados hoy: 0.15.1, 0.16.0, 0.16.1 (fotos) y 0.17.0 (paneles F y G) | `claude-nube/avisos-y-paneles-h`, versión 0.18.0 | PR abierto |
+| Claude (nube, el chat del móvil) | **T-008: cola de correos** con reintentos y límite diario. Fusionados hoy: 0.15.1 a 0.18.0 (demo separada, bloqueos y avisos, fotos fuera de la base, paneles F y G, gimnasios reales y campanita de avisos) | `claude-nube/t-008-cola-de-correos-con-limite-diario-20261015`, versión 0.18.1 | PR abierto |
 | Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
 | Codex | Lo pendiente está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`: rehacer la lista única de moderación, vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y RFC-002. Sus PR #56, #62, #64 y #71 están sustituidos | parte de `claude/ring-espana-mvp` | pendiente |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |

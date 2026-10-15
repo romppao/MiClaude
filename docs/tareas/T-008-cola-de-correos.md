@@ -1,6 +1,6 @@
 # T-008 — Cola de correos (outbox)
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** lista (cola y reintentos) / envío real **propuesto en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Resend gratis + dominio propio** (sin dominio no hay correos reales; el código de envío ya existe) · **Sugerida a:** Codex · **Depende de:** —
+**Fase:** F2 · **Estado:** **hecha por Claude en la 0.18.1 (15-10-2026)**: `src/lib/common/cola-correo.ts`, con límite diario y prioridad para los correos de la cuenta; sin ruta propia, la cola se procesa al enviar cada correo, en la limpieza periódica y en la tarea de noticias (sin gastar otra tarea programada) · antes: lista (cola y reintentos) / envío real **propuesto en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Resend gratis + dominio propio** (sin dominio no hay correos reales; el código de envío ya existe) · **Sugerida a:** Codex · **Depende de:** —
 
 ## Objetivo
 Que enviar un correo nunca ralentice ni haga fallar una petición, y que un fallo del proveedor no pierda avisos: los correos se guardan en una cola y un proceso aparte los envía con reintentos.
