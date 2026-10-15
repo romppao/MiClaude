@@ -8,6 +8,7 @@ import { plural } from "../../lib/common/text";
 import VerificationTag from "../components/VerificationTag";
 import { toggleFollow } from "../actions/community";
 import { filtrosSiguiendo } from "../../lib/community/siguiendo";
+import { recordHidden } from "../../lib/fighters/privacy";
 
 export const metadata = { title: "Peleadores que sigo" };
 export const dynamic = "force-dynamic";
@@ -29,6 +30,10 @@ export default async function Following() {
   // «Próximos» y «celebrados» usan la misma definición de «ya celebrada» que el resto de la aplicación (día de Madrid).
   const upcoming = proximos.filter((b) => !eventDayReached(b.event.date) || !b.result);
   const recent = celebrados.filter((b) => eventDayReached(b.event.date)).slice(0, 10);
+  // Igual que en la ficha de la velada: un resultado amateur no revela el récord que alguno de los dos mantiene privado (T-016, C3-01).
+  const resultadoOculto = (b: (typeof celebrados)[number]) =>
+    recordHidden(b.event.level, b.fighterA.recordPublic, false) ||
+    recordHidden(b.event.level, b.fighterB.recordPublic, false);
   const fights = (b: (typeof proximos)[number]) => `${publicFighterName(b.fighterA)} contra ${publicFighterName(b.fighterB)}`;
 
   return (
@@ -71,7 +76,7 @@ export default async function Following() {
                   <tr key={b.id}>
                     <td>{b.event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</td>
                     <td>{fights(b)}</td>
-                    <td>{b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${publicFighterName(b.result === "A_WIN" ? b.fighterA : b.fighterB)}`}{b.method && b.result !== "DRAW" && b.result !== "NO_CONTEST" ? ` (${METHOD_LABEL[b.method]})` : ""}</td>
+                    <td>{resultadoOculto(b) ? <span className="mut">Récord amateur privado</span> : b.result === "DRAW" ? "Empate" : b.result === "NO_CONTEST" ? "Sin decisión" : `Gana ${publicFighterName(b.result === "A_WIN" ? b.fighterA : b.fighterB)}`}{!resultadoOculto(b) && b.method && b.result !== "DRAW" && b.result !== "NO_CONTEST" ? ` (${METHOD_LABEL[b.method]})` : ""}</td>
                     <td><VerificationTag bout={b} verification={b.verification} now={ahora} recordCreatedAt={b.createdAt} /></td>
                   </tr>
                 ))}

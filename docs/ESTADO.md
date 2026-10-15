@@ -18,8 +18,8 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
-| Claude Code (portátil) | **Revisión T-016 hecha**: partes 1 y 2, y comprobación de las partes 3-5 de Codex. Siguiente: PR de arreglos (bloqueantes de las 5 partes). Montar la oficial sigue en pausa hasta que el fundador dé por buena la app | `claude/revision-t016-seguridad`, versión 0.14.1 | revisión hecha |
-| Codex | Revisión T-016, partes 3-5 (**entregada** en `codex/revision-t016`); paneles F y G (`codex/paneles-f-pulido`, #56, y `codex/paneles-g-madrid`); propuesta de estrategia RFC-001 (`codex/estrategia-lona-20261014`) | varias | en curso |
+| Claude Code (portátil) | **Arreglos de T-016** (bloqueantes de las 5 partes) y, después, **relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI) | `claude/arreglos-t016`, versión 0.15.0 | en curso |
+| Codex | **Parado** por créditos (15-10-2026): todo lo suyo pasa a Claude. Ramas F (#56), G (#62), D (#64), H (local, sin subir); T-016 (#60); RFC-001 (#61) | varias | parado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

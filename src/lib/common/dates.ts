@@ -17,6 +17,16 @@ export const eventDayReached = (eventDate: Date, now: Date = new Date()): boolea
 export const MIN_EVENT_DAY = "1980-01-01";
 
 /** Interpreta un día AAAA-MM-DD escrito por el usuario: debe existir de verdad, no ser anterior a 1980 ni estar a más de un año vista. */
+/**
+ * ¿Es «AAAA-MM-DD» un día que existe? `Date.parse` acepta el 31 de noviembre y lo convierte en el 1 de diciembre, así que se comprueba
+ * que la fecha interpretada sea la misma que se escribió (T-016, C4-03).
+ */
+export function esDiaReal(raw: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return false;
+  const t = Date.parse(`${raw}T00:00:00Z`);
+  return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === raw;
+}
+
 export function parseDay(raw: string, now: Date = new Date()): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || raw < MIN_EVENT_DAY) return null;
   const d = new Date(`${raw}T12:00:00Z`);

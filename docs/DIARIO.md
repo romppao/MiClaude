@@ -2028,3 +2028,29 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Uso de modelos de Codex:** el fundador observó que Codex gasta mucho. Se añadió a `AGENTS.md` una regla de uso proporcional de modelos. Cambiar la configuración de Codex (`~/.codex/config.toml`: esfuerzo «high» fijo) lo bloqueó el sistema de permisos, así que lo cambia el fundador en el selector.
 
 **Estado:** PR abierto.
+
+## 15-10-2026 (madrugada). Claude Code: arreglos de la revisión T-016 (0.15.0)
+
+**Bloqueantes corregidos:** C3-01, C3-02, C4-01, C5-01, C5-02 y C5-04.
+
+**Importantes corregidos:** borrar la cuenta tras entrar con Google, límite de 5 fotos al día, C4-03 y C5-03.
+
+**Menores:** `MAIL_TRANSPORT=log` en producción y los restos de «Ring España».
+
+**Decisiones de diseño:**
+- **Veladas pasadas:** para saber si una velada «pidió autorización» se lee el historial (`AuditLog`) en lugar de añadir una columna, para no tocar la estructura de la base.
+- **Cataluña:** lista central en `src/lib/common/territorio.ts`. Los peleadores y entrenadores de esas provincias pueden usar Lona, pero sin gimnasio vinculado.
+- **Borrar con Google:** confirmar con una sesión de menos de 15 minutos. El inicio de la sesión se deduce de su caducidad (30 días).
+
+**Pendiente:**
+- C4-04 (más de 50 solicitudes de clase): no es urgente al lanzar;
+- política de menores (T-014): decisión del fundador;
+- ajustes de móvil: encargados a Antigravity;
+- la cadena de Codex (F → G → D → H), que pasa a Claude por el relevo `2026-10-15-codex-relevo-a-claude.md`.
+
+**Comprobado:**
+- `tsc` sin errores;
+- `vitest`: 744 de 746. Las 2 que fallan son de `password.test.ts` y fallan por tiempo (5 s) en este PC también sin los cambios;
+- catálogo con 391 archivos.
+
+**Estado:** PR abierto.

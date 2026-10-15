@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-const CLAVE = "ringespana:formulario-enviado";
+const CLAVE = "lona:formulario-enviado";
 /** `firma` identifica el formulario por los nombres de sus campos (no por su posición, que cambia si la pantalla cambia) y `orden` distingue a los que comparten firma. */
 type Guardado = { ruta: string; firma: string; orden: number; valores: Record<string, string> };
 type Campo = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;

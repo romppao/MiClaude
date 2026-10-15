@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { normalizeName } from "./names";
+import { PROVINCIAS_SIN_GIMNASIOS } from "./territorio";
 
 /**
  * Búsqueda por texto sin distinguir mayúsculas ni tildes, donde cada palabra escrita debe aparecer en alguno de los campos
@@ -16,7 +17,7 @@ export const ACCENT_TO = ACCENT_PAIRS.map(([letters, plain]) => plain.repeat([..
 const SOURCES = {
   fighter: { table: "Fighter", fields: ["firstName", "lastName", "alias"], where: Prisma.sql`"listed" = true AND "hiddenAt" IS NULL`, order: `"lastName", "firstName"` },
   fighterUnclaimed: { table: "Fighter", fields: ["firstName", "lastName", "alias"], where: Prisma.sql`"userId" IS NULL AND "hiddenAt" IS NULL`, order: `"lastName", "firstName"` },
-  gym: { table: "Gym", fields: ["name", "city"], where: Prisma.sql`true`, order: `"name"` },
+  gym: { table: "Gym", fields: ["name", "city"], where: Prisma.sql`"province" NOT IN (${Prisma.join([...PROVINCIAS_SIN_GIMNASIOS])})`, order: `"name"` },
   trainer: { table: "Trainer", fields: ["name"], where: Prisma.sql`true`, order: `"name"` },
   event: { table: "Event", fields: ["name", "city", "venue"], where: Prisma.sql`"status" NOT IN ('CANCELLED', 'PENDING_AUTHORIZATION', 'REJECTED')`, order: `"date" DESC` },
 } as const;
