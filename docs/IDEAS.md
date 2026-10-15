@@ -413,3 +413,6 @@ Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; 
 
 ## 2026-10-15 — Paneles H preparados para revisión (Codex)
 Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.
+- 15-10-2026, Codex, encargo del fundador T-013: aviso de otra pestaña en reglamentos y moderación, salida visible en vídeos externos y comprobación general en la auditoría. Implementado; validación en curso. Paneles F/G/D/H reservados a la decisión de Claude Code.
+
+- 15-10-2026, Codex al ejecutar T-013 en local: quedan por revisar autoenlaces en el estado sin resultados de veladas pasadas, el atajo de ciudad de propuestas y los filtros de estado de fallos. Diez hallazgos al recorrer 414 pantallas por cinco papeles; no son defectos de aviso externo. Pendiente de una tarea propia; no se modifican esas pantallas en T-013.

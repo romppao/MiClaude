@@ -499,3 +499,13 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
+
+## 15-10-2026 — Auditar enlaces con contenido real (Codex, T-013)
+La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en moderación. Una cola vacía y un selector sin división no muestran esos enlaces: la auditoría debe preparar los datos y seleccionar la división antes de comprobar el aviso de otra pestaña. El script de versión exige escribir primero el contenido de «Sin publicar».
+
+## 15-10-2026 — Preparación de T-013 en navegador (Codex)
+El primer guion buscaba un papel ARIA «tab» donde la aplicación usa enlaces de sección; se corrigió usando `pestanaDeMiFicha`. La reproducción siguiente agotó el tiempo del registro al compilar una ruta en desarrollo. Además, la ficha tiene tres selectores de división: se acotó al formulario «Registrar este combate». Ninguno de esos intentos demuestra la regresión: se repite contra `next build` y `next start`, manteniendo las comprobaciones.
+
+La búsqueda en TSX no incluye enlaces creados por librerías: la autoría del mapa también abre pestañas. Auditar después de que cargue y normalizar los enlaces cuando la librería renueve su contenido; no borrar ni ocultar las atribuciones.
+
+La desconexión del entorno ocurrió con cambios todavía sin commit. Se recuperaron completos y se subieron a sus ramas antes de continuar: guardar avances revisables antes de baterías largas, indicando expresamente qué pruebas siguen pendientes.
