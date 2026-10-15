@@ -11,6 +11,8 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.16.0] — 2026-10-15
+
 PR de Claude con el bloque F de los paneles que preparó Codex (#56), integrado sobre 0.15.0.
 
 ### Mejorado
