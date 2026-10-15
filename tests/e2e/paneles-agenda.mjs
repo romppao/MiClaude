@@ -1,0 +1,68 @@
+// Flujos G con datos propios en la base vacía de CI; nunca se ejecuta contra la base real.
+import { PrismaClient } from "@prisma/client";
+import { B, rnd, browser, newUser, seen, check, terminarDiagnosticos } from "./ayudas.mjs";
+const db = new PrismaClient();
+const fan = await newUser("AgendaFan");
+const user = await db.user.findUniqueOrThrow({ where: { email: fan.email } });
+const event = await db.event.create({ data: { name: `Agenda ${rnd}`, slug: `agenda-${rnd}`, date: new Date(Date.now() + 3 * 864e5), discipline: "BOXEO", level: "AMATEUR", venue: "Sala", city: "Madrid", province: "Madrid" } });
+const hidden = await db.event.create({ data: { name: `No pública ${rnd}`, slug: `agenda-oculta-${rnd}`, date: event.date, discipline: "BOXEO", level: "AMATEUR", venue: "Sala", city: "Madrid", province: "Madrid", status: "PENDING_AUTHORIZATION" } });
+await fan.p.goto(B + `/veladas/${event.slug}`);
+await fan.p.getByRole("button", { name: "Voy a ir", exact: true }).click();
+await fan.p.getByRole("button", { name: "Ya no voy a ir", exact: true }).waitFor();
+check("la asistencia pertenece a la cuenta que la marca", await db.eventAttendance.count({ where: { userId: user.id, eventId: event.id } }) === 1);
+await fan.p.goto(B + "/mi-panel");
+check("la velada marcada aparece en Mi agenda", await seen(fan.p.getByRole("region", { name: "Mi agenda", exact: true }).getByText(event.name, { exact: false })));
+await fan.p.goto(B + `/veladas/${event.slug}`);
+const ics = await fan.p.request.get(B + `/veladas/${event.slug}/calendario`);
+check("el calendario es público y no contiene datos de asistentes", ics.status() === 200 && (await ics.text()).includes("BEGIN:VCALENDAR") && !(await ics.text()).includes(fan.email));
+check("una velada pendiente no permite descargar calendario", (await fan.p.request.get(B + `/veladas/${hidden.slug}/calendario`)).status() === 404);
+await fan.p.getByRole("button", { name: "Ya no voy a ir", exact: true }).click();
+await fan.p.getByRole("button", { name: "Voy a ir", exact: true }).waitFor();
+check("se puede quitar la asistencia", await db.eventAttendance.count({ where: { userId: user.id, eventId: event.id } }) === 0);
+await db.user.update({ where: { id: user.id }, data: { province: "Madrid" } });
+await fan.p.goto(B + "/mi-panel");
+check("buscar clases usa la provincia elegida", await fan.p.locator('a.accion-principal[href="/clases?provincia=Madrid"]').count() === 1);
+await fan.p.goto(B + "/?provincia=Valencia");
+check("la portada permite cambiar provincia", await seen(fan.p.getByRole("heading", { name: "Esta semana en Valencia", exact: true })));
+// Disponibilidad voluntaria y peso: el mismo titular activa, caduca y retira el dato.
+await db.user.update({ where: { id: user.id }, data: { role: "FIGHTER" } });
+const fighter = await db.fighter.create({ data: { userId: user.id, firstName: "Disponible", lastName: `Agenda${rnd}`, slug: `disponible-agenda-${rnd}`, disciplines: { create: { discipline: "BOXEO", level: "AMATEUR" } } } });
+await fan.p.goto(B + "/mi-ficha");
+await fan.p.locator('#disponibilidad label.chip').click();
+check("el titular activa voluntariamente la disponibilidad", await fan.p.locator('#disponibilidad input[name=available]').isChecked());
+await fan.p.locator('#disponibilidad input[name=weight]').fill("70.25");
+await fan.p.getByRole("button", { name: "Guardar disponibilidad", exact: true }).click();
+await fan.p.locator('.notice-ok').waitFor();
+await fan.p.goto(B + `/peleadores?q=Agenda${rnd}&disponibles=1`);
+check("el filtro incluye disponibilidad vigente y peso declarado", await seen(fan.p.locator('main a.card', { hasText: `Agenda${rnd}` }).getByText("Disponible para pelear · 70.25 kg", { exact: true })));
+await db.fighter.update({ where: { id: fighter.id }, data: { availableSince: new Date(Date.now() - 61 * 864e5) } });
+await fan.p.reload();
+check("la disponibilidad caducada desaparece del filtro", await fan.p.locator('main a.card', { hasText: `Agenda${rnd}` }).count() === 0);
+await fan.p.goto(B + "/mi-ficha");
+check("el titular recibe aviso de caducidad", await seen(fan.p.getByText("Tu disponibilidad ha caducado después de 60 días. Puedes renovarla.", { exact: true })));
+await fan.p.getByRole("button", { name: "Guardar disponibilidad", exact: true }).click();
+await fan.p.locator('.notice-ok').waitFor();
+check("desactivar elimina el peso", (await db.fighter.findUniqueOrThrow({ where: { id: fighter.id } })).currentWeightKg === null);
+const coach = await newUser("AgendaCoach", "TRAINER");
+const coachUser = await db.user.findUniqueOrThrow({ where: { email: coach.email } });
+// newUser solo diferencia FAN y FIGHTER; el perfil por sí solo no cambia el tipo de cuenta.
+await db.user.update({ where: { id: coachUser.id }, data: { role: "TRAINER" } });
+const trainer = await db.trainer.create({ data: { userId: coachUser.id, name: `CoachAgenda ${rnd}`, slug: `coach-agenda-${rnd}`, disciplines: ["BOXEO"], province: "Madrid" } });
+const training = await db.trainingClass.create({ data: { trainerId: trainer.id, title: `ClaseAgenda ${rnd}`, kind: "INDIVIDUAL", minutes: 30, priceEuros: 20 } });
+const monday = new Date(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()) + "T00:00:00Z");
+monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
+for (const [day, fromMinute, preferred] of [[monday, 600, "Mañana"], [monday, 540, "Primera"], [null, null, "Antigua por acordar"]]) {
+  await db.classRequest.create({ data: { classId: training.id, userId: user.id, status: "ACCEPTED", day, fromMinute, toMinute: fromMinute === null ? null : fromMinute + 30, preferred } });
+}
+await coach.p.goto(B + "/mi-panel");
+const weekly = coach.p.getByRole("region", { name: "Esta semana", exact: true });
+const rows = await weekly.locator('.fila').allTextContents();
+if (rows.length !== 3) console.log("Diagnóstico de agenda:", rows);
+check("agenda ordenada por hora y solicitudes antiguas al final", rows.length === 3 && rows[0].includes("09:00–09:30") && rows[1].includes("10:00–10:30") && rows[2].includes("Antigua por acordar"));
+await db.event.update({ where: { id: event.id }, data: { organizerId: coachUser.id } });
+await coach.p.goto(B + `/organizador/${event.slug}`);
+const preparation = coach.p.getByRole("region", { name: "Preparación de la velada", exact: true });
+check("preparación enlaza los tres puntos pendientes y muestra solo cantidades", await preparation.getByRole("link", { name: "Completar", exact: true }).count() === 3 && await seen(preparation.getByText("0 van a ir · 0 seguidores de los peleadores del cartel", { exact: true })));
+await terminarDiagnosticos();
+await db.$disconnect();
+await browser.close();

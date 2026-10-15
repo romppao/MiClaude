@@ -11,6 +11,9 @@ import { safeHttpUrl } from "../../lib/common/url";
 import { audit } from "../../lib/common/audit";
 import { registrarFallo } from "../../lib/common/fallos";
 import { borrarFotos, guardarFoto, type FotoGuardada } from "../../lib/media/fotos";
+import { slugName } from "../../lib/common/labels";
+import { provinciaConGimnasios } from "../../lib/common/territorio";
+import { oneLine } from "../../lib/common/text";
 import { str, go, checkLengths } from "./shared";
 
 export async function saveProfile(f: FormData) {
@@ -20,7 +23,7 @@ export async function saveProfile(f: FormData) {
   const back = `/perfiles/${kind}/${id}/editar`;
   const { source, editable } = await profileAccess(kind, id, user);
   if (!source || !editable) go("/mi-cuenta", { problema: "sin_permiso" });
-  checkLengths(f, back, { bio: 2000, website: 500, city: 100, name: 150, ownerEmail: 200, address: 200 });
+  checkLengths(f, back, { bio: 2000, website: 500, city: 100, name: 150, ownerEmail: 200, address: 200, trainerGym: 120 });
   const website = str(f, "website") ? safeHttpUrl(str(f, "website")) : null;
   if (str(f, "website") && !website) go(back, { problema: "enlace_invalido" });
   const avatarX = imagePosition(str(f, "avatarX")), avatarY = imagePosition(str(f, "avatarY"));
@@ -60,6 +63,16 @@ export async function saveProfile(f: FormData) {
   const direccionCambiada = address !== undefined && (gymAntes?.address ?? null) !== address;
   try {
     await db.$transaction(async tx => {
+      // El mismo permiso de edición del perfil protege la vinculación del gimnasio del entrenador.
+      if (kind === "entrenador" && f.has("trainerGym")) {
+        const trainer = await tx.trainer.findUniqueOrThrow({ where: { id } });
+        const name = oneLine(str(f, "trainerGym"));
+        const city = trainer.city ?? trainer.province ?? "";
+        // En las provincias sin gimnasios en Lona (Cataluña) el entrenador se queda sin gimnasio vinculado (T-016, C5-02).
+        const gymId = name && provinciaConGimnasios(trainer.province) ? (await tx.gym.upsert({ where: { slug: slugName(name, city) }, create: { name, slug: slugName(name, city), city, province: trainer.province ?? "" }, update: {} })).id : null;
+        await tx.trainer.update({ where: { id }, data: { gymId } });
+        await audit({ userId: user.id, entity: "TRAINER", entityId: id, action: "PROFILE_UPDATED", before: { gymId: trainer.gymId }, after: { gymId } }, tx);
+      }
       if (direccionCambiada) await tx.gym.update({ where: { id }, data: { address, lat: null, lng: null, geoSource: null, geocodedAt: null } });
       await tx.profile.upsert({ where: { kind_entityId: { kind, entityId: id } }, create: { kind, entityId: id, ...data }, update: data });
       await audit({ userId: user.id, entity: "PROFILE", entityId: id, action: "PROFILE_UPDATED", after: { kind, imagesUpdated: avatar !== undefined || banner !== undefined } }, tx);

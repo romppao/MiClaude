@@ -9,8 +9,9 @@ export const dynamic = "force-dynamic";
  * Portada. Sin cuenta: la portada pública. Con cuenta: la misma portada para todas las personas, con la actualidad y sus disciplinas
  * (decisión del fundador, 8 de octubre de 2026). Lo propio de cada tipo de cuenta está en /mi-panel.
  */
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ provincia?: string }> }) {
   actualizarSiToca();
   const user = await getUser();
-  return user ? <InicioComun user={user} /> : <InicioVisitante />;
+  const { provincia } = await searchParams;
+  return user ? <InicioComun user={user} provincia={provincia} /> : <InicioVisitante provincia={provincia} />;
 }
