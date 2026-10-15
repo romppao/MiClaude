@@ -361,7 +361,7 @@ export default async function Moderation({
               ? "Combate en revisión"
               : "Combate por verificar"}
         </span>
-        <h3>{b.event.name}</h3>
+        <h3><Link className="btn secondary" href={`/veladas/${b.event.slug}`}>{b.event.name}</Link></h3>
         <p>
           {nombreCombate(b)} · {DISCIPLINE_LABEL[b.event.discipline]} ·{" "}
           {fmtDate(b.event.date)}
@@ -885,7 +885,7 @@ export default async function Moderation({
               )}
               <span className="pildora">Ficha reclamada</span>
               <h3>
-                {c.fighter.firstName} {c.fighter.lastName}
+                <Link className="btn secondary" href={`/peleadores/${c.fighter.slug}`}>{c.fighter.firstName} {c.fighter.lastName}</Link>
               </h3>
               <p>
                 {publicUserName(c.user.name)} · {c.user.email}
@@ -1011,6 +1011,7 @@ export default async function Moderation({
                 Corregir o revisar el gimnasio
               </Link>
               <p>{g.verifiedNote}</p>
+              {g.website && <a className="btn secondary" href={g.website} rel="noopener noreferrer nofollow">Sitio web de {g.name}</a>}
               <form action={setGymVerified}>
                 <input type="hidden" name="gymId" value={g.id} />
                 <input type="hidden" name="back" value={back("gimnasios")} />

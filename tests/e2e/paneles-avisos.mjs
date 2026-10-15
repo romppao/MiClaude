@@ -53,6 +53,7 @@ for (const ancla of ["avisos", "reclamaciones", "organizadores", "gimnasios", "s
   check(`el ancla antigua #${ancla} existe una sola vez`, await mod.p.locator(`[id="${ancla}"]`).count() === 1);
 }
 check("GYM conserva el enlace a su gestión", await mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso gimnasio ${rnd}` }).getByRole("link", { name: `Gimnasio: ${gym.name}` }).getAttribute("href") === `/mis-gimnasios?gimnasio=${gym.id}`);
+check("el combate conserva el acceso a su velada para comprobar los datos", await mod.p.locator('article[data-cola]', { has: mod.p.locator(`input[name=boutId][value="${bout.id}"]`) }).locator(`a[href="/veladas/${event.slug}"]`).count() === 1);
 const prioridades = await bandeja.locator(":scope > li").evaluateAll(items => items.map(i => Number(i.dataset.prioridad)));
 check("las prioridades no retroceden entre elementos", prioridades.every((p, i) => i === 0 || p >= prioridades[i - 1]));
 const avisoPagina = mod.p.locator('article[data-cola="avisos"]', { hasText: `Página anónima ${rnd}` });

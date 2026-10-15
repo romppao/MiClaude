@@ -418,3 +418,5 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Validación inicial (0.18.0):** tipos, 827 unitarias, 15 comprobaciones de documentación, compilación, catálogo y mapa aprobados. La prueba de bandeja y pulido pasan en navegador. Al publicar, la demo había avanzado a 0.18.6: se incorpora, se conservan los avisos de enlaces y se renumera a 0.18.7; validación de esa base en curso. No se modifican ramas sustituidas ni los PR #77/#78.
 
 **Revisión de #86:** el CI 38739924528 pasó tipos, unitarias, compilación, flujos y auditoría de enlaces, pero detectó el acceso de gimnasio con altura táctil insuficiente. Se corrige usando el botón de enlace compartido; nuevo CI pendiente. La ejecución local simultánea de flujo agotó 30 s al navegar a Mi ficha; no se alteran esperas ni afirmaciones.
+
+**Revisión de contratos de la bandeja:** se mantienen también los accesos a la velada del combate, la ficha reclamada y la web profesional del gimnasio, con zona táctil suficiente. El CI anterior ya había superado e2e y accesibilidad; esta conservación de accesos vuelve a validarse sobre el nuevo commit.
