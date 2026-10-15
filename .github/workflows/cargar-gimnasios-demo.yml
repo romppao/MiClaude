@@ -11,11 +11,11 @@ on:
   workflow_dispatch:
     inputs:
       accion:
-        description: "recuento (solo mirar) o cargar (escribir en la demo)"
+        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento o lista-cargar"
         required: true
         default: recuento
         type: choice
-        options: [recuento, cargar]
+        options: [recuento, cargar, lista-recuento, lista-cargar]
 
 permissions:
   contents: read
@@ -45,7 +45,13 @@ jobs:
           fi
       - run: npm ci
       - run: npx prisma generate
+      - name: Lista investigada (recuento o carga)
+        if: startsWith(inputs.accion, 'lista-')
+        run: |
+          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || '' }} | tee lista.txt
+          { echo "## Lista investigada: ${{ inputs.accion }}"; echo '```'; cat lista.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Descargar de OpenStreetMap y comparar con la demo
+        if: "!startsWith(inputs.accion, 'lista-')"
         run: |
           npm run gimnasios:osm -- --comparar-base --demo | tee recuento.json
           {

@@ -11,12 +11,41 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.18.3] — 2026-10-15
+## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).
 
 ### Cambiado
 - `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md`: qué se hizo hoy, qué queda a medias y cómo cerrarlo, cómo seguir con los gimnasios reales (información de menos de un año y todas las comunidades) y las reglas nuevas. `ESTADO.md` lo enlaza al principio.
+
+## [0.18.5] — 2026-10-15
+
+PR de Claude (nube): T-013 (#77) y T-002 (#78) de Codex, integrados sobre la 0.18.x.
+
+### Corregido
+- Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La autoría generada por el mapa también incorpora aviso y protección. La auditoría espera al mapa y comprueba el aviso y la protección de la pestaña de origen.
+
+### Cambiado
+- Los vídeos externos de la galería avisan visiblemente de la salida; condiciones y privacidad explican qué ocurre al abrir páginas ajenas.
+
+### Cambiado
+- Se agrupan las actualizaciones de Dependabot #17, #18, #19, #65 y #66: Vitest 5.0.3, Sharp 0.35.5, Next 15.5.27, MapLibre 6.14.0 y tipos de Node 26.6.5, con una única resolución de dependencias.
+
+## [0.18.4] — 2026-10-15
+
+PR de Claude: primera lista de gimnasios reales investigada a mano (petición del fundador, 15-10-2026: «los gimnasios de la vida real… solo gimnasios de deportes de contacto… todas las comunidades autónomas»).
+
+### Añadido
+- `docs/datos/gimnasios-investigados.json`: 191 clubes de boxeo, kickboxing, K-1, muay thai, MMA y jiu-jitsu con su fuente, en 24 provincias (108 en Madrid). Faltan Castilla-La Mancha, Extremadura, Canarias, Huesca y casi toda Castilla y León.
+- `scripts/importar-gimnasios-lista.ts` y las opciones «lista-recuento» y «lista-cargar» del botón «Cargar gimnasios reales en la demo». Solo se publica con confianza alta y fuente de menos de un año (`fechaFuente`, petición del fundador); el resto queda por revisar en moderación. El Club de Boxeo Ludus queda con boxeo y K-1, como confirmó el fundador. Nunca pisa un gimnasio existente ni carga Cataluña.
+
+## [0.18.3] — 2026-10-15
+
+PR de Claude: T-010, avisos de fallos (imprescindible n.º 7 del lanzamiento, en la parte de programación).
+
+### Añadido
+- **Avisos a Sentry** con `SENTRY_DSN`: cada fallo nuevo (y cada uno que reaparece tras darse por resuelto) llega a Sentry con el mismo texto que en «Fallos», con los datos personales ya tachados y sin usuario, correo ni IP. Si la base de datos no responde, también avisa. Sin dependencias nuevas: se usa el formato estándar de Sentry por HTTP.
+- `/salud` da la latencia de la base de datos y si los avisos de fallos están activados.
 
 ## [0.18.2] — 2026-10-15
 

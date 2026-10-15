@@ -27,6 +27,17 @@ export async function crearMapa(contenedor: HTMLElement, centro: { lat: number; 
     container: contenedor, style: ESTILO_MAPA, center: [centro.lng, centro.lat], zoom,
     attributionControl: { compact: true }, locale: TEXTOS_MAPA, dragRotate: false, pitchWithRotate: false,
   });
+  // MapLibre y el estilo crean enlaces de autoría fuera de React. Se conservan sus textos y destinos;
+  // al actualizar fuentes o estilo se repone el aviso accesible y la protección de la pestaña de origen (T-013).
+  const avisarEnlaces = () => {
+    for (const enlace of contenedor.querySelectorAll<HTMLAnchorElement>('.maplibregl-ctrl-attrib a[target="_blank"]')) {
+      const nombre = enlace.getAttribute("aria-label") || enlace.textContent?.trim() || "Autoría del mapa";
+      if (!/otra pestaña|otra página web/i.test(nombre)) enlace.setAttribute("aria-label", `${nombre} (se abre en otra pestaña)`);
+      enlace.rel = [...new Set([...enlace.rel.split(/\s+/).filter(Boolean), "noopener", "noreferrer"])].join(" ");
+    }
+  };
+  avisarEnlaces();
+  for (const evento of ["load", "styledata", "sourcedata", "terrain"] as const) m.on(evento, avisarEnlaces);
   m.addControl(new ml.NavigationControl({ showCompass: false }), "top-right");
   // «Acercar» y «Alejar» actúan sobre el mapa: se dice con aria-controls (lo usan los lectores de pantalla y tests/e2e/enlaces.mjs).
   if (!contenedor.id) contenedor.id = `mapa-${Math.random().toString(36).slice(2, 10)}`;

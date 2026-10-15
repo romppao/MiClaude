@@ -275,6 +275,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/importar-gimnasios-lista.ts",
+    "purpose": "Carga en la demo la lista de clubes investigada a mano (docs/datos/gimnasios-investigados.json): recuento por defecto, --aplicar solo con DEMO_MODE=si, sin pisar los existentes.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "scripts/importar-gimnasios-osm.mjs",
     "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -646,7 +651,7 @@
   },
   {
     "path": "src/app/components/Multimedia.tsx",
-    "purpose": "Galería de vídeos y fotos del público con descarga y formulario de aviso (recibe la acción por props); SELECT_MEDIO define qué se consulta.",
+    "purpose": "Galería de medios públicos con descargas, avisos y bloqueo; el vídeo externo anuncia visiblemente que se abre en otra página web.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -796,7 +801,7 @@
   },
   {
     "path": "src/app/components/mapa/base.ts",
-    "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor.",
+    "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor. Los enlaces de autoría generados por la librería anuncian otra pestaña y conservan rel seguro al renovarse.",
     "guide": "docs/DISENO.md"
   },
   {
@@ -1435,6 +1440,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/sentry.ts",
+    "purpose": "Envía a Sentry, sin SDK, los fallos nuevos ya registrados en «Fallos», sin datos personales; sin SENTRY_DSN no hace nada.",
+    "guide": "docs/MODERACION.md"
+  },
+  {
     "path": "src/lib/common/territorio.ts",
     "purpose": "Provincias cuyos gimnasios no salen en Lona (Cataluña, decisión del fundador del 14-10-2026) y el filtro común para listas, mapa, búsqueda, sitemap y altas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1766,7 +1776,7 @@
   },
   {
     "path": "tests/e2e/enlaces.mjs",
-    "purpose": "Audita enlaces/botones por papel y detecta destinos inservibles; considera controles de diálogo.",
+    "purpose": "Audita enlaces y botones por papel; exige aviso accesible y rel seguro al abrir pestañas, con división seleccionada y avisos de fotos, vídeos y páginas de #73.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -2010,6 +2020,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/gimnasios-lista.test.ts",
+    "purpose": "Validación de cada club de la lista investigada: fuente, provincia, disciplinas, Cataluña y enlaces.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/gimnasios-reales.test.ts",
     "purpose": "Pruebas de exclusión territorial con provincia y áreas de coordenadas, ficción, contactos, duplicados y protección del propietario.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -2172,6 +2187,11 @@
   {
     "path": "tests/unit/search.test.ts",
     "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/sentry.test.ts",
+    "purpose": "DSN de Sentry, contenido del aviso sin datos de usuario y envío que nunca lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
