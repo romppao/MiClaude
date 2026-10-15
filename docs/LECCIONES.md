@@ -500,3 +500,9 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 |---|---|---|
 | Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
 | Una batería de pruebas corrió contra el servidor de otra rama y falló entera | `kill` al PID de `npx next start` deja vivo al hijo `next-server`, que sigue ocupando el puerto | Arrancar con `node node_modules/next/dist/bin/next start` (un solo proceso) y guardar su PID; antes de cada batería, comprobar que el puerto está libre y que el aviso EADDRINUSE sale 0 (el guion ya lo imprime: si no es 0, parar) |
+
+## 15 de octubre de 2026 — Dominio (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Los pasos para separar lonaclub.es de la demo decían quitar primero el dominio en Render y después el DNS | Se escribieron pensando en el resultado, no en el estado intermedio | Al quitar algo de un dominio, primero el DNS y después el servicio: nunca dejar un registro apuntando a un servicio que ya no lo reclama. Todo cambio de dominio va en `docs/DOMINIO.md` con cómo deshacerlo |

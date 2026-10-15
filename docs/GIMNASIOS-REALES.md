@@ -8,6 +8,8 @@ La cuenta verificada busca y reclama desde `/mis-gimnasios`. Aporta texto y enla
 
 El importador `npm run gimnasios:osm` se ejecuta con `tsx` (con `node --experimental-strip-types` fallaba al importar `territorio` sin extensión). Por defecto solo consulta Overpass y guarda en `docs/logs/gimnasios-osm/` la fuente y un plan, sin tocar la base. `--entrada ruta.json` reutiliza una respuesta conservada. Las provincias ausentes se resuelven con áreas administrativas OSM que contienen el punto y caché local. No usa Nominatim para hacer geocodificación masiva. Un endpoint alternativo de Overpass puede indicarse con `OSM_OVERPASS_URL`; debe ser HTTPS.
 
+**En la demo, desde GitHub (0.18.2):** Actions → «Cargar gimnasios reales en la demo» → «Run workflow», primero con «recuento» (solo mira) y luego con «cargar». El resumen de la ejecución muestra el recuento por provincia. Necesita una sola vez el secreto `DEMO_DATABASE_URL` (Settings → Secrets and variables → Actions), con el mismo valor que `DATABASE_URL` en Render. Nunca toca la versión real.
+
 Preparación y carga, a realizar por el asistente en el entorno que corresponda:
 
 1. Generar el plan. Los contactos dudosos no se publican; los dudosos de disciplina/ciudad quedan por revisar.
