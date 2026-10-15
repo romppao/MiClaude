@@ -20,7 +20,7 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
-| Claude Code (portátil) | **Cerrando el relevo de Claude (nube):** #81 fusionado (0.18.3); #82 gimnasios investigados (0.18.4), #84 T-013 y T-002 de Codex (0.18.5) y #83 este relevo (0.18.6), por ese orden. Después, los gimnasios reales de todas las comunidades | `claude-nube/gimnasios-investigados`, `claude-nube/integrar-t013-t002`, `claude-nube/relevo-a-claude-code` | en curso |
+| Claude Code (portátil) | Relevo de Claude (nube) cerrado: #82, #84 y #83 fusionados (0.18.4–0.18.6); #77, #78 y los de Dependabot, sustituidos. **Siguiente:** revisar los 190 gimnasios sin fecha y completar las comunidades que faltan (ver «Gimnasios reales») | — | siguiente |
 | Codex | Relevo D/H: bandeja #86, miembros #88, cesión #89 y altas #90 en validación. T-009 amplía los recorridos de todos los tipos de cuenta. | `codex/t-009-escenarios-de-todos-los-tipos-de-c-20261015` | en pruebas y revisión visual |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
@@ -56,7 +56,8 @@
 ## 5. Siguiente, por orden
 
 0. **Gimnasios reales (petición del fundador, 15-10):**
-   - **Fundador:** poner el secreto `DEMO_DATABASE_URL` y pulsar el botón «Cargar gimnasios reales en la demo» (primero OpenStreetMap; después «lista-cargar»).
+   - **Hecho (15-10):** secreto `DEMO_DATABASE_URL` puesto. Recuento de la lista en la demo: 191 se crearían, **solo 1 publicado** (Ludus) y 190 por revisar, porque no tienen `fechaFuente`. **No cargar todavía:** primero revisar las fechas, para no llenar moderación con 190 fichas.
+   - **OpenStreetMap:** el recuento falló por tiempo de espera de Overpass (servidor saturado) y la acción salió en verde igualmente; repetir más tarde y revisar que la acción falle cuando falla el script.
    - **Claude Code (portátil, con internet completo):** ampliar `docs/datos/gimnasios-investigados.json` con Castilla-La Mancha, Extremadura, Canarias, Huesca y Castilla y León, y con más clubes del resto. Solo de deportes de contacto, cada uno con su fuente **de menos de un año** (`fechaFuente`: «información actualizada… de no más de un año», fundador 15-10) y comprobando las disciplinas de hoy; sin copiar de Google Maps. Revisar también las 190 entradas actuales, que no tienen fecha.
 
 0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación: bloquear usuarios, aviso sin cuenta y correos de la decisión, **hechos en la 0.16.0**; T-013 (aviso al salir a enlaces externos), **hecha en la 0.18.5**.

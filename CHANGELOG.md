@@ -20,6 +20,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
 
 
+## [0.18.7] — 2026-10-15
+
+PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).
+
+### Cambiado
+- `docs/ESTADO.md`: relevo cerrado (#82, #84 y #83), recuento de gimnasios en la demo (1 publicado, 190 por revisar) y fallo de tiempo de espera de OpenStreetMap.
+
 ## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).
