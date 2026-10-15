@@ -1976,3 +1976,43 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 ## 2026-10-14 — Continuación del encargo de paneles
 F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+## 2026-10-15 — Textos legales para el lanzamiento (Claude)
+
+**Qué se pidió:**
+- El fundador recordó que faltaban las condiciones de uso y que la privacidad estaba «un poco dudosa».
+- También que faltaba «un bloque de responsabilidad jurídica».
+- Pidió investigar, hacer todo lo que no necesite abogado y listar lo que sí.
+
+**Qué se hizo:**
+- `/aviso-legal`, con el bloque de responsabilidad.
+- `/condiciones`, según el DSA.
+- `/cookies`, solo con las técnicas.
+- Privacidad completada según el art. 13 del RGPD.
+- Enlaces en el pie, el registro y Google.
+- Aviso al arrancar si faltan los datos del titular.
+- Detalle en `docs/LEGAL.md`.
+- Fuera del repositorio, la carpeta `MiProyectoAI/LEGAL-LONA/`, con:
+  - las tareas del fundador;
+  - las preguntas para el abogado;
+  - la investigación con fuentes;
+  - el registro de actividades de tratamiento;
+  - los protocolos de derechos, brechas y avisos.
+
+**Hallazgos para programar:**
+- bloquear usuarios (Apple 1.2);
+- avisos automáticos a denunciantes y afectados (DSA, arts. 16.5 y 17);
+- aviso sin cuenta;
+- T-013 y T-014.
+
+**Comprobaciones:**
+- `tsc`;
+- `vitest` (740 de 740);
+- `npm run build`, con las páginas nuevas compiladas;
+- catálogo y mapa.
+
+**Estado:** PR abierto. Los textos son borradores pendientes del abogado.
+
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.

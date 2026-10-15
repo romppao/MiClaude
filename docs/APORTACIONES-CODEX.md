@@ -354,3 +354,7 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 
 ## 2026-10-14 — Continuación del encargo de paneles
 F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.

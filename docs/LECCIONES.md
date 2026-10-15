@@ -466,3 +466,7 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba una prueba `.test.tsx` nueva. Se amplió el patrón y se configuró JSX en Oxc, el transformador instalado; las 4 pruebas nuevas ya pasan. La tubería de PowerShell a Python sustituyó inicialmente algunas tildes: corregidas y fijada salida UTF-8 antes de nuevas escrituras. Revisar siempre el diff y el recuento de pruebas.
 
 14 oct: esperar la URL de una transición React no acredita que el formulario nuevo esté montado. En registro, esperar el campo que identifica el paso y verificar sus valores; conservar la prueba de persistencia en base.
+
+
+## 2026-10-15 — Conflictos y finales de línea
+Una expresión regular de resolución con DOTALL consumió contenido posterior al marcador y el primer reintento no contempló CRLF. Recuperar siempre desde los padres originales, normalizar finales de línea, acotar cada marcador a su línea y validar los documentos antes de confirmar. No encadenar una confirmación tras un script fallido.
