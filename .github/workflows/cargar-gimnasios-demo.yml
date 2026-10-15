@@ -4,6 +4,8 @@ name: Cargar gimnasios reales en la demo
 # reales en la demo. Desde la nube de Claude no se puede ni descargar de OpenStreetMap ni entrar en la base de la demo; GitHub sí.
 # Solo a mano (botón «Run workflow»), nunca programado, y solo contra la demo: la versión real exige otro procedimiento con el fundador.
 #  - «recuento»: descarga, compara con la base de la demo y muestra cuántos gimnasios se cargarían por provincia. No escribe nada.
+#  - «ficticios-recuento» / «ficticios-retirar»: cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo.
+#  - «ubicar»: busca las coordenadas de los gimnasios publicados que aún no las tienen (calle o, si no hay, ciudad).
 #  - «cargar»: hace lo mismo y, a continuación, los carga en la demo. Los gimnasios reclamados o corregidos quedan protegidos y los
 #    posibles duplicados quedan «por revisar» en moderación.
 # Necesita el secreto DEMO_DATABASE_URL: la misma dirección de la base que tiene Render en DATABASE_URL (Neon, lona-demo).
@@ -11,11 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       accion:
-        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento o lista-cargar"
+        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento, lista-cargar o lista-actualizar (direcciones). Gimnasios ficticios: ficticios-recuento o ficticios-retirar. Mapa: ubicar"
         required: true
         default: recuento
         type: choice
-        options: [recuento, cargar, lista-recuento, lista-cargar]
+        options: [recuento, cargar, lista-recuento, lista-cargar, lista-actualizar, ficticios-recuento, ficticios-retirar, ubicar]
 
 permissions:
   contents: read
@@ -48,10 +50,20 @@ jobs:
       - name: Lista investigada (recuento o carga)
         if: startsWith(inputs.accion, 'lista-')
         run: |
-          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || '' }} | tee lista.txt
+          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || inputs.accion == 'lista-actualizar' && '--actualizar' || '' }} | tee lista.txt
           { echo "## Lista investigada: ${{ inputs.accion }}"; echo '```'; cat lista.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Gimnasios ficticios (recuento o retirada)
+        if: startsWith(inputs.accion, 'ficticios-')
+        run: |
+          npx tsx scripts/retirar-gimnasios-ficticios.ts ${{ inputs.accion == 'ficticios-retirar' && '--aplicar' || '' }} | tee ficticios.txt
+          { echo "## Gimnasios ficticios: ${{ inputs.accion }}"; echo '```'; cat ficticios.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Ubicar en el mapa
+        if: inputs.accion == 'ubicar'
+        run: |
+          npx tsx scripts/ubicar-gimnasios.ts | tee ubicar.txt
+          { echo "## Gimnasios ubicados en el mapa"; echo '```'; cat ubicar.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Descargar de OpenStreetMap y comparar con la demo
-        if: "!startsWith(inputs.accion, 'lista-')"
+        if: "!startsWith(inputs.accion, 'lista-') && !startsWith(inputs.accion, 'ficticios-') && inputs.accion != 'ubicar'"
         run: |
           npm run gimnasios:osm -- --comparar-base --demo | tee recuento.json
           {

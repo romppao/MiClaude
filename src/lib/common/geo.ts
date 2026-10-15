@@ -35,6 +35,19 @@ export async function buscarCoordenadas(texto: string): Promise<Punto | null> {
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
+/**
+ * Formas más sencillas de una dirección, por si Nominatim no reconoce la original (15-10-2026: fallaban 13 de 61 por «nave 5», «local 7»,
+ * paréntesis o «de los»): sin nave, local, planta ni paréntesis; después sin artículos; y por último solo el nombre de la vía y el número.
+ */
+export function variantesDireccion(address: string, city: string): string[] {
+  const limpia = address.replace(/\([^)]*\)/g, "").replace(/,?\s*(nave|local|bajo|planta|piso|puerta|edificio)\b[^,]*/gi, "").replace(/\bs\/n\b/gi, "").replace(/\s+,/g, ",").replace(/[\s,]+$/, "").trim();
+  const sinArticulos = limpia.replace(/\b(de la|de los|de las|del|de)\s+/gi, "");
+  const via = /^(.*?),?\s*(\d+)\b/.exec(sinArticulos);
+  const formas = [`${limpia}, ${city}, España`, `${sinArticulos}, ${city}, España`];
+  if (via) formas.push(`${via[1].replace(/^(Calle|C\/|Avenida|Avda\.?|Plaza|Paseo)\s+/i, "")} ${via[2]}, ${city}, España`);
+  return [...new Set(formas)];
+}
+
 /** Busca y guarda las coordenadas de un gimnasio (primero por dirección, luego por ciudad). Nunca lanza. */
 export async function ubicarGimnasio(gymId: string): Promise<void> {
   if (!geocodificarActivo()) return;
@@ -42,7 +55,11 @@ export async function ubicarGimnasio(gymId: string): Promise<void> {
     const g = await db.gym.findUnique({ where: { id: gymId }, select: { address: true, city: true, province: true } });
     if (!g) return;
     let punto: Punto | null = null, origen: OrigenUbicacion = "ciudad";
-    if (g.address?.trim()) { punto = await buscarCoordenadas(`${g.address}, ${g.city}, ${g.province}, España`); origen = "direccion"; }
+    if (g.address?.trim()) {
+      punto = await buscarCoordenadas(`${g.address}, ${g.city}, ${g.province}, España`);
+      for (const forma of punto ? [] : variantesDireccion(g.address, g.city)) if ((punto = await buscarCoordenadas(forma))) break;
+      origen = "direccion";
+    }
     if (!punto) { punto = await buscarCoordenadas(`${g.city}, ${g.province}, España`); origen = "ciudad"; }
     // Aunque no se encuentre, se anota el intento para no repetirlo en cada visita (se reintenta si cambian la dirección o la ciudad).
     await db.gym.update({ where: { id: gymId }, data: { lat: punto?.lat ?? null, lng: punto?.lng ?? null, geoSource: punto ? origen : null, geocodedAt: new Date() } });

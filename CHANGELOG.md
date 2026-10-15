@@ -11,6 +11,26 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.8] — 2026-10-15
+
+PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).
+
+### Cambiado
+- `docs/datos/gimnasios-investigados.json`: **93 gimnasios publicables** (54 en Madrid), frente a 1 antes de la revisión. Se publica lo que tiene web viva con contenido de 2025 o 2026, o un Instagram con publicaciones de menos de un año; la `fechaFuente` es la de esa comprobación o la de la última publicación.
+  - Webs: se abrieron las 52 fichas con web propia (20 publicables).
+  - Instagram: los 56 perfiles apuntados (46 activos) y, en Madrid, se buscaron los clubes sin web ni Instagram (26 activos más).
+  - Quedan por revisar, con una nota que explica el motivo: perfiles inactivos o vacíos, gimnasios que parecen de fitness, sedes con la ciudad sin confirmar y los 7 clubes de Madrid sin perfil encontrado.
+- Se quitan dos repetidos: Lotus Club Chamberí (es BJJ Madrid Academy - Lotus Club) y Muay Thai Las Rozas Madrid (es Slava Legacy Muay Thai, en Las Rozas). Los nombres son siempre el nombre comercial del club, no el usuario de Instagram.
+
+### Añadido
+- Opciones «ficticios-recuento» y «ficticios-retirar» del botón «Cargar gimnasios reales en la demo» (`scripts/retirar-gimnasios-ficticios.ts`): retiran de la demo los gimnasios ficticios (estado REMOVED, reversible) sin romper los peleadores de prueba enlazados. Petición del fundador: «borra todos los demás gimnasios demo».
+- Opción «ubicar» del mismo botón (`scripts/ubicar-gimnasios.ts`): pone en el mapa, de una vez, los gimnasios sin coordenadas (por su calle o, si no la hay, por su ciudad). En la app se hacía poco a poco y, tras cargar la lista, el mapa los mostraba en el centro de la provincia.
+
+### Corregido
+- **Mapa:** si la dirección de un gimnasio no se encuentra tal cual, se prueban formas más sencillas (sin nave, local, paréntesis ni artículos) antes de ponerlo en el centro de su ciudad (`variantesDireccion`). De 13 direcciones que fallaban se recuperan 10. «ubicar» reintenta los que tenían dirección y quedaron en la ciudad.
+- Opción «lista-actualizar» del botón de la demo: pone la dirección y la ciudad corregidas de la lista en los gimnasios ya cargados desde ella que nadie ha reclamado (la carga normal nunca toca los existentes).
+- Dirección de 16 gimnasios publicados de Madrid, sacada de su web o de su bio de Instagram. Morales Box Alcalá estaba en Alcalá de Henares por error: es la calle de Alcalá, 507 (Madrid).
+
 ## [0.18.7] — 2026-10-15
 
 PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).

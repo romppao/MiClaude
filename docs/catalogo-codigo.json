@@ -285,6 +285,16 @@
     "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
+    "path": "scripts/retirar-gimnasios-ficticios.ts",
+    "purpose": "Cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo cuando ya hay gimnasios reales; solo con DEMO_MODE=si y desde el botón de GitHub.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/ubicar-gimnasios.ts",
+    "purpose": "Ubica de una vez en el mapa los gimnasios publicados sin coordenadas (Nominatim, una consulta por segundo) tras una carga grande; se lanza desde el botón de GitHub de la demo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "scripts/version.mjs",
     "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2017,6 +2027,11 @@
   {
     "path": "tests/unit/fotos.test.ts",
     "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/geo-direcciones.test.ts",
+    "purpose": "Comprueba las formas sencillas de una dirección (sin nave, local, paréntesis ni artículos) que se prueban cuando el mapa no reconoce la original.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
