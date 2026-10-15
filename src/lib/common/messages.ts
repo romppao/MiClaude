@@ -3,6 +3,13 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  entradas_guardadas: "Cartel y entradas guardados.",
+  entradas_reservadas: "Reserva hecha. Envía la señal por Bizum con tu código como concepto para confirmarla.",
+  entradas_canceladas: "Reserva cancelada.",
+  entradas_senal_confirmada: "Señal recibida: la reserva está confirmada y se le ha avisado.",
+  entradas_validadas: "Entrada validada. Ya puede pasar.",
+  entradas_validacion_deshecha: "Validación deshecha: la reserva vuelve a estar confirmada.",
+  entradas_canceladas_promotora: "Reserva cancelada. Se le ha avisado a quien reservó.",
   highlight_publico_anadido: "Vídeo añadido a tus highlights. Quien lo compartió recibe un aviso si es otra persona.",
   aviso_leido: "Aviso marcado como leído.",
   avisos_leidos: "Tus avisos se han marcado como leídos.",
@@ -130,6 +137,18 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  hora_invalida: "Escribe la hora como 20:30.",
+  entradas_numeros: "El precio y el aforo tienen que ser números enteros (el precio, entre 1 y 1.000 €).",
+  bizum_invalido: "El Bizum tiene que ser un móvil español: 9 cifras que empiezan por 6 o 7.",
+  entradas_incompletas: "Para abrir la venta pon el precio de la entrada y tu número de Bizum.",
+  aforo_menor_que_reservas: "Ya hay más entradas reservadas que ese aforo. Pon un aforo mayor o cancela reservas antes.",
+  entradas_no_disponibles: "Esta velada no tiene entradas a la venta en Lona.",
+  entradas_cerradas: "Las reservas se cierran 3 horas antes del inicio. Pregunta a la promotora por la taquilla.",
+  entradas_cantidad: "Elige entre 1 y 6 entradas.",
+  entradas_propias: "No puedes reservar entradas de tu propia velada.",
+  entradas_limite: "Has hecho muchas reservas seguidas. Inténtalo dentro de un rato.",
+  entradas_ya_reservadas: "Ya tienes una reserva para esta velada. Puedes verla o cancelarla en «Mis entradas».",
+  entradas_agotadas: "No quedan entradas suficientes.",
   highlight_ya_anadido: "Ese vídeo ya está en tus highlights.",
   gimnasio_contacto: "Revisa el teléfono y el correo profesional del gimnasio.",
   gimnasio_prueba: "Explica cómo comprobar tu relación con el gimnasio y usa un enlace web válido si lo aportas. No envíes DNI.",

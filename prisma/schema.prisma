@@ -436,6 +436,21 @@ model Event {
   registrationUntil DateTime?           @db.Date
   registrations     EventRegistration[]
   slots             EventSlot[]
+  // Hora de inicio (minutos desde las 00:00, hora peninsular) y cartel de la velada (petición del fundador, 15-10-2026: «que aparezcan
+  // directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio de la entrada»). El cartel va al almacén de fotos
+  // (posterKey) o, sin almacén, a la propia fila (poster), como las fotos de perfil.
+  startMinute       Int?
+  posterKey         String?
+  poster            Bytes?
+  // Entradas reservadas en Lona (lib/events/entradas.ts): la promotora fija el precio y cobra ella. Se paga la mitad por Bizum para
+  // confirmar la reserva y el resto en la puerta. Lona no toca el dinero.
+  ticketsOpen       Boolean             @default(false)
+  ticketPriceEuros  Int?
+  doorPriceEuros    Int?
+  ticketCapacity    Int?
+  bizumPhone        String?
+  ticketNote        String?
+  tickets           TicketReservation[]
 
   @@index([discipline, date])
   @@index([organizerId])
@@ -536,6 +551,7 @@ model User {
   trainer               Trainer?
   media                 MediaItem[]
   classRequests         ClassRequest[]
+  ticketReservations    TicketReservation[]
   // Disciplinas que le interesan (registro de aficionado): ordenan su inicio.
   interests             Discipline[]           @default([])
   // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
@@ -979,4 +995,39 @@ model EmailOutbox {
 
   @@index([status, priority, nextAttemptAt])
   @@index([sentAt])
+}
+
+enum TicketStatus {
+  PENDING_DEPOSIT
+  CONFIRMED
+  CHECKED_IN
+  CANCELLED
+  EXPIRED
+}
+
+// Reserva de entradas de una velada (15-10-2026). Se crea «pendiente de señal»: quien reserva envía la mitad por Bizum a la promotora con
+// el código como concepto antes de depositUntil; la promotora la confirma al recibirla y marca la entrada en la puerta, donde se paga el
+// resto. Sin señal a tiempo, caduca y libera las plazas. Una reserva activa por persona y velada.
+model TicketReservation {
+  id           String       @id @default(cuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity     Int
+  unitEuros    Int
+  totalEuros   Int
+  depositEuros Int
+  code         String       @unique
+  status       TicketStatus @default(PENDING_DEPOSIT)
+  depositUntil DateTime
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+  checkedInAt  DateTime?
+  cancelledAt  DateTime?
+  // Quién la canceló: «comprador» o «promotora».
+  cancelledBy  String?
+
+  @@index([eventId, status])
+  @@index([userId, createdAt])
 }
