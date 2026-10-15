@@ -21,7 +21,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | **Cerrando el relevo de Claude (nube):** #81 fusionado (0.18.3); #82 gimnasios investigados (0.18.4), #84 T-013 y T-002 de Codex (0.18.5) y #83 este relevo (0.18.6), por ese orden. Después, los gimnasios reales de todas las comunidades | `claude-nube/gimnasios-investigados`, `claude-nube/integrar-t013-t002`, `claude-nube/relevo-a-claude-code` | en curso |
-| Codex | Bandeja única en PR #86; invitaciones de miembros con aceptación en pruebas. Después cesión, altas desde fichas y T-009. T-013/T-002 ya integradas por Claude. | `codex/invitaciones-de-miembros-de-gimnasio-20261015` | PR #88, en pruebas |
+| Codex | Bandeja única en PR #86; invitaciones de miembros con aceptación en pruebas. Después cesión, altas desde fichas y T-009. T-013/T-002 ya integradas por Claude. | `codex/invitaciones-de-miembros-de-gimnasio-20261015` | PR #88, pendiente de revisión y CI |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
