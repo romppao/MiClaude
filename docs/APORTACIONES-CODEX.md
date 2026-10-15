@@ -418,3 +418,5 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Compartidos:** esquema, migración aditiva, package.json (se conserva y amplía el guion e2e).
 **Validación:** tipos aprobados; pendientes migraciones/paridad, pruebas unitarias y recorrido real de correo con/sin cuenta, repetición, cancelación, caducidad y bloqueos.
 **Siguiente:** revisión de Claude y cuarto punto en PR separado. No hay cambios de proveedor ni dominio.
+
+**Resultado local de #89:** migraciones en base vacía, paridad, tipos, compilación y 15 comprobaciones documentales aprobados. El recorrido completo de cesión pasa: ambos tipos de destinatario, enlace ajeno y repetido, dos correos de confirmación, ambos sentidos de bloqueo, cancelación y caducidad. Las unitarias locales detectaron un código de error en AVISOS: corregido a PROBLEMAS y prueba de mensajes aprobada. Cuatro comprobaciones de contraseña siguen agotando 5 segundos en esta máquina, incluso en una repetición sin otras compilaciones; no se atribuye todo a la carga ni se alteran los límites. El CI 38743105233 sí ha pasado las unitarias sobre la corrección y está recorriendo navegador.
