@@ -2,6 +2,8 @@
 
 > **Para qué sirve (petición del fundador, 14 de octubre de 2026):** Claude en la nube o en el móvil, Claude Code en el portátil, Codex y cualquier otro asistente **no se pueden hablar entre sí**. El repositorio es su único canal. Este archivo es la página corta que dice cómo está todo **ahora**, para no repetir lo que el fundador ya hizo o dijo en otra sesión ni pisarse el trabajo.
 >
+> **15-10-2026, tarde: Claude Code, empieza por [`ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md`](ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md).**
+>
 > **Al empezar:** `git fetch` y `node scripts/estado.mjs` (lo que dice la realidad en directo: demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez) y lee esta página. **Antes de un trabajo grande:** `node scripts/estado.mjs reservar <asistente> "<tema>"`. **Al terminar:** actualiza tu fila y lo que cambie. Reglas completas al final.
 
 **Última revisión completa:** 15 de octubre de 2026 (Claude, nube). Si el script avisa de que tiene más de 3 días, no te fíes sin mirar el script.
@@ -17,8 +19,8 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **T-008: cola de correos** con reintentos y límite diario. Fusionados hoy: 0.15.1 a 0.18.0 (demo separada, bloqueos y avisos, fotos fuera de la base, paneles F y G, gimnasios reales y campanita de avisos) | `claude-nube/t-008-cola-de-correos-con-limite-diario-20261015`, versión 0.18.1 | PR abierto |
-| Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
+| Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
+| Claude Code (portátil) | **Cerrando el relevo de Claude (nube):** #81 fusionado (0.18.3); #82 gimnasios investigados (0.18.4), #84 T-013 y T-002 de Codex (0.18.5) y #83 este relevo (0.18.6), por ese orden. Después, los gimnasios reales de todas las comunidades | `claude-nube/gimnasios-investigados`, `claude-nube/integrar-t013-t002`, `claude-nube/relevo-a-claude-code` | en curso |
 | Codex | **Sin créditos desde las 12:30 del 15-10** (vuelve cuando el fundador los recupere). Lo único pendiente, por orden, está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-pendientes.md`: bandeja única de moderación (la reserva no tiene código), vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y T-009. T-013 y T-002 los integra Claude | `codex/bandeja-unica-de-moderacion-20261015` (solo reserva) | parado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
