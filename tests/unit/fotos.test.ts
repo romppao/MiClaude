@@ -9,7 +9,7 @@ import { registrarFallo } from "../../src/lib/common/fallos";
 
 // Fotos fuera de la base de datos (T-004, parte 2): lib/media/fotos.ts.
 const bytes = new Uint8Array([1, 2, 3, 4, 5]);
-const R2 = { R2_ACCOUNT_ID: "cuenta", R2_ACCESS_KEY_ID: "id", R2_SECRET_ACCESS_KEY: "secreto", R2_BUCKET: "ring-videos", R2_JURISDICCION: "eu" } as NodeJS.ProcessEnv;
+const R2 = { R2_ACCOUNT_ID: "cuenta", R2_ACCESS_KEY_ID: "id", R2_SECRET_ACCESS_KEY: "secreto", R2_BUCKET: "ring-videos", R2_JURISDICCION: "eu" } as unknown as NodeJS.ProcessEnv;
 
 afterEach(() => { vi.unstubAllGlobals(); vi.mocked(registrarFallo).mockClear(); });
 
@@ -31,7 +31,7 @@ describe("almacenDeFotos", () => {
 });
 
 describe("en disco", () => {
-  const env = () => ({ FOTOS_EN_DISCO: "si", MEDIA_DIR: mkdtempSync(join(tmpdir(), "fotos-")) }) as NodeJS.ProcessEnv;
+  const env = () => ({ FOTOS_EN_DISCO: "si", MEDIA_DIR: mkdtempSync(join(tmpdir(), "fotos-")) }) as unknown as NodeJS.ProcessEnv;
   it("guarda, lee y borra por su clave", async () => {
     const e = env();
     const almacen = almacenDeFotos(e)!;
