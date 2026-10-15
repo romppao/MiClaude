@@ -31,7 +31,7 @@
 | `/entrenadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | — | Trainer |
 | `/federaciones` | Federaciones | Pública (cambia lo que ve según la cuenta) | `profiles.createFederation` | Profile |
 | `/federaciones/:id` | (ficha individual: el título depende del elemento) | Pública | — | Profile |
-| `/gimnasios` | Gimnasios | Pública | — | Gym |
+| `/gimnasios` | Gimnasios | Pública | — | Aura, Fighter, Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | `community.createReport` | Gym |
 | `/highlights/:id/imagen` | Foto de un highlight. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. Revalida con ETag, como las fotos de perfil. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
 | `/highlights/:id/video` | Vídeo de un highlight subido a la aplicación. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
@@ -171,7 +171,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `setAttendance` | Cuenta con sesión iniciada | EventAttendance | — | — | — |
 | `setBoutResult` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Bout, Event, Fighter, Notification | BOUT: RESULT_SET | — | resultado_guardado |
 | `setEventStatus` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
-| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event | EVENT: UPDATED | — | velada_actualizada |
+| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event | EVENT: PAST_EVENT_AUTHORIZATION_REQUESTED, EVENT: UPDATED | — | velada_actualizada |
 
 ### `fighters`
 
@@ -213,7 +213,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `adminDecide` | Moderación | AuditLog, Bout, Fighter | BOUT: (varias) | — | moderacion_rechazado, moderacion_restaurado, moderacion_verificado |
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, Profile, User | ORGANIZER: (varias), PROFILE: FEDERATION_CREATED | Sí | — |
-| `decidirVeladaPasada` | Moderación | AuditLog, Event | EVENT: (varias) | Sí | — |
+| `decidirVeladaPasada` | Moderación | AuditLog, Event, Fighter | EVENT: (varias) | Sí | — |
 | `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Gym, Highlight, MediaItem, Profile, Report | GYM: GYM_REMOVED_BY_REPORT, REPORT: (varias) | — | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
 
@@ -295,7 +295,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EventRegistration | `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations` |
 | FightProposal | `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal` |
 | Highlight | `accounts.deleteAccount`, `fighters.addPublicVideoHighlight`, `fighters.publishHighlight`, `fighters.manageHighlight`, `moderation.resolveReport` |
-| Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.setRecordPublic`, `gyms.setGymMember`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport` |
+| Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.setRecordPublic`, `gyms.setGymMember`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport`, `moderation.decidirVeladaPasada` |
 | Event | `bouts.addBout`, `bouts.removeMyBout`, `events.createEvent`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `moderation.decidirVeladaPasada`, `registrations.setRegistration` |
 | Bout | `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.removeCartelBout`, `moderation.adminDecide`, `moderation.resolveReport`, `trajectory.endorseBout` |
 | Notification | `aura.giveAura`, `bouts.addBout`, `bouts.setMyBoutResult`, `events.setBoutResult`, `fighters.addPublicVideoHighlight`, `media.shareMedia`, `notifications.readNotification`, `notifications.readAllNotifications`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass`, `trainers.answerClassRequest` |
@@ -327,7 +327,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `completeSecondFactor`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `getUserPendingSecondFactor`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `unsubscribeLink`, `unsubscribeWithToken` |
+| `auth.ts` | `RESET_HOURS`, `VERIFY_HOURS`, `completeSecondFactor`, `consumeVerificationToken`, `createSession`, `destroyOtherSessions`, `destroySession`, `getUser`, `getUserPendingSecondFactor`, `isResetTokenUsable`, `readReturnPath`, `rememberReturnPath`, `requireUser`, `requireVerifiedUser`, `resetPasswordWithToken`, `sendPasswordResetEmail`, `sendVerificationEmail`, `sesionReciente`, `unsubscribeLink`, `unsubscribeWithToken` |
 | `backing.ts` | `canEndorse`, `requireSupportActor` |
 | `creador.ts` | `EstadoCodigos`, `correoCreador`, `esCreador` |
 | `google.ts` | `COOKIE_GOOGLE`, `DURACION_VIAJE_S`, `DecisionCuenta`, `GOOGLE_AUTORIZACION`, `GOOGLE_TOKENS`, `IdentidadGoogle`, `ViajeGoogle`, `canjearCodigo`, `configGoogle`, `decidirCuenta`, `escribirViaje`, `googleDisponible`, `leerViaje`, `nuevoViaje`, `urlDeAutorizacion`, `validarIdToken` |
@@ -363,7 +363,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `apariencia.ts` | `COLOR_DISCIPLINA`, `conAlfa`, `iniciales`, `nombreDePila`, `tinteDe` |
 | `audit.ts` | `audit` |
 | `competition.ts` | `COMPETITION_DIVISIONS`, `CompetitionDivision`, `divisionAgeEligible`, `divisionById`, `divisionEligible`, `divisionLabel`, `divisionsFor`, `knownBoxingAgeEligible` |
-| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayAndMonth`, `dayKey`, `daysUntil`, `eventDayReached`, `haceTiempo`, `madridDayStart`, `monthlySeries`, `parseBirthDate`, `parseDay`, `todayMadrid`, `whenLabel` |
+| `dates.ts` | `MIN_BIRTH_DAY`, `MIN_EVENT_DAY`, `calendarDayStart`, `dayAndMonth`, `dayKey`, `daysUntil`, `esDiaReal`, `eventDayReached`, `haceTiempo`, `madridDayStart`, `monthlySeries`, `parseBirthDate`, `parseDay`, `todayMadrid`, `whenLabel` |
 | `db.ts` | `db` |
 | `demo.ts` | `DEMO_PAPELES`, `demoActiva` |
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `DISCIPLINE_SLUG`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `categoryLabel`, `disciplineFromSlug`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
@@ -385,6 +385,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `record-time.ts` | `HORAS_PARA_CONTAR_DECLARADO`, `fechaInicioEnRecord` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
+| `territorio.ts` | `PROVINCIAS_SIN_GIMNASIOS`, `gimnasiosVisibles`, `provinciaConGimnasios` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
 | `titular.ts` | `LEGAL_ACTUALIZADO`, `Titular`, `faltanDatosTitular`, `titular` |
 | `url.ts` | `safeHttpUrl`, `safeHttpsUrl` |
@@ -432,7 +433,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `rules.ts` | `CONSENTIMIENTO`, `DIAS_PARA_COMPARTIR`, `MAX_MEDIOS_POR_DIA`, `MedioInput`, `MedioParsed`, `PIE_MAX`, `nombreDeDescarga`, `parseMedio`, `veladaAbiertaAlPublico` |
+| `rules.ts` | `CONSENTIMIENTO`, `DIAS_PARA_COMPARTIR`, `MAX_FOTOS_POR_DIA`, `MAX_MEDIOS_POR_DIA`, `MedioInput`, `MedioParsed`, `PIE_MAX`, `nombreDeDescarga`, `parseMedio`, `veladaAbiertaAlPublico` |
 | `s3.ts` | `Credenciales`, `codificar`, `presignar` |
 | `storage.ts` | `Almacen`, `CLAVE_VALIDA`, `MAX_VIDEO_DISCO`, `MAX_VIDEO_R2`, `TIPOS_DE_VIDEO`, `almacenDeVideos`, `carpetaEnDisco`, `claveDe`, `guardarEnDisco`, `lecturaR2`, `nuevaClave`, `responderVideo`, `rutaEnDisco`, `servirDesdeDisco`, `tipoDeClave` |
 

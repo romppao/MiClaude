@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "../../../lib/accounts/auth";
 import { readOnboarding } from "../../../lib/accounts/onboarding";
 import { db } from "../../../lib/common/db";
+import { gimnasiosVisibles } from "../../../lib/common/territorio";
 import { PROVINCES } from "../../../lib/common/labels";
 import { LIMITS } from "../../../lib/common/text";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../lib/common/disciplines";
@@ -17,7 +18,7 @@ export default async function PerfilEntrenadorRegistro() {
   const user = await requireUser("/registro/perfil");
   const previo = readOnboarding(user.onboarding);
   const p = previo?.kind === "entrenador" ? previo : null;
-  const gimnasios = await db.gym.findMany({ select: { name: true }, orderBy: { name: "asc" }, take: 200 });
+  const gimnasios = await db.gym.findMany({ where: gimnasiosVisibles(), select: { name: true }, orderBy: { name: "asc" }, take: 200 });
   return (
     <div className="pantalla pantalla-formulario">
       <p><Link href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo y reclámalo después de confirmar tu correo</Link></p>

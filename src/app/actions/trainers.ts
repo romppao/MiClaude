@@ -4,6 +4,7 @@
 
 import { revalidatePath } from "next/cache";
 import { putNotification, notifyInApp } from "../../lib/community/notifications";
+import { provinciaConGimnasios } from "../../lib/common/territorio";
 import { after } from "next/server";
 import { todayMadrid } from "../../lib/common/dates";
 import { Prisma } from "@prisma/client";
@@ -45,7 +46,7 @@ export async function createMyTrainer(f: FormData) {
   const borrador = readOnboarding(user.onboarding);
   const primera = borrador?.kind === "entrenador" && borrador.clase && str(f, "publicarClase") === "on" ? parseClass(borrador.clase) : null;
   await guard(back, () => db.$transaction(async (tx) => {
-    const gymId = gymName ? (await tx.gym.upsert({ where: { slug: slugName(gymName, city) }, create: { name: gymName, slug: slugName(gymName, city), city, province, status: excludedGymProvince(province) ? "PENDING" : "PUBLISHED" }, update: {} })).id : null;
+    const gymId = gymName && provinciaConGimnasios(province) ? (await tx.gym.upsert({ where: { slug: slugName(gymName, city) }, create: { name: gymName, slug: slugName(gymName, city), city, province }, update: {} })).id : null;
     const slug = await uniqueSlug(slugify(user.name), async (s) => !!(await tx.trainer.findUnique({ where: { slug: s } })), "entrenador");
     const t = await tx.trainer.create({ data: { slug, name: user.name, bio: str(f, "bio") || null, gymId, userId: user.id, disciplines, yearsCoaching: years, city, province } });
     if (primera?.ok) await tx.trainingClass.create({ data: { trainerId: t.id, discipline: disciplines[0], ...primera.value } });

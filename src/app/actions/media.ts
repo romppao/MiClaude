@@ -10,7 +10,7 @@ import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { audit } from "../../lib/common/audit";
 import { todayMadrid } from "../../lib/common/dates";
 import { normalizeImage } from "../../lib/profiles/images";
-import { MAX_MEDIOS_POR_DIA, parseMedio, veladaAbiertaAlPublico } from "../../lib/media/rules";
+import { MAX_FOTOS_POR_DIA, MAX_MEDIOS_POR_DIA, parseMedio, veladaAbiertaAlPublico } from "../../lib/media/rules";
 import { almacenDeVideos, claveDe } from "../../lib/media/storage";
 import { go, guard, str } from "./shared";
 
@@ -36,6 +36,7 @@ export async function shareMedia(f: FormData) {
   const datos = parseMedio({ caption: str(f, "caption"), hayFoto, videoKey: str(f, "videoKey"), videoUrl: str(f, "videoUrl"), consentimiento: str(f, "consentimiento") === "on" });
   if (!datos.ok) go(back, { problema: datos.problema });
   if ((await db.mediaItem.count({ where: { uploaderId: user.id, createdAt: { gte: new Date(Date.now() - 864e5) } } })) >= MAX_MEDIOS_POR_DIA) go(back, { problema: "medio_limite" });
+  if (hayFoto && (await db.mediaItem.count({ where: { uploaderId: user.id, kind: "PHOTO", createdAt: { gte: new Date(Date.now() - 864e5) } } })) >= MAX_FOTOS_POR_DIA) go(back, { problema: "fotos_limite" });
   let videoBytes: number | null = null;
   if (datos.videoKey) {
     videoBytes = await videoSubido(datos.videoKey, user.id);
