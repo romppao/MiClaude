@@ -6,7 +6,8 @@
 //   npx tsx scripts/importar-gimnasios-lista.ts --aplicar    → lo carga. Solo con DEMO_MODE=si (nunca en la versión real sin el fundador).
 //
 // Reglas: nunca toca un gimnasio que ya exista con el mismo nombre en la misma provincia (ni reclamados ni corregidos); descarta Cataluña;
-// confianza «alta» se publica y «media» queda «por revisar» en moderación. Cada ficha guarda en reviewNote la fuente que la confirma.
+// solo se publica con confianza «alta» y fuente de menos de un año (`fechaFuente`); el resto queda «por revisar» en moderación. Cada ficha
+// guarda en reviewNote la fuente que la confirma y, si la hay, la nota.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { PrismaClient, type Discipline } from "@prisma/client";
@@ -14,7 +15,10 @@ import { gymNameKey } from "../src/lib/common/gym-osm";
 import { excludedGymProvince } from "../src/lib/common/gym-policy";
 import { PROVINCES, slugName } from "../src/lib/common/labels";
 
-type Fila = { name: string; city: string; province: string; address?: string | null; disciplines: string[]; website?: string | null; instagram?: string | null; source: string; confidence?: string };
+type Fila = { name: string; city: string; province: string; address?: string | null; disciplines: string[]; website?: string | null; instagram?: string | null; source: string; confidence?: string; fechaFuente?: string | null; nota?: string | null };
+
+/** Antigüedad máxima de la fuente para publicar sin revisión (petición del fundador, 15-10-2026: «información actualizada… de no más de un año»). */
+export const MAX_DIAS_FUENTE = 365;
 
 const DISCIPLINAS: Discipline[] = ["BOXEO", "MMA", "MUAYTHAI", "KICKBOXING", "K1", "JIUJITSU"];
 const web = (raw: string | null | undefined, instagram = false) => {
@@ -27,7 +31,7 @@ const web = (raw: string | null | undefined, instagram = false) => {
 };
 
 /** Comprueba y normaliza una fila. Devuelve el motivo si se descarta. */
-export function prepararFila(f: Fila): { ok: true; datos: { name: string; city: string; province: string; address: string | null; disciplines: Discipline[]; website: string | null; instagram: string | null; fuente: string; publicar: boolean } } | { ok: false; motivo: string } {
+export function prepararFila(f: Fila, hoy = new Date()): { ok: true; datos: { name: string; city: string; province: string; address: string | null; disciplines: Discipline[]; website: string | null; instagram: string | null; fuente: string; publicar: boolean; nota: string | null } } | { ok: false; motivo: string } {
   const name = (f.name ?? "").replace(/\s+/g, " ").trim().slice(0, 150);
   const city = (f.city ?? "").replace(/\s+/g, " ").trim().slice(0, 100);
   if (!name || !city) return { ok: false, motivo: "sin nombre o ciudad" };
@@ -37,7 +41,10 @@ export function prepararFila(f: Fila): { ok: true; datos: { name: string; city: 
   if (!disciplines.length) return { ok: false, motivo: "sin disciplinas de contacto" };
   const fuente = web(f.source);
   if (!fuente) return { ok: false, motivo: "sin fuente que lo confirme" };
-  return { ok: true, datos: { name, city, province: f.province, address: f.address?.trim().slice(0, 200) || null, disciplines, website: web(f.website), instagram: web(f.instagram, true), fuente, publicar: f.confidence === "alta" } };
+  // Solo se publica sin revisión si la confianza es alta y la fuente tiene fecha de hace menos de un año; si no, queda «por revisar».
+  const fecha = f.fechaFuente ? new Date(f.fechaFuente) : null;
+  const reciente = !!fecha && Number.isFinite(fecha.getTime()) && hoy.getTime() - fecha.getTime() <= MAX_DIAS_FUENTE * 864e5;
+  return { ok: true, datos: { name, city, province: f.province, address: f.address?.trim().slice(0, 200) || null, disciplines, website: web(f.website), instagram: web(f.instagram, true), fuente, publicar: f.confidence === "alta" && reciente, nota: f.nota?.slice(0, 300) || null } };
 }
 
 async function main() {
@@ -59,7 +66,7 @@ async function main() {
     if (!aplicar) continue;
     let slug = slugName(p.datos.name, p.datos.city);
     for (let n = 2; await db.gym.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${slugName(p.datos.name, p.datos.city)}-${n}`;
-    const g = await db.gym.create({ data: { slug, name: p.datos.name, city: p.datos.city, province: p.datos.province, address: p.datos.address, disciplines: p.datos.disciplines, website: p.datos.website, instagram: p.datos.instagram, source: "MANUAL", status: p.datos.publicar ? "PUBLISHED" : "PENDING", reviewNote: `Investigado por Claude el 15-10-2026. Fuente: ${p.datos.fuente}`, importedAt: new Date() } });
+    const g = await db.gym.create({ data: { slug, name: p.datos.name, city: p.datos.city, province: p.datos.province, address: p.datos.address, disciplines: p.datos.disciplines, website: p.datos.website, instagram: p.datos.instagram, source: "MANUAL", status: p.datos.publicar ? "PUBLISHED" : "PENDING", reviewNote: `Investigado por Claude el 15-10-2026. Fuente: ${p.datos.fuente}${p.datos.nota ? `. ${p.datos.nota}` : ""}`, importedAt: new Date() } });
     await db.auditLog.create({ data: { entity: "GYM", entityId: g.id, action: "GYM_IMPORTED_LIST", after: { fuente: p.datos.fuente, estado: g.status } } });
   }
   await db.$disconnect();

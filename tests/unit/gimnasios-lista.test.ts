@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import { prepararFila } from "../../scripts/importar-gimnasios-lista";
 
 // Lista de clubes investigada a mano (scripts/importar-gimnasios-lista.ts).
-const base = { name: "Club de Boxeo Ludus", city: "Móstoles", province: "Madrid", disciplines: ["BOXEO"], source: "https://ejemplo.es/ludus", confidence: "alta" };
+const base = { name: "Club de Boxeo Ludus", city: "Móstoles", province: "Madrid", disciplines: ["BOXEO", "K1"], source: "https://ejemplo.es/ludus", confidence: "alta", fechaFuente: "2026-10-15" };
+const hoy = new Date("2026-10-15T12:00:00Z");
 
 describe("lista de gimnasios investigada", () => {
-  it("admite un club con fuente y lo publica si la confianza es alta", () => {
-    const r = prepararFila(base);
-    expect(r.ok && r.datos.publicar && r.datos.disciplines).toEqual(["BOXEO"]);
+  it("admite un club con fuente y lo publica si la confianza es alta y la fuente es de este año", () => {
+    const r = prepararFila(base, hoy);
+    expect(r.ok && r.datos.publicar && r.datos.disciplines).toEqual(["BOXEO", "K1"]);
+  });
+  it("una fuente de hace más de un año, o sin fecha, queda por revisar aunque la confianza sea alta", () => {
+    for (const fechaFuente of ["2025-09-01", null]) { const r = prepararFila({ ...base, fechaFuente }, hoy); expect(r.ok && r.datos.publicar).toBe(false); }
   });
   it("la confianza media queda por revisar", () => {
     const r = prepararFila({ ...base, confidence: "media" });

@@ -17,7 +17,7 @@ PR de Claude: primera lista de gimnasios reales investigada a mano (petición de
 
 ### Añadido
 - `docs/datos/gimnasios-investigados.json`: 191 clubes de boxeo, kickboxing, K-1, muay thai, MMA y jiu-jitsu con su fuente, en 24 provincias (108 en Madrid). Faltan Castilla-La Mancha, Extremadura, Canarias, Huesca y casi toda Castilla y León.
-- `scripts/importar-gimnasios-lista.ts` y las opciones «lista-recuento» y «lista-cargar» del botón «Cargar gimnasios reales en la demo». Confianza alta se publica; media queda por revisar en moderación. Nunca pisa un gimnasio existente ni carga Cataluña.
+- `scripts/importar-gimnasios-lista.ts` y las opciones «lista-recuento» y «lista-cargar» del botón «Cargar gimnasios reales en la demo». Solo se publica con confianza alta y fuente de menos de un año (`fechaFuente`, petición del fundador); el resto queda por revisar en moderación. El Club de Boxeo Ludus queda con boxeo y K-1, como confirmó el fundador. Nunca pisa un gimnasio existente ni carga Cataluña.
 
 ## [0.18.2] — 2026-10-15
 

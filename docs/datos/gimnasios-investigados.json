@@ -270,7 +270,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.deia.eus/bizkaia/2017/07/15/ukabilak-100-artes-marciales-4937044.html",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Bilbao Combat Center",
@@ -358,7 +359,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.deia.eus/bizkaia/2021/04/20/club-getxo-sancionado-prueba-irregular-1968386.html",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "NeskaBox",
@@ -371,7 +373,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.deia.eus/otros-deportes/2017/05/18/pioneras-cuadrilatero-4952902.html",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Bastos & Selvagem Brazilian Jiu-Jitsu",
@@ -738,7 +741,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.merca2.es/2024/10/25/el-team-mario-padilla-se-hara-presente-en-alcobendas-con-el-proximo-combate-de-omar-el-morabet-2048584/",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Emporio Boxing",
@@ -1833,12 +1837,15 @@
   "province": "Madrid",
   "address": "Calle Cid Campeador, 7",
   "disciplines": [
-   "BOXEO"
+   "BOXEO",
+   "K1"
   ],
   "website": null,
   "instagram": "https://www.instagram.com/club_de_boxeo_ludus/",
   "source": "https://elrincondelboxeador.com/gimnasios/club-de-boxeo-ludus/",
-  "confidence": "alta"
+  "confidence": "alta",
+  "fechaFuente": "2026-10-15",
+  "nota": "Disciplinas confirmadas por el fundador (socio del club) el 15-10-2026: boxeo y K-1; ya no hay jiu-jitsu ni MMA."
  },
  {
   "name": "Escuela Heras Pinong",
@@ -1882,7 +1889,8 @@
   "website": "https://www.gimnasioestoril.com/",
   "instagram": null,
   "source": "https://www.gimnasioestoril.com/actividades/",
-  "confidence": "alta"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "C.D.E. Boxyfitness Sport",
@@ -1925,7 +1933,8 @@
   "website": null,
   "instagram": null,
   "source": "https://linksqr.es/praguinhamma/",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "247Studio BJJ",
@@ -2113,7 +2122,8 @@
   "website": null,
   "instagram": "https://www.instagram.com/fight_club_valdemoro/",
   "source": "https://www.badgie.es/directorio/fight-club-valdemoro-kick-boxing-k1-muaythai-boxeo-mma",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Gimnasio Up Center",
@@ -2165,7 +2175,8 @@
   "website": null,
   "instagram": null,
   "source": "https://enfaf.com/author/nico-medina/",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Club Deportivo Golden Boy de Muaytai",
@@ -2204,7 +2215,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.bjjee.com/interview/spains-pablo-cabo-on-bjj-in-spain-his-master-roger-gracie/",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Scramble Academy Málaga",
@@ -2455,7 +2467,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.gofundme.com/f/reconstruction-reconstrucao-aurum-valencia",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Evolution Box",
@@ -2522,7 +2535,8 @@
   "website": null,
   "instagram": null,
   "source": "https://www.elespanol.com/castilla-y-leon/region/valladolid/20190303/club-boxeo-valladolid-campeon-espana-clubes/380462703_0.html",
-  "confidence": "media"
+  "confidence": "media",
+  "nota": "Fuente antigua (más de un año) o sin fecha: comprobar que sigue abierto y qué disciplinas da hoy."
  },
  {
   "name": "Club Boxeo Zaragoza (CBZ Joan Pintor)",
