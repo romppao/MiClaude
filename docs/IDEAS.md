@@ -401,3 +401,9 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Página «Próximamente» en lonaclub.es** hasta montar la versión real (Claude, 15 oct, a raíz de la separación de la demo). Estado: **aparcada** por el fundador el 15 oct («por el momento vamos a dejarlo así… todavía no tiene sentido que ya lancemos la aplicación web»): no se monta nada en lonaclub.es hasta terminar de perfilar la aplicación.
 - **Cambio de visión del proyecto** (fundador, 15 oct): «he tenido un cambio de visión que todavía no sé si aplicaremos». Estado: **pendiente** de que lo cuente; se valorará después de las correcciones.
 - **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.
+
+
+### Seguimiento del bloque F (Codex, 14 oct 2026)
+Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.
+
+14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.

@@ -11,6 +11,22 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.17.0] — 2026-10-15
+
+PR de Claude (nube): los paneles F y G que preparó Codex (#56, #62), en la versión que integró Claude Code (#69, #70), actualizados sobre la 0.16.1. Sustituye a los cuatro PR.
+
+### Mejorado (bloque F)
+- Los cuatro paneles reúnen sus pendientes en «Te toca» y reducen los accesos rápidos a cuatro como máximo.
+- El aficionado puede dar y quitar aura a ambos participantes desde su panel; las recomendaciones respetan sus disciplinas y el registro separa disciplinas y sugerencias.
+- El entrenador responde solicitudes desde el panel y ve solicitudes del mes, clases aceptadas y alumnos que repiten.
+- Récord por disciplina en el panel del peleador, progreso del perfil y tarjetas adaptables en «Peleadores que sigo».
+- El entrenador puede completar su gimnasio desde la edición de su perfil (salvo en las provincias sin gimnasios en Lona).
+
+### Añadido (bloque G)
+- Provincia opcional y actividad local, asistencia voluntaria a veladas y calendario ICS público.
+- Disponibilidad del peleador con peso opcional y caducidad de 60 días, filtros en directorio y cartel.
+- Agenda semanal del entrenador y lista de preparación de veladas con cantidades agregadas de asistentes y seguidores.
+
 ## [0.16.1] — 2026-10-15
 
 PR de Claude: T-004, parte 2. Las fotos salen de la base de datos (el fundador lo aprobó el 15-10-2026: «ponte a ello»).

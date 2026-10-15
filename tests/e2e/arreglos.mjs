@@ -150,7 +150,7 @@ check("el entrenador recibe un correo con la solicitud, y al responderlo le lleg
 await fan.p.goto(B + `/clases/${clase.id}/solicitar`);
 check("no deja pedir dos veces la misma clase mientras espera", await seen(fan.p.getByText("Ya has solicitado esta clase")));
 await ent.p.goto(B + "/mi-panel");
-check("el panel del entrenador tiene «Solicitudes de clase» entre sus acciones principales, con 1 pendiente", (await ent.p.locator(".accion-principal", { hasText: "Solicitudes de clase" }).locator(".aviso-accion").innerText()).startsWith("1"));
+check("el panel del entrenador tiene «Solicitudes de clase» entre sus acciones principales, con 1 pendiente", (await ent.p.getByRole("region", { name: "Te toca" }).locator("a", { hasText: "Solicitudes de clase" }).locator(".pildora").innerText()).startsWith("1"));
 await ent.p.goto(B + "/mis-clases#solicitudes");
 const sol = ent.p.locator("article", { hasText: "Alumna" });
 check("el entrenador ve la solicitud con el día, la franja y el contacto", await seen(sol.getByText(resumen)) && await sol.locator(`a[href="mailto:${fan.email}"]`).count() === 1 && await sol.locator('a[href="tel:600123456"]').count() === 1);

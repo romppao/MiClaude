@@ -7,16 +7,16 @@ import { boutsQueCuentan } from "../../lib/common/record-eligibility";
 export const CUENTA = boutsQueCuentan();
 
 /** Próximas veladas de todas las disciplinas y provincias, por fecha (sin prioridad editorial). */
-export const proximasVeladas = (take = 6, discipline?: Discipline) =>
-  db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED", ...(discipline && { discipline }) }, orderBy: [{ date: "asc" }, { id: "asc" }], take });
+export const proximasVeladas = (take = 6, discipline?: Discipline, interests: Discipline[] = []) =>
+  db.event.findMany({ where: { date: { gte: calendarDayStart() }, status: "SCHEDULED", ...(discipline ? { discipline } : interests.length ? { discipline: { in: interests } } : {}) }, orderBy: [{ date: "asc" }, { id: "asc" }], take });
 
 /**
  * Peleadores con más aura del público (fichas públicas), con su disciplina principal. Empates por apellido.
  * Con `discipline`, solo cuenta el aura de combates de esa disciplina (portada de cada disciplina).
  */
-export async function peleadoresConAura(take = 6, discipline?: Discipline) {
+export async function peleadoresConAura(take = 6, discipline?: Discipline, interests: Discipline[] = []) {
   const bout = discipline ? { AND: [CUENTA, { event: { discipline } }] } : CUENTA;
-  const grupos = await db.aura.groupBy({ by: ["fighterId"], where: { bout, fighter: { listed: true, hiddenAt: null } }, _count: { _all: true }, orderBy: { _count: { fighterId: "desc" } }, take: take * 3 });
+  const grupos = await db.aura.groupBy({ by: ["fighterId"], where: { bout, fighter: { listed: true, hiddenAt: null, ...(interests.length ? { disciplines: { some: { discipline: { in: interests } } } } : {}) } }, _count: { _all: true }, orderBy: { _count: { fighterId: "desc" } }, take: take * 3 });
   if (!grupos.length) return [];
   const fichas = await db.fighter.findMany({ where: { id: { in: grupos.map((g) => g.fighterId) } }, include: { disciplines: true } });
   const porId = new Map(fichas.map(f => [f.id, f]));

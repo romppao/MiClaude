@@ -1,4 +1,8 @@
+import PreparacionVelada from "./PreparacionVelada";
+import { preparationAudience } from "../../lib/events/preparation-data";
 import Link from "next/link";
+import TeToca from "./TeToca";
+import CompletaPerfil from "./CompletaPerfil";
 import type { CSSProperties } from "react";
 import type { User } from "@prisma/client";
 import { db } from "../../lib/common/db";
@@ -24,22 +28,31 @@ export default async function InicioEntidad({ user }: { user: User }) {
     db.event.findMany({ where: veladasConResultadosPendientes(user.id, hoy), include: { _count: { select: { bouts: { where: { result: null } } } } }, orderBy: [{ date: "desc" }, { id: "asc" }] }),
     db.event.findFirst({ where: { organizerId: user.id, date: { gte: hoy }, status: "SCHEDULED" }, include: { _count: { select: { bouts: true } } }, orderBy: [{ date: "asc" }, { id: "asc" }] }),
   ]);
+  const preparaciones = await db.event.findMany({ where: { organizerId: user.id, status: { in: ["SCHEDULED", "COMPLETED"] }, OR: [{ date: { gte: hoy } }, { bouts: { some: { result: null } } }] }, include: { bouts: { select: { result: true, weightClass: true } } }, orderBy: [{ date: "asc" }, { id: "asc" }], take: 3 });
+  const audiencias = await Promise.all(preparaciones.map((v) => preparationAudience(v.id)));
   const combates = await db.bout.count({ where: { event: { organizerId: user.id } } });
   const inscripciones = veladas ? await db.eventRegistration.count({ where: { status: "PENDING", event: { organizerId: user.id } } }) : 0;
   const kind = parseTipoDeEntidad(solicitud?.kind ?? "") ?? "PROMOTORA";
   const nombre = solicitud?.status === "APPROVED" ? solicitud.orgName : user.name;
   const porResultado = resumenResultadosPendientes(pendientes);
+  const perfil = await db.profile.findUnique({ where: { kind_entityId: { kind: "promotor", entityId: user.id } }, select: { hasAvatar: true, bio: true, website: true } });
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc-text)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
+      <TeToca pendientes={[
+        { texto: "Resultados por poner", href: "/organizador#mis-eventos", cantidad: porResultado.total },
+        { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },
+      ]} />
+      <CompletaPerfil campos={[
+        { texto: "Añadir logotipo", completo: !!perfil?.hasAvatar, href: `/perfiles/promotor/${user.id}/editar` },
+        { texto: "Añadir presentación", completo: !!perfil?.bio, href: `/perfiles/promotor/${user.id}/editar` },
+        { texto: "Añadir web", completo: !!perfil?.website, href: `/perfiles/promotor/${user.id}/editar` },
+      ]} />
       <AccionesPrincipales acciones={[
-        { href: "/organizador?tipo=velada#crear", titulo: "Crear una velada", detalle: "Cartel abierto al público", icono: "trofeo" },
-        { href: "/organizador?tipo=interclub#crear", titulo: "Crear un interclub", detalle: "Encuentro entre clubes", icono: "personas" },
+        { href: "/organizador#crear", titulo: "Crear una velada o interclub", detalle: "Cartel abierto al público", icono: "trofeo" },
         { href: "/organizador", titulo: "Mis veladas", detalle: "Cartel y resultados", icono: "calendario" },
-        { href: "/organizador#mis-eventos", titulo: "Solicitudes para participar", detalle: "Peleadores que quieren entrar", icono: "check", aviso: inscripciones },
         { href: "/peleadores", titulo: "Buscar peleadores", detalle: "Para tus carteles", icono: "buscar" },
         { href: `/promotores/${user.id}`, titulo: "Mi perfil público", detalle: "Cómo te ve la gente", icono: "escudo" },
-        { href: "/clases", titulo: "Buscar clases", detalle: "Con entrenadores", icono: "capas" },
       ]} />
       <div className="rejilla-3">
         <div className="dato"><span className="clave">Veladas</span><span className="valor" style={{ fontSize: 34 }}>{veladas}</span></div>
@@ -54,6 +67,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
         </Link>
       ))}
       {porResultado.resto > 0 && <Link href="/organizador#mis-eventos" style={{ alignSelf: "flex-start" }}>{porResultado.resto === 1 ? "Ver otra velada" : `Ver otras ${porResultado.resto} veladas`} con resultados por poner</Link>}
+      <section aria-label="Preparar mis veladas"><h2>Preparar mis veladas</h2>{preparaciones.map((v, i) => <div key={v.id}><Link className="btn secondary" href={`/organizador/${v.slug}`}>{v.name}</Link><PreparacionVelada event={v} asistentes={audiencias[i].asistentes} seguidores={audiencias[i].seguidores} /></div>)}<Link className="btn secondary" href="/organizador">Ver todas mis veladas</Link></section>
       <section aria-labelledby="titulo-proxima-velada" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="titulo-seccion"><h2 id="titulo-proxima-velada">Próxima velada</h2><Link href="/organizador">Todas</Link></div>
         {proxima ? (
