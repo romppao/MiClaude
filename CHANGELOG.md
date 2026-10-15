@@ -11,6 +11,17 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.14.4] — 2026-10-15
+
+### Añadido
+- Campanita de avisos personales, con lectura, descarga propia y conservación de doce meses.
+- Vídeos públicos de tus combates añadidos por referencia a tus highlights; aviso a quien los compartió.
+- Seguidores y comentarios recientes en el panel del peleador, plantilla del gimnasio del entrenador y pendientes de federación con acreditación.
+
+### Cambiado
+- Moderación reúne las colas en una lista por urgencia, con acciones en línea, paginación y anclas conservadas.
+- Seguir y dar aura a entidades queda en propuesta RFC-002 para revisión previa de Claude; no activa una función nueva.
+
 ## [0.14.3] — 2026-10-15
 
 

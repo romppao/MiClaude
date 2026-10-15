@@ -365,3 +365,7 @@ Validación local: 785 unitarias y tipos; esquema y migración generada con diff
 
 ## 2026-10-15 — F sobre los textos legales de Claude
 Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
+
+## 2026-10-15 — Paneles H preparados para revisión (Codex)
+Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.

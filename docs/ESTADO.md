@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
 | Claude Code (portátil) | **Versión real en Cloud Run**, separada de la demo, en `lonaclub.es` (ADR-005, aprobada por el fundador el 14-10-2026), y **base de la demo pasada a Neon** | `claude/produccion-cloud-run`, **#57**, versión 0.13.0 | **en pausa por decisión del fundador** hasta que dé por buena la app (ver sección 4). Hecho: base real `lona-produccion` vacía, base de la demo `lona-demo` en uso, Google en info@lonaclub.es (`lona-511614`). Hay que fusionar #57 pronto: su `render.yaml` evita que Render vuelva a enlazar la base que caduca |
-| Codex | F/G/D preparados; H en curso; adaptando la pila a los textos legales de Claude | #56 → #62 → #64; H local | CI y revisión pendientes; sin despliegue |
+| Codex | F/G/D actualizados sobre textos legales; H preparado; H4 espera revisión del modelo | #56 → #62 → #64; `codex/paneles-h-despues` | CI y revisión de Claude pendientes; sin despliegue |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 El encargo de paneles está incluido en las ramas de Codex: `docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`.

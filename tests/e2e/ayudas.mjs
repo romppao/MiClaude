@@ -217,7 +217,7 @@ export async function anadirAlCartel(p, nombreRojo, nombreAzul) {
 /** Un moderador aprueba la solicitud de organizador anotando la evidencia comprobada (es obligatoria) y espera a que salga de la cola. */
 export async function aprobarOrganizador(mod, nombreOrg) {
   await mod.goto(B + "/moderacion");
-  const fila = mod.locator("tr", { hasText: nombreOrg });
+  const fila = mod.locator("article", { hasText: nombreOrg });
   await fila.locator("input[name=note]").fill("Web y redes comprobadas");
   await fila.locator("button:has-text('Aprobar')").click();
   await fila.waitFor({ state: "detached" });

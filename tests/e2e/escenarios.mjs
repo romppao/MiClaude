@@ -209,7 +209,7 @@ await persona("federacion", "Pedro, delegado de una federación autonómica: la 
     const mctx = await browser.newContext({ ...devices["iPhone 14"], reducedMotion: "reduce" }); const m = await mctx.newPage();
     const memail = await registrarse(m, "Moderadora Dos", "FAN"); await confirmarCorreo(m, memail); hacerAdmin(memail);
     await m.goto(B + "/moderacion");
-    const fila = m.locator("tr", { hasText: nombreFed });
+    const fila = m.locator("article", { hasText: nombreFed });
     await fila.waitFor({ timeout: 8000 });
     const t = await fila.innerText();
     if (!t.includes("Federación") || !(await fila.locator("a[href*='example.org']").count())) throw new Error("la cola no muestra el tipo de entidad y su web");

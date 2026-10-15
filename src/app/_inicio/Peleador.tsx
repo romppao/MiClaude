@@ -1,4 +1,5 @@
 import { isAvailable } from "../../lib/fighters/availability";
+import { addPublicVideoHighlight } from "../actions/fighters";
 import Link from "next/link";
 import TeToca from "./TeToca";
 import CompletaPerfil from "./CompletaPerfil";
@@ -51,6 +52,11 @@ export default async function InicioPeleador({ user, disciplina }: { user: User 
   const [perfil, totalPorConfirmar] = await Promise.all([
     db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: me.id } }, select: { hasAvatar: true } }),
     db.bout.count({ where: { fighterBId: me.id, verification: "SELF_REPORTED", result: { not: null } } }),
+  ]);
+  const [videos, followers, comments] = await Promise.all([
+    db.mediaItem.findMany({ where: { kind: "VIDEO", hiddenAt: null, bout: deMi, event: { status: { in: ["SCHEDULED", "COMPLETED"] } } }, select: { id: true, caption: true, videoUrl: true, videoKey: true, highlightCopies: { where: { fighterId: me.id, hiddenAt: null }, select: { id: true } } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 10 }),
+    db.follow.count({ where: { fighterId: me.id } }),
+    db.aura.findMany({ where: { fighterId: me.id, hiddenAt: null, comment: { not: null }, bout: CUENTA }, select: { id: true, comment: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 3 }),
   ]);
   const principal = me.disciplines.find((d) => d.discipline === disciplina) ?? me.disciplines[0];
   const tally = principal ? computeRecords(me.id, bouts)[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();
@@ -129,9 +135,11 @@ export default async function InicioPeleador({ user, disciplina }: { user: User 
           <div><h2 id="titulo-mi-aura" style={{ font: "800 24px var(--font)", letterSpacing: "-.03em" }}>Tu aura</h2><div className="meta">Reconocimiento del público</div></div>
           <span className="pildora pildora-violeta">+{esteMes} este mes</span>
         </div>
+        <p>{followers} seguidores</p>{comments.map((c) => <blockquote key={c.id}>{c.comment}</blockquote>)}
         <GraficoAura serie={serie} etiqueta={`Aura recibida en los últimos 7 meses: ${serie.map((x) => `${x.mes} ${x.total}`).join(", ")}`} />
       </section>
 
+      <section id="videos" className="tarjeta" aria-label="Vídeos de tus combates"><h2>Vídeos de tus combates</h2>{videos.map((v) => <article key={v.id}><h3>{v.caption || "Vídeo de tu combate"}</h3><a className="btn secondary" href={v.videoKey ? `/medios/${v.id}/video` : v.videoUrl!} rel="noopener noreferrer nofollow">Ver vídeo</a>{v.highlightCopies.length ? <span className="pildora">Ya está en tus highlights</span> : <form action={addPublicVideoHighlight}><input type="hidden" name="mediaId" value={v.id} /><button>Añadir a mis highlights</button></form>}</article>)}{!videos.length && <p>Todavía no han compartido vídeos de tus combates.</p>}</section>
     </div>
   );
 }

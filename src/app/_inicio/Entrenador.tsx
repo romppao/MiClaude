@@ -1,3 +1,4 @@
+import { gymIsPublic } from "../../lib/common/gym-policy";
 import { trainerWeek, agendaTime } from "../../lib/trainers/agenda";
 import Link from "next/link";
 import TeToca from "./TeToca";
@@ -93,6 +94,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     db.profile.findUnique({ where: { kind_entityId: { kind: "entrenador", entityId: trainer.id } }, select: { hasAvatar: true, bio: true } }),
   ]);
   const agenda = await db.classRequest.findMany({ where: { class: { trainerId: trainer.id }, status: "ACCEPTED", OR: [{ day: trainerWeek() }, { day: null }] }, include: { class: { select: { title: true } }, user: { select: { name: true } } }, orderBy: [{ day: { sort: "asc", nulls: "last" } }, { fromMinute: { sort: "asc", nulls: "last" } }, { toMinute: { sort: "asc", nulls: "last" } }, { id: "asc" }], take: 20 });
+  const gymFighters = trainer.gymId ? await db.fighter.findMany({ where: { gymId: trainer.gymId, listed: true, hiddenAt: null }, include: { boutsAsA: { where: { event: { status: "SCHEDULED", date: { gte: calendarDayStart() } } }, include: { event: true }, orderBy: [{ event: { date: "asc" } }, { id: "asc" }], take: 1 }, boutsAsB: { where: { event: { status: "SCHEDULED", date: { gte: calendarDayStart() } } }, include: { event: true }, orderBy: [{ event: { date: "asc" } }, { id: "asc" }], take: 1 } }, orderBy: [{ lastName: "asc" }, { id: "asc" }], take: 20 }) : [];
   const pendientes = await db.classRequest.count({ where: { class: { trainerId: trainer.id }, status: "PENDING" } });
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
@@ -125,6 +127,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
         {!agenda.length && <p>No tienes clases aceptadas esta semana.</p>}
         <Link className="btn secondary" href="/mis-clases#solicitudes">Ver todas las solicitudes y clases aceptadas</Link>
       </section>
+      <section className="tarjeta" aria-label="Mis peleadores"><h2>Mis peleadores</h2>{gymFighters.map((f) => { const next = [...f.boutsAsA, ...f.boutsAsB].sort((a,b) => +a.event.date - +b.event.date)[0]; return <div className="fila" key={f.id}><Link className="cuerpo" href={`/peleadores/${f.slug}`}>{f.firstName} {f.lastName}</Link>{next ? <Link href={`/veladas/${next.event.slug}`}>{fmtDate(next.event.date)} · {next.event.name}</Link> : <span className="meta">Sin próximo combate</span>}</div>; })}{!trainer.gymId && <Link href={`/perfiles/entrenador/${trainer.id}/editar`}>Indica tu gimnasio para ver su equipo</Link>}{trainer.gym && gymIsPublic(trainer.gym) && <Link href={`/gimnasios/${trainer.gym.slug}`}>Ver el equipo completo del gimnasio</Link>}</section>
       <section id="solicitudes" className="tarjeta" aria-label="Solicitudes de clase pendientes">
         <h2>Solicitudes de clase pendientes</h2>
         {solicitudes.map((r) => <article key={r.id}><h3>{r.user.name} · {r.class.title}</h3><p>{r.preferred}</p>{r.message && <p>{r.message}</p>}

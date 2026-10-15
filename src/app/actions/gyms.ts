@@ -15,13 +15,13 @@ import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { slugName } from "../../lib/common/labels";
 import { ubicarGimnasio } from "../../lib/common/geo";
 import { sendMail } from "../../lib/common/mail";
-import { str, go, checkLengths, readProvince, guard, Rechazo, withLock, uniqueSlug } from "./shared";
+import { str, go, checkLengths, readProvince, guard, Rechazo, withLock, uniqueSlug, returnTo } from "./shared";
 
 /** Alta manual: moderación publica; las demás cuentas aportan prueba y quedan en revisión, sin autoasignarse propiedad. */
 export async function saveGym(f: FormData) {
   const user = await requireVerifiedUser("/mis-gimnasios");
   const id = str(f, "gymId");
-  const back = "/mis-gimnasios";
+  const back = returnTo(f, str(f, "back").split(/[?#]/)[0] === "/moderacion" ? "/moderacion" : "/mis-gimnasios");
   const before = id ? await db.gym.findUnique({ where: { id } }) : null;
   if (id && (!before || (user.role !== "ADMIN" && before.ownerUserId !== user.id))) go(back, { problema: "sin_permiso" });
   checkLengths(f, back, { name: 150, city: 100, address: 200, phone: 30, email: 200, website: 500, instagram: 500, evidence: 2000, evidenceUrl: 500, note: 1000 });
@@ -78,7 +78,7 @@ export async function requestGymClaim(f: FormData) {
 /** Decisión reservada a moderación; bloqueo por gimnasio y comprobación de propiedad dentro de la transacción. */
 export async function decideGymClaim(f: FormData) {
   const admin = await requireAdmin();
-  const back = "/moderacion/gimnasios";
+  const back = returnTo(f, str(f, "back").split(/[?#]/)[0] === "/moderacion" ? "/moderacion" : "/moderacion/gimnasios");
   const decision = str(f, "decision"), note = str(f, "note");
   checkLengths(f, back, { note: 1000 });
   if (!["approve", "reject"].includes(decision)) go(back, { problema: "opcion_invalida" });

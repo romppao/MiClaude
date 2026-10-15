@@ -3,6 +3,7 @@ import { db } from "../../../lib/common/db";
 import { getUser } from "../../../lib/accounts/auth";
 import { loginPath } from "../../../lib/common/paths";
 import { publicFighterName } from "../../../lib/common/names";
+import { notificationCutoff } from "../../../lib/common/periods";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,11 @@ export async function GET(request: Request) {
 
   const agenda = await db.eventAttendance.findMany({ where: { userId: user.id }, include: { event: { select: { name: true, date: true } } }, orderBy: { createdAt: "desc" } });
 
-  const [misGimnasios, reclamacionesGimnasio] = await Promise.all([db.gym.findMany({ where: { ownerUserId: user.id } }), db.gymClaimRequest.findMany({ where: { userId: user.id }, include: { gym: { select: { name: true } } } })]);
+  const [misGimnasios, reclamacionesGimnasio, avisosPersonales] = await Promise.all([
+    db.gym.findMany({ where: { ownerUserId: user.id } }),
+    db.gymClaimRequest.findMany({ where: { userId: user.id }, include: { gym: { select: { name: true } } } }),
+    db.notification.findMany({ where: { userId: user.id, createdAt: { gte: notificationCutoff() } }, select: { kind: true, title: true, href: true, createdAt: true, readAt: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
+  ]);
 
   const datos = {
     generadoEl: new Date().toISOString(),
@@ -45,7 +50,7 @@ export async function GET(request: Request) {
     cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, provinciaOpcional: user.province, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
     perfilDeEntrenador: entrenador && { nombre: entrenador.name, presentacion: entrenador.bio, disciplinas: entrenador.disciplines, anosEntrenando: entrenador.yearsCoaching, ciudad: entrenador.city, provincia: entrenador.province, gimnasio: entrenador.gym?.name ?? null, creadoEl: entrenador.createdAt,
       clases: entrenador.classes.map((c) => ({ tipo: c.kind, titulo: c.title, disciplina: c.discipline, minutos: c.minutes, precioEuros: c.priceEuros, plazas: c.capacity, horario: c.schedule, publicada: c.active, creadaEl: c.createdAt })) },
-    misHighlights: highlights.map((h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, foto: h.image ? Buffer.from(h.image).toString("base64") : null, formatoImagen: h.image ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt })),
+    misHighlights: highlights.map((h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, referenciaAlVideoOriginal: h.sourceMediaId, foto: h.image ? Buffer.from(h.image).toString("base64") : null, formatoImagen: h.image ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt })),
     perfilesPersonalizados: (await db.profile.findMany({where:{ownerId:user.id}})).map(p => ({ tipo:p.kind, nombre:p.name, presentacion:p.bio, zona:p.city, web:p.website, foto:p.avatar ? Buffer.from(p.avatar).toString("base64") : null, banner:p.banner ? Buffer.from(p.banner).toString("base64") : null, formatoImagen:"image/webp", encuadre:{fotoX:p.avatarX,fotoY:p.avatarY,bannerX:p.bannerX,bannerY:p.bannerY} })),
     fichaDePeleador: fighter && {
       nombre: fighter.firstName, apellidos: fighter.lastName, alias: fighter.alias, fechaDeNacimiento: fighter.birthDate, ciudad: fighter.city, provincia: fighter.province,
@@ -63,6 +68,7 @@ export async function GET(request: Request) {
     gimnasiosQueGestiono: misGimnasios.map((g) => ({ nombre: g.name, ciudad: g.city, provincia: g.province, telefonoProfesional: g.phone, correoProfesional: g.email, estado: g.status, reclamadoEl: g.claimedAt })),
     reclamacionesDeGimnasio: reclamacionesGimnasio.map((c) => ({ gimnasio: c.gym.name, prueba: c.evidence, enlaceDePrueba: c.evidenceUrl, estado: c.status, nota: c.note, creadaEl: c.createdAt, revisadaEl: c.reviewedAt })),
     veladasQueHeMarcado: agenda.map((a) => ({ evento: a.event.name, fecha: a.event.date, marcadaEl: a.createdAt })),
+    avisosDentroDeLaAplicacion: avisosPersonales.map((a) => ({ tipo: a.kind, titulo: a.title, destino: a.href, creadoEl: a.createdAt, leidoEl: a.readAt })),
     disponibilidadParaPelear: fighter && { activada: fighter.availableToFight, desde: fighter.availableSince, pesoDeclaradoKg: fighter.currentWeightKg },
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),
     solicitudesParaReclamarUnaFicha: claims.map((c) => ({ ficha: publicFighterName(c.fighter), estado: c.status, fecha: c.createdAt })),

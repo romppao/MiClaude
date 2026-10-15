@@ -1,3 +1,4 @@
+import { boutsQueCuentan } from "../../lib/common/record-eligibility";
 import PreparacionVelada from "./PreparacionVelada";
 import { preparationAudience } from "../../lib/events/preparation-data";
 import Link from "next/link";
@@ -33,6 +34,13 @@ export default async function InicioEntidad({ user }: { user: User }) {
   const combates = await db.bout.count({ where: { event: { organizerId: user.id } } });
   const inscripciones = veladas ? await db.eventRegistration.count({ where: { status: "PENDING", event: { organizerId: user.id } } }) : 0;
   const kind = parseTipoDeEntidad(solicitud?.kind ?? "") ?? "PROMOTORA";
+  const accreditation = kind === "FEDERACION" ? await db.supportAccreditation.findUnique({ where: { userId: user.id } }) : null;
+  const canSupport = accreditation?.active && accreditation.kind === "FEDERATION";
+  const [pendingTitles, pendingBouts, competitions] = kind === "FEDERACION" ? await Promise.all([
+    canSupport ? db.fighterAchievement.count({ where: { reviewRequestedAt: { not: null }, supportKind: "DECLARED", withdrawnAt: null, rejectedAt: null, discipline: { in: accreditation.disciplines }, fighter: { listed: true, hiddenAt: null, OR: [{ userId: null }, { userId: { not: user.id } }] } } }) : 0,
+    canSupport ? db.bout.count({ where: { AND: [boutsQueCuentan(), { event: { discipline: { in: accreditation.disciplines } }, fighterA: { hiddenAt: null, OR: [{ userId: null }, { userId: { not: user.id } }] }, fighterB: { hiddenAt: null, OR: [{ userId: null }, { userId: { not: user.id } }] }, supportKind: { not: "FEDERATION" } }] } }) : 0,
+    db.event.findMany({ where: { organizerId: user.id }, orderBy: [{ date: "desc" }, { id: "asc" }], take: 10 }),
+  ]) : [0, 0, []];
   const nombre = solicitud?.status === "APPROVED" ? solicitud.orgName : user.name;
   const porResultado = resumenResultadosPendientes(pendientes);
   const perfil = await db.profile.findUnique({ where: { kind_entityId: { kind: "promotor", entityId: user.id } }, select: { hasAvatar: true, bio: true, website: true } });
@@ -40,6 +48,7 @@ export default async function InicioEntidad({ user }: { user: User }) {
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
       <Saludo kicker="Mi panel" nombre={nombre} cuadrado sub={<span style={{ display: "inline-flex", gap: 5, alignItems: "center", color: "var(--acc-text)" }}><Icono nombre="check" tam={14} grosor={2.4} />{TIPO_DE_ENTIDAD_ETIQUETA[kind]} · organizador aprobado</span>} />
       <Link className="btn secondary" href="/mis-gimnasios">¿Tu gimnasio ya está en Lona? Búscalo o gestiona el tuyo</Link>
+      {kind === "FEDERACION" && <section className="tarjeta" aria-label="Panel de federación"><h2>Tu federación</h2>{canSupport ? <Link className="btn secondary" href="/respaldar">Respaldar resultados y títulos ({pendingBouts + pendingTitles})</Link> : <p>Para respaldar resultados y títulos, moderación debe autorizar tu acreditación de federación. Tu perfil público no concede ese permiso.</p>}<p>{pendingTitles} títulos pendientes de respaldo en tus disciplinas autorizadas</p><h3>Tus competiciones</h3>{competitions.map((c) => <Link key={c.id} className="fila" href={`/organizador/${c.slug}`}>{c.name} · {fmtDate(c.date)}</Link>)}<Link className="btn secondary" href="/organizador">Ver todas tus competiciones</Link></section>}
       <TeToca pendientes={[
         { texto: "Resultados por poner", href: "/organizador#mis-eventos", cantidad: porResultado.total },
         { texto: "Solicitudes para participar", href: "/organizador", cantidad: inscripciones },

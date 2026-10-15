@@ -406,3 +406,7 @@ Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; 
 14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.
 
 14 oct, D: código de directorio e importador preparado; recuento real/cargas pendientes por red y CI/revisión sin cerrar. H sigue pendiente.
+
+
+## 2026-10-15 — Paneles H preparados para revisión (Codex)
+Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.

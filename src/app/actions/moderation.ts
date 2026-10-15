@@ -175,7 +175,7 @@ export async function resolveReport(f: FormData) {
 export async function actualizarFallo(f: FormData) {
   const admin = await requireAdmin();
   const id = str(f, "falloId");
-  const back = returnTo(f, `/moderacion/fallos/${encodeURIComponent(id)}`);
+  const back = returnTo(f, str(f, "back").split(/[?#]/)[0] === "/moderacion" ? "/moderacion" : `/moderacion/fallos/${encodeURIComponent(id)}`);
   const fallo = await db.appError.findUnique({ where: { id }, select: { id: true, status: true, note: true } });
   if (!fallo) go(back, { problema: "no_existe" });
   const estado = str(f, "estado");
@@ -195,7 +195,7 @@ export async function actualizarFallo(f: FormData) {
 export async function decidirVeladaPasada(f: FormData) {
   const admin = await requireAdmin();
   const id = str(f, "eventId");
-  const back = "/moderacion/veladas";
+  const back = returnTo(f, str(f, "back").split(/[?#]/)[0] === "/moderacion" ? "/moderacion" : "/moderacion/veladas");
   const event = await db.event.findUnique({ where: { id }, include: { organizer: { select: { id: true } } } });
   if (!event || event.status !== "PENDING_AUTHORIZATION" || !event.organizerId) go(back, { problema: "no_existe" });
   const decision = str(f, "decision");

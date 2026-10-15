@@ -79,13 +79,17 @@ export default function Privacy() {
       <p>En España, a partir de los 14 años puedes dar tu consentimiento para usar Lona. Si tienes menos de 14 años, es tu madre, padre o tutor quien debe autorizarlo. Si eres madre, padre o tutor y crees que un menor usa Lona sin tu permiso, o aparece en una ficha, foto o vídeo, escríbenos y lo retiraremos.</p>
 
       <h2>Cuánto tiempo los conservamos</h2>
+      <p>Los avisos de tu campanita solo los ves tú. Te informan sobre actividad relacionada con tu cuenta; son independientes de la preferencia de correo y no son mensajes comerciales. Puedes marcarlos como leídos y descargarlos con tus datos.</p>
       <ul>
         <li>Tu cuenta y tu ficha, hasta que las elimines.</li>
         <li>Cuentas cuyo correo nunca se ha confirmado: se borran a los 30 días.</li>
         <li>Enlaces enviados por correo: caducan a la hora (recuperar contraseña) o a las 48 horas (confirmar correo).</li>
         <li>Solicitudes para reclamar una ficha: el texto con el que demuestras quién eres se borra en cuanto un moderador decide, y la solicitud a los 90 días.</li>
         <li>Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.</li>
+        <li>Avisos de la campanita: 12 meses desde su creación. Después dejan de mostrarse y se eliminan en la limpieza periódica; al eliminar tu cuenta también se borran.</li>
       </ul>
+
+      <p>Si añades a tus highlights un vídeo público de tu combate, se mantiene una referencia al vídeo original y se avisa a quien lo compartió. Si el original se retira, se oculta o su velada deja de ser pública, también deja de verse en tus highlights. Quitar esa referencia de tu ficha no borra el vídeo de otra persona.</p>
 
       <h2>Tus derechos y cómo ejercerlos</h2>
       <p>Puedes ejercerlos tú mismo, sin pedir permiso a nadie, desde tu cuenta:</p>

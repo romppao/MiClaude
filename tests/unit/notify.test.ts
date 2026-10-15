@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const db = vi.hoisted(() => ({ bout: { findUnique: vi.fn() }, follow: { findMany: vi.fn() } }));
 const mail = vi.hoisted(() => ({ APP_URL: "https://ring.test", sendMail: vi.fn() }));
 const auth = vi.hoisted(() => ({ unsubscribeLink: vi.fn(async (id: string) => `https://ring.test/baja?token=${id}`) }));
+vi.mock("../../src/lib/community/notifications", () => ({ notifyFollowedBout: vi.fn(), notifyInApp: vi.fn() }));
 vi.mock("../../src/lib/common/db", () => ({ db }));
 vi.mock("../../src/lib/common/mail", () => mail);
 vi.mock("../../src/lib/accounts/auth", () => auth);

@@ -60,11 +60,12 @@ import * as entrenadores from "../../src/app/actions/trainers";
 import * as noticias from "../../src/app/actions/news";
 import * as medios from "../../src/app/actions/media";
 import * as propuestas from "../../src/app/actions/proposals";
+import * as notificaciones from "../../src/app/actions/notifications";
 import * as gimnasios from "../../src/app/actions/gyms";
 import * as inscripciones from "../../src/app/actions/registrations";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones, ...gimnasios };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones, ...gimnasios, ...notificaciones };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -83,8 +84,8 @@ beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; i
 
 const SOLO_MODERADORES = ["decideGymClaim","adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
-const EXIGEN_SESION = ["setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["addPublicVideoHighlight","saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
+const EXIGEN_SESION = ["readNotification", "readAllNotifications","setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…).
 const PUBLICAS = ["register", "login", "logout", "requestPasswordReset", "resetPassword", "unsubscribeEmails", "verifyEmail"] as const;
@@ -637,5 +638,27 @@ describe("gimnasios: control de propiedad", () => {
     expect(await destino(acciones.transferGym, { gymId: "g", email: "nuevo@x.es" })).toContain("problema=sin_permiso");
     expect(await destino(acciones.setGymMember, { gymId: "g", kind: "fighter", memberId: "f", decision: "unlink" })).toContain("problema=sin_permiso");
     expect(mundo.estado.escrituras).toEqual([]);
+  });
+});
+
+
+describe("H: aislamiento de avisos y vídeos", () => {
+  it("marcar un aviso siempre filtra por la cuenta autenticada", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["notification.updateMany"] = (a: { where: { userId: string } }) => { expect(a.where.userId).toBe("u-FAN"); return { count: 0 }; };
+    expect(await destino(acciones.readNotification, { notificationId: "aviso-ajeno", userId: "otro" })).toContain("problema=no_existe");
+  });
+  it("un vídeo que no pertenece a su combate no se convierte en highlight", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "propia", slug: "propia", disciplines: [] } }));
+    mundo.estado.respuestas["mediaItem.findFirst"] = null;
+    expect(await destino(acciones.addPublicVideoHighlight, { mediaId: "ajeno" })).toContain("problema=highlight_combate");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("la copia referencia el original y no guarda su clave de archivo", async () => {
+    iniciarSesion(persona("FIGHTER", { fighter: { id: "propia", slug: "propia", disciplines: [] } }));
+    mundo.estado.respuestas["mediaItem.findFirst"] = { id: "m", kind: "VIDEO", eventId: "e", bout: { eventId: "e" }, boutId: "b", caption: "Vídeo", uploaderId: "autor", videoKey: "archivo-del-autor", videoUrl: null };
+    mundo.estado.respuestas["highlight.create"] = (a: { data: Record<string, unknown> }) => { expect(a.data.sourceMediaId).toBe("m"); expect(a.data).not.toHaveProperty("videoKey"); return { id: "h" }; };
+    expect(await destino(acciones.addPublicVideoHighlight, { mediaId: "m" })).toContain("aviso=highlight_publico_anadido");
+    expect(mundo.estado.escrituras).toContain("notification.upsert");
   });
 });

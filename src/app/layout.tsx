@@ -9,6 +9,7 @@ import TemaPersistente from "./components/TemaPersistente";
 import MobileNav from "./components/MobileNav";
 import NavigationMenu from "./components/NavigationMenu";
 import Experience from "./components/experience/Experience";
+import { notificationCutoff } from "../lib/common/periods";
 import { db } from "../lib/common/db";
 import { getUser } from "../lib/accounts/auth";
 import { logout } from "./actions/accounts";
@@ -33,10 +34,11 @@ const TEMA_INICIAL = `try{var t=localStorage.getItem("lona:tema");if(t==="claro"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
-  const [accreditation, managedProfileCount, trainer] = await Promise.all([
+  const [accreditation, managedProfileCount, trainer, unread] = await Promise.all([
     user && user.role !== "ADMIN" ? db.supportAccreditation.findUnique({ where: { userId: user.id } }) : Promise.resolve(null),
     user ? db.profile.count({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } } }) : Promise.resolve(0),
     user?.role === "TRAINER" ? db.trainer.findUnique({ where: { userId: user.id }, select: { slug: true, gym: { select: { slug: true } } } }) : Promise.resolve(null),
+    user ? db.notification.count({ where: { userId: user.id, readAt: null, createdAt: { gte: notificationCutoff() } } }) : Promise.resolve(0),
   ]);
   // Menú, barra inferior del móvil y enlaces de la cabecera según el tipo de cuenta: cada persona ve solo lo suyo.
   const papel: Papel = papelDe(user);
@@ -71,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
+                  <Link href="/avisos" className="siempre" aria-label={`Avisos: ${unread} sin leer`}><span aria-hidden="true">🔔</span>{unread > 0 && <span className="pildora">{unread > 99 ? "99+" : unread}</span>}</Link>
                   <Link href="/mi-panel" className="siempre mi-panel-cabecera">Mi panel</Link>
                   {papel === "entidad" && <Link href="/organizador" className="siempre">Mis veladas</Link>}
                   {papel === "entrenador" && <Link href="/mis-clases" className="siempre">Mis clases</Link>}

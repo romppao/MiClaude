@@ -175,6 +175,11 @@
     "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
+    "path": "prisma/migrations/20261014220000_avisos_y_videos/migration.sql",
+    "purpose": "Añade avisos personales y referencias de highlights al vídeo original con índices, unicidad y borrado en cascada; no modifica registros anteriores.",
+    "guide": "docs/AVISOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -395,6 +400,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/actions/notifications.ts",
+    "purpose": "Marca avisos propios como leídos comprobando la sesión y el destinatario; rechaza identificadores ajenos y actualiza la campanita.",
+    "guide": "docs/AVISOS.md"
+  },
+  {
     "path": "src/app/actions/profiles.ts",
     "purpose": "Guarda personalización e imágenes tras comprobar propiedad y crea perfiles de federación por moderación; normaliza archivos antes de escribir.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -453,6 +463,11 @@
     "path": "src/app/aviso-legal/page.tsx",
     "purpose": "Aviso legal (LSSI art. 10 y 16): titular desde variables de entorno y bloque de responsabilidad; borrador pendiente de revisión jurídica (docs/LEGAL.md).",
     "guide": "docs/LEGAL.md"
+  },
+  {
+    "path": "src/app/avisos/page.tsx",
+    "purpose": "Lista privada paginada de avisos de los últimos doce meses, con destino y lectura individual o conjunta.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "src/app/ayuda/page.tsx",
@@ -1351,7 +1366,7 @@
   },
   {
     "path": "src/lib/common/periods.ts",
-    "purpose": "Plazo compartido de disponibilidad aprobado en G4, sin acoplar limpieza de cuentas con consultas deportivas.",
+    "purpose": "Plazos compartidos de disponibilidad del peleador y corte de doce meses de avisos, usados por lectura, exportación y retención.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1393,6 +1408,11 @@
     "path": "src/lib/common/version.ts",
     "purpose": "Versión de la aplicación (de package.json) y commit desplegado, solo para el servidor: se muestra en ayuda, moderación y /salud y se guarda en cada fallo.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/notifications.ts",
+    "purpose": "Productores internos de avisos idempotentes por destinatario y hecho, agrupación diaria de aura y exclusión de resultados o fichas no publicables.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "src/lib/community/notify.ts",
@@ -1476,7 +1496,7 @@
   },
   {
     "path": "src/lib/fighters/highlights.ts",
-    "purpose": "Valida foto o vídeo (subido, con videoKey, o por enlace https), título y orden de publicaciones del titular; define límites del escaparate.",
+    "purpose": "Reglas y orden de highlights, límites y filtro de referencias cuyo vídeo original y velada siguen publicados.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1765,6 +1785,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "tests/e2e/paneles-avisos.mjs",
+    "purpose": "Comprueba avisos y exportación propios, manipulación de destinatario, referencias y retirada del vídeo original, prioridad/anclas de moderación y axe.",
+    "guide": "docs/AVISOS.md"
+  },
+  {
     "path": "tests/e2e/paneles-pulido.mjs",
     "purpose": "Comprueba dar y quitar aura a ambos participantes desde el panel, con y sin JavaScript, accesibilidad y anchura móvil.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1963,6 +1988,11 @@
     "path": "tests/unit/noticias.test.ts",
     "purpose": "Comprueba el lector RSS/Atom, entidades, descartes, disciplinas por palabras clave, variedad de medios y fuentes iniciales.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/notifications.test.ts",
+    "purpose": "Verifica idempotencia por destinatario, día de Madrid, retención, destino interno, privacidad de resultados y deduplicación de seguidores.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "tests/unit/notify.test.ts",

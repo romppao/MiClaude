@@ -417,3 +417,7 @@ Ficha [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md) y
   - Apple antes de las tiendas;
   - desvincular desde «Mi cuenta»;
   - añadir la dirección de vuelta de producción cuando exista.
+
+
+## Avisos y referencias de vídeos (H)
+`Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.

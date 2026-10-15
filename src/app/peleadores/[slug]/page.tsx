@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/common/db";
 import { combinedRecord, computeRecords, emptyTally } from "../../../lib/fighters/record";
 import { recordHidden } from "../../../lib/fighters/privacy";
-import { HIGHLIGHT_KIND_LABEL, miniaturaDeEnlace, orderHighlights, webDeEnlace } from "../../../lib/fighters/highlights";
+import { visibleHighlightSources, HIGHLIGHT_KIND_LABEL, miniaturaDeEnlace, orderHighlights, webDeEnlace } from "../../../lib/fighters/highlights";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
 import { iniciales, tinteDe } from "../../../lib/common/apariencia";
 import { monthlySeries } from "../../../lib/common/dates";
@@ -111,7 +111,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
   // Diseño v3: highlights del propio peleador, aura por combate y por mes, y récord amateur privado salvo para su titular.
   const propia = !!user?.fighter && user.fighter.id === fighter.id;
   const [highlights, auraPorCombate, perfil, aurasRecientes, acceso, medios] = await Promise.all([
-    publica || propia ? db.highlight.findMany({ where: { fighterId: fighter.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, videoKey: true, hasImage: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }) : Promise.resolve([]),
+    publica || propia ? db.highlight.findMany({ where: { fighterId: fighter.id, hiddenAt: null, ...visibleHighlightSources }, select: { sourceMedia: { select: { videoKey: true } }, id: true, kind: true, title: true, videoUrl: true, videoKey: true, hasImage: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }) : Promise.resolve([]),
     db.aura.groupBy({ by: ["boutId"], where: { fighterId: fighter.id, bout: COUNTED }, _count: { _all: true } }),
     db.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: fighter.id } }, select: { hasBanner: true, hasAvatar: true, updatedAt: true, bannerX: true, bannerY: true, avatarX: true, avatarY: true } }),
     db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED, createdAt: { gte: new Date(Date.now() - 220 * 864e5) } }, select: { createdAt: true } }),
@@ -195,22 +195,23 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           {(ordenados.length > 0 || propia) && <div className="desliza" role="region" tabIndex={0} aria-label="Highlights (desliza para ver más)">
             {propia && <Link href="/mi-ficha#publicar-highlight" className="highlight-nuevo"><span className="mas" aria-hidden="true"><Icono nombre="mas" tam={24} grosor={2.4} /></span>Publicar highlight</Link>}
             {ordenados.map((h) => {
-              const destino = h.kind === "VIDEO" ? (h.videoKey ? `/highlights/${h.id}/video` : h.videoUrl!) : `/highlights/${h.id}/imagen`;
+              const videoSubido = h.videoKey || h.sourceMedia?.videoKey;
+              const destino = h.kind === "VIDEO" ? (videoSubido ? `/highlights/${h.id}/video` : h.videoUrl!) : `/highlights/${h.id}/imagen`;
               return (
                 <a key={h.id} href={destino} target="_blank" rel="noopener noreferrer nofollow ugc" className="tarjeta-foto highlight" style={{ "--tinte": tinteDe(principal?.discipline) } as CSSProperties}>
                   {/* Portada: la foto elegida o sacada del vídeo al subirlo; si no hay, un fotograma del propio vídeo o la miniatura de YouTube. */}
                   {h.hasImage ? <img src={`/highlights/${h.id}/imagen`} alt="" loading="lazy" />
-                    : h.videoKey ? <video className="portada-video" src={`/highlights/${h.id}/video#t=0.5`} preload="metadata" muted playsInline aria-hidden="true" tabIndex={-1} />
+                    : videoSubido ? <video className="portada-video" src={`/highlights/${h.id}/video#t=0.5`} preload="metadata" muted playsInline aria-hidden="true" tabIndex={-1} />
                     : miniaturaDeEnlace(h.videoUrl) && <img src={miniaturaDeEnlace(h.videoUrl)!} alt="" loading="lazy" />}
                   <span className="arriba"><span className="pildora" style={{ background: "rgba(0,0,0,.6)", fontSize: 13 }}>{HIGHLIGHT_KIND_LABEL[h.kind]}</span>{h.pinned && <span className="pildora pildora-acc" style={{ fontSize: 13 }}>Destacado</span>}</span>
                   {h.kind === "VIDEO" && <span className="play" aria-hidden="true"><Icono nombre="play" /></span>}
-                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(var(--ink),.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "PHOTO" ? "Foto" : h.videoKey ? "Vídeo" : `Vídeo de ${webDeEnlace(h.videoUrl)}`)}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
+                  <span className="abajo"><strong>{h.title}</strong><span className="meta" style={{ color: "rgba(var(--ink),.75)", fontSize: 13 }}>{h.bout?.event.name ?? (h.kind === "PHOTO" ? "Foto" : videoSubido ? "Vídeo" : `Vídeo de ${webDeEnlace(h.videoUrl)}`)}</span><span className="sr-only"> (se abre en otra pestaña)</span></span>
                 </a>
               );
             })}
           </div>}
           {ordenados.length === 0 && !propia && <p className="mut" style={{ margin: 0 }}>Todavía no ha publicado highlights.</p>}
-          {ordenados.some((h) => h.kind === "VIDEO" && !h.videoKey) && <p className="meta" style={{ margin: 0 }}>Los vídeos con enlace se abren en la web donde se publicaron.</p>}
+          {ordenados.some((h) => h.kind === "VIDEO" && !h.videoKey && !h.sourceMedia?.videoKey) && <p className="meta" style={{ margin: 0 }}>Los vídeos con enlace se abren en la web donde se publicaron.</p>}
         </section>
       )}
 

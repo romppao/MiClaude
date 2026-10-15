@@ -55,8 +55,8 @@ const admin = await newUser("Admin");
 hacerAdmin(admin.email);
 await admin.p.goto(B + "/moderacion");
 check("admin ve la reclamación", await admin.p.locator("body").innerText().then((t) => t.includes(`Dos${rnd}`)));
-await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
-await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" }); // la acción ha terminado
+await admin.p.locator("article", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
+await admin.p.locator("article", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" }); // la acción ha terminado
 await luis.goto(B + "/mi-ficha");
 check("Luis ya tiene la ficha reclamada", await luis.locator("body").innerText().then((t) => t.includes("Registrar un combate")));
 await btn(luis, "Sí, es correcto");
@@ -158,11 +158,11 @@ await report();
 await fan.locator(".notice-bad", { hasText: "Ya nos avisaste" }).waitFor();
 check("no se puede repetir un aviso abierto", await fan.locator(".notice-bad").count() === 1);
 await admin.p.goto(B + "/moderacion");
-const repRow = admin.p.locator("tr", { hasText: `Aviso ${rnd}` });
+const repRow = admin.p.locator("article", { hasText: `Aviso ${rnd}` });
 check("el moderador ve el aviso con su motivo", await repRow.count() === 1 && (await repRow.innerText()).includes("El resultado no es correcto"));
 await repRow.locator("button:has-text('Cerrar: ya está corregido')").click();
 await repRow.waitFor({ state: "detached" });
-check("el aviso resuelto sale de la cola", await admin.p.locator("tr", { hasText: `Aviso ${rnd}` }).count() === 0);
+check("el aviso resuelto sale de la cola", await admin.p.locator("article", { hasText: `Aviso ${rnd}` }).count() === 0);
 
 // 4c) seguir a un peleador y ver la página de ayuda sin cuenta
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
@@ -305,11 +305,13 @@ check("«Peleadores que sigo» muestra el próximo combate", await fan.locator("
 
 // Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
 await admin.p.goto(B + "/moderacion");
-const gymRow = () => admin.p.locator("tr", { hasText: `Gym Test ${rnd}` });
+const gymRow = () => admin.p.locator("article", { hasText: `Gym Test ${rnd}` });
 await gymRow().locator("button:has-text('Verificar')").click();
 check("sello sin nota se rechaza", await seen(admin.p.locator("text=necesita una nota")));
 await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, llamada al responsable");
 await gymRow().locator("button:has-text('Verificar')").click();
+await admin.p.locator(".notice-ok").waitFor();
+await admin.p.goto(B + "/moderacion?gimnasiosTodos=1#gimnasios");
 await gymRow().locator("button:has-text('Retirar sello')").waitFor(); // la acción ha terminado
 await pepe.goto(B + `/gimnasios/gym-test-${rnd}-madrid`);
 check("gimnasio muestra el sello de verificado", await pepe.locator('.profile-heading .tag[title="Verificado por un moderador"]', { hasText: "verificado" }).count() === 1);

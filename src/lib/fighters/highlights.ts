@@ -6,6 +6,9 @@ export const HIGHLIGHT_TITLE_MAX = 60;
 export const MAX_HIGHLIGHTS = 12;
 export const HIGHLIGHT_KIND_LABEL: Record<HighlightKind, string> = { VIDEO: "Vídeo", PHOTO: "Foto" };
 
+/** Una referencia al vídeo del público sigue su retirada y la publicación de su velada; no copia archivos ajenos. */
+export const visibleHighlightSources = { OR: [{ sourceMediaId: null }, { sourceMedia: { hiddenAt: null, event: { status: { in: ["SCHEDULED", "COMPLETED"] as ("SCHEDULED" | "COMPLETED")[] } } } }] };
+
 export type HighlightInput = { kind: string; title: string; videoUrl: string; hasImage: boolean; videoKey?: string };
 export type HighlightParsed = { ok: true; kind: HighlightKind; title: string; videoUrl: string | null; videoKey: string | null } | { ok: false; problema: string };
 

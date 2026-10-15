@@ -56,7 +56,7 @@ await fan.locator(".notice-ok", { hasText: "aura" }).waitFor();
 check("el aura se suma en la ficha", await seen(fan.locator(".rec", { hasText: /^\s*1\s*$/ }).first()));
 check("no se puede dar aura dos veces al mismo combate", await fan.locator("button:has-text('Dar aura')").count() === 0 && await fan.locator("button:has-text('Quitar mi aura')").count() === 1);
 
-const filaCombate = () => mod.locator("tr", { hasText: `Velada de Hoy ${rnd}` });
+const filaCombate = () => mod.locator("article", { hasText: `Velada de Hoy ${rnd}` });
 await mod.goto(B + "/moderacion");
 await filaCombate().locator("button:has-text('Marcar como no correcto')").click();
 await filaCombate().locator("button:has-text('Restaurar')").waitFor();
@@ -80,7 +80,7 @@ await detalles.locator("select[name=reason]").selectOption({ index: 1 });
 await detalles.locator("button:has-text('Enviar aviso')").click();
 await aviso.locator(".notice-ok").waitFor();
 await mod.goto(B + "/moderacion");
-const filaAviso = mod.locator("tr", { hasText: `Gran pelea ${rnd}` });
+const filaAviso = mod.locator("article", { hasText: `Gran pelea ${rnd}` });
 check("el moderador ve el comentario denunciado", await seen(filaAviso.first()));
 await filaAviso.locator("button:has-text('Resolver y retirar el comentario')").click();
 await filaAviso.waitFor({ state: "detached" });

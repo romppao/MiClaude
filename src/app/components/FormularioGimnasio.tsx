@@ -3,9 +3,10 @@ import { PROVINCES } from "../../lib/common/labels";
 import { DISCIPLINE_ORDER, DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 
 /** Formulario compartido; recibe la acción autorizada desde la página. Solo contacto profesional del negocio. */
-export default function FormularioGimnasio({ action, gym, admin = false }: { action: (f: FormData) => Promise<void>; gym?: Gym | null; admin?: boolean }) {
+export default function FormularioGimnasio({ action, gym, admin = false, back }: { action: (f: FormData) => Promise<void>; gym?: Gym | null; admin?: boolean; back?: string }) {
   return <form action={action} className="tarjeta">
     {gym && <input type="hidden" name="gymId" value={gym.id} />}
+    {back && <input type="hidden" name="back" value={back} />}
     <label className="field"><span>Nombre del gimnasio</span><input name="name" required maxLength={150} defaultValue={gym?.name} /></label>
     <label className="field"><span>Ciudad</span><input name="city" required maxLength={100} defaultValue={gym?.city} /></label>
     <label className="field"><span>Provincia</span><select name="province" required defaultValue={gym?.province ?? ""}><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>

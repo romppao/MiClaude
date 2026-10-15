@@ -3,6 +3,9 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  highlight_publico_anadido: "Vídeo añadido a tus highlights. Quien lo compartió recibe un aviso si es otra persona.",
+  aviso_leido: "Aviso marcado como leído.",
+  avisos_leidos: "Tus avisos se han marcado como leídos.",
   gimnasio_guardado: "Gimnasio guardado. Las altas y los datos por revisar no se publican hasta su revisión.",
   gimnasio_reclamado: "Reclamación enviada a moderación. Puedes ver su estado en Mis gimnasios.",
   gimnasio_conflicto: "El gimnasio ya tiene titular. La solicitud queda en conflicto y no cambia su propiedad.",
@@ -124,6 +127,7 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  highlight_ya_anadido: "Ese vídeo ya está en tus highlights.",
   gimnasio_contacto: "Revisa el teléfono y el correo profesional del gimnasio.",
   gimnasio_prueba: "Explica cómo comprobar tu relación con el gimnasio y usa un enlace web válido si lo aportas. No envíes DNI.",
   gimnasio_solicitud_repetida: "Ya tienes una reclamación de este gimnasio pendiente de revisión.",
