@@ -1036,7 +1036,7 @@
   },
   {
     "path": "src/app/moderacion/page.tsx",
-    "purpose": "Colas moderadoras de combates, avisos (con vídeos y fotos), reclamaciones, organizadores y gimnasios; enlaza a fuentes de noticias; conserva filtros tras decidir.",
+    "purpose": "Bandeja única protegida de moderación por urgencia, con páginas independientes, avisos sin cuenta/PAGINA y decisiones según entidad y estado; conserva versiones de combate y notas de resolución.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1916,7 +1916,7 @@
   },
   {
     "path": "tests/e2e/paneles-avisos.mjs",
-    "purpose": "Comprueba avisos y exportación propios, manipulación de destinatario, referencias y retirada del vídeo original, prioridad/anclas de moderación y axe.",
+    "purpose": "Recorridos reales de avisos privados, referencias de highlights y bandeja única: prioridades, remitente sin cuenta, PAGINA, las tres decisiones de combate y accesibilidad.",
     "guide": "docs/AVISOS.md"
   },
   {

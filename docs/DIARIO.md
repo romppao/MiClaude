@@ -2310,6 +2310,9 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
 
+## 2026-10-15 — Relevo D/H: bandeja única de moderación
+El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
+
 ## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
 
 **Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
@@ -2323,4 +2326,4 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 **Validación:** tipos y compilación correctos; 851 de 853 pruebas unitarias en este portátil. Fallan las dos de contraseñas por pasar de 5 s con el equipo cargado, como ya pasó otras veces en local. Las de entradas pasan. La prueba de navegador `tests/e2e/entradas.mjs` se ejecuta en el CI (Linux), porque las ayudas de las pruebas usan `psql` y variables de shell que no hay en Windows.
 
-**Pendiente:** fusionar #92 y los PR de Codex #88–#91 (el fundador o con un permiso; el clasificador de seguridad de Claude Code no deja fusionar sin revisión). Después, la fase 2 (agenda del entrenador).
+**Pendiente:** el #92 ya está fusionado (autorizado por el fundador el 15-10 por la noche). Quedan este PR (#93) y los de Codex #88–#91, que se fusionan solo con el «sí» del fundador (el clasificador de seguridad de Claude Code no deja fusionar sin esa autorización). Después, la fase 2 (agenda del entrenador).

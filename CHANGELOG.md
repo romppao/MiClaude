@@ -31,6 +31,13 @@ PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas
 - **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
 - **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
 
+## [0.18.9] — 2026-10-15
+
+PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.
+
+### Cambiado
+- Moderación reúne sus colas en una bandeja por urgencia, mantiene las páginas y los avisos sin cuenta/PAGINA/GYM. «Poner en revisión» envía `dispute`; se conservan notas y avisos al abrir enlaces.
+
 ## [0.18.8] — 2026-10-15
 
 PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).

@@ -55,8 +55,8 @@ const admin = await newUser("Admin");
 hacerAdmin(admin.email);
 await admin.p.goto(B + "/moderacion");
 check("admin ve la reclamación", await admin.p.locator("body").innerText().then((t) => t.includes(`Dos${rnd}`)));
-await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
-await admin.p.locator("tr", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" }); // la acción ha terminado
+await admin.p.locator("tr, article[data-cola]", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").click();
+await admin.p.locator("tr, article[data-cola]", { hasText: `Dos${rnd}` }).locator("button:has-text('Aprobar')").waitFor({ state: "detached" }); // la acción ha terminado
 await luis.goto(B + "/mi-ficha");
 check("Luis ya tiene la ficha reclamada", await luis.locator("body").innerText().then((t) => t.includes("Registrar un combate")));
 await btn(luis, "Sí, es correcto");
@@ -81,15 +81,15 @@ check("y quien lo registró recibe el motivo por correo", !!(await esperarCorreo
 
 // 3c) Quien ya tiene una ficha provisional con su nombre: se le avisa antes de crear otra, y con una solicitud pendiente no se le deja crearla
 await registrar(pepe, { evento: `Velada Nuria ${rnd}`, fecha: "2026-08-10", rivalNombre: "Nuria", rivalApellidos: `Provisional${rnd}` });
-await pepe.locator("tr", { hasText: `Velada Nuria ${rnd}` }).waitFor(); // se espera a la fila nueva, no al aviso: el formulario se vacía justo al terminar y rellenarlo antes lo perdería
+await pepe.locator("tr, article[data-cola]", { hasText: `Velada Nuria ${rnd}` }).waitFor(); // se espera a la fila nueva, no al aviso: el formulario se vacía justo al terminar y rellenarlo antes lo perdería
 await registrar(pepe, { evento: `Velada Olga ${rnd}`, fecha: "2026-08-11", rivalNombre: "Olga", rivalApellidos: `Provisional${rnd}` });
-await pepe.locator("tr", { hasText: `Velada Olga ${rnd}` }).waitFor();
+await pepe.locator("tr, article[data-cola]", { hasText: `Velada Olga ${rnd}` }).waitFor();
 // 3b2) Un combate registrado por error se puede quitar (y con él la velada y la ficha provisional que solo existían por él)
 await registrar(pepe, { evento: `Velada Error ${rnd}`, fecha: "2026-08-12", rivalNombre: "Error", rivalApellidos: `Quitar${rnd}` });
-await pepe.locator("tr", { hasText: `Velada Error ${rnd}` }).waitFor();
-await pepe.locator("tr", { hasText: `Velada Error ${rnd}` }).locator("summary", { hasText: "Quitar este combate" }).click();
-await pepe.locator("tr", { hasText: `Velada Error ${rnd}` }).locator("button:has-text('Sí, quitar este combate')").click();
-check("un combate registrado por error se quita y se confirma", await seen(pepe.locator("[role=status]", { hasText: "se ha quitado de tu ficha" })) && await pepe.locator("tr", { hasText: `Velada Error ${rnd}` }).count() === 0);
+await pepe.locator("tr, article[data-cola]", { hasText: `Velada Error ${rnd}` }).waitFor();
+await pepe.locator("tr, article[data-cola]", { hasText: `Velada Error ${rnd}` }).locator("summary", { hasText: "Quitar este combate" }).click();
+await pepe.locator("tr, article[data-cola]", { hasText: `Velada Error ${rnd}` }).locator("button:has-text('Sí, quitar este combate')").click();
+check("un combate registrado por error se quita y se confirma", await seen(pepe.locator("[role=status]", { hasText: "se ha quitado de tu ficha" })) && await pepe.locator("tr, article[data-cola]", { hasText: `Velada Error ${rnd}` }).count() === 0);
 const huerfana = await pepe.goto(B + `/peleadores/error-q`);
 check("y la ficha provisional del rival, que solo existía por ese combate, desaparece con él", huerfana.status() === 404);
 await pepe.goto(B + "/mi-ficha");
@@ -158,11 +158,11 @@ await report();
 await fan.locator(".notice-bad", { hasText: "Ya nos avisaste" }).waitFor();
 check("no se puede repetir un aviso abierto", await fan.locator(".notice-bad").count() === 1);
 await admin.p.goto(B + "/moderacion");
-const repRow = admin.p.locator("tr", { hasText: `Aviso ${rnd}` });
+const repRow = admin.p.locator("tr, article[data-cola]", { hasText: `Aviso ${rnd}` });
 check("el moderador ve el aviso con su motivo", await repRow.count() === 1 && (await repRow.innerText()).includes("El resultado no es correcto"));
 await repRow.locator("button:has-text('Cerrar: ya está corregido')").click();
 await repRow.waitFor({ state: "detached" });
-check("el aviso resuelto sale de la cola", await admin.p.locator("tr", { hasText: `Aviso ${rnd}` }).count() === 0);
+check("el aviso resuelto sale de la cola", await admin.p.locator("tr, article[data-cola]", { hasText: `Aviso ${rnd}` }).count() === 0);
 
 // 4c) seguir a un peleador y ver la página de ayuda sin cuenta
 await fan.goto(B + `/peleadores/pepe-uno${rnd}`);
@@ -311,7 +311,7 @@ check("«Peleadores que sigo» muestra el próximo combate", await fan.locator("
 
 // Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
 await admin.p.goto(B + "/moderacion");
-const gymRow = () => admin.p.locator("tr", { hasText: `Gym Test ${rnd}` });
+const gymRow = () => admin.p.locator("tr, article[data-cola]", { hasText: `Gym Test ${rnd}` });
 await gymRow().locator("button:has-text('Verificar')").click();
 check("sello sin nota se rechaza", await seen(admin.p.locator("text=necesita una nota")));
 await gymRow().locator("input[name=note]").fill("Web y Google Maps comprobadas, llamada al responsable");
