@@ -17,9 +17,9 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **Lo legal que faltaba programar**: bloquear usuarios, aviso sin cuenta (`/avisar`) y correos con la decisión de moderación. Antes: separar la demo (0.15.1, fusionado) | `claude-nube/legal-en-la-app-bloquear-usuarios-avisos-20261015`, versión 0.16.0 | PR abierto |
+| Claude (nube, el chat del móvil) | **T-004: fotos fuera de la base de datos** (almacén de fotos en R2). Antes, fusionados: separar la demo (0.15.1) y bloqueos, aviso sin cuenta y correos de moderación (0.16.0) | `claude-nube/t-004-parte-2-fotos-fuera-de-la-base-de--20261015`, versión 0.16.1 | PR abierto |
 | Claude Code (portátil) | **Arreglos de T-016** (bloqueantes de las 5 partes) y, después, **relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI) | `claude/arreglos-t016`, versión 0.15.0 | en curso |
-| Codex | **T-002: Dependabot agrupado** (#17/#18/#19/#65/#66), después de T-013 en su rama propia. **F/G/D/H no se tocan** (#56/#62/#64/#71) hasta que Claude Code decida entre F/G y lo indique aquí (#69/#70). | `codex/t-002-dependabot-agrupado-20261015`, versión 0.16.2 (después de T-013, 0.16.1) | en validación |
+| Codex | **T-002: Dependabot agrupado** (#17/#18/#19/#65/#66), después de T-013 en su rama propia. **F/G/D/H no se tocan** (#56/#62/#64/#71) hasta que Claude Code decida entre F/G y lo indique aquí (#69/#70). | `codex/t-002-dependabot-agrupado-20261015`, versión 0.16.3 (después de T-013, 0.16.2) | en validación |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
@@ -29,7 +29,7 @@
 0. **Desenganchar ya lonaclub.es de la demo** (paso 0 de [`PRODUCCION.md`](PRODUCCION.md)): quitar el dominio en Render y borrar el A y el CNAME `www` en Infomaniak, sin tocar MX, SPF ni DMARC.
 1. **Poner el repositorio en privado.**
 2. **Claves de Google** ([`GOOGLE.md`](GOOGLE.md)): proyecto en Google Cloud, ID de cliente con la dirección de vuelta de la demo, y pegar `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en Render (nunca en el chat). Mientras no haya dominio propio, **no pulsar «Publicar aplicación»** (Google pide verificar los dominios); basta el modo de prueba con él como usuario. Con el dominio real habrá que añadir su dirección de vuelta.
-3. **Cuentas de producción** de #57 (facturación de Google Cloud, R2, Resend y Sentry), cuando el fundador decida montar la versión real. Neon ya está; **la demo ya usa su base de Neon** (`lona-demo`) desde el 14-10-2026, así que la caducidad de la base de Render ya no la afecta.
+3. **Cuentas de producción** de #57 (facturación de Google Cloud, R2, Resend y Sentry), cuando el fundador decida montar la versión real. **R2 es imprescindible** desde la 0.16.1: guarda las fotos (sin él, la base gratuita se llenaría). Neon ya está; **la demo ya usa su base de Neon** (`lona-demo`) desde el 14-10-2026, así que la caducidad de la base de Render ya no la afecta.
 4. **UptimeRobot** y cambiar la clave de noticias `CRON_SECRET`.
 5. **Decisiones:** menores (T-014: abrir solo a mayores de 18 o hacer la política), abogado para condiciones de uso y privacidad, y los gastos que falten por aprobar ([`LANZAMIENTO.md`](LANZAMIENTO.md), sección 2).
 

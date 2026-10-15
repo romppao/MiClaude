@@ -3,6 +3,10 @@ import { db } from "../../../lib/common/db";
 import { getUser } from "../../../lib/accounts/auth";
 import { loginPath } from "../../../lib/common/paths";
 import { publicFighterName } from "../../../lib/common/names";
+import { leerFoto } from "../../../lib/media/fotos";
+
+/** Una foto de la copia de datos, en base64 (del almacén de fotos o de la base). */
+const enBase64 = async (f: { clave: string | null; bytes: Uint8Array | null }) => { const b = await leerFoto(f); return b ? Buffer.from(b).toString("base64") : null; };
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +45,8 @@ export async function GET(request: Request) {
     cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
     perfilDeEntrenador: entrenador && { nombre: entrenador.name, presentacion: entrenador.bio, disciplinas: entrenador.disciplines, anosEntrenando: entrenador.yearsCoaching, ciudad: entrenador.city, provincia: entrenador.province, gimnasio: entrenador.gym?.name ?? null, creadoEl: entrenador.createdAt,
       clases: entrenador.classes.map((c) => ({ tipo: c.kind, titulo: c.title, disciplina: c.discipline, minutos: c.minutes, precioEuros: c.priceEuros, plazas: c.capacity, horario: c.schedule, publicada: c.active, creadaEl: c.createdAt })) },
-    misHighlights: highlights.map((h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, foto: h.image ? Buffer.from(h.image).toString("base64") : null, formatoImagen: h.image ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt })),
-    perfilesPersonalizados: (await db.profile.findMany({where:{ownerId:user.id}})).map(p => ({ tipo:p.kind, nombre:p.name, presentacion:p.bio, zona:p.city, web:p.website, foto:p.avatar ? Buffer.from(p.avatar).toString("base64") : null, banner:p.banner ? Buffer.from(p.banner).toString("base64") : null, formatoImagen:"image/webp", encuadre:{fotoX:p.avatarX,fotoY:p.avatarY,bannerX:p.bannerX,bannerY:p.bannerY} })),
+    misHighlights: await Promise.all(highlights.map(async (h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, foto: await enBase64({ clave: h.imageKey, bytes: h.image }), formatoImagen: h.hasImage ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt }))),
+    perfilesPersonalizados: await Promise.all((await db.profile.findMany({where:{ownerId:user.id}})).map(async p => ({ tipo:p.kind, nombre:p.name, presentacion:p.bio, zona:p.city, web:p.website, foto: await enBase64({ clave: p.avatarKey, bytes: p.avatar }), banner: await enBase64({ clave: p.bannerKey, bytes: p.banner }), formatoImagen:"image/webp", encuadre:{fotoX:p.avatarX,fotoY:p.avatarY,bannerX:p.bannerX,bannerY:p.bannerY} }))),
     fichaDePeleador: fighter && {
       nombre: fighter.firstName, apellidos: fighter.lastName, alias: fighter.alias, fechaDeNacimiento: fighter.birthDate, ciudad: fighter.city, provincia: fighter.province,
       guardia: fighter.stance, recordAmateurPublico: fighter.recordPublic, alturaCm: fighter.heightCm, envergaduraCm: fighter.reachCm, presentacion: fighter.bio, creadaEl: fighter.createdAt,

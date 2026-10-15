@@ -9,6 +9,8 @@ import { profileKind, profileAccess } from "../../lib/profiles/profiles";
 import { imagePosition, normalizeImage } from "../../lib/profiles/images";
 import { safeHttpUrl } from "../../lib/common/url";
 import { audit } from "../../lib/common/audit";
+import { registrarFallo } from "../../lib/common/fallos";
+import { borrarFotos, guardarFoto, type FotoGuardada } from "../../lib/media/fotos";
 import { str, go, checkLengths } from "./shared";
 
 export async function saveProfile(f: FormData) {
@@ -39,16 +41,34 @@ export async function saveProfile(f: FormData) {
     if (email && !owner?.emailVerifiedAt) go(back, { problema: "titular_invalido" });
     ownerId = owner?.id ?? null;
   }
-  const data = { bio: str(f, "bio") || null, website, city: str(f, "city") || null, name: kind === "federacion" ? str(f, "name") || source.name : undefined, ownerId, avatar, banner, hasAvatar: avatar === undefined ? undefined : avatar !== null, hasBanner: banner === undefined ? undefined : banner !== null, avatarX: avatarX!, avatarY: avatarY!, bannerX: bannerX!, bannerY: bannerY! };
+  // Las fotos nuevas van al almacén de fotos (o a la base si no hay almacén: lib/media/fotos.ts); las que se sustituyen o quitan se borran después.
+  const sinFoto: FotoGuardada = { clave: null, bytes: null };
+  let foto: FotoGuardada | undefined, fondo: FotoGuardada | undefined;
+  try {
+    foto = avatar === undefined ? undefined : avatar ? await guardarFoto("perfiles", avatar) : sinFoto;
+    fondo = banner === undefined ? undefined : banner ? await guardarFoto("perfiles", banner) : sinFoto;
+  } catch (e) {
+    await borrarFotos([foto?.clave]);
+    await registrarFallo({ origen: "ACCION", contexto: "No se pudo guardar una foto de perfil en el almacén", error: e });
+    go(back, { problema: "foto_no_guardada" });
+  }
+  const anterior = foto || fondo ? await db.profile.findUnique({ where: { kind_entityId: { kind, entityId: id } }, select: { avatarKey: true, bannerKey: true } }) : null;
+  const data = { bio: str(f, "bio") || null, website, city: str(f, "city") || null, name: kind === "federacion" ? str(f, "name") || source.name : undefined, ownerId, avatar: foto?.bytes, avatarKey: foto?.clave, banner: fondo?.bytes, bannerKey: fondo?.clave, hasAvatar: avatar === undefined ? undefined : avatar !== null, hasBanner: banner === undefined ? undefined : banner !== null, avatarX: avatarX!, avatarY: avatarY!, bannerX: bannerX!, bannerY: bannerY! };
   // Dirección del gimnasio (mapa de /gimnasios, 13 de octubre de 2026): si cambia, se borran sus coordenadas y se vuelven a buscar.
   const address = kind === "gimnasio" && f.has("address") ? str(f, "address") || null : undefined;
   const gymAntes = address !== undefined ? await db.gym.findUnique({ where: { id }, select: { address: true } }) : null;
   const direccionCambiada = address !== undefined && (gymAntes?.address ?? null) !== address;
-  await db.$transaction(async tx => {
-    if (direccionCambiada) await tx.gym.update({ where: { id }, data: { address, lat: null, lng: null, geoSource: null, geocodedAt: null } });
-    await tx.profile.upsert({ where: { kind_entityId: { kind, entityId: id } }, create: { kind, entityId: id, ...data }, update: data });
-    await audit({ userId: user.id, entity: "PROFILE", entityId: id, action: "PROFILE_UPDATED", after: { kind, imagesUpdated: avatar !== undefined || banner !== undefined } }, tx);
-  });
+  try {
+    await db.$transaction(async tx => {
+      if (direccionCambiada) await tx.gym.update({ where: { id }, data: { address, lat: null, lng: null, geoSource: null, geocodedAt: null } });
+      await tx.profile.upsert({ where: { kind_entityId: { kind, entityId: id } }, create: { kind, entityId: id, ...data }, update: data });
+      await audit({ userId: user.id, entity: "PROFILE", entityId: id, action: "PROFILE_UPDATED", after: { kind, imagesUpdated: avatar !== undefined || banner !== undefined } }, tx);
+    });
+  } catch (e) {
+    await borrarFotos([foto?.clave, fondo?.clave]); // no se guardó el perfil: las fotos nuevas no deben quedarse huérfanas en el almacén
+    throw e;
+  }
+  await borrarFotos([foto && anterior?.avatarKey, fondo && anterior?.bannerKey]);
   if (direccionCambiada) after(() => ubicarGimnasio(id));
   revalidatePath("/", "layout"); go(back, { aviso: "perfil_guardado" });
 }

@@ -27,7 +27,7 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 | `GOOGLE_CLIENT_ID` | El ID de cliente de Google |
 | `TRUSTED_PROXY_HOPS` | `1` (comprobarlo con la primera petición real: la IP debe ser la del visitante) |
 
-**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO` y, cuando haya vídeos, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET`.
+**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` (más la variable normal `R2_JURISDICCION=eu`). Desde la 0.16.1, **R2 guarda también las fotos** (perfiles, highlights y fotos del público) en la carpeta `fotos/` del mismo cubo que los vídeos; sin estas variables las fotos se guardan dentro de la base de datos, y la base gratuita de Neon (0,5 GB) se llenaría con unos miles de fotos. No poner `FOTOS_EN_DISCO`: es solo para pruebas.
 
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 
@@ -64,7 +64,11 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
    - URI de redirección `https://lonaclub.es/api/auth/google/callback` (ya está puesta);
    - app publicada;
    - correo de asistencia info@lonaclub.es.
-9. **Resend:**
+9. **Fotos fuera de la base de datos** (T-004). Con las variables `R2_*` puestas, las fotos nuevas ya van a R2. Las que ya estuvieran en la base (por ejemplo, si se copia la base de la demo) se trasladan así:
+   - `npx tsx scripts/fotos-al-almacen.ts`, con `DATABASE_URL` y las variables `R2_*` de producción. Copia y apunta; **no borra nada** y se puede repetir;
+   - comprobar en la aplicación que las fotos se ven;
+   - solo entonces, y con el visto bueno del fundador, `npx tsx scripts/fotos-al-almacen.ts --vaciar`, que comprueba cada foto en R2 antes de vaciar sus bytes de la base.
+10. **Resend:**
    - verificar lonaclub.es (los registros van en su subdominio de envío);
    - `RESEND_API_KEY` en Secret Manager.
 
