@@ -393,6 +393,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `record-time.ts` | `HORAS_PARA_CONTAR_DECLARADO`, `fechaInicioEnRecord` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
+| `sentry.ts` | `Dsn`, `FalloParaSentry`, `avisarASentry`, `leerDsn`, `sobre` |
 | `territorio.ts` | `PROVINCIAS_SIN_GIMNASIOS`, `gimnasiosVisibles`, `provinciaConGimnasios` |
 | `text.ts` | `LIMITS`, `firstTooLong`, `isEmail`, `oneLine`, `plural` |
 | `titular.ts` | `LEGAL_ACTUALIZADO`, `Titular`, `faltanDatosTitular`, `titular` |

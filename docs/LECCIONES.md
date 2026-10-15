@@ -506,3 +506,4 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | Los pasos para separar lonaclub.es de la demo decían quitar primero el dominio en Render y después el DNS | Se escribieron pensando en el resultado, no en el estado intermedio | Al quitar algo de un dominio, primero el DNS y después el servicio: nunca dejar un registro apuntando a un servicio que ya no lo reclama. Todo cambio de dominio va en `docs/DOMINIO.md` con cómo deshacerlo |
+| El CI falló al compilar por `import { randomUUID } from "node:crypto"` en `sentry.ts` | `fallos.ts`, que lo importa, también se empaqueta fuera de Node (middleware), y ahí `node:` no existe. `tsc` y las pruebas unitarias no lo detectan | Lo que importe `fallos.ts` (o cualquier módulo común) no usa `node:*`: `globalThis.crypto`. Antes de subir un módulo común nuevo, `npm run build` en local |
