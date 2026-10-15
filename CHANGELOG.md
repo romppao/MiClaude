@@ -11,6 +11,11 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+PR de Claude: cargar los gimnasios reales en la demo desde GitHub (el fundador quiere probarlos en la demo, 15-10-2026).
+
+### Añadido
+- **Acción «Cargar gimnasios reales en la demo»** (pestaña Actions, botón «Run workflow»). «recuento» descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y muestra cuántos se cargarían por provincia, sin escribir nada; «cargar» hace lo mismo y los carga. Solo para la demo. Necesita el secreto `DEMO_DATABASE_URL`.
+
 ## [0.18.0] — 2026-10-15
 
 PR de Claude (nube): los bloques D (#64) y H (#71) de Codex, integrados sobre la 0.17.0 con las correcciones de su revisión. La lista única de moderación de H no entra: tenía un botón que no funcionaba y no admitía los avisos sin cuenta (queda para Codex).
