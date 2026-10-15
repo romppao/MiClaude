@@ -11,11 +11,20 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.18.7] — 2026-10-15
+## [0.18.9] — 2026-10-15
+
 
 ### Cambiado
 - Moderación reúne sus colas en una bandeja por urgencia, mantiene las páginas y los avisos sin cuenta/PAGINA/GYM. «Poner en revisión» envía `dispute`; se conservan notas y avisos al abrir enlaces.
 
+
+
+## [0.18.7] — 2026-10-15
+
+PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).
+
+### Cambiado
+- `docs/ESTADO.md`: relevo cerrado (#82, #84 y #83), recuento de gimnasios en la demo (1 publicado, 190 por revisar) y fallo de tiempo de espera de OpenStreetMap.
 
 ## [0.18.6] — 2026-10-15
 
