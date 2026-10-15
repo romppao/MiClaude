@@ -32,6 +32,11 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 
 ## Puesta en marcha (una sola vez)
+0. **Separar ya lonaclub.es de la demo** (petición del fundador, 15-10-2026: «quiero separar la aplicación web de la demo de render… ya»). Hasta que la versión real esté montada, lonaclub.es no debe enseñar la demo:
+   - Render → servicio `ring-espana-demo` → Settings → Custom Domains → borrar `lonaclub.es` y `www.lonaclub.es`;
+   - Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
+   - **no tocar** MX, SPF, `_dmarc` ni los TXT de verificación (Google, Search Console): el buzón info@ sigue funcionando.
+   - La demo sigue en https://ring-espana-demo.onrender.com/ y, desde la 0.15.1, pide a los buscadores que no la muestren (`noindex` y sin mapa del sitio).
 1. **Proyecto y facturación.**
    - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación y poner una alerta de presupuesto de 1 €.
    - Activar Cloud Run, Artifact Registry, Secret Manager e IAM Credentials.
@@ -105,7 +110,7 @@ Las claves de cada servicio solo están en Secret Manager o en los secretos de G
 | `lonaclub.es` | MX | `mta-gw.infomaniak.ch` | Recibir correo en info@ | **No** |
 | `lonaclub.es` | TXT | `v=spf1 include:spf.infomaniak.ch -all` | SPF del buzón | Solo para añadir un `include` si un proveedor lo exige |
 | `_dmarc.lonaclub.es` | TXT | `v=DMARC1; p=reject;` | Protección contra suplantación | **No** |
-| `lonaclub.es` y `www` | A, AAAA o CNAME | Los que indique Cloud Run (hoy, hasta que se haga el cambio: A `216.24.57.1` y CNAME `ring-espana-demo.onrender.com`, que es la demo) | Web | Sí, al cambiar de alojamiento |
+| `lonaclub.es` y `www` | A, AAAA o CNAME | Los que indique Cloud Run. Hasta entonces, **ninguno** (paso 0): los antiguos A `216.24.57.1` y CNAME `ring-espana-demo.onrender.com` llevaban a la demo y hay que borrarlos | Web | Sí, al cambiar de alojamiento |
 | Registros de Resend | TXT/MX en su subdominio | Los que indique Resend | Envío de correos | Sí, si se cambia de proveedor |
 
 ## Problemas conocidos y cómo resolverlos

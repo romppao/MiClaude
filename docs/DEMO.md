@@ -4,6 +4,8 @@ Una copia con **datos ficticios** (peleadores, gimnasios y veladas inventados) p
 
 **Demo activa:** <https://ring-espana-demo.onrender.com/>. El 3 de octubre de 2026 se integró la propuesta #11 en `claude/ring-espana-mvp`: incluye categorías por edad, correcciones de calendario/récords y comunicación inclusiva. Comprobados públicamente portada, ránking, ayuda y salud, todos con respuesta 200 y los contenidos nuevos.
 
+**La demo es solo para pruebas (15 de octubre de 2026):** no sale en los buscadores (páginas con «noindex», sin mapa del sitio) y **no se le pone el dominio lonaclub.es**, que es solo para la versión real ([`PRODUCCION.md`](PRODUCCION.md), paso 0).
+
 ## Que la demo no caduque (13 de octubre de 2026)
 
 Render avisó al fundador por correo de que la demo iba a caducar. Lo que caduca es **la base de datos gratuita de Render**, que dura 30 días desde que se creó (hacia el 2 de octubre). Después hay 14 días de gracia y luego Render la borra. La web en sí no caduca, pero sin base de datos no funciona.

@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.15.1] — 2026-10-15
+
+PR de Claude: separar la demo de la versión real (petición del fundador, 15-10-2026).
+
+### Cambiado
+- **La demo ya no sale en los buscadores:** sus páginas llevan «noindex», su `robots.txt` no anuncia el mapa del sitio y su `sitemap.xml` está vacío. Quien busque «Lona» no debe llegar a la versión de pruebas. La versión real no cambia: se sigue dejando encontrar.
+- **Documentación:** `PRODUCCION.md` tiene un paso 0 para quitar ya lonaclub.es de Render y de la zona DNS (sin tocar el correo); `ESTADO.md` recoge la decisión.
+
 ## [0.15.0] — 2026-10-15
 
 PR de Claude: arreglos de la revisión previa a la versión oficial (T-016). Codex encontró los de las partes 3-5 y Claude, los de las partes 1-2.
