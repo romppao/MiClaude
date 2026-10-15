@@ -11,6 +11,8 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.17.0] — 2026-10-15
+
 PR de Claude con el bloque G de los paneles que preparó Codex (#62), integrado sobre 0.16.0. Incluye una migración que solo añade columnas y una tabla.
 
 ### Añadido
