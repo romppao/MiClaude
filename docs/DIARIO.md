@@ -2192,3 +2192,25 @@ No se ha encontrado nada que corregir.
 
 ## 2026-10-15 — Reanudación de Codex y compatibilidad con T-016
 El fundador pide continuar. La comprobación final de la principal detecta #68 integrado (0.15.0); se incorpora a F/G/D/H sin eliminar privacidad, autorización de veladas ni política territorial. Se resuelven conflictos de presentación manteniendo los filtros de Claude y los de publicación del directorio. La última validación de H: tipos, 806/807 unitarias y la restante aprobada aislada por timeout local, catálogo 425, mapa y versión. H4 espera revisión del modelo en RFC-002; CI completo y revisión de Claude pendientes. Los ajustes móviles pertenecen a Antigravity. No se despliega ni se cargan datos.
+
+## 15-10-2026. Claude (nube): gimnasios reales (D) y avisos y paneles (H) de Codex, corregidos (0.18.0)
+
+**Qué se pidió:** lo mismo que con F y G: corregir lo que Codex dejó a medias e integrarlo.
+
+**Qué se hizo:**
+- **Base:** el diff de cada bloque de Codex (D: #64, H: #71) se aplicó sobre la 0.17.0 en ramas propias.
+- **Correcciones de D**, según la revisión de #64:
+  - vincular y ceder gimnasios, solo moderación (antes, un titular podía cambiar el club de cualquier ficha y la cesión revelaba si un correo tenía cuenta);
+  - aprobar una reclamación no da el sello ni republica un gimnasio retirado;
+  - no se reclaman gimnasios retirados ni ficticios;
+  - retirar el gimnasio pide confirmación;
+  - `GYM` está en «Mis avisos» y en los correos de decisión, y la ficha del gimnasio enlaza a `/avisar`;
+  - el importador se ejecuta con `tsx`.
+- **Correcciones de H:**
+  - la lista única de moderación **no entra**: el botón «Poner en revisión» no funcionaba, rompía tres pruebas y no admitía los avisos sin cuenta;
+  - bloqueos en el panel y en los avisos;
+  - icono de campana en lugar de emoji y «seguidor» en singular;
+  - la copia de datos lee las fotos del almacén.
+- **Instrucciones para Codex:** `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`.
+
+**Estado:** PR abierto.

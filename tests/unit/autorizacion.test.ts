@@ -636,8 +636,16 @@ describe("gimnasios: control de propiedad", () => {
     iniciarSesion(persona("FAN"));
     mundo.estado.respuestas["user.findUnique"] = { id: "nuevo", emailVerifiedAt: verificado };
     mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "otro" };
-    expect(await destino(acciones.transferGym, { gymId: "g", email: "nuevo@x.es" })).toContain("problema=sin_permiso");
+    // Ceder un gimnasio es cosa de moderación (revisión de Claude, 15-10-2026): un titular ni siquiera llega a comprobar el correo.
+    expect(await destino(acciones.transferGym, { gymId: "g", email: "nuevo@x.es" })).toContain("problema=gimnasio_cesion_moderacion");
     expect(await destino(acciones.setGymMember, { gymId: "g", kind: "fighter", memberId: "f", decision: "unlink" })).toContain("problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+
+  it("un titular no puede vincular a otra persona a su gimnasio: solo moderación", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "u-FAN" };
+    expect(await destino(acciones.setGymMember, { gymId: "g", kind: "fighter", memberId: "f", decision: "link" })).toContain("problema=sin_permiso");
     expect(mundo.estado.escrituras).toEqual([]);
   });
 });

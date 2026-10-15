@@ -17,9 +17,9 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **Integrar los paneles F y G** (los de #69/#70, actualizados sobre la 0.16.1) y después **D y H de Codex** con las correcciones de la revisión. Antes, fusionados: 0.15.1 (demo separada), 0.16.0 (bloqueos, aviso sin cuenta, correos de moderación) y 0.16.1 (fotos fuera de la base) | `claude-nube/integrar-paneles-f-g`, versión 0.17.0 | en curso |
-| Claude Code (portátil) | Hizo el relevo de Codex en F y G (#69, #70); sin actividad desde las 05:35 del 15-10. **Claude (nube) los integra** por petición del fundador (agilizar) | `claude/paneles-f`, `claude/paneles-g` | sustituidos |
-| Codex | Hizo F, G, D y H (#56, #62, #64, #71). **Claude (nube) los integra** con las correcciones de su revisión (comentarios en cada PR); la parte de moderación de H (lista única) queda para que Codex la rehaga | #56 → #62 → #64 → #71 | sustituidos por los PR de Claude |
+| Claude (nube, el chat del móvil) | **D y H de Codex corregidos** (gimnasios reales, campanita de avisos, vídeos del público como highlights). Fusionados hoy: 0.15.1, 0.16.0, 0.16.1 (fotos) y 0.17.0 (paneles F y G) | `claude-nube/avisos-y-paneles-h`, versión 0.18.0 | PR abierto |
+| Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
+| Codex | Lo pendiente está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`: rehacer la lista única de moderación, vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y RFC-002. Sus PR #56, #62, #64 y #71 están sustituidos | parte de `claude/ring-espana-mvp` | pendiente |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
