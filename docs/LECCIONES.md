@@ -470,6 +470,16 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | La prueba de navegador no podía marcar la casilla de la declaración | Las casillas `chip` están tapadas por su texto; Playwright no puede pulsar la casilla directamente | En las pruebas se pulsa la etiqueta, como una persona. No usar `force` para saltarse lo que vería un usuario |
 | No se pudo comprobar la demo publicada desde la nube | El proxy de esta sesión rechaza `onrender.com` | Si no se puede comprobar algo, se dice en el diario y al fundador, y se deja el comprobante para quien pueda (el portátil) en lugar de darlo por hecho |
 
+## 15 de octubre de 2026 — Fotos fuera de la base (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Al apagar el servidor de pruebas se cortó la batería entera | `kill $(pgrep -f next-server)` dentro de una orden cuyo propio texto contenía «next-server»: se mató a sí misma | Guardar el PID al arrancar (`echo $! > fichero.pid`) y matar ese número. Si hay que buscar, comprobar los procesos uno a uno antes de matarlos; nunca `pgrep -f` dentro de la misma orden |
+| La base de pruebas no respondía al volver a la sesión | El contenedor se reinició y PostgreSQL no arranca solo | Antes de culpar al código, `pg_isready`; si está parada, `service postgresql start` |
+| Un script con `await` fuera de una función no arrancaba con `tsx` | El proyecto compila a CommonJS, que no lo admite | En `scripts/*.ts`, todo dentro de `async function main()` |
+| El CI falló en `tsc` por una prueba unitaria nueva (`{…} as NodeJS.ProcessEnv`) | Se pasó `typecheck` antes de escribir la prueba; las pruebas también se comprueban con `tsc` | `npm run typecheck` es lo último antes de cada commit, no lo primero; en las pruebas, los entornos falsos van con `as unknown as NodeJS.ProcessEnv` |
+| Una ficha de hace 9 días (T-004 parte 1, PR #23) proponía una interfaz pensada solo para perfiles | La ficha se escribió antes de existir el almacén de vídeos | Antes de seguir una ficha antigua, mirar qué existe ya en el código y reutilizarlo (aquí, las variables y la firma de R2 de los vídeos) |
+
 ## 15-10-2026 — Auditar enlaces con contenido real (Codex, T-013)
 La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en moderación. Una cola vacía y un selector sin división no muestran esos enlaces: la auditoría debe preparar los datos y seleccionar la división antes de comprobar el aviso de otra pestaña. El script de versión exige escribir primero el contenido de «Sin publicar».
 

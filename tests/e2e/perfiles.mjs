@@ -2,7 +2,13 @@
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import AxeBuilder from '@axe-core/playwright';
+import { existsSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { B, rnd, browser, newUser, btn, check, seen, terminarDiagnosticos } from './ayudas.mjs';
+// Con FOTOS_EN_DISCO=si (el CI), las fotos van al almacén de fotos en disco y la base solo guarda la clave (T-004, lib/media/fotos.ts).
+const enAlmacen = process.env.FOTOS_EN_DISCO === 'si';
+const enDisco = (clave) => !!clave && existsSync(join(resolve(process.env.MEDIA_DIR ?? '.subidas'), clave));
+const tieneFoto = (bytes, clave) => (enAlmacen ? !bytes && enDisco(clave) : !!bytes?.length && !clave);
 const db = new PrismaClient();
 const own = await newUser('Perfil', 'FIGHTER');
 await own.p.goto(B + '/mi-ficha');
@@ -26,7 +32,8 @@ await own.p.locator('[name=avatarX]').press('ArrowRight');
 await btn(own.p, 'Guardar perfil');
 check('La personalización confirma el guardado', await seen(own.p.locator('.notice-ok')));
 const saved = await db.profile.findUniqueOrThrow({where:{kind_entityId:{kind:'peleador',entityId:f.id}}});
-check('Foto y banner se almacenan optimizados con su encuadre', saved.hasAvatar && saved.hasBanner && saved.avatarX === 1 && saved.avatar.length > 0);
+check('Foto y banner se almacenan optimizados con su encuadre', saved.hasAvatar && saved.hasBanner && saved.avatarX === 1 && tieneFoto(saved.avatar, saved.avatarKey) && tieneFoto(saved.banner, saved.bannerKey));
+if (enAlmacen) check('con el almacén de fotos, la base no guarda los bytes: solo la clave', saved.avatar === null && /^fotos\/perfiles\//.test(saved.avatarKey ?? ''));
 // Una foto de móvil (más de 4 MB y 4000 píxeles) se reduce sola en el navegador y se guarda sin errores (petición del fundador, 8 de octubre de 2026).
 {
   const ruido = Buffer.alloc(4000 * 3000 * 3); for (let n = 0; n < ruido.length; n++) ruido[n] = (n * 2654435761 >>> 24) & 255;
@@ -38,8 +45,9 @@ check('Foto y banner se almacenan optimizados con su encuadre', saved.hasAvatar 
   const enviada = await own.p.locator('[name=avatar]').evaluate((e) => ({ peso: e.files[0].size, tipo: e.files[0].type }));
   check('El navegador reduce la foto grande antes de enviarla', enviada.peso < 3.2 * 1024 * 1024 && enviada.tipo === 'image/jpeg');
   await btn(own.p, 'Guardar perfil'); await own.p.locator('.notice-ok').waitFor();
-  const guardada = await db.profile.findUniqueOrThrow({ where: { kind_entityId: { kind: 'peleador', entityId: f.id } }, select: { avatar: true } });
-  check('La foto grande se guarda en el perfil', !!guardada?.avatar?.length);
+  const guardada = await db.profile.findUniqueOrThrow({ where: { kind_entityId: { kind: 'peleador', entityId: f.id } }, select: { avatar: true, avatarKey: true } });
+  check('La foto grande se guarda en el perfil', tieneFoto(guardada.avatar, guardada.avatarKey));
+  if (enAlmacen) check('y la foto sustituida se borra del almacén', !enDisco(saved.avatarKey) && guardada.avatarKey !== saved.avatarKey);
 }
 const anon = await (await browser.newContext()).newPage();
 await anon.goto(B + `/peleadores/${f.slug}`);
@@ -59,6 +67,7 @@ await btn(own.p, 'Guardar perfil');
 await own.p.locator('.notice-ok').waitFor();
 const removed = await db.profile.findUniqueOrThrow({where:{kind_entityId:{kind:'peleador',entityId:f.id}}});
 check('Quitar las imágenes elimina los bytes y las marcas públicas', removed.avatar === null && removed.banner === null && !removed.hasAvatar && !removed.hasBanner);
+if (enAlmacen) check('y también las borra del almacén', removed.avatarKey === null && removed.bannerKey === null && !enDisco(saved.bannerKey));
 await db.fighter.update({where:{id:f.id},data:{hiddenAt:new Date()}});
 check('Una ficha ocultada no publica su imagen', (await anon.request.get(B + `/imagenes/peleador/${f.id}/avatar`)).status() === 404);
 await db.fighter.update({where:{id:f.id},data:{hiddenAt:null}});
@@ -96,4 +105,22 @@ await other.p.setInputFiles('[name=banner]', {name:'portada.png',mimeType:'image
 await btn(other.p, 'Guardar perfil'); await other.p.locator('.notice-ok').waitFor();
 await anon.goto(B + `/promotores/${promoter.id}`);
 check('El promotor puede publicar su banner', await anon.locator('.profile-banner').count() === 1);
+// Al eliminar la cuenta, sus fotos se borran también del almacén de fotos (no solo de la base): son datos personales (T-004).
+if (enAlmacen) {
+  const marcha = await newUser('Marcha', 'FIGHTER');
+  await marcha.p.goto(B + '/mi-ficha');
+  await marcha.p.fill('[name=firstName]', 'Marcha'); await marcha.p.fill('[name=lastName]', `Fotos${rnd}`);
+  await marcha.p.selectOption('select[name=discipline]', 'BOXEO'); await marcha.p.selectOption('select[name=province]', 'Madrid');
+  await btn(marcha.p, 'Crear mi ficha'); await marcha.p.locator('.notice-ok').waitFor();
+  const suya = await db.fighter.findFirstOrThrow({ where: { lastName: `Fotos${rnd}` } });
+  await marcha.p.goto(B + `/perfiles/peleador/${suya.id}/editar`);
+  await marcha.p.setInputFiles('[name=avatar]', { name: 'yo.png', mimeType: 'image/png', buffer: image });
+  await btn(marcha.p, 'Guardar perfil'); await marcha.p.locator('.notice-ok').waitFor();
+  const clave = (await db.profile.findUniqueOrThrow({ where: { kind_entityId: { kind: 'peleador', entityId: suya.id } } })).avatarKey;
+  check('la foto de la cuenta que se va a eliminar está en el almacén', enDisco(clave));
+  await marcha.p.goto(B + '/mi-cuenta/eliminar');
+  await marcha.p.fill('[name=current]', 'contraseña123'); await marcha.p.locator('[name=confirm]').check();
+  await btn(marcha.p, 'Eliminar mi cuenta definitivamente'); await marcha.p.locator('.notice-ok').waitFor();
+  check('al eliminar la cuenta, su foto desaparece del almacén', !enDisco(clave));
+}
 await terminarDiagnosticos(); await browser.close(); await db.$disconnect();

@@ -14,7 +14,9 @@ import { audit } from "../../lib/common/audit";
 import { notificarResolucionDeAviso, notifyDecision } from "../../lib/community/notify";
 import { REPORT_REASONS } from "../../lib/community/reports";
 import { lookup } from "../../lib/common/safe";
-import { anonymizeFighter } from "../../lib/fighters/anonymize";
+import { anonymizeFighter, type ArchivosRetirados } from "../../lib/fighters/anonymize";
+import { borrarFotos } from "../../lib/media/fotos";
+import { almacenDeVideos } from "../../lib/media/storage";
 import { LIMITS, oneLine } from "../../lib/common/text";
 import { Rechazo, fullNameSlug, go, guard, listFighters, returnTo, str } from "./shared";
 
@@ -148,6 +150,7 @@ export async function resolveReport(f: FormData) {
   if (hide && report.entity === "FIGHTER" && !note) go(back, { problema: "ocultar_sin_nota" });
   // Un aviso sobre una página (desde /avisar) no señala un dato concreto: moderación actúa desde la propia página y luego lo cierra.
   if (hide && report.entity === "PAGINA") go(back, { problema: "decision_no_valida" });
+  let retirados: ArchivosRetirados | null = null;
   await guard(back, () => db.$transaction(async (tx) => {
     if (!(await tx.report.updateMany({ where: { id: report.id, status: "OPEN" }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } })).count) throw new Rechazo("solicitud_cambiada");
     if (hide) {
@@ -156,13 +159,20 @@ export async function resolveReport(f: FormData) {
         const ficha = await tx.fighter.findUnique({ where: { id: report.entityId }, select: { userId: true } });
         if (!ficha) throw new Rechazo("no_existe");
         if (ficha.userId) throw new Rechazo("ficha_con_titular");
-        await anonymizeFighter(tx, report.entityId);
+        retirados = await anonymizeFighter(tx, report.entityId);
       }
       else if (report.entity === "AURA") await tx.aura.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
       else if (report.entity === "MEDIA") await tx.mediaItem.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
     }
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);
   }));
+  // Las fotos y vídeos de una ficha ocultada se borran de los almacenes (sus filas ya no existen).
+  const archivos = retirados as ArchivosRetirados | null;
+  if (archivos) {
+    await borrarFotos(archivos.fotos);
+    const videos = almacenDeVideos();
+    if (videos) await Promise.all(archivos.videos.map((v) => videos.borrar(v).catch(() => undefined)));
+  }
   // Correo a quien avisó y, si se retiró algo, a su autor, con los motivos y cómo reclamar (DSA, arts. 16.5 y 17). Después de responder.
   after(() => notificarResolucionDeAviso(report.id, hide, (lookup(REPORT_REASONS, report.reason) ?? "otro motivo").toLowerCase()));
   revalidatePath("/", "layout");

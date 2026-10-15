@@ -2090,6 +2090,35 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 
 **Estado:** PR abierto. **Siguiente:** T-013 (aviso al salir a enlaces externos) y lo que diga el fundador sobre su cambio de visión.
 
+## 15-10-2026. Claude (nube): fotos fuera de la base de datos (T-004, 0.16.1)
+
+**Qué se pidió:** el fundador no entendía qué era «sacar las fotos de la base de datos». Se le explicó (foto y banner de los perfiles, fotos de highlights y fotos del público; hoy van dentro de la base, cuyo plan gratuito es de 0,5 GB) y contestó: «Vale, de acuerdo, pues nada, ponte a ello… haz lo que tengas que hacer para dejar la aplicación lista».
+
+**Qué se decidió y por qué:**
+- **Un almacén para las fotos** (`src/lib/media/fotos.ts`) con el mismo R2 y las mismas variables que los vídeos, en la carpeta `fotos/`. Menos cuentas y variables para el fundador.
+- **Sin R2, todo sigue como antes** (fotos en la base): no se rompe nada mientras no exista la cuenta, y la demo no cambia. El disco solo con `FOTOS_EN_DISCO=si` (pruebas): en Render el disco se borra al reiniciar y las fotos desaparecerían.
+- **Las fotos se siguen sirviendo a través de la aplicación**, no con enlaces directos a R2, para que ocultar una ficha o una velada las oculte al instante.
+- **Claves nuevas en cada subida** (`fotos/<carpeta>/<uuid>.webp`) y la anterior se borra: no hay cachés con la foto vieja.
+- **No se usó la parte 1 del PR #23** (6 de octubre): solo cubría perfiles, con otra interfaz, y llevaba 9 días sin fusionar.
+
+**Qué se hizo:**
+- Migración aditiva (`avatarKey`, `bannerKey`, `imageKey`).
+- Subir, sustituir y quitar fotos de perfil; publicar y retirar highlights; compartir y borrar fotos del público.
+- Las tres rutas de imagen y la copia de datos.
+- Borrar del almacén al eliminar la cuenta o al ocultar una ficha. De paso, ocultar una ficha borra ahora también sus vídeos, que se quedaban huérfanos.
+- `scripts/fotos-al-almacen.ts`: copia sin borrar; `--vaciar` comprueba cada foto antes de vaciar la base. Probado en local en las dos fases.
+- El CI usa `FOTOS_EN_DISCO=si`, así todas las pruebas de navegador recorren el camino del almacén.
+- Pruebas:
+  - `tests/unit/fotos.test.ts` (10): disco, sin almacén y R2 simulado: firma, 404, rechazo y borrado fallido;
+  - `perfiles.mjs`: clave en lugar de bytes, la foto sustituida y la quitada desaparecen del almacén, y eliminar la cuenta borra sus fotos.
+
+**Qué salió mal:**
+- **Pruebas cortadas al apagar el servidor.** En la tanda anterior, `for p in $(pgrep -f next-server); do kill $p; done` mató también la propia orden: su texto contenía «next-server».
+- **Base de pruebas parada.** El PostgreSQL de la sesión estaba apagado al volver, seguramente porque el contenedor se reinició. Se arrancó con `service postgresql start`.
+- **El script del traslado no arrancaba.** Fallaba con `tsx` porque el proyecto compila a CommonJS y no admite `await` fuera de una función; se metió en `main()`.
+
+**Estado:** PR abierto. **Siguiente:** que el fundador cree la cuenta de R2 cuando monte la versión real (PRODUCCION.md, paso 9).
+
 ## 15 de octubre de 2026 — T-013: avisos de enlaces externos (Codex)
 
 **Encargo:** «T-013 enlaces externos»; partir de la demo con #73 fusionado; no tocar F/G/D/H (#56/#62/#64/#71), y después agrupar Dependabot en T-002. Reserva publicada con `node scripts/estado.mjs reservar codex "T-013 enlaces externos"`, desde 8c789bc (0.16.0).
@@ -2103,3 +2132,5 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Continuación de validación (15-10-2026):** las dos compilaciones finales, tipos y 754 unitarias por rama estaban correctas al perderse la conexión del entorno. La batería completa de navegador quedó interrumpida con tiempos de espera en el registro, no aprobada. Recuperado el acceso, se guardaron los avances en las ramas propias antes de continuar. La reproducción roja de T-013 sí detectó el reglamento y los enlaces de foto, vídeo y página en moderación (los dos vídeos comparten mensaje y se agrupan).
 
 **Enlaces del mapa:** la autoría de MapLibre y del estilo crea `target="_blank"` fuera de React, sin aviso ni `rel`. Se normalizan en `components/mapa/base.ts` al cargar y actualizar el mapa, sin cambiar textos visibles ni destinos. La auditoría espera al mapa o a la alternativa sin WebGL. Son controles compartidos existentes; no se actualizan ramas ni implementaciones de F/G/D/H. Se recompila y valida esta corrección antes de darla por terminada.
+
+**Actualización de base:** el PR #74 entró durante las pruebas (demo 543a2a7, 0.16.1). Se integra en esta rama propia con un merge, sin reescribir ramas; se conservan completos sus cambios de fotos y sus registros. La versión actual de esta entrega pasa a **0.16.2** mediante `scripts/version.mjs`. Las baterías de los heads anteriores quedan sustituidas por las del head nuevo; no se presentan como validación de la base nueva. F/G/D/H siguen sin actualizarse.

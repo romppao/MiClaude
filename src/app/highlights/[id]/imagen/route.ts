@@ -1,5 +1,6 @@
 import { db } from "../../../../lib/common/db";
 import { getUser } from "../../../../lib/accounts/auth";
+import { leerFoto } from "../../../../lib/media/fotos";
 
 export const dynamic = "force-dynamic";
 const CABECERAS = { "Cache-Control": "private, no-cache", "X-Content-Type-Options": "nosniff" };
@@ -14,7 +15,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!publica && (!h.fighter.userId || (await getUser())?.id !== h.fighter.userId)) return new Response(null, { status: 404 });
   const etag = `"hl-${id}-${h.createdAt.getTime()}"`;
   if (request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { ...CABECERAS, ETag: etag } });
-  const fila = await db.highlight.findUnique({ where: { id }, select: { image: true } });
-  if (!fila?.image) return new Response(null, { status: 404 });
-  return new Response(new Uint8Array(fila.image), { headers: { ...CABECERAS, "Content-Type": "image/webp", ETag: etag } });
+  const fila = await db.highlight.findUnique({ where: { id }, select: { image: true, imageKey: true } });
+  const bytes = fila && await leerFoto({ clave: fila.imageKey, bytes: fila.image });
+  if (!bytes) return new Response(null, { status: 404 });
+  return new Response(new Uint8Array(bytes), { headers: { ...CABECERAS, "Content-Type": "image/webp", ETag: etag } });
 }

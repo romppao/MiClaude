@@ -170,6 +170,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261015120000_fotos_en_almacen/migration.sql",
+    "purpose": "Añade las claves de las fotos en el almacén (avatarKey, bannerKey, imageKey) sin borrar las columnas de bytes.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -223,6 +228,11 @@
     "path": "scripts/estado.mjs",
     "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/fotos-al-almacen.ts",
+    "purpose": "Traslada al almacén de fotos las fotos que siguen en la base; con --vaciar, comprueba cada una y vacía sus bytes de la base.",
+    "guide": "docs/PRODUCCION.md"
   },
   {
     "path": "scripts/generar-catalogo.mjs",
@@ -1430,6 +1440,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/media/fotos.ts",
+    "purpose": "Almacén de fotos (T-004): guarda, lee y borra las fotos de perfiles, highlights y del público en R2 (o en disco en pruebas); sin almacén siguen en la base.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/media/rules.ts",
     "purpose": "Reglas puras de vídeos y fotos del público: consentimiento, una sola cosa por envío, enlace https, plazo tras la velada y nombre de descarga.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1812,6 +1827,11 @@
   {
     "path": "tests/unit/fallos.test.ts",
     "purpose": "Pruebas unitarias del registro de fallos: tachado de datos, agrupación, reapertura y que nunca lanza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/fotos.test.ts",
+    "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

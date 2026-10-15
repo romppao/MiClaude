@@ -37,7 +37,8 @@ export const CLAVE_VALIDA = /^videos\/[a-z0-9]{8,40}\/[0-9a-f-]{36}\.(mp4|mov|we
 export const claveDe = (clave: string, userId: string) => CLAVE_VALIDA.test(clave) && clave.startsWith(`videos/${userId}/`);
 export const tipoDeClave = (clave: string) => Object.keys(TIPOS_DE_VIDEO).find((t) => clave.endsWith(`.${TIPOS_DE_VIDEO[t]}`)) ?? "video/mp4";
 
-function configuracionR2(env: NodeJS.ProcessEnv) {
+/** Cubo de R2 configurado (variables R2_*), o null. Lo comparten los vídeos y las fotos (lib/media/fotos.ts). */
+export function configuracionR2(env: NodeJS.ProcessEnv) {
   const { R2_ACCOUNT_ID: cuenta, R2_ACCESS_KEY_ID: id, R2_SECRET_ACCESS_KEY: secreto, R2_BUCKET: cubo } = env;
   if (!cuenta || !id || !secreto || !cubo) return null;
   // Cubo con jurisdicción de la Unión Europea (ADR-003): su dirección lleva «.eu». Se elige al crear el cubo y no se puede cambiar.

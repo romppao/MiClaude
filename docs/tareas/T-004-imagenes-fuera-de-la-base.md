@@ -1,6 +1,6 @@
 # T-004 — Imágenes fuera de PostgreSQL
 **Nivel:** N3 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F2 · **Estado:** lista (parte 1) / parte 2 **propuesta en [ADR-003](../decisiones/ADR-003-proveedores-fase-0.md): Cloudflare R2 en jurisdicción UE** (pendiente de que el fundador apruebe y cree la cuenta; imágenes servidas a través de la aplicación) · **Sugerida a:** Codex · **Depende de:** —
+**Fase:** F2 · **Estado:** **hecha por Claude en la 0.16.1 (15-10-2026)**, con un diseño más sencillo que el de abajo: `src/lib/media/fotos.ts` (R2 / disco de pruebas / base como hasta ahora), claves en `Profile.avatarKey`, `Profile.bannerKey`, `Highlight.imageKey` y `MediaItem.imageKey`, mismas variables `R2_*` que los vídeos y traslado con `scripts/fotos-al-almacen.ts`. La parte 1 del PR #23 no se usó (llevaba 9 días sin fusionar y solo cubría perfiles). Falta: que el fundador cree la cuenta de R2 (es la de los vídeos y las copias) y ejecutar el traslado. · **Sugerida a:** — · **Depende de:** —
 
 ## Objetivo
 Que las fotos y banners de perfil no engorden la base de datos ni la ralenticen: guardarlas en un almacenamiento de objetos con CDN, manteniendo la base de datos solo con la referencia.

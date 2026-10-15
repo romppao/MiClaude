@@ -11,13 +11,23 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.16.1] — 2026-10-15
+## [0.16.2] — 2026-10-15
 
 ### Corregido
 - Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La autoría generada por el mapa también incorpora aviso y protección. La auditoría espera al mapa y comprueba el aviso y la protección de la pestaña de origen.
 
 ### Cambiado
 - Los vídeos externos de la galería avisan visiblemente de la salida; condiciones y privacidad explican qué ocurre al abrir páginas ajenas.
+
+## [0.16.1] — 2026-10-15
+
+PR de Claude: T-004, parte 2. Las fotos salen de la base de datos (el fundador lo aprobó el 15-10-2026: «ponte a ello»).
+
+### Cambiado
+- **Fotos fuera de la base de datos:** la foto y el banner de los perfiles, las fotos de los highlights y las del público se guardan en el almacén de fotos (Cloudflare R2, el mismo cubo que los vídeos) y la base solo apunta dónde está cada una. Así la base gratuita (0,5 GB) no se llena con unos miles de fotos. Para quien usa la aplicación no cambia nada.
+- Mientras no estén las variables `R2_*`, todo sigue como antes: las fotos se guardan en la base. Las fotos antiguas se siguen viendo y se trasladan con `scripts/fotos-al-almacen.ts`, que no borra nada de la base sin la opción `--vaciar`.
+- Al quitar o sustituir una foto, retirar un highlight o un vídeo del público, eliminar la cuenta u ocultar una ficha, la foto se borra también del almacén. Ocultar una ficha borra además sus vídeos, que hasta ahora se quedaban.
+- El CI guarda las fotos en un almacén en disco (`FOTOS_EN_DISCO=si`), para probar el mismo camino que en producción.
 
 ## [0.16.0] — 2026-10-15
 
