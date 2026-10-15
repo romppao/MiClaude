@@ -55,7 +55,7 @@ export function GaleriaMedios({ medios, avisar, bloquear, yo, back, conVelada = 
               <span className="acciones" style={{ margin: 0 }}>
                 {m.kind === "PHOTO" && <a className="btn secondary" href={`/medios/${m.id}/imagen?descargar=1`} download>Descargar la foto<span className="sr-only">: {titulo}</span></a>}
                 {m.kind === "VIDEO" && m.videoKey && <a className="btn secondary" href={`/medios/${m.id}/video?descargar=1`} download>Descargar el vídeo<span className="sr-only">: {titulo}</span></a>}
-                {m.kind === "VIDEO" && m.videoUrl && <a className="btn secondary" href={m.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo<span className="sr-only">: {titulo} (se abre en otra pestaña)</span></a>}
+                {m.kind === "VIDEO" && m.videoUrl && <a className="btn secondary" href={m.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo<span className="sr-only">: {titulo}</span> (se abre en otra página web)</a>}
               </span>
               {avisar && (
                 <details>

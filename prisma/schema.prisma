@@ -951,3 +951,32 @@ model EventAttendance {
   @@id([userId, eventId])
   @@index([eventId])
 }
+
+enum EmailStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+// Cola de correos (T-008; src/lib/common/cola-correo.ts). Cada correo se guarda antes de enviarse: si el proveedor falla o se alcanza su
+// límite diario, se reintenta después. Al enviarse se vacía el cuerpo (puede llevar enlaces de un solo uso) y a los 30 días se borra.
+model EmailOutbox {
+  id             String      @id @default(cuid())
+  to             String
+  subject        String
+  body           String
+  replyTo        String?
+  unsubscribeUrl String?
+  // 0: cuenta (confirmar el correo, contraseña), que pasa antes y tiene reservado parte del cupo diario; 1: el resto.
+  priority       Int         @default(1)
+  status         EmailStatus @default(PENDING)
+  attempts       Int         @default(0)
+  nextAttemptAt  DateTime    @default(now())
+  lastError      String?
+  createdAt      DateTime    @default(now())
+  sentAt         DateTime?
+
+  @@index([status, priority, nextAttemptAt])
+  @@index([sentAt])
+}

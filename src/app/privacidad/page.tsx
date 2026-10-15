@@ -24,6 +24,8 @@ export default function Privacy() {
         </>
       )}
 
+      <p>Los vídeos enlazados desde otras páginas web se abren allí cuando pulsas el enlace; no se reproducen incrustados en Lona. Al salir, se aplica la política de privacidad de esa página, que puede usar sus propias cookies.</p>
+
       <h2>Qué datos guardamos</h2>
       <ul>
         <li><strong>Tu cuenta:</strong> tu nombre, tu correo electrónico y tu contraseña. La contraseña no se guarda: solo se conserva una huella cifrada que no permite conocerla.</li>
@@ -87,6 +89,7 @@ export default function Privacy() {
         <li>Enlaces enviados por correo: caducan a la hora (recuperar contraseña) o a las 48 horas (confirmar correo).</li>
         <li>Solicitudes para reclamar una ficha: el texto con el que demuestras quién eres se borra en cuanto un moderador decide, y la solicitud a los 90 días.</li>
         <li>Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.</li>
+        <li>Correos que te enviamos: se guardan hasta entregarlos, para reintentarlo si falla el envío; una vez enviados se borra su contenido y a los 30 días, el registro.</li>
         <li>Avisos de la campanita: 12 meses desde su creación. Después dejan de mostrarse y se eliminan en la limpieza periódica; al eliminar tu cuenta también se borran.</li>
       </ul>
 

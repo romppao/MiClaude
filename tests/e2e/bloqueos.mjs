@@ -114,6 +114,13 @@ const motivos = await esperarCorreo(tito.email, "Hemos retirado un contenido tuy
 check("el autor del comentario recibe los motivos (art. 17): qué, por qué y cómo reclamar", !!motivos && motivos.includes(`Comentario de Tito ${rnd}`) && motivos.includes("ofensivo") && motivos.includes("no usamos sistemas automáticos"));
 check("y quien avisó con cuenta, la decisión", !!(await esperarCorreo(lola.email, "Hemos revisado tu aviso")));
 
+// 7) Cola de correos (T-008): cada correo pasa por la cola y, una vez entregado, no se guarda su contenido.
+const cola = await db.emailOutbox.findMany({ where: { to: correo } });
+check("los correos de quien avisó pasan por la cola y quedan entregados", cola.length >= 2 && cola.every((c) => c.status === "SENT" && c.sentAt));
+check("y su contenido se vacía al entregarlos (puede llevar enlaces de un solo uso)", cola.every((c) => c.body === ""));
+const salud = await (await anonimo.request.get(B + "/salud")).json();
+check("/salud dice cuántos correos esperan, sin direcciones", typeof salud.correos?.pendientes === "number" && !JSON.stringify(salud).includes("@"));
+
 await terminarDiagnosticos();
 await db.$disconnect();
 await browser.close();

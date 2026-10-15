@@ -76,6 +76,8 @@ export default function Condiciones() {
       <h2>9. Responsabilidad</h2>
       <p>Lo que publican los usuarios es responsabilidad de quien lo publica. Lona no organiza veladas, combates ni clases y no responde de ellos. Practicar deportes de contacto tiene riesgos. Lo explicamos con detalle en el <Link href="/aviso-legal">aviso legal</Link>.</p>
 
+      <p>Los enlaces a noticias, reglamentos, entradas y vídeos de otras páginas web abren otra pestaña y lo indican en el enlace. Al seguirlos sales de Lona: su contenido y sus condiciones dependen de quien gestione esa página.</p>
+
       <h2>10. Ley aplicable</h2>
       <p>Estas condiciones se rigen por la ley española. Si eres consumidor, son competentes los juzgados de tu domicilio.</p>
     </>

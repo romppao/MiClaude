@@ -754,7 +754,7 @@ export default async function Moderation({
                             rel="noopener noreferrer"
                           >
                             Ver la foto
-                          </a>
+                          <span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>
                         </>
                       ) : medio.videoUrl ? (
                         <>
@@ -766,7 +766,7 @@ export default async function Moderation({
                             rel="noopener noreferrer"
                           >
                             Ver el vídeo
-                          </a>
+                          <span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>
                         </>
                       ) : (
                         <>
@@ -778,7 +778,7 @@ export default async function Moderation({
                             rel="noopener noreferrer"
                           >
                             Ver el vídeo
-                          </a>
+                          <span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>
                         </>
                       )}
                       {medio.hiddenAt ? " (ya retirado)" : ""}
@@ -793,7 +793,7 @@ export default async function Moderation({
                         rel="noopener noreferrer"
                       >
                         {r.entityId}
-                      </a>
+                      <span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra pestaña)</span></a>
                       <div className="mut">
                         Retira lo que haga falta desde la propia página y
                         después cierra el aviso: quien avisó recibirá la

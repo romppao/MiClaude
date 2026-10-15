@@ -27,14 +27,15 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 | `GOOGLE_CLIENT_ID` | El ID de cliente de Google |
 | `TRUSTED_PROXY_HOPS` | `1` (comprobarlo con la primera petición real: la IP debe ser la del visitante) |
 
-**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` (más la variable normal `R2_JURISDICCION=eu`). Desde la 0.16.1, **R2 guarda también las fotos** (perfiles, highlights y fotos del público) en la carpeta `fotos/` del mismo cubo que los vídeos; sin estas variables las fotos se guardan dentro de la base de datos, y la base gratuita de Neon (0,5 GB) se llenaría con unos miles de fotos. No poner `FOTOS_EN_DISCO`: es solo para pruebas.
+**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO`, `SENTRY_DSN` (avisos de fallos, región UE), `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` (más la variable normal `R2_JURISDICCION=eu`). Desde la 0.16.1, **R2 guarda también las fotos** (perfiles, highlights y fotos del público) en la carpeta `fotos/` del mismo cubo que los vídeos; sin estas variables las fotos se guardan dentro de la base de datos, y la base gratuita de Neon (0,5 GB) se llenaría con unos miles de fotos. No poner `FOTOS_EN_DISCO`: es solo para pruebas.
 
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 
 ## Puesta en marcha (una sola vez)
 0. **Separar ya lonaclub.es de la demo** (petición del fundador, 15-10-2026: «quiero separar la aplicación web de la demo de render… ya»). Hasta que la versión real esté montada, lonaclub.es no debe enseñar la demo:
-   - Render → servicio `ring-espana-demo` → Settings → Custom Domains → borrar `lonaclub.es` y `www.lonaclub.es`;
-   - Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
+   - **Seguir [`DOMINIO.md`](DOMINIO.md), sección 3, al pie de la letra** (orden seguro, cómo comprobarlo y cómo deshacerlo). Resumen:
+   - primero Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
+   - después Render → servicio `ring-espana-demo` → Settings → Custom Domains → borrar `lonaclub.es` y `www.lonaclub.es` (al revés quedaría un rato el dominio apuntando a un servicio que no lo reclama);
    - **no tocar** MX, SPF, `_dmarc` ni los TXT de verificación (Google, Search Console): el buzón info@ sigue funcionando.
    - La demo sigue en https://ring-espana-demo.onrender.com/ y, desde la 0.15.1, pide a los buscadores que no la muestren (`noindex` y sin mapa del sitio).
 1. **Proyecto y facturación.**
