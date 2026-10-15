@@ -802,7 +802,7 @@ export default async function Moderation({
                     </>
                   )}
                   {gimnasio && (
-                    <Link href={`/mis-gimnasios?gimnasio=${gimnasio.id}`}>
+                    <Link className="btn secondary" href={`/mis-gimnasios?gimnasio=${gimnasio.id}`}>
                       Gimnasio: {gimnasio.name}
                     </Link>
                   )}
@@ -1007,7 +1007,7 @@ export default async function Moderation({
                 {g.city} · {g.province} ·{" "}
                 {g.verifiedAt ? "Con sello" : "Sin sello"}
               </p>
-              <Link href={`/mis-gimnasios?gimnasio=${g.id}`}>
+              <Link className="btn secondary" href={`/mis-gimnasios?gimnasio=${g.id}`}>
                 Corregir o revisar el gimnasio
               </Link>
               <p>{g.verifiedNote}</p>

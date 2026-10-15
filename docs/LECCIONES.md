@@ -523,3 +523,5 @@ Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir u
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
 
 - 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
+
+- 15-10-2026: al sacar un enlace de una celda y convertirlo en hijo directo de una tarjeta flex, su zona táctil puede quedar en 25 px. El CI móvil detectó la regresión en la bandeja; los accesos de gimnasio pasan a botón de enlace con altura mínima, sin relajar la prueba.
