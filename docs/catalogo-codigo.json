@@ -1440,6 +1440,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/sentry.ts",
+    "purpose": "Envía a Sentry, sin SDK, los fallos nuevos ya registrados en «Fallos», sin datos personales; sin SENTRY_DSN no hace nada.",
+    "guide": "docs/MODERACION.md"
+  },
+  {
     "path": "src/lib/common/territorio.ts",
     "purpose": "Provincias cuyos gimnasios no salen en Lona (Cataluña, decisión del fundador del 14-10-2026) y el filtro común para listas, mapa, búsqueda, sitemap y altas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -2182,6 +2187,11 @@
   {
     "path": "tests/unit/search.test.ts",
     "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/sentry.test.ts",
+    "purpose": "DSN de Sentry, contenido del aviso sin datos de usuario y envío que nunca lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

@@ -2235,6 +2235,20 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 **Estado:** PR abierto. **Siguiente:** T-013, el aviso en los enlaces que abren otra pestaña.
 
+## 15-10-2026. Claude (nube): avisos de fallos a Sentry (T-010, en parte)
+
+**Qué se pidió:** seguir con lo que falta para publicar. El imprescindible n.º 7, avisos de caídas y fallos, tenía una parte de Claude («medio día»).
+
+**Qué se decidió:**
+- **Sin SDK de Sentry.** Se envía el «sobre» por HTTP, que es el formato estándar de Sentry: sin dependencias nuevas, que la ficha prohibía sin el visto bueno del fundador, y fácil de cambiar de servicio.
+- **Solo llega a Sentry lo que ya está en «Fallos»**, con los datos tachados.
+- **Solo los fallos nuevos y los que reaparecen**, para no agotar el cupo gratuito.
+- **Si la base no responde, también se avisa**: es justo cuando «Fallos» no puede guardar nada.
+
+**Qué se hizo:** `sentry.ts`, la llamada desde `registrarFallo`, `/salud` con la latencia de la base y si los avisos están activados, y `sentry.test.ts`.
+
+**Pendiente de T-010:** el registro en JSON con `x-request-id` y `OPERACION.md`. **Del fundador:** crear el proyecto en Sentry (región UE) y UptimeRobot sobre `/salud`.
+
 ## 15-10-2026. Claude (nube): lista de gimnasios reales investigada a mano
 
 **Qué se pidió:** el fundador: «quiero que vayas cogiendo todos los perfiles de clubes de boxeo… de jiu-jitsu, de muay thai, de todas las disciplinas… Puedes buscar la información en Google Maps, en Facebook, en Instagram, TikTok… Solo gimnasios de deportes de contacto… esfuérzate». Y: «no te olvides de hacerlo con todas las comunidades autónomas».
