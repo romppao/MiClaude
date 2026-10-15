@@ -509,3 +509,7 @@ El primer guion buscaba un papel ARIA «tab» donde la aplicación usa enlaces d
 La búsqueda en TSX no incluye enlaces creados por librerías: la autoría del mapa también abre pestañas. Auditar después de que cargue y normalizar los enlaces cuando la librería renueve su contenido; no borrar ni ocultar las atribuciones.
 
 La desconexión del entorno ocurrió con cambios todavía sin commit. Se recuperaron completos y se subieron a sus ramas antes de continuar: guardar avances revisables antes de baterías largas, indicando expresamente qué pruebas siguen pendientes.
+## 15-10-2026 — Versiones exactas de los PR de Dependabot (Codex, T-002)
+Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir una versión posterior a la solicitada. Resolver las cinco versiones explícitas y comprobar las instaladas, conservando el pin de MapLibre; las actualizaciones transitivas se revisan juntas.
+
+La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.

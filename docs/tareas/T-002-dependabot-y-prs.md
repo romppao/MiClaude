@@ -1,8 +1,24 @@
 # T-002 — Dependabot sin saltos mayores y limpieza de PRs
 **Nivel:** N1 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F1 · **Estado:** hecha por Claude el 6 de octubre de 2026 (a petición del fundador: «corrige todo lo que dijiste…»); ya no sirve como prueba de ingreso (la sustituye [T-013](T-013-enlaces-externos-avisan.md)) · **Sugerida a:** — · **Depende de:** —
+**Fase:** F1 · **Estado vigente:** pendiente de revisión (PR #78), ejecutada por Codex (15-10-2026) · **Depende de:** T-013 como orden de integración.
 
-## Objetivo
+**Historial:** la tarea original la terminó Claude el 6-10-2026. Dejó de servir como prueba de ingreso (la sustituyó T-013); el nuevo encargo de abajo la reabre para agrupar actualizaciones.
+
+## Encargo vigente — 15 de octubre de 2026
+
+El fundador encarga a Codex unir **#17, #18, #19, #65 y #66 en un solo PR**, después de T-013. Reserva: `codex/t-002-dependabot-agrupado-20261015`, desde la demo 8c789bc. **Estado: pendiente de revisión.** Este encargo sustituye para esta entrega las restricciones históricas «no actualizar dependencias / no tocar package.json» de abajo; se conserva el historial de la tarea original.
+
+| PR | Dependencia | Versión solicitada |
+|---|---|---|
+| #17 | vitest | 5.0.3 |
+| #18 | sharp | 0.35.5 |
+| #19 | next | 15.5.27 |
+| #65 | maplibre-gl | 6.14.0 (fijada) |
+| #66 | @types/node | 26.6.5 |
+
+Pasos: actualizar juntas las cinco declaraciones y generar un único `package-lock.json`; conservar Node >=22, Next 15, Prisma 6, React 19 y TypeScript 5; ejecutar instalación reproducible, tipos, unitarias, compilación, mapa, catálogo, navegador y accesibilidad. Documentar pruebas reales y límites, CHANGELOG, versión, fila de Codex y APORTACIONES-CODEX. No modificar los paneles F/G/D/H ni cerrar los PR ajenos. Tras integrar, el fundador puede cerrar los cinco originales por sustitución; #20 queda fuera de este encargo.
+
+## Objetivo histórico
 Que Dependabot deje de proponer saltos mayores incompatibles (Next 16, Prisma 7, TypeScript 7) y que las PRs obsoletas queden identificadas para cerrar.
 
 ## Contexto
@@ -26,3 +42,9 @@ No actualizar dependencias. No tocar `package.json`.
 
 ## Documentar
 Entrada breve en tu registro y en `DIARIO.md`. Si es tu primera tarea, escribe antes tu `APORTACIONES-<NOMBRE>.md` con qué puedes y qué no puedes ejecutar.
+
+## Base y versión actuales
+
+La rama integra d6a63d5 (#75, demo 0.17.0) y conserva sus scripts y pruebas de paneles sin modificarlos. Entrega 0.17.2 para integrar tras T-013 (0.17.1). Las cinco resoluciones siguen exactamente en las versiones de la tabla. Validación anterior de d62b8d1 sobre #74: https://github.com/romppao/MiClaude/actions/runs/38706575120. El PR de esta entrega valida la base actual.
+
+PR de entrega: https://github.com/romppao/MiClaude/pull/78. Comprobaciones actuales: https://github.com/romppao/MiClaude/pull/78/checks.

@@ -416,3 +416,4 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - 15-10-2026, Codex, encargo del fundador T-013: aviso de otra pestaña en reglamentos y moderación, salida visible en vídeos externos y comprobación general en la auditoría. Implementado; validación en curso. Paneles F/G/D/H reservados a la decisión de Claude Code.
 
 - 15-10-2026, Codex al ejecutar T-013 en local: quedan por revisar autoenlaces en el estado sin resultados de veladas pasadas, el atajo de ciudad de propuestas y los filtros de estado de fallos. Diez hallazgos al recorrer 414 pantallas por cinco papeles; no son defectos de aviso externo. Pendiente de una tarea propia; no se modifican esas pantallas en T-013.
+- 15-10-2026, fundador → Codex: T-002 agrupa #17/#18/#19/#65/#66 en un único PR (0.17.2) tras T-013. Implementación preparada; pruebas en curso. Los PR originales quedan para cerrar tras integrar, sin alterar el calendario ni la política de saltos mayores de Dependabot.
