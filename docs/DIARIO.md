@@ -2215,6 +2215,61 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 **Estado:** PR abierto.
 
+## 15-10-2026. Claude (nube): cola de correos (T-008, 0.18.1)
+
+**Qué se pidió:** el fundador: «continúa con todo… yo quiero tener la aplicación ya publicada». El imprescindible n.º 3 (correo real) tenía dos partes: la cuenta de Resend (fundador) y la cola con límites (Claude).
+
+**Qué se decidió y por qué:**
+- **`sendMail` no cambia de forma** y por dentro pasa por la cola. Las 15 llamadas no se tocan.
+- **La entrega va a `mail-transporte.ts`**, para que la cola no dependa de `mail.ts` (sin dependencias circulares).
+- **Límite diario con cupo reservado:** el plan gratuito de Resend es de 100 correos al día. Un día de muchos avisos de combates no debe impedir que alguien confirme su cuenta, así que los correos de la cuenta tienen prioridad y los 10 últimos del cupo.
+- **Sin ruta ni tarea programada nueva** (la ficha proponía `/api/cola-correo`). La cola se procesa al enviar cada correo, en la limpieza periódica (como mucho cada 30 minutos por proceso) y en la tarea de noticias, cada 6 horas. Así no se gastan más minutos de GitHub Actions.
+- **El contenido se vacía al entregar:** los correos de confirmación y de contraseña llevan enlaces de un solo uso, y no deben quedarse guardados en la base.
+
+**Qué se hizo:**
+- Modelo `EmailOutbox` y migración.
+- `cola-correo.ts`: reserva atómica para no enviar dos veces, esperas exponenciales y estado `FAILED` con aviso en «Fallos».
+- Prioridad 0 para confirmar el correo, recuperar la contraseña y el aviso de contraseña cambiada.
+- Retención de 30 días (90 para los fallidos), recuento en `/salud` y texto en `/privacidad`.
+- Pruebas: `cola-correo.test.ts`, y en `bloqueos.mjs`, que los correos quedan entregados, vacíos y contados en `/salud`.
+
+**Estado:** PR abierto. **Siguiente:** T-013, el aviso en los enlaces que abren otra pestaña.
+
+## 15-10-2026. Claude (nube): avisos de fallos a Sentry (T-010, en parte)
+
+**Qué se pidió:** seguir con lo que falta para publicar. El imprescindible n.º 7, avisos de caídas y fallos, tenía una parte de Claude («medio día»).
+
+**Qué se decidió:**
+- **Sin SDK de Sentry.** Se envía el «sobre» por HTTP, que es el formato estándar de Sentry: sin dependencias nuevas, que la ficha prohibía sin el visto bueno del fundador, y fácil de cambiar de servicio.
+- **Solo llega a Sentry lo que ya está en «Fallos»**, con los datos tachados.
+- **Solo los fallos nuevos y los que reaparecen**, para no agotar el cupo gratuito.
+- **Si la base no responde, también se avisa**: es justo cuando «Fallos» no puede guardar nada.
+
+**Qué se hizo:** `sentry.ts`, la llamada desde `registrarFallo`, `/salud` con la latencia de la base y si los avisos están activados, y `sentry.test.ts`.
+
+**Pendiente de T-010:** el registro en JSON con `x-request-id` y `OPERACION.md`. **Del fundador:** crear el proyecto en Sentry (región UE) y UptimeRobot sobre `/salud`.
+
+## 15-10-2026. Claude (nube): lista de gimnasios reales investigada a mano
+
+**Qué se pidió:** el fundador: «quiero que vayas cogiendo todos los perfiles de clubes de boxeo… de jiu-jitsu, de muay thai, de todas las disciplinas… Puedes buscar la información en Google Maps, en Facebook, en Instagram, TikTok… Solo gimnasios de deportes de contacto… esfuérzate». Y: «no te olvides de hacerlo con todas las comunidades autónomas».
+
+**Qué se hizo:**
+- **Cuatro búsquedas en paralelo:** Madrid golpeo, Madrid MMA y jiu-jitsu, sur y este, y norte, centro e islas.
+- **Resultado:** 207 clubes en bruto; tras quitar duplicados, 191 en 24 provincias (108 en Madrid). Cada uno con la fuente que lo confirma y una confianza: alta (64) o media (127).
+- **Club del fundador:** el Club de Boxeo Ludus de Móstoles está, en la calle Cid Campeador, 7. Se quitó el duplicado «Gimnasio Ludus», que salía de un listado antiguo.
+- **Carga:** `importar-gimnasios-lista.ts` con su prueba, y opciones nuevas en el botón de GitHub.
+
+**Qué salió mal:**
+- **Límite de búsquedas:** se agotó el de la sesión (200, compartido entre las cuatro búsquedas).
+- **Webs sin abrir:** WebFetch no pudo abrir ninguna web, así que todo descansa en lo que dicen los resultados de búsqueda.
+- **Comunidades sin clubes:** Castilla-La Mancha, Extremadura, Canarias, Huesca y casi toda Castilla y León.
+
+**Decisiones:**
+- **No se copia de Google Maps**, porque sus condiciones lo prohíben; solo se usa para descubrir clubes.
+- **La confianza media queda por revisar**, para que nadie vea como seguro un club que quizá ha cerrado.
+
+**Siguiente:** completar con Claude Code en el portátil, que tiene internet completo, y con OpenStreetMap (el botón de GitHub).
+
 ## 15 de octubre de 2026 — T-013: avisos de enlaces externos (Codex)
 
 **Encargo:** «T-013 enlaces externos»; partir de la demo con #73 fusionado; no tocar F/G/D/H (#56/#62/#64/#71), y después agrupar Dependabot en T-002. Reserva publicada con `node scripts/estado.mjs reservar codex "T-013 enlaces externos"`, desde 8c789bc (0.16.0).

@@ -1,0 +1,75 @@
+name: Cargar gimnasios reales en la demo
+
+# Gimnasios reales de OpenStreetMap en la DEMO (docs/GIMNASIOS-REALES.md). Petición del fundador, 15-10-2026: quiere probar los gimnasios
+# reales en la demo. Desde la nube de Claude no se puede ni descargar de OpenStreetMap ni entrar en la base de la demo; GitHub sí.
+# Solo a mano (botón «Run workflow»), nunca programado, y solo contra la demo: la versión real exige otro procedimiento con el fundador.
+#  - «recuento»: descarga, compara con la base de la demo y muestra cuántos gimnasios se cargarían por provincia. No escribe nada.
+#  - «cargar»: hace lo mismo y, a continuación, los carga en la demo. Los gimnasios reclamados o corregidos quedan protegidos y los
+#    posibles duplicados quedan «por revisar» en moderación.
+# Necesita el secreto DEMO_DATABASE_URL: la misma dirección de la base que tiene Render en DATABASE_URL (Neon, lona-demo).
+on:
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: "OpenStreetMap: recuento o cargar. Lista investigada por Claude (docs/datos/gimnasios-investigados.json): lista-recuento o lista-cargar"
+        required: true
+        default: recuento
+        type: choice
+        options: [recuento, cargar, lista-recuento, lista-cargar]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gimnasios-demo
+  cancel-in-progress: false
+
+jobs:
+  gimnasios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.DEMO_DATABASE_URL }}
+      DEMO_MODE: "si"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Comprobar que está la dirección de la base de la demo
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Falta el secreto DEMO_DATABASE_URL (Settings → Secrets and variables → Actions). Es la misma DATABASE_URL que tiene Render."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npx prisma generate
+      - name: Lista investigada (recuento o carga)
+        if: startsWith(inputs.accion, 'lista-')
+        run: |
+          npx tsx scripts/importar-gimnasios-lista.ts ${{ inputs.accion == 'lista-cargar' && '--aplicar' || '' }} | tee lista.txt
+          { echo "## Lista investigada: ${{ inputs.accion }}"; echo '```'; cat lista.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Descargar de OpenStreetMap y comparar con la demo
+        if: "!startsWith(inputs.accion, 'lista-')"
+        run: |
+          npm run gimnasios:osm -- --comparar-base --demo | tee recuento.json
+          {
+            echo "## Gimnasios reales para la demo: recuento"
+            echo '```json'
+            cat recuento.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Cargar en la demo
+        if: inputs.accion == 'cargar'
+        run: |
+          npm run gimnasios:osm -- --aplicar --demo --plan docs/logs/gimnasios-osm/plan-osm.json | tee carga.json
+          { echo "## Carga en la demo"; echo '```json'; cat carga.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Guardar el plan y la fuente
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gimnasios-osm
+          path: docs/logs/gimnasios-osm/
+          if-no-files-found: ignore
+          retention-days: 14

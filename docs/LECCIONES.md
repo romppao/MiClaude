@@ -499,6 +499,14 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
+| Una batería de pruebas corrió contra el servidor de otra rama y falló entera | `kill` al PID de `npx next start` deja vivo al hijo `next-server`, que sigue ocupando el puerto | Arrancar con `node node_modules/next/dist/bin/next start` (un solo proceso) y guardar su PID; antes de cada batería, comprobar que el puerto está libre y que el aviso EADDRINUSE sale 0 (el guion ya lo imprime: si no es 0, parar) |
+
+## 15 de octubre de 2026 — Dominio (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Los pasos para separar lonaclub.es de la demo decían quitar primero el dominio en Render y después el DNS | Se escribieron pensando en el resultado, no en el estado intermedio | Al quitar algo de un dominio, primero el DNS y después el servicio: nunca dejar un registro apuntando a un servicio que ya no lo reclama. Todo cambio de dominio va en `docs/DOMINIO.md` con cómo deshacerlo |
+| El CI falló al compilar por `import { randomUUID } from "node:crypto"` en `sentry.ts` | `fallos.ts`, que lo importa, también se empaqueta fuera de Node (middleware), y ahí `node:` no existe. `tsc` y las pruebas unitarias no lo detectan | Lo que importe `fallos.ts` (o cualquier módulo común) no usa `node:*`: `globalThis.crypto`. Antes de subir un módulo común nuevo, `npm run build` en local |
 
 ## 15-10-2026 — Auditar enlaces con contenido real (Codex, T-013)
 La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en moderación. Una cola vacía y un selector sin división no muestran esos enlaces: la auditoría debe preparar los datos y seleccionar la división antes de comprobar el aviso de otra pestaña. El script de versión exige escribir primero el contenido de «Sin publicar».

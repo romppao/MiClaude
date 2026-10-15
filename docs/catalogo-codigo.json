@@ -20,6 +20,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/cargar-gimnasios-demo.yml",
+    "purpose": "Botón manual que descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y, si se pide, los carga solo en la demo.",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
     "path": ".github/workflows/ci.yml",
     "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004).",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -190,6 +195,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261015150000_cola_de_correos/migration.sql",
+    "purpose": "Crea la tabla EmailOutbox (cola de correos) y su enumerado de estados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -263,6 +273,11 @@
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/importar-gimnasios-lista.ts",
+    "purpose": "Carga en la demo la lista de clubes investigada a mano (docs/datos/gimnasios-investigados.json): recuento por defecto, --aplicar solo con DEMO_MODE=si, sin pisar los existentes.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "scripts/importar-gimnasios-osm.mjs",
@@ -1300,6 +1315,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/cola-correo.ts",
+    "purpose": "Cola de correos (T-008): guarda cada correo, lo entrega con reintentos, respeta el límite diario del proveedor y da prioridad a los de la cuenta.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/competition.ts",
     "purpose": "Catálogo de divisiones versionadas y reglas de edad/sexo; preserva el significado de categorías deportivas históricas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1360,8 +1380,13 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/mail-transporte.ts",
+    "purpose": "Entrega de un correo al proveedor (Resend) o al registro en desarrollo; sin cola. Solo la usa la cola de correos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/mail.ts",
-    "purpose": "Envía correo mediante Resend o transporte de log y declara resultado del envío; separa simulación local de entrega real.",
+    "purpose": "sendMail: el punto de entrada para enviar correos desde la aplicación; valida y pasa cada correo por la cola (cola-correo.ts).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1413,6 +1438,11 @@
     "path": "src/lib/common/search.ts",
     "purpose": "Busca palabras sin distinguir tildes/mayúsculas mediante SQL parametrizado y limita IDs de resultados; depende de PostgreSQL.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/sentry.ts",
+    "purpose": "Envía a Sentry, sin SDK, los fallos nuevos ya registrados en «Fallos», sin datos personales; sin SENTRY_DSN no hace nada.",
+    "guide": "docs/MODERACION.md"
   },
   {
     "path": "src/lib/common/territorio.ts",
@@ -1940,6 +1970,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/cola-correo.test.ts",
+    "purpose": "Esperas entre reintentos, límite diario y cupo reservado para los correos de la cuenta.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/competition.test.ts",
     "purpose": "Prueba divisiones deportivas versionadas y elegibilidad por edad/sexo/nivel.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1982,6 +2017,11 @@
   {
     "path": "tests/unit/fotos.test.ts",
     "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/gimnasios-lista.test.ts",
+    "purpose": "Validación de cada club de la lista investigada: fuente, provincia, disciplinas, Cataluña y enlaces.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -2147,6 +2187,11 @@
   {
     "path": "tests/unit/search.test.ts",
     "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/sentry.test.ts",
+    "purpose": "DSN de Sentry, contenido del aviso sin datos de usuario y envío que nunca lanza.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

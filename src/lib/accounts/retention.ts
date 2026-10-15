@@ -1,6 +1,7 @@
 import { FIGHTER_AVAILABILITY_DAYS, notificationCutoff } from "../common/periods";
 import { db } from "../common/db";
 import { registrarFallo } from "../common/fallos";
+import { procesarCola } from "../common/cola-correo";
 
 const DIA = 864e5;
 /** Cuentas cuyo correo nunca se verificó se borran a los 30 días: no han podido publicar nada y así nadie retiene un correo ajeno. */
@@ -8,7 +9,8 @@ export const DIAS_CUENTA_SIN_VERIFICAR = 30;
 
 /**
  * Borra lo que ya no sirve: sesiones y enlaces caducados, intentos antiguos (2 días), cuentas sin verificar de hace más de 30 días,
- * solicitudes de ficha decididas (90 días desde que se decidieron), avisos resueltos (12 meses) e historial de cambios (3 años). Los plazos figuran en /privacidad.
+ * solicitudes de ficha decididas (90 días desde que se decidieron), avisos resueltos (12 meses), historial de cambios (3 años) y correos
+ * enviados de la cola (30 días; los fallidos, 90). Los plazos figuran en /privacidad.
  */
 export async function purgeStale(now: Date = new Date()) {
   await db.$transaction([
@@ -23,6 +25,8 @@ export async function purgeStale(now: Date = new Date()) {
     // Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.
     db.report.deleteMany({ where: { status: { not: "OPEN" }, resolvedAt: { lt: new Date(now.getTime() - 365 * DIA) } } }),
     db.auditLog.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 3 * 365 * DIA) } } }),
+    // Cola de correos (T-008): enviados, 30 días (su cuerpo ya se vació al enviarlos); fallidos, 90 días.
+    db.emailOutbox.deleteMany({ where: { OR: [{ status: "SENT", sentAt: { lt: new Date(now.getTime() - 30 * DIA) } }, { status: "FAILED", createdAt: { lt: new Date(now.getTime() - 90 * DIA) } }] } }),
     db.user.deleteMany({ where: { emailVerifiedAt: null, fighter: null, role: { in: ["FAN", "FIGHTER"] }, createdAt: { lt: new Date(now.getTime() - DIAS_CUENTA_SIN_VERIFICAR * DIA) } } }),
   ]);
 }
@@ -37,5 +41,9 @@ export async function maybePurge() {
     await purgeStale();
   } catch (e) {
     await registrarFallo({ origen: "TAREA", contexto: "La limpieza periódica de datos caducados no se pudo completar", error: e });
+  }
+  // De paso, se reintentan los correos pendientes de la cola (T-008): así no dependen solo de la tarea programada.
+  try { await procesarCola(20); } catch (e) {
+    await registrarFallo({ origen: "TAREA", contexto: "No se pudo procesar la cola de correos", error: e });
   }
 }

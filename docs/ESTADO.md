@@ -17,7 +17,7 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **D y H de Codex corregidos** (gimnasios reales, campanita de avisos, vídeos del público como highlights). Fusionados hoy: 0.15.1, 0.16.0, 0.16.1 (fotos) y 0.17.0 (paneles F y G) | `claude-nube/avisos-y-paneles-h`, versión 0.18.0 | PR abierto |
+| Claude (nube, el chat del móvil) | **T-008: cola de correos** con reintentos y límite diario. Fusionados hoy: 0.15.1 a 0.18.0 (demo separada, bloqueos y avisos, fotos fuera de la base, paneles F y G, gimnasios reales y campanita de avisos) | `claude-nube/t-008-cola-de-correos-con-limite-diario-20261015`, versión 0.18.1 | PR abierto |
 | Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
 | Codex | **Sin créditos desde las 12:30 del 15-10** (vuelve cuando el fundador los recupere). Lo único pendiente, por orden, está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-pendientes.md`: bandeja única de moderación (la reserva no tiene código), vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y T-009. T-013 y T-002 los integra Claude | `codex/bandeja-unica-de-moderacion-20261015` (solo reserva) | parado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
@@ -26,7 +26,7 @@
 
 ## 3. Lo que solo puede hacer el fundador
 
-0. **Desenganchar ya lonaclub.es de la demo** (paso 0 de [`PRODUCCION.md`](PRODUCCION.md)): quitar el dominio en Render y borrar el A y el CNAME `www` en Infomaniak, sin tocar MX, SPF ni DMARC.
+0. **Dominio:** proteger lonaclub.es (renovación automática, bloqueo de transferencia y verificación en dos pasos en Infomaniak) y, cuando quiera, desengancharlo de la demo **siguiendo [`DOMINIO.md`](DOMINIO.md)**: primero el DNS en Infomaniak y después Render, sin tocar MX, SPF ni DMARC. **Ningún asistente toca el dominio.**
 1. **Poner el repositorio en privado.**
 2. **Claves de Google** ([`GOOGLE.md`](GOOGLE.md)): proyecto en Google Cloud, ID de cliente con la dirección de vuelta de la demo, y pegar `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en Render (nunca en el chat). Mientras no haya dominio propio, **no pulsar «Publicar aplicación»** (Google pide verificar los dominios); basta el modo de prueba con él como usuario. Con el dominio real habrá que añadir su dirección de vuelta.
 3. **Cuentas de producción** de #57 (facturación de Google Cloud, R2, Resend y Sentry), cuando el fundador decida montar la versión real. **R2 es imprescindible** desde la 0.16.1: guarda las fotos (sin él, la base gratuita se llenaría). Neon ya está; **la demo ya usa su base de Neon** (`lona-demo`) desde el 14-10-2026, así que la caducidad de la base de Render ya no la afecta.
@@ -44,6 +44,7 @@
 - **Mejoras de las veladas:** dijo que tenía y que las daría; sigue a la espera de su lista.
 - **Versión real (14 oct, tarde):** primero hay que comprobar que la app está bien desarrollada y, solo después, montar la versión oficial en lonaclub.es. Tiene que ser «la aplicación real y definitiva»: sin datos de prueba, sin avisos de demo y completamente independiente de la demo. Habrá un espacio de pruebas aparte (la demo) para las próximas actualizaciones. No hay que pulsar «Publicar app» en Google hasta entonces. **No poner `APP_URL=https://lonaclub.es` en Render**.
 - **lonaclub.es, esperar (15 oct, después):** «por el momento vamos a dejarlo así… No hagas nada en cuanto a eso, porque… todavía no hemos terminado de perfilar la aplicación, entonces todavía no tiene sentido que ya lancemos la aplicación web». **No montar nada en lonaclub.es** (ni versión real ni «próximamente») hasta que lo diga. Ahora toca: «procede con todo lo que hay que hacer, todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano del usuario».
+- **Dominio, máximo cuidado (15 oct):** «ten muchísimo cuidado, porque a lo mejor me roban el dominio… documéntalo al pie de la letra, explicando el porqué, el cómo, dónde… he invertido dinero ahí». Todo cambio del dominio va en [`DOMINIO.md`](DOMINIO.md), con cómo deshacerlo, y solo lo hace el fundador.
 - **Agilizar, Claude corrige a Codex (15 oct):** «Si ves que Codex ha fallado en alguna prueba o está a medias de algo, tú mismo ya corrígele… y le dices, mira, necesito que esto lo hagas así… Esto para agilizar el trabajo es importante». Y: «no hace falta que me informes sobre cualquier cosa». Claude corrige e integra lo de Codex en su propia rama (nunca escribe en la de Codex) y le deja instrucciones en el PR; al fundador solo se le escribe lo que necesita de él.
 - **Cambio de visión y RFC-001 de Codex (15 oct):** «he tenido un cambio de visión que todavía no sé si aplicaremos». Sobre la RFC-001 (#61): «no estoy seguro si es la que definitivamente acepté… Sé que dije dos versiones… hubo una… que me convenció más. Pero no estoy seguro de cuál es la que hizo Codex». Y el orden: «Eso es el final. Primero hacemos todo el plan para finalizar el proyecto, hacer la promoción mediante vídeos y todo más, y ya pues valoraremos si el enfoque va a ser ese o no». **Nadie aplica la RFC-001 ni cambia el enfoque** hasta que el fundador confirme cuál de las dos versiones aceptó (puede habérselo dicho a Claude Code en el portátil: si lo sabes, apúntalo aquí).
 - **Separar ya (15 oct):** no quiere que quien busque el nombre llegue a la demo con su aviso. «Quiero separarlo ya… la demo de render… es donde haremos las pruebas para corregir pequeñas cosas, hacer configuraciones nuevas, actualizaciones. Pero la parte de oficial de la web, ahí es donde pues estará la web de verdad.» lonaclub.es **nunca** vuelve a apuntar a Render; la demo no se indexa.
@@ -52,7 +53,11 @@
 
 ## 5. Siguiente, por orden
 
-0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación: bloquear usuarios, aviso sin cuenta y correos de la decisión, **hechos en la 0.16.0**; T-013 implementada en el PR #77, pendiente de revisión e integración.
+0. **Gimnasios reales (petición del fundador, 15-10):**
+   - **Fundador:** poner el secreto `DEMO_DATABASE_URL` y pulsar el botón «Cargar gimnasios reales en la demo» (primero OpenStreetMap; después «lista-cargar»).
+   - **Claude Code (portátil, con internet completo):** ampliar `docs/datos/gimnasios-investigados.json` con Castilla-La Mancha, Extremadura, Canarias, Huesca y Castilla y León, y con más clubes del resto. Solo de deportes de contacto, cada uno con su fuente **de menos de un año** (`fechaFuente`: «información actualizada… de no más de un año», fundador 15-10) y comprobando las disciplinas de hoy; sin copiar de Google Maps. Revisar también las 190 entradas actuales, que no tienen fecha.
+
+0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación: bloquear usuarios, aviso sin cuenta y correos de la decisión, **hechos en la 0.16.0**; T-013 (aviso al salir a enlaces externos), **hecha en la 0.18.5**.
 0. **Revisión completa antes de la versión oficial:** [`tareas/T-016-revision-previa-al-lanzamiento.md`](tareas/T-016-revision-previa-al-lanzamiento.md). Es lo que pidió el fundador antes de montar lonaclub.es y publicar en Google. Sin empezar: el primer intento se cortó por un fallo del servicio.
 1. Resolver #57 (producción) y #56 (bloque F): revisar, retargetar y renumerar.
 2. **Probar «Continuar con Google»** en la demo en cuanto el fundador ponga las claves.
