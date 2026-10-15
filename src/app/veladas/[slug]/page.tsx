@@ -57,7 +57,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       {e.kind === "INTERCLUB" && <span className="tag">Interclub</span>}
       <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       {e.status === "CANCELLED" && <span className="tag">velada cancelada</span>}
-      {!e.organizerId && <span className="tag">no oficial</span>}
+      {!e.organizerId && <span className="tag">No oficial</span>}
       <h1>{e.name}</h1>
       <p>{asistentes} van a ir</p>
       {e.status === "SCHEDULED" && e.date >= calendarDayStart() && <section className="tarjeta" aria-label="Asistencia y calendario">
