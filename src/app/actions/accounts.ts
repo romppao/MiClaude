@@ -6,7 +6,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db } from "../../lib/common/db";
-import { consumeVerificationToken, createSession, destroyOtherSessions, destroySession, getUser, isResetTokenUsable, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
+import { consumeVerificationToken, createSession, sesionReciente, destroyOtherSessions, destroySession, getUser, isResetTokenUsable, rememberReturnPath, requireUser, resetPasswordWithToken, sendPasswordResetEmail, sendVerificationEmail, unsubscribeWithToken } from "../../lib/accounts/auth";
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from "../../lib/accounts/password";
 import { HORA, MINUTO, allow, clearHits, clientIp, reservar } from "../../lib/accounts/ratelimit";
 import { maybePurge } from "../../lib/accounts/retention";
@@ -279,7 +279,10 @@ export async function deleteAccount(f: FormData) {
   const user = await requireUser();
   const back = "/mi-cuenta/eliminar";
   if (f.get("confirm") !== "on") go(back, { problema: "eliminar_sin_confirmar" });
-  await confirmOwnPassword(user, String(f.get("current") ?? ""), back);
+  // Quien entró con Google puede no tener contraseña (se creó una aleatoria): le basta con haber vuelto a entrar con Google hace poco.
+  const actual = String(f.get("current") ?? "");
+  if (!actual && user.googleSub) { if (!(await sesionReciente())) go(back, { problema: "google_confirmar" }); }
+  else await confirmOwnPassword(user, actual, back);
   // Vídeos subidos por la persona (a las veladas y a sus highlights): sus filas se borran con la cuenta y los archivos, después.
   const videos = [
     ...(await db.mediaItem.findMany({ where: { uploaderId: user.id, videoKey: { not: null } }, select: { videoKey: true } })),

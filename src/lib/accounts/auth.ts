@@ -62,6 +62,17 @@ export async function completeSecondFactor() {
   if (token) await db.session.updateMany({ where: { id: sha256(token) }, data: { secondFactorAt: new Date() } });
 }
 
+/**
+ * ¿Se ha abierto la sesión actual hace menos de `minutos`? (las sesiones duran siempre SESSION_DAYS, así que su inicio se deduce de la caducidad).
+ * Sirve de confirmación para quien entra con Google y nunca eligió contraseña: volver a entrar con Google demuestra que es él (T-016, parte 1).
+ */
+export async function sesionReciente(minutos = 15): Promise<boolean> {
+  const token = (await cookies()).get(COOKIE)?.value;
+  if (!token) return false;
+  const s = await db.session.findUnique({ where: { id: sha256(token) }, select: { expiresAt: true } });
+  return !!s && s.expiresAt.getTime() - SESSION_DAYS * 864e5 > Date.now() - minutos * 60_000;
+}
+
 /** Exige una sesión iniciada. Si falta, lleva a «Entrar» explicando por qué y, si se indica `next`, con la ruta a la que volver. */
 export async function requireUser(next?: string) {
   const u = await getUser();

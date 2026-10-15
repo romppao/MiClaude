@@ -1,6 +1,7 @@
 import type { User } from "@prisma/client";
 import { publicUserName } from "../common/names";
 import { db } from "../common/db";
+import { provinciaConGimnasios } from "../common/territorio";
 export const PROFILE_KINDS = ["peleador", "gimnasio", "entrenador", "promotor", "federacion"] as const;
 export type ProfileKind = typeof PROFILE_KINDS[number];
 /** Resuelve únicamente tipos visuales admitidos; null evita consultas con un tipo arbitrario recibido por URL/formulario. */
@@ -17,7 +18,7 @@ export async function profileSource(kind: ProfileKind, id: string) {
     const f = await db.fighter.findUnique({ where: { id } });
     return f ? { name: `${f.firstName} ${f.lastName}`, href: `/peleadores/${f.slug}`, ownerId: f.userId, visible: f.listed && !f.hiddenAt } : null;
   }
-  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: null, visible: true } : null; }
+  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: null, visible: provinciaConGimnasios(g.province) } : null; }
   if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: t.userId, visible: true } : null; }
   if (kind === "promotor") {
     const u = await db.user.findUnique({ where: { id }, include: { organizerRequest: true } });

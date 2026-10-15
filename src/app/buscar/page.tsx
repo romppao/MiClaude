@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "../../lib/common/db";
+import { gimnasiosVisibles } from "../../lib/common/territorio";
 import { flatParams } from "../../lib/common/safe";
 import { searchIds } from "../../lib/common/search";
 import { publicFighterName } from "../../lib/common/names";
@@ -30,7 +31,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<R
   const [fighters, gyms, trainers, events] = q
     ? await Promise.all([
         db.fighter.findMany({ where: { id: { in: (fighterIds ?? []).slice(0, POR_GRUPO) } }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }] }),
-        db.gym.findMany({ where: { id: { in: (gymIds ?? []).slice(0, POR_GRUPO) } }, orderBy: { name: "asc" } }),
+        db.gym.findMany({ where: { id: { in: (gymIds ?? []).slice(0, POR_GRUPO) }, ...gimnasiosVisibles() }, orderBy: { name: "asc" } }),
         db.trainer.findMany({ where: { id: { in: (trainerIds ?? []).slice(0, POR_GRUPO) } }, orderBy: { name: "asc" } }),
         db.event.findMany({ where: { id: { in: (eventIds ?? []).slice(0, POR_GRUPO) }, status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } }, orderBy: { date: "desc" } }),
       ])

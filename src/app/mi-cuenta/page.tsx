@@ -56,6 +56,7 @@ export default async function Account() {
         </> },
         { id: "pestana-clave", titulo: "Contraseña", contenido: <>
           <h2>Cambiar mi contraseña</h2>
+          {user.googleSub && <p className="mut">Entraste con Google. Si nunca elegiste una contraseña, pide una con <Link href="/recuperar">«¿Has olvidado tu contraseña?»</Link>: te llegará un enlace a tu correo.</p>}
           <form className="search" action={changePassword} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 420 }}>
             <label className="field"><span>Contraseña actual</span><input name="current" type="password" autoComplete="current-password" required maxLength={LIMITS.password} /></label>
             <label className="field"><span>Contraseña nueva</span><input name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={LIMITS.password} /><span className="hint">Mínimo 8 caracteres. Al cambiarla, cerraremos las sesiones abiertas en otros dispositivos.</span></label>

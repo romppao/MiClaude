@@ -58,7 +58,7 @@ async function revisarGuardadas() {
 }
 
 async function leer(url: string): Promise<string> {
-  const r = await fetch(url, { signal: AbortSignal.timeout(TIEMPO_MAX_MS), headers: { "user-agent": "RingEspana/1.0 (lector de noticias)", accept: "application/rss+xml, application/atom+xml, application/xml, text/xml" }, redirect: "follow" });
+  const r = await fetch(url, { signal: AbortSignal.timeout(TIEMPO_MAX_MS), headers: { "user-agent": "Lona/1.0 (lector de noticias; lonaclub.es)", accept: "application/rss+xml, application/atom+xml, application/xml, text/xml" }, redirect: "follow" });
   if (!r.ok) throw new Error(`La fuente respondió con el código ${r.status}`);
   if (Number(r.headers.get("content-length") ?? 0) > MAX_BYTES) throw new Error("La fuente es demasiado grande");
   const texto = await r.text();

@@ -1,6 +1,6 @@
 # T-016 — Revisión completa antes de montar la versión oficial
 
-**Estado:** pendiente, sin empezar.
+**Estado:** revisión hecha (14-10-2026): partes 1 y 2 de Claude, 3-5 de Codex (`docs/tareas/T-016-hallazgos-codex.md` en `codex/revision-t016`). Siguiente: PR de arreglos.
 - 14-10-2026: Claude Code lanzó las cinco partes en paralelo y las cinco se cortaron por un fallo del servicio de Anthropic (`[reasoning_extraction]`), no de la app. No hay resultados parciales.
 - Se repite desde cero.
 
@@ -66,4 +66,126 @@ En todas las partes hay que buscar también restos de demo que se vean sin `DEMO
 Se entrega al fundador una lista corta y en lenguaje llano: lo que está bien, lo que hay que arreglar antes de la oficial y lo que puede esperar. Después vienen los arreglos, montar la oficial (`docs/PRODUCCION.md`) y publicar la app en Google.
 
 ### Hallazgos
-_(vacío: rellenar parte por parte)_
+
+#### Parte 1. Seguridad y moderación
+Hecha por Claude Code el 14-10-2026, en la sesión y sin subagentes, sobre `f7204ac` (0.14.0). Solo lectura.
+
+**Revisado y correcto** (comprobado leyendo el código):
+- **Sesiones:**
+  - token aleatorio de 32 bytes; la base solo guarda su SHA-256;
+  - cookie `httpOnly`, `sameSite=lax` y `secure` en producción;
+  - los enlaces de verificación y recuperación son de un solo uso, con borrado atómico;
+  - la recuperación cierra todas las sesiones (`src/lib/accounts/auth.ts`).
+- **Entrar:**
+  - el intento se reserva antes de calcular el hash (`reservar`);
+  - hay límite por correo y por IP;
+  - un correo inexistente tarda lo mismo (`dummyHash`);
+  - la recuperación no revela si la cuenta existe (`src/app/actions/accounts.ts`).
+- **Google:**
+  - PKCE S256, `state` y `nonce` en una cookie de 10 minutos y de un solo uso;
+  - se comprueban el emisor, el destinatario, la caducidad y `email_verified`;
+  - unión de cuentas: si había una cuenta con ese correo sin confirmar, se invalida su contraseña y se cierran sus sesiones («secuestro previo»);
+  - no se cambia en silencio otra cuenta de Google ya vinculada (`src/app/api/auth/google/callback/route.ts`).
+- **Segundo paso del creador:**
+  - TOTP con protección contra reutilización (`totpLastStep`);
+  - códigos de emergencia de un solo uso, con actualización condicionada;
+  - 6 intentos por cuarto de hora;
+  - `esCreador` exige el correo verificado (`src/app/actions/creador.ts`, `src/lib/accounts/creador.ts`).
+- **Autorización:**
+  - las 80 acciones exportadas de `src/app/actions/` empiezan por `requireUser`, `requireVerifiedUser`, `requireOrganizer`, `requireAdmin`, `requireCreador` o `requireSupportActor`, salvo las públicas por diseño: registro, entrar, salir, recuperar, verificar y baja;
+  - `shared.ts` no lleva `"use server"`, así que sus funciones no se exponen;
+  - `saveProfile` usa `profileAccess`, que solo deja editar al titular o a moderación.
+- **Modo demo:**
+  - `demoConfirmarCorreo` y `demoCambiarPapel` comprueban `demoActiva()` en el servidor;
+  - `/laboratorio` exige `EXPERIENCE_LAB=si` y `DEMO_MODE=si`, y si no da 404.
+- **Inyección y XSS:**
+  - todo el SQL a mano usa plantillas etiquetadas de Prisma (parametrizadas); no hay `$queryRawUnsafe`;
+  - el único `dangerouslySetInnerHTML` es una constante (`TEMA_INICIAL`);
+  - los enlaces de usuarios pasan por `safeHttpUrl`, que solo admite http y https.
+- **Subidas de imágenes:** `sharp` con límite de píxeles; solo JPEG, PNG o WebP de una página; se recodifican a WebP, lo que borra el EXIF y la ubicación (`src/lib/profiles/images.ts`).
+- **CSP y cabeceras:** `frame-ancestors 'none'`, `form-action 'self'`, `object-src 'none'`, HSTS, `nosniff` y `poweredByHeader: false`. CSRF: las acciones de Next comprueban el origen, y `/api/fallos` exige el mismo `Origin`.
+- **Redirecciones:** `internalPath` rechaza otro origen, las barras invertidas y los caracteres de control.
+- **`CRON_SECRET`:** va en una cabecera, con comparación en tiempo constante; sin la variable, el endpoint queda cerrado (503).
+- **Registros:** `tacharDatos` quita correos, `?token=`, claves largas y URLs de Postgres. El modo de correo «log» solo se activa fuera de producción o con `MAIL_TRANSPORT=log`.
+- **Exportar datos:** `/mi-cuenta/datos` exige sesión y enumera los campos uno a uno, sin el hash, el TOTP ni los códigos.
+- **Borrar la cuenta:**
+  - anonimiza la ficha si tiene combates;
+  - vacía los datos del historial;
+  - impide borrar al último moderador;
+  - borra después los vídeos del almacén.
+
+**Hallazgos:**
+1. **IMPORTANTE. Quien se registra con Google no puede borrar su cuenta ni cambiar la contraseña** (comprobado).
+   - **Dónde:** `src/app/api/auth/google/callback/route.ts:236` crea la cuenta con una contraseña aleatoria que nadie conoce. `deleteAccount` y `changePassword` (`src/app/actions/accounts.ts:232`, `confirmOwnPassword`) exigen la contraseña actual, y `/mi-cuenta/eliminar` solo pide la contraseña.
+   - **Cómo se reproduce:** entrar con Google, ir a *Mi cuenta → Eliminar*: imposible sin pasar antes por «¿Has olvidado tu contraseña?».
+   - **Por qué importa:** Apple 5.1.1 y Google Play exigen poder borrar la cuenta desde la app, y es un derecho del RGPD.
+   - **Arreglo:** si la cuenta tiene `googleSub` y la persona nunca ha elegido contraseña (campo nuevo, o comprobar que el inicio de sesión con Google es reciente, de menos de 10 minutos), confirmar escribiendo «ELIMINAR» o volviendo a pasar por Google. En «Cambiar contraseña», ofrecer «Elegir una contraseña» con un enlace por correo.
+2. **IMPORTANTE. Comprobar `TRUSTED_PROXY_HOPS` en Cloud Run antes de abrir** (sospecha, no comprobado).
+   - **Dónde:** `src/lib/accounts/ratelimit.ts:193` toma la IP del final de `X-Forwarded-For`, contando desde el final.
+   - **El riesgo:** si el frontal de Google añade su propia IP detrás de la del cliente, todos los usuarios compartirían una sola «IP». Entonces el límite de 40 intentos de acceso cada 15 minutos o el de 10 registros por hora bloquearían a todo el mundo a la vez.
+   - **Arreglo:** en el primer despliegue, mirar el valor real de la cabecera en una petición de prueba (en `/moderacion/fallos` o en un registro temporal) y ajustar `TRUSTED_PROXY_HOPS`. Apuntarlo en `docs/PRODUCCION.md`.
+3. **MENOR. El segundo paso del creador se activa con la primera sesión que tenga la contraseña** (comprobado; es por diseño).
+   - **Dónde:** `activarSegundoPaso`.
+   - **El riesgo:** hasta que el fundador lo activa, quien conozca la contraseña del creador podría activarlo con su propio móvil.
+   - **Arreglo (de procedimiento):** en la oficial, activar el segundo paso nada más crear la cuenta del creador. Añadirlo a la lista de `docs/PRODUCCION.md`.
+4. **MENOR. Restos de «Ring España»** (comprobado; no se ven en la web).
+   - **Dónde:**
+     - `src/lib/common/env.ts:13-14` pone `https://ringespana.es` como ejemplo en los mensajes de arranque;
+     - `src/app/components/RecordarCampos.tsx:6` usa la clave `ringespana:formulario-enviado` en `sessionStorage`.
+   - **Arreglo:**
+     - cambiar el ejemplo a `https://lonaclub.es`;
+     - renombrar la clave a `lona:` y añadirla a la tabla de `/cookies`, que hoy solo cita el «borrador» sin nombre.
+5. **MENOR. `MAIL_TRANSPORT=log` en producción escribiría los enlaces de los correos en los registros** (comprobado).
+   - **Dónde:** `src/lib/common/mail.ts:14`.
+   - **Arreglo:** en `validateEnv`, error si `NODE_ENV=production`, `MAIL_TRANSPORT=log` y no hay `DEMO_MODE=si`.
+
+**No revisado en esta parte** (queda para las siguientes o para Codex):
+- el detalle de cada comprobación de propiedad dentro de los 80 cuerpos de acción, más allá de la guarda inicial. Se han mirado `saveProfile`, las acciones de demo y el creador; el resto se cubre en las partes 3 a 5, recorriendo cada flujo;
+- `src/app/actions/media.ts` y la subida directa de vídeos a R2 (URL prefirmadas): solo se vio el límite de tamaño y de cantidad al día.
+
+#### Parte 2. Preparación de la versión oficial
+Hecha por Claude Code el 14-10-2026 sobre `f7204ac` (0.14.0). Con permiso del fundador, se construyó la imagen y se arrancó **en local** contra un PostgreSQL 18 vacío y desechable (Docker). Después se borró todo. No se tocaron la demo ni Neon.
+
+**Comprobado y correcto:**
+- `docker build` del `Dockerfile` termina bien:
+  - imagen de 493 MB;
+  - salida *standalone*;
+  - Prisma con OpenSSL;
+  - `public/`;
+  - trabajador de MapLibre en `/vendor/maplibre/6.11.2/maplibre-gl-worker.mjs`, que responde 200;
+  - `sharp` funciona dentro de la imagen.
+- `prisma migrate deploy` aplica las 20 migraciones sobre una base vacía.
+- **Arranque con base vacía y sin `DEMO_MODE`:**
+  - «Ready» en 2,2 s;
+  - solo avisos esperados: no hay `RESEND_API_KEY`, no hay `R2_*` y faltan los datos `TITULAR_*`;
+  - ningún error en el registro.
+- **Con la base vacía:**
+  - 22 rutas públicas responden 200, entre ellas la portada, peleadores, veladas, gimnasios, noticias, ranking, buscar, entrar, registro, recuperar, las 4 páginas legales, `sitemap.xml`, `robots.txt` y el manifiesto;
+  - las privadas (`/propuestas`, `/siguiendo`, `/mi-cuenta`, `/moderacion`) redirigen a «Entrar»;
+  - `/laboratorio` da 404;
+  - la CSP sale en las respuestas;
+  - no aparecen «Ring España», `onrender`, `localhost` ni datos de ejemplo.
+- **Nada depende del seed:** las fuentes de noticias se crean solas al primer refresco (`src/lib/news/refresh.ts:24`).
+
+**Hallazgos:**
+1. **BLOQUEA EL LANZAMIENTO. Sin Resend no se puede crear la cuenta del creador ni ningún moderador** (comprobado por lectura).
+   - **Por qué:** `esCreador` exige el correo verificado, y sin el modo demo la única forma de verificarlo es el enlace por correo. Sin moderador no se pueden autorizar veladas ni organizadores.
+   - **Arreglo:** configurar Resend (lonaclub.es verificado, `RESEND_API_KEY`, `MAIL_FROM`) **antes** de abrir. Después: registrarse con `CREADOR_CORREO`, confirmar el correo, entrar y activar el segundo paso en ese mismo momento (parte 1, hallazgo 3).
+2. **IMPORTANTE. Las fotos se guardan en la base de datos y el plan gratuito de Neon es de 1 GB** (estimación, no medido).
+   - **Dónde:** `Bytes` en `prisma/schema.prisma:287`, `:679-680` y `:775`. El límite es `MAX_MEDIOS_POR_DIA = 20` (`src/lib/media/rules.ts:9`), con fotos recodificadas de hasta 1920 px.
+   - **El riesgo:** unos cientos de usuarios activos subiendo fotos de veladas pueden llenar el GB en semanas.
+   - **Arreglo:** a corto plazo, bajar el límite diario de fotos (por ejemplo, a 5) y mostrar en moderación el tamaño de la base. A medio plazo, T-004 parte 2: las fotos a R2.
+3. **IMPORTANTE. La versión oficial arranca sin gimnasios** (comprobado).
+   - **Por qué:** con la base vacía, `/gimnasios` y el mapa salen vacíos hasta cargar los reales (bloque D, sin Cataluña).
+   - **Arreglo:** el bloque D tiene que estar hecho antes de abrir. Codex confirmó (C5-02) que hoy no hay importador ni exclusión de Cataluña.
+
+**Sin comprobar:** el correo real con Resend, la conexión *pooled* de Neon desde Cloud Run y `/moderacion/fallos` con una sesión de moderador. Necesitan la infraestructura real.
+
+#### Revisión de los hallazgos de Codex (partes 3-5, rama `codex/revision-t016`)
+Revisados por Claude el 14-10-2026 contra la 0.14.0:
+- **C3-01** confirmado. `src/app/siguiendo/page.tsx` escribe «Gana …» sin comprobar si el récord es privado.
+- **C5-01** confirmado:
+  - `setBoutResult` pone `COMPLETED` sin comprobar la autorización (`src/app/actions/events.ts`);
+  - reabrir tras cancelar también calcula `COMPLETED`.
+- **C3-03** ya está resuelto en la 0.14.0 (PR #63): `/condiciones`, `/cookies` y `/aviso-legal`, el inventario de almacenamiento y los enlaces en el registro y el pie.
+- El resto se da por bueno tal como lo describe Codex. Los arreglos irán en el PR de correcciones.
