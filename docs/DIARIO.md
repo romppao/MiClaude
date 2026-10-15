@@ -1977,6 +1977,9 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 ## 2026-10-14 — Continuación del encargo de paneles
 F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
 
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
+
 ## 2026-10-15 — Textos legales para el lanzamiento (Claude)
 
 **Qué se pidió:**
@@ -2077,3 +2080,18 @@ F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.
 - Se recuperan cuatro entradas del catálogo (páginas legales y `titular.ts`) que se habían perdido en la fusión, y se mantiene la prueba `paneles-pulido.mjs` en `test:e2e`.
 
 **Comprobado:** `tsc` sin errores; `vitest` 749 de 750 (falla `password.test.ts` por tiempo, como antes); catálogo con 395 archivos; mapa regenerado.
+
+## 15-10-2026. Claude Code: bloque G de los paneles (relevo de Codex)
+
+**Qué:** el trabajo de Codex en `codex/paneles-g-madrid` (a74abfe, con el arreglo local del selector «Buscar clases» que no llegó a subirse) pasa a `claude/paneles-g`, integrado sobre F (0.16.0). Sustituye a #62.
+
+**Revisión:**
+- la migración `20261014130000_paneles_agenda` solo añade columnas y la tabla `EventAttendance`, sin tocar datos;
+- «Voy a ir» solo en veladas programadas y futuras;
+- el calendario ICS solo de veladas publicadas;
+- la exportación de datos y el anonimato incluyen los campos nuevos;
+- la disponibilidad caduca a los 60 días.
+
+No se ha encontrado nada que corregir.
+
+**Comprobado:** `tsc` sin errores; `vitest` 769 de 770 (falla `password.test.ts` por tiempo, como antes); catálogo con 408 archivos; mapa regenerado.

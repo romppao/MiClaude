@@ -466,3 +466,5 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba una prueba `.test.tsx` nueva. Se amplió el patrón y se configuró JSX en Oxc, el transformador instalado; las 4 pruebas nuevas ya pasan. La tubería de PowerShell a Python sustituyó inicialmente algunas tildes: corregidas y fijada salida UTF-8 antes de nuevas escrituras. Revisar siempre el diff y el recuento de pruebas.
 
 14 oct: esperar la URL de una transición React no acredita que el formulario nuevo esté montado. En registro, esperar el campo que identifica el paso y verificar sus valores; conservar la prueba de persistencia en base.
+
+14 oct, G: caducidad en filtros y vistas además de limpieza; DATE se interpreta como día elegido, semana según Madrid. Una oferta de clase sin fecha nunca se anuncia como reserva confirmada.

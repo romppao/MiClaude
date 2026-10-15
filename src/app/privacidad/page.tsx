@@ -33,6 +33,8 @@ export default function Privacy() {
         <li><strong>Datos técnicos mínimos:</strong> una cookie necesaria para mantener tu sesión iniciada (detalle en <Link href="/cookies">Cookies</Link>) y, durante 2 días como máximo, tu dirección de conexión, solo para frenar intentos repetidos de acceso. No usamos cookies de publicidad ni de medición.</li>
       </ul>
 
+      <h2>Provincia, asistencia y disponibilidad</h2>
+      <p>La provincia de tu cuenta es opcional y sirve para mostrar actividad cerca de ti. Las veladas que marcas con «Voy a ir» aparecen en tu agenda; el público solo ve cuántas personas han marcado su asistencia, nunca sus nombres. Puedes quitar la marca. Si activas «Disponible para pelear», tu disponibilidad y el peso que quieras declarar se muestran durante 60 días y puedes retirarlos cuando quieras. Todo ello figura en tu descarga de datos; la asistencia se borra con tu cuenta.</p>
       <h2>Para qué los usamos</h2>
       <p>Para darte el servicio que has pedido al crear tu cuenta: mantener tu ficha y tu récord, permitirte dar aura y seguir a peleadores, enviarte los correos necesarios (confirmar tu correo, recuperar tu contraseña y, si no los desactivas, avisos de nuevos combates de los peleadores que sigues) y garantizar que los datos publicados son fiables y que la comunidad es segura.</p>
 

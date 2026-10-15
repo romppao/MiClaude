@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+PR de Claude con el bloque G de los paneles que preparó Codex (#62), integrado sobre 0.16.0. Incluye una migración que solo añade columnas y una tabla.
+
+### Añadido
+- Provincia opcional y actividad local, asistencia voluntaria a veladas y calendario ICS público.
+- Disponibilidad del peleador con peso opcional y caducidad de 60 días, filtros en directorio y cartel.
+- Agenda semanal del entrenador y lista de preparación de veladas con cantidades agregadas de asistentes y seguidores.
+
 ## [0.16.0] — 2026-10-15
 
 PR de Claude con el bloque F de los paneles que preparó Codex (#56), integrado sobre 0.15.0.

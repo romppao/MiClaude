@@ -14,6 +14,8 @@ import { REG_STATUS_LABEL, claveCategoria, inscripcionAbierta, ocupacion } from 
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
 import { recordHidden } from "../../../lib/fighters/privacy";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
+import { setAttendance } from "../../actions/events";
+import { calendarDayStart } from "../../../lib/common/dates";
 import { createReport } from "../../actions/community";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +47,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const plazas = e.registrationOpen ? await db.eventSlot.findMany({ where: { eventId: e.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] }) : [];
   const ocupPlazas = plazas.length ? ocupacion(plazas, await db.eventRegistration.findMany({ where: { eventId: e.id }, select: { status: true, divisionId: true, weightClass: true } })) : new Map();
   const miInscripcion = user?.fighter ? await db.eventRegistration.findUnique({ where: { eventId_fighterId: { eventId: e.id, fighterId: user.fighter.id } }, select: { status: true } }) : null;
+  const [asistentes, asistencia] = await Promise.all([
+    db.eventAttendance.count({ where: { eventId: e.id } }),
+    user ? db.eventAttendance.findUnique({ where: { userId_eventId: { userId: user.id, eventId: e.id } } }) : null,
+  ]);
   const compartir = veladaAbiertaAlPublico(e, todayMadrid());
   return (
     <>
@@ -53,6 +59,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       {e.status === "CANCELLED" && <span className="tag">velada cancelada</span>}
       {!e.organizerId && <span className="tag">No oficial</span>}
       <h1>{e.name}</h1>
+      <p>{asistentes} van a ir</p>
+      {e.status === "SCHEDULED" && e.date >= calendarDayStart() && <section className="tarjeta" aria-label="Asistencia y calendario">
+        {user ? <form action={setAttendance}><input type="hidden" name="eventId" value={e.id} /><input type="hidden" name="asistir" value={asistencia ? "0" : "1"} /><button>{asistencia ? "Ya no voy a ir" : "Voy a ir"}</button></form> : <Link className="btn secondary" href={`/entrar?next=${encodeURIComponent(`/veladas/${e.slug}`)}`}>Entra para marcar «Voy a ir»</Link>}
+        <a className="btn secondary" href={`/veladas/${e.slug}/calendario`}>Añadir a mi calendario</a>
+      </section>}
       {!e.organizerId && <p className="mut">Esta velada no la ha publicado un organizador: la indicó un peleador al registrar su combate. Los datos pueden estar incompletos.</p>}
       <p className="mut">
         {fmtDate(e.date)} · {e.venue}, {e.city} ({e.province})

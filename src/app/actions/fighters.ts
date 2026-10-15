@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { provinciaConGimnasios } from "../../lib/common/territorio";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
+import { parseCurrentWeight } from "../../lib/fighters/availability";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { slugName, slugify } from "../../lib/common/labels";
 import { findNameCandidates } from "../../lib/fighters/fighters";
@@ -22,6 +23,21 @@ import { normalizeImage } from "../../lib/profiles/images";
 import { almacenDeVideos, claveDe, tipoDeClave } from "../../lib/media/storage";
 import { Prisma } from "@prisma/client";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
+
+/** Disponibilidad voluntaria por 60 días: guarda solo el peso opcional del titular y lo elimina al desactivar. */
+export async function setAvailability(f: FormData) {
+  const user = await requireVerifiedUser("/mi-ficha");
+  if (!user.fighter) go("/mi-ficha", { problema: "sin_permiso" });
+  const active = f.get("available") === "on";
+  const weight = active ? parseCurrentWeight(str(f, "weight")) : null;
+  if (weight === undefined) go("/mi-ficha#disponibilidad", { problema: "peso_actual_invalido" });
+  await db.$transaction(async (tx) => {
+    await tx.fighter.update({ where: { id: user.fighter!.id }, data: { availableToFight: active, currentWeightKg: weight, availableSince: active ? new Date() : null } });
+    await audit({ userId: user.id, entity: "FIGHTER", entityId: user.fighter!.id, action: "AVAILABILITY_UPDATED", after: { available: active } }, tx);
+  });
+  revalidatePath("/", "layout");
+  go("/mi-ficha#disponibilidad", { aviso: "disponibilidad_guardada" });
+}
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
 function readDisciplineForm(f: FormData) {

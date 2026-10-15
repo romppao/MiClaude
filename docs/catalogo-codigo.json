@@ -1973,5 +1973,70 @@
     "path": "tests/e2e/paneles-pulido.mjs",
     "purpose": "Comprueba dar y quitar aura a ambos participantes desde el panel, con y sin JavaScript, accesibilidad y anchura móvil.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "prisma/migrations/20261014130000_paneles_agenda/migration.sql",
+    "purpose": "Migración aditiva G: provincia opcional, disponibilidad con caducidad, peso voluntario y asistencia única por cuenta/velada con borrado en cascada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/_inicio/CercaDeTi.tsx",
+    "purpose": "Actividad por provincia: veladas de los siguientes siete días y ofertas de clases para solicitar, sin inventar un horario confirmado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/_inicio/PreparacionVelada.tsx",
+    "purpose": "Lista informativa de preparación de una velada y cifras agregadas, sin publicar identidades de asistentes o seguidores.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/veladas/[slug]/calendario/route.ts",
+    "purpose": "GET público de calendario ICS solo para veladas publicadas; sin datos personales ni descarga de veladas ocultas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/common/periods.ts",
+    "purpose": "Plazo compartido de disponibilidad aprobado en G4, sin acoplar limpieza de cuentas con consultas deportivas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/events/calendar.ts",
+    "purpose": "Exportación ICS de día completo con escape de texto y plegado UTF-8 por octetos; nunca incluye asistencia.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/events/preparation.ts",
+    "purpose": "Lista pura de comprobaciones antes y después de una velada; informa sin autorizar o certificar aptitud deportiva.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/events/preparation-data.ts",
+    "purpose": "Consulta cantidades de asistencia y relaciones Follow del cartel sin duplicar por combate ni exponer cuentas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/fighters/availability.ts",
+    "purpose": "Disponibilidad voluntaria efectiva durante 60 días y validación del peso opcional, usada por consultas y vistas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/trainers/agenda.ts",
+    "purpose": "Límites de semana de Madrid sobre DATE y texto de franjas del entrenador; conserva solicitudes antiguas sin día.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/unit/paneles-agenda.test.ts",
+    "purpose": "Casos límite G: caducidad exacta, peso inválido, semana en Madrid, preparación vacía y exportación ICS segura.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/unit/cartel-disponibilidad.test.ts",
+    "purpose": "Comprueba el filtro de disponibilidad y caducidad antes del límite tanto en sugerencias como en búsqueda SQL.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/e2e/paneles-agenda.mjs",
+    "purpose": "Flujos G en CI con base de pruebas: marcar/quitar asistencia, agenda, provincia, calendario público, disponibilidad y preparación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   }
 ]

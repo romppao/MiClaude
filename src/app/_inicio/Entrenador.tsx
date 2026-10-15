@@ -1,3 +1,4 @@
+import { trainerWeek, agendaTime } from "../../lib/trainers/agenda";
 import Link from "next/link";
 import TeToca from "./TeToca";
 import CompletaPerfil from "./CompletaPerfil";
@@ -90,6 +91,7 @@ export default async function InicioEntrenador({ user }: { user: User }) {
     db.$queryRaw<{ total: bigint }[]>`SELECT COUNT(*) AS total FROM (SELECT r."userId" FROM "ClassRequest" r JOIN "TrainingClass" c ON c.id = r."classId" WHERE c."trainerId" = ${trainer.id} AND r.status = 'ACCEPTED' GROUP BY r."userId" HAVING COUNT(*) > 1) alumnos`,
     db.profile.findUnique({ where: { kind_entityId: { kind: "entrenador", entityId: trainer.id } }, select: { hasAvatar: true, bio: true } }),
   ]);
+  const agenda = await db.classRequest.findMany({ where: { class: { trainerId: trainer.id }, status: "ACCEPTED", OR: [{ day: trainerWeek() }, { day: null }] }, include: { class: { select: { title: true } }, user: { select: { name: true } } }, orderBy: [{ day: { sort: "asc", nulls: "last" } }, { fromMinute: { sort: "asc", nulls: "last" } }, { toMinute: { sort: "asc", nulls: "last" } }, { id: "asc" }], take: 20 });
   const pendientes = await db.classRequest.count({ where: { class: { trainerId: trainer.id }, status: "PENDING" } });
   return (
     <div className="pantalla inicio-adaptable" style={{ gap: 22 }}>
@@ -116,6 +118,11 @@ export default async function InicioEntrenador({ user }: { user: User }) {
         <div className="dato"><span className="clave">Clases aceptadas</span><span className="valor">{aceptadas}</span></div>
         <div className="dato"><span className="clave">Alumnos que repiten</span><span className="valor">{Number(repetidores[0]?.total ?? 0)}</span></div>
       </div>
+      <section className="tarjeta" aria-label="Esta semana"><h2>Esta semana</h2>
+        {agenda.map((r) => <div className="fila" key={r.id}><span className="cuerpo"><strong>{r.user.name} · {r.class.title}</strong><span>{r.day ? `${fmtDate(r.day)} · ${agendaTime(r.fromMinute, r.toMinute)}` : `Fecha por acordar · ${r.preferred}`}</span></span></div>)}
+        {!agenda.length && <p>No tienes clases aceptadas esta semana.</p>}
+        <Link className="btn secondary" href="/mis-clases#solicitudes">Ver todas las solicitudes y clases aceptadas</Link>
+      </section>
       <section id="solicitudes" className="tarjeta" aria-label="Solicitudes de clase pendientes">
         <h2>Solicitudes de clase pendientes</h2>
         {solicitudes.map((r) => <article key={r.id}><h3>{r.user.name} · {r.class.title}</h3><p>{r.preferred}</p>{r.message && <p>{r.message}</p>}

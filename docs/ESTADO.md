@@ -18,7 +18,7 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | Este relevo entre sesiones (`ESTADO.md` y `scripts/estado.mjs`) | `claude/relevo-entre-sesiones`, versión 0.12.2 | en curso |
-| Claude Code (portátil) | **Relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI). T-016 fusionado (#67, #68) | `claude/paneles-f` (sustituye a #56), versión 0.16.0 | en curso |
+| Claude Code (portátil) | **Relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI). T-016 fusionado (#67, #68) | `claude/paneles-f` (#69, 0.16.0) y `claude/paneles-g` (sustituye a #62, 0.17.0) | en curso |
 | Codex | **Parado** por créditos (15-10-2026): todo lo suyo pasa a Claude. Ramas F (#56), G (#62), D (#64), H (local, sin subir); T-016 (#60); RFC-001 (#61) | varias | parado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 

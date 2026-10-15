@@ -35,10 +35,12 @@ export async function GET(request: Request) {
   const inscripciones = fighter ? await db.eventRegistration.findMany({ where: { fighterId: fighter.id }, include: { event: true }, orderBy: { createdAt: "desc" } }) : [];
   const solicitudesRecibidas = entrenador ? await db.classRequest.findMany({ where: { class: { trainerId: entrenador.id } }, include: { class: true, user: { select: { name: true } } }, orderBy: { createdAt: "desc" } }) : [];
 
+  const agenda = await db.eventAttendance.findMany({ where: { userId: user.id }, include: { event: { select: { name: true, date: true } } }, orderBy: { createdAt: "desc" } });
+
   const datos = {
     generadoEl: new Date().toISOString(),
     nota: "Estos son los datos personales que Lona guarda de tu cuenta. La contraseña no se guarda: solo se conserva una huella cifrada que no se puede convertir en la contraseña.",
-    cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
+    cuenta: { correoElectronico: user.email, nombre: user.name, tipo: user.role, creadaEl: user.createdAt, correoVerificadoEl: user.emailVerifiedAt, avisosPorCorreo: user.notifyEmails, provinciaOpcional: user.province, disciplinasQueMeInteresan: user.interests, eleccionesDelRegistroPendientes: user.onboarding },
     perfilDeEntrenador: entrenador && { nombre: entrenador.name, presentacion: entrenador.bio, disciplinas: entrenador.disciplines, anosEntrenando: entrenador.yearsCoaching, ciudad: entrenador.city, provincia: entrenador.province, gimnasio: entrenador.gym?.name ?? null, creadoEl: entrenador.createdAt,
       clases: entrenador.classes.map((c) => ({ tipo: c.kind, titulo: c.title, disciplina: c.discipline, minutos: c.minutes, precioEuros: c.priceEuros, plazas: c.capacity, horario: c.schedule, publicada: c.active, creadaEl: c.createdAt })) },
     misHighlights: highlights.map((h) => ({ tipo: h.kind, titulo: h.title, enlaceDelVideo: h.videoUrl, foto: h.image ? Buffer.from(h.image).toString("base64") : null, formatoImagen: h.image ? "image/webp" : null, combate: h.bout?.event.name ?? null, destacado: h.pinned, publicadoEl: h.createdAt })),
@@ -56,6 +58,8 @@ export async function GET(request: Request) {
     solicitudesRecibidasEnMisClases: solicitudesRecibidas.map((r) => ({ clase: r.class.title, persona: r.user.name, cuandoLeVieneBien: r.preferred, estado: r.status, fecha: r.createdAt })),
     retosYSparrings: propuestas.map((p) => ({ tipo: p.kind, enviadaPorMi: p.fromId === fighter?.id, otroPeleador: publicFighterName(p.fromId === fighter?.id ? p.to : p.from), disciplina: p.discipline, fecha: p.day, lugar: p.place, mensaje: p.message, estado: p.status, respuesta: p.reply, creadaEl: p.createdAt })),
     inscripcionesEnVeladas: inscripciones.map((r) => ({ evento: r.event.name, fecha: r.event.date, categoria: r.weightClass, divisionDeportiva: r.divisionId, pesoDeclaradoKg: r.weightKg, mensaje: r.message, estado: r.status, respuesta: r.reply, solicitadaEl: r.createdAt, respondidaEl: r.answeredAt })),
+    veladasQueHeMarcado: agenda.map((a) => ({ evento: a.event.name, fecha: a.event.date, marcadaEl: a.createdAt })),
+    disponibilidadParaPelear: fighter && { activada: fighter.availableToFight, desde: fighter.availableSince, pesoDeclaradoKg: fighter.currentWeightKg },
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),
     solicitudesParaReclamarUnaFicha: claims.map((c) => ({ ficha: publicFighterName(c.fighter), estado: c.status, fecha: c.createdAt })),
     solicitudDeOrganizador: organizer && { organizacion: organizer.orgName, estado: organizer.status, fecha: organizer.createdAt },
