@@ -11,6 +11,12 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.1] — 2026-10-15
+
+### Cambiado
+- Moderación reúne sus colas en una bandeja por urgencia, conserva las páginas y admite avisos de página y de personas sin cuenta. Las decisiones de combate envían las opciones admitidas por el servidor.
+
+
 ## [0.18.0] — 2026-10-15
 
 PR de Claude (nube): los bloques D (#64) y H (#71) de Codex, integrados sobre la 0.17.0 con las correcciones de su revisión. La lista única de moderación de H no entra: tenía un botón que no funcionaba y no admitía los avisos sin cuenta (queda para Codex).

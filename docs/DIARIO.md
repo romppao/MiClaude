@@ -2214,3 +2214,6 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 - **Instrucciones para Codex:** `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`.
 
 **Estado:** PR abierto.
+
+## 2026-10-15 — Relevo D/H: bandeja única de moderación
+El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.

@@ -17,7 +17,7 @@ Las demás cuentas (aficionado, peleador, entrenador y promotora, federación o 
 
 Tiene tres bloques, de arriba abajo:
 
-1. **Pendiente de revisar.** Cada recuadro dice cuántas cosas hay en cada cola y lleva a su pestaña. Los recuadros con trabajo pendiente tienen el borde violeta.
+1. **Pendiente de revisar.** Cada recuadro dice cuántas cosas hay en cada cola y lleva a su posición en la bandeja única. Los recuadros con trabajo pendiente tienen el borde violeta.
 
    | Cola | Qué contiene | Qué decide el moderador |
    |---|---|---|
@@ -25,8 +25,8 @@ Tiene tres bloques, de arriba abajo:
    | Fichas reclamadas | Alguien dice que una ficha es suya (`ClaimRequest`). | Aprobar o rechazar; el motivo es obligatorio al rechazar. |
    | Organizadores | Solicitudes de promotora, federación o club (`OrganizerRequest`). | Aprobar (con la evidencia comprobada) o rechazar. |
    | Gimnasios sin sello | Gimnasios que todavía no se han comprobado. | Dar o quitar el sello. |
-   | Combates con señales | Combates con algo raro, como fechas imposibles o récords que no cuadran (`src/lib/fighters/coherence.ts`). | Verificar o rechazar. |
-   | Combates por verificar | Combates declarados sin señales. | Verificar o rechazar. |
+   | Combates con señales | Combates con algo raro, como fechas imposibles o récords que no cuadran (`src/lib/fighters/coherence.ts`). | Verificar o poner en revisión. |
+   | Combates por verificar | Combates declarados sin señales. | Verificar o poner en revisión. |
    | Combates en revisión | Rechazados por el rival o por moderación. | Verificar o restaurarlos como declarados. |
 
 2. **Autorización de veladas pasadas.**
@@ -120,3 +120,9 @@ catch (e) { await registrarFallo({ origen: "CORREO", contexto: "No se pudo envia
 - **Aviso por correo al creador** cuando aparezca un fallo nuevo o uno se repita mucho (por ejemplo, más de 50 veces en una hora).
 - **Sentry** (ficha T-010, aprobado en ADR-003): sigue siendo útil para agrupar mejor y ver la pila con el código original. El registro propio no lo sustituye: es el historial que se queda en nuestra base.
 - **Tipos de moderador** (por ejemplo, solo noticias o solo combates), si el equipo crece.
+
+## Bandeja única (15-10-2026)
+
+Las colas se muestran como tarjetas en una lista ordenada: veladas pendientes, combates con señales (también los suspendidos), fallos, avisos y reclamaciones, organizadores, gimnasios y combates restantes. Cada cola mantiene sus páginas de 50 y su ancla al decidir. El orden de urgencia es por tipo, no una evaluación automática de la gravedad.
+
+«Poner en revisión» envía `dispute`; verificar envía `verify` y restaurar `restore`. Se conserva la huella del combate para impedir decisiones sobre datos cambiados. Los avisos conservan una etiqueta de retirada por tipo, la nota obligatoria para ocultar fichas y la explicación del correo. `PAGINA` solo ofrece cerrar: se corrige desde la página enlazada. La identidad del remitente sin cuenta se obtiene de `reporterName` y `reporterEmail`.

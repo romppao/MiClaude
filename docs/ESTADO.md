@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **D y H de Codex corregidos** (gimnasios reales, campanita de avisos, vídeos del público como highlights). Fusionados hoy: 0.15.1, 0.16.0, 0.16.1 (fotos) y 0.17.0 (paneles F y G) | `claude-nube/avisos-y-paneles-h`, versión 0.18.0 | PR abierto |
 | Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
-| Codex | Lo pendiente está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`: rehacer la lista única de moderación, vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y RFC-002. Sus PR #56, #62, #64 y #71 están sustituidos | parte de `claude/ring-espana-mvp` | pendiente |
+| Codex | Bandeja única de moderación sobre la demo 0.18.0; después invitaciones, cesión, altas desde fichas y T-009. T-013 (#77) y T-002 (#78) los integra Claude: no se actualizan. | `codex/bandeja-unica-de-moderacion-20261015` | en pruebas |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

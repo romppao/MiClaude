@@ -372,3 +372,9 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 
 15-10-2026: el fundador reanuda Codex. Se incorpora #68 (T-016, 0.15.0) en toda la pila F/G/D/H y se renumera 0.15.1–0.15.4. Se conserva la privacidad en las tarjetas de seguidos y se unifica la fuente territorial de gimnasios. H está en #71. Tipos aprobados; 806/807 unitarias y la única que agotó el tiempo pasa aislada. Catálogo 425, mapa y versión comprobados. CI final y revisión de Claude pendientes; sin despliegue.
+
+## 2026-10-15 — Bandeja única de moderación, rehecha sobre 0.18.0
+**Pedido:** puntos 1–4 del relevo de Claude y después T-009, cada uno en su PR. No actualizar T-013 ni T-002.
+**Base:** `claude/ring-espana-mvp`, `5995bd7`. **Rama:** `codex/bandeja-unica-de-moderacion-20261015`.
+**Cambios:** bandeja por urgencia con paginación independiente, decisiones de combate válidas, contratos actuales de avisos sin cuenta y PAGINA. Se adaptan los ocho guiones solicitados y se recuperan las comprobaciones de la bandeja en paneles-avisos. Fichero compartido: package.json y lock solo por versión.
+**Validación:** en curso; se anotará el resultado real antes de entregar. No se modifican ramas sustituidas ni los PR #77/#78.

@@ -51,7 +51,7 @@
 | `/mis-gimnasios` | Mis gimnasios | Cuenta con correo verificado | `gyms.requestGymClaim`, `gyms.saveGym`, `gyms.setGymMember`, `gyms.transferGym` | Fighter, Gym, GymClaimRequest, Trainer |
 | `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration, EventSlot |
 | `/mis-reservas` | Mis reservas de clases | Cuenta con sesión iniciada | `trainers.cancelClassRequest` | ClassRequest |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, NewsSource, OrganizerRequest, Report |
+| `/moderacion` | Moderación | Moderación | `gyms.decideGymClaim`, `moderation.actualizarFallo`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.decidirVeladaPasada`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Event, Fighter, Gym, GymClaimRequest, MediaItem, NewsSource, OrganizerRequest, Report |
 | `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
 | `/moderacion/fallos` | Fallos de la aplicación | Moderación | — | AppError |
 | `/moderacion/fallos/:id` | Detalle de un fallo | Moderación | `moderation.actualizarFallo` | AppError, AuditLog, User |

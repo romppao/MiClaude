@@ -499,3 +499,5 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
+
+- 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
