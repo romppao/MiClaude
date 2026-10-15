@@ -190,6 +190,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261015150000_cola_de_correos/migration.sql",
+    "purpose": "Crea la tabla EmailOutbox (cola de correos) y su enumerado de estados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -1300,6 +1305,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/cola-correo.ts",
+    "purpose": "Cola de correos (T-008): guarda cada correo, lo entrega con reintentos, respeta el límite diario del proveedor y da prioridad a los de la cuenta.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/competition.ts",
     "purpose": "Catálogo de divisiones versionadas y reglas de edad/sexo; preserva el significado de categorías deportivas históricas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1360,8 +1370,13 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/mail-transporte.ts",
+    "purpose": "Entrega de un correo al proveedor (Resend) o al registro en desarrollo; sin cola. Solo la usa la cola de correos.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/mail.ts",
-    "purpose": "Envía correo mediante Resend o transporte de log y declara resultado del envío; separa simulación local de entrega real.",
+    "purpose": "sendMail: el punto de entrada para enviar correos desde la aplicación; valida y pasa cada correo por la cola (cola-correo.ts).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1937,6 +1952,11 @@
   {
     "path": "tests/unit/coherence.test.ts",
     "purpose": "Prueba señales de proximidad deportiva y excepciones de torneos sin transformarlas en prohibición automática.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/cola-correo.test.ts",
+    "purpose": "Esperas entre reintentos, límite diario y cupo reservado para los correos de la cuenta.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

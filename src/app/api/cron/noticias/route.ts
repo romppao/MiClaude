@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { actualizarNoticias } from "../../../../lib/news/refresh";
 import { registrarFallo } from "../../../../lib/common/fallos";
+import { procesarCola } from "../../../../lib/common/cola-correo";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,9 @@ export async function GET(request: Request) {
 
   try {
     const resultado = await actualizarNoticias({ forzar: true });
-    return NextResponse.json({ ok: true, resultado, timestamp: new Date().toISOString() });
+    // La misma tarea (cada 6 horas) reintenta los correos pendientes de la cola (T-008), sin gastar otra tarea programada.
+    const correos = await procesarCola(50).catch(async (error) => { await registrarFallo({ origen: "TAREA", contexto: "No se pudo procesar la cola de correos", error }); return null; });
+    return NextResponse.json({ ok: true, resultado, correos, timestamp: new Date().toISOString() });
   } catch (error) {
     await registrarFallo({ origen: "TAREA", contexto: "La actualización programada de noticias falló", error, ruta: "/api/cron/noticias" });
     return NextResponse.json({ ok: false, error: "Error al actualizar" }, { status: 500 });

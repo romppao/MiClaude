@@ -11,6 +11,16 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.1] — 2026-10-15
+
+PR de Claude: T-008, cola de correos. Imprescindible n.º 3 del lanzamiento (correo real), en la parte de programación.
+
+### Cambiado
+- **Ningún correo se pierde:** cada correo se guarda antes de enviarse. Si el proveedor falla, se reintenta (1 min, 5 min, 30 min, 2 h y 12 h); tras 6 intentos queda apuntado en «Fallos».
+- **Límite diario del proveedor** (`MAIL_LIMITE_DIARIO`, 100 por defecto, el plan gratuito de Resend). Al llegar, los correos esperan al día siguiente. Los de la cuenta (confirmar el correo, contraseña) pasan antes y tienen reservados los últimos 10.
+- Los correos entregados no guardan su contenido (puede llevar enlaces de un solo uso) y se borran a los 30 días; `/privacidad` lo dice.
+- La cola se procesa al enviar cada correo, en la limpieza periódica y con la tarea de noticias, sin tareas programadas nuevas. `/salud` dice cuántos esperan y cuántos fallaron.
+
 ## [0.18.0] — 2026-10-15
 
 PR de Claude (nube): los bloques D (#64) y H (#71) de Codex, integrados sobre la 0.17.0 con las correcciones de su revisión. La lista única de moderación de H no entra: tenía un botón que no funcionaba y no admitía los avisos sin cuenta (queda para Codex).

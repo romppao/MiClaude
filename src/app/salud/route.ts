@@ -1,5 +1,6 @@
 import { db } from "../../lib/common/db";
 import { VERSION } from "../../lib/common/version";
+import { estadoDeLaCola } from "../../lib/common/cola-correo";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +8,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await db.$queryRaw`SELECT 1`;
-    return Response.json({ estado: "ok", version: VERSION }, { headers: { "Cache-Control": "no-store" } });
+    // Cola de correos (T-008): solo cuántos esperan y cuántos fallaron, nunca a quién.
+    const correos = await estadoDeLaCola().catch(() => null);
+    return Response.json({ estado: "ok", version: VERSION, correos }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ estado: "sin conexión con la base de datos" }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }

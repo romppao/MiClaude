@@ -2214,3 +2214,23 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 - **Instrucciones para Codex:** `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`.
 
 **Estado:** PR abierto.
+
+## 15-10-2026. Claude (nube): cola de correos (T-008, 0.18.1)
+
+**Qué se pidió:** el fundador: «continúa con todo… yo quiero tener la aplicación ya publicada». El imprescindible n.º 3 (correo real) tenía dos partes: la cuenta de Resend (fundador) y la cola con límites (Claude).
+
+**Qué se decidió y por qué:**
+- **`sendMail` no cambia de forma** y por dentro pasa por la cola. Las 15 llamadas no se tocan.
+- **La entrega va a `mail-transporte.ts`**, para que la cola no dependa de `mail.ts` (sin dependencias circulares).
+- **Límite diario con cupo reservado:** el plan gratuito de Resend es de 100 correos al día. Un día de muchos avisos de combates no debe impedir que alguien confirme su cuenta, así que los correos de la cuenta tienen prioridad y los 10 últimos del cupo.
+- **Sin ruta ni tarea programada nueva** (la ficha proponía `/api/cola-correo`). La cola se procesa al enviar cada correo, en la limpieza periódica (como mucho cada 30 minutos por proceso) y en la tarea de noticias, cada 6 horas. Así no se gastan más minutos de GitHub Actions.
+- **El contenido se vacía al entregar:** los correos de confirmación y de contraseña llevan enlaces de un solo uso, y no deben quedarse guardados en la base.
+
+**Qué se hizo:**
+- Modelo `EmailOutbox` y migración.
+- `cola-correo.ts`: reserva atómica para no enviar dos veces, esperas exponenciales y estado `FAILED` con aviso en «Fallos».
+- Prioridad 0 para confirmar el correo, recuperar la contraseña y el aviso de contraseña cambiada.
+- Retención de 30 días (90 para los fallidos), recuento en `/salud` y texto en `/privacidad`.
+- Pruebas: `cola-correo.test.ts`, y en `bloqueos.mjs`, que los correos quedan entregados, vacíos y contados en `/salud`.
+
+**Estado:** PR abierto. **Siguiente:** T-013, el aviso en los enlaces que abren otra pestaña.
