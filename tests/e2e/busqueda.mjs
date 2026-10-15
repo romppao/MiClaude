@@ -61,6 +61,8 @@ check("la política de contenido no bloquea nada de la propia web (scripts, esti
 // 4) Buscadores: robots, mapa del sitio y comprobación de salud
 const robots = await (await anon.request.get(B + "/robots.txt")).text();
 check("robots.txt indica el mapa del sitio y oculta las zonas privadas", /Sitemap: .*\/sitemap\.xml/.test(robots) && /Disallow: \/moderacion/.test(robots) && /Disallow: \/mi-cuenta/.test(robots));
+await anon.goto(B + "/ayuda");
+check("la versión real se deja encontrar en los buscadores (sin «noindex», que es solo de la demo)", await anon.locator('meta[name="robots"][content*="noindex"]').count() === 0);
 const mapa = await (await anon.request.get(B + "/sitemap.xml")).text();
 check("el mapa del sitio incluye las fichas públicas y no las provisionales", mapa.includes(`/peleadores/alvaro-perez${rnd}-nunez`) && !mapa.includes(`oculto${rnd}`));
 const salud = await anon.request.get(B + "/salud");

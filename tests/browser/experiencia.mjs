@@ -11,6 +11,12 @@ const check=(name,passed,detail)=>{results.push({name,passed,detail});console.lo
 try{
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();
  page.on('pageerror',e=>errors.push(e.message));
+ // La demo no debe salir en los buscadores (petición del fundador, 15 oct 2026): «noindex» en las páginas y sin mapa del sitio.
+ const robotsDemo=await (await page.request.get(base+'/robots.txt')).text();
+ check('La demo no anuncia su mapa del sitio a los buscadores',!/Sitemap:/i.test(robotsDemo));
+ check('El mapa del sitio de la demo está vacío',!/<url>/.test(await (await page.request.get(base+'/sitemap.xml')).text()));
+ await page.goto(base+'/ayuda');
+ check('La demo pide a los buscadores que no la muestren (noindex)',/noindex/.test((await page.locator('meta[name="robots"]').getAttribute('content'))??''));
  await page.goto(base+'/laboratorio');await page.getByRole('button',{name:'Probar reconocimiento',exact:true}).waitFor();await page.waitForTimeout(1800);
  await page.screenshot({path:dir+'/escritorio.png',fullPage:true});
  check('Ring disponible con o sin aceleración',await page.locator('.arena-3d canvas').count()===1||await page.locator('.gpu-arena .arena-fallback').isVisible(),{canvas:await page.locator('.arena-3d canvas').count()});

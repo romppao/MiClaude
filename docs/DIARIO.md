@@ -2054,3 +2054,20 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - catálogo con 391 archivos.
 
 **Estado:** PR abierto.
+
+## 15-10-2026. Claude (nube): separar la demo de la versión real (0.15.1)
+
+**Qué se pidió:** el fundador escribió lonaclub.es y le llevó a la demo, con su aviso. «Eso es algo que yo ya había dicho que no quería, porque… alguien busca el nombre, va a ver la demo directamente… quiero separar la aplicación web de la demo de render. Quiero separarlo ya.» La demo de Render queda para pruebas, correcciones y actualizaciones; lonaclub.es, para la web de verdad.
+
+**Causa:** no era un fallo de la aplicación. El 14-10 se apuntaron los DNS de lonaclub.es a Render (A `216.24.57.1` y CNAME `www`) y se añadió el dominio en Render como solución provisional hasta montar Cloud Run. Además, la demo se podía indexar en Google con sus datos ficticios.
+
+**Qué se hizo:**
+- La demo (`DEMO_MODE=si`) pide a los buscadores que no la muestren: `noindex, nofollow` en `layout.tsx` (`generateMetadata`, para leer la variable en cada petición), sin `Sitemap:` en `robots.txt` y `sitemap.xml` vacío. Se sigue dejando entrar a los rastreadores para que vean el «noindex»: si se les cerrara la puerta, Google conservaría lo que ya tuviera.
+- Pruebas: `tests/browser/experiencia.mjs` (demo: noindex y sin mapa) y `tests/e2e/busqueda.mjs` (versión real: sin noindex).
+- `PRODUCCION.md`, paso 0: quitar lonaclub.es de Render y borrar el A y el CNAME en Infomaniak, sin tocar MX, SPF ni DMARC. `ESTADO.md` y `DEMO.md` lo recogen.
+
+**Lo que no puede hacer Claude:** los pasos en Render e Infomaniak y montar la versión real (facturación de `lona-511614` y demás pasos de `PRODUCCION.md`) necesitan las cuentas del fundador.
+
+**Comprobado:** typecheck; `busqueda.mjs` 29 correctas; `experiencia.mjs` 30 correctas; con curl, la demo da `noindex` y mapa vacío y la versión real, mapa y sin `noindex`.
+
+**Estado:** PR abierto. **Siguiente:** que el fundador desenganche el dominio y decida si lonaclub.es queda vacío hasta montar la versión real.

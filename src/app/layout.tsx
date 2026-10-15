@@ -18,11 +18,18 @@ import { esCreador } from "../lib/accounts/creador";
 import { papelDe, puedeOrganizar, type Papel } from "../lib/accounts/landing";
 import { menuDe } from "../lib/accounts/menu";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
-  title: { default: "Lona", template: "%s · Lona" },
-  description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
-};
+/**
+ * La demo (DEMO_MODE=si) pide a los buscadores que no la muestren: si alguien busca «Lona», debe encontrar la versión real, no la de
+ * pruebas (petición del fundador, 15 de octubre de 2026). Se calcula en cada petición para leer la variable del servidor en marcha.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: new URL(APP_URL),
+    title: { default: "Lona", template: "%s · Lona" },
+    description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
+    ...(demoActiva() ? { robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } } } : {}),
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F2EC" }, { media: "(prefers-color-scheme: dark)", color: "#0A0A0C" }],

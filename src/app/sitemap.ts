@@ -2,11 +2,13 @@ import type { MetadataRoute } from "next";
 import { db } from "../lib/common/db";
 import { gimnasiosVisibles } from "../lib/common/territorio";
 import { APP_URL } from "../lib/common/mail";
+import { demoActiva } from "../lib/common/demo";
 
 export const dynamic = "force-dynamic";
 
 /** Mapa del sitio: páginas fijas y fichas públicas (no incluye fichas sin reclamar ni ocultas). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (demoActiva()) return []; // la demo no se anuncia a los buscadores (sus datos son de prueba)
   const [fighters, events, gyms, trainers] = await Promise.all([
     db.fighter.findMany({ where: { listed: true, hiddenAt: null }, select: { slug: true }, take: 5000 }),
     db.event.findMany({ where: { status: { notIn: ["CANCELLED", "PENDING_AUTHORIZATION", "REJECTED"] } }, select: { slug: true, date: true }, orderBy: { date: "desc" }, take: 5000 }),
