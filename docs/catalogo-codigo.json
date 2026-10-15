@@ -20,6 +20,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": ".github/workflows/cargar-gimnasios-demo.yml",
+    "purpose": "Botón manual que descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y, si se pide, los carga solo en la demo.",
+    "guide": "docs/PRODUCCION.md"
+  },
+  {
     "path": ".github/workflows/ci.yml",
     "purpose": "Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004).",
     "guide": "docs/mantenimiento/OPERACION.md"
