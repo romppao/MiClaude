@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.19.2] — 2026-10-15
+
+
+
+### Corregido
+- Los gimnasios nuevos aportados al crear o editar fichas de peleador o entrenador quedan pendientes de moderación. Se mantiene el estado de los gimnasios existentes y la excepción de publicación de moderación.
+
+
 ## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).

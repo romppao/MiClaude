@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EXCLUDED_GYM_PROVINCES, excludedGymProvince, gymIsPublic, gymDistanceMetres, osmMayUpdate } from "../../src/lib/common/gym-policy";
+import { newGymStatus, EXCLUDED_GYM_PROVINCES, excludedGymProvince, gymIsPublic, gymDistanceMetres, osmMayUpdate } from "../../src/lib/common/gym-policy";
 import { osmGymCandidate, osmProvince, osmAreaProvince } from "../../src/lib/common/gym-osm";
 import { PROVINCES } from "../../src/lib/common/labels";
 import { publicGyms } from "../../src/lib/common/gym-directory";
@@ -46,5 +46,15 @@ describe("transformación de OSM", () => {
   it("detecta la proximidad de duplicados sin consultar la ubicación de personas", () => {
     expect(gymDistanceMetres({ lat: 40.4, lng: -3.7 }, { lat: 40.4001, lng: -3.7 })).toBeLessThan(150);
     expect(gymDistanceMetres({ lat: 40.4, lng: -3.7 }, { lat: 40.5, lng: -3.7 })).toBeGreaterThan(150);
+  });
+});
+
+describe("altas de gimnasio desde las fichas", () => {
+  it.each(["FAN", "FIGHTER", "TRAINER", "ORGANIZER"])("%s aporta un gimnasio pendiente de revisar", role => {
+    expect(newGymStatus(role, "Madrid")).toBe("PENDING");
+  });
+  it("moderación publica solo en territorio admitido y con provincia", () => {
+    expect(newGymStatus("ADMIN", "Madrid")).toBe("PUBLISHED");
+    for (const province of [...EXCLUDED_GYM_PROVINCES, ""]) expect(newGymStatus("ADMIN", province)).toBe("PENDING");
   });
 });

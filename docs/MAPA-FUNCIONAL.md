@@ -379,7 +379,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes` |
 | `gym-directory.ts` | `publicGyms` |
 | `gym-osm.ts` | `gymNameKey`, `osmAreaProvince`, `osmGymCandidate`, `osmProvince` |
-| `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `osmMayUpdate` |
+| `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `newGymStatus`, `osmMayUpdate` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `fmtFechaHoraMadrid`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail-transporte.ts` | `entregarCorreo`, `hayTransporte`, `logMode` |
 | `mail.ts` | `APP_URL`, `sendMail` |
