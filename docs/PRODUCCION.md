@@ -27,7 +27,7 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 | `GOOGLE_CLIENT_ID` | El ID de cliente de Google |
 | `TRUSTED_PROXY_HOPS` | `1` (comprobarlo con la primera petición real: la IP debe ser la del visitante) |
 
-**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` (más la variable normal `R2_JURISDICCION=eu`). Desde la 0.16.1, **R2 guarda también las fotos** (perfiles, highlights y fotos del público) en la carpeta `fotos/` del mismo cubo que los vídeos; sin estas variables las fotos se guardan dentro de la base de datos, y la base gratuita de Neon (0,5 GB) se llenaría con unos miles de fotos. No poner `FOTOS_EN_DISCO`: es solo para pruebas.
+**Secretas** (Secret Manager, montadas como variables): `DATABASE_URL` (*pooled*), `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`, `CREADOR_CORREO`, `SENTRY_DSN` (avisos de fallos, región UE), `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` (más la variable normal `R2_JURISDICCION=eu`). Desde la 0.16.1, **R2 guarda también las fotos** (perfiles, highlights y fotos del público) en la carpeta `fotos/` del mismo cubo que los vídeos; sin estas variables las fotos se guardan dentro de la base de datos, y la base gratuita de Neon (0,5 GB) se llenaría con unos miles de fotos. No poner `FOTOS_EN_DISCO`: es solo para pruebas.
 
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 

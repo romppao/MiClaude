@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.2] — 2026-10-15
+
+PR de Claude: T-010, avisos de fallos (imprescindible n.º 7 del lanzamiento, en la parte de programación).
+
+### Añadido
+- **Avisos a Sentry** con `SENTRY_DSN`: cada fallo nuevo (y cada uno que reaparece tras darse por resuelto) llega a Sentry con el mismo texto que en «Fallos», con los datos personales ya tachados y sin usuario, correo ni IP. Si la base de datos no responde, también avisa. Sin dependencias nuevas: se usa el formato estándar de Sentry por HTTP.
+- `/salud` da la latencia de la base de datos y si los avisos de fallos están activados.
+
 ## [0.18.1] — 2026-10-15
 
 PR de Claude: T-008, cola de correos. Imprescindible n.º 3 del lanzamiento (correo real), en la parte de programación.

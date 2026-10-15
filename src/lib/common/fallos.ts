@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { VERSION } from "./version";
+import { avisarASentry } from "./sentry";
 
 /**
  * Registro de fallos de la aplicación (13 de octubre de 2026, petición del fundador).
@@ -111,8 +112,11 @@ export async function registrarFallo(datos: DatosFallo): Promise<void> {
     const stack = pila ? tacharDatos(pila).slice(0, MAX_PILA) : null;
     const ahora = new Date();
     const previo = await db.appError.findUnique({ where: { fingerprint }, select: { id: true, status: true } });
+    // Aviso a Sentry (T-010) solo la primera vez y cuando un fallo resuelto reaparece; las repeticiones se suman aquí.
+    const aSentry = () => void avisarASentry({ mensaje, origen: datos.origen, ruta, huella: fingerprint, version: VERSION, pila: stack });
     if (!previo) {
       await db.appError.create({ data: { fingerprint, origin: datos.origen, message: mensaje, stack, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null, firstVersion: VERSION, version: VERSION } });
+      aSentry();
       return;
     }
     const reabrir = previo.status === "RESOLVED";
@@ -120,8 +124,13 @@ export async function registrarFallo(datos: DatosFallo): Promise<void> {
       where: { id: previo.id },
       data: { count: { increment: 1 }, lastSeenAt: ahora, message: mensaje, stack: stack ?? undefined, path: ruta, digest: datos.digest ?? null, role: datos.papel ?? null, version: VERSION, ...(reabrir ? { status: "OPEN" } : {}) },
     });
-    if (reabrir) await db.auditLog.create({ data: { entity: "APP_ERROR", entityId: previo.id, action: "FALLO_REAPARECE", before: { status: "RESOLVED" }, after: { status: "OPEN" } } });
+    if (reabrir) {
+      await db.auditLog.create({ data: { entity: "APP_ERROR", entityId: previo.id, action: "FALLO_REAPARECE", before: { status: "RESOLVED" }, after: { status: "OPEN" } } });
+      aSentry();
+    }
   } catch (e) {
     console.error(`[fallo] no se pudo guardar en la base: ${e instanceof Error ? e.message : String(e)}`);
+    // Si la base no responde, «Fallos» no se entera: es justo cuando más falta hace el aviso de fuera.
+    void avisarASentry({ mensaje: `Sin base de datos al registrar un fallo: ${mensaje}`, origen: datos.origen, ruta, huella: `sin-base-${datos.origen}`, version: VERSION });
   }
 }
