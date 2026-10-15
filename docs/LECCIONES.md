@@ -521,3 +521,5 @@ La desconexión del entorno ocurrió con cambios todavía sin commit. Se recuper
 Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir una versión posterior a la solicitada. Resolver las cinco versiones explícitas y comprobar las instaladas, conservando el pin de MapLibre; las actualizaciones transitivas se revisan juntas.
 
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
+
+- 15-10-2026: si un destinatario puede registrarse después de recibir una invitación, no basta comprobar bloqueos al enviarla: deben comprobarse otra vez con la cuenta verificada al aceptar. La respuesta del remitente no revela la existencia de esa cuenta.

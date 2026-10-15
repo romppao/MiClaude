@@ -1,6 +1,9 @@
 // Directorio de gimnasios: altas, propiedad revisada y edición autorizada. Ninguna acción envía campañas.
 "use server";
 
+import { createHash, randomBytes } from "node:crypto";
+import { hayBloqueo } from "../../lib/community/bloqueos";
+import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import type { GymStatus } from "@prisma/client";
@@ -14,7 +17,7 @@ import { isEmail, oneLine } from "../../lib/common/text";
 import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { slugName } from "../../lib/common/labels";
 import { ubicarGimnasio } from "../../lib/common/geo";
-import { sendMail } from "../../lib/common/mail";
+import { APP_URL, sendMail } from "../../lib/common/mail";
 import { str, go, checkLengths, readProvince, guard, Rechazo, withLock, uniqueSlug, returnTo } from "./shared";
 
 /** Alta manual: moderación publica; las demás cuentas aportan prueba y quedan en revisión, sin autoasignarse propiedad. */
@@ -152,4 +155,79 @@ export async function setGymMember(f: FormData) {
     await audit({ userId: user.id, entity: kind === "fighter" ? "FIGHTER" : "TRAINER", entityId: id, action: "GYM_MEMBERSHIP_CHANGED", after: { gymId: decision === "link" ? gym.id : null } }, tx);
   }));
   revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_vinculo" });
+}
+
+/** El titular propone una cesión. No informa de si el correo tiene cuenta ni cambia la propiedad. */
+export async function inviteGymTransfer(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios";
+  checkLengths(f, back, { email: 200, gymId: 40 });
+  const email = str(f, "email").toLowerCase(), gymId = str(f, "gymId");
+  if (!isEmail(email)) go(back, { problema: "gimnasio_cesion_correo" });
+  const token = randomBytes(32).toString("hex");
+  const result = await guard(back, () => withLock(`gym:${gymId}`, async (tx) => {
+    const gym = await tx.gym.findUnique({ where: { id: gymId } });
+    if (!gym || gym.ownerUserId !== user.id || gym.status === "REMOVED" || gym.isFictional) throw new Rechazo("sin_permiso");
+    const recipient = await tx.user.findUnique({ where: { email }, select: { id: true } });
+    // La misma respuesta para correo registrado, no registrado, propio o bloqueado. No se contacta con una cuenta bloqueada.
+    if (email === user.email || await hayBloqueo(user.id, recipient?.id, tx)) return null;
+    if (!(await allow(`gym-transfer:${user.id}:${gym.id}`, 5, 24 * HORA))) return null;
+    await tx.gymTransferInvitation.updateMany({ where: { gymId, status: "PENDING" }, data: { status: "CANCELLED", answeredAt: new Date() } });
+    const invitation = await tx.gymTransferInvitation.create({ data: { gymId, senderId: user.id, recipientEmail: email, tokenHash: createHash("sha256").update(token).digest("hex"), expiresAt: new Date(Date.now() + 14 * 864e5) } });
+    await audit({ userId: user.id, entity: "GYM", entityId: gym.id, action: "GYM_TRANSFER_INVITED", after: { invitationId: invitation.id } }, tx);
+    return { name: gym.name };
+  }));
+  // Fuera de la respuesta HTTP: ni el contenido ni el destino dependen de que exista una cuenta.
+  if (result) after(async () => {
+    const link = `${APP_URL}/mis-gimnasios?cesion=${token}`;
+    await sendMail(email, "Invitación para gestionar un gimnasio en Lona", `Te invitan a gestionar ${oneLine(result.name)}. La propiedad no cambiará hasta que aceptes.\n\nEntra o crea una cuenta con este mismo correo y confírmalo; después abre ${link}\n\nEl enlace caduca en 14 días. Si no lo esperabas, puedes ignorarlo o rechazarlo desde la aplicación.`);
+  });
+  revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_cesion_invitada" });
+}
+
+/** Solo el correo destinatario confirmado, con el enlace secreto, acepta o rechaza; la escritura es atómica y vuelve a comprobar bloqueos. */
+export async function answerGymTransfer(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios";
+  const token = str(f, "token"), decision = str(f, "decision");
+  if (!/^[a-f0-9]{64}$/.test(token) || !["accept", "decline"].includes(decision)) go(back, { problema: "opcion_invalida" });
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  const invitation = await db.gymTransferInvitation.findUnique({ where: { tokenHash } });
+  if (!invitation || invitation.recipientEmail !== user.email.toLowerCase()) go(back, { problema: "no_existe" });
+  const result = await guard(back, () => withLock(`gym:${invitation.gymId}`, async (tx) => {
+    const current = await tx.gymTransferInvitation.findUnique({ where: { id: invitation.id }, include: { sender: { select: { email: true } } } });
+    if (!current || current.recipientEmail !== user.email.toLowerCase() || current.status !== "PENDING" || current.expiresAt <= new Date()) throw new Rechazo("solicitud_cambiada");
+    const gym = await tx.gym.findUnique({ where: { id: current.gymId } });
+    if (!gym || gym.ownerUserId !== current.senderId || gym.status === "REMOVED") throw new Rechazo("solicitud_cambiada");
+    if (await hayBloqueo(current.senderId, user.id, tx)) throw new Rechazo("bloqueo_contacto");
+    if (decision === "accept") {
+      const saved = await tx.gym.updateMany({ where: { id: gym.id, ownerUserId: current.senderId }, data: { ownerUserId: user.id, claimedAt: new Date(), source: "PROPIETARIO" } });
+      if (saved.count !== 1) throw new Rechazo("solicitud_cambiada");
+      await tx.profile.upsert({ where: { kind_entityId: { kind: "gimnasio", entityId: gym.id } }, create: { kind: "gimnasio", entityId: gym.id, ownerId: user.id }, update: { ownerId: user.id } });
+    }
+    const saved = await tx.gymTransferInvitation.updateMany({ where: { id: current.id, status: "PENDING" }, data: { status: decision === "accept" ? "ACCEPTED" : "DECLINED", answeredAt: new Date() } });
+    if (saved.count !== 1) throw new Rechazo("solicitud_cambiada");
+    if (decision === "accept") await tx.gymTransferInvitation.updateMany({ where: { gymId: gym.id, status: "PENDING" }, data: { status: "CANCELLED", answeredAt: new Date() } });
+    await audit({ userId: user.id, entity: "GYM", entityId: gym.id, action: decision === "accept" ? "GYM_TRANSFERRED" : "GYM_TRANSFER_DECLINED", before: { ownerUserId: current.senderId }, after: { invitationId: current.id, ...(decision === "accept" ? { ownerUserId: user.id } : {}) } }, tx);
+    return { gymName: gym.name, senderEmail: current.sender.email };
+  }));
+  after(async () => {
+    const text = decision === "accept" ? `Se ha aceptado la cesión de ${oneLine(result.gymName)}. La cuenta con correo ${user.email} gestiona ahora el gimnasio. Puedes consultar el estado en ${APP_URL}/mis-gimnasios.` : `Se ha rechazado la cesión de ${oneLine(result.gymName)}. La propiedad no ha cambiado.`;
+    await Promise.all([sendMail(result.senderEmail, "Respuesta a la cesión de gimnasio en Lona", text), sendMail(user.email, "Tu respuesta a la cesión de gimnasio en Lona", text)]);
+  });
+  revalidatePath("/", "layout"); go(back, { aviso: decision === "accept" ? "gimnasio_cesion_aceptada" : "gimnasio_cesion_rechazada" });
+}
+
+/** El titular retira la invitación pendiente; nunca altera la propiedad. */
+export async function cancelGymTransfer(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios";
+  const invitation = await db.gymTransferInvitation.findFirst({ where: { id: str(f, "invitationId"), senderId: user.id } });
+  if (!invitation) go(back, { problema: "no_existe" });
+  await guard(back, () => withLock(`gym:${invitation.gymId}`, async (tx) => {
+    const result = await tx.gymTransferInvitation.updateMany({ where: { id: invitation.id, senderId: user.id, status: "PENDING" }, data: { status: "CANCELLED", answeredAt: new Date() } });
+    if (result.count !== 1) throw new Rechazo("solicitud_cambiada");
+    await audit({ userId: user.id, entity: "GYM", entityId: invitation.gymId, action: "GYM_TRANSFER_CANCELLED", after: { invitationId: invitation.id } }, tx);
+  }));
+  revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_cesion_cancelada" });
 }

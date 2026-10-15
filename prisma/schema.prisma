@@ -107,6 +107,7 @@ enum GymClaimStatus {
 }
 
 model Gym {
+  transferInvitations GymTransferInvitation[]
   id           String    @id @default(cuid())
   slug         String    @unique
   name         String
@@ -502,6 +503,7 @@ model Notification {
 }
 
 model User {
+  sentGymTransfers GymTransferInvitation[] @relation("GymTransferSender")
   notifications Notification[]
   ownedGyms Gym[] @relation("GymOwner")
   gymClaims GymClaimRequest[] @relation("GymClaimApplicant")
@@ -979,4 +981,23 @@ model EmailOutbox {
 
   @@index([status, priority, nextAttemptAt])
   @@index([sentAt])
+}
+
+// El correo puede no tener cuenta aún. La invitación solo se acepta con ese correo confirmado y el enlace secreto.
+model GymTransferInvitation {
+  id String @id @default(cuid())
+  gymId String
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  senderId String
+  sender User @relation("GymTransferSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientEmail String
+  tokenHash String @unique
+  status ClassRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  answeredAt DateTime?
+
+  @@index([gymId, status])
+  @@index([senderId])
+  @@index([recipientEmail, status])
 }

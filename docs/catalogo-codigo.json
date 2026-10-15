@@ -2218,5 +2218,15 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "prisma/migrations/20261015190000_cesion_con_aceptacion/migration.sql",
+    "purpose": "Añade invitaciones de cesión con hash único del enlace, correo destinatario e índices y claves foráneas de gimnasio y remitente; no altera propietarios.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-cesion.mjs",
+    "purpose": "Cesión real por invitación: cuenta existente y posterior al correo, respuesta indistinguible, aceptación única, ajenos, bloqueos, cancelación, caducidad y confirmaciones a ambas personas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

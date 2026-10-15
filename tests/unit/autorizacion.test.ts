@@ -84,7 +84,7 @@ beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; i
 
 const SOLO_MODERADORES = ["decideGymClaim","adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
-const EXIGEN_CORREO_VERIFICADO = ["addPublicVideoHighlight","saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
+const EXIGEN_CORREO_VERIFICADO = ["inviteGymTransfer", "answerGymTransfer", "cancelGymTransfer","addPublicVideoHighlight","saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
 const EXIGEN_SESION = ["readNotification", "readAllNotifications","setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent", "bloquearUsuario", "desbloquearUsuario"] as const;
 
 // Acciones que cualquiera puede lanzar (se protegen por sí solas: enlace de un solo uso, límites de intentos, contraseña…). avisarSinCuenta es
@@ -669,5 +669,28 @@ describe("H: aislamiento de avisos y vídeos", () => {
     mundo.estado.respuestas["highlight.create"] = (a: { data: Record<string, unknown> }) => { expect(a.data.sourceMediaId).toBe("m"); expect(a.data).not.toHaveProperty("videoKey"); return { id: "h" }; };
     expect(await destino(acciones.addPublicVideoHighlight, { mediaId: "m" })).toContain("aviso=highlight_publico_anadido");
     expect(mundo.estado.escrituras).toContain("notification.upsert");
+  });
+});
+
+describe("cesión consentida de gimnasio", () => {
+  it("solo el titular puede invitar a aceptar una cesión", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "otro" };
+    expect(await destino(acciones.inviteGymTransfer, { gymId: "g", email: "destino@x.es" })).toContain("problema=sin_permiso");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("un correo bloqueado recibe la respuesta genérica sin invitación ni cambios", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["gym.findUnique"] = { id: "g", ownerUserId: "u-FAN", status: "PUBLISHED" };
+    mundo.estado.respuestas["user.findUnique"] = { id: "destinatario" };
+    mundo.estado.respuestas["block.findFirst"] = { blockerId: "destinatario" };
+    expect(await destino(acciones.inviteGymTransfer, { gymId: "g", email: "destino@x.es" })).toContain("aviso=gimnasio_cesion_invitada");
+    expect(mundo.estado.escrituras).toEqual([]);
+  });
+  it("ni siquiera un enlace válido permite aceptar con otro correo", async () => {
+    iniciarSesion(persona("FAN"));
+    mundo.estado.respuestas["gymTransferInvitation.findUnique"] = { recipientEmail: "otro@x.es" };
+    expect(await destino(acciones.answerGymTransfer, { token: "a".repeat(64), decision: "accept" })).toContain("problema=no_existe");
+    expect(mundo.estado.escrituras).toEqual([]);
   });
 });

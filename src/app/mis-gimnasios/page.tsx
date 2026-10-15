@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { pageNumber, pageWindow } from "../../lib/common/pagination";
+import Paginacion from "../components/Paginacion";
+import { hayBloqueo } from "../../lib/community/bloqueos";
 import Link from "next/link";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { db } from "../../lib/common/db";
@@ -5,18 +9,24 @@ import { publicGyms } from "../../lib/common/gym-directory";
 import { searchIds } from "../../lib/common/search";
 import { flatParams } from "../../lib/common/safe";
 import { PROVINCES } from "../../lib/common/labels";
-import { saveGym, requestGymClaim, transferGym, setGymMember } from "../actions/gyms";
+import { saveGym, requestGymClaim, transferGym, setGymMember, inviteGymTransfer, answerGymTransfer, cancelGymTransfer } from "../actions/gyms";
 import FormularioGimnasio from "../components/FormularioGimnasio";
-import { titular } from "../../lib/common/titular";
 
 export const metadata = { title: "Mis gimnasios", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 /** Área privada: buscar/reclamar, estado de solicitudes y control de los gimnasios cuya propiedad se revisó. */
 export default async function MyGyms({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireVerifiedUser("/mis-gimnasios");
-  const { contacto } = titular();
-  const { q, province, gimnasio, miembros } = flatParams(await searchParams);
+  const params = flatParams(await searchParams);
+  const token = /^[a-f0-9]{64}$/.test(params.cesion ?? "") ? params.cesion! : "";
+  const user = await requireVerifiedUser(`/mis-gimnasios${token ? `?cesion=${token}` : ""}`);
+  const { q, province, gimnasio, miembros } = params;
+  const receivedTransfer = token ? await db.gymTransferInvitation.findFirst({ where: { tokenHash: createHash("sha256").update(token).digest("hex"), recipientEmail: user.email.toLowerCase(), status: "PENDING", expiresAt: { gt: new Date() } }, include: { gym: true, sender: { select: { name: true } } } }) : null;
+  const transfer = receivedTransfer && !await hayBloqueo(user.id, receivedTransfer.senderId) && receivedTransfer.gym.ownerUserId === receivedTransfer.senderId && receivedTransfer.gym.status !== "REMOVED" ? receivedTransfer : null;
+  const transfersWhere = { senderId: user.id, status: "PENDING" as const, expiresAt: { gt: new Date() } };
+  const totalTransfers = await db.gymTransferInvitation.count({ where: transfersWhere });
+  const window = pageWindow(totalTransfers, pageNumber(params.cesiones));
+  const outgoingTransfers = await db.gymTransferInvitation.findMany({ where: transfersWhere, include: { gym: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: window.take, skip: window.skip });
   const ids = await searchIds("gym", q);
   const [owned, claims, found, selected] = await Promise.all([
     db.gym.findMany({ where: { ownerUserId: user.id }, orderBy: [{ name: "asc" }, { id: "asc" }] }),
@@ -32,6 +42,8 @@ export default async function MyGyms({ searchParams }: { searchParams: Promise<R
   const claimLabel = { PENDING: "Pendiente de revisión", APPROVED: "Aprobada", REJECTED: "Rechazada", CONFLICT: "Conflicto de propiedad: en revisión" };
   return <div className="pantalla">
     <h1>Mis gimnasios</h1>
+    {token && (transfer ? <section className="tarjeta" aria-label="Aceptar cesión de gimnasio"><h2>Te invitan a gestionar {transfer.gym.name}</h2><p>{transfer.sender.name} te propone cederte la gestión. Al aceptar tendrás el control del gimnasio y la otra persona dejará de gestionarlo. La cesión no concede un sello de verificación.</p><form action={answerGymTransfer}><input type="hidden" name="token" value={token} /><button name="decision" value="accept">Aceptar cesión de gimnasio</button><button name="decision" value="decline" className="secondary">Rechazar cesión de gimnasio</button></form></section> : <p role="status">Esta invitación no está disponible. Comprueba que has entrado con el correo destinatario; puede haber caducado o haber sido cancelada.</p>)}
+    {outgoingTransfers.length > 0 && <section aria-label="Cesiones pendientes"><h2>Cesiones pendientes</h2>{outgoingTransfers.map(i => <article className="tarjeta" key={i.id}><h3>{i.gym.name}</h3><p>Invitación a {i.recipientEmail}. La propiedad no cambia hasta que se acepte.</p><form action={cancelGymTransfer}><input type="hidden" name="invitationId" value={i.id} /><button className="secondary">Cancelar cesión</button></form></article>)}<Paginacion ruta="/mis-gimnasios" params={{ q, province, gimnasio, miembros }} parametro="cesiones" actual={window.current} paginas={window.pages} desde={window.from} hasta={window.to} total={totalTransfers} unidad={["cesión", "cesiones"]} /></section>}
     <p>¿Tu gimnasio ya está en Lona? Búscalo por nombre, ciudad o provincia y solicita su control.</p>
     <form method="get" className="search"><label className="field"><span>Nombre o ciudad</span><input name="q" defaultValue={q} maxLength={80} /></label><label className="field"><span>Provincia</span><select name="province" defaultValue={province ?? ""}><option value="">Todas</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label><button>Buscar mi gimnasio</button></form>
     {(q || province) && <section aria-label="Gimnasios encontrados"><h2>Gimnasios encontrados</h2>{found.map((g) => <article className="tarjeta" key={g.id}><h3>{g.name} · {g.city}</h3><Link className="btn secondary" href={`/gimnasios/${g.slug}`}>Ver ficha</Link>{g.ownerUserId === user.id ? <Link className="btn secondary" href={`/mis-gimnasios?gimnasio=${g.id}`}>Gestionar</Link> : <details><summary>Es mi gimnasio — reclamarlo</summary><form action={requestGymClaim}><input type="hidden" name="gymId" value={g.id} /><label className="field"><span>Explica tu relación y cómo comprobarla (sin DNI)</span><textarea name="evidence" required minLength={10} maxLength={2000} /></label><label className="field"><span>Web o redes oficiales</span><input name="evidenceUrl" type="url" maxLength={500} /></label><button>Solicitar la reclamación</button></form></details>}</article>)}{!found.length && <p>No se han encontrado gimnasios. Puedes dar de alta el tuyo para revisión.</p>}{found.length === 30 && <p>Se muestran hasta 30: concreta el nombre o la ciudad.</p>}</section>}
@@ -45,7 +57,8 @@ export default async function MyGyms({ searchParams }: { searchParams: Promise<R
       {[...fighters.map((f) => ({ id: f.id, name: `${f.firstName} ${f.lastName}`, kind: "fighter" })), ...trainers.map((t) => ({ id: t.id, name: t.name, kind: "trainer" }))].map((m) => <form className="fila" action={setGymMember} key={`${m.kind}-${m.id}`}><input type="hidden" name="gymId" value={selected.id} /><input type="hidden" name="memberId" value={m.id} /><input type="hidden" name="kind" value={m.kind} /><span className="cuerpo">{m.name}</span><button name="decision" value="link">Vincular</button></form>)}
       </> : <p className="mut">Cada peleador y entrenador elige su gimnasio desde su propia ficha. Aquí ves quién está vinculado y puedes desvincular a quien no pertenezca a tu club.</p>}
       <h3>Miembros vinculados</h3>{[...selected.fighters.map((f) => ({ id: f.id, name: `${f.firstName} ${f.lastName}`, kind: "fighter" })), ...selected.trainers.map((t) => ({ id: t.id, name: t.name, kind: "trainer" }))].map((m) => <form className="fila" action={setGymMember} key={`${m.kind}-${m.id}`}><input type="hidden" name="gymId" value={selected.id} /><input type="hidden" name="memberId" value={m.id} /><input type="hidden" name="kind" value={m.kind} /><span className="cuerpo">{m.name}</span><button name="decision" value="unlink" className="secondary">Desvincular</button></form>)}
-      {user.role === "ADMIN" ? <form action={transferGym} className="tarjeta"><input type="hidden" name="gymId" value={selected.id} /><h3>Ceder la propiedad</h3><label className="field"><span>Correo de una cuenta con correo confirmado</span><input name="email" type="email" required maxLength={200} /></label><p>Al cederlo, esa cuenta tendrá el control y tú dejarás de gestionarlo.</p><button>Ceder gimnasio</button></form> : <p className="mut">Para ceder el gimnasio a otra persona, pídelo a moderación{contacto ? <> escribiendo a <a href={`mailto:${contacto}`}>{contacto}</a></> : null}: lo comprobará con las dos cuentas.</p>}
+      {selected.ownerUserId === user.id && <form action={inviteGymTransfer} className="tarjeta"><input type="hidden" name="gymId" value={selected.id} /><h3>Invitar a gestionar el gimnasio</h3><label className="field"><span>Correo electrónico de la persona destinataria</span><input name="email" type="email" required maxLength={200} /></label><p>Recibirá un enlace para aceptar con ese correo confirmado, aunque todavía no tenga cuenta. Hasta que acepte, tú conservas el control. El enlace caduca en 14 días. Una nueva invitación cancela la anterior.</p><button>Invitar a aceptar la cesión</button></form>}
+      {user.role === "ADMIN" && <details><summary>Cesión directa de moderación</summary><form action={transferGym}><input type="hidden" name="gymId" value={selected.id} /><label className="field"><span>Correo confirmado de la nueva cuenta titular</span><input name="email" type="email" required maxLength={200} /></label><p>Esta intervención de moderación cambia la propiedad directamente.</p><button>Ceder gimnasio</button></form></details>}
       <form action={saveGym}><input type="hidden" name="gymId" value={selected.id} />{["name", "city", "province", "address", "phone", "email", "website", "instagram"].map((k) => <input type="hidden" key={k} name={k} value={String(selected[k as keyof typeof selected] ?? "")} />)}{selected.disciplines.map((d) => <input key={d} type="hidden" name="disciplina" value={d} />)}<input type="hidden" name="status" value="REMOVED" /><label className="chip"><input type="checkbox" name="confirmar" value="si" required />Entiendo que dejará de verse y que volver a publicarlo necesita revisión</label><button className="secondary">Retirar el gimnasio del directorio</button></form>
     </section>}
     <details id="alta"><summary>Dar de alta mi gimnasio</summary><FormularioGimnasio action={saveGym} admin={user.role === "ADMIN"} /></details>

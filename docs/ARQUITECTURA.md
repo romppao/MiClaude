@@ -421,3 +421,9 @@ Ficha [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md) y
 
 ## Avisos y referencias de vídeos (H)
 `Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.
+
+## Cesiones de gimnasio con aceptación (15-10-2026)
+
+El titular invita a un correo, registrado o no. La respuesta y redirección no dependen de la existencia de cuenta, de un bloqueo o del cupo de invitaciones. Solo se contacta cuando corresponde: hayBloqueo se comprueba con la cuenta actual y de nuevo al responder, por si se creó después. El enlace aleatorio de 256 bits se guarda como SHA-256, caduca a los 14 días y exige el correo destinatario confirmado. No se exporta el hash ni el enlace secreto en la copia de datos.
+
+GymTransferInvitation referencia gimnasio y remitente; el destinatario se identifica por correo porque puede no tener cuenta. Al aceptar se serializa por gimnasio, se revalida propietario y estado pendiente, y se actualizan Gym y Profile juntos. Se cancelan las demás invitaciones; solo entonces sendMail confirma a ambas personas. Rechazar y cancelar mantienen la propiedad. La intervención directa de moderación se conserva. Al bloquear se cancelan pendientes entre las dos personas; al eliminar una cuenta se borran las dirigidas a su correo, además de las que elimina la FK del remitente.

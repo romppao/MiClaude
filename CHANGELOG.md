@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.19.1] — 2026-10-15
+
+
+### Añadido
+- Cesión de gimnasios por invitación al correo: aceptación expresa, respuesta idéntica con y sin cuenta, bloqueos, enlace con caducidad y confirmación a las dos personas mediante sendMail.
+
+
 ## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).
