@@ -499,3 +499,9 @@ Una expresión regular de resolución con DOTALL consumió contenido posterior a
 | Hallazgo | Causa | Regla resultante |
 |---|---|---|
 | Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
+
+## 15 de octubre de 2026 — Dominio (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Los pasos para separar lonaclub.es de la demo decían quitar primero el dominio en Render y después el DNS | Se escribieron pensando en el resultado, no en el estado intermedio | Al quitar algo de un dominio, primero el DNS y después el servicio: nunca dejar un registro apuntando a un servicio que ya no lo reclama. Todo cambio de dominio va en `docs/DOMINIO.md` con cómo deshacerlo |
