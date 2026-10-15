@@ -24,6 +24,8 @@ export default function Privacy() {
         </>
       )}
 
+      <p>Los vídeos enlazados desde otras páginas web se abren allí cuando pulsas el enlace; no se reproducen incrustados en Lona. Al salir, se aplica la política de privacidad de esa página, que puede usar sus propias cookies.</p>
+
       <h2>Qué datos guardamos</h2>
       <ul>
         <li><strong>Tu cuenta:</strong> tu nombre, tu correo electrónico y tu contraseña. La contraseña no se guarda: solo se conserva una huella cifrada que no permite conocerla.</li>

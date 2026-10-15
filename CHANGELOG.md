@@ -11,6 +11,19 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.5] — 2026-10-15
+
+PR de Claude (nube): T-013 (#77) y T-002 (#78) de Codex, integrados sobre la 0.18.x.
+
+### Corregido
+- Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La autoría generada por el mapa también incorpora aviso y protección. La auditoría espera al mapa y comprueba el aviso y la protección de la pestaña de origen.
+
+### Cambiado
+- Los vídeos externos de la galería avisan visiblemente de la salida; condiciones y privacidad explican qué ocurre al abrir páginas ajenas.
+
+### Cambiado
+- Se agrupan las actualizaciones de Dependabot #17, #18, #19, #65 y #66: Vitest 5.0.3, Sharp 0.35.5, Next 15.5.27, MapLibre 6.14.0 y tipos de Node 26.6.5, con una única resolución de dependencias.
+
 ## [0.18.4] — 2026-10-15
 
 PR de Claude: primera lista de gimnasios reales investigada a mano (petición del fundador, 15-10-2026: «los gimnasios de la vida real… solo gimnasios de deportes de contacto… todas las comunidades autónomas»).

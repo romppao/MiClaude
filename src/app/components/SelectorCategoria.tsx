@@ -94,7 +94,7 @@ export default function SelectorCategoria({ modo, fijas, nivelesPorDisciplina, d
           {disciplina && niveles.flatMap(n => divisionsFor(disciplina, n)).map(d => <option key={d.id} value={d.id}>{d.label}{!nivel ? ` · ${levelName(d.level)}` : ""}</option>)}
         </select>
         <span className="hint" id={`${id}-division`} aria-live="polite">
-          {division ? <>{division.note} <a href={division.source} target="_blank" rel="noreferrer">Consultar reglamento</a></> : "Elige la división de tu competición. Dejarla sin confirmar conserva una declaración incompleta; no te asigna a élite ni acredita tu edad. En un combate, indica la división de aquel día."}
+          {division ? <>{division.note} <a href={division.source} target="_blank" rel="noreferrer">Consultar reglamento<span className="sr-only"> (se abre en otra pestaña)</span></a></> : "Elige la división de tu competición. Dejarla sin confirmar conserva una declaración incompleta; no te asigna a élite ni acredita tu edad. En un combate, indica la división de aquel día."}
         </span>
       </label>
       {chips && !esFiltro ? <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }} aria-describedby={`${id}-nota`}>
