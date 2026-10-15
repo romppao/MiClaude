@@ -1,9 +1,10 @@
-/** Decisión del fundador del 14-10-2026: Cataluña queda fuera del directorio y mapa. Única lista, también usada por el importador. */
-export const EXCLUDED_GYM_PROVINCES = ["Barcelona", "Girona", "Lleida", "Tarragona"] as const;
+import { PROVINCIAS_SIN_GIMNASIOS, provinciaConGimnasios } from "./territorio";
 
-const plain = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/^provincia de /, "").trim();
+/** Alias de la política territorial compartida, también usado por el importador. */
+export const EXCLUDED_GYM_PROVINCES = PROVINCIAS_SIN_GIMNASIOS;
+
 export function excludedGymProvince(province: string) {
-  return EXCLUDED_GYM_PROVINCES.some((p) => plain(p) === plain(province)) || ["gerona", "lerida"].includes(plain(province));
+  return !provinciaConGimnasios(province);
 }
 
 /** La provincia desconocida nunca se publica automáticamente. Los ficticios solo existen en demo. */

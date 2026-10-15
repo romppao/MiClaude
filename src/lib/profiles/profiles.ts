@@ -2,6 +2,7 @@ import { gymIsPublic } from "../common/gym-policy";
 import type { User } from "@prisma/client";
 import { publicUserName } from "../common/names";
 import { db } from "../common/db";
+import { provinciaConGimnasios } from "../common/territorio";
 export const PROFILE_KINDS = ["peleador", "gimnasio", "entrenador", "promotor", "federacion"] as const;
 export type ProfileKind = typeof PROFILE_KINDS[number];
 /** Resuelve únicamente tipos visuales admitidos; null evita consultas con un tipo arbitrario recibido por URL/formulario. */

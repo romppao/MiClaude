@@ -2,6 +2,7 @@ import { EXCLUDED_GYM_PROVINCES } from "./gym-policy";
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { normalizeName } from "./names";
+import { PROVINCIAS_SIN_GIMNASIOS } from "./territorio";
 
 /**
  * Búsqueda por texto sin distinguir mayúsculas ni tildes, donde cada palabra escrita debe aparecer en alguno de los campos

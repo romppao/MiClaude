@@ -4,6 +4,11 @@ import { validateEnv } from "../../src/lib/common/env";
 const prod = (extra: Record<string, string> = {}) => ({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", APP_URL: "https://ringespana.es", RESEND_API_KEY: "k", MAIL_FROM: "Lona <hola@ringespana.es>", CONTACT_EMAIL: "privacidad@ringespana.es", R2_ACCOUNT_ID: "c", R2_ACCESS_KEY_ID: "k", R2_SECRET_ACCESS_KEY: "s", R2_BUCKET: "videos", CREADOR_CORREO: "fundador@ringespana.es", TITULAR_NOMBRE: "Titular de prueba", TITULAR_NIF: "00000000T", TITULAR_DOMICILIO: "Calle Falsa 1, Madrid", ...extra }) as NodeJS.ProcessEnv;
 
 describe("comprobación del entorno", () => {
+  it("una instalación real (https, sin demo) no arranca con los correos escritos en el registro", () => {
+    expect(validateEnv(prod({ MAIL_TRANSPORT: "log" })).errors.join()).toContain("MAIL_TRANSPORT=log");
+    expect(validateEnv(prod({ MAIL_TRANSPORT: "log", DEMO_MODE: "si" })).errors).toEqual([]);
+    expect(validateEnv(prod({ MAIL_TRANSPORT: "log", APP_URL: "http://localhost:3111" })).errors).toEqual([]);
+  });
   it("en desarrollo no exige nada", () => {
     expect(validateEnv({ NODE_ENV: "development" } as NodeJS.ProcessEnv)).toEqual({ errors: [], warnings: [] });
   });

@@ -1375,6 +1375,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/territorio.ts",
+    "purpose": "Provincias cuyos gimnasios no salen en Lona (Cataluña, decisión del fundador del 14-10-2026) y el filtro común para listas, mapa, búsqueda, sitemap y altas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/text.ts",
     "purpose": "Centraliza tamaños máximos, validación básica de correo, texto de una línea y plurales de interfaz/correos.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -2062,6 +2067,11 @@
   {
     "path": "tests/unit/search.test.ts",
     "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/territorio.test.ts",
+    "purpose": "Prueba la exclusión de los gimnasios de Cataluña y la validación de días reales (T-016, C5-02 y C4-03).",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

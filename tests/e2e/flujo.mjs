@@ -189,6 +189,12 @@ await aprobarOrganizador(admin.p, `Club Demo Madrid ${rnd}`);
 await org.goto(B + "/organizador");
 await org.fill("[name=name]", `Gran Velada Org ${rnd}`); await org.fill("[name=date]", "2026-07-20"); await datosDeAlta(org); await btn(org, "Crear el evento");
 await org.waitForURL(`**/organizador/gran-velada-org-${rnd}-2026-07-20?*`);
+// La fecha ya ha pasado: la velada queda pendiente y un moderador la autoriza antes de que su resultado sea público (T-016, C5-01).
+await admin.p.goto(B + "/moderacion/veladas");
+const pendiente = admin.p.locator("section", { hasText: `Gran Velada Org ${rnd}` });
+await pendiente.locator("textarea[name=note]").fill("Fecha y cartel revisados");
+await pendiente.getByRole("button", { name: "Autorizar y publicar" }).click();
+await admin.p.locator("[role=status]", { hasText: "Velada autorizada y publicada" }).waitFor();
 await anadirAlCartel(org, `Pepe Uno${rnd}`, `Luis Dos${rnd}`);
 await org.locator("[role=status]", { hasText: "se ha añadido al cartel" }).waitFor();
 await org.selectOption("select[name=outcome]", "WIN"); await org.selectOption("select[name=method]", "KO"); await btn(org, "Guardar resultado");
