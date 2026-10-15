@@ -475,3 +475,5 @@ La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en modera
 
 ## 15-10-2026 — Preparación de T-013 en navegador (Codex)
 El primer guion buscaba un papel ARIA «tab» donde la aplicación usa enlaces de sección; se corrigió usando `pestanaDeMiFicha`. La reproducción siguiente agotó el tiempo del registro al compilar una ruta en desarrollo. Además, la ficha tiene tres selectores de división: se acotó al formulario «Registrar este combate». Ninguno de esos intentos demuestra la regresión: se repite contra `next build` y `next start`, manteniendo las comprobaciones.
+
+La búsqueda en TSX no incluye enlaces creados por librerías: la autoría del mapa también abre pestañas. Auditar después de que cargue y normalizar los enlaces cuando la librería renueve su contenido; no borrar ni ocultar las atribuciones.

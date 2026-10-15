@@ -2099,3 +2099,7 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Validación en curso:** 21 migraciones sobre PostgreSQL 16 propio y paridad de esquema correctas; tipos y 754 unitarias correctas. Chromium local disponible. Reproducción roja, compilación y batería final se registrarán antes de entregar. No se ha comprobado Safari ni dispositivos físicos ni se ha desplegado.
 
 **Siguiente:** revisión del PR por Claude y decisión del fundador; conservar las ramas de paneles sin actualizarlas. T-002 va en otro PR.
+
+**Continuación de validación (15-10-2026):** las dos compilaciones finales, tipos y 754 unitarias por rama estaban correctas al perderse la conexión del entorno. La batería completa de navegador quedó interrumpida con tiempos de espera en el registro, no aprobada. Recuperado el acceso, se guardaron los avances en las ramas propias antes de continuar. La reproducción roja de T-013 sí detectó el reglamento y los enlaces de foto, vídeo y página en moderación (los dos vídeos comparten mensaje y se agrupan).
+
+**Enlaces del mapa:** la autoría de MapLibre y del estilo crea `target="_blank"` fuera de React, sin aviso ni `rel`. Se normalizan en `components/mapa/base.ts` al cargar y actualizar el mapa, sin cambiar textos visibles ni destinos. La auditoría espera al mapa o a la alternativa sin WebGL. Son controles compartidos existentes; no se actualizan ramas ni implementaciones de F/G/D/H. Se recompila y valida esta corrección antes de darla por terminada.

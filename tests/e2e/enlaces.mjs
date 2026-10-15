@@ -21,6 +21,10 @@ const problemas = [];
 const anotar = (papel, desde, texto) => problemas.push(`[${papel}] ${desde}: ${texto}`);
 
 async function auditarPagina(p, papel, ruta) {
+  // La autoría llega con el mapa: esperar a que se dibuje o explique la alternativa sin WebGL.
+  if (await p.locator(".mapa-gimnasios").count()) {
+    await p.locator('.mapa-gimnasios [data-listo="si"], .mapa-gimnasios .notice-info').first().waitFor({ state: "attached", timeout: 15000 });
+  }
   // 1) Lo que se ve en la propia pantalla.
   const hallazgos = await p.evaluate(() => {
     const out = [];

@@ -1,6 +1,6 @@
 # T-013 — Todo enlace que abre otra pestaña lo avisa
 **Nivel:** N1 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Actualización del encargo (fundador, 15-10-2026):** ejecución por Codex desde la demo tras fusionar #73; reserva `codex/t-013-enlaces-externos-20261015`. Incluye condiciones, privacidad, Multimedia y los enlaces de moderación de #73. Se permiten los registros, versión, catálogo y documentación exigidos en cada PR. Los paneles F/G/D/H y sus ramas quedan fuera del alcance.
+**Actualización del encargo (fundador, 15-10-2026):** ejecución por Codex desde la demo tras fusionar #73; reserva `codex/t-013-enlaces-externos-20261015`. Incluye condiciones, privacidad, Multimedia y los enlaces de moderación de #73 y la autoría generada por el mapa. Se permiten los registros, versión, catálogo y documentación exigidos en cada PR. Los paneles F/G/D/H y sus ramas quedan fuera del alcance.
 
 **Fase:** F1 · **Estado:** en curso · **Asignada a:** Codex (encargo del fundador, 15-10-2026) · **Depende de:** #73 fusionado (comprobado: 8c789bc)
 

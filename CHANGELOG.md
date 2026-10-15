@@ -14,7 +14,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 ## [0.16.1] — 2026-10-15
 
 ### Corregido
-- Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La auditoría de enlaces comprueba el aviso y la protección de la pestaña de origen.
+- Los enlaces al reglamento y a contenido avisado en moderación anuncian que abren otra pestaña. La autoría generada por el mapa también incorpora aviso y protección. La auditoría espera al mapa y comprueba el aviso y la protección de la pestaña de origen.
 
 ### Cambiado
 - Los vídeos externos de la galería avisan visiblemente de la salida; condiciones y privacidad explican qué ocurre al abrir páginas ajenas.

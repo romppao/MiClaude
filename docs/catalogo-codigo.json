@@ -716,7 +716,7 @@
   },
   {
     "path": "src/app/components/mapa/base.ts",
-    "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor.",
+    "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor. Los enlaces de autoría generados por la librería anuncian otra pestaña y conservan rel seguro al renovarse.",
     "guide": "docs/DISENO.md"
   },
   {
