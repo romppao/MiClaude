@@ -10,6 +10,7 @@ import { DISCIPLINE_LABEL } from "../../../lib/common/disciplines";
 import { LEVEL_LABEL } from "../../../lib/common/labels";
 import { puntoDeGimnasio } from "../../../lib/common/mapa";
 import DondeEsta from "../../components/DondeEsta";
+import { provinciaConGimnasios } from "../../../lib/common/territorio";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function GymPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const gym = await getGym(slug);
-  if (!gym) notFound();
+  if (!gym || !provinciaConGimnasios(gym.province)) notFound();
   return (
     <>
       <ProfileHeader kind="gimnasio" id={gym.id} name={gym.name} subtitle={[gym.city,gym.province].join(" · ")}>{gym.verifiedAt && <span className="tag" title="Verificado por un moderador">✓ verificado</span>}</ProfileHeader><ProfileDetails kind="gimnasio" id={gym.id}/>

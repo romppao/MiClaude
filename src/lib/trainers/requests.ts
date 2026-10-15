@@ -1,3 +1,4 @@
+import { esDiaReal } from "../common/dates";
 import type { ClassRequestStatus } from "@prisma/client";
 
 /**
@@ -54,7 +55,7 @@ const minutos = (raw: string) => (/^\d{1,4}$/.test(raw.trim()) ? Number(raw.trim
  * 23:00 en medias horas que quepa la clase entera. Los códigos de problema tienen su texto en `messages.ts`.
  */
 export function parseClassRequest(input: RequestInput): RequestParsed {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.day) || Number.isNaN(Date.parse(`${input.day}T00:00:00Z`))) return { ok: false, problema: "solicitud_dia" };
+  if (!esDiaReal(input.day)) return { ok: false, problema: "solicitud_dia" };
   const limite = new Date(Date.parse(`${input.today}T00:00:00Z`) + DIAS_POR_DELANTE * 864e5).toISOString().slice(0, 10);
   if (input.day < input.today || input.day > limite) return { ok: false, problema: "solicitud_dia" };
   let fromMinute: number | null = null, toMinute: number | null = null;

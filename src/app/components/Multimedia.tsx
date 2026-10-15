@@ -1,6 +1,9 @@
 import { REASONS_BY_ENTITY, REPORT_REASONS } from "../../lib/community/reports";
-import { publicUserName } from "../../lib/common/names";
+import { publicFighterName, publicUserName } from "../../lib/common/names";
 import { haceTiempo } from "../../lib/common/dates";
+
+/** Lo que hace falta de cada peleador para escribir su nombre público (ficha provisional: solo la inicial; oculta: anónimo). */
+type FighterDeMedio = { firstName: string; lastName: string; listed: boolean; hiddenAt: Date | null };
 
 /** Un vídeo o una foto del público, con lo necesario para mostrarlo (sin los bytes). */
 export type MedioPublico = {
@@ -11,19 +14,21 @@ export type MedioPublico = {
   videoUrl: string | null;
   createdAt: Date;
   uploader: { name: string };
-  bout: { fighterA: { firstName: string; lastName: string }; fighterB: { firstName: string; lastName: string } } | null;
+  bout: { fighterA: FighterDeMedio; fighterB: FighterDeMedio } | null;
   event?: { name: string; slug: string };
 };
+
+const NOMBRE_PUBLICO = { firstName: true, lastName: true, listed: true, hiddenAt: true } as const;
 
 /** Lo que hay que pedir a la base de datos para pintar la galería. */
 export const SELECT_MEDIO = {
   id: true, kind: true, caption: true, videoKey: true, videoUrl: true, createdAt: true,
   uploader: { select: { name: true } },
-  bout: { select: { fighterA: { select: { firstName: true, lastName: true } }, fighterB: { select: { firstName: true, lastName: true } } } },
+  bout: { select: { fighterA: { select: NOMBRE_PUBLICO }, fighterB: { select: NOMBRE_PUBLICO } } },
   event: { select: { name: true, slug: true } },
 } as const;
 
-const combate = (m: MedioPublico) => (m.bout ? `${m.bout.fighterA.firstName} ${m.bout.fighterA.lastName} contra ${m.bout.fighterB.firstName} ${m.bout.fighterB.lastName}` : null);
+const combate = (m: MedioPublico) => (m.bout ? `${publicFighterName(m.bout.fighterA)} contra ${publicFighterName(m.bout.fighterB)}` /* T-016, C3-02 */ : null);
 
 /**
  * Galería de vídeos y fotos del público (petición del fundador, 8 de octubre de 2026): en la velada, en la ficha de cada peleador y en su

@@ -50,6 +50,8 @@ await org.p.goto(B+"/organizador");
 await org.p.locator('[name=name]').fill(`Divisiones cartel ${rnd}`); await org.p.locator('[name=date]').fill(enDias(-1));
 await datosDeAlta(org.p);
 await org.p.getByRole("button",{name:"Crear el evento",exact:true}).click(); await org.p.waitForURL('**/organizador/*');
+// Velada de ayer: queda pendiente hasta que un moderador la autoriza (T-016, C5-01). Aquí se da por autorizada; el recorrido de autorización está en veladas-pasadas.mjs.
+sql(`UPDATE "Event" SET status='SCHEDULED' WHERE name='Divisiones cartel ${rnd}';`);
 const cartel=formButton(org.p,"Añadir al cartel");
 const valor=async (name,text)=>cartel.locator(`[name=${name}]`).evaluate((el,text)=>[...el.options].find(o=>o.textContent.includes(text))?.value,text);
 const aid=await valor("fighterA",`JuniorCategorias Divisiones${rnd}`), bid=await valor("fighterB",`RivalCategorias Divisiones${rnd}`);

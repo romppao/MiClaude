@@ -380,6 +380,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/aviso-legal/page.tsx",
+    "purpose": "Aviso legal (LSSI art. 10 y 16): titular desde variables de entorno y bloque de responsabilidad; borrador pendiente de revisión jurídica (docs/LEGAL.md).",
+    "guide": "docs/LEGAL.md"
+  },
+  {
     "path": "src/app/ayuda/page.tsx",
     "purpose": "Explica cuenta, declaración, trayectoria, respaldo y aura en lenguaje público con enlaces a los flujos disponibles.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -668,6 +673,16 @@
     "path": "src/app/components/mapa/base.ts",
     "purpose": "Parte común de los mapas: carga diferida de MapLibre, mapa libre de OpenFreeMap, textos en español, botones y trabajador servido desde public/vendor.",
     "guide": "docs/DISENO.md"
+  },
+  {
+    "path": "src/app/condiciones/page.tsx",
+    "purpose": "Condiciones de uso (DSA arts. 14, 16, 17 y 20): normas, licencia del contenido, avisos, moderación y reclamaciones; borrador pendiente de revisión jurídica.",
+    "guide": "docs/LEGAL.md"
+  },
+  {
+    "path": "src/app/cookies/page.tsx",
+    "purpose": "Política de cookies con el inventario real de cookies y almacenamiento local; si se añade alguno hay que actualizar la tabla.",
+    "guide": "docs/LEGAL.md"
   },
   {
     "path": "src/app/disciplinas/[slug]/page.tsx",
@@ -1225,9 +1240,19 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/territorio.ts",
+    "purpose": "Provincias cuyos gimnasios no salen en Lona (Cataluña, decisión del fundador del 14-10-2026) y el filtro común para listas, mapa, búsqueda, sitemap y altas.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/text.ts",
     "purpose": "Centraliza tamaños máximos, validación básica de correo, texto de una línea y plurales de interfaz/correos.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/titular.ts",
+    "purpose": "Datos del titular para el aviso legal y la privacidad, leídos de variables de entorno, y la lista de los que faltan para el aviso de arranque.",
+    "guide": "docs/LEGAL.md"
   },
   {
     "path": "src/lib/common/url.ts",
@@ -1787,6 +1812,11 @@
   {
     "path": "tests/unit/search.test.ts",
     "purpose": "Prueba interpretación de palabras y construcción parametrizada de búsqueda sin tildes/mayúsculas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/territorio.test.ts",
+    "purpose": "Prueba la exclusión de los gimnasios de Cataluña y la validación de días reales (T-016, C5-02 y C4-03).",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

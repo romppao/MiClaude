@@ -12,6 +12,8 @@ import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
 import ProfileThumbnail from "../components/ProfileThumbnail";
 import MapaGimnasios, { type GimnasioEnMapa } from "../components/MapaGimnasios";
 import { PROVINCES } from "../../lib/common/labels";
+import { gimnasiosVisibles } from "../../lib/common/territorio";
+import { boutsQueCuentan } from "../../lib/common/record-eligibility";
 
 export const metadata = { title: "Gimnasios" };
 export const dynamic = "force-dynamic";
@@ -26,18 +28,22 @@ const MAX_EN_MAPA = 1500;
 export default async function Gyms({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { q, province, pagina } = flatParams(await searchParams);
   const ids = await searchIds("gym", q);
-  const where = { ...(province && { province }), ...(ids && { id: { in: ids } }) };
+  const where: Prisma.GymWhereInput = { AND: [gimnasiosVisibles(), { ...(province && { province }), ...(ids && { id: { in: ids } }) }] };
   const total = await db.gym.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
   const [gyms, enMapa] = await Promise.all([
     db.gym.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { _count: { select: { fighters: true } } } }),
     db.gym.findMany({ where, orderBy: [{ name: "asc" }, { id: "asc" }], take: MAX_EN_MAPA, select: { id: true, slug: true, name: true, city: true, province: true, lat: true, lng: true, geoSource: true, verifiedAt: true, _count: { select: { fighters: { where: { listed: true, hiddenAt: null } }, trainers: true } } } }),
   ]);
-  // Aura que la comunidad ha dado a los peleadores de cada gimnasio (sin las ocultadas por moderación): parte de la valoración Lona.
-  const auras = enMapa.length ? await db.$queryRaw<{ gymId: string; n: bigint }[]>`
-    select f."gymId", count(a.id) as n from "Aura" a join "Fighter" f on f.id = a."fighterId"
-    where a."hiddenAt" is null and f."hiddenAt" is null and f."gymId" in (${Prisma.join(enMapa.map((g) => g.id))}) group by f."gymId"` : [];
-  const auraDe = new Map(auras.map((a) => [a.gymId, Number(a.n)]));
+  // Aura que la comunidad ha dado a los peleadores de cada gimnasio: sin la ocultada por moderación y solo la de combates que cuentan
+  // (igual que en el ránking: ni veladas canceladas o sin autorizar, ni combates en revisión o declarados hace menos de 24 h) (T-016, C5-03).
+  const auraDe = new Map<string, number>();
+  if (enMapa.length) {
+    const deGimnasio = await db.fighter.findMany({ where: { hiddenAt: null, gymId: { in: enMapa.map((g) => g.id) } }, select: { id: true, gymId: true } });
+    const porPeleador = deGimnasio.length ? await db.aura.groupBy({ by: ["fighterId"], where: { hiddenAt: null, fighterId: { in: deGimnasio.map((f) => f.id) }, bout: boutsQueCuentan() }, _count: { _all: true } }) : [];
+    const gimnasioDe = new Map(deGimnasio.map((f) => [f.id, f.gymId!]));
+    for (const a of porPeleador) { const g = gimnasioDe.get(a.fighterId); if (g) auraDe.set(g, (auraDe.get(g) ?? 0) + a._count._all); }
+  }
   const puntos: GimnasioEnMapa[] = enMapa.flatMap((g) => {
     const p = puntoDeGimnasio(g);
     if (!p) return [];

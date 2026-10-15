@@ -11,8 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.14.1] — 2026-10-15
-
+PR de Claude con el bloque F de los paneles que preparó Codex (#56), integrado sobre 0.15.0.
 
 ### Mejorado
 - Los cuatro paneles reúnen sus pendientes en «Te toca» y reducen los accesos rápidos a cuatro como máximo.
@@ -20,6 +19,28 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - El entrenador responde solicitudes desde el panel y ve solicitudes del mes, clases aceptadas y alumnos que repiten.
 - Récord por disciplina en el panel del peleador, progreso del perfil y tarjetas adaptables en «Peleadores que sigo».
 - El entrenador puede completar su gimnasio desde la edición de su perfil.
+
+## [0.15.0] — 2026-10-15
+
+PR de Claude: arreglos de la revisión previa a la versión oficial (T-016). Codex encontró los de las partes 3-5 y Claude, los de las partes 1-2.
+
+### Seguridad
+- **Récord amateur privado:** ya no se ve en «Peleadores que sigo» (C3-01) ni en la búsqueda de sparring cuando se suman varias disciplinas (C4-01).
+- **Fichas provisionales:** las galerías de fotos y vídeos ya no muestran el apellido completo, solo la inicial (C3-02).
+- **Veladas pasadas:** siempre necesitan la autorización de moderación. Ya no se publican al poner un resultado, al cancelar y reabrir ni al mover una velada futura a una fecha pasada (C5-01). Su cartel no hace públicas las fichas provisionales hasta que se autoriza (C5-04).
+- **Correos en el registro del servidor:** una instalación real (https, sin demo) no arranca con `MAIL_TRANSPORT=log`, que dejaría ahí los enlaces de acceso.
+
+### Corregido
+- **Borrar la cuenta tras entrar con Google:** quien entró con Google y no tiene contraseña confirma volviendo a entrar con Google y tiene 15 minutos para borrarla. «Cambiar mi contraseña» le explica cómo elegir una.
+- **Fechas imposibles:** las solicitudes de clase y las propuestas de sparring rechazan días que no existen, como el 31 de noviembre (C4-03).
+- **Valoración de gimnasios:** solo cuenta el aura de los combates que cuentan para el récord (C5-03).
+- Quedan fuera los restos de «Ring España» en los mensajes de arranque, el lector de noticias y la clave del formulario.
+
+### Cambiado
+- **Gimnasios de Cataluña** (Barcelona, Girona, Lleida y Tarragona): no salen en la lista, el mapa, la búsqueda, el sitemap ni su ficha, y no se crean gimnasios nuevos en esas provincias (C5-02, decisión del fundador). La lista está en `src/lib/common/territorio.ts`.
+- **Máximo de 5 fotos al día por persona** mientras las fotos se guarden en la base de datos, que tiene 1 GB gratis.
+
+## [0.14.1] — 2026-10-14
 
 ## [0.14.0] — 2026-10-15
 

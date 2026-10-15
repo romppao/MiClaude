@@ -9,6 +9,7 @@ import { plural } from "../../lib/common/text";
 import { fechaInicioEnRecord } from "../../lib/common/record-time";
 import { toggleFollow } from "../actions/community";
 import { filtrosSiguiendo } from "../../lib/community/siguiendo";
+import { recordHidden } from "../../lib/fighters/privacy";
 
 export const metadata = { title: "Peleadores que sigo" };
 export const dynamic = "force-dynamic";
@@ -30,6 +31,10 @@ export default async function Following() {
   // «Próximos» y «celebrados» usan la misma definición de «ya celebrada» que el resto de la aplicación (día de Madrid).
   const upcoming = proximos.filter((b) => !eventDayReached(b.event.date) || !b.result);
   const recent = celebrados.filter((b) => eventDayReached(b.event.date)).slice(0, 10);
+  // Igual que en la ficha de la velada: un resultado amateur no revela el récord que alguno de los dos mantiene privado (T-016, C3-01).
+  const resultadoOculto = (b: (typeof celebrados)[number]) =>
+    recordHidden(b.event.level, b.fighterA.recordPublic, false) ||
+    recordHidden(b.event.level, b.fighterB.recordPublic, false);
   const fights = (b: (typeof proximos)[number]) => `${publicFighterName(b.fighterA)} contra ${publicFighterName(b.fighterB)}`;
 
   return (
@@ -52,7 +57,7 @@ export default async function Following() {
           {recent.length === 0 ? <p className="mut">Aún no hay resultados recientes.</p> : (
             <div className="tarjeta" aria-label="Combates recientes de los peleadores que sigues">
               {recent.map((b) => <div key={b.id} className="fila"><span className="cuerpo"><strong>{fights(b)}</strong><span>{fmtDate(b.event.date)} · <Link href={`/veladas/${b.event.slug}`}>{b.event.name}</Link></span>
-                <span>{textoResultado(b)}</span>
+                <span>{textoResultado(b)}{resultadoOculto(b) && b.result ? <span className="mut"> · récord amateur privado</span> : null}</span>
                 <span className="meta">{b.verification === "SELF_REPORTED" ? `Declarado: cuenta a partir del ${fechaInicioEnRecord(b.createdAt).toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}` : b.verification === "VERIFIED" ? "Verificado" : "Confirmado por el rival"}</span>
               </span></div>)}
             </div>

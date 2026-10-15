@@ -202,6 +202,11 @@ export async function decidirVeladaPasada(f: FormData) {
   await guard(back, () => db.$transaction(async (tx) => {
     const saved = await tx.event.updateMany({ where: { id: event.id, status: "PENDING_AUTHORIZATION" }, data: { status } });
     if (!saved.count) throw new Rechazo("solicitud_cambiada");
+    // Autorizada la velada, su cartel ya es público: las fichas provisionales que aparecen en él pasan a ser públicas, como en una velada normal.
+    if (decision === "approve") {
+      const bouts = await tx.bout.findMany({ where: { eventId: event.id }, select: { fighterAId: true, fighterBId: true } });
+      await listFighters(tx, bouts.flatMap((b) => [b.fighterAId, b.fighterBId]));
+    }
     await audit({ userId: admin.id, entity: "EVENT", entityId: event.id, action: decision === "approve" ? "PAST_EVENT_APPROVED" : "PAST_EVENT_REJECTED", before: { status: event.status }, after: { status, note } }, tx);
   }));
   revalidatePath("/", "layout");
