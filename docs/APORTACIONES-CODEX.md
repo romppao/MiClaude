@@ -345,6 +345,23 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
 
+
+## 2026-10-14 — Bloque F de paneles
+**Base:** 8146d0f (#55); **rama:** codex/paneles-f-pulido. El fundador autoriza avanzar sobre esta base antes de su integración.
+**Cambios:** componentes TeToca/CompletaPerfil; cuatro paneles; selección de disciplina; alta de intereses en dos pasos; aura sin JavaScript; respuestas del entrenador y editor de su gimnasio; menú y tarjetas de seguidos.
+**Comprobaciones:** tipos, 741 unitarias, build inicial. CI pendiente; sin PostgreSQL/Docker disponible localmente. No se ha desplegado.
+**Relevo:** revisar PR F antes de integrar; continuar G y H en PR separados. H4 conserva revisión de modelo previa a interfaz.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
+
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
 ## 15 de octubre de 2026 — T-002: cinco actualizaciones en un PR (Codex)
 
 **Encargo:** agrupar Dependabot #17 (Vitest 5.0.3), #18 (Sharp 0.35.5), #19 (Next 15.5.27), #65 (MapLibre 6.14.0) y #66 (tipos de Node 26.6.5), después de T-013. Reserva publicada `codex/t-002-dependabot-agrupado-20261015`, base 8c789bc. Se actualiza la ficha histórica T-002 para reflejar la autorización de actualizar dependencias.
@@ -356,3 +373,5 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 **Validación parcial:** instalación reproducible con las cinco versiones exactas; 21 migraciones y paridad del esquema; tipos; 754 unitarias con `npm test -- --maxWorkers=1`; catálogo, mapa y 15 documentales correctas. Las dos pasadas simultáneas con navegador (trabajadores automáticos y dos trabajadores) terminaron con 752 correctas y dos tiempos de espera de 5 segundos en contraseñas. La pasada aislada no cambia límites, pruebas ni parámetros de seguridad. Chromium y Node 24 locales (el CI usa Node 22). Compilación y navegador pendientes de cierre. Sin integración ni despliegue. El segundo PR que se integre debe comprobar de nuevo su número frente a la demo.
 
 **Actualización de base:** el PR #74 entró durante las pruebas (demo 543a2a7, 0.16.1). Se integra en esta rama propia con un merge, sin reescribir ramas; se conservan completos sus cambios de fotos y sus registros. La versión actual de esta entrega pasa a **0.16.3** mediante `scripts/version.mjs`. Las baterías de los heads anteriores quedan sustituidas por las del head nuevo; no se presentan como validación de la base nueva. F/G/D/H siguen sin actualizarse.
+
+**Base vigente tras #75:** la demo pasó a d6a63d5 (0.17.0) al integrar Claude los F/G elegidos en ESTADO.md. Se incorpora ese resultado en esta rama propia; no se actualiza ninguna rama ni PR de F/G/D/H. Se conservan íntegros sus ficheros y pruebas. T-002 queda en **0.17.2** usando el script de versión. Las pruebas anteriores se identifican por su SHA; la validación actual se consulta en los checks del PR de esta entrega. Revisión de Claude e integración del fundador pendientes.

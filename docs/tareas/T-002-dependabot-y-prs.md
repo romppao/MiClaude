@@ -1,12 +1,12 @@
 # T-002 — Dependabot sin saltos mayores y limpieza de PRs
 **Nivel:** N1 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
-**Fase:** F1 · **Estado vigente:** en curso por Codex (15-10-2026) · **Depende de:** T-013 como orden de integración.
+**Fase:** F1 · **Estado vigente:** pendiente de revisión por Codex (15-10-2026) · **Depende de:** T-013 como orden de integración.
 
 **Historial:** la tarea original la terminó Claude el 6-10-2026. Dejó de servir como prueba de ingreso (la sustituyó T-013); el nuevo encargo de abajo la reabre para agrupar actualizaciones.
 
 ## Encargo vigente — 15 de octubre de 2026
 
-El fundador encarga a Codex unir **#17, #18, #19, #65 y #66 en un solo PR**, después de T-013. Reserva: `codex/t-002-dependabot-agrupado-20261015`, desde la demo 8c789bc. **Estado: en curso.** Este encargo sustituye para esta entrega las restricciones históricas «no actualizar dependencias / no tocar package.json» de abajo; se conserva el historial de la tarea original.
+El fundador encarga a Codex unir **#17, #18, #19, #65 y #66 en un solo PR**, después de T-013. Reserva: `codex/t-002-dependabot-agrupado-20261015`, desde la demo 8c789bc. **Estado: pendiente de revisión.** Este encargo sustituye para esta entrega las restricciones históricas «no actualizar dependencias / no tocar package.json» de abajo; se conserva el historial de la tarea original.
 
 | PR | Dependencia | Versión solicitada |
 |---|---|---|
@@ -42,3 +42,7 @@ No actualizar dependencias. No tocar `package.json`.
 
 ## Documentar
 Entrada breve en tu registro y en `DIARIO.md`. Si es tu primera tarea, escribe antes tu `APORTACIONES-<NOMBRE>.md` con qué puedes y qué no puedes ejecutar.
+
+## Base y versión actuales
+
+La rama integra d6a63d5 (#75, demo 0.17.0) y conserva sus scripts y pruebas de paneles sin modificarlos. Entrega 0.17.2 para integrar tras T-013 (0.17.1). Las cinco resoluciones siguen exactamente en las versiones de la tabla. Validación anterior de d62b8d1 sobre #74: https://github.com/romppao/MiClaude/actions/runs/38706575120. El PR de esta entrega valida la base actual.

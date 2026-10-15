@@ -34,7 +34,7 @@ export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: 
       slug: `peleador-anonimo-${fighterId.slice(-8)}`,
       firstName: "Peleador", lastName: "anónimo", alias: null, birthDate: null, city: null, province: null, bio: null,
       gymId: null, trainerId: null, heightCm: null, reachCm: null, stance: null,
-      listed: false, hiddenAt: new Date(),
+      listed: false, hiddenAt: new Date(), availableToFight: false, currentWeightKg: null, availableSince: null,
     },
   });
   await tx.profile.deleteMany({ where: { kind: "peleador", entityId: fighterId } });

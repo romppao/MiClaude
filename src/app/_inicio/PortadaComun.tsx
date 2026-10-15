@@ -1,4 +1,6 @@
 import Link from "next/link";
+import CercaDeTi from "./CercaDeTi";
+import { PROVINCES } from "../../lib/common/labels";
 import type { Discipline, User } from "@prisma/client";
 import { db } from "../../lib/common/db";
 import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
@@ -29,9 +31,9 @@ async function disciplinasDe(user: Usuario): Promise<Discipline[]> {
  * pantalla de inicio», con la actualidad de todos los deportes de contacto de fuentes variadas; al elegir un deporte se abre su portada,
  * igual que esta pero solo de esa disciplina. Lo propio de cada tipo de cuenta está en «Mi panel».
  */
-export default async function InicioComun({ user }: { user: Usuario }) {
+export default async function InicioComun({ user, provincia }: { user: Usuario; provincia?: string }) {
   return (
-    <Portada
+    <><Portada
       primero={await disciplinasDe(user)}
       cabecera={<Saludo nombre={user.name} sub="Lo último de los deportes de contacto" />}
       despuesDeNoticias={
@@ -41,6 +43,6 @@ export default async function InicioComun({ user }: { user: Usuario }) {
           <Icono nombre="siguiente" tam={18} />
         </Link>
       }
-    />
+    /><CercaDeTi province={provincia && PROVINCES.includes(provincia) ? provincia : user.province ?? "Madrid"} semana /></>
   );
 }

@@ -402,4 +402,10 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Cambio de visión del proyecto** (fundador, 15 oct): «he tenido un cambio de visión que todavía no sé si aplicaremos». Estado: **pendiente** de que lo cuente; se valorará después de las correcciones.
 - **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.
 
-- 15-10-2026, fundador → Codex: T-002 agrupa #17/#18/#19/#65/#66 en un único PR (0.16.3) tras T-013. Implementación preparada; pruebas en curso. Los PR originales quedan para cerrar tras integrar, sin alterar el calendario ni la política de saltos mayores de Dependabot.
+
+### Seguimiento del bloque F (Codex, 14 oct 2026)
+Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.
+
+14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.
+
+- 15-10-2026, fundador → Codex: T-002 agrupa #17/#18/#19/#65/#66 en un único PR (0.17.2) tras T-013. Implementación preparada; pruebas en curso. Los PR originales quedan para cerrar tras integrar, sin alterar el calendario ni la política de saltos mayores de Dependabot.
