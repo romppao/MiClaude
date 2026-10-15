@@ -1,3 +1,4 @@
+import { notifyFollowedBout, notifyInApp } from "./notifications";
 import { db } from "../common/db";
 import { APP_URL, sendMail } from "../common/mail";
 import { unsubscribeLink } from "../accounts/auth";
@@ -17,6 +18,7 @@ const fullName = (f: { firstName: string; lastName: string }) => oneLine(`${f.fi
 export async function notifyFollowersOfBout(boutId: string): Promise<number> {
   const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
   if (!bout || bout.event.date.getTime() <= Date.now()) return 0;
+  await notifyFollowedBout(boutId, "BOUT_ANNOUNCED");
   const followers = await db.follow.findMany({
     where: { fighterId: { in: [bout.fighterAId, bout.fighterBId] }, user: { emailVerifiedAt: { not: null }, notifyEmails: true } },
     include: { user: true, fighter: true },
@@ -69,6 +71,7 @@ export async function notifyRivalOfBout(boutId: string): Promise<boolean> {
   try {
     const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
     if (!bout || bout.verification !== "SELF_REPORTED" || !bout.fighterB.userId) return false;
+    await notifyInApp(bout.fighterB.userId, "BOUT_DECLARED", "Otro peleador ha declarado un combate contigo", "/mi-ficha#por-confirmar", `declared:${bout.id}`);
     return await notifyDecision(bout.fighterB.userId, `${fullName(bout.fighterA)} ha registrado un combate contra ti`,
       `${fullName(bout.fighterA)} ha registrado en Lona un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
   } catch (e) {

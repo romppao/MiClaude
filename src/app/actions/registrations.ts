@@ -3,6 +3,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { putNotification } from "../../lib/community/notifications";
 import { after } from "next/server";
 import { db } from "../../lib/common/db";
 import { requireOrganizer } from "../../lib/accounts/permissions";
@@ -118,6 +119,7 @@ export async function requestRegistration(f: FormData) {
       ? await tx.eventRegistration.update({ where: { id: previa.id }, data: { ...valores, status: "PENDING", reply: null, answeredAt: null, createdAt: new Date() } })
       : await tx.eventRegistration.create({ data: { eventId: event.id, fighterId: me.id, ...valores } });
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "REGISTRATION_REQUESTED", after: { inscripcion: guardada.id } }, tx);
+    if (event.organizerId) await putNotification(event.organizerId, "REGISTRATION", "Tienes una solicitud para participar en tu velada", `/organizador/${event.slug}/inscripciones`, `registration:${guardada.id}`, tx);
     return guardada;
   });
   if (event.organizer) {

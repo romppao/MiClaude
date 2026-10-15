@@ -328,6 +328,8 @@ enum HighlightKind {
 // Lo mejor de un peleador, publicado por él mismo en su ficha. Un vídeo es un enlace (los archivos de vídeo no se guardan en la base de datos);
 // una foto se guarda normalizada (webp). Solo uno puede estar destacado por ficha.
 model Highlight {
+  sourceMediaId String?
+  sourceMedia MediaItem? @relation(fields: [sourceMediaId], references: [id], onDelete: Cascade)
   id        String        @id @default(cuid())
   fighterId String
   fighter   Fighter       @relation(fields: [fighterId], references: [id], onDelete: Cascade)
@@ -348,6 +350,7 @@ model Highlight {
   createdAt DateTime      @default(now())
 
   @@index([fighterId, hiddenAt])
+  @@unique([fighterId, sourceMediaId])
 }
 
 model Fighter {
@@ -485,7 +488,21 @@ model Bout {
   @@index([createdAt])
 }
 
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind String
+  title String
+  href String
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, readAt])
+  @@index([createdAt])
+}
+
 model User {
+  notifications Notification[]
   ownedGyms Gym[] @relation("GymOwner")
   gymClaims GymClaimRequest[] @relation("GymClaimApplicant")
   reviewedGymClaims GymClaimRequest[] @relation("GymClaimReviewer")
@@ -850,6 +867,7 @@ enum MediaKind {
 }
 
 model MediaItem {
+  highlightCopies Highlight[]
   id         String    @id @default(cuid())
   eventId    String
   event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)

@@ -107,3 +107,7 @@ Las páginas del App Router renderizan en servidor salvo componentes con `"use c
 Las rutas `route.ts` sirven imágenes, exportación privada y salud. `middleware.ts` limpia parámetros; no sustituye las guardas de las acciones. `instrumentation.ts` valida entorno al arrancar. `src/pages/_error.tsx` cubre el error del Pages Router usado por Next.js, aunque las pantallas estén en App Router.
 
 Scripts: arranque de demo, entorno aislado, mapas y examen de ingreso tienen objetivos distintos; leer [Operación](OPERACION.md) antes de ejecutarlos. Las unitarias comprueban reglas y restricciones estáticas; los recorridos de navegador comprueban permisos y respuesta visible; axe cubre parte de accesibilidad. Ninguno demuestra por sí solo comprensión por personas, funcionamiento en dispositivos reales o capacidad bajo carga.
+
+
+## Avisos y referencias de vídeos (H)
+`Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.

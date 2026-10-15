@@ -3,6 +3,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { putNotification, notifyInApp } from "../../lib/community/notifications";
 import { provinciaConGimnasios } from "../../lib/common/territorio";
 import { after } from "next/server";
 import { todayMadrid } from "../../lib/common/dates";
@@ -124,6 +125,7 @@ export async function requestClass(f: FormData) {
     if (!(await allow(`clase:solicitud:${user.id}`, REQUESTS_PER_DAY, 24 * HORA))) volverConLoEscrito(back, f, "solicitudes_diarias");
     const creada = await tx.classRequest.create({ data: { classId: clase.id, userId: user.id, ...datos.value } });
     await audit({ userId: user.id, entity: "CLASS", entityId: clase.id, action: "REQUESTED", after: { solicitud: creada.id } }, tx);
+    await putNotification(clase.trainer.userId!, "CLASS_REQUEST", "Tienes una nueva solicitud de clase", "/mis-clases#solicitudes", `class-request:${creada.id}`, tx);
     return creada;
   });
   avisar(clase.trainer.user.email, `Nueva solicitud para tu clase «${oneLine(clase.title)}»`,
@@ -149,6 +151,7 @@ export async function answerClassRequest(f: FormData) {
   const cambio = await db.classRequest.updateMany({ where: { id: r.id, status: "PENDING" }, data: { status, reply, answeredAt: new Date() } });
   if (!cambio.count) go(back, { problema: "solicitud_ya_respondida" });
   await audit({ userId: user.id, entity: "CLASS", entityId: r.classId, action: decision === "aceptar" ? "REQUEST_ACCEPTED" : "REQUEST_DECLINED", after: { solicitud: r.id } });
+  await notifyInApp(r.userId, "CLASS_ANSWER", "Tu solicitud de clase tiene respuesta", "/mis-reservas", `class-answer:${r.id}:${status}`);
   const entrenador = oneLine(r.class.trainer.name);
   avisar(r.user.email, decision === "aceptar" ? `${entrenador} ha aceptado tu clase` : `${entrenador} no puede darte la clase`,
     `Hola ${oneLine(r.user.name)},\n\n${decision === "aceptar" ? `${entrenador} ha aceptado tu solicitud para «${oneLine(r.class.title)}».` : `${entrenador} no puede darte la clase «${oneLine(r.class.title)}» en las fechas que propusiste.`}\n${reply ? `\nSu mensaje: ${reply}\n` : ""}${decision === "aceptar" ? `\nPara hablar con ${entrenador}, responde a este correo (le llega directamente) o escribe a ${user.email}.\nLa clase se paga directamente al entrenador: Lona no cobra nada.\n` : "\nPuedes solicitarla de nuevo con otras fechas o buscar otro entrenador.\n"}\nTus reservas: ${APP_URL}/mis-reservas\n`,

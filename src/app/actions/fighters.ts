@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { excludedGymProvince } from "../../lib/common/gym-policy";
 import { db } from "../../lib/common/db";
 import { parseCurrentWeight } from "../../lib/fighters/availability";
+import { putNotification } from "../../lib/community/notifications";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { slugName, slugify } from "../../lib/common/labels";
 import { findNameCandidates } from "../../lib/fighters/fighters";
@@ -19,13 +20,34 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, parseCompetitionChoice } from "../.
 import { parsePrior } from "../../lib/fighters/prior";
 import { LIMITS } from "../../lib/common/text";
 import { readOnboarding } from "../../lib/accounts/onboarding";
-import { MAX_HIGHLIGHTS, parseHighlight } from "../../lib/fighters/highlights";
+import { MAX_HIGHLIGHTS, HIGHLIGHT_TITLE_MAX, visibleHighlightSources, parseHighlight } from "../../lib/fighters/highlights";
 import { normalizeImage } from "../../lib/profiles/images";
 import { almacenDeVideos, claveDe, tipoDeClave } from "../../lib/media/storage";
 import { Prisma } from "@prisma/client";
-import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
+import { checkLengths, go, guard, readProvince, str, uniqueSlug, withLock, Rechazo } from "./shared";
+import { hayBloqueo } from "../../lib/community/bloqueos";
 import { borrarFotos, guardarFoto, type FotoGuardada } from "../../lib/media/fotos";
 import { registrarFallo } from "../../lib/common/fallos";
+
+/** Añade una referencia al vídeo de su combate. Retirar el original retira también el highlight y nunca se duplican archivos ajenos. */
+export async function addPublicVideoHighlight(f: FormData) {
+  const user = await requireVerifiedUser("/mi-panel");
+  const me = user.fighter;
+  const back = "/mi-panel#videos";
+  if (!me) go(back, { problema: "sin_permiso" });
+  await guard(back, () => withLock(`highlights:${me.id}`, async (tx) => {
+    const media = await tx.mediaItem.findFirst({ where: { id: str(f, "mediaId"), kind: "VIDEO", hiddenAt: null, event: { status: { in: ["SCHEDULED", "COMPLETED"] } }, bout: { OR: [{ fighterAId: me.id }, { fighterBId: me.id }] } }, include: { bout: { select: { eventId: true } } } });
+    if (!media || media.bout?.eventId !== media.eventId) throw new Rechazo("highlight_combate");
+    const previous = await tx.highlight.findUnique({ where: { fighterId_sourceMediaId: { fighterId: me.id, sourceMediaId: media.id } } });
+    if (previous && !previous.hiddenAt) throw new Rechazo("highlight_ya_anadido");
+    if (await tx.highlight.count({ where: { fighterId: me.id, hiddenAt: null, ...visibleHighlightSources } }) >= MAX_HIGHLIGHTS) throw new Rechazo("highlight_limite");
+    const highlight = previous ? await tx.highlight.update({ where: { id: previous.id }, data: { hiddenAt: null } }) : await tx.highlight.create({ data: { fighterId: me.id, sourceMediaId: media.id, boutId: media.boutId, kind: "VIDEO", title: (media.caption || "Vídeo de mi combate").slice(0, HIGHLIGHT_TITLE_MAX), videoUrl: media.videoUrl } });
+    // Sin aviso si hay un bloqueo entre las dos personas (lib/community/bloqueos.ts): sería un contacto nuevo.
+    if (media.uploaderId !== user.id && !(await hayBloqueo(user.id, media.uploaderId, tx))) await putNotification(media.uploaderId, "MEDIA_HIGHLIGHT", "Un peleador ha añadido tu vídeo a sus highlights", `/peleadores/${me.slug}`, `highlight:${highlight.id}`, tx);
+    await audit({ userId: user.id, entity: "FIGHTER", entityId: me.id, action: "PUBLIC_VIDEO_HIGHLIGHT", after: { highlightId: highlight.id, mediaId: media.id } }, tx);
+  }));
+  revalidatePath("/", "layout"); go(back, { aviso: "highlight_publico_anadido" });
+}
 
 /** Disponibilidad voluntaria por 60 días: guarda solo el peso opcional del titular y lo elimina al desactivar. */
 export async function setAvailability(f: FormData) {
@@ -251,7 +273,7 @@ export async function publishHighlight(f: FormData) {
     const bytes = almacen && claveDe(datos.videoKey, user.id) ? await almacen.tamano(datos.videoKey).catch(() => null) : null;
     if (!almacen || !bytes || bytes > almacen.maxBytes || (await db.highlight.findFirst({ where: { videoKey: datos.videoKey }, select: { id: true } }))) go(back, { problema: "medio_subida" });
   }
-  if ((await db.highlight.count({ where: { fighterId: me.id, hiddenAt: null } })) >= MAX_HIGHLIGHTS) go(back, { problema: "highlight_limite" });
+  if ((await db.highlight.count({ where: { fighterId: me.id, hiddenAt: null, ...visibleHighlightSources } })) >= MAX_HIGHLIGHTS) go(back, { problema: "highlight_limite" });
   // El combate, si se indica, tiene que ser uno de los suyos.
   const boutId = str(f, "boutId") || null;
   if (boutId && !(await db.bout.findFirst({ where: { id: boutId, OR: [{ fighterAId: me.id }, { fighterBId: me.id }] }, select: { id: true } }))) go(back, { problema: "highlight_combate" });

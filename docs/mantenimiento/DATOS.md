@@ -66,3 +66,7 @@ Las fechas de velada representan un día, guardado a las 12:00 UTC. Las comparac
 6. Para una operación real, preparar copia y comprobar restauración antes de ejecutarla, siguiendo la tarea/procedimiento aprobado. No ejecutar seed ni reinicios contra una base con datos reales.
 
 Las herramientas de borrado requieren leer su alcance: el seed sustituye datos ficticios y tiene protección para bases con datos; anonimizar conserva hechos compartidos pero puede ser irreversible. No desactivar esas protecciones para hacer pasar una prueba.
+
+
+## Avisos y referencias de vídeos (H)
+`Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.

@@ -2021,6 +2021,13 @@ Validación local: 785 unitarias y tipos; esquema y migración generada con diff
 **Estado:** PR abierto. Los textos son borradores pendientes del abogado.
 
 
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
+
+## 2026-10-15 — Paneles H preparados para revisión (Codex)
+Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.
+
 ## 14-10-2026 (noche). Claude Code: revisión T-016, partes 1 y 2
 
 **Petición:** el fundador pidió revisar la app antes de montar la versión oficial.
@@ -2182,3 +2189,6 @@ No se ha encontrado nada que corregir.
 - Revisión escrita en #56 y #62 (duplicados), #64 (D) y #71 (H), con lo que hay que cambiar.
 
 **Siguiente:** D y H, con las correcciones de la revisión, en ramas propias.
+
+## 2026-10-15 — Reanudación de Codex y compatibilidad con T-016
+El fundador pide continuar. La comprobación final de la principal detecta #68 integrado (0.15.0); se incorpora a F/G/D/H sin eliminar privacidad, autorización de veladas ni política territorial. Se resuelven conflictos de presentación manteniendo los filtros de Claude y los de publicación del directorio. La última validación de H: tipos, 806/807 unitarias y la restante aprobada aislada por timeout local, catálogo 425, mapa y versión. H4 espera revisión del modelo en RFC-002; CI completo y revisión de Claude pendientes. Los ajustes móviles pertenecen a Antigravity. No se despliega ni se cargan datos.
