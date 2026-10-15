@@ -18,7 +18,16 @@ export async function scrubFighterHistory(tx: Prisma.TransactionClient, fighterI
  * El nombre pasa a «Peleador anónimo», se borran alias, fecha de nacimiento, ciudad, provincia, gimnasio, entrenador,
  * medidas y biografía, y la ficha deja de salir en listados y buscadores. También se vacían los datos personales de su historial de cambios.
  */
-export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: string) {
+export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: string): Promise<ArchivosRetirados> {
+  // Fotos y vídeos que estaban en los almacenes: quien llama los borra después de confirmar la transacción (lib/media/fotos.ts, storage.ts).
+  const [perfil, highlights] = await Promise.all([
+    tx.profile.findUnique({ where: { kind_entityId: { kind: "peleador", entityId: fighterId } }, select: { avatarKey: true, bannerKey: true } }),
+    tx.highlight.findMany({ where: { fighterId }, select: { imageKey: true, videoKey: true } }),
+  ]);
+  const retirados: ArchivosRetirados = {
+    fotos: [perfil?.avatarKey, perfil?.bannerKey, ...highlights.map((h) => h.imageKey)].filter((c): c is string => !!c),
+    videos: highlights.flatMap((h) => (h.videoKey ? [h.videoKey] : [])),
+  };
   await tx.fighter.update({
     where: { id: fighterId },
     data: {
@@ -33,4 +42,8 @@ export async function anonymizeFighter(tx: Prisma.TransactionClient, fighterId: 
   await tx.auditLog.updateMany({ where: { entity: "HIGHLIGHT", userId: (await tx.fighter.findUnique({ where: { id: fighterId }, select: { userId: true } }))?.userId ?? "-" }, data: { before: Prisma.DbNull, after: Prisma.DbNull } });
   await tx.fighterDiscipline.updateMany({ where: { fighterId }, data: { belt: null, beltDegrees: null } });
   await scrubFighterHistory(tx, fighterId);
+  return retirados;
 }
+
+/** Claves de las fotos y los vídeos que una operación ha dejado sin fila y hay que borrar de los almacenes. */
+export type ArchivosRetirados = { fotos: string[]; videos: string[] };

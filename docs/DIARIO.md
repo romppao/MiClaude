@@ -2089,3 +2089,32 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - La primera prueba de navegador no marcaba la declaración: la casilla está oculta bajo su etiqueta (estilo `chip`) y hay que pulsar el texto, como haría una persona. Además, `RecordarCampos` no devuelve las casillas tras un error, a propósito: la declaración se confirma en cada envío.
 
 **Estado:** PR abierto. **Siguiente:** T-013 (aviso al salir a enlaces externos) y lo que diga el fundador sobre su cambio de visión.
+
+## 15-10-2026. Claude (nube): fotos fuera de la base de datos (T-004, 0.16.1)
+
+**Qué se pidió:** el fundador no entendía qué era «sacar las fotos de la base de datos». Se le explicó (foto y banner de los perfiles, fotos de highlights y fotos del público; hoy van dentro de la base, cuyo plan gratuito es de 0,5 GB) y contestó: «Vale, de acuerdo, pues nada, ponte a ello… haz lo que tengas que hacer para dejar la aplicación lista».
+
+**Qué se decidió y por qué:**
+- **Un almacén para las fotos** (`src/lib/media/fotos.ts`) con el mismo R2 y las mismas variables que los vídeos, en la carpeta `fotos/`. Menos cuentas y variables para el fundador.
+- **Sin R2, todo sigue como antes** (fotos en la base): no se rompe nada mientras no exista la cuenta, y la demo no cambia. El disco solo con `FOTOS_EN_DISCO=si` (pruebas): en Render el disco se borra al reiniciar y las fotos desaparecerían.
+- **Las fotos se siguen sirviendo a través de la aplicación**, no con enlaces directos a R2, para que ocultar una ficha o una velada las oculte al instante.
+- **Claves nuevas en cada subida** (`fotos/<carpeta>/<uuid>.webp`) y la anterior se borra: no hay cachés con la foto vieja.
+- **No se usó la parte 1 del PR #23** (6 de octubre): solo cubría perfiles, con otra interfaz, y llevaba 9 días sin fusionar.
+
+**Qué se hizo:**
+- Migración aditiva (`avatarKey`, `bannerKey`, `imageKey`).
+- Subir, sustituir y quitar fotos de perfil; publicar y retirar highlights; compartir y borrar fotos del público.
+- Las tres rutas de imagen y la copia de datos.
+- Borrar del almacén al eliminar la cuenta o al ocultar una ficha. De paso, ocultar una ficha borra ahora también sus vídeos, que se quedaban huérfanos.
+- `scripts/fotos-al-almacen.ts`: copia sin borrar; `--vaciar` comprueba cada foto antes de vaciar la base. Probado en local en las dos fases.
+- El CI usa `FOTOS_EN_DISCO=si`, así todas las pruebas de navegador recorren el camino del almacén.
+- Pruebas:
+  - `tests/unit/fotos.test.ts` (10): disco, sin almacén y R2 simulado: firma, 404, rechazo y borrado fallido;
+  - `perfiles.mjs`: clave en lugar de bytes, la foto sustituida y la quitada desaparecen del almacén, y eliminar la cuenta borra sus fotos.
+
+**Qué salió mal:**
+- **Pruebas cortadas al apagar el servidor.** En la tanda anterior, `for p in $(pgrep -f next-server); do kill $p; done` mató también la propia orden: su texto contenía «next-server».
+- **Base de pruebas parada.** El PostgreSQL de la sesión estaba apagado al volver, seguramente porque el contenedor se reinició. Se arrancó con `service postgresql start`.
+- **El script del traslado no arrancaba.** Fallaba con `tsx` porque el proyecto compila a CommonJS y no admite `await` fuera de una función; se metió en `main()`.
+
+**Estado:** PR abierto. **Siguiente:** que el fundador cree la cuenta de R2 cuando monte la versión real (PRODUCCION.md, paso 9).
