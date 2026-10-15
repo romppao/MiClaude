@@ -270,7 +270,7 @@ Palabras del fundador: «después de iniciar sesión a todos los usuarios les ap
 Palabras del fundador: «el proceso para publicar la aplicación oficialmente al mercado […] tanto a Apple Store como a Google Store» y «limitar un poco el uso de la aplicación en web para incitar a que la gente descargue la aplicación». Guía completa: [`PUBLICACION.md`](PUBLICACION.md).
 - **App en las dos tiendas con Capacitor** (Claude, 8 oct) — **propuesta**; sustituye la recomendación abierta de `MOVIL.md`.
 - **Limitar la web para empujar a la app** (fundador, 8 oct) — **propuesta de Claude:** la consulta pública sigue abierta en la web; avisos y subida desde la cámara, solo en la app; **dar aura solo desde la app**, a decidir por el fundador (ventaja: comprobación de dispositivo contra cuentas falsas; contra: se pierde el voto desde enlaces compartidos).
-- **Bloquear a otro usuario** (Claude, 8 oct, requisito de Apple 1.2) — **pendiente**, necesario para publicar.
+- **Bloquear a otro usuario** (Claude, 8 oct, requisito de Apple 1.2) — **hecho** en la 0.16.0 (15 oct), junto con el aviso sin cuenta (`/avisar`) y los correos de la decisión de moderación (DSA).
 - **Condiciones de uso aceptadas al registrarse y filtro de palabras** (Claude, 8 oct, Apple 1.2 y Reglamento de Servicios Digitales) — **pendiente**.
 - **Avisos en el teléfono** (combate de un peleador seguido, vídeo nuevo de tu combate, aura recibida) con Firebase (Claude, 8 oct) — **pendiente**; es lo que más justifica descargar la app.
 - **Banner «Abrir en la app» y QR en carteles de veladas** (Claude, 8 oct) — **pendiente**, después de publicar.
@@ -398,4 +398,6 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Visitante:** «Esta semana en Madrid» con cambio de provincia.
 - **Moderación:** bandeja única ordenada por urgencia.
 - **Relevo entre sesiones sin repetir contexto** (fundador, 14 oct). Estado: **hecho** (0.12.2): `docs/ESTADO.md` y `scripts/estado.mjs`. Mejoras posibles: un aviso automático en el PR cuando toca ficheros de una rama ajena (cuesta minutos de CI: solo si hace falta); una pantalla de «Estado del equipo» para el fundador dentro de moderación.
-- **Página «Próximamente» en lonaclub.es** hasta montar la versión real (Claude, 15 oct, a raíz de la separación de la demo). Estado: **propuesta**, pendiente del fundador; alternativa: dejar el dominio sin web hasta Cloud Run.
+- **Página «Próximamente» en lonaclub.es** hasta montar la versión real (Claude, 15 oct, a raíz de la separación de la demo). Estado: **aparcada** por el fundador el 15 oct («por el momento vamos a dejarlo así… todavía no tiene sentido que ya lancemos la aplicación web»): no se monta nada en lonaclub.es hasta terminar de perfilar la aplicación.
+- **Cambio de visión del proyecto** (fundador, 15 oct): «he tenido un cambio de visión que todavía no sé si aplicaremos». Estado: **pendiente** de que lo cuente; se valorará después de las correcciones.
+- **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.

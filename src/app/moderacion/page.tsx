@@ -185,7 +185,7 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
                     <tr key={r.id}>
                       <th scope="row" className="celda-fila">
                         <strong>{lookup(REPORT_REASONS, r.reason) ?? "Motivo no reconocido"}</strong>
-                        <div className="mut">{publicUserName(r.user.name)} · {r.user.email}</div>
+                        <div className="mut">{r.user ? <>{publicUserName(r.user.name)} · {r.user.email}</> : <>Sin cuenta · {r.reporterName ?? "anónimo"}{r.reporterEmail ? ` · ${r.reporterEmail}` : ""}</>}</div>
                         {r.message && <div>{r.message}</div>}
                       </th>
                       <td>
@@ -193,18 +193,19 @@ export default async function Moderation({ searchParams }: { searchParams: Promi
                         {fighter && <><span className="mut">Ficha: </span><Link href={`/peleadores/${fighter.slug}`}>{fighter.firstName} {fighter.lastName}</Link></>}
                         {aura && <><span className="mut">Comentario de {publicUserName(aura.user.name)} en </span><Link href={`/peleadores/${aura.fighter.slug}`}>{aura.fighter.firstName} {aura.fighter.lastName}</Link>: «{aura.comment}»</>}
                         {medio && <><span className="mut">{medio.kind === "PHOTO" ? "Foto" : "Vídeo"} de {publicUserName(medio.uploader.name)} en </span><Link href={`/veladas/${medio.event.slug}#medio-${medio.id}`}>{medio.event.name}</Link>{medio.caption ? <>: «{medio.caption}»</> : null}{medio.kind === "PHOTO" ? <> · <a href={`/medios/${medio.id}/imagen`} target="_blank" rel="noopener noreferrer">Ver la foto</a></> : medio.videoUrl ? <> · <a href={medio.videoUrl} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></> : <> · <a href={`/medios/${medio.id}/video`} target="_blank" rel="noopener noreferrer">Ver el vídeo</a></>}{medio.hiddenAt ? " (ya retirado)" : ""}</>}
-                        {!bout && !fighter && !aura && !medio && <span className="mut">El elemento ya no existe.</span>}
+                        {r.entity === "PAGINA" && <><span className="mut">Página: </span><a href={r.entityId} target="_blank" rel="noopener noreferrer">{r.entityId}</a><div className="mut">Retira lo que haga falta desde la propia página y después cierra el aviso: quien avisó recibirá la decisión por correo.</div></>}
+                        {r.entity !== "PAGINA" && !bout && !fighter && !aura && !medio && <span className="mut">El elemento ya no existe.</span>}
                       </td>
                       <td>
                         <form action={resolveReport} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           <input type="hidden" name="reportId" value={r.id} />
                           <input type="hidden" name="back" value={back("avisos")} />
-                          <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar)" : "Nota (opcional)"} aria-label="Nota de resolución" maxLength={500} />
-                          <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${publicUserName(r.user.name)})`}>Cerrar: ya está corregido</button>
-                          <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : medio ? "Deja de mostrarse en la velada y en las fichas" : "Retira el comentario"}>
+                          <input name="note" placeholder={fighter ? "Nota (obligatoria para ocultar; se envía por correo)" : "Nota (opcional; se envía por correo)"} aria-label="Nota de resolución" maxLength={500} />
+                          <button name="decision" value="resolve" aria-label={`Cerrar: ya está corregido (aviso de ${r.user ? publicUserName(r.user.name) : r.reporterName ?? "una persona sin cuenta"})`}>Cerrar: ya está corregido</button>
+                          {r.entity !== "PAGINA" && <button name="decision" value="hide" className="secondary" title={bout ? "Marca el combate como «en revisión»" : fighter ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)" : medio ? "Deja de mostrarse en la velada y en las fichas" : "Retira el comentario"}>
                             {bout ? "Resolver y rechazar el combate" : fighter ? "Resolver y ocultar la ficha" : medio ? (medio.kind === "PHOTO" ? "Resolver y retirar la foto" : "Resolver y retirar el vídeo") : "Resolver y retirar el comentario"}
-                          </button>
-                          <button name="decision" value="dismiss" className="secondary" aria-label={`Cerrar: no hay error (aviso de ${publicUserName(r.user.name)})`}>Cerrar: no hay error</button>
+                          </button>}
+                          <button name="decision" value="dismiss" className="secondary" aria-label={`Cerrar: no hay error (aviso de ${r.user ? publicUserName(r.user.name) : r.reporterName ?? "una persona sin cuenta"})`}>Cerrar: no hay error</button>
                         </form>
                       </td>
                     </tr>

@@ -18,6 +18,7 @@ import { CLASS_KIND_LABEL, classMeta, parseClass, parseYears, pickDisciplines } 
 import { REQUEST_REPLY_MAX, REQUESTS_PER_DAY, parseClassRequest, puedeCancelar, puedeResponder } from "../../lib/trainers/requests";
 import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
+import { hayBloqueo } from "../../lib/community/bloqueos";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug, withLock } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
 
@@ -113,6 +114,7 @@ export async function requestClass(f: FormData) {
   const clase = classId.length <= 40 ? await db.trainingClass.findFirst({ where: { id: classId, active: true, trainer: { userId: { not: null } } }, include: { trainer: { include: { user: true } } } }) : null;
   if (!clase?.trainer.user) go("/entrenadores", { problema: "clase_no_disponible" });
   if (clase.trainer.userId === user.id) go(back, { problema: "clase_propia" });
+  if (await hayBloqueo(user.id, clase.trainer.userId)) go(back, { problema: "bloqueo_contacto" });
   checkLengths(f, back, { day: 10, fromMinute: 4, toMinute: 4, message: 1000, phone: 40 });
   const datos = parseClassRequest({ day: str(f, "day"), from: str(f, "fromMinute"), to: str(f, "toMinute"), message: str(f, "message"), phone: str(f, "phone"), kind: clase.kind, minutes: clase.minutes, today: todayMadrid() });
   if (!datos.ok) volverConLoEscrito(back, f, datos.problema);

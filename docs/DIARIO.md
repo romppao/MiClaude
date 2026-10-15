@@ -2071,3 +2071,21 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Comprobado:** typecheck; `busqueda.mjs` 29 correctas; `experiencia.mjs` 30 correctas; con curl, la demo da `noindex` y mapa vacío y la versión real, mapa y sin `noindex`.
 
 **Estado:** PR abierto. **Siguiente:** que el fundador desenganche el dominio y decida si lonaclub.es queda vacío hasta montar la versión real.
+
+## 15-10-2026. Claude (nube): bloquear usuarios, aviso sin cuenta y correos de la decisión (0.16.0)
+
+**Qué se pidió:** tras separar la demo, el fundador decidió esperar para montar lonaclub.es: «por el momento vamos a dejarlo así… todavía no hemos terminado de perfilar la aplicación, entonces todavía no tiene sentido que ya lancemos la aplicación web». Y pidió seguir: «procede con todo lo que hay que hacer, todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano del usuario». Avisó de que tiene «un cambio de visión» del proyecto que se valorará más adelante.
+
+**Qué se eligió y por qué:** Claude Code (portátil) tiene los paneles F y G (#69, #70) y la cadena de Codex, que tocan casi toda la portada y los paneles. Para no pisarlos, esta sesión tomó lo que quedaba pendiente de programar en `LEGAL.md` y que nadie tenía: bloquear usuarios (Apple 1.2, imprescindible para las tiendas), el aviso sin cuenta (DSA, art. 16) y los correos con la decisión (DSA, arts. 16.5 y 17). Reservado con `estado.mjs` antes de empezar.
+
+**Qué se hizo:**
+- **Bloquear** (`lib/community/bloqueos.ts`, modelo `Block`): desde la ficha, el comentario de aura, el vídeo o la foto, la propuesta recibida o la solicitud de clase. El formulario recibe «qué estás viendo» (`origen` + `id`) y el servidor averigua la cuenta, para no publicar identificadores de usuario en la página. El contacto se corta en los dos sentidos; quien bloquea deja de ver lo que publica la otra persona; lo pendiente se cancela y los «seguir» se quitan. Bloquear no retira nada para los demás ni toca el aura: eso es de moderación. Pestaña «Bloqueos» en «Mi cuenta» y bloqueos en la copia de datos.
+- **Aviso sin cuenta** (`/avisar`, al pie y en `/condiciones#avisos`): `Report` admite `userId` vacío, `reporterName`, `reporterEmail` y `entity = PAGINA`. Valida que la dirección sea de Lona (`rutaDeLona`), pide explicación, identidad y declaración salvo en los avisos de abuso de menores, tiene una trampa para programas y un límite de 5 al día por IP. Acusa recibo por correo.
+- **Correos de la decisión** (`notificarResolucionDeAviso`): a quien avisó, siempre; al autor, si se retira su comentario, su vídeo o foto o su combate pasa a revisión. Dicen que decidió una persona y cómo reclamar (contacto del aviso legal, órgano extrajudicial, tribunales).
+- Pruebas: `tests/unit/avisos.test.ts` (5) y `tests/e2e/bloqueos.mjs` (todo el recorrido: bloquear, no poder contactar, desbloquear, aviso sin cuenta, moderación y los tres correos).
+
+**Qué salió mal:**
+- Desde esta sesión ya no se puede abrir `ring-espana-demo.onrender.com` (el proxy rechaza la conexión), así que **no se ha podido comprobar en la demo** que la 0.15.1 da «noindex». La etiqueta `v0.15.1` sí se creó.
+- La primera prueba de navegador no marcaba la declaración: la casilla está oculta bajo su etiqueta (estilo `chip`) y hay que pulsar el texto, como haría una persona. Además, `RecordarCampos` no devuelve las casillas tras un error, a propósito: la declaración se confirma en cada envío.
+
+**Estado:** PR abierto. **Siguiente:** T-013 (aviso al salir a enlaces externos) y lo que diga el fundador sobre su cambio de visión.

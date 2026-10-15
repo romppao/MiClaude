@@ -25,7 +25,9 @@ import { profileAccess } from "../../../lib/profiles/profiles";
 import { giveAura, removeAura } from "../../actions/aura";
 import { removeDiscipline } from "../../actions/fighters";
 import Pestanas from "../../components/Pestanas";
-import { createReport, toggleFollow } from "../../actions/community";
+import { bloquearUsuario, createReport, desbloquearUsuario, toggleFollow } from "../../actions/community";
+import { BotonBloquear, Desbloquear } from "../../components/Bloquear";
+import { bloqueadosPor, hayBloqueo } from "../../../lib/community/bloqueos";
 import { REASONS_BY_ENTITY, REPORT_REASONS, type ReportEntity } from "../../../lib/community/reports";
 import { LEVEL_LABEL, METHOD_LABEL, STANCE_LABEL, resultWord } from "../../../lib/common/labels";
 import { publicFighterName, publicUserName } from "../../../lib/common/names";
@@ -65,13 +67,17 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
     orderBy: { event: { date: "desc" } },
   }), getUser()]);
   const records = computeRecords(fighter.id, bouts);
+  // Bloqueos (lib/community/bloqueos.ts): quien mira no ve lo que publican las personas que ha bloqueado, y con un bloqueo en cualquier sentido
+  // no se ofrece retar, proponer sparring ni seguir.
+  const [ocultos, bloqueoMutuo] = await Promise.all([bloqueadosPor(user?.id), hayBloqueo(user?.id, fighter.userId)]);
+  const leBloqueo = !!fighter.userId && ocultos.includes(fighter.userId);
   const [followerCount, following] = await Promise.all([
     db.follow.count({ where: { fighterId: fighter.id } }),
     user ? db.follow.findUnique({ where: { userId_fighterId: { userId: user.id, fighterId: fighter.id } } }) : Promise.resolve(null),
   ]);
   const [auraTotal, auras, myAuras] = await Promise.all([
     db.aura.count({ where: { fighterId: fighter.id, bout: COUNTED } }),
-    db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED }, include: { user: { select: { name: true } }, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
+    db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED, userId: { notIn: ocultos } }, include: { user: { select: { name: true } }, bout: { include: { event: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
     user ? db.aura.findMany({ where: { fighterId: fighter.id, userId: user.id } }) : Promise.resolve([]),
   ]);
 
@@ -115,7 +121,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
     db.aura.findMany({ where: { fighterId: fighter.id, bout: COUNTED, createdAt: { gte: new Date(Date.now() - 220 * 864e5) } }, select: { createdAt: true } }),
     profileAccess("peleador", fighter.id, user),
     // Vídeos y fotos que el público subió de sus combates (petición del fundador, 8 de octubre de 2026).
-    publica || propia ? db.mediaItem.findMany({ where: { hiddenAt: null, bout: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 40, select: SELECT_MEDIO }) : Promise.resolve([]),
+    publica || propia ? db.mediaItem.findMany({ where: { hiddenAt: null, uploaderId: { notIn: ocultos }, bout: { OR: [{ fighterAId: fighter.id }, { fighterBId: fighter.id }] } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 40, select: SELECT_MEDIO }) : Promise.resolve([]),
   ]);
   const ordenados = orderHighlights(highlights);
   const auraDe = (boutId: string) => auraPorCombate.find((g) => g.boutId === boutId)?._count._all ?? 0;
@@ -163,7 +169,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
       )}
 
       <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 16 }}>
-        {user?.fighter?.id !== fighter.id && !fighter.hiddenAt && (user ? (
+        {user?.fighter?.id !== fighter.id && !fighter.hiddenAt && !(bloqueoMutuo && !following) && (user ? (
           <form action={toggleFollow} style={{ flex: 1, display: "flex" }}>
             <input type="hidden" name="fighterId" value={fighter.id} /><input type="hidden" name="back" value={back} />
             <button className={following ? "secondary" : undefined} style={{ flex: 1, minHeight: 54 }}>{following ? "Dejar de seguir" : "Seguir a este peleador"}</button>
@@ -172,10 +178,16 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
         <span className="pildora" style={{ minHeight: 54, padding: "0 18px", fontWeight: 500, background: "rgba(var(--ink),.06)" }}>{plural(followerCount, "seguidor", "seguidores")}</span>
       </div>
       {/* Retar o proponer sparring (propuesta n.º 1 del diseño v3): solo entre peleadores, y a fichas con titular que pueda responder. */}
-      {publica && fighter.userId && user?.fighter && user.fighter.id !== fighter.id && (
+      {publica && fighter.userId && user?.fighter && user.fighter.id !== fighter.id && !bloqueoMutuo && (
         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
           <Link href={`/peleadores/${fighter.slug}/proponer?tipo=FIGHT`} className="btn" style={{ flex: 1 }}><Icono nombre="reto" tam={18} grosor={2} />Retar a combate</Link>
           <Link href={`/peleadores/${fighter.slug}/proponer?tipo=SPARRING`} className="btn secondary" style={{ flex: 1 }}>Proponer sparring</Link>
+        </div>
+      )}
+      {user && fighter.userId && fighter.userId !== user.id && (
+        <div style={{ marginTop: 10 }}>
+          {leBloqueo ? <Desbloquear accion={desbloquearUsuario} userId={fighter.userId} back={back} nombre={nombre} />
+            : <BotonBloquear accion={bloquearUsuario} origen="peleador" id={fighter.id} back={back} nombre={nombre} />}
         </div>
       )}
       {publica && fighter.gym && <Link href={`/gimnasios/${fighter.gym.slug}`} className="btn secondary" style={{ marginTop: 10 }}><Icono nombre="gimnasio" tam={18} grosor={1.9} />{fighter.gym.name}</Link>}
@@ -296,7 +308,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           ...(medios.length > 0 ? [{ id: "multimedia", titulo: "Vídeos", contenido: <>
             <h2 id="titulo-multimedia">Vídeos y fotos de sus combates</h2>
             <p className="mut" style={{ margin: 0 }}>Grabados por el público en las veladas.</p>
-            <GaleriaMedios medios={medios} conVelada back={`/peleadores/${fighter.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} />
+            <GaleriaMedios medios={medios} conVelada back={`/peleadores/${fighter.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} bloquear={bloquearUsuario} yo={user?.id} />
           </> }] : []),
           { id: "publico", titulo: "Público", contenido: <>
           <h2 id="titulo-publico">Lo que dice el público</h2>
@@ -308,6 +320,7 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
               </div>
               {r.hiddenAt ? <div className="mut">Comentario retirado por moderación.</div> : r.comment && <p style={{ margin: 0 }}>{r.comment}</p>}
               {!r.hiddenAt && r.comment && reportForm("AURA", r.id, "Avisar de este comentario", `el comentario de ${publicUserName(r.user.name)}`)}
+              {user && r.userId !== user.id && r.comment && <BotonBloquear accion={bloquearUsuario} origen="aura" id={r.id} back={`${back}#publico`} nombre={publicUserName(r.user.name)} />}
             </div>
           ))}
           {auras.length === 0 && <p className="mut" style={{ margin: 0 }}>Todavía nadie ha dado aura a este peleador. Si has visto uno de sus combates, puedes ser la primera persona.</p>}

@@ -1,6 +1,7 @@
 import { REASONS_BY_ENTITY, REPORT_REASONS } from "../../lib/community/reports";
 import { publicFighterName, publicUserName } from "../../lib/common/names";
 import { haceTiempo } from "../../lib/common/dates";
+import { BotonBloquear } from "./Bloquear";
 
 /** Lo que hace falta de cada peleador para escribir su nombre público (ficha provisional: solo la inicial; oculta: anónimo). */
 type FighterDeMedio = { firstName: string; lastName: string; listed: boolean; hiddenAt: Date | null };
@@ -13,16 +14,16 @@ export type MedioPublico = {
   videoKey: string | null;
   videoUrl: string | null;
   createdAt: Date;
+  uploaderId: string;
   uploader: { name: string };
   bout: { fighterA: FighterDeMedio; fighterB: FighterDeMedio } | null;
   event?: { name: string; slug: string };
 };
-
 const NOMBRE_PUBLICO = { firstName: true, lastName: true, listed: true, hiddenAt: true } as const;
 
 /** Lo que hay que pedir a la base de datos para pintar la galería. */
 export const SELECT_MEDIO = {
-  id: true, kind: true, caption: true, videoKey: true, videoUrl: true, createdAt: true,
+  id: true, kind: true, caption: true, videoKey: true, videoUrl: true, createdAt: true, uploaderId: true,
   uploader: { select: { name: true } },
   bout: { select: { fighterA: { select: NOMBRE_PUBLICO }, fighterB: { select: NOMBRE_PUBLICO } } },
   event: { select: { name: true, slug: true } },
@@ -33,9 +34,10 @@ const combate = (m: MedioPublico) => (m.bout ? `${publicFighterName(m.bout.fight
 /**
  * Galería de vídeos y fotos del público (petición del fundador, 8 de octubre de 2026): en la velada, en la ficha de cada peleador y en su
  * panel. Los vídeos y fotos subidos a la aplicación se pueden descargar, para que el peleador tenga las imágenes de su combate.
- * `avisar` es la acción de los avisos (los componentes no importan acciones); sin ella no se muestra el formulario.
+ * `avisar` es la acción de los avisos (los componentes no importan acciones); sin ella no se muestra el formulario. Con `bloquear` y `yo` (quien
+ * mira), cada vídeo o foto ajeno ofrece bloquear a quien lo compartió; lo de personas ya bloqueadas se filtra antes, en la consulta.
  */
-export function GaleriaMedios({ medios, avisar, back, conVelada = false, ahora = new Date() }: { medios: MedioPublico[]; avisar?: (f: FormData) => Promise<void>; back: string; conVelada?: boolean; ahora?: Date }) {
+export function GaleriaMedios({ medios, avisar, bloquear, yo, back, conVelada = false, ahora = new Date() }: { medios: MedioPublico[]; avisar?: (f: FormData) => Promise<void>; bloquear?: (f: FormData) => Promise<void>; yo?: string; back: string; conVelada?: boolean; ahora?: Date }) {
   return (
     <ul className="galeria">
       {medios.map((m) => {
@@ -69,6 +71,7 @@ export function GaleriaMedios({ medios, avisar, back, conVelada = false, ahora =
                   </form>
                 </details>
               )}
+              {bloquear && yo && m.uploaderId !== yo && <BotonBloquear accion={bloquear} origen="medio" id={m.id} back={back} nombre={publicUserName(m.uploader.name)} />}
             </div>
           </li>
         );

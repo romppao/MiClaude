@@ -57,6 +57,7 @@ export async function GET(request: Request) {
     retosYSparrings: propuestas.map((p) => ({ tipo: p.kind, enviadaPorMi: p.fromId === fighter?.id, otroPeleador: publicFighterName(p.fromId === fighter?.id ? p.to : p.from), disciplina: p.discipline, fecha: p.day, lugar: p.place, mensaje: p.message, estado: p.status, respuesta: p.reply, creadaEl: p.createdAt })),
     inscripcionesEnVeladas: inscripciones.map((r) => ({ evento: r.event.name, fecha: r.event.date, categoria: r.weightClass, divisionDeportiva: r.divisionId, pesoDeclaradoKg: r.weightKg, mensaje: r.message, estado: r.status, respuesta: r.reply, solicitadaEl: r.createdAt, respondidaEl: r.answeredAt })),
     peleadoresQueSigo: follows.map((f) => ({ peleador: publicFighterName(f.fighter), desde: f.createdAt })),
+    personasQueHeBloqueado: (await db.block.findMany({ where: { blockerId: user.id }, select: { createdAt: true, blocked: { select: { name: true } } } })).map((b) => ({ persona: b.blocked.name, desde: b.createdAt })),
     solicitudesParaReclamarUnaFicha: claims.map((c) => ({ ficha: publicFighterName(c.fighter), estado: c.status, fecha: c.createdAt })),
     solicitudDeOrganizador: organizer && { organizacion: organizer.orgName, estado: organizer.status, fecha: organizer.createdAt },
     velasPublicadasComoOrganizador: events.map((e) => ({ nombre: e.name, fecha: e.date, recinto: e.venue, ciudad: e.city })),

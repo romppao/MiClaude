@@ -11,7 +11,9 @@ import { db } from "../../lib/common/db";
 import { requireAdmin } from "../../lib/accounts/permissions";
 import { APP_URL } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
-import { notifyDecision } from "../../lib/community/notify";
+import { notificarResolucionDeAviso, notifyDecision } from "../../lib/community/notify";
+import { REPORT_REASONS } from "../../lib/community/reports";
+import { lookup } from "../../lib/common/safe";
 import { anonymizeFighter } from "../../lib/fighters/anonymize";
 import { LIMITS, oneLine } from "../../lib/common/text";
 import { Rechazo, fullNameSlug, go, guard, listFighters, returnTo, str } from "./shared";
@@ -144,6 +146,8 @@ export async function resolveReport(f: FormData) {
   // Ocultar una ficha borra sus datos personales y no se puede deshacer: exige anotar el motivo, y solo vale para fichas sin titular
   // (si tiene una cuenta, su titular puede corregirla o eliminarla; ocultarla lo dejaría atado a una ficha inservible).
   if (hide && report.entity === "FIGHTER" && !note) go(back, { problema: "ocultar_sin_nota" });
+  // Un aviso sobre una página (desde /avisar) no señala un dato concreto: moderación actúa desde la propia página y luego lo cierra.
+  if (hide && report.entity === "PAGINA") go(back, { problema: "decision_no_valida" });
   await guard(back, () => db.$transaction(async (tx) => {
     if (!(await tx.report.updateMany({ where: { id: report.id, status: "OPEN" }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } })).count) throw new Rechazo("solicitud_cambiada");
     if (hide) {
@@ -159,6 +163,8 @@ export async function resolveReport(f: FormData) {
     }
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);
   }));
+  // Correo a quien avisó y, si se retiró algo, a su autor, con los motivos y cómo reclamar (DSA, arts. 16.5 y 17). Después de responder.
+  after(() => notificarResolucionDeAviso(report.id, hide, (lookup(REPORT_REASONS, report.reason) ?? "otro motivo").toLowerCase()));
   revalidatePath("/", "layout");
   go(back, { aviso: hide ? "aviso_resuelto_oculto" : status === "RESOLVED" ? "aviso_resuelto" : "aviso_descartado" });
 }

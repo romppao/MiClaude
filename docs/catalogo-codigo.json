@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261015090000_bloqueos_y_avisos_sin_cuenta/migration.sql",
+    "purpose": "Crea la tabla Block y permite avisos sin cuenta en Report (userId opcional, nombre y correo de quien avisa).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -410,6 +415,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/avisar/page.tsx",
+    "purpose": "Formulario público para avisar de un contenido ilegal o que incumple las normas, con o sin cuenta (DSA, art. 16).",
+    "guide": "docs/LEGAL.md"
+  },
+  {
     "path": "src/app/aviso-legal/page.tsx",
     "purpose": "Aviso legal (LSSI art. 10 y 16): titular desde variables de entorno y bloque de responsabilidad; borrador pendiente de revisión jurídica (docs/LEGAL.md).",
     "guide": "docs/LEGAL.md"
@@ -452,6 +462,11 @@
   {
     "path": "src/app/components/AuraBreakdown.tsx",
     "purpose": "Presenta desglose de trayectoria, respaldo y comunidad por categoría histórica con los datos calculados del ránking.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/Bloquear.tsx",
+    "purpose": "Botón desplegable «Bloquear a…» con la explicación de lo que pasará, y el aviso de persona bloqueada con «Desbloquear».",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1320,6 +1335,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/community/bloqueos.ts",
+    "purpose": "Bloqueos entre usuarios (Apple 1.2): a quién ha bloqueado alguien, si hay bloqueo entre dos personas, de quién es lo que se quiere bloquear y qué se cancela al bloquear.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/community/notify.ts",
     "purpose": "Avisa a seguidores/rival/autor y responde a solicitudes; agrupa destinatarios, respeta preferencias y tolera fallos de envío individuales.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1545,6 +1565,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/bloqueos.mjs",
+    "purpose": "Recorrido de bloquear y desbloquear a otra persona (propuesta, comentario, Mi cuenta) y del aviso sin cuenta con su acuse, la decisión de moderación y los correos a quien avisó y al autor (Apple 1.2; DSA, arts. 16 y 17).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/busqueda.mjs",
     "purpose": "Recorre búsqueda global y por entidades, normalización y destinos de resultados.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1737,6 +1762,11 @@
   {
     "path": "tests/unit/autorizacion.test.ts",
     "purpose": "Clasifica cada acción pública según guarda requerida y detecta exportaciones sin clasificación; complementa permisos reales en E2E.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/avisos.test.ts",
+    "purpose": "Validación del aviso sin cuenta: dirección dentro de Lona, motivo, explicación, identidad y declaración, con la excepción de los avisos de abuso de menores.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

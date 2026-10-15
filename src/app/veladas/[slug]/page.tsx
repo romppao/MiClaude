@@ -14,7 +14,8 @@ import { REG_STATUS_LABEL, claveCategoria, inscripcionAbierta, ocupacion } from 
 import { veladaAbiertaAlPublico } from "../../../lib/media/rules";
 import { recordHidden } from "../../../lib/fighters/privacy";
 import { GaleriaMedios, SELECT_MEDIO } from "../../components/Multimedia";
-import { createReport } from "../../actions/community";
+import { bloquearUsuario, createReport } from "../../actions/community";
+import { bloqueadosPor } from "../../../lib/community/bloqueos";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const org = e.organizer?.organizerRequest;
   const oficial = !!e.organizerId && org?.status === "APPROVED";
   const entrenador = e.organizer?.role === "TRAINER" ? e.organizer.trainer : null;
-  const [user, medios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  const [user, todosLosMedios] = await Promise.all([getUser(), db.mediaItem.findMany({ where: { eventId: e.id, hiddenAt: null }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 60, select: SELECT_MEDIO })]);
+  // Lo que compartieron personas que quien mira ha bloqueado no se le muestra (lib/community/bloqueos.ts).
+  const ocultos = await bloqueadosPor(user?.id);
+  const medios = todosLosMedios.filter((m) => !ocultos.includes(m.uploaderId));
   if ((e.status === "PENDING_AUTHORIZATION" || e.status === "REJECTED") && user?.id !== e.organizerId && user?.role !== "ADMIN") notFound();
   // Plazas por categoría que ofrece el organizador, con las que quedan libres.
   const plazas = e.registrationOpen ? await db.eventSlot.findMany({ where: { eventId: e.id }, orderBy: [{ divisionId: "asc" }, { weightClass: "asc" }] }) : [];
@@ -132,7 +136,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <p className="mut" style={{ margin: 0 }}>Lo que graba el público en la velada, para que los peleadores tengan las imágenes de sus combates.</p>
         {compartir === "ok" ? <p className="acciones" style={{ margin: 0 }}><Link className="btn" href={user ? `/compartir?velada=${e.slug}` : `/entrar?next=${encodeURIComponent(`/compartir?velada=${e.slug}`)}`}>Subir vídeos o fotos de esta velada</Link></p>
           : compartir === "futura" ? <p className="mut" style={{ margin: 0 }}>El día de la velada podrás compartir aquí lo que grabes.</p> : null}
-        {medios.length ? <GaleriaMedios medios={medios} back={`/veladas/${e.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} /> : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de esta velada.</p>}
+        {medios.length ? <GaleriaMedios medios={medios} back={`/veladas/${e.slug}#multimedia`} avisar={user?.emailVerifiedAt ? createReport : undefined} bloquear={bloquearUsuario} yo={user?.id} /> : <p className="mut" style={{ margin: 0 }}>Todavía nadie ha compartido vídeos ni fotos de esta velada.</p>}
       </section>
     </>
   );

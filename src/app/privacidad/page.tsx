@@ -29,7 +29,8 @@ export default function Privacy() {
         <li><strong>Tu cuenta:</strong> tu nombre, tu correo electrónico y tu contraseña. La contraseña no se guarda: solo se conserva una huella cifrada que no permite conocerla.</li>
         <li><strong>Tu ficha de peleador</strong> (solo si la creas): nombre, apellidos, alias, ciudad, provincia, gimnasio, medidas, guardia, presentación, disciplinas, las divisiones deportivas y pesos que declaras (grupo de edad y categoría masculina o femenina), tu récord anterior declarado y, si quieres, tu fecha de nacimiento (en público solo se enseña la edad).</li>
         <li><strong>Trayectoria y respaldos:</strong> los títulos que declaras, sus categorías históricas y fuentes, las solicitudes de revisión y, cuando corresponda, tu acreditación para respaldar hechos de otras personas.</li>
-        <li><strong>Tu actividad:</strong> los combates que registras o confirmas, las auras y comentarios que das, los peleadores que sigues y los avisos que envías.</li>
+        <li><strong>Tu actividad:</strong> los combates que registras o confirmas, las auras y comentarios que das, los peleadores que sigues, las personas que bloqueas y los avisos que envías.</li>
+        <li><strong>Si avisas de un contenido sin tener cuenta</strong> (<Link href="/avisar">Avisar de un contenido</Link>): tu nombre, tu correo y lo que nos cuentas, solo para tramitar el aviso y comunicarte la decisión.</li>
         <li><strong>Datos técnicos mínimos:</strong> una cookie necesaria para mantener tu sesión iniciada (detalle en <Link href="/cookies">Cookies</Link>) y, durante 2 días como máximo, tu dirección de conexión, solo para frenar intentos repetidos de acceso. No usamos cookies de publicidad ni de medición.</li>
       </ul>
 

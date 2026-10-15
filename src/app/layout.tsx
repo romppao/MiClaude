@@ -107,7 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {(!user || puedeOrganizar(user.role)) && <Link href="/organizador">Organizar una velada</Link>}
           {user ? <Link href="/mi-cuenta">Mi cuenta</Link> : <Link href="/registro">Crear una cuenta</Link>}
           <Link href="/federaciones">Federaciones</Link><Link href="/promotores">Promotores</Link>
-          <Link href="/condiciones">Condiciones</Link><Link href="/privacidad">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/aviso-legal">Aviso legal</Link>
+          <Link href="/condiciones">Condiciones</Link><Link href="/privacidad">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/aviso-legal">Aviso legal</Link><Link href="/avisar">Avisar de un contenido</Link>
           {process.env.CONTACT_EMAIL && <a href={`mailto:${process.env.CONTACT_EMAIL}`}>Contacto</a>}
         </footer>
         <MobileNav papel={papel} />

@@ -46,7 +46,8 @@ export default function Condiciones() {
       <h2 id="avisos">5. Cómo avisar de algo ilegal o que incumple estas normas</h2>
       <p>Cualquier persona puede avisarnos, tenga cuenta o no:</p>
       <ul>
-        <li>Con cuenta, desde el botón «¿Hay un error? Avísanos» de la ficha o del combate.</li>
+        <li>Con o sin cuenta, desde el formulario <Link href="/avisar">Avisar de un contenido</Link> (también está al pie de cada página).</li>
+        <li>Con cuenta, también desde el botón «¿Hay un error? Avísanos» de la ficha, del combate, del comentario o del vídeo.</li>
         <li>Con o sin cuenta, escribiendo a {correo}.</li>
       </ul>
       <p>Para poder actuar, indica en tu aviso:</p>

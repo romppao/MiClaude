@@ -9,6 +9,9 @@ import { changePassword, updateAccount } from "../actions/accounts";
 import { LIMITS } from "../../lib/common/text";
 import { DEMO_PAPELES, demoActiva } from "../../lib/common/demo";
 import { demoCambiarPapel } from "../actions/demo";
+import { desbloquearUsuario } from "../actions/community";
+import { Desbloquear } from "../components/Bloquear";
+import { publicUserName } from "../../lib/common/names";
 
 export const metadata = { title: "Mi cuenta" };
 export const dynamic = "force-dynamic";
@@ -18,8 +21,9 @@ export default async function Account() {
   const avisos = await db.report.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 20 });
   const accreditation = await db.supportAccreditation.findUnique({where:{userId:user.id}});
   const papel = papelDe(user);
-  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario", MEDIA: "un vídeo o una foto" } as const;
+  const sobre = { BOUT: "un combate", FIGHTER: "una ficha", AURA: "un comentario", MEDIA: "un vídeo o una foto", PAGINA: "una página" } as const;
   const estado = { OPEN: "En revisión", RESOLVED: "Cerrado: ya está corregido", DISMISSED: "Cerrado: no se ha encontrado ningún error" } as const;
+  const bloqueos = await db.block.findMany({ where: { blockerId: user.id }, orderBy: { createdAt: "desc" }, select: { blockedId: true, createdAt: true, blocked: { select: { name: true } } } });
   const managedProfiles = await db.profile.findMany({ where: { ownerId: user.id, kind: { in: ["gimnasio", "entrenador", "federacion"] } }, select: { id: true, kind: true, entityId: true, name: true } });
   return (
     <>
@@ -109,6 +113,20 @@ export default async function Account() {
                 </tbody>
               </table>
             </div>
+          )}
+        </> },
+        { id: "pestana-bloqueos", titulo: "Bloqueos", contenido: <>
+          <h2>Personas que has bloqueado</h2>
+          <p className="mut">Una persona bloqueada no puede retarte, proponerte sparring, pedir tus clases ni seguirte, y tú no ves sus comentarios, vídeos ni fotos. No le avisamos. Para bloquear a alguien, pulsa «Bloquear» en su ficha, en su comentario o en su propuesta.</p>
+          {bloqueos.length === 0 ? <p className="mut">No has bloqueado a nadie.</p> : (
+            <ul className="lista" style={{ display: "flex", flexDirection: "column", gap: 10, padding: 0, listStyle: "none" }}>
+              {bloqueos.map((b) => (
+                <li key={b.blockedId} className="tarjeta" style={{ gap: 6 }}>
+                  <span className="meta">Bloqueada el {b.createdAt.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}</span>
+                  <Desbloquear accion={desbloquearUsuario} userId={b.blockedId} back="/mi-cuenta#pestana-bloqueos" nombre={publicUserName(b.blocked.name)} />
+                </li>
+              ))}
+            </ul>
           )}
         </> },
         { id: "pestana-privacidad", titulo: "Privacidad", contenido: <>

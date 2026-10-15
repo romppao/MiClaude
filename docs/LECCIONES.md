@@ -461,3 +461,11 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | El encargo de los paneles para Codex se citaba en el diario y en las ideas, pero no estaba subido a ninguna rama | Se escribió en un ordenador y nunca se hizo `git add` | Un documento al que se remite desde otro tiene que estar en el repositorio **antes** de citarlo; `git ls-tree` o `git grep` lo comprueban en segundos |
 | El primer script daba 30 solapes falsos | Comparaba ramas apiladas (un PR sobre otro), que comparten ficheros por construcción, y ramas olvidadas de hace una semana | Una herramienta de aviso que grita tanto como una que no avisa. Antes de darla por buena se mira su salida con datos reales y se afina hasta que lo que enseña sea accionable |
 | lonaclub.es acabó enseñando la demo, cosa que el fundador había dicho que no quería, y la demo se podía indexar en Google | Se apuntó el dominio a Render como apaño provisional y nadie lo contrastó con lo que el fundador había pedido; la demo nunca tuvo «noindex» | El dominio oficial solo apunta a la versión real. Un entorno de pruebas público lleva siempre «noindex» desde el primer día. Un apaño provisional que contradiga una petición del fundador se le consulta antes |
+
+## 15 de octubre de 2026 — Bloqueos y avisos (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Para bloquear «desde un comentario» parecía necesario poner el id del usuario en la página | Se pensaba en la acción («bloquear a X») en lugar de en lo que la persona ve | El formulario manda lo que se está viendo (comentario, vídeo, propuesta) y el servidor deduce la cuenta, comprobando que quien bloquea puede verlo. Así no se publican identificadores de usuario |
+| La prueba de navegador no podía marcar la casilla de la declaración | Las casillas `chip` están tapadas por su texto; Playwright no puede pulsar la casilla directamente | En las pruebas se pulsa la etiqueta, como una persona. No usar `force` para saltarse lo que vería un usuario |
+| No se pudo comprobar la demo publicada desde la nube | El proxy de esta sesión rechaza `onrender.com` | Si no se puede comprobar algo, se dice en el diario y al fundador, y se deja el comprobante para quien pueda (el portátil) en lugar de darlo por hecho |

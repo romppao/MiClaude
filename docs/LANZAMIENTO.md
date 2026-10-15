@@ -36,7 +36,7 @@ Estado a 13 de octubre de 2026. ❌ = no empezado · 🟡 = en marcha · ✅ = h
 
 ## 3. Importante, pero puede seguir justo después
 
-- **Bloquear a otro usuario.** Lo exige Apple; obligatorio antes de las tiendas.
+- ✅ **Bloquear a otro usuario** (0.16.0, 15-10-2026). Lo exige Apple. También están hechos el aviso sin cuenta (`/avisar`) y los correos con la decisión de moderación (DSA): [`LEGAL.md`](LEGAL.md).
 - **Filtro de palabras** en comentarios y pies de foto.
 - **Una persona revisando la cola de moderación cada día.**
 - **Veladas falsas:** hoy cualquiera con el correo confirmado puede publicarlas sin revisión previa (decisión 6 pendiente en [`TRASLADO.md`](TRASLADO.md)).
