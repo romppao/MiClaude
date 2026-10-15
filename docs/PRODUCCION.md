@@ -33,8 +33,9 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 
 ## Puesta en marcha (una sola vez)
 0. **Separar ya lonaclub.es de la demo** (petición del fundador, 15-10-2026: «quiero separar la aplicación web de la demo de render… ya»). Hasta que la versión real esté montada, lonaclub.es no debe enseñar la demo:
-   - Render → servicio `ring-espana-demo` → Settings → Custom Domains → borrar `lonaclub.es` y `www.lonaclub.es`;
-   - Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
+   - **Seguir [`DOMINIO.md`](DOMINIO.md), sección 3, al pie de la letra** (orden seguro, cómo comprobarlo y cómo deshacerlo). Resumen:
+   - primero Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
+   - después Render → servicio `ring-espana-demo` → Settings → Custom Domains → borrar `lonaclub.es` y `www.lonaclub.es` (al revés quedaría un rato el dominio apuntando a un servicio que no lo reclama);
    - **no tocar** MX, SPF, `_dmarc` ni los TXT de verificación (Google, Search Console): el buzón info@ sigue funcionando.
    - La demo sigue en https://ring-espana-demo.onrender.com/ y, desde la 0.15.1, pide a los buscadores que no la muestren (`noindex` y sin mapa del sitio).
 1. **Proyecto y facturación.**

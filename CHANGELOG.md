@@ -11,6 +11,15 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.2] — 2026-10-15
+
+PR de Claude: cargar los gimnasios reales en la demo desde GitHub (el fundador quiere probarlos en la demo, 15-10-2026).
+
+### Añadido
+- **Acción «Cargar gimnasios reales en la demo»** (pestaña Actions, botón «Run workflow»). «recuento» descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y muestra cuántos se cargarían por provincia, sin escribir nada; «cargar» hace lo mismo y los carga. Solo para la demo. Necesita el secreto `DEMO_DATABASE_URL`.
+
+- **Dominio:** `docs/DOMINIO.md` explica cómo proteger lonaclub.es, el orden seguro para separarlo de la demo (primero el DNS y luego Render) y cómo deshacer cada cambio. Ningún asistente toca el dominio.
+
 ## [0.18.1] — 2026-10-15
 
 PR de Claude: T-008, cola de correos. Imprescindible n.º 3 del lanzamiento (correo real), en la parte de programación.
