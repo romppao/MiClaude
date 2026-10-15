@@ -36,6 +36,8 @@ export async function saveGym(f: FormData) {
   const evidence = str(f, "evidence"), evidenceUrl = str(f, "evidenceUrl") ? safeHttpUrl(str(f, "evidenceUrl")) : null;
   if (!id && user.role !== "ADMIN" && (evidence.length < 10 || (str(f, "evidenceUrl") && !evidenceUrl))) go(back, { problema: "gimnasio_prueba" });
   const requested = str(f, "status");
+  // Retirar un gimnasio no se deshace desde aquí (volver a publicarlo pasa por revisión): se confirma antes (principio 9).
+  if (requested === "REMOVED" && user.role !== "ADMIN" && str(f, "confirmar") !== "si") go(back, { problema: "gimnasio_retirar_confirmar" });
   if (requested && !["PUBLISHED", "PENDING", "REMOVED"].includes(requested)) go(back, { problema: "opcion_invalida" });
   const status: GymStatus = requested === "REMOVED" ? "REMOVED" : excludedGymProvince(province) ? "PENDING" : user.role === "ADMIN" ? (requested === "PENDING" ? "PENDING" : "PUBLISHED") : before?.status === "PUBLISHED" ? "PUBLISHED" : "PENDING";
   const address = str(f, "address") || null;
@@ -66,7 +68,8 @@ export async function requestGymClaim(f: FormData) {
   if (evidence.length < 10 || (str(f, "evidenceUrl") && !evidenceUrl)) go(back, { problema: "gimnasio_prueba" });
   await guard(back, () => withLock(`gym:${str(f, "gymId")}`, async (tx) => {
     const g = await tx.gym.findUnique({ where: { id: str(f, "gymId") } });
-    if (!g) throw new Rechazo("no_existe");
+    // Solo gimnasios del directorio: ni retirados por moderación ni los ficticios del seed (revisión de Claude, 15-10-2026).
+    if (!g || g.status === "REMOVED" || g.isFictional) throw new Rechazo("no_existe");
     if (g.ownerUserId === user.id) throw new Rechazo("gimnasio_ya_tuyo");
     if (await tx.gymClaimRequest.findFirst({ where: { gymId: g.id, userId: user.id, status: { in: ["PENDING", "CONFLICT"] } } })) throw new Rechazo("gimnasio_solicitud_repetida");
     const claim = await tx.gymClaimRequest.create({ data: { userId: user.id, gymId: g.id, evidence, evidenceUrl, status: g.ownerUserId ? "CONFLICT" : "PENDING" } });
@@ -98,7 +101,8 @@ export async function decideGymClaim(f: FormData) {
     const now = new Date();
     await tx.gymClaimRequest.update({ where: { id: claim.id }, data: { status: decision === "approve" ? "APPROVED" : "REJECTED", note, reviewedAt: now, reviewedById: admin.id, evidence: "", evidenceUrl: null } });
     if (decision === "approve") {
-      await tx.gym.update({ where: { id: gym.id }, data: { ownerUserId: claim.userId, claimedAt: now, verifiedAt: now, verifiedNote: note, source: "PROPIETARIO", status: excludedGymProvince(gym.province) ? "PENDING" : "PUBLISHED" } });
+      // Confirmar quién es el titular no da el sello de verificado (eso es setGymVerified) ni devuelve al directorio un gimnasio retirado.
+      await tx.gym.update({ where: { id: gym.id }, data: { ownerUserId: claim.userId, claimedAt: now, source: "PROPIETARIO", status: gym.status === "REMOVED" ? "REMOVED" : excludedGymProvince(gym.province) ? "PENDING" : "PUBLISHED" } });
       await tx.profile.upsert({ where: { kind_entityId: { kind: "gimnasio", entityId: gym.id } }, create: { kind: "gimnasio", entityId: gym.id, ownerId: claim.userId }, update: { ownerId: claim.userId } });
     }
     await audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: decision === "approve" ? "GYM_CLAIM_APPROVED" : "GYM_CLAIM_REJECTED", after: { claimId: claim.id } }, tx);
@@ -108,10 +112,14 @@ export async function decideGymClaim(f: FormData) {
   revalidatePath("/", "layout"); go(back, { aviso: result === "conflict" ? "gimnasio_conflicto" : "gimnasio_decidido" });
 }
 
-/** Cede a una cuenta ya verificada; nunca modifica permisos de moderación. */
+/**
+ * Cede el gimnasio a otra cuenta con el correo confirmado. Solo moderación (revisión de Claude, 15-10-2026): si lo hacía el propio titular,
+ * la respuesta revelaba si un correo tenía cuenta y la otra persona recibía un gimnasio sin aceptarlo. El titular lo pide a moderación.
+ */
 export async function transferGym(f: FormData) {
   const user = await requireVerifiedUser("/mis-gimnasios");
   const back = "/mis-gimnasios";
+  if (user.role !== "ADMIN") go(back, { problema: "gimnasio_cesion_moderacion" });
   checkLengths(f, back, { email: 200 });
   const next = await db.user.findUnique({ where: { email: str(f, "email").toLowerCase() } });
   if (!next?.emailVerifiedAt) go(back, { problema: "titular_invalido" });
@@ -122,6 +130,7 @@ export async function transferGym(f: FormData) {
     await tx.profile.upsert({ where: { kind_entityId: { kind: "gimnasio", entityId: gym.id } }, create: { kind: "gimnasio", entityId: gym.id, ownerId: next.id }, update: { ownerId: next.id } });
     await audit({ userId: user.id, entity: "GYM", entityId: gym.id, action: "GYM_TRANSFERRED", before: { ownerUserId: gym.ownerUserId }, after: { ownerUserId: next.id } }, tx);
   }));
+  after(() => sendMail(next.email, "Ahora gestionas un gimnasio en Lona", `Hola ${oneLine(next.name)},\n\nModeración te ha cedido la gestión de un gimnasio en Lona. Puedes verlo y editarlo en «Mis gimnasios».\n\nSi no lo esperabas, responde a este correo o avísanos y lo revisaremos.\n`));
   revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_cedido" });
 }
 
@@ -131,6 +140,8 @@ export async function setGymMember(f: FormData) {
   const back = "/mis-gimnasios";
   const kind = str(f, "kind"), decision = str(f, "decision");
   if (!["fighter", "trainer"].includes(kind) || !["link", "unlink"].includes(decision)) go(back, { problema: "opcion_invalida" });
+  // Vincular cambia la ficha pública de otra persona: solo moderación. Cada cual elige su gimnasio desde su ficha (revisión de Claude, 15-10-2026).
+  if (decision === "link" && user.role !== "ADMIN") go(back, { problema: "sin_permiso" });
   await guard(back, () => withLock(`gym:${str(f, "gymId")}`, async (tx) => {
     const gym = await tx.gym.findUnique({ where: { id: str(f, "gymId") } });
     if (!gym || (gym.ownerUserId !== user.id && user.role !== "ADMIN")) throw new Rechazo("sin_permiso");

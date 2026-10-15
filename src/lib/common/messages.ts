@@ -296,6 +296,8 @@ export const PROBLEMAS: Record<string, string> = {
   aviso_identidad: "Escribe tu nombre y tu correo electrónico: los necesitamos para comunicarte la decisión. Solo los avisos de abuso de menores se pueden enviar sin identificarse.",
   aviso_declaracion: "Marca la casilla que confirma que lo que cuentas es cierto: la ley la pide para tramitar el aviso.",
   foto_no_guardada: "No hemos podido guardar la foto. No se ha cambiado nada: inténtalo de nuevo dentro de unos minutos.",
+  gimnasio_cesion_moderacion: "Para ceder el gimnasio a otra persona, pídelo a moderación: lo comprobará con las dos cuentas.",
+  gimnasio_retirar_confirmar: "Marca la casilla para confirmar que quieres retirar el gimnasio del directorio.",
   bloqueo_contacto: "No puedes contactar con esta persona: una de las dos ha bloqueado a la otra. Si fuiste tú, puedes desbloquearla en «Mi cuenta», pestaña «Bloqueos».",
   bloqueo_no_existe: "No hemos encontrado a esa persona. Puede que ya la hayas desbloqueado o que haya eliminado su cuenta.",
   bloqueo_propio: "No puedes bloquearte a ti mismo.",
