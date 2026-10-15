@@ -24,6 +24,7 @@ PR de Claude Code: revisión de la lista de gimnasios reales (petición del fund
 
 ### Añadido
 - Opciones «ficticios-recuento» y «ficticios-retirar» del botón «Cargar gimnasios reales en la demo» (`scripts/retirar-gimnasios-ficticios.ts`): retiran de la demo los gimnasios ficticios (estado REMOVED, reversible) sin romper los peleadores de prueba enlazados. Petición del fundador: «borra todos los demás gimnasios demo».
+- Opción «ubicar» del mismo botón (`scripts/ubicar-gimnasios.ts`): pone en el mapa, de una vez, los gimnasios sin coordenadas (por su calle o, si no la hay, por su ciudad). En la app se hacía poco a poco y, tras cargar la lista, el mapa los mostraba en el centro de la provincia.
 
 ## [0.18.7] — 2026-10-15
 

@@ -290,6 +290,11 @@
     "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
+    "path": "scripts/ubicar-gimnasios.ts",
+    "purpose": "Ubica de una vez en el mapa los gimnasios publicados sin coordenadas (Nominatim, una consulta por segundo) tras una carga grande; se lanza desde el botón de GitHub de la demo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "scripts/version.mjs",
     "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"
