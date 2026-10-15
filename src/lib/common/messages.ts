@@ -156,6 +156,7 @@ export const PROBLEMAS: Record<string, string> = {
   correo_no_valido: "Escribe una dirección de correo electrónico completa, como nombre@ejemplo.es.",
   contrasenas_distintas: "Las dos contraseñas no coinciden. Escríbelas de nuevo.",
   contrasena_actual_incorrecta: "La contraseña actual no es correcta. Revísala e inténtalo de nuevo.",
+  google_confirmar: "Para confirmar que eres tú, pulsa «Confirmar con Google» (o escribe tu contraseña, si elegiste una). Después tienes 15 minutos para eliminar la cuenta.",
   eliminar_sin_confirmar: "Marca la casilla para confirmar que quieres eliminar tu cuenta. Es una acción que no se puede deshacer.",
   ultimo_moderador: "No puedes eliminar la cuenta porque eres la única persona moderadora. Nombra antes a otra.",
   datos_ficha: "Alguno de los datos de tu ficha no es válido. Revísalos e inténtalo de nuevo.",
@@ -329,4 +330,5 @@ export const PROBLEMAS: Record<string, string> = {
   medio_enlace: "El enlace del vídeo no es válido: debe empezar por https://.",
   medio_subida: "No encontramos el vídeo subido. Vuelve a elegirlo y espera a que la barra llegue al 100 % antes de publicarlo.",
   medio_limite: "Has compartido muchos vídeos y fotos hoy. Vuelve a intentarlo mañana.",
+  fotos_limite: "Hoy ya has compartido 5 fotos, el máximo diario. Puedes seguir compartiendo vídeos, o vuelve mañana.",
 };

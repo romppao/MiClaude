@@ -2019,3 +2019,54 @@ Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy
 
 ## 2026-10-15 — F sobre los textos legales de Claude
 Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
+## 14-10-2026 (noche). Claude Code: revisión T-016, partes 1 y 2
+
+**Petición:** el fundador pidió revisar la app antes de montar la versión oficial.
+
+**Cómo:** en la propia sesión y sin subagentes, porque los cinco que se lanzaron a la vez se cortaron por `[reasoning_extraction]`.
+
+**Parte 1, seguridad:** todo bien salvo dos puntos importantes:
+- quien entra con Google no puede borrar su cuenta, porque se le pide una contraseña que nunca eligió;
+- hay que comprobar `TRUSTED_PROXY_HOPS` en Cloud Run.
+
+**Parte 2, versión oficial:** la imagen Docker se construyó y se arrancó contra un PostgreSQL vacío y desechable, con permiso del fundador:
+- arranca en 2,2 s y las 22 rutas públicas responden 200;
+- no aparecen restos de la demo.
+
+**Bloquea el lanzamiento:**
+- sin Resend no se puede crear al creador ni a ningún moderador;
+- la base gratuita de 1 GB guarda las fotos;
+- no hay gimnasios hasta el bloque D.
+
+**Hallazgos de Codex (partes 3-5):** comprobados dos (C3-01 y C5-01); uno ya estaba resuelto en la 0.14.0 (C3-03).
+
+**Uso de modelos de Codex:** el fundador observó que Codex gasta mucho. Se añadió a `AGENTS.md` una regla de uso proporcional de modelos. Cambiar la configuración de Codex (`~/.codex/config.toml`: esfuerzo «high» fijo) lo bloqueó el sistema de permisos, así que lo cambia el fundador en el selector.
+
+**Estado:** PR abierto.
+
+## 15-10-2026 (madrugada). Claude Code: arreglos de la revisión T-016 (0.15.0)
+
+**Bloqueantes corregidos:** C3-01, C3-02, C4-01, C5-01, C5-02 y C5-04.
+
+**Importantes corregidos:** borrar la cuenta tras entrar con Google, límite de 5 fotos al día, C4-03 y C5-03.
+
+**Menores:** `MAIL_TRANSPORT=log` en producción y los restos de «Ring España».
+
+**Decisiones de diseño:**
+- **Veladas pasadas:** para saber si una velada «pidió autorización» se lee el historial (`AuditLog`) en lugar de añadir una columna, para no tocar la estructura de la base.
+- **Cataluña:** lista central en `src/lib/common/territorio.ts`. Los peleadores y entrenadores de esas provincias pueden usar Lona, pero sin gimnasio vinculado.
+- **Borrar con Google:** confirmar con una sesión de menos de 15 minutos. El inicio de la sesión se deduce de su caducidad (30 días).
+
+**Pendiente:**
+- C4-04 (más de 50 solicitudes de clase): no es urgente al lanzar;
+- política de menores (T-014): decisión del fundador;
+- ajustes de móvil: encargados a Antigravity;
+- la cadena de Codex (F → G → D → H), que pasa a Claude por el relevo `2026-10-15-codex-relevo-a-claude.md`.
+
+**Comprobado:**
+- `tsc` sin errores;
+- `vitest`: 744 de 746. Las 2 que fallan son de `password.test.ts` y fallan por tiempo (5 s) en este PC también sin los cambios;
+- catálogo con 391 archivos.
+
+**Estado:** PR abierto.

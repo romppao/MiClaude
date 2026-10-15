@@ -3,6 +3,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { provinciaConGimnasios } from "../../lib/common/territorio";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { parseCurrentWeight } from "../../lib/fighters/availability";
@@ -72,7 +73,7 @@ export async function createMyFighter(f: FormData) {
 
   const created = await guard(back, async () => {
     let gymId: string | undefined;
-    if (gymName) {
+    if (gymName && provinciaConGimnasios(province)) { // en las provincias sin gimnasios (lib/common/territorio.ts) no se vincula ninguno
       const gymSlug = slugName(gymName, city);
       const gym = await db.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} });
       gymId = gym.id;
@@ -122,7 +123,7 @@ export async function updateMyFighter(f: FormData) {
   const patch = { firstName, lastName, alias: str(f, "alias") || null, city, province, bio: str(f, "bio") || null, stance: (stance || null) as "ORTODOXO" | "ZURDO" | "AMBIDIESTRO" | null, birthDate, heightCm, reachCm };
   await guard(back, () => db.$transaction(async (tx) => {
     let gymId: string | null = null;
-    if (gymName) {
+    if (gymName && provinciaConGimnasios(province)) {
       const gymSlug = slugName(gymName, city);
       gymId = (await tx.gym.upsert({ where: { slug: gymSlug }, create: { name: gymName, slug: gymSlug, city, province }, update: {} })).id;
     }
