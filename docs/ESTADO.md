@@ -51,6 +51,10 @@
 
 ## 5. Siguiente, por orden
 
+0. **Gimnasios reales (petición del fundador, 15-10):**
+   - **Fundador:** poner el secreto `DEMO_DATABASE_URL` y pulsar el botón «Cargar gimnasios reales en la demo» (primero OpenStreetMap; después «lista-cargar»).
+   - **Claude Code (portátil, con internet completo):** ampliar `docs/datos/gimnasios-investigados.json` con Castilla-La Mancha, Extremadura, Canarias, Huesca y Castilla y León, y con más clubes del resto. Solo de deportes de contacto, cada uno con su fuente **de menos de un año** (`fechaFuente`: «información actualizada… de no más de un año», fundador 15-10) y comprobando las disciplinas de hoy; sin copiar de Google Maps. Revisar también las 190 entradas actuales, que no tienen fecha.
+
 0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación: bloquear usuarios, aviso sin cuenta y correos de la decisión, **hechos en la 0.16.0**; falta T-013 (aviso al salir a enlaces externos).
 0. **Revisión completa antes de la versión oficial:** [`tareas/T-016-revision-previa-al-lanzamiento.md`](tareas/T-016-revision-previa-al-lanzamiento.md). Es lo que pidió el fundador antes de montar lonaclub.es y publicar en Google. Sin empezar: el primer intento se cortó por un fallo del servicio.
 1. Resolver #57 (producción) y #56 (bloque F): revisar, retargetar y renumerar.

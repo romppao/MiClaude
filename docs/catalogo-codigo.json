@@ -275,6 +275,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/importar-gimnasios-lista.ts",
+    "purpose": "Carga en la demo la lista de clubes investigada a mano (docs/datos/gimnasios-investigados.json): recuento por defecto, --aplicar solo con DEMO_MODE=si, sin pisar los existentes.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "scripts/importar-gimnasios-osm.mjs",
     "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -2012,6 +2017,11 @@
   {
     "path": "tests/unit/fotos.test.ts",
     "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/gimnasios-lista.test.ts",
+    "purpose": "Validación de cada club de la lista investigada: fuente, provincia, disciplinas, Cataluña y enlaces.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
