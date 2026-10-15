@@ -523,3 +523,5 @@ Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir u
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
 
 - 15-10-2026: una regla de publicación también debe aplicarse a los alta indirectas y a los valores por defecto. La revisión de gimnasio y su sello de verificación son independientes; las pruebas deben pasar por ambas decisiones cuando las necesitan.
+
+- 15-10-2026: al introducir revisión previa, las pruebas de búsqueda y metadatos deben preparar la aprobación mediante la interfaz y comprobar la invisibilidad antes de ella; no basta adaptar el recorrido principal.
