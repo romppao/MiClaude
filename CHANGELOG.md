@@ -26,6 +26,10 @@ PR de Claude Code: revisión de la lista de gimnasios reales (petición del fund
 - Opciones «ficticios-recuento» y «ficticios-retirar» del botón «Cargar gimnasios reales en la demo» (`scripts/retirar-gimnasios-ficticios.ts`): retiran de la demo los gimnasios ficticios (estado REMOVED, reversible) sin romper los peleadores de prueba enlazados. Petición del fundador: «borra todos los demás gimnasios demo».
 - Opción «ubicar» del mismo botón (`scripts/ubicar-gimnasios.ts`): pone en el mapa, de una vez, los gimnasios sin coordenadas (por su calle o, si no la hay, por su ciudad). En la app se hacía poco a poco y, tras cargar la lista, el mapa los mostraba en el centro de la provincia.
 
+### Corregido
+- **Mapa:** si la dirección de un gimnasio no se encuentra tal cual, se prueban formas más sencillas (sin nave, local, paréntesis ni artículos) antes de ponerlo en el centro de su ciudad (`variantesDireccion`). De 13 direcciones que fallaban se recuperan 10. «ubicar» reintenta los que tenían dirección y quedaron en la ciudad.
+- Dirección de 16 gimnasios publicados de Madrid, sacada de su web o de su bio de Instagram. Morales Box Alcalá estaba en Alcalá de Henares por error: es la calle de Alcalá, 507 (Madrid).
+
 ## [0.18.7] — 2026-10-15
 
 PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).

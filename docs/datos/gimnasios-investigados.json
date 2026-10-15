@@ -728,7 +728,7 @@
   "name": "Factory of Fighters",
   "city": "Alcalá de Henares",
   "province": "Madrid",
-  "address": null,
+  "address": "Avenida de Ajalvir, 38",
   "disciplines": [
    "BOXEO",
    "JIUJITSU",
@@ -761,9 +761,9 @@
  },
  {
   "name": "Morales Box Alcalá",
-  "city": "Alcalá de Henares",
+  "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Alcalá, 507",
   "disciplines": [
    "BOXEO"
   ],
@@ -772,7 +772,7 @@
   "source": "https://urbansportsclub.com/en/venues/morales-box-alcala",
   "confidence": "alta",
   "fechaFuente": "2026-10-14",
-  "nota": "Instagram activo: última publicación el 2026-10-14 (comprobado el 15-10-2026)."
+  "nota": "Instagram activo: última publicación el 2026-10-14 (comprobado el 15-10-2026). Sede en la calle de Alcalá, 507 (Madrid), no en Alcalá de Henares (bio de Instagram, 15-10-2026)."
  },
  {
   "name": "Club Kick Boxing Alcobendas",
@@ -849,7 +849,7 @@
   "name": "MAT Fight Center",
   "city": "Alcorcón",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de los Pintores, 6",
   "disciplines": [
    "MMA",
    "JIUJITSU"
@@ -865,7 +865,7 @@
   "name": "OSF Aranjuez",
   "city": "Aranjuez",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle Gonzalo Chacón, 40",
   "disciplines": [
    "MMA",
    "BOXEO"
@@ -930,7 +930,7 @@
   "name": "Madrid Grapple Jiu-Jitsu",
   "city": "Colmenar Viejo",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Isaac Albéniz, 20",
   "disciplines": [
    "JIUJITSU"
   ],
@@ -1428,7 +1428,7 @@
   "name": "De La Vega Golden Boxing",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Nuestra Señora de Valverde, 40",
   "disciplines": [
    "BOXEO"
   ],
@@ -1443,7 +1443,7 @@
   "name": "Distrito Zero Boxing Club",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Puerto Rico, 15",
   "disciplines": [
    "BOXEO"
   ],
@@ -1474,7 +1474,7 @@
   "name": "Escuela de Boxeo Club de la Lucha",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Isabel Colbrand, 10",
   "disciplines": [
    "BOXEO"
   ],
@@ -1634,7 +1634,7 @@
   "name": "Killer Bees Muay Thai College Madrid",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle del Padre Oltra, 54",
   "disciplines": [
    "MUAYTHAI"
   ],
@@ -1785,7 +1785,7 @@
   "name": "Muay Thai Madrid",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Guipúzcoa, 11",
   "disciplines": [
    "MUAYTHAI"
   ],
@@ -1814,7 +1814,7 @@
   "name": "Slava Legacy Muay Thai",
   "city": "Las Rozas de Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle Comunidad de Andalucía, 33",
   "disciplines": [
    "MUAYTHAI",
    "BOXEO",
@@ -1864,7 +1864,7 @@
   "name": "Stealth BJJ Madrid",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Francisco Paíno, 7",
   "disciplines": [
    "JIUJITSU"
   ],
@@ -1946,7 +1946,7 @@
   "name": "Vallekas Gym",
   "city": "Madrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Vilches, 2",
   "disciplines": [
    "BOXEO"
   ],
@@ -1980,7 +1980,7 @@
   "name": "La Roca Majadahonda",
   "city": "Majadahonda",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de San Roque, 17",
   "disciplines": [
    "BOXEO"
   ],
@@ -2124,7 +2124,7 @@
   "name": "Lotus Rivas BJJ",
   "city": "Rivas-Vaciamadrid",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Mariano Barbacid, 5",
   "disciplines": [
    "JIUJITSU"
   ],
@@ -2187,7 +2187,7 @@
   "name": "Ayutthaya Boxing Center",
   "city": "Torrejón de Ardoz",
   "province": "Madrid",
-  "address": null,
+  "address": "Calle de Beatriz Galindo, 1",
   "disciplines": [
    "MUAYTHAI",
    "K1",

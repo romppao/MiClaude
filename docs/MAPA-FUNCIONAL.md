@@ -376,7 +376,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `DISCIPLINE_SLUG`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `categoryLabel`, `disciplineFromSlug`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
 | `fallos.ts` | `DatosFallo`, `ESTADOS_FALLO`, `EstadoFallo`, `ORIGENES_FALLO`, `OrigenFallo`, `huellaFallo`, `normalizarMensaje`, `normalizarRuta`, `registrarFallo`, `tacharDatos` |
-| `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes` |
+| `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes`, `variantesDireccion` |
 | `gym-directory.ts` | `publicGyms` |
 | `gym-osm.ts` | `gymNameKey`, `osmAreaProvince`, `osmGymCandidate`, `osmProvince` |
 | `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `osmMayUpdate` |

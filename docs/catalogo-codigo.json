@@ -2030,6 +2030,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/geo-direcciones.test.ts",
+    "purpose": "Comprueba las formas sencillas de una dirección (sin nave, local, paréntesis ni artículos) que se prueban cuando el mapa no reconoce la original.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/gimnasios-lista.test.ts",
     "purpose": "Validación de cada club de la lista investigada: fuente, provincia, disciplinas, Cataluña y enlaces.",
     "guide": "docs/mantenimiento/OPERACION.md"

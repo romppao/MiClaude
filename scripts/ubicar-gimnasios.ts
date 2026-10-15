@@ -3,11 +3,16 @@
 // Nominatim, como piden sus normas: unos 2 minutos por cada 100 gimnasios.
 //
 //   npx tsx scripts/ubicar-gimnasios.ts    → ubica los pendientes y dice cuántos quedaron por dirección, por ciudad o sin encontrar.
+//
+// También reintenta los que tienen dirección pero quedaron en el centro de su ciudad: ubicarGimnasio prueba ahora formas más sencillas
+// de la dirección (variantesDireccion).
 import { db } from "../src/lib/common/db";
 import { ubicarPendientes } from "../src/lib/common/geo";
 
 async function main() {
   try {
+    const reintentos = await db.gym.updateMany({ where: { status: "PUBLISHED", address: { not: null }, OR: [{ geoSource: "ciudad" }, { geoSource: null }], geocodedAt: { not: null } }, data: { geocodedAt: null } });
+    console.log(`Con dirección pero sin calle en el mapa, se reintentan: ${reintentos.count}.`);
     for (let vuelta = 0; vuelta < 100; vuelta++) {
       const antes = await db.gym.count({ where: { status: "PUBLISHED", geocodedAt: null } });
       if (!antes) break;
