@@ -58,7 +58,7 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
     <>
       <h1>Gimnasios</h1>
       <Link className="btn secondary" href="/mis-gimnasios">¿Es tu gimnasio? Búscalo y reclámalo</Link>
-      <p className="meta" style={{ fontSize: 16 }}><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">© colaboradores de OpenStreetMap · datos ODbL</a></p>
+      <p className="meta" style={{ fontSize: 16 }}><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", minHeight: 44 }}>© colaboradores de OpenStreetMap · datos ODbL</a></p>
       <form className="search" role="search" aria-label="Filtrar gimnasios">
         <CampoFiltro etiqueta="Nombre o ciudad"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
