@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { createHmac } from "node:crypto";
 import sharp from "sharp";
 import { devices } from "playwright-core";
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { B, rnd, browser, link, hacerAdmin, sql, datosDeAlta, enDias, hoyMadrid, registrar, esperarEnlace, esperarCorreo, mostrar } from "./ayudas.mjs";
 
 const DIR = process.env.ESC_DIR ?? "test-results/escenarios";
@@ -50,7 +50,7 @@ async function persona(nombre, descripcion, guion) {
     if (estado !== "ok") throw new RecorridoInterrumpido(detalle);
   };
   try { await guion(p, paso, ctx); } catch (e) { if (!(e instanceof RecorridoInterrumpido)) { pasos.push({ texto: "Completar el recorrido", estado: "FALLO", detalle: e.message, archivo: "", url: new URL(p.url()).pathname }); } }
-  informe.push({ nombre, descripcion, pasos, fricciones: [...new Set(fricciones)] });
+  informe.push({ nombre, descripcion, ejecutadoEl: new Date().toISOString(), pasos, fricciones: [...new Set(fricciones)] });
   await ctx.close();
 }
 
@@ -94,7 +94,7 @@ async function crearFicha(p, nombre, apellido) {
 async function registrarContra(p, rival, evento) {
   await p.goto(B + "/mi-ficha"); await registrar(p, { evento, fecha: enDias(-45), rivalNombre: rival.firstName, rivalApellidos: rival.lastName });
   await p.getByRole("heading", { name: "¿Quién es tu rival?", exact: true }).waitFor();
-  await p.getByRole("button", { name: "Es esta persona", exact: true }).click(); await aviso(p, "Combate registrado");
+  await p.getByRole("button", { name: /^Es esta persona:/ }).click(); await aviso(p, "Combate registrado");
 }
 const fotoPequena = async () => sharp({ create: { width: 640, height: 360, channels: 3, background: "#65774a" } }).png().toBuffer();
 const archivoFoto = async nombre => ({ name: nombre, mimeType: "image/png", buffer: await fotoPequena() });
@@ -112,7 +112,7 @@ async function recuperar(p, email, nueva) {
 // ───────────────────────── 1) Visitante sin cuenta ─────────────────────────
 await persona("visitante", "Marta, 58 años, sin cuenta, quiere ver si su sobrino aparece y qué pasa en su ciudad", async (p, paso) => {
   await paso("abre la portada", async () => { await p.goto(B + "/"); await p.locator("h1").first().waitFor(); });
-  await paso("pulsa «Explorar peleadores»", async () => { await p.getByRole("link", { name: /Explorar peleadores/ }).click(); await p.waitForURL("**/peleadores"); });
+  await paso("pulsa «Encontrar un peleador»", async () => { await p.getByRole("link", { name: /Encontrar un peleador/ }).click(); await p.waitForURL("**/peleadores"); });
   await paso("abre la ficha del primer peleador", async () => { await p.locator("main a.card").first().click(); await p.waitForURL(/\/peleadores\/.+/); });
   await paso("intenta seguirlo (debe llevarla a entrar y explicarle por qué)", async () => {
     await p.getByRole("link", { name: /Entra para seguir/ }).click(); await p.waitForURL("**/entrar**");
@@ -159,7 +159,7 @@ await persona("aficionado", "Lucas, 24 años, aficionado: sigue a un peleador, l
 });
 
 // ───────────────────────── 3) Peleador ─────────────────────────
-await persona("peleador", "Diego, 27 años, boxeador amateur: crea su ficha, registra su primer combate y completa su perfil", async (p, paso) => {
+await persona("peleador", "Diego, 27 años, peleador amateur de boxeo: crea su ficha, registra su primer combate y completa su perfil", async (p, paso) => {
   let email;
   await paso("crea su cuenta eligiendo «Tener mi ficha de peleador»", async () => { email = await registrarse(p, "Diego", "FIGHTER"); });
   await paso("confirma su correo", async () => { await confirmarCorreo(p, email); });
@@ -177,7 +177,7 @@ await persona("peleador", "Diego, 27 años, boxeador amateur: crea su ficha, reg
   await paso("ve su combate en «Mis combates» con su estado explicado", async () => {
     const t = await texto(p);
     if (!t.includes(`Velada Escenario ${rnd}`)) throw new Error("el combate no aparece en «Mis combates»");
-    if (!/pendiente de confirmar/i.test(t)) throw new Error("no explica que está pendiente de confirmar");
+    if (!/declarado/i.test(t) || !/Contará en tu récord a partir|cuenta en el récord a partir/i.test(t)) throw new Error("no explica que es declarado y cuándo empezará a contar (regla de 24 horas)");
   });
   await paso("abre su ficha pública y comprueba su récord", async () => { await p.getByRole("link", { name: /Ver mi ficha pública/ }).click(); await p.waitForURL(/\/peleadores\/.+/); });
   await paso("entra en «Mi trayectoria»", async () => { await p.goto(B + "/mi-ficha/trayectoria"); await p.locator("h1").waitFor(); });
@@ -270,7 +270,7 @@ await persona("federacion", "Pedro, delegado de una federación autonómica: la 
     await p.getByRole("button", { name: /Guardar/ }).first().click(); await aviso(p, /guardad|actualizad/i);
   });
   await paso("comprueba cómo ve su perfil el público", async () => { await p.goto(B + `/federaciones/${idFed}`); await p.getByText(nombreFed).first().waitFor(); const t = await texto(p); if (!t.includes("Valencia")) throw new Error("el perfil público no muestra la ciudad que acaba de guardar"); });
-  await paso("sin acreditación, no puede respaldar resultados (y se le explica)", async () => { await p.goto(B + "/respaldar"); await p.locator("h1").first().waitFor(); });
+  await paso("sin acreditación, no puede respaldar resultados (y se le explica)", async () => { await p.goto(B + "/respaldar"); await aviso(p, "Este respaldo requiere una acreditación activa"); comprobar(new URL(p.url()).searchParams.get("problema") === "respaldo_sin_permiso", "una federación sin acreditar ha accedido a respaldar resultados"); });
 });
 
 
@@ -296,7 +296,7 @@ await persona("reclamacion", "Nuria reclama una ficha provisional que creó su r
     await registrar(rival.p, { evento: `Origen ficha Nuria ${rnd}`, fecha: enDias(-60), rivalNombre: "Nuria", rivalApellidos: `Reclamacion${rnd}` }); await aviso(rival.p, "Combate registrado");
     ficha = await db.fighter.findFirstOrThrow({ where: { firstName: "Nuria", lastName: `Reclamacion${rnd}` } }); comprobar(ficha.userId === null, "la ficha no era provisional"); await p.goto(B + `/peleadores/${ficha.slug}`);
   });
-  await paso("crea y confirma su cuenta, busca su ficha y la reclama", async () => { const email = await registrarse(p, "Nuria Reclamante", "FIGHTER"); await confirmarCorreo(p, email); await p.goto(B + `/mi-ficha?q=Reclamacion${rnd}`); await p.locator('form', { has: p.locator(`input[name=fighterId][value="${ficha.id}"]`) }).locator('[name=message]').fill("Soy Nuria, la participante de este combate; comprobad el acta."); await p.getByRole("button", { name: "Reclamar", exact: true }).click(); await aviso(p, "Solicitud enviada"); });
+  await paso("crea y confirma su cuenta, busca su ficha y la reclama", async () => { const email = await registrarse(p, "Nuria Reclamante", "FIGHTER"); await confirmarCorreo(p, email); await p.goto(B + `/mi-ficha?q=Reclamacion${rnd}`); await p.locator('form', { has: p.locator(`input[name=fighterId][value="${ficha.id}"]`) }).locator('[name=message]').fill("Soy Nuria, la participante de este combate; comprobad el acta."); await p.getByRole("button", { name: /^Reclamar esta ficha/ }).click(); await aviso(p, "Solicitud enviada"); });
   await paso("moderación comprueba la prueba y aprueba la reclamación", async () => { moderadora = await auxiliar("Moderadora Nuria", "FAN", true); await moderadora.p.goto(B + "/moderacion"); await filaDe(moderadora.p, `Reclamacion${rnd}`).getByRole("button", { name: /^Aprobar/ }).click(); await aviso(moderadora.p, /aprobad/i); await p.goto(B + "/mi-ficha"); });
   await paso("Nuria ve su ficha y puede registrar combates", async () => { await p.getByRole("button", { name: "Registrar este combate", exact: true }).waitFor(); comprobar((await db.fighter.findUniqueOrThrow({ where: { id: ficha.id } })).userId !== null, "la reclamación aprobada no vinculó la cuenta"); });
 });
@@ -386,6 +386,15 @@ await persona("creador", "La cuenta del creador entra con contraseña y segundo 
 });
 
 // ───────────────────────── Informe ─────────────────────────
+// Una repetición explícita de una persona conserva el resultado y las capturas de las demás.
+// Solo sustituye su resultado tras ejecutarla de nuevo; los fallos del resto siguen siendo fallos.
+if (SOLO.length && existsSync(`${DIR}/informe.json`)) {
+  const anteriores = JSON.parse(readFileSync(`${DIR}/informe.json`, "utf8"));
+  const repetidas = new Set(informe.map(i => i.nombre));
+  informe.push(...anteriores.filter(i => !repetidas.has(i.nombre)));
+}
+comprobar(informe.length > 0, "No se ha ejecutado ninguna persona: comprueba el nombre del escenario solicitado");
+if (!SOLO.length) comprobar(informe.length >= 12, "La batería completa debe cubrir al menos doce personas");
 writeFileSync(`${DIR}/informe.json`, JSON.stringify(informe, null, 1));
 console.log("\n══ RESUMEN POR PERSONA ══");
 for (const i of informe) {
