@@ -420,3 +420,5 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Revisión de #86:** el CI 38739924528 pasó tipos, unitarias, compilación, flujos y auditoría de enlaces, pero detectó el acceso de gimnasio con altura táctil insuficiente. Se corrige usando el botón de enlace compartido; nuevo CI pendiente. La ejecución local simultánea de flujo agotó 30 s al navegar a Mi ficha; no se alteran esperas ni afirmaciones.
 
 **Revisión de contratos de la bandeja:** se mantienen también los accesos a la velada del combate, la ficha reclamada y la web profesional del gimnasio, con zona táctil suficiente. El CI anterior ya había superado e2e y accesibilidad; esta conservación de accesos vuelve a validarse sobre el nuevo commit.
+
+**Comprobación de etiquetas por entidad:** el caso GYM heredaba el texto de retirar comentario de la demo; ahora dice «Resolver y retirar el gimnasio» y el recorrido pulsa ese botón y comprueba REMOVED en ese gimnasio. El CI 38745856730 pasó completo sobre b9cc10f; este ajuste de etiqueta y su recorrido añadido vuelven a validarse en el siguiente CI.

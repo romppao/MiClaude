@@ -849,7 +849,7 @@ export default async function Moderation({
                               ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)"
                               : medio
                                 ? "Deja de mostrarse en la velada y en las fichas"
-                                : "Retira el comentario"
+                                : gimnasio ? "Retira el gimnasio del directorio" : "Retira el comentario"
                         }
                       >
                         {bout
@@ -860,7 +860,7 @@ export default async function Moderation({
                               ? medio.kind === "PHOTO"
                                 ? "Resolver y retirar la foto"
                                 : "Resolver y retirar el vídeo"
-                              : "Resolver y retirar el comentario"}
+                              : gimnasio ? "Resolver y retirar el gimnasio" : "Resolver y retirar el comentario"}
                       </button>
                     )}
                     <button

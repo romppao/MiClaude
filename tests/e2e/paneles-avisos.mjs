@@ -54,6 +54,8 @@ for (const ancla of ["avisos", "reclamaciones", "organizadores", "gimnasios", "s
 }
 check("GYM conserva el enlace a su gestión", await mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso gimnasio ${rnd}` }).getByRole("link", { name: `Gimnasio: ${gym.name}` }).getAttribute("href") === `/mis-gimnasios?gimnasio=${gym.id}`);
 check("el combate conserva el acceso a su velada para comprobar los datos", await mod.p.locator('article[data-cola]', { has: mod.p.locator(`input[name=boutId][value="${bout.id}"]`) }).locator(`a[href="/veladas/${event.slug}"]`).count() === 1);
+const avisoGym = mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso gimnasio ${rnd}` });
+check("GYM ofrece su propia etiqueta de retirada", await avisoGym.getByRole("button", { name: "Resolver y retirar el gimnasio", exact: true }).count() === 1);
 const prioridades = await bandeja.locator(":scope > li").evaluateAll(items => items.map(i => Number(i.dataset.prioridad)));
 check("las prioridades no retroceden entre elementos", prioridades.every((p, i) => i === 0 || p >= prioridades[i - 1]));
 const avisoPagina = mod.p.locator('article[data-cola="avisos"]', { hasText: `Página anónima ${rnd}` });
@@ -63,6 +65,9 @@ await avisoPagina.locator('[name=note]').fill("Comprobado en la página de la ve
 await avisoPagina.getByRole("button", { name: /^Cerrar: ya está corregido/ }).click();
 await mod.p.locator('.notice-ok').waitFor();
 check("se puede resolver un aviso sin cuenta", (await db.report.findUniqueOrThrow({ where: { id: pagina.id } })).status === "RESOLVED");
+await avisoGym.getByRole("button", { name: "Resolver y retirar el gimnasio", exact: true }).click();
+await avisoGym.waitFor({ state: "detached" });
+check("retirar un aviso GYM actúa sobre el gimnasio indicado", (await db.gym.findUniqueOrThrow({ where: { id: gym.id } })).status === "REMOVED");
 const combate = () => mod.p.locator('article[data-cola]', { has: mod.p.locator(`input[name=boutId][value="${bout.id}"]`) });
 for (const [boton, estado] of [["Poner en revisión el combate:", "DISPUTED"], ["Restaurar como pendiente el combate:", "SELF_REPORTED"], ["Verificar combate:", "VERIFIED"]]) {
   await mod.p.goto(B + "/moderacion");
