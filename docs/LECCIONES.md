@@ -493,3 +493,9 @@ La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba un
 
 ## 2026-10-15 — Conflictos y finales de línea (Codex)
 Una expresión regular de resolución con DOTALL consumió contenido posterior al marcador y el primer reintento no contempló CRLF. Recuperar siempre desde los padres originales, normalizar finales de línea, acotar cada marcador a su línea y validar los documentos antes de confirmar. No encadenar una confirmación tras un script fallido.
+
+## 15 de octubre de 2026 — Integrar ramas ajenas (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
