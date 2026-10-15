@@ -285,6 +285,11 @@
     "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
+    "path": "scripts/retirar-gimnasios-ficticios.ts",
+    "purpose": "Cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo cuando ya hay gimnasios reales; solo con DEMO_MODE=si y desde el botón de GitHub.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "scripts/version.mjs",
     "purpose": "Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar.",
     "guide": "docs/mantenimiento/OPERACION.md"

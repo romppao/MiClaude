@@ -2,7 +2,7 @@
 
 > Generado con `node scripts/generar-catalogo.mjs`. Editar responsabilidades en `docs/catalogo-codigo.json`; no editar esta salida.
 
-Cobertura estructural: **444 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
+Cobertura estructural: **445 archivos mantenidos**, cada uno con responsabilidad y guía. La comprobación no certifica que la explicación sea suficiente; requiere revisión humana.
 
 La huella SHA-256 abreviada permite detectar cambios del archivo; `--comprobar` compara toda la salida. Las declaraciones exportadas se extraen por patrón léxico, son orientativas y no incluyen todas las reexportaciones: consultar el código y el [mapa funcional](../MAPA-FUNCIONAL.md) para acciones, tablas y guardas.
 
@@ -132,7 +132,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | Entrada de instrucciones del asistente Copilot hacia reglas compartidas; no debe divergir del protocolo del proyecto. | [Contexto](OPERACION.md) | — | `5fee685a3e0aae5b` |
 | [.github/dependabot.yml](../../.github/dependabot.yml) | Configura actualización de dependencias y evita saltos mayores automáticos no planificados. | [Contexto](OPERACION.md) | — | `d3d8f5a4368d2cb4` |
 | [.github/workflows/actualizar-noticias.yml](../../.github/workflows/actualizar-noticias.yml) | Cron gratuito cada 6 horas en GitHub Actions que despierta la demo de Render y llama a /api/cron/noticias con el secreto CRON_SECRET en cabecera; falla visible si no actualiza. | [Contexto](OPERACION.md) | — | `702aae2050edda40` |
-| [.github/workflows/cargar-gimnasios-demo.yml](../../.github/workflows/cargar-gimnasios-demo.yml) | Botón manual que descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y, si se pide, los carga solo en la demo. | [Contexto](../PRODUCCION.md) | — | `8233b70d13715932` |
+| [.github/workflows/cargar-gimnasios-demo.yml](../../.github/workflows/cargar-gimnasios-demo.yml) | Botón manual que descarga los gimnasios de OpenStreetMap, los compara con la base de la demo y, si se pide, los carga solo en la demo. | [Contexto](../PRODUCCION.md) | — | `7d2e33d885f00b3c` |
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | Receta reproducible con PostgreSQL vacío, paridad, tipos, documentación, unitarias, build, navegador y accesibilidad; solo en PR, al fusionar en la rama de la demo y a mano (ADR-004). | [Contexto](OPERACION.md) | — | `1384711645874db8` |
 | [.github/workflows/copia-diaria.yml](../../.github/workflows/copia-diaria.yml) | Copia nocturna de la base real con pg_dump a un cubo de Cloudflare R2 con jurisdicción UE. | [Contexto](../PRODUCCION.md) | — | `32873ac868d63baf` |
 | [.github/workflows/desplegar-produccion.yml](../../.github/workflows/desplegar-produccion.yml) | Despliegue manual de la versión real: compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud. | [Contexto](../PRODUCCION.md) | — | `c3f85ae6218781eb` |
@@ -549,5 +549,6 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [scripts/generar-mapa.mjs](../../scripts/generar-mapa.mjs) | Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada. | [Contexto](OPERACION.md) | — | `210037e5b96ee20d` |
 | [scripts/importar-gimnasios-lista.ts](../../scripts/importar-gimnasios-lista.ts) | Carga en la demo la lista de clubes investigada a mano (docs/datos/gimnasios-investigados.json): recuento por defecto, --aplicar solo con DEMO_MODE=si, sin pisar los existentes. | [Contexto](../GIMNASIOS-REALES.md) | `MAX_DIAS_FUENTE`, `prepararFila` | `6684bd1c69a5bff8` |
 | [scripts/importar-gimnasios-osm.mjs](../../scripts/importar-gimnasios-osm.mjs) | Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas. | [Contexto](../GIMNASIOS-REALES.md) | — | `3b931dd66153b967` |
+| [scripts/retirar-gimnasios-ficticios.ts](../../scripts/retirar-gimnasios-ficticios.ts) | Cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo cuando ya hay gimnasios reales; solo con DEMO_MODE=si y desde el botón de GitHub. | [Contexto](../GIMNASIOS-REALES.md) | — | `bce6a2d2f9ed55ae` |
 | [scripts/version.mjs](../../scripts/version.mjs) | Control de versiones (docs/VERSIONES.md): sube la versión y abre su sección del CHANGELOG, comprueba en cada PR que sube y tiene entrada, y lista las etiquetas que el CI debe crear al fusionar. | [Contexto](OPERACION.md) | — | `cbf8c15a8453cc47` |
 | [scripts/vitest.escalera.config.mts](../../scripts/vitest.escalera.config.mts) | Configuración unitaria separada para retos de ingreso; no forma parte de la batería funcional de la aplicación. | [Contexto](OPERACION.md) | — | `8befcd84acf5599a` |

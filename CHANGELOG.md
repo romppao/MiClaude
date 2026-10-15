@@ -22,6 +22,9 @@ PR de Claude Code: revisión de la lista de gimnasios reales (petición del fund
   - Quedan por revisar, con una nota que explica el motivo: perfiles inactivos o vacíos, gimnasios que parecen de fitness, sedes con la ciudad sin confirmar y los 7 clubes de Madrid sin perfil encontrado.
 - Se quitan dos repetidos: Lotus Club Chamberí (es BJJ Madrid Academy - Lotus Club) y Muay Thai Las Rozas Madrid (es Slava Legacy Muay Thai, en Las Rozas). Los nombres son siempre el nombre comercial del club, no el usuario de Instagram.
 
+### Añadido
+- Opciones «ficticios-recuento» y «ficticios-retirar» del botón «Cargar gimnasios reales en la demo» (`scripts/retirar-gimnasios-ficticios.ts`): retiran de la demo los gimnasios ficticios (estado REMOVED, reversible) sin romper los peleadores de prueba enlazados. Petición del fundador: «borra todos los demás gimnasios demo».
+
 ## [0.18.7] — 2026-10-15
 
 PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).
