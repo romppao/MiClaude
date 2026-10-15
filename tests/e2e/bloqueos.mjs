@@ -99,7 +99,7 @@ check("y se acusa recibo por correo", !!(await esperarCorreo(correo, "Hemos reci
 const mod = await newUser("Moderadora"); hacerAdmin(mod.email);
 await db.report.create({ data: { userId: lola.user.id, entity: "AURA", entityId: aura.id, reason: "INAPROPIADO", message: "Me insulta" } });
 await mod.p.goto(B + "/moderacion#avisos");
-const filaPagina = mod.p.locator("tr", { hasText: `/peleadores/${lola.f.slug}` });
+const filaPagina = mod.p.locator("article[data-cola=avisos]", { hasText: `/peleadores/${lola.f.slug}` });
 check("moderación ve el aviso sin cuenta, con quién lo envía", await seen(filaPagina.getByText(`Sin cuenta · Testigo · ${correo}`)));
 check("un aviso sobre una página no ofrece «retirar» (se actúa desde la página)", !(await filaPagina.getByRole("button", { name: /^Resolver y/ }).count()));
 await filaPagina.locator("[name=note]").fill("Hemos retirado el comentario.");
@@ -107,7 +107,7 @@ await filaPagina.getByRole("button", { name: /^Cerrar: ya está corregido/ }).cl
 await mod.p.locator(".notice-ok", { hasText: "Aviso marcado como resuelto" }).waitFor();
 const decision = await esperarCorreo(correo, "Hemos revisado tu aviso");
 check("quien avisó sin cuenta recibe la decisión, la nota y cómo reclamar", !!decision && decision.includes("Hemos retirado el comentario.") && decision.includes("resolución extrajudicial"));
-const filaAura = mod.p.locator("tr", { hasText: `Comentario de Tito ${rnd}` });
+const filaAura = mod.p.locator("article[data-cola=avisos]", { hasText: `Comentario de Tito ${rnd}` });
 await filaAura.getByRole("button", { name: "Resolver y retirar el comentario" }).click();
 await mod.p.locator(".notice-ok", { hasText: "Aviso resuelto y contenido ocultado" }).waitFor();
 const motivos = await esperarCorreo(tito.email, "Hemos retirado un contenido tuyo");
