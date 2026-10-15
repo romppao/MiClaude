@@ -74,3 +74,5 @@ Entrega de Claude Design «Ring España App v3». **Fase 1 (hecha por Claude el 
 6. Plantilla del club (peleadores y entrenadores con confirmación de cada uno).
 7. ~~Portada por disciplina~~ (hecha en la fase 2a), y pasar a la estética v3 las pantallas que aún usan el aspecto heredado (listados, velada, gimnasios, ránking, moderación).
 8. Escenarios por persona (`escenarios.mjs`) para entrenador y club.
+
+- 15-10-2026: T-009 en curso por encargo del fundador; 16 recorridos por persona, ejecución independiente en CI y revisión visual documentada en docs/pruebas. No equivale a dar por revisados los textos jurídicos ni a una prueba con personas reales.

@@ -1781,7 +1781,7 @@
   },
   {
     "path": "tests/e2e/escenarios.mjs",
-    "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
+    "purpose": "Dieciséis recorridos móviles por persona y tipo de cuenta, con registro, interlocutores reales, decisiones, letra ampliada, protección del creador, capturas e informe de fallos/fricciones para revisión visual.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

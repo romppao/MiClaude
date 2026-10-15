@@ -11,6 +11,15 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.19.3] — 2026-10-15
+
+
+
+
+### Añadido
+- T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
+
+
 ## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).
