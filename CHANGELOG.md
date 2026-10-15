@@ -11,6 +11,8 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.3] — 2026-10-15
+
 PR de Claude: T-010, avisos de fallos (imprescindible n.º 7 del lanzamiento, en la parte de programación).
 
 ### Añadido
