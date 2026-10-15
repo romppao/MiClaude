@@ -2234,3 +2234,24 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 - Pruebas: `cola-correo.test.ts`, y en `bloqueos.mjs`, que los correos quedan entregados, vacíos y contados en `/salud`.
 
 **Estado:** PR abierto. **Siguiente:** T-013, el aviso en los enlaces que abren otra pestaña.
+
+## 15-10-2026. Claude (nube): lista de gimnasios reales investigada a mano
+
+**Qué se pidió:** el fundador: «quiero que vayas cogiendo todos los perfiles de clubes de boxeo… de jiu-jitsu, de muay thai, de todas las disciplinas… Puedes buscar la información en Google Maps, en Facebook, en Instagram, TikTok… Solo gimnasios de deportes de contacto… esfuérzate». Y: «no te olvides de hacerlo con todas las comunidades autónomas».
+
+**Qué se hizo:**
+- **Cuatro búsquedas en paralelo:** Madrid golpeo, Madrid MMA y jiu-jitsu, sur y este, y norte, centro e islas.
+- **Resultado:** 207 clubes en bruto; tras quitar duplicados, 191 en 24 provincias (108 en Madrid). Cada uno con la fuente que lo confirma y una confianza: alta (64) o media (127).
+- **Club del fundador:** el Club de Boxeo Ludus de Móstoles está, en la calle Cid Campeador, 7. Se quitó el duplicado «Gimnasio Ludus», que salía de un listado antiguo.
+- **Carga:** `importar-gimnasios-lista.ts` con su prueba, y opciones nuevas en el botón de GitHub.
+
+**Qué salió mal:**
+- **Límite de búsquedas:** se agotó el de la sesión (200, compartido entre las cuatro búsquedas).
+- **Webs sin abrir:** WebFetch no pudo abrir ninguna web, así que todo descansa en lo que dicen los resultados de búsqueda.
+- **Comunidades sin clubes:** Castilla-La Mancha, Extremadura, Canarias, Huesca y casi toda Castilla y León.
+
+**Decisiones:**
+- **No se copia de Google Maps**, porque sus condiciones lo prohíben; solo se usa para descubrir clubes.
+- **La confianza media queda por revisar**, para que nadie vea como seguro un club que quizá ha cerrado.
+
+**Siguiente:** completar con Claude Code en el portátil, que tiene internet completo, y con OpenStreetMap (el botón de GitHub).

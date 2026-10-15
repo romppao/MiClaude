@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.3] — 2026-10-15
+
+PR de Claude: primera lista de gimnasios reales investigada a mano (petición del fundador, 15-10-2026: «los gimnasios de la vida real… solo gimnasios de deportes de contacto… todas las comunidades autónomas»).
+
+### Añadido
+- `docs/datos/gimnasios-investigados.json`: 191 clubes de boxeo, kickboxing, K-1, muay thai, MMA y jiu-jitsu con su fuente, en 24 provincias (108 en Madrid). Faltan Castilla-La Mancha, Extremadura, Canarias, Huesca y casi toda Castilla y León.
+- `scripts/importar-gimnasios-lista.ts` y las opciones «lista-recuento» y «lista-cargar» del botón «Cargar gimnasios reales en la demo». Confianza alta se publica; media queda por revisar en moderación. Nunca pisa un gimnasio existente ni carga Cataluña.
+
 ## [0.18.2] — 2026-10-15
 
 PR de Claude: cargar los gimnasios reales en la demo desde GitHub (el fundador quiere probarlos en la demo, 15-10-2026).
