@@ -13,10 +13,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [0.18.8] — 2026-10-15
 
-PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año).
+PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).
 
 ### Cambiado
-- `docs/datos/gimnasios-investigados.json`: se comprobaron las 52 fichas con web propia. **20 pasan a publicarse**: su web responde hoy, anuncia todas sus disciplinas y tiene contenido de 2025 o 2026 (`fechaFuente` 2026-10-15). Las otras 32 llevan una nota con el motivo (web caída, sin fechas recientes o sin alguna disciplina) y siguen por revisar. También se abrió el Instagram de las 56 fichas que lo tienen: **46 publican desde hace menos de un año** y pasan a publicarse, con la fecha de su última publicación como `fechaFuente`; 3 están inactivos, 6 perfiles no existen y 1 no deja claro que dé deportes de contacto, todos con su nota. **En total, 67 publicables.** Quedan 114 fichas sin web ni Instagram, por revisar.
+- `docs/datos/gimnasios-investigados.json`: **93 gimnasios publicables** (54 en Madrid), frente a 1 antes de la revisión. Se publica lo que tiene web viva con contenido de 2025 o 2026, o un Instagram con publicaciones de menos de un año; la `fechaFuente` es la de esa comprobación o la de la última publicación.
+  - Webs: se abrieron las 52 fichas con web propia (20 publicables).
+  - Instagram: los 56 perfiles apuntados (46 activos) y, en Madrid, se buscaron los clubes sin web ni Instagram (26 activos más).
+  - Quedan por revisar, con una nota que explica el motivo: perfiles inactivos o vacíos, gimnasios que parecen de fitness, sedes con la ciudad sin confirmar y los 7 clubes de Madrid sin perfil encontrado.
+- Se quitan dos repetidos: Lotus Club Chamberí (es BJJ Madrid Academy - Lotus Club) y Muay Thai Las Rozas Madrid (es Slava Legacy Muay Thai, en Las Rozas). Los nombres son siempre el nombre comercial del club, no el usuario de Instagram.
 
 ## [0.18.7] — 2026-10-15
 
