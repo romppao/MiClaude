@@ -18,7 +18,7 @@ await org.p.setViewportSize({ width: 390, height: 844 });
 await org.p.goto(B + "/organizador");
 const nombre = `Velada Entradas ${rnd}`;
 await org.p.fill("[name=name]", nombre); await org.p.fill("[name=date]", enDias(30)); await org.p.fill("[name=hora]", "20:30");
-await org.p.selectOption("select[name=discipline]", "BOXING"); await org.p.fill("[name=venue]", "Pabellón Lona"); await org.p.fill("[name=city]", "Madrid"); await org.p.selectOption("select[name=province]", "Madrid");
+await org.p.selectOption("select[name=discipline]", "BOXEO"); await org.p.fill("[name=venue]", "Pabellón Lona"); await org.p.fill("[name=city]", "Madrid"); await org.p.selectOption("select[name=province]", "Madrid");
 await org.p.selectOption("select[name=level]", "AMATEUR");
 await btn(org.p, "Crear el evento"); await org.p.waitForURL((u) => /\/organizador\/[^/]+$/.test(u.pathname));
 const slug = new URL(org.p.url()).pathname.split("/").pop();

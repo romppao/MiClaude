@@ -33,11 +33,14 @@ export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Da
 export function TarjetaVelada({ e }: { e: { slug: string; name: string; date: Date; discipline: Discipline; level: Level; venue: string; city: string; hora: string | null; cartel: string | null; precio: number | null; reservar: boolean; etiquetas: string[] } }) {
   const { dia, mes } = dayAndMonth(e.date);
   return (
-    <Link href={`/veladas/${e.slug}`} className="tarjeta-foto velada-cartel" style={tinte(e.discipline)}>
-      {e.cartel ? <Foto src={e.cartel} /> : <span className="velada-cartel-icono" aria-hidden="true"><IconoDisciplina d={e.discipline} tam={88} grosor={1.25} /></span>}
-      <span className="velada-cartel-arriba">
-        <span className="fecha-cartel" aria-hidden="true"><b>{dia}</b><span>{mes}</span></span>
-        {e.precio !== null && <span className="velada-precio">{e.precio} €</span>}
+    <Link href={`/veladas/${e.slug}`} className="velada-cartel" style={tinte(e.discipline)}>
+      {/* El cartel va arriba y los datos debajo, sobre fondo liso: los carteles llevan su propio texto y encima no se leería nada. */}
+      <span className="velada-cartel-imagen">
+        {e.cartel ? <Foto src={e.cartel} /> : <span className="velada-cartel-icono" aria-hidden="true"><IconoDisciplina d={e.discipline} tam={80} grosor={1.25} /></span>}
+        <span className="velada-cartel-arriba">
+          <span className="fecha-cartel" aria-hidden="true"><b>{dia}</b><span>{mes}</span></span>
+          {e.precio !== null && <span className="velada-precio">{e.precio} €</span>}
+        </span>
       </span>
       <span className="velada-cartel-abajo">
         {e.etiquetas.length > 0 && <span className="velada-etiquetas">{e.etiquetas.map((t) => <span key={t} className="tag">{t}</span>)}</span>}
