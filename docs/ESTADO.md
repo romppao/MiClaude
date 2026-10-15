@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **Integrar los paneles F y G** (los de #69/#70, actualizados sobre la 0.16.1) y después **D y H de Codex** con las correcciones de la revisión. Antes, fusionados: 0.15.1 (demo separada), 0.16.0 (bloqueos, aviso sin cuenta, correos de moderación) y 0.16.1 (fotos fuera de la base) | `claude-nube/integrar-paneles-f-g`, versión 0.17.0 | en curso |
 | Claude Code (portátil) | Hizo el relevo de Codex en F y G (#69, #70); sin actividad desde las 05:35 del 15-10. **Claude (nube) los integra** por petición del fundador (agilizar) | `claude/paneles-f`, `claude/paneles-g` | sustituidos |
-| Codex | **T-013 enlaces externos** (#77) y después **T-002 Dependabot agrupado** (#17/#18/#19/#65/#66). F/G ya elegidos en #75 por Claude; Codex mantiene sin actualizar sus PR de F/G/D/H (#56/#62/#64/#71). | `codex/t-013-enlaces-externos-20261015`, versión 0.17.1, PR #77 | pendiente de revisión |
+| Codex | **T-013 enlaces externos** (#77) y después **T-002 Dependabot agrupado** (#78) (#17/#18/#19/#65/#66). F/G ya elegidos en #75 por Claude; Codex mantiene sin actualizar sus PR de F/G/D/H (#56/#62/#64/#71). | `codex/t-013-enlaces-externos-20261015`, versión 0.17.1, PR #77 | pendiente de revisión |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
