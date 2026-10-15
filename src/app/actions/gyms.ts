@@ -14,6 +14,8 @@ import { isEmail, oneLine } from "../../lib/common/text";
 import { DISCIPLINE_ORDER } from "../../lib/common/disciplines";
 import { slugName } from "../../lib/common/labels";
 import { ubicarGimnasio } from "../../lib/common/geo";
+import { hayBloqueo } from "../../lib/community/bloqueos";
+import { putNotification } from "../../lib/community/notifications";
 import { sendMail } from "../../lib/common/mail";
 import { str, go, checkLengths, readProvince, guard, Rechazo, withLock, uniqueSlug, returnTo } from "./shared";
 
@@ -152,4 +154,87 @@ export async function setGymMember(f: FormData) {
     await audit({ userId: user.id, entity: kind === "fighter" ? "FIGHTER" : "TRAINER", entityId: id, action: "GYM_MEMBERSHIP_CHANGED", after: { gymId: decision === "link" ? gym.id : null } }, tx);
   }));
   revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_vinculo" });
+}
+
+/** Titular actual de una ficha: el perfil visual del entrenador también puede tener titular asignado por moderación. */
+async function gymMember(tx: import("@prisma/client").Prisma.TransactionClient, kind: string, id: string) {
+  if (kind === "fighter") {
+    const f = await tx.fighter.findFirst({ where: { id, listed: true, hiddenAt: null }, select: { userId: true, gymId: true } });
+    return f;
+  }
+  const t = await tx.trainer.findUnique({ where: { id }, select: { userId: true, gymId: true } });
+  if (!t) return null;
+  const profile = t.userId ? null : await tx.profile.findUnique({ where: { kind_entityId: { kind: "entrenador", entityId: id } }, select: { ownerId: true } });
+  return { gymId: t.gymId, userId: t.userId ?? profile?.ownerId ?? null };
+}
+
+/** El titular invita sin cambiar la ficha ajena; la persona tendrá que aceptar en Mis gimnasios. Moderación conserva setGymMember. */
+export async function inviteGymMember(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios";
+  const kind = str(f, "kind"), id = str(f, "memberId"), gymId = str(f, "gymId");
+  if (!["fighter", "trainer"].includes(kind) || id.length > 40 || gymId.length > 40) go(back, { problema: "opcion_invalida" });
+  await guard(back, () => withLock(`gym:${gymId}`, async (tx) => {
+    const gym = await tx.gym.findUnique({ where: { id: gymId } });
+    if (!gym || gym.ownerUserId !== user.id || gym.status !== "PUBLISHED" || gym.isFictional) throw new Rechazo("sin_permiso");
+    const member = await gymMember(tx, kind, id);
+    if (!member?.userId || member.gymId === gym.id) throw new Rechazo("gimnasio_miembro_invalido");
+    if (await hayBloqueo(user.id, member.userId, tx)) throw new Rechazo("bloqueo_contacto");
+    const recipient = await tx.user.findUnique({ where: { id: member.userId }, select: { emailVerifiedAt: true } });
+    if (!recipient?.emailVerifiedAt) throw new Rechazo("gimnasio_miembro_invalido");
+    const target = kind === "fighter" ? { fighterId: id } : { trainerId: id };
+    if (await tx.gymMemberInvitation.findFirst({ where: { gymId, ...target, status: "PENDING", expiresAt: { gt: new Date() } } })) throw new Rechazo("gimnasio_invitacion_repetida");
+    const created = await tx.gymMemberInvitation.create({ data: { gymId, senderId: user.id, recipientId: member.userId, ...target, previousGymId: member.gymId, expiresAt: new Date(Date.now() + 14 * 864e5) } });
+    await audit({ userId: user.id, entity: "GYM", entityId: gym.id, action: "GYM_MEMBER_INVITED", after: { invitationId: created.id } }, tx);
+    await putNotification(member.userId, "GYM_MEMBER", "Un gimnasio te invita a vincular tu ficha", "/mis-gimnasios#invitaciones", `gym-member:${created.id}`, tx);
+    return created;
+  }));
+  revalidatePath("/", "layout");
+  go(back, { aviso: "gimnasio_invitacion_enviada" });
+}
+
+/** Solo quien recibió la invitación decide. Propiedad, bloqueos y afiliación se vuelven a comprobar dentro de la transacción. */
+export async function answerGymMemberInvitation(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios#invitaciones";
+  const decision = str(f, "decision");
+  if (decision !== "accept" && decision !== "decline") go(back, { problema: "decision_no_valida" });
+  const invitation = await db.gymMemberInvitation.findFirst({ where: { id: str(f, "invitationId"), recipientId: user.id } });
+  if (!invitation) go(back, { problema: "no_existe" });
+  await guard(back, () => withLock(`gym:${invitation.gymId}`, async (tx) => {
+    const current = await tx.gymMemberInvitation.findUnique({ where: { id: invitation.id } });
+    if (!current || current.recipientId !== user.id || current.status !== "PENDING" || current.expiresAt <= new Date()) throw new Rechazo("solicitud_cambiada");
+    const gym = await tx.gym.findUnique({ where: { id: current.gymId } });
+    if (!gym || gym.ownerUserId !== current.senderId || gym.status !== "PUBLISHED") throw new Rechazo("solicitud_cambiada");
+    if (await hayBloqueo(user.id, current.senderId, tx)) throw new Rechazo("bloqueo_contacto");
+    const kind = current.fighterId ? "fighter" : "trainer", id = (current.fighterId ?? current.trainerId)!;
+    const member = await gymMember(tx, kind, id);
+    if (!member || member.userId !== user.id) throw new Rechazo("sin_permiso");
+    if (decision === "accept") {
+      // Escritura condicionada: ni otra invitación ni una edición posterior pueden quedar sobrescritas.
+      const where = { id, gymId: current.previousGymId };
+      const saved = kind === "fighter" ? await tx.fighter.updateMany({ where: { ...where, userId: user.id, listed: true, hiddenAt: null }, data: { gymId: gym.id } }) : await tx.trainer.updateMany({ where, data: { gymId: gym.id } });
+      if (saved.count !== 1) throw new Rechazo("solicitud_cambiada");
+    }
+    const saved = await tx.gymMemberInvitation.updateMany({ where: { id: current.id, status: "PENDING" }, data: { status: decision === "accept" ? "ACCEPTED" : "DECLINED", answeredAt: new Date() } });
+    if (saved.count !== 1) throw new Rechazo("solicitud_cambiada");
+    await audit({ userId: user.id, entity: "GYM", entityId: gym.id, action: decision === "accept" ? "GYM_MEMBER_ACCEPTED" : "GYM_MEMBER_DECLINED", after: { invitationId: current.id } }, tx);
+    await putNotification(current.senderId, "GYM_MEMBER", decision === "accept" ? "Han aceptado una invitación de tu gimnasio" : "Han rechazado una invitación de tu gimnasio", `/mis-gimnasios?gimnasio=${gym.id}`, `gym-member-answer:${current.id}`, tx);
+  }));
+  revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_invitacion_respondida" });
+}
+
+/** El remitente cancela una invitación pendiente; no se altera ninguna afiliación. */
+export async function cancelGymMemberInvitation(f: FormData) {
+  const user = await requireVerifiedUser("/mis-gimnasios");
+  const back = "/mis-gimnasios";
+  const invitation = await db.gymMemberInvitation.findFirst({ where: { id: str(f, "invitationId"), senderId: user.id } });
+  if (!invitation) go(back, { problema: "no_existe" });
+  await guard(back, () => withLock(`gym:${invitation.gymId}`, async (tx) => {
+    const current = await tx.gymMemberInvitation.findFirst({ where: { id: str(f, "invitationId"), senderId: user.id, status: "PENDING" } });
+    if (!current) throw new Rechazo("no_existe");
+    await tx.gymMemberInvitation.update({ where: { id: current.id }, data: { status: "CANCELLED", answeredAt: new Date() } });
+    await audit({ userId: user.id, entity: "GYM", entityId: current.gymId, action: "GYM_MEMBER_CANCELLED", after: { invitationId: current.id } }, tx);
+  }));
+  revalidatePath("/", "layout"); go(back, { aviso: "gimnasio_invitacion_cancelada" });
 }

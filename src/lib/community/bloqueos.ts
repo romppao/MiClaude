@@ -81,6 +81,7 @@ export async function bloquear(tx: Prisma.TransactionClient, blockerId: string, 
   }
   await tx.classRequest.updateMany({ where: { userId: blockedId, status: "PENDING", class: { trainer: { userId: blockerId } } }, data: { status: "DECLINED", answeredAt: new Date() } });
   await tx.classRequest.updateMany({ where: { userId: blockerId, status: "PENDING", class: { trainer: { userId: blockedId } } }, data: { status: "CANCELLED" } });
+  await tx.gymMemberInvitation.updateMany({ where: { status: "PENDING", OR: [{ senderId: blockerId, recipientId: blockedId }, { senderId: blockedId, recipientId: blockerId }] }, data: { status: "CANCELLED", answeredAt: new Date() } });
   if (suyo) await tx.follow.deleteMany({ where: { userId: blockerId, fighterId: suyo.id } });
   if (mio) await tx.follow.deleteMany({ where: { userId: blockedId, fighterId: mio.id } });
 }
