@@ -24,6 +24,7 @@ import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/clas
 import { safeHttpUrl } from "../../lib/common/url";
 import { checkLengths, go, guard, readProvince, Rechazo, str } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
+import { borrarFotos } from "../../lib/media/fotos";
 
 const MIN_PASSWORD = 8;
 
@@ -287,6 +288,16 @@ export async function deleteAccount(f: FormData) {
     ...(await db.mediaItem.findMany({ where: { uploaderId: user.id, videoKey: { not: null } }, select: { videoKey: true } })),
     ...(await db.highlight.findMany({ where: { fighter: { userId: user.id }, videoKey: { not: null } }, select: { videoKey: true } })),
   ].flatMap((v) => (v.videoKey ? [v.videoKey] : []));
+  // Y sus fotos (perfiles que gestiona o que son suyos, highlights y fotos de las veladas): igual, las filas con la cuenta y los archivos después.
+  const [miFicha, miPerfilDeEntrenador] = await Promise.all([
+    db.fighter.findUnique({ where: { userId: user.id }, select: { id: true } }),
+    db.trainer.findUnique({ where: { userId: user.id }, select: { id: true } }),
+  ]);
+  const fotos = [
+    ...(await db.profile.findMany({ where: { OR: [{ ownerId: user.id }, ...(miFicha ? [{ kind: "peleador", entityId: miFicha.id }] : []), ...(miPerfilDeEntrenador ? [{ kind: "entrenador", entityId: miPerfilDeEntrenador.id }] : [])] }, select: { avatarKey: true, bannerKey: true } })).flatMap((p) => [p.avatarKey, p.bannerKey]),
+    ...(await db.highlight.findMany({ where: { fighter: { userId: user.id } }, select: { imageKey: true } })).map((h) => h.imageKey),
+    ...(await db.mediaItem.findMany({ where: { uploaderId: user.id }, select: { imageKey: true } })).map((m) => m.imageKey),
+  ];
   await guard(back, () => db.$transaction(async (tx) => {
     if (user.role === "ADMIN" && (await tx.user.count({ where: { role: "ADMIN" } })) <= 1) throw new Rechazo("ultimo_moderador");
     const fighter = await tx.fighter.findUnique({ where: { userId: user.id }, include: { _count: { select: { boutsAsA: true, boutsAsB: true } } } });
@@ -322,6 +333,7 @@ export async function deleteAccount(f: FormData) {
   }));
   const almacen = almacenDeVideos();
   if (almacen) await Promise.all(videos.map((v) => almacen.borrar(v).catch(() => undefined)));
+  await borrarFotos(fotos);
   await destroySession();
   go("/", { aviso: "cuenta_eliminada" });
 }

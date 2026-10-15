@@ -40,7 +40,7 @@
 | `/medios/:id/imagen` | Foto que el público subió a una velada (guardada ya normalizada en WebP). ?descargar=1 la descarga. | Pública | — | MediaItem |
 | `/medios/:id/video` | Vídeo que el público subió a una velada. ?descargar=1 lo descarga (para que el peleador lo guarde). | Pública | — | MediaItem |
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `community.desbloquearUsuario`, `demo.demoCambiarPapel` | Block, Profile, Report, SupportAccreditation |
-| `/mi-cuenta/datos` | Descarga de todos los datos que Lona guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Block, Bout, ClaimRequest, ClassRequest, Event, EventRegistration, FightProposal, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
+| `/mi-cuenta/datos` | Una foto de la copia de datos, en base64 (del almacén de fotos o de la base). | Cuenta con sesión iniciada | — | AuditLog, Aura, Block, Bout, ClaimRequest, ClassRequest, Event, EventRegistration, FightProposal, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Lona? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.removeDiscipline`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, FighterAchievement, Gym, Highlight, MediaItem, Profile |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
@@ -101,7 +101,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `changePassword` | Cuenta con sesión iniciada | AppError, AuditLog, RateHit, Session, User | — | Sí | contrasena_guardada |
-| `deleteAccount` | Cuenta con sesión iniciada | AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
+| `deleteAccount` | Cuenta con sesión iniciada | AppError, AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | AuditLog, RateHit, Session, User | USER: CREADOR_PERMISOS | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
 | `register` | Cualquiera | AppError, AuditLog, EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
@@ -177,8 +177,8 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `createMyFighter` | Cuenta con correo verificado | AuditLog, Fighter, Gym, User | FIGHTER: CREATED | — | ficha_creada |
-| `manageHighlight` | Cuenta con correo verificado | AuditLog, Highlight | HIGHLIGHT: (varias) | — | — |
-| `publishHighlight` | Cuenta con correo verificado | AuditLog, Highlight | HIGHLIGHT: CREATED | — | highlight_publicado |
+| `manageHighlight` | Cuenta con correo verificado | AppError, AuditLog, Highlight | HIGHLIGHT: (varias) | — | — |
+| `publishHighlight` | Cuenta con correo verificado | AppError, AuditLog, Highlight | HIGHLIGHT: CREATED | — | highlight_publicado |
 | `removeDiscipline` | Cuenta con correo verificado | AuditLog, FighterAchievement, FighterDiscipline | FIGHTER: DISCIPLINE_REMOVED | — | disciplina_quitada |
 | `requestClaim` | Cuenta con correo verificado | ClaimRequest | — | — | solicitud_enviada |
 | `saveDiscipline` | Cuenta con correo verificado | AuditLog, FighterDiscipline | FIGHTER: (varias) | — | disciplina_guardada |
@@ -189,8 +189,8 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
-| `deleteMyMedia` | Cuenta con correo verificado | AuditLog, MediaItem | MEDIA: DELETED | — | medio_borrado |
-| `shareMedia` | Cuenta con correo verificado | AuditLog, MediaItem | MEDIA: CREATED | — | medio_compartido |
+| `deleteMyMedia` | Cuenta con correo verificado | AppError, AuditLog, MediaItem | MEDIA: DELETED | — | medio_borrado |
+| `shareMedia` | Cuenta con correo verificado | AppError, AuditLog, MediaItem | MEDIA: CREATED | — | medio_compartido |
 
 ### `moderation`
 
@@ -284,7 +284,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
 | AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `community.bloquearUsuario`, `community.desbloquearUsuario`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `moderation.decidirVeladaPasada`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
-| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `bouts.addBout`, `bouts.respondBout`, `community.avisarSinCuenta`, `events.addCartelBout`, `moderation.resolveReport`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.respondBout`, `community.avisarSinCuenta`, `events.addCartelBout`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | Report | `bouts.respondBout`, `community.createReport`, `community.avisarSinCuenta`, `moderation.resolveReport` |
 | Block | `community.bloquearUsuario`, `community.desbloquearUsuario` |
 | Follow | `accounts.saveInterests`, `community.toggleFollow`, `community.bloquearUsuario`, `moderation.decideClaim` |
@@ -388,7 +388,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `anonymize.ts` | `anonymizeFighter`, `scrubFighterHistory` |
+| `anonymize.ts` | `ArchivosRetirados`, `anonymizeFighter`, `scrubFighterHistory` |
 | `coherence.ts` | `FLAG_LABEL`, `Flag`, `MIN_DAYS_BETWEEN_BOUTS`, `proximityAppliesTo`, `proximityFlags` |
 | `fighters.ts` | `findNameCandidates` |
 | `graduation.ts` | `BELTS`, `graduationLabel`, `parseGraduation` |
@@ -403,9 +403,10 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
+| `fotos.ts` | `AlmacenDeFotos`, `CLAVE_DE_FOTO`, `CarpetaDeFotos`, `FotoGuardada`, `almacenDeFotos`, `borrarFotos`, `guardarFoto`, `leerFoto`, `nuevaClaveDeFoto` |
 | `rules.ts` | `CONSENTIMIENTO`, `DIAS_PARA_COMPARTIR`, `MAX_FOTOS_POR_DIA`, `MAX_MEDIOS_POR_DIA`, `MedioInput`, `MedioParsed`, `PIE_MAX`, `nombreDeDescarga`, `parseMedio`, `veladaAbiertaAlPublico` |
 | `s3.ts` | `Credenciales`, `codificar`, `presignar` |
-| `storage.ts` | `Almacen`, `CLAVE_VALIDA`, `MAX_VIDEO_DISCO`, `MAX_VIDEO_R2`, `TIPOS_DE_VIDEO`, `almacenDeVideos`, `carpetaEnDisco`, `claveDe`, `guardarEnDisco`, `lecturaR2`, `nuevaClave`, `responderVideo`, `rutaEnDisco`, `servirDesdeDisco`, `tipoDeClave` |
+| `storage.ts` | `Almacen`, `CLAVE_VALIDA`, `MAX_VIDEO_DISCO`, `MAX_VIDEO_R2`, `TIPOS_DE_VIDEO`, `almacenDeVideos`, `carpetaEnDisco`, `claveDe`, `configuracionR2`, `guardarEnDisco`, `lecturaR2`, `nuevaClave`, `responderVideo`, `rutaEnDisco`, `servirDesdeDisco`, `tipoDeClave` |
 
 ### `lib/news`
 

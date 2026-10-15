@@ -22,6 +22,8 @@ import { normalizeImage } from "../../lib/profiles/images";
 import { almacenDeVideos, claveDe, tipoDeClave } from "../../lib/media/storage";
 import { Prisma } from "@prisma/client";
 import { checkLengths, go, guard, readProvince, str, uniqueSlug } from "./shared";
+import { borrarFotos, guardarFoto, type FotoGuardada } from "../../lib/media/fotos";
+import { registrarFallo } from "../../lib/common/fallos";
 
 /** Lee del formulario la disciplina elegida (con categoría) y el récord de partida declarado. */
 function readDisciplineForm(f: FormData) {
@@ -241,11 +243,24 @@ export async function publishHighlight(f: FormData) {
     try { image = await normalizeImage(foto, "banner"); } catch { go(back, { problema: "imagen_invalida" }); }
   }
   const pinned = str(f, "pinned") === "on";
-  await db.$transaction(async (tx) => {
-    if (pinned) await tx.highlight.updateMany({ where: { fighterId: me.id, pinned: true }, data: { pinned: false } });
-    const h = await tx.highlight.create({ data: { fighterId: me.id, kind: datos.kind, title: datos.title, videoUrl: datos.videoUrl, videoKey: datos.videoKey, videoType: datos.videoKey ? tipoDeClave(datos.videoKey) : null, image, hasImage: !!image, boutId, pinned } });
-    await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: "CREATED", after: { kind: h.kind, title: h.title, videoUrl: h.videoUrl, subido: !!h.videoKey, boutId, pinned } }, tx);
-  });
+  // La foto va al almacén de fotos (o a la base si no hay almacén: lib/media/fotos.ts).
+  let guardada: FotoGuardada = { clave: null, bytes: null };
+  if (image) {
+    try { guardada = await guardarFoto("highlights", image); } catch (e) {
+      await registrarFallo({ origen: "ACCION", contexto: "No se pudo guardar la foto de un highlight en el almacén", error: e });
+      go(back, { problema: "foto_no_guardada" });
+    }
+  }
+  try {
+    await db.$transaction(async (tx) => {
+      if (pinned) await tx.highlight.updateMany({ where: { fighterId: me.id, pinned: true }, data: { pinned: false } });
+      const h = await tx.highlight.create({ data: { fighterId: me.id, kind: datos.kind, title: datos.title, videoUrl: datos.videoUrl, videoKey: datos.videoKey, videoType: datos.videoKey ? tipoDeClave(datos.videoKey) : null, image: guardada.bytes, imageKey: guardada.clave, hasImage: !!image, boutId, pinned } });
+      await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: "CREATED", after: { kind: h.kind, title: h.title, videoUrl: h.videoUrl, subido: !!h.videoKey, boutId, pinned } }, tx);
+    });
+  } catch (e) {
+    await borrarFotos([guardada.clave]);
+    throw e;
+  }
   revalidatePath("/", "layout");
   go(back, { aviso: "highlight_publicado" });
 }
@@ -268,6 +283,7 @@ export async function manageHighlight(f: FormData) {
     await audit({ userId: user.id, entity: "HIGHLIGHT", entityId: h.id, action: accion === "destacar" ? "PINNED" : "DELETED", before: { title: h.title } }, tx);
   });
   if (accion === "retirar" && h.videoKey) await almacenDeVideos()?.borrar(h.videoKey);
+  if (accion === "retirar") await borrarFotos([h.imageKey]);
   revalidatePath("/", "layout");
   go(back, { aviso: accion === "destacar" ? "highlight_destacado" : "highlight_retirado" });
 }

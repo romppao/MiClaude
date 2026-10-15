@@ -55,6 +55,8 @@ jobs:
       GOOGLE_CLIENT_ID: cliente-de-pruebas.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: secreto-de-pruebas
       MEDIA_DIR: /tmp/ring-subidas
+      # Las fotos van al almacén de fotos en disco (lib/media/fotos.ts), como irán a R2 en producción: así las pruebas recorren ese camino.
+      FOTOS_EN_DISCO: "si"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

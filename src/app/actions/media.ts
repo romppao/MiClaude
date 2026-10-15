@@ -11,6 +11,8 @@ import { normalizeImage } from "../../lib/profiles/images";
 import { MAX_FOTOS_POR_DIA, MAX_MEDIOS_POR_DIA, parseMedio, veladaAbiertaAlPublico } from "../../lib/media/rules";
 import { almacenDeVideos, claveDe } from "../../lib/media/storage";
 import { go, guard, str } from "./shared";
+import { borrarFotos, guardarFoto, type FotoGuardada } from "../../lib/media/fotos";
+import { registrarFallo } from "../../lib/common/fallos";
 
 /** Comprueba que un vídeo subido existe, es de quien lo publica y no supera el máximo. Devuelve sus bytes o null. */
 async function videoSubido(clave: string, userId: string): Promise<number | null> {
@@ -44,7 +46,16 @@ export async function shareMedia(f: FormData) {
   if (hayFoto) {
     try { image = await normalizeImage(foto, "banner"); } catch { go(back, { problema: "imagen_invalida" }); }
   }
-  const medio = await guard(back, () => db.mediaItem.create({ data: { eventId: event.id, boutId, uploaderId: user.id, kind: datos.kind, caption: datos.caption, image, videoKey: datos.videoKey, videoBytes, videoUrl: datos.videoUrl } }));
+  // La foto va al almacén de fotos (o a la base si no hay almacén: lib/media/fotos.ts).
+  let guardada: FotoGuardada = { clave: null, bytes: null };
+  if (image) {
+    try { guardada = await guardarFoto("medios", image); } catch (e) {
+      await registrarFallo({ origen: "ACCION", contexto: "No se pudo guardar una foto del público en el almacén", error: e });
+      go(back, { problema: "foto_no_guardada" });
+    }
+  }
+  const medio = await guard(back, () => db.mediaItem.create({ data: { eventId: event.id, boutId, uploaderId: user.id, kind: datos.kind, caption: datos.caption, image: guardada.bytes, imageKey: guardada.clave, videoKey: datos.videoKey, videoBytes, videoUrl: datos.videoUrl } })
+    .catch(async (e) => { await borrarFotos([guardada.clave]); throw e; }));
   await audit({ userId: user.id, entity: "MEDIA", entityId: medio.id, action: "CREATED", after: { eventId: event.id, boutId, kind: datos.kind, videoUrl: datos.videoUrl, subido: !!datos.videoKey } });
   revalidatePath("/", "layout");
   go(`/veladas/${event.slug}#multimedia`, { aviso: "medio_compartido" });
@@ -58,6 +69,7 @@ export async function deleteMyMedia(f: FormData) {
   if (!m) go(back, { problema: "no_existe" });
   await db.mediaItem.delete({ where: { id: m.id } });
   if (m.videoKey) await almacenDeVideos()?.borrar(m.videoKey);
+  await borrarFotos([m.imageKey]);
   await audit({ userId: user.id, entity: "MEDIA", entityId: m.id, action: "DELETED", before: { eventId: m.eventId, kind: m.kind } });
   revalidatePath("/", "layout");
   go(back, { aviso: "medio_borrado" });

@@ -285,6 +285,8 @@ model Highlight {
   videoKey  String?
   videoType String?
   image     Bytes?
+  // Clave de la foto en el almacén de fotos (lib/media/fotos.ts); si la hay, `image` queda vacío.
+  imageKey  String?
   hasImage  Boolean       @default(false)
   boutId    String?
   bout      Bout?         @relation(fields: [boutId], references: [id], onDelete: SetNull)
@@ -698,6 +700,9 @@ model Profile {
   hasBanner Boolean  @default(false)
   avatar    Bytes?
   banner    Bytes?
+  // Claves de la foto y del banner en el almacén de fotos (lib/media/fotos.ts); si las hay, `avatar` y `banner` quedan vacíos.
+  avatarKey String?
+  bannerKey String?
   avatarX   Int      @default(50)
   avatarY   Int      @default(50)
   bannerX   Int      @default(50)
@@ -793,6 +798,8 @@ model MediaItem {
   kind       MediaKind
   caption    String?
   image      Bytes?
+  // Clave de la foto en el almacén de fotos (lib/media/fotos.ts); si la hay, `image` queda vacío.
+  imageKey   String?
   videoKey   String?
   videoType  String?
   videoBytes Int?
