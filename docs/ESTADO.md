@@ -2,6 +2,8 @@
 
 > **Para qué sirve (petición del fundador, 14 de octubre de 2026):** Claude en la nube o en el móvil, Claude Code en el portátil, Codex y cualquier otro asistente **no se pueden hablar entre sí**. El repositorio es su único canal. Este archivo es la página corta que dice cómo está todo **ahora**, para no repetir lo que el fundador ya hizo o dijo en otra sesión ni pisarse el trabajo.
 >
+> **15-10-2026, tarde: Claude Code, empieza por [`ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md`](ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md).**
+>
 > **Al empezar:** `git fetch` y `node scripts/estado.mjs` (lo que dice la realidad en directo: demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez) y lee esta página. **Antes de un trabajo grande:** `node scripts/estado.mjs reservar <asistente> "<tema>"`. **Al terminar:** actualiza tu fila y lo que cambie. Reglas completas al final.
 
 **Última revisión completa:** 15 de octubre de 2026 (Claude, nube). Si el script avisa de que tiene más de 3 días, no te fíes sin mirar el script.
@@ -17,8 +19,8 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **T-008: cola de correos** con reintentos y límite diario. Fusionados hoy: 0.15.1 a 0.18.0 (demo separada, bloqueos y avisos, fotos fuera de la base, paneles F y G, gimnasios reales y campanita de avisos) | `claude-nube/t-008-cola-de-correos-con-limite-diario-20261015`, versión 0.18.1 | PR abierto |
-| Claude Code (portátil) | F y G (#69, #70) integrados por Claude (nube) en #75 (0.17.0) y cerrados | — | hecho |
+| Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Todo su trabajo y lo que queda a medias está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | PR abiertos: #81 (Sentry), #82 (gimnasios investigados); rama sin PR: `claude-nube/integrar-t013-t002` | en pausa |
+| Claude Code (portátil) | **Siguiente en trabajar:** cerrar lo pendiente de Claude (nube) y seguir con los gimnasios reales, según `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | por empezar |
 | Codex | Lo pendiente está en `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`: rehacer la lista única de moderación, vincular y ceder gimnasios con aceptación, gimnasios desde las fichas en revisión y RFC-002. Sus PR #56, #62, #64 y #71 están sustituidos | parte de `claude/ring-espana-mvp` | pendiente |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 

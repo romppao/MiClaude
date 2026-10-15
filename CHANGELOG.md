@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.3] — 2026-10-15
+
+PR de Claude (nube): relevo a Claude Code (documentación).
+
+### Cambiado
+- `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md`: qué se hizo hoy, qué queda a medias y cómo cerrarlo, cómo seguir con los gimnasios reales (información de menos de un año y todas las comunidades) y las reglas nuevas. `ESTADO.md` lo enlaza al principio.
+
 ## [0.18.2] — 2026-10-15
 
 PR de Claude: cargar los gimnasios reales en la demo desde GitHub (el fundador quiere probarlos en la demo, 15-10-2026).
