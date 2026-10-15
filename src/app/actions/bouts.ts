@@ -3,6 +3,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { notifyFollowedBout } from "../../lib/community/notifications";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
@@ -162,6 +163,7 @@ export async function setMyBoutResult(f: FormData) {
     if (r.count === 0) throw new Rechazo("combate_cambiado");
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET_BY_AUTHOR", before: { result: bout.result, method: bout.method, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification: soloEmparejamientoConfirmado ? "SELF_REPORTED" : bout.verification } }, tx);
   }));
+  after(() => notifyFollowedBout(bout.id, "BOUT_RESULT"));
   revalidatePath("/", "layout");
   go(back, { aviso: soloEmparejamientoConfirmado ? "resultado_guardado_confirmar" : "resultado_guardado" });
 }

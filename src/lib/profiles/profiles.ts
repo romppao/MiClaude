@@ -1,3 +1,4 @@
+import { gymIsPublic } from "../common/gym-policy";
 import type { User } from "@prisma/client";
 import { publicUserName } from "../common/names";
 import { db } from "../common/db";
@@ -18,7 +19,7 @@ export async function profileSource(kind: ProfileKind, id: string) {
     const f = await db.fighter.findUnique({ where: { id } });
     return f ? { name: `${f.firstName} ${f.lastName}`, href: `/peleadores/${f.slug}`, ownerId: f.userId, visible: f.listed && !f.hiddenAt } : null;
   }
-  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: null, visible: provinciaConGimnasios(g.province) } : null; }
+  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: g.ownerUserId, visible: gymIsPublic(g) } : null; }
   if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: t.userId, visible: true } : null; }
   if (kind === "promotor") {
     const u = await db.user.findUnique({ where: { id }, include: { organizerRequest: true } });
@@ -38,5 +39,5 @@ export function canEditProfile(user: Pick<User, "id" | "role"> | null, ownerId: 
  */
 export async function profileAccess(kind: ProfileKind, id: string, user: Pick<User, "id" | "role"> | null) {
   const [source, profile] = await Promise.all([profileSource(kind, id), db.profile.findUnique({ where: { kind_entityId: { kind, entityId: id } }, select: profileSelect })]);
-  return { source, profile, editable: !!source && canEditProfile(user, source.ownerId, kind === "peleador" || kind === "promotor" ? null : profile?.ownerId ?? null) };
+  return { source, profile, editable: !!source && canEditProfile(user, source.ownerId, kind === "peleador" || kind === "promotor" || kind === "gimnasio" ? null : profile?.ownerId ?? null) };
 }

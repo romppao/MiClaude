@@ -2,6 +2,8 @@
 // Todo lo que se exporta aquí es un punto de entrada público del servidor (POST): los ayudantes van sin exportar o en ./shared.
 "use server";
 
+import { after } from "next/server";
+import { notifyBoutVideo } from "../../lib/community/notifications";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
@@ -57,6 +59,7 @@ export async function shareMedia(f: FormData) {
   const medio = await guard(back, () => db.mediaItem.create({ data: { eventId: event.id, boutId, uploaderId: user.id, kind: datos.kind, caption: datos.caption, image: guardada.bytes, imageKey: guardada.clave, videoKey: datos.videoKey, videoBytes, videoUrl: datos.videoUrl } })
     .catch(async (e) => { await borrarFotos([guardada.clave]); throw e; }));
   await audit({ userId: user.id, entity: "MEDIA", entityId: medio.id, action: "CREATED", after: { eventId: event.id, boutId, kind: datos.kind, videoUrl: datos.videoUrl, subido: !!datos.videoKey } });
+  if (medio.kind === "VIDEO" && medio.boutId) after(() => notifyBoutVideo(medio.id));
   revalidatePath("/", "layout");
   go(`/veladas/${event.slug}#multimedia`, { aviso: "medio_compartido" });
 }

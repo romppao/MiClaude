@@ -3,6 +3,15 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  highlight_publico_anadido: "Vídeo añadido a tus highlights. Quien lo compartió recibe un aviso si es otra persona.",
+  aviso_leido: "Aviso marcado como leído.",
+  avisos_leidos: "Tus avisos se han marcado como leídos.",
+  gimnasio_guardado: "Gimnasio guardado. Las altas y los datos por revisar no se publican hasta su revisión.",
+  gimnasio_reclamado: "Reclamación enviada a moderación. Puedes ver su estado en Mis gimnasios.",
+  gimnasio_conflicto: "El gimnasio ya tiene titular. La solicitud queda en conflicto y no cambia su propiedad.",
+  gimnasio_decidido: "Decisión guardada. Se ha avisado a quien reclamó el gimnasio.",
+  gimnasio_cedido: "Has cedido la propiedad a la cuenta indicada.",
+  gimnasio_vinculo: "Vinculación del gimnasio guardada.",
   asistencia_guardada: "Has marcado que vas a ir. La velada aparece en tu agenda.",
   asistencia_quitada: "Has retirado la velada de tu agenda.",
   disponibilidad_guardada: "Disponibilidad guardada. Si la activas, caduca a los 60 días.",
@@ -121,6 +130,12 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  highlight_ya_anadido: "Ese vídeo ya está en tus highlights.",
+  gimnasio_contacto: "Revisa el teléfono y el correo profesional del gimnasio.",
+  gimnasio_prueba: "Explica cómo comprobar tu relación con el gimnasio y usa un enlace web válido si lo aportas. No envíes DNI.",
+  gimnasio_solicitud_repetida: "Ya tienes una reclamación de este gimnasio pendiente de revisión.",
+  gimnasio_ya_tuyo: "Ya gestionas este gimnasio.",
+  gimnasio_nota: "Escribe una nota de revisión de al menos diez caracteres.",
   opcion_invalida: "La opción enviada no es válida. Vuelve a intentarlo desde el formulario.",
   peso_actual_invalido: "Escribe un peso de 20 a 300 kg, con como máximo dos decimales, o deja el campo vacío.",
   entradas_https: "El enlace de entradas debe empezar por https://. Copia la dirección segura de la web de venta.",
@@ -285,6 +300,8 @@ export const PROBLEMAS: Record<string, string> = {
   aviso_identidad: "Escribe tu nombre y tu correo electrónico: los necesitamos para comunicarte la decisión. Solo los avisos de abuso de menores se pueden enviar sin identificarse.",
   aviso_declaracion: "Marca la casilla que confirma que lo que cuentas es cierto: la ley la pide para tramitar el aviso.",
   foto_no_guardada: "No hemos podido guardar la foto. No se ha cambiado nada: inténtalo de nuevo dentro de unos minutos.",
+  gimnasio_cesion_moderacion: "Para ceder el gimnasio a otra persona, pídelo a moderación: lo comprobará con las dos cuentas.",
+  gimnasio_retirar_confirmar: "Marca la casilla para confirmar que quieres retirar el gimnasio del directorio.",
   bloqueo_contacto: "No puedes contactar con esta persona: una de las dos ha bloqueado a la otra. Si fuiste tú, puedes desbloquearla en «Mi cuenta», pestaña «Bloqueos».",
   bloqueo_no_existe: "No hemos encontrado a esa persona. Puede que ya la hayas desbloqueado o que haya eliminado su cuenta.",
   bloqueo_propio: "No puedes bloquearte a ti mismo.",

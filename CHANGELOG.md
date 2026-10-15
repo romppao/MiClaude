@@ -11,6 +11,21 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.0] — 2026-10-15
+
+PR de Claude (nube): los bloques D (#64) y H (#71) de Codex, integrados sobre la 0.17.0 con las correcciones de su revisión. La lista única de moderación de H no entra: tenía un botón que no funcionaba y no admitía los avisos sin cuenta (queda para Codex).
+
+### Añadido (bloque H)
+- Campanita de avisos personales, con lectura, descarga propia y conservación de doce meses.
+- Vídeos públicos de tus combates añadidos por referencia a tus highlights; aviso a quien los compartió (salvo si hay un bloqueo entre los dos).
+- Seguidores y comentarios recientes en el panel del peleador (sin los de personas que ha bloqueado), plantilla del gimnasio del entrenador y pendientes de federación con acreditación.
+
+
+### Añadido (bloque D)
+- Directorio de gimnasios con procedencia OSM, contactos profesionales y disciplinas, revisión de altas, reclamación, gestión y cesión de propiedad.
+- Importador manual con recuento previo, protección de datos corregidos, duplicados por revisar y guardas de carga oficial.
+- Exclusión de Cataluña en directorio y mapa; atribución ODbL y distinción del seed ficticio.
+
 ## [0.17.0] — 2026-10-15
 
 PR de Claude (nube): los paneles F y G que preparó Codex (#56, #62), en la versión que integró Claude Code (#69, #70), actualizados sobre la 0.16.1. Sustituye a los cuatro PR.

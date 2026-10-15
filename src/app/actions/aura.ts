@@ -2,6 +2,7 @@
 // Todo lo que se exporta aquí es un punto de entrada público del servidor (POST): los ayudantes van sin exportar o en ./shared.
 "use server";
 
+import { putNotification, dailyAuraKey } from "../../lib/community/notifications";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/common/db";
@@ -38,6 +39,8 @@ export async function giveAura(f: FormData) {
       create: { userId: user.id, boutId: bout.id, fighterId, comment, attended },
       update: { comment, attended },
     });
+    const recipient = await tx.fighter.findUnique({ where: { id: fighterId }, select: { userId: true } });
+    if (recipient?.userId) await putNotification(recipient.userId, "AURA_RECEIVED", "Has recibido aura hoy", "/mi-panel#titulo-mi-aura", dailyAuraKey(fighterId), tx, true);
     return "ok" as const;
   });
   if (status === "limite") go(back, { problema: "aura_limite" });

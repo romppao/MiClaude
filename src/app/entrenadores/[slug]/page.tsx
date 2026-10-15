@@ -1,3 +1,4 @@
+import { gymIsPublic, excludedGymProvince } from "../../../lib/common/gym-policy";
 import ProfileThumbnail from "../../components/ProfileThumbnail";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileDetails from "../../components/ProfileDetails";
@@ -31,13 +32,13 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <ProfileHeader kind="entrenador" id={t.id} name={t.name} subtitle={t.gym?.name ?? "Entrenador"}/><ProfileDetails kind="entrenador" id={t.id}/>
-      {t.gym && <p className="mut">Gimnasio: <Link href={`/gimnasios/${t.gym.slug}`}>{t.gym.name}</Link></p>}
+      {t.gym && gymIsPublic(t.gym) && <p className="mut">Gimnasio: <Link href={`/gimnasios/${t.gym.slug}`}>{t.gym.name}</Link></p>}
       {(t.disciplines.length > 0 || t.yearsCoaching !== null) && <p className="chips" style={{ marginTop: 12 }}>{t.disciplines.map((d) => <span key={d} className="pildora">{DISCIPLINE_LABEL[d]}</span>)}{t.yearsCoaching !== null && <span className="pildora pildora-acc">{t.yearsCoaching} años entrenando</span>}{t.province && <span className="pildora">{t.city && t.city !== t.province ? `${t.city}, ` : ""}{t.province}</span>}</p>}
       {t.bio && <p>{t.bio}</p>}
       {/* Dónde entrena (13 de octubre de 2026): su gimnasio en el mapa; si no tiene, su provincia, como zona aproximada. */}
-      {t.gym ? (
+      {t.gym && gymIsPublic(t.gym) ? (
         <DondeEsta titulo="Dónde entrena" nombre={t.gym.name} direccion={[t.gym.name, t.gym.address, t.gym.city, t.gym.province].filter(Boolean).join(", ")} punto={puntoDeGimnasio(t.gym)} />
-      ) : t.province && CENTROS_PROVINCIA[t.province] ? (
+      ) : !t.gym && t.province && !excludedGymProvince(t.province) && CENTROS_PROVINCIA[t.province] ? (
         <DondeEsta titulo="Dónde entrena" nombre={t.name} direccion={`Zona de ${t.city && t.city !== t.province ? `${t.city}, ` : ""}${t.province}`} punto={{ ...CENTROS_PROVINCIA[t.province], origen: "provincia" }} />
       ) : null}
       {t.userId && <>

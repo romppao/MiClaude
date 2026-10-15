@@ -34,6 +34,8 @@ export default function Privacy() {
         <li><strong>Datos técnicos mínimos:</strong> una cookie necesaria para mantener tu sesión iniciada (detalle en <Link href="/cookies">Cookies</Link>) y, durante 2 días como máximo, tu dirección de conexión, solo para frenar intentos repetidos de acceso. No usamos cookies de publicidad ni de medición.</li>
       </ul>
 
+      <h2>Gimnasios y datos profesionales</h2>
+      <p>El directorio publica datos profesionales del negocio aportados por su responsable, por moderación o procedentes de OpenStreetMap. Los datos importados conservan su origen y la atribución ODbL. No se publican automáticamente contactos que parezcan personales. Puedes pedir corrección o retirada desde la ficha o escribiendo al contacto de esta página. La prueba para reclamar un gimnasio solo la ven quien la aporta y moderación: no pedimos DNI. Se vacía al decidir y las solicitudes decididas se conservan como máximo 90 días. Los gimnasios ficticios se identifican en la demo y no se publican en la versión real.</p>
       <h2>Provincia, asistencia y disponibilidad</h2>
       <p>La provincia de tu cuenta es opcional y sirve para mostrar actividad cerca de ti. Las veladas que marcas con «Voy a ir» aparecen en tu agenda; el público solo ve cuántas personas han marcado su asistencia, nunca sus nombres. Puedes quitar la marca. Si activas «Disponible para pelear», tu disponibilidad y el peso que quieras declarar se muestran durante 60 días y puedes retirarlos cuando quieras. Todo ello figura en tu descarga de datos; la asistencia se borra con tu cuenta.</p>
       <h2>Para qué los usamos</h2>
@@ -78,13 +80,17 @@ export default function Privacy() {
       <p>En España, a partir de los 14 años puedes dar tu consentimiento para usar Lona. Si tienes menos de 14 años, es tu madre, padre o tutor quien debe autorizarlo. Si eres madre, padre o tutor y crees que un menor usa Lona sin tu permiso, o aparece en una ficha, foto o vídeo, escríbenos y lo retiraremos.</p>
 
       <h2>Cuánto tiempo los conservamos</h2>
+      <p>Los avisos de tu campanita solo los ves tú. Te informan sobre actividad relacionada con tu cuenta; son independientes de la preferencia de correo y no son mensajes comerciales. Puedes marcarlos como leídos y descargarlos con tus datos.</p>
       <ul>
         <li>Tu cuenta y tu ficha, hasta que las elimines.</li>
         <li>Cuentas cuyo correo nunca se ha confirmado: se borran a los 30 días.</li>
         <li>Enlaces enviados por correo: caducan a la hora (recuperar contraseña) o a las 48 horas (confirmar correo).</li>
         <li>Solicitudes para reclamar una ficha: el texto con el que demuestras quién eres se borra en cuanto un moderador decide, y la solicitud a los 90 días.</li>
         <li>Avisos ya resueltos: 12 meses. Historial de cambios: 3 años.</li>
+        <li>Avisos de la campanita: 12 meses desde su creación. Después dejan de mostrarse y se eliminan en la limpieza periódica; al eliminar tu cuenta también se borran.</li>
       </ul>
+
+      <p>Si añades a tus highlights un vídeo público de tu combate, se mantiene una referencia al vídeo original y se avisa a quien lo compartió. Si el original se retira, se oculta o su velada deja de ser pública, también deja de verse en tus highlights. Quitar esa referencia de tu ficha no borra el vídeo de otra persona.</p>
 
       <h2>Tus derechos y cómo ejercerlos</h2>
       <p>Puedes ejercerlos tú mismo, sin pedir permiso a nadie, desde tu cuenta:</p>

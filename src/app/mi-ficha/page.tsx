@@ -21,7 +21,7 @@ import { addBout, removeMyBout, respondBout, setBoutEvidence, setMyBoutResult } 
 import { setAvailability, createMyFighter, manageHighlight, publishHighlight, removeDiscipline, requestClaim, saveDiscipline, setRecordPublic, updateMyFighter } from "../actions/fighters";
 import { isAvailable } from "../../lib/fighters/availability";
 import { readOnboarding } from "../../lib/accounts/onboarding";
-import { HIGHLIGHT_KIND_LABEL, HIGHLIGHT_TITLE_MAX, orderHighlights } from "../../lib/fighters/highlights";
+import { visibleHighlightSources, HIGHLIGHT_KIND_LABEL, HIGHLIGHT_TITLE_MAX, orderHighlights } from "../../lib/fighters/highlights";
 import { recordHidden, shownRecord } from "../../lib/fighters/privacy";
 import { combinedRecord, emptyTally } from "../../lib/fighters/record";
 import { iniciales } from "../../lib/common/apariencia";
@@ -122,7 +122,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
   const toConfirm = bouts.filter((b) => b.verification === "SELF_REPORTED" && b.fighterBId === me.id);
   const almacen = almacenDeVideos();
   const mediosDeMisCombates = await db.mediaItem.findMany({ where: { hiddenAt: null, bout: { OR: [{ fighterAId: me.id }, { fighterBId: me.id }] } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 40, select: SELECT_MEDIO });
-  const misHighlights = orderHighlights(await db.highlight.findMany({ where: { fighterId: me.id, hiddenAt: null }, select: { id: true, kind: true, title: true, videoUrl: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }));
+  const misHighlights = orderHighlights(await db.highlight.findMany({ where: { fighterId: me.id, hiddenAt: null, ...visibleHighlightSources }, select: { id: true, kind: true, title: true, videoUrl: true, pinned: true, createdAt: true, bout: { select: { event: { select: { name: true } } } } } }));
   const tieneAmateur = me.disciplines.some((d) => d.level === "AMATEUR") || bouts.some((b) => b.event.level === "AMATEUR");
   const principal = [...me.disciplines].sort((a, b) => DISCIPLINE_ORDER.indexOf(a.discipline) - DISCIPLINE_ORDER.indexOf(b.discipline))[0];
   const tallyP = principal ? records[principal.discipline]?.[principal.level] ?? emptyTally() : emptyTally();

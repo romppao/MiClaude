@@ -3,6 +3,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { putNotification } from "../../lib/community/notifications";
 import { after } from "next/server";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
@@ -50,6 +51,7 @@ export async function proposeFight(f: FormData) {
     if (!(await allow(`propuesta:${me.id}`, PROPOSALS_PER_DAY, 24 * HORA))) go(back, { problema: "propuestas_diarias" });
     const creada = await tx.fightProposal.create({ data: { fromId: me.id, toId: rival.id, ...datos.value } });
     await audit({ userId: user.id, entity: "PROPOSAL", entityId: creada.id, action: "PROPOSED", after: { tipo: creada.kind, a: rival.id, disciplina: creada.discipline } }, tx);
+    if (rival.userId) await putNotification(rival.userId, "PROPOSAL", "Has recibido un reto o una propuesta de sparring", "/propuestas", `proposal:${creada.id}`, tx);
     return creada;
   });
   const quien = oneLine(publicFighterName(me));

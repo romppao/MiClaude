@@ -358,6 +358,17 @@ F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.
 ## 2026-10-14 — Bloque G de paneles
 Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
 
+## 2026-10-14 — Gimnasios reales, bloque D
+Modelo aditivo de procedencia, contacto profesional, disciplinas, propiedad revisada, publicación y ficción. Directorio/mapa/fichas/búsqueda excluyen Cataluña con una sola constante; las altas excluidas permanecen por revisar. Reclamación, conflicto, edición, cesión, miembros y aviso de corrección quedan auditados. El titular natural del gimnasio es la fuente de permisos; se preservan los titulares anteriores del perfil visual mediante migración. El importador reutilizable hace recuento por defecto, consulta áreas OSM para provincia ausente, conserva caché y protege gimnasios corregidos/reclamados. Una carga real requiere plan comparado con esa base, hash presentado e IMPORTAR_EN_REAL=si. Nunca usa seed o crea campañas.
+Validación local: 785 unitarias y tipos; esquema y migración generada con diff sobre G. Fixture sintético del importador: Madrid 1, Valencia 1, cuatro provincias excluidas descartadas; NO es un inventario real. Consulta real de Overpass falla por EACCES de red: no hay recuento real ni carga en demo/producción. Navegador, migración vacía/paridad y revisión pendientes de CI/Claude.
+
 
 ## 2026-10-15 — F sobre los textos legales de Claude
 Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
+
+## 2026-10-15 — Paneles H preparados para revisión (Codex)
+Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.
+
+
+15-10-2026: el fundador reanuda Codex. Se incorpora #68 (T-016, 0.15.0) en toda la pila F/G/D/H y se renumera 0.15.1–0.15.4. Se conserva la privacidad en las tarjetas de seguidos y se unifica la fuente territorial de gimnasios. H está en #71. Tipos aprobados; 806/807 unitarias y la única que agotó el tiempo pasa aislada. Catálogo 425, mapa y versión comprobados. CI final y revisión de Claude pendientes; sin despliegue.

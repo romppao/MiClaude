@@ -1,3 +1,4 @@
+import { notifyFollowedBout, notifyInApp } from "./notifications";
 import { db } from "../common/db";
 import { APP_URL, sendMail } from "../common/mail";
 import { unsubscribeLink } from "../accounts/auth";
@@ -17,6 +18,7 @@ const fullName = (f: { firstName: string; lastName: string }) => oneLine(`${f.fi
 export async function notifyFollowersOfBout(boutId: string): Promise<number> {
   const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
   if (!bout || bout.event.date.getTime() <= Date.now()) return 0;
+  await notifyFollowedBout(boutId, "BOUT_ANNOUNCED");
   const followers = await db.follow.findMany({
     where: { fighterId: { in: [bout.fighterAId, bout.fighterBId] }, user: { emailVerifiedAt: { not: null }, notifyEmails: true } },
     include: { user: true, fighter: true },
@@ -69,6 +71,7 @@ export async function notifyRivalOfBout(boutId: string): Promise<boolean> {
   try {
     const bout = await db.bout.findUnique({ where: { id: boutId }, include: { event: true, fighterA: true, fighterB: true } });
     if (!bout || bout.verification !== "SELF_REPORTED" || !bout.fighterB.userId) return false;
+    await notifyInApp(bout.fighterB.userId, "BOUT_DECLARED", "Otro peleador ha declarado un combate contigo", "/mi-ficha#por-confirmar", `declared:${bout.id}`);
     return await notifyDecision(bout.fighterB.userId, `${fullName(bout.fighterA)} ha registrado un combate contra ti`,
       `${fullName(bout.fighterA)} ha registrado en Lona un combate contra ti en «${oneLine(bout.event.name)}» (${fmtDate(bout.event.date)}).\n\nEntra en «Mi ficha» y confirma que es correcto o indica que no lo es: ${APP_URL}/mi-ficha\nEl resultado se muestra como declarado en ambas fichas. Confirmarlo es opcional; si hay un error, tu aviso solicita revisión a moderación.`);
   } catch (e) {
@@ -124,7 +127,7 @@ export async function notificarResolucionDeAviso(reportId: string, retirado: boo
     const r = await db.report.findUnique({ where: { id: reportId }, include: { user: { select: { id: true, email: true, name: true } } } });
     if (!r) return;
     const nota = r.resolutionNote ? `\n\nNota de moderación: ${r.resolutionNote}` : "";
-    const sobre = r.entity === "PAGINA" ? `la página ${APP_URL}${oneLine(r.entityId)}` : r.entity === "BOUT" ? "un combate" : r.entity === "FIGHTER" ? "una ficha" : r.entity === "AURA" ? "un comentario" : "un vídeo o una foto";
+    const sobre = r.entity === "PAGINA" ? `la página ${APP_URL}${oneLine(r.entityId)}` : r.entity === "BOUT" ? "un combate" : r.entity === "FIGHTER" ? "una ficha" : r.entity === "AURA" ? "un comentario" : r.entity === "GYM" ? "un gimnasio" : "un vídeo o una foto";
     const decision = retirado ? "Hemos actuado: el contenido se ha retirado o ha dejado de contar mientras se revisa."
       : r.status === "RESOLVED" ? "Hemos revisado el contenido y lo hemos corregido."
       : "Hemos revisado el contenido y no hemos encontrado motivos para retirarlo.";
@@ -151,6 +154,10 @@ async function autorDe(entity: string, id: string): Promise<{ userId: string; qu
   if (entity === "MEDIA") {
     const m = await db.mediaItem.findUnique({ where: { id }, select: { uploaderId: true, kind: true, caption: true, event: { select: { name: true } } } });
     return m ? { userId: m.uploaderId, que: `Hemos retirado ${m.kind === "PHOTO" ? "tu foto" : "tu vídeo"}${m.caption ? ` «${oneLine(m.caption)}»` : ""} de la velada «${oneLine(m.event.name)}». Ya no se muestra en la velada ni en las fichas.` } : null;
+  }
+  if (entity === "GYM") {
+    const g = await db.gym.findUnique({ where: { id }, select: { ownerUserId: true, name: true } });
+    return g?.ownerUserId ? { userId: g.ownerUserId, que: `Hemos retirado del directorio de Lona el gimnasio «${oneLine(g.name)}», que gestionas.` } : null;
   }
   if (entity === "BOUT") {
     const b = await db.bout.findUnique({ where: { id }, select: { createdById: true, fighterA: { select: { firstName: true, lastName: true } }, fighterB: { select: { firstName: true, lastName: true } }, event: { select: { name: true } } } });

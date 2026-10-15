@@ -9,7 +9,11 @@ import type { Prisma } from "@prisma/client";
 export const PROVINCIAS_SIN_GIMNASIOS: readonly string[] = ["Barcelona", "Girona", "Lleida", "Tarragona"];
 
 /** ¿Se pueden mostrar o crear gimnasios en esta provincia? */
-export const provinciaConGimnasios = (provincia: string | null | undefined): boolean => !PROVINCIAS_SIN_GIMNASIOS.includes(provincia ?? "");
+const provinciaNormalizada = (value: string) => value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/^provincia de /, "").trim();
+export const provinciaConGimnasios = (provincia: string | null | undefined): boolean => {
+  const name = provinciaNormalizada(provincia ?? "");
+  return !PROVINCIAS_SIN_GIMNASIOS.some((p) => provinciaNormalizada(p) === name) && !["gerona", "lerida"].includes(name);
+};
 
 /** Filtro para cualquier consulta pública de gimnasios. */
 export const gimnasiosVisibles = (): Prisma.GymWhereInput => ({ province: { notIn: [...PROVINCIAS_SIN_GIMNASIOS] } });

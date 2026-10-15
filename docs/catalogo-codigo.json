@@ -170,6 +170,16 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "prisma/migrations/20261014210000_gimnasios_reales/migration.sql",
+    "purpose": "Migración aditiva D: contacto, procedencia, estado y propietario de gimnasio; reclamaciones revisadas; preserva propiedad visual y marca solo los tres seed conocidos.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "prisma/migrations/20261014220000_avisos_y_videos/migration.sql",
+    "purpose": "Añade avisos personales y referencias de highlights al vídeo original con índices, unicidad y borrado en cascada; no modifica registros anteriores.",
+    "guide": "docs/AVISOS.md"
+  },
+  {
     "path": "prisma/migrations/20261015090000_bloqueos_y_avisos_sin_cuenta/migration.sql",
     "purpose": "Crea la tabla Block y permite avisos sin cuenta en Report (userId opcional, nombre y correo de quien avisa).",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -253,6 +263,11 @@
     "path": "scripts/generar-mapa.mjs",
     "purpose": "Analiza TypeScript y schema para generar mapa de pantallas, acciones, guardas y tablas; comprueba que salida esté actualizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/importar-gimnasios-osm.mjs",
+    "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "scripts/version.mjs",
@@ -380,6 +395,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/actions/gyms.ts",
+    "purpose": "Acciones verificadas de alta, reclamación, revisión, cesión y miembros del gimnasio; propiedad comprobada dentro de transacciones bloqueadas y auditoría.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "src/app/actions/media.ts",
     "purpose": "Compartir foto o vídeo de una velada (consentimiento, plazo, combate de esa velada, vídeo subido propio y existente, límite diario) y borrar lo propio con su archivo.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -393,6 +413,11 @@
     "path": "src/app/actions/news.ts",
     "purpose": "Moderación de noticias: actualizar ahora, añadir fuente https, activar/desactivar y ocultar o mostrar un titular; todo auditado.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/notifications.ts",
+    "purpose": "Marca avisos propios como leídos comprobando la sesión y el destinatario; rechaza identificadores ajenos y actualiza la campanita.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "src/app/actions/profiles.ts",
@@ -458,6 +483,11 @@
     "path": "src/app/aviso-legal/page.tsx",
     "purpose": "Aviso legal (LSSI art. 10 y 16): titular desde variables de entorno y bloque de responsabilidad; borrador pendiente de revisión jurídica (docs/LEGAL.md).",
     "guide": "docs/LEGAL.md"
+  },
+  {
+    "path": "src/app/avisos/page.tsx",
+    "purpose": "Lista privada paginada de avisos de los últimos doce meses, con destino y lectura individual o conjunta.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "src/app/ayuda/page.tsx",
@@ -558,6 +588,11 @@
     "path": "src/app/components/FlashNotice.tsx",
     "purpose": "Traduce mensajes de URL, anuncia resultado accesible y ofrece retorno a sección/cola tras acción.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/FormularioGimnasio.tsx",
+    "purpose": "Formulario de contacto profesional y disciplinas compartido; recibe la acción desde la página y no publica altas por sí solo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/app/components/Foto.tsx",
@@ -910,6 +945,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/mis-gimnasios/page.tsx",
+    "purpose": "Área privada de búsqueda, reclamación y gestión del gimnasio propio, con edición, miembros, retirada y cesión de propiedad.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "src/app/mis-inscripciones/page.tsx",
     "purpose": "Pantalla del peleador con sus solicitudes para participar en veladas e interclubs y la respuesta de cada organizador.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -933,6 +973,11 @@
     "path": "src/app/moderacion/fallos/page.tsx",
     "purpose": "Lista de fallos de la aplicación con recuentos por estado, filtros por estado y origen, y paginación; solo moderación.",
     "guide": "docs/MODERACION.md"
+  },
+  {
+    "path": "src/app/moderacion/gimnasios/page.tsx",
+    "purpose": "Colas paginadas de altas/importaciones dudosas y reclamaciones de propiedad; las pruebas privadas solo llegan a moderación.",
+    "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
     "path": "src/app/moderacion/historial/page.tsx",
@@ -1295,6 +1340,21 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/gym-directory.ts",
+    "purpose": "Filtro común de gimnasios publicados, territorio permitido y exclusión del seed en producción.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-osm.ts",
+    "purpose": "Transformación pura de OSM: provincia, disciplina, descartes y contactos dudosos sin publicar; sin base ni llamadas de red.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/lib/common/gym-policy.ts",
+    "purpose": "Política territorial aprobada del gimnasio, publicación, distancia para duplicados y protección frente a reimportación; compartida con script.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "src/lib/common/labels.ts",
     "purpose": "Traduce enums y resultados, lista provincias y genera slugs/huellas para nombres; mantiene texto público en español.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1331,7 +1391,7 @@
   },
   {
     "path": "src/lib/common/periods.ts",
-    "purpose": "Plazo compartido de disponibilidad aprobado en G4, sin acoplar limpieza de cuentas con consultas deportivas.",
+    "purpose": "Plazos compartidos de disponibilidad del peleador y corte de doce meses de avisos, usados por lectura, exportación y retención.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1383,6 +1443,11 @@
     "path": "src/lib/community/bloqueos.ts",
     "purpose": "Bloqueos entre usuarios (Apple 1.2): a quién ha bloqueado alguien, si hay bloqueo entre dos personas, de quién es lo que se quiere bloquear y qué se cancela al bloquear.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/notifications.ts",
+    "purpose": "Productores internos de avisos idempotentes por destinatario y hecho, agrupación diaria de aura y exclusión de resultados o fichas no publicables.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "src/lib/community/notify.ts",
@@ -1466,7 +1531,7 @@
   },
   {
     "path": "src/lib/fighters/highlights.ts",
-    "purpose": "Valida foto o vídeo (subido, con videoKey, o por enlace https), título y orden de publicaciones del titular; define límites del escaparate.",
+    "purpose": "Reglas y orden de highlights, límites y filtro de referencias cuyo vídeo original y velada siguen publicados.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1710,6 +1775,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/gimnasios-reales.mjs",
+    "purpose": "Flujo D con datos sintéticos: reclamación pendiente, aprobación, edición profesional y exclusión de alta manual en directorio/mapa/ficha.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "tests/e2e/google-falso.mjs",
     "purpose": "Google simulado para el servidor de pruebas: solo sustituye la respuesta del endpoint de tokens de Google para que google.mjs recorra la vuelta completa. Se carga con node --import al arrancar el servidor del CI.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1758,6 +1828,11 @@
     "path": "tests/e2e/paneles-agenda.mjs",
     "purpose": "Flujos G en CI con base de pruebas: marcar/quitar asistencia, agenda, provincia, calendario público, disponibilidad y preparación.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/e2e/paneles-avisos.mjs",
+    "purpose": "Comprueba avisos y exportación propios, manipulación de destinatario, referencias y retirada del vídeo original, prioridad/anclas de moderación y axe.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "tests/e2e/paneles-pulido.mjs",
@@ -1910,6 +1985,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/gimnasios-reales.test.ts",
+    "purpose": "Pruebas de exclusión territorial con provincia y áreas de coordenadas, ficción, contactos, duplicados y protección del propietario.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
     "path": "tests/unit/google.test.ts",
     "purpose": "Pruebas unitarias de entrar con Google: viaje, dirección de autorización con PKCE, validación del id_token y decisión de cuenta.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1963,6 +2043,11 @@
     "path": "tests/unit/noticias.test.ts",
     "purpose": "Comprueba el lector RSS/Atom, entidades, descartes, disciplinas por palabras clave, variedad de medios y fuentes iniciales.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/notifications.test.ts",
+    "purpose": "Verifica idempotencia por destinatario, día de Madrid, retención, destino interno, privacidad de resultados y deduplicación de seguidores.",
+    "guide": "docs/AVISOS.md"
   },
   {
     "path": "tests/unit/notify.test.ts",

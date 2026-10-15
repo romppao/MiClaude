@@ -45,14 +45,14 @@ export function textoDistancia(km: number): string {
   return `a ${Math.round(km).toLocaleString("es-ES")} km`;
 }
 
-export type OrigenUbicacion = "direccion" | "ciudad" | "provincia";
+export type OrigenUbicacion = "direccion" | "ciudad" | "provincia" | "osm";
 
 /**
  * Dónde pintar un gimnasio: sus coordenadas si las tiene; si no, el centro de su provincia, desplazado un poco (siempre igual para
  * el mismo gimnasio) para que varios gimnasios de la misma provincia no queden uno encima de otro.
  */
 export function puntoDeGimnasio(g: { id: string; lat: number | null; lng: number | null; geoSource: string | null; province: string }): (Punto & { origen: OrigenUbicacion }) | null {
-  if (g.lat !== null && g.lng !== null) return { lat: g.lat, lng: g.lng, origen: g.geoSource === "direccion" ? "direccion" : "ciudad" };
+  if (g.lat !== null && g.lng !== null) return { lat: g.lat, lng: g.lng, origen: g.geoSource === "osm" ? "osm" : g.geoSource === "direccion" ? "direccion" : "ciudad" };
   const c = CENTROS_PROVINCIA[g.province];
   if (!c) return null;
   let h = 0;

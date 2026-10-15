@@ -1980,6 +1980,10 @@ F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.
 ## 2026-10-14 — Bloque G de paneles
 Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
 
+## 2026-10-14 — Gimnasios reales, bloque D
+Modelo aditivo de procedencia, contacto profesional, disciplinas, propiedad revisada, publicación y ficción. Directorio/mapa/fichas/búsqueda excluyen Cataluña con una sola constante; las altas excluidas permanecen por revisar. Reclamación, conflicto, edición, cesión, miembros y aviso de corrección quedan auditados. El titular natural del gimnasio es la fuente de permisos; se preservan los titulares anteriores del perfil visual mediante migración. El importador reutilizable hace recuento por defecto, consulta áreas OSM para provincia ausente, conserva caché y protege gimnasios corregidos/reclamados. Una carga real requiere plan comparado con esa base, hash presentado e IMPORTAR_EN_REAL=si. Nunca usa seed o crea campañas.
+Validación local: 785 unitarias y tipos; esquema y migración generada con diff sobre G. Fixture sintético del importador: Madrid 1, Valencia 1, cuatro provincias excluidas descartadas; NO es un inventario real. Consulta real de Overpass falla por EACCES de red: no hay recuento real ni carga en demo/producción. Navegador, migración vacía/paridad y revisión pendientes de CI/Claude.
+
 ## 2026-10-15 — Textos legales para el lanzamiento (Claude)
 
 **Qué se pidió:**
@@ -2016,6 +2020,13 @@ Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy
 
 **Estado:** PR abierto. Los textos son borradores pendientes del abogado.
 
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
+
+## 2026-10-15 — Paneles H preparados para revisión (Codex)
+Avisos personales con retención de doce meses y exportación; vídeos del público añadidos por referencia a highlights y aviso al autor; seguidores y comentarios recientes; peleadores del gimnasio del entrenador; pendientes de federación con acreditación; moderación en lista única. Contratos en AVISOS.md y traspaso 2026-10-15-codex-paneles-h.md. H4 solo tiene propuesta RFC-002 y espera revisión de Claude. Los cuatro ajustes móviles quedan asignados a Antigravity. No equivale a validación completa ni despliegue.
 
 ## 14-10-2026 (noche). Claude Code: revisión T-016, partes 1 y 2
 
@@ -2178,3 +2189,28 @@ No se ha encontrado nada que corregir.
 - Revisión escrita en #56 y #62 (duplicados), #64 (D) y #71 (H), con lo que hay que cambiar.
 
 **Siguiente:** D y H, con las correcciones de la revisión, en ramas propias.
+
+## 2026-10-15 — Reanudación de Codex y compatibilidad con T-016
+El fundador pide continuar. La comprobación final de la principal detecta #68 integrado (0.15.0); se incorpora a F/G/D/H sin eliminar privacidad, autorización de veladas ni política territorial. Se resuelven conflictos de presentación manteniendo los filtros de Claude y los de publicación del directorio. La última validación de H: tipos, 806/807 unitarias y la restante aprobada aislada por timeout local, catálogo 425, mapa y versión. H4 espera revisión del modelo en RFC-002; CI completo y revisión de Claude pendientes. Los ajustes móviles pertenecen a Antigravity. No se despliega ni se cargan datos.
+
+## 15-10-2026. Claude (nube): gimnasios reales (D) y avisos y paneles (H) de Codex, corregidos (0.18.0)
+
+**Qué se pidió:** lo mismo que con F y G: corregir lo que Codex dejó a medias e integrarlo.
+
+**Qué se hizo:**
+- **Base:** el diff de cada bloque de Codex (D: #64, H: #71) se aplicó sobre la 0.17.0 en ramas propias.
+- **Correcciones de D**, según la revisión de #64:
+  - vincular y ceder gimnasios, solo moderación (antes, un titular podía cambiar el club de cualquier ficha y la cesión revelaba si un correo tenía cuenta);
+  - aprobar una reclamación no da el sello ni republica un gimnasio retirado;
+  - no se reclaman gimnasios retirados ni ficticios;
+  - retirar el gimnasio pide confirmación;
+  - `GYM` está en «Mis avisos» y en los correos de decisión, y la ficha del gimnasio enlaza a `/avisar`;
+  - el importador se ejecuta con `tsx`.
+- **Correcciones de H:**
+  - la lista única de moderación **no entra**: el botón «Poner en revisión» no funcionaba, rompía tres pruebas y no admitía los avisos sin cuenta;
+  - bloqueos en el panel y en los avisos;
+  - icono de campana en lugar de emoji y «seguidor» en singular;
+  - la copia de datos lee las fotos del almacén.
+- **Instrucciones para Codex:** `docs/ecosistema/traspasos/2026-10-15-claude-a-codex-d-h.md`.
+
+**Estado:** PR abierto.

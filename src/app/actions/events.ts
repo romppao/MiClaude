@@ -2,6 +2,7 @@
 // Todo lo que se exporta aquí es un punto de entrada público del servidor (POST): los ayudantes van sin exportar o en ./shared.
 "use server";
 
+import { notifyFollowedBout } from "../../lib/community/notifications";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import type { Discipline } from "@prisma/client";
@@ -167,6 +168,7 @@ export async function setBoutResult(f: FormData) {
     await audit({ userId: user.id, entity: "BOUT", entityId: bout.id, action: "RESULT_SET", before: { result: bout.result, method: bout.method, endRound: bout.endRound, verification: bout.verification }, after: { result: v.result, method: v.method, endRound: v.endRound, verification } }, tx);
   });
   revalidatePath("/", "layout");
+  after(() => notifyFollowedBout(bout.id, "BOUT_RESULT"));
   go(back, { aviso: "resultado_guardado" });
 }
 
