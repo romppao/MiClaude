@@ -11,6 +11,8 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.14.1] — 2026-10-14
+
 ## [0.14.0] — 2026-10-15
 
 PR de Claude: textos legales para el lanzamiento (petición del fundador). Son borradores pendientes de revisión jurídica (`docs/LEGAL.md`).

@@ -2002,3 +2002,29 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - catálogo y mapa.
 
 **Estado:** PR abierto. Los textos son borradores pendientes del abogado.
+
+
+## 14-10-2026 (noche). Claude Code: revisión T-016, partes 1 y 2
+
+**Petición:** el fundador pidió revisar la app antes de montar la versión oficial.
+
+**Cómo:** en la propia sesión y sin subagentes, porque los cinco que se lanzaron a la vez se cortaron por `[reasoning_extraction]`.
+
+**Parte 1, seguridad:** todo bien salvo dos puntos importantes:
+- quien entra con Google no puede borrar su cuenta, porque se le pide una contraseña que nunca eligió;
+- hay que comprobar `TRUSTED_PROXY_HOPS` en Cloud Run.
+
+**Parte 2, versión oficial:** la imagen Docker se construyó y se arrancó contra un PostgreSQL vacío y desechable, con permiso del fundador:
+- arranca en 2,2 s y las 22 rutas públicas responden 200;
+- no aparecen restos de la demo.
+
+**Bloquea el lanzamiento:**
+- sin Resend no se puede crear al creador ni a ningún moderador;
+- la base gratuita de 1 GB guarda las fotos;
+- no hay gimnasios hasta el bloque D.
+
+**Hallazgos de Codex (partes 3-5):** comprobados dos (C3-01 y C5-01); uno ya estaba resuelto en la 0.14.0 (C3-03).
+
+**Uso de modelos de Codex:** el fundador observó que Codex gasta mucho. Se añadió a `AGENTS.md` una regla de uso proporcional de modelos. Cambiar la configuración de Codex (`~/.codex/config.toml`: esfuerzo «high» fijo) lo bloqueó el sistema de permisos, así que lo cambia el fundador en el selector.
+
+**Estado:** PR abierto.
