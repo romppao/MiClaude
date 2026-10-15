@@ -11,6 +11,15 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.10] — 2026-10-15
+
+### Corregido
+- **Móvil (375 px):** cuatro ajustes de presentación y maquetación detectados en la auditoría de la demo:
+  - **Portada:** altura acotada de `.portada-visita` (400 px) y tipografía ajustada de `.lema-portada` para que el subtítulo no quede tapado por el degradado de la barra inferior fija en pantallas de 375 × 667 px antes de hacer scroll.
+  - **Gimnasios:** `scroll-margin-top: 96px` en `.mapa-gimnasios` y margen inferior en el formulario de búsqueda para que el botón «Aplicar filtros» no quede cortado horizontalmente por detrás de la cabecera fija al desplazarse hacia el mapa.
+  - **Veladas:** visualización en bloque (`display: block`) del título de la velada en `.card` para que aparezca siempre debajo de las etiquetas, evitando que títulos cortos queden comprimidos en la misma línea que «Inscripción abierta».
+  - **Peleadores:** botón «Aplicar filtros» posicionado antes del desplegable «Más filtros» para que sea inmediatamente accesible sin hacer scroll al abrir los filtros, con botón de envío repetido al pie de los campos secundarios.
+
 ## [0.18.9] — 2026-10-15
 
 PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.

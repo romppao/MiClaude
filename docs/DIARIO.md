@@ -2312,3 +2312,24 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 ## 2026-10-15 — Relevo D/H: bandeja única de moderación
 El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
+
+## 2026-10-15 — Antigravity — Cuatro ajustes de móvil en Lona (375 px)
+
+**Pedido:** Encargo de Claude Code (`2026-10-15-claude-encargo-antigravity-ajustes-movil.md`): resolver los 4 desajustes visuales detectados en la auditoría de demo a 375 px (iPhone SE), limitándose a cambios de presentación/CSS en una rama propia aislada.
+
+**Base:** `origin/claude/ring-espana-mvp` (0.18.9). **Rama:** `antigravity/ajustes-movil`.
+
+**Cambios:**
+1. **Portada (`/`):** Acotada la altura de `.portada-visita` a 400 px y tipografía de `.lema-portada` a 16 px en móvil para que el subtítulo «Tu comunidad de deportes de contacto en toda España» no quede tapado por la barra inferior fija antes de hacer scroll.
+2. **Gimnasios (`/gimnasios`):** Declarado `scroll-margin-top: 96px` en `.mapa-gimnasios` y añadido margen inferior en `form.search` para que el botón verde «Aplicar filtros» no quede cortado horizontalmente por detrás de la cabecera fija al desplazarse hacia el mapa.
+3. **Veladas (`/veladas`):** Título de la velada en bloque (`display: block; margin: 6px 0 2px`) en las tarjetas para que aparezca siempre debajo de las etiquetas en su propia línea, evitando que títulos cortos como «Yess» se coloquen horizontalmente junto a «Inscripción abierta».
+4. **Peleadores (`/peleadores`):** Reubicado `BotonesFiltro` («Aplicar filtros») antes del desplegable `MasFiltros` para que sea inmediatamente visible al abrir los filtros sin requerir scroll, y añadido un botón de envío repetido al final de los campos desplegados para comodidad al filtrar.
+
+**Comprobaciones:**
+- `npx tsc --noEmit`: 0 errores.
+- `npx vitest run`: 59 archivos de pruebas pasados, 858 pruebas unitarias pasadas al 100% (incluyendo nuevo test `tests/unit/ajustes-movil.test.ts`).
+- Generadas capturas de verificación en `docs/logs/antigravity-ajustes-movil/` a 375 px (móvil) y 1280 px (escritorio) para las 4 pantallas, comparadas contra las capturas del antes. En escritorio no se altera la composición.
+- Versión actualizada a **0.18.10** con `node scripts/version.mjs subir parche` y documentada en `CHANGELOG.md`.
+
+**Siguiente:** Revisión de Claude Code y confirmación del fundador.
+

@@ -114,13 +114,14 @@ main{max-width:1240px;margin:auto;padding:32px 24px 72px}
 .sin-corte{white-space:nowrap}
 .skip{position:absolute;left:-999px;top:0;background:var(--acc);color:var(--acc-ink);padding:10px 14px;z-index:100;border-radius:12px}
 .skip:focus{left:8px;top:8px}
-form.search{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;align-items:flex-end}
+form.search{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;align-items:flex-end;position:relative}
 .field{display:flex;flex-direction:column;gap:8px;min-width:160px;max-width:100%}
 .field>span{font:500 16px/1.35 var(--font);color:var(--mut)}
 .field .hint{font-size:16px;color:rgba(var(--ink),.6);padding-left:6px}
 .field .hint.hint-error{color:var(--bad)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px}
 .card{background:var(--card);border:1px solid rgba(var(--ink),.07);border-radius:24px;padding:18px;display:block;overflow-wrap:anywhere;color:var(--text)}
+.card>strong{display:block;margin:6px 0 2px}
 @media (hover: hover) and (pointer: fine){
 a.card:hover{border-color:var(--line-strong);color:var(--text)}}
 .tag{display:inline-block;font:600 16px/1.4 var(--font);padding:4px 11px;border-radius:999px;background:rgba(var(--ink),.08);color:var(--text);margin:3px 6px 3px 0}
@@ -448,6 +449,8 @@ dialog.hoja h2{margin:0;font-size:28px}
   .a-sangre{margin-left:-16px;margin-right:-16px}
   .chips-desliza,.desliza{margin:0 -16px;padding-left:16px;padding-right:16px}
   .home-hero{padding:26px 22px;min-height:520px}
+  .portada-visita{min-height:400px;padding-bottom:14px;gap:10px}
+  .portada-visita .lema-portada{font-size:16px;line-height:1.35}
   .profile-hero{padding:24px 20px}
   .profile-identity{align-items:flex-start;gap:16px}
   .profile-avatar{width:96px;height:96px;font-size:2rem}
@@ -752,7 +755,7 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .herramientas-moderacion li a{font-weight:700;min-height:44px;display:inline-flex;align-items:center}
 /* Mapa de gimnasios (13 de octubre de 2026): components/MapaGimnasios.tsx. El mapa base es claro (OpenFreeMap «positron»); en el tema
    oscuro se invierte con un filtro para que case con la aplicación. Los marcadores van fuera del lienzo y no se invierten. */
-.mapa-gimnasios{margin:20px 0 28px}
+.mapa-gimnasios{margin:20px 0 28px;scroll-margin-top:96px}
 .mapa-cabecera{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mapa-cabecera h2{margin:0}
 .mapa-ayuda{margin:8px 0 12px}

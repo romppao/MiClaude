@@ -1945,6 +1945,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/ajustes-movil.test.ts",
+    "purpose": "Prueba los cuatro ajustes de móvil en Lona (portada, gimnasios, veladas y filtros de peleadores).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/arquitectura.test.ts",
     "purpose": "Vigila dominios/importaciones, separación lib/app, directivas y exportaciones de acciones y ausencia de rutas antiguas.",
     "guide": "docs/mantenimiento/OPERACION.md"
