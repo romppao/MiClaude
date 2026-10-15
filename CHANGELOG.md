@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.8] — 2026-10-15
+
+PR de Claude Code: primera revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año).
+
+### Cambiado
+- `docs/datos/gimnasios-investigados.json`: se comprobaron las 52 fichas con web propia. **20 pasan a publicarse**: su web responde hoy, anuncia todas sus disciplinas y tiene contenido de 2025 o 2026 (`fechaFuente` 2026-10-15). Las otras 32 llevan una nota con el motivo (web caída, sin fechas recientes o sin alguna disciplina) y siguen por revisar. Las 139 que solo tienen Instagram están pendientes.
+
 ## [0.18.7] — 2026-10-15
 
 PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).
