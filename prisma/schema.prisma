@@ -438,10 +438,12 @@ model Event {
   slots             EventSlot[]
   // Hora de inicio (minutos desde las 00:00, hora peninsular) y cartel de la velada (petición del fundador, 15-10-2026: «que aparezcan
   // directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio de la entrada»). El cartel va al almacén de fotos
-  // (posterKey) o, sin almacén, a la propia fila (poster), como las fotos de perfil.
+  // (posterKey) o, sin almacén, a una tabla aparte (EventPoster) para que las consultas de veladas no arrastren la imagen.
   startMinute       Int?
   posterKey         String?
-  poster            Bytes?
+  posterBytes       EventPoster?
+  // Cuándo se subió el cartel actual (null si no hay): dice si hay cartel sin leer los bytes y versiona la dirección de la imagen.
+  posterAt          DateTime?
   // Entradas reservadas en Lona (lib/events/entradas.ts): la promotora fija el precio y cobra ella. Se paga la mitad por Bizum para
   // confirmar la reserva y el resto en la puerta. Lona no toca el dinero.
   ticketsOpen       Boolean             @default(false)
@@ -1030,4 +1032,11 @@ model TicketReservation {
 
   @@index([eventId, status])
   @@index([userId, createdAt])
+}
+
+// Bytes del cartel cuando no hay almacén de fotos (desarrollo y pruebas). Aparte de Event para no leerlos en cada consulta de veladas.
+model EventPoster {
+  eventId String @id
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bytes   Bytes
 }

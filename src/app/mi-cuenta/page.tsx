@@ -76,6 +76,7 @@ export default async function Account() {
           <h2>Accesos directos</h2>
           <ul>
             <li><Link href="/mi-panel">Mi panel</Link>: lo tuyo de un vistazo.</li>
+            <li><Link href="/mis-entradas">Mis entradas</Link>: tus reservas para las veladas y el código para la puerta.</li>
             {papel === "peleador" && <li><Link href="/mi-ficha">Mi ficha de peleador</Link>: tus combates, tu récord y los datos de tu ficha.</li>}
             {papel === "entrenador" && <li><Link href="/mis-clases">Mis clases</Link>: tu perfil de entrenador y tus clases.</li>}
             {puedeOrganizar(user.role) && <li><Link href="/organizador">{papel === "entrenador" ? "Mis veladas e interclubs" : "Mis veladas"}</Link>: crear eventos y montar carteles.</li>}

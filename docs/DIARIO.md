@@ -2309,3 +2309,18 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 **Base vigente tras #75:** la demo pasó a d6a63d5 (0.17.0) al integrar Claude los F/G elegidos en ESTADO.md. Se incorpora ese resultado en esta rama propia; no se actualiza ninguna rama ni PR de F/G/D/H. Se conservan íntegros sus ficheros y pruebas. T-002 queda en **0.17.2** usando el script de versión. Las pruebas anteriores se identifican por su SHA; la validación actual se consulta en los checks del PR de esta entrega. Revisión de Claude e integración del fundador pendientes.
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
+
+## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
+
+**Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
+
+**Decisiones:**
+- Los bytes del cartel, cuando no hay almacén de fotos, van a una tabla aparte (`EventPoster`). Muchas consultas leen la velada entera; con la imagen en `Event` la habrían arrastrado todas. Se probó a omitirla con el `omit` global de Prisma, pero cambia el tipo del cliente y rompía una decena de sitios. `Event.posterAt` dice si hay cartel y versiona su dirección, así la caché puede ser larga.
+- La hora se edita en «Datos de la velada» (también al crearla). El formulario de entradas ya no la toca, para no borrarla sin querer.
+- El precio solo se anuncia en la tarjeta del calendario cuando se puede reservar: si la venta está cerrada, podría estar desfasado.
+- Cancelar una reserva desde la promotora pide confirmación (no se puede deshacer). Validar en la puerta sí se puede deshacer.
+- La promotora ve el nombre y el correo de quien reserva (lo necesita para devolver una señal). Se avisa en el formulario de reserva.
+
+**Validación:** tipos y compilación correctos; 851 de 853 pruebas unitarias en este portátil. Fallan las dos de contraseñas por pasar de 5 s con el equipo cargado, como ya pasó otras veces en local. Las de entradas pasan. La prueba de navegador `tests/e2e/entradas.mjs` se ejecuta en el CI (Linux), porque las ayudas de las pruebas usan `psql` y variables de shell que no hay en Windows.
+
+**Pendiente:** fusionar #92 y los PR de Codex #88–#91 (el fundador o con un permiso; el clasificador de seguridad de Claude Code no deja fusionar sin revisión). Después, la fase 2 (agenda del entrenador).

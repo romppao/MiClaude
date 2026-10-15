@@ -26,6 +26,30 @@ export function TarjetaCartel({ e }: { e: { slug: string; name: string; date: Da
   );
 }
 
+/**
+ * Velada del calendario como cartel (fase 1 de entradas, 15-10-2026: «que aparezcan directamente la imagen de la cartelera, el lugar,
+ * la fecha, la hora y el precio»). Sin cartel subido, el color de la disciplina. Toda la tarjeta es el enlace; «Reservar» solo lo anuncia.
+ */
+export function TarjetaVelada({ e }: { e: { slug: string; name: string; date: Date; discipline: Discipline; level: Level; venue: string; city: string; hora: string | null; cartel: string | null; precio: number | null; reservar: boolean; etiquetas: string[] } }) {
+  const { dia, mes } = dayAndMonth(e.date);
+  return (
+    <Link href={`/veladas/${e.slug}`} className="tarjeta-foto velada-cartel" style={tinte(e.discipline)}>
+      {e.cartel ? <Foto src={e.cartel} /> : <span className="velada-cartel-icono" aria-hidden="true"><IconoDisciplina d={e.discipline} tam={88} grosor={1.25} /></span>}
+      <span className="velada-cartel-arriba">
+        <span className="fecha-cartel" aria-hidden="true"><b>{dia}</b><span>{mes}</span></span>
+        {e.precio !== null && <span className="velada-precio">{e.precio} €</span>}
+      </span>
+      <span className="velada-cartel-abajo">
+        {e.etiquetas.length > 0 && <span className="velada-etiquetas">{e.etiquetas.map((t) => <span key={t} className="tag">{t}</span>)}</span>}
+        <strong>{e.name}</strong>
+        <span className="meta"><span className="sr-only">{dia} de {mes}{e.hora ? `, ${e.hora}` : ""} · </span>{e.hora ? <span aria-hidden="true">{e.hora} · </span> : null}{e.venue}, {e.city}</span>
+        <span className="meta">{DISCIPLINE_LABEL[e.discipline]} · {LEVEL_LABEL[e.level]}</span>
+        {e.reservar && <span className="velada-reservar">Reservar entradas<span aria-hidden="true"> →</span></span>}
+      </span>
+    </Link>
+  );
+}
+
 /** Tarjeta grande de una disciplina, con su raya de color. */
 export function TarjetaDisciplina({ d, href, pequena = false }: { d: Discipline; href: string; pequena?: boolean }) {
   return (

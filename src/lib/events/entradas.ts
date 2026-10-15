@@ -99,3 +99,34 @@ export function motivoSinReserva(e: VeladaConEntradas, ahora = new Date()): stri
   if (ahora >= cierreDeReservas(e.date, e.startMinute)) return "entradas_cerradas";
   return null;
 }
+
+/** Dirección del cartel de una velada, con su versión para que la caché se renueve al cambiarlo. Null si no tiene cartel. */
+export const urlCartel = (e: { slug: string; posterAt: Date | null }) => (e.posterAt ? `/veladas/${e.slug}/cartel?v=${e.posterAt.getTime().toString(36)}` : null);
+
+/** Si la venta en Lona está abierta y aún se puede reservar (para las tarjetas y la ficha). */
+export const ventaAbierta = (e: VeladaConEntradas, ahora = new Date()) => motivoSinReserva(e, ahora) === null;
+
+/** Filtros de la lista de reservas de la promotora (pantalla y CSV). «activas» = pendientes de señal y confirmadas. */
+export const FILTROS_RESERVAS = { activas: "Por atender", PENDING_DEPOSIT: "Pendientes de señal", CONFIRMED: "Confirmadas", CHECKED_IN: "Validadas", CANCELLED: "Canceladas", EXPIRED: "Caducadas", todas: "Todas" } as const;
+export type FiltroReservas = keyof typeof FILTROS_RESERVAS;
+export const parseFiltroReservas = (raw: string | undefined): FiltroReservas => (raw && raw in FILTROS_RESERVAS ? (raw as FiltroReservas) : "activas");
+
+/**
+ * Reservas de una velada para su promotora, filtradas por estado y por código, nombre o correo. Antes, caduca las vencidas para que
+ * la lista diga la verdad. Las más recientes primero.
+ */
+export async function reservasDeVelada(eventId: string, filtro: FiltroReservas, texto?: string) {
+  await caducarVencidas(db, eventId);
+  const t = texto?.trim().slice(0, 80);
+  const codigo = t?.toUpperCase().replace(/^LONA-?/, "");
+  return db.ticketReservation.findMany({
+    where: {
+      eventId,
+      ...(filtro === "activas" ? { status: { in: ["PENDING_DEPOSIT", "CONFIRMED"] as TicketStatus[] } } : filtro !== "todas" ? { status: filtro } : {}),
+      ...(t && { OR: [{ code: { contains: codigo, mode: "insensitive" as const } }, { user: { name: { contains: t, mode: "insensitive" as const } } }, { user: { email: { contains: t, mode: "insensitive" as const } } }] }),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    take: 500,
+    include: { user: { select: { name: true, email: true } } },
+  });
+}

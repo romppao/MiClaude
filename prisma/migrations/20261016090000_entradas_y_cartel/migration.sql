@@ -4,8 +4,8 @@ CREATE TYPE "TicketStatus" AS ENUM ('PENDING_DEPOSIT', 'CONFIRMED', 'CHECKED_IN'
 -- AlterTable
 ALTER TABLE "Event" ADD COLUMN     "bizumPhone" TEXT,
 ADD COLUMN     "doorPriceEuros" INTEGER,
-ADD COLUMN     "poster" BYTEA,
 ADD COLUMN     "posterKey" TEXT,
+ADD COLUMN     "posterAt" TIMESTAMP(3),
 ADD COLUMN     "startMinute" INTEGER,
 ADD COLUMN     "ticketCapacity" INTEGER,
 ADD COLUMN     "ticketNote" TEXT,
@@ -48,3 +48,14 @@ ALTER TABLE "TicketReservation" ADD CONSTRAINT "TicketReservation_eventId_fkey" 
 -- AddForeignKey
 ALTER TABLE "TicketReservation" ADD CONSTRAINT "TicketReservation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+
+-- CreateTable
+CREATE TABLE "EventPoster" (
+    "eventId" TEXT NOT NULL,
+    "bytes" BYTEA NOT NULL,
+
+    CONSTRAINT "EventPoster_pkey" PRIMARY KEY ("eventId")
+);
+
+-- AddForeignKey
+ALTER TABLE "EventPoster" ADD CONSTRAINT "EventPoster_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -29,7 +29,8 @@ export async function guardarCartelYEntradas(f: FormData) {
   const event = await ownEvent(str(f, "eventId"), user);
   const back = `/organizador/${event.slug}#entradas`;
   checkLengths(f, back, { hora: 5, precio: 5, puerta: 5, aforo: 6, bizum: 20, nota: 300 });
-  const hora = str(f, "hora") ? parseHora(str(f, "hora")) : null;
+  // La hora se corrige en «Datos de la velada»; aquí solo cambia si el formulario la trae.
+  const hora = f.has("hora") ? (str(f, "hora") ? parseHora(str(f, "hora")) : null) : event.startMinute;
   if (str(f, "hora") && hora === null) go(back, { problema: "hora_invalida" });
   const precio = str(f, "precio") ? enteroEntre(str(f, "precio"), 1, 1000) : null;
   const puerta = str(f, "puerta") ? enteroEntre(str(f, "puerta"), 1, 1000) : null;
@@ -51,9 +52,14 @@ export async function guardarCartelYEntradas(f: FormData) {
 
   const data = {
     startMinute: hora, ticketPriceEuros: precio, doorPriceEuros: puerta, ticketCapacity: aforo, bizumPhone: bizum, ticketNote: str(f, "nota") || null, ticketsOpen: abrir,
-    ...(cartel && { posterKey: cartel.clave, poster: cartel.bytes }),
+    ...(cartel && { posterKey: cartel.clave, posterAt: cartel.clave || cartel.bytes ? new Date() : null }),
   };
-  await db.event.update({ where: { id: event.id }, data });
+  await db.$transaction(async (tx) => {
+    await tx.event.update({ where: { id: event.id }, data });
+    // Sin almacén, los bytes van a EventPoster; con almacén (o al quitar el cartel), esa fila sobra.
+    if (cartel?.bytes) await tx.eventPoster.upsert({ where: { eventId: event.id }, create: { eventId: event.id, bytes: cartel.bytes }, update: { bytes: cartel.bytes } });
+    else if (cartel) await tx.eventPoster.deleteMany({ where: { eventId: event.id } });
+  });
   if (cartel && event.posterKey && event.posterKey !== cartel.clave) await borrarFotos([event.posterKey]);
   await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "TICKETS_UPDATED", after: { hora, precio, puerta, aforo, abrir, cartel: cartel ? (cartel.clave || cartel.bytes ? "nuevo" : "quitado") : "sin cambios" } });
   revalidatePath("/", "layout");

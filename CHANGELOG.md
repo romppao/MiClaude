@@ -11,6 +11,26 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.20.0] — 2026-10-15
+
+PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas (peticiones del fundador del 15-10-2026: «que aparezcan directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y «que se puedan comprar entradas… se deberá pagar la mitad vía Bizum para reservar»). La numeración salta a 0.20.0 para dejar la 0.19.x a los PR de Codex #88–#91.
+
+### Añadido
+- **Entradas reservadas en Lona.** La promotora pone el precio, el aforo (opcional), el precio en taquilla (opcional), una nota y su Bizum, y abre la venta. Se reservan de 1 a 6 entradas, con una reserva activa por persona y velada; se respetan los bloqueos.
+  - Al reservar se pide una **señal del 50 %** (redondeada al euro hacia arriba) por Bizum a la promotora, con el código `LONA-XXXXXX` como concepto. Hay 24 horas para enviarla, nunca más tarde de 3 horas antes del inicio. Si no llega, la reserva caduca y libera las plazas. El resto se paga en la puerta.
+  - Lona no cobra ni guarda dinero: solo lleva la cuenta de las reservas (pendiente de señal, confirmada, validada en la puerta, cancelada o caducada).
+- **Cartel de la velada:** la promotora sube una imagen (JPG, PNG o WebP de hasta 4 MB) que se guarda en el almacén de fotos (carpeta `carteles`) y se sirve en `/veladas/[slug]/cartel`, solo de las veladas visibles.
+- **Hora de inicio** de la velada al crearla y al corregir sus datos.
+- **«Mis entradas»** (`/mis-entradas`): el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar. Se enlaza desde «Mi cuenta» y desde el panel, que avisa en «Te toca» de las señales pendientes.
+- **Reservas de la promotora** (`/organizador/[slug]/entradas`): resumen (reservadas, validadas, señales recibidas y lo que queda por cobrar en la puerta), filtros por estado, búsqueda por código, nombre o correo, y botones «Señal recibida» (también tarde, si queda sitio), «Validar en la puerta», «Deshacer la validación» y «Cancelar la reserva». Se descarga en CSV.
+- Avisos dentro de la aplicación y correos: a la promotora con cada reserva o cancelación; a quien reserva, con las instrucciones del Bizum y al confirmarse la señal.
+- La descarga de datos personales (`/mi-cuenta/datos`) incluye las entradas reservadas.
+- Prueba de navegador `tests/e2e/entradas.mjs` y pruebas unitarias de las reglas (`tests/unit/entradas.test.ts`).
+
+### Cambiado
+- **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
+- **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
+
 ## [0.18.8] — 2026-10-15
 
 PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).

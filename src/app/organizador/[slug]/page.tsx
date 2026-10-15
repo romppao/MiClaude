@@ -20,6 +20,9 @@ import { EVENT_KIND_LABEL, PROVINCES } from "../../../lib/common/labels";
 import { removeSlot, setRegistration, setSlot } from "../../actions/registrations";
 import { PLAZAS_MAX, REG_NOTE_MAX, claveCategoria, inscripcionAbierta, ocupacion } from "../../../lib/events/registrations";
 import { todayMadrid } from "../../../lib/common/dates";
+import { HORAS_CIERRE_ANTES, MAX_ENTRADAS, fmtBizum, fmtHora, plazasOcupadas, urlCartel } from "../../../lib/events/entradas";
+import { guardarCartelYEntradas } from "../../actions/entradas";
+import InputFoto from "../../components/InputFoto";
 
 export const metadata = { title: "Gestionar velada", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -47,6 +50,14 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
     db.eventRegistration.findMany({ where: { eventId: event.id }, select: { status: true, divisionId: true, weightClass: true } }),
   ]);
   const ocup = ocupacion(plazas, filasCategoria);
+  // Cartel y entradas (fase 1, 15-10-2026): resumen de reservas para el enlace a la lista.
+  const [reservasPorEstado, ocupadas] = await Promise.all([
+    db.ticketReservation.groupBy({ by: ["status"], where: { eventId: event.id }, _count: { _all: true }, _sum: { quantity: true } }),
+    plazasOcupadas(db, event.id),
+  ]);
+  const nReservas = reservasPorEstado.reduce((n, x) => n + x._count._all, 0);
+  const pendientesSenal = reservasPorEstado.find((x) => x.status === "PENDING_DEPOSIT")?._count._all ?? 0;
+  const cartel = urlCartel(event);
   const nEstado = (s: string) => porEstado.find((x) => x.status === s)?._count._all ?? 0;
   const idsAceptados = new Set(aceptados.map((a) => a.fighterId));
   const hoy = todayMadrid();
@@ -84,6 +95,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
           <label className="field"><span>Nombre de la velada</span><input name="name" defaultValue={event.name} required maxLength={LIMITS.eventName} /></label>
           <label className="field"><span>Tipo</span><select name="kind" defaultValue={event.kind}>{(["VELADA", "INTERCLUB"] as const).map((k) => <option key={k} value={k}>{EVENT_KIND_LABEL[k]}</option>)}</select></label>
           <label className="field"><span>Fecha</span><input name="date" type="date" defaultValue={event.date.toISOString().slice(0, 10)} required min="1980-01-01" /></label>
+          <label className="field"><span>Hora de inicio (opcional)</span><input name="hora" type="time" defaultValue={event.startMinute !== null ? fmtHora(event.startMinute) : ""} /><span className="hint">Sale en el calendario. Las reservas de entradas se cierran {HORAS_CIERRE_ANTES} horas antes; sin hora se cuenta desde las 20:00.</span></label>
           <label className="field"><span>Disciplina</span>
             <select name="discipline" defaultValue={event.discipline}>{DISCIPLINE_ORDER.map(d => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select>
             <span className="hint">Solo se puede cambiar mientras el cartel está vacío.</span>
@@ -104,6 +116,42 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
           <button name="decision" value={event.status === "CANCELLED" ? "reopen" : "cancel"} className={event.status === "CANCELLED" ? undefined : "secondary"}>{event.status === "CANCELLED" ? "Volver a activar la velada" : "Sí, cancelar la velada"}</button>
         </form>
       </details>
+
+      {/* Cartel y entradas (fase 1, 15-10-2026). La promotora cobra la señal por Bizum; Lona solo lleva la cuenta (lib/events/entradas.ts). */}
+      <section id="entradas" aria-labelledby="titulo-entradas" className="tarjeta" style={{ marginTop: 16, scrollMarginTop: 80 }}>
+        <h2 id="titulo-entradas" style={{ margin: 0 }}>Cartel y entradas</h2>
+        <p style={{ margin: 0 }}><span className={`pildora ${event.ticketsOpen ? "pildora-acc" : ""}`}>{event.ticketsOpen ? "Venta abierta en Lona" : "Venta cerrada"}</span> {event.ticketsOpen ? `${ocupadas}${event.ticketCapacity !== null ? ` de ${event.ticketCapacity}` : ""} entradas reservadas.` : "Pon precio y Bizum y abre la venta para que el público reserve desde la página de la velada."}</p>
+        {nReservas > 0 && <Link className="btn" href={`/organizador/${event.slug}/entradas`} style={{ alignSelf: "flex-start" }}>Ver las reservas{pendientesSenal ? ` (${pendientesSenal} ${pendientesSenal === 1 ? "pendiente de señal" : "pendientes de señal"})` : ""}</Link>}
+        <form action={guardarCartelYEntradas} encType="multipart/form-data" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <input type="hidden" name="eventId" value={event.id} />
+          <div className="cartel-editor">
+            {cartel ? <img src={cartel} alt="Cartel actual" className="entrada-mini" style={{ width: 96, height: 144 }} /> : <span className="entrada-mini" aria-hidden="true" style={{ width: 96, height: 144, display: "grid", placeItems: "center", color: "var(--mut)", fontSize: 13, textAlign: "center", padding: 8 }}>Sin cartel</span>}
+            <div className="field" style={{ flex: 1, minWidth: 220 }}>
+              <span>{cartel ? "Cambiar el cartel" : "Cartel (opcional)"}</span>
+              <InputFoto name="cartel" />
+              <span className="hint">JPG, PNG o WebP de hasta 4 MB. Mejor vertical: es lo primero que ve el público en el calendario.</span>
+              {cartel && <label style={{ display: "flex", gap: 10, alignItems: "center", minHeight: 44 }}><input type="checkbox" name="quitarCartel" value="1" style={{ width: 22, height: 22 }} /> Quitar el cartel</label>}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <label className="field" style={{ flex: 1, minWidth: 140 }}><span>Precio de la entrada (€)</span><input name="precio" inputMode="numeric" pattern="[0-9]*" maxLength={5} defaultValue={event.ticketPriceEuros ?? ""} /></label>
+            <label className="field" style={{ flex: 1, minWidth: 140 }}><span>Precio en taquilla (€, opcional)</span><input name="puerta" inputMode="numeric" pattern="[0-9]*" maxLength={5} defaultValue={event.doorPriceEuros ?? ""} /><span className="hint">Si es distinto, se avisa al público.</span></label>
+            <label className="field" style={{ flex: 1, minWidth: 140 }}><span>Aforo en Lona (opcional)</span><input name="aforo" inputMode="numeric" pattern="[0-9]*" maxLength={6} defaultValue={event.ticketCapacity ?? ""} /><span className="hint">Sin aforo no hay límite.</span></label>
+          </div>
+          <label className="field"><span>Tu número de Bizum</span><input name="bizum" type="tel" autoComplete="tel" maxLength={20} defaultValue={event.bizumPhone ? fmtBizum(event.bizumPhone) : ""} placeholder="600 000 000" /><span className="hint">Solo lo ve quien reserva, para enviarte la señal: la mitad del precio, con su código como concepto. El resto lo cobras en la puerta.</span></label>
+          <label className="field"><span>Nota para el público (opcional)</span><textarea name="nota" rows={2} maxLength={300} defaultValue={event.ticketNote ?? ""} placeholder="Apertura de puertas, edad mínima, si hay entrada infantil…" /></label>
+          <p className="meta" style={{ margin: 0 }}>{event.startMinute === null && <>Pon la hora de inicio en «Datos de la velada»: las reservas se cierran {HORAS_CIERRE_ANTES} horas antes. </>}Cada persona puede reservar de 1 a {MAX_ENTRADAS} entradas. Tiene 24 horas para enviar la señal; si no llega, la reserva caduca sola y libera las plazas.</p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {event.ticketsOpen ? <>
+              <button name="abrir" value="1">Guardar</button>
+              <button name="abrir" value="0" className="secondary">Cerrar la venta</button>
+            </> : <>
+              <button name="abrir" value="1">Guardar y abrir la venta</button>
+              <button name="abrir" value="0" className="secondary">Guardar sin abrir</button>
+            </>}
+          </div>
+        </form>
+      </section>
 
       <section id="inscripcion" aria-labelledby="titulo-inscripcion" className="tarjeta" style={{ marginTop: 16, scrollMarginTop: 80 }}>
         <h2 id="titulo-inscripcion" style={{ margin: 0 }}>Inscripción de peleadores</h2>
