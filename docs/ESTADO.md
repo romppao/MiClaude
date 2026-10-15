@@ -17,7 +17,7 @@
 
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
-| Claude (nube, el chat del móvil) | **Separar la demo de la versión real**: la demo deja de salir en los buscadores; pasos para desenganchar lonaclub.es de Render | `claude/separar-demo-y-real`, versión 0.15.1 | PR abierto |
+| Claude (nube, el chat del móvil) | **Lo legal que faltaba programar**: bloquear usuarios, aviso sin cuenta (`/avisar`) y correos con la decisión de moderación. Antes: separar la demo (0.15.1, fusionado) | `claude-nube/legal-en-la-app-bloquear-usuarios-avisos-20261015`, versión 0.16.0 | PR abierto |
 | Claude Code (portátil) | **Arreglos de T-016** (bloqueantes de las 5 partes) y, después, **relevo de Codex**: cadena F → G → D → H (`docs/ecosistema/traspasos/2026-10-15-codex-relevo-a-claude.md`, en MiProyectoAI) | `claude/arreglos-t016`, versión 0.15.0 | en curso |
 | Codex | **Parado** por créditos (15-10-2026): todo lo suyo pasa a Claude. Ramas F (#56), G (#62), D (#64), H (local, sin subir); T-016 (#60); RFC-001 (#61) | varias | parado |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
@@ -41,13 +41,15 @@
 - **Dominio:** lona.es y lona.com están ocupados. Pidió más nombres; según #57 se eligió **lonaclub.es**. Falta que el fundador lo confirme por escrito aquí. También mencionó Infomaniak (dominio y correo); sin decidir y sin precios comprobados.
 - **Mejoras de las veladas:** dijo que tenía y que las daría; sigue a la espera de su lista.
 - **Versión real (14 oct, tarde):** primero hay que comprobar que la app está bien desarrollada y, solo después, montar la versión oficial en lonaclub.es. Tiene que ser «la aplicación real y definitiva»: sin datos de prueba, sin avisos de demo y completamente independiente de la demo. Habrá un espacio de pruebas aparte (la demo) para las próximas actualizaciones. No hay que pulsar «Publicar app» en Google hasta entonces. **No poner `APP_URL=https://lonaclub.es` en Render**.
+- **lonaclub.es, esperar (15 oct, después):** «por el momento vamos a dejarlo así… No hagas nada en cuanto a eso, porque… todavía no hemos terminado de perfilar la aplicación, entonces todavía no tiene sentido que ya lancemos la aplicación web». **No montar nada en lonaclub.es** (ni versión real ni «próximamente») hasta que lo diga. Ahora toca: «procede con todo lo que hay que hacer, todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano del usuario».
+- **Cambio de visión y RFC-001 de Codex (15 oct):** «he tenido un cambio de visión que todavía no sé si aplicaremos». Sobre la RFC-001 (#61): «no estoy seguro si es la que definitivamente acepté… Sé que dije dos versiones… hubo una… que me convenció más. Pero no estoy seguro de cuál es la que hizo Codex». Y el orden: «Eso es el final. Primero hacemos todo el plan para finalizar el proyecto, hacer la promoción mediante vídeos y todo más, y ya pues valoraremos si el enfoque va a ser ese o no». **Nadie aplica la RFC-001 ni cambia el enfoque** hasta que el fundador confirme cuál de las dos versiones aceptó (puede habérselo dicho a Claude Code en el portátil: si lo sabes, apúntalo aquí).
 - **Separar ya (15 oct):** no quiere que quien busque el nombre llegue a la demo con su aviso. «Quiero separarlo ya… la demo de render… es donde haremos las pruebas para corregir pequeñas cosas, hacer configuraciones nuevas, actualizaciones. Pero la parte de oficial de la web, ahí es donde pues estará la web de verdad.» lonaclub.es **nunca** vuelve a apuntar a Render; la demo no se indexa.
 - **Dominio confirmado:** lonaclub.es (Infomaniak, comprado el 14-10-2026), con el buzón info@lonaclub.es.
 - **Siempre:** no tocar ni quitar lo que funciona sin que lo pida; avisarle de lo que un diseño aprobado trae y no está hecho; nada de pago sin su aprobación; todo en español.
 
 ## 5. Siguiente, por orden
 
-0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación pendiente: bloquear usuarios, avisos automáticos de moderación (DSA) y aviso sin cuenta.
+0. **Textos legales (0.14.0):** borradores hechos (`docs/LEGAL.md`). El fundador tiene sus tareas y las preguntas para el abogado en `MiProyectoAI/LEGAL-LONA/`. Programación: bloquear usuarios, aviso sin cuenta y correos de la decisión, **hechos en la 0.16.0**; falta T-013 (aviso al salir a enlaces externos).
 0. **Revisión completa antes de la versión oficial:** [`tareas/T-016-revision-previa-al-lanzamiento.md`](tareas/T-016-revision-previa-al-lanzamiento.md). Es lo que pidió el fundador antes de montar lonaclub.es y publicar en Google. Sin empezar: el primer intento se cortó por un fallo del servicio.
 1. Resolver #57 (producción) y #56 (bloque F): revisar, retargetar y renumerar.
 2. **Probar «Continuar con Google»** en la demo en cuanto el fundador ponga las claves.

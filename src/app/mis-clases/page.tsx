@@ -5,6 +5,9 @@ import { db } from "../../lib/common/db";
 import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 import { CLASS_KIND_LABEL, classMeta } from "../../lib/trainers/classes";
 import { answerClassRequest, createClass, toggleClass } from "../actions/trainers";
+import { bloquearUsuario } from "../actions/community";
+import { BotonBloquear } from "../components/Bloquear";
+import { bloqueadosPor } from "../../lib/community/bloqueos";
 import { REQUEST_REPLY_MAX, REQUEST_STATUS_LABEL } from "../../lib/trainers/requests";
 import { fmtDate } from "../../lib/common/labels";
 import CamposClase from "../components/CamposClase";
@@ -18,7 +21,7 @@ export default async function MisClases() {
   const user = await requireUser("/mis-clases");
   const trainer = await db.trainer.findUnique({ where: { userId: user.id }, include: { classes: { orderBy: [{ active: "desc" }, { createdAt: "asc" }] } } });
   if (!trainer) redirect(user.role === "TRAINER" ? "/" : "/registro?tipo=entrenador");
-  const solicitudes = await db.classRequest.findMany({ where: { class: { trainerId: trainer.id }, OR: [{ status: "PENDING" }, { createdAt: { gte: new Date(Date.now() - 60 * 864e5) } }] }, orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: 50, include: { class: true, user: { select: { name: true, email: true } } } });
+  const solicitudes = await db.classRequest.findMany({ where: { class: { trainerId: trainer.id }, userId: { notIn: await bloqueadosPor(user.id) }, OR: [{ status: "PENDING" }, { createdAt: { gte: new Date(Date.now() - 60 * 864e5) } }] }, orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: 50, include: { class: true, user: { select: { name: true, email: true } } } });
   const pendientes = solicitudes.filter((r) => r.status === "PENDING");
   return (
     <div className="pantalla">
@@ -45,6 +48,7 @@ export default async function MisClases() {
                 </div>
               </form>
             )}
+            <BotonBloquear accion={bloquearUsuario} origen="solicitud" id={r.id} back="/mis-clases#solicitudes" nombre={r.user.name} />
           </article>
         ))}
       </section>

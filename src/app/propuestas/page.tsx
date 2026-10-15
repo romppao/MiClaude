@@ -9,6 +9,9 @@ import { flatParams } from "../../lib/common/safe";
 import { searchIds } from "../../lib/common/search";
 import { PROPOSAL_KIND_LABEL, PROPOSAL_REPLY_MAX, PROPOSAL_STATUS_LABEL, puedeCancelarPropuesta, puedeResponderPropuesta } from "../../lib/fighters/proposals";
 import { answerProposal, cancelProposal } from "../actions/proposals";
+import { bloquearUsuario } from "../actions/community";
+import { BotonBloquear } from "../components/Bloquear";
+import { bloqueadosPor } from "../../lib/community/bloqueos";
 import Pestanas from "../components/Pestanas";
 import type { Discipline, Prisma } from "@prisma/client";
 import { DISCIPLINE_ORDER, categoryLabel, weightClassesFor } from "../../lib/common/disciplines";
@@ -113,7 +116,8 @@ export default async function Propuestas({ searchParams }: { searchParams: Promi
   const rango = (a: number | undefined, b: number | undefined, u: string) => (a !== undefined && b !== undefined ? `de ${a} a ${b} ${u}` : a !== undefined ? `${a} ${u} o más` : `hasta ${b} ${u}`);
   const incluir = { include: { disciplines: true, user: { select: { email: true } } } } as const;
   const [recibidas, enviadas] = await Promise.all([
-    db.fightProposal.findMany({ where: { toId: me.id }, orderBy: [{ createdAt: "desc" }], take: 50, include: { from: incluir } }),
+    // Las de personas que ha bloqueado no se le muestran (lib/community/bloqueos.ts).
+    db.fightProposal.findMany({ where: { toId: me.id, from: { OR: [{ userId: null }, { userId: { notIn: await bloqueadosPor(user.id) } }] } }, orderBy: [{ createdAt: "desc" }], take: 50, include: { from: incluir } }),
     db.fightProposal.findMany({ where: { fromId: me.id }, orderBy: [{ createdAt: "desc" }], take: 50, include: { to: incluir } }),
   ]);
   const pendientes = recibidas.filter((p) => p.status === "PENDING").length;
@@ -198,6 +202,7 @@ export default async function Propuestas({ searchParams }: { searchParams: Promi
                   </div>
                 </form>
               )}
+              {p.from.userId && <BotonBloquear accion={bloquearUsuario} origen="propuesta" id={p.id} back="/propuestas#pestana-recibidas" nombre={publicFighterName(p.from)} />}
             </article>
           ))}
         </> },

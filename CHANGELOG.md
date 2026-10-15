@@ -11,6 +11,19 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.16.0] — 2026-10-15
+
+PR de Claude: lo que faltaba programar de los textos legales (petición del fundador, 15-10-2026: «procede con todas las correcciones para dejar la aplicación lista y perfecta para el uso cotidiano»).
+
+### Añadido
+- **Bloquear a otra persona** (lo exige Apple para publicar en la tienda): desde su ficha, su comentario de aura, su vídeo o foto, su propuesta o su solicitud de clase. Ya no podrá retarte, proponerte sparring, pedir tus clases ni seguirte, y no verás lo que publique; lo pendiente entre las dos se cancela. No se le avisa ni cambia nada para los demás. Se deshace en «Mi cuenta», pestaña «Bloqueos», y entra en la copia de tus datos.
+- **Avisar de un contenido sin cuenta** (`/avisar`, al pie de todas las páginas): dirección, motivo, explicación, nombre, correo y declaración de buena fe, como pide la ley de servicios digitales. Acusa recibo por correo y entra en la cola de moderación.
+- **Correos con la decisión de moderación:** al cerrar un aviso, quien avisó recibe la decisión; si se retira algo, su autor recibe qué se ha hecho, por qué y cómo reclamar.
+
+### Cambiado
+- Moderación ve los avisos sin cuenta (con nombre y correo de quien avisa) y, en los avisos sobre una página, solo puede cerrarlos: se actúa desde la propia página.
+- `/condiciones`, `/privacidad` y `docs/LEGAL.md` recogen las tres funciones nuevas.
+
 ## [0.15.1] — 2026-10-15
 
 PR de Claude: separar la demo de la versión real (petición del fundador, 15-10-2026).

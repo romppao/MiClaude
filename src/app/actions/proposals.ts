@@ -14,6 +14,7 @@ import { publicFighterName } from "../../lib/common/names";
 import { allow, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL, sendMail } from "../../lib/common/mail";
 import { PROPOSAL_KIND_LABEL, PROPOSAL_REPLY_MAX, PROPOSALS_PER_DAY, parseProposal, puedeCancelarPropuesta, puedeResponderPropuesta } from "../../lib/fighters/proposals";
+import { hayBloqueo } from "../../lib/community/bloqueos";
 import { checkLengths, go, str, withLock } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
 
@@ -40,6 +41,7 @@ export async function proposeFight(f: FormData) {
   const back = `/peleadores/${rival.slug}/proponer`;
   if (rival.id === me.id) go(back, { problema: "propuesta_a_ti" });
   if (!rival.user || !rival.userId) go(back, { problema: "propuesta_sin_titular" });
+  if (await hayBloqueo(user.id, rival.userId)) go(back, { problema: "bloqueo_contacto" });
   checkLengths(f, back, { day: 10, place: 200, message: 1000 });
   const datos = parseProposal({ kind: str(f, "kind"), discipline: str(f, "discipline"), day: str(f, "day"), place: str(f, "place"), message: str(f, "message"), today: todayMadrid(), disciplinasDelRival: rival.disciplines.map((d) => d.discipline) });
   if (!datos.ok) go(back, { problema: datos.problema });

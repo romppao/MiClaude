@@ -464,6 +464,9 @@ model User {
   totpConfirmedAt       DateTime?
   totpLastStep          Int?
   recoveryCodes         String[]               @default([])
+  // Personas que ha bloqueado y quienes la han bloqueado (lib/community/bloqueos.ts).
+  bloqueos              Block[]                @relation("Bloqueador")
+  bloqueadoPor          Block[]                @relation("Bloqueado")
 }
 
 model Session {
@@ -598,11 +601,15 @@ model AppError {
 }
 
 // Aviso de un usuario sobre un dato que cree incorrecto (combate o ficha). Lo revisa un moderador.
+// Desde la 0.15.2 también se puede avisar sin cuenta (DSA, art. 16): entity PAGINA, entityId = dirección de la página dentro de Lona,
+// sin userId y con el nombre y el correo de quien avisa (para acusar recibo y comunicarle la decisión).
 model Report {
   id             String       @id @default(cuid())
-  userId         String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entity         String // BOUT | FIGHTER
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reporterName   String?
+  reporterEmail  String?
+  entity         String // BOUT | FIGHTER | AURA | MEDIA | PAGINA
   entityId       String
   reason         String
   message        String?
@@ -615,6 +622,19 @@ model Report {
   @@index([status, createdAt])
   @@index([entity, entityId])
   @@index([userId])
+}
+
+// Una persona bloquea a otra (Apple, norma 1.2; docs/LEGAL.md): la bloqueada ya no puede retarla, proponerle sparring, pedirle clases
+// ni seguir su ficha, y quien bloquea deja de ver sus comentarios, vídeos, fotos, propuestas y solicitudes. No se avisa a la bloqueada.
+model Block {
+  blockerId String
+  blocker   User     @relation("Bloqueador", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User     @relation("Bloqueado", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
 }
 
 // Un aficionado sigue a un peleador para ver sus próximas veladas y recibir avisos.

@@ -13,6 +13,7 @@
 | `/api/auth/google/callback` | (respuesta técnica, sin pantalla) | Pública | — | User |
 | `/api/cron/noticias` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/api/fallos` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
+| `/avisar` | Avisar de un contenido | Pública (cambia lo que ve según la cuenta) | `community.avisarSinCuenta` | — |
 | `/aviso-legal` | Aviso legal | Pública | — | — |
 | `/ayuda` | ¿Cómo funciona Lona? | Pública | — | — |
 | `/baja` | Avisos por correo electrónico | Pública | `accounts.unsubscribeEmails` | — |
@@ -38,14 +39,14 @@
 | `/laboratorio` | (respuesta técnica, sin pantalla) | Pública | — | — |
 | `/medios/:id/imagen` | Foto que el público subió a una velada (guardada ya normalizada en WebP). ?descargar=1 la descarga. | Pública | — | MediaItem |
 | `/medios/:id/video` | Vídeo que el público subió a una velada. ?descargar=1 lo descarga (para que el peleador lo guarde). | Pública | — | MediaItem |
-| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `demo.demoCambiarPapel` | Profile, Report, SupportAccreditation |
-| `/mi-cuenta/datos` | Descarga de todos los datos que Lona guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Bout, ClaimRequest, ClassRequest, Event, EventRegistration, FightProposal, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
+| `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `community.desbloquearUsuario`, `demo.demoCambiarPapel` | Block, Profile, Report, SupportAccreditation |
+| `/mi-cuenta/datos` | Descarga de todos los datos que Lona guarda de la persona que ha iniciado sesión (derecho de acceso y portabilidad). | Cuenta con sesión iniciada | — | AuditLog, Aura, Block, Bout, ClaimRequest, ClassRequest, Event, EventRegistration, FightProposal, FighterAchievement, Follow, Highlight, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Lona? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.removeDiscipline`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, FighterAchievement, Gym, Highlight, MediaItem, Profile |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
 | `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
 | `/mi-panel` | (respuesta técnica, sin pantalla) | Cuenta con sesión iniciada | — | — |
-| `/mis-clases` | Solicitudes | Cuenta con sesión iniciada | `trainers.answerClassRequest`, `trainers.createClass`, `trainers.toggleClass` | ClassRequest, Trainer |
+| `/mis-clases` | Solicitudes | Cuenta con sesión iniciada | `community.bloquearUsuario`, `trainers.answerClassRequest`, `trainers.createClass`, `trainers.toggleClass` | ClassRequest, Trainer |
 | `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration, EventSlot |
 | `/mis-reservas` | Mis reservas de clases | Cuenta con sesión iniciada | `trainers.cancelClassRequest` | ClassRequest |
 | `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, NewsSource, OrganizerRequest, Report |
@@ -63,13 +64,13 @@
 | `/organizador/:slug/inscripciones` | Solicitudes para participar | Moderación | `registrations.answerRegistrations` | Event, EventSlot |
 | `/organizador/:slug/inscripciones/csv` | Una celda de CSV: entre comillas, y sin que una hoja de cálculo la tome por una fórmula (empieza por =, +, - o @). | Cuenta con sesión iniciada | — | Event |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
-| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.createReport`, `community.toggleFollow`, `fighters.removeDiscipline` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, MediaItem, Profile |
+| `/peleadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `aura.giveAura`, `aura.removeAura`, `community.bloquearUsuario`, `community.createReport`, `community.desbloquearUsuario`, `community.toggleFollow`, `fighters.removeDiscipline` | Aura, Bout, Fighter, FighterAchievement, Follow, Highlight, MediaItem, Profile |
 | `/peleadores/:slug/proponer` | Retar o proponer sparring | Pública (cambia lo que ve según la cuenta) | `proposals.proposeFight` | Fighter, FighterDiscipline |
 | `/perfiles/:kind/:id/editar` | Personalizar | Cuenta con correo verificado | `profiles.saveProfile` | Gym, User |
 | `/privacidad` | Privacidad y tus datos | Pública | — | — |
 | `/promotores` | Promotores | Pública | — | User |
 | `/promotores/:id` | (ficha individual: el título depende del elemento) | Pública | — | Event, User |
-| `/propuestas` | Retos y sparrings | Cuenta con sesión iniciada | `proposals.answerProposal`, `proposals.cancelProposal` | Aura, Bout, FightProposal, Fighter |
+| `/propuestas` | Retos y sparrings | Cuenta con sesión iniciada | `community.bloquearUsuario`, `proposals.answerProposal`, `proposals.cancelProposal` | Aura, Bout, FightProposal, Fighter |
 | `/ranking` | Ránking de aura | Pública | — | — |
 | `/recuperar` | ¿Has olvidado tu contraseña? | Pública | `accounts.requestPasswordReset` | — |
 | `/recuperar/nueva` | El enlace ya no sirve | Pública | `accounts.resetPassword` | — |
@@ -85,7 +86,7 @@
 | `/subidas` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/subidas/:...clave` | Recibe un vídeo cuando el almacén es el disco del servidor (desarrollo, pruebas y demo). Con R2, el navegador sube directamente allí. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
-| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.createReport` | Event, EventRegistration, EventSlot, MediaItem |
+| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.bloquearUsuario`, `community.createReport` | Event, EventRegistration, EventSlot, MediaItem |
 | `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Bout, Event, EventRegistration, EventSlot, FighterDiscipline |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
@@ -136,7 +137,10 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
+| `avisarSinCuenta` | Cualquiera | AppError, AuditLog, RateHit, Report | REPORT: CREATED | Sí | aviso_pagina_recibido |
+| `bloquearUsuario` | Cualquiera | AuditLog, Block, ClassRequest, FightProposal, Follow | USER: BLOCKED | — | bloqueado |
 | `createReport` | Cuenta con correo verificado | AuditLog, Report | REPORT: CREATED | — | reporte_enviado |
+| `desbloquearUsuario` | Cualquiera | AuditLog, Block | USER: UNBLOCKED | — | desbloqueado |
 | `toggleFollow` | Cualquiera | Follow | — | — | — |
 
 ### `creador`
@@ -197,7 +201,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `decideClaim` | Moderación | AuditLog, Aura, ClaimRequest, Fighter, Follow | CLAIM: (varias) | Sí | — |
 | `decideOrganizer` | Moderación | AuditLog, OrganizerRequest, Profile, User | ORGANIZER: (varias), PROFILE: FEDERATION_CREATED | Sí | — |
 | `decidirVeladaPasada` | Moderación | AuditLog, Event, Fighter | EVENT: (varias) | Sí | — |
-| `resolveReport` | Moderación | AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, MediaItem, Profile, Report | REPORT: (varias) | — | — |
+| `resolveReport` | Moderación | AppError, AuditLog, Aura, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, MediaItem, Profile, Report | REPORT: (varias) | Sí | — |
 | `setGymVerified` | Moderación | AuditLog, Gym | GYM: (varias) | — | — |
 
 ### `news`
@@ -265,10 +269,10 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Gym | `fighters.createMyFighter`, `fighters.updateMyFighter`, `moderation.setGymVerified`, `profiles.saveProfile`, `trainers.createMyTrainer` |
 | Trainer | `accounts.deleteAccount`, `trainers.createMyTrainer` |
 | TrainingClass | `trainers.createMyTrainer`, `trainers.createClass`, `trainers.toggleClass` |
-| ClassRequest | `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| ClassRequest | `community.bloquearUsuario`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | EventSlot | `registrations.setSlot`, `registrations.removeSlot` |
 | EventRegistration | `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations` |
-| FightProposal | `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal` |
+| FightProposal | `community.bloquearUsuario`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal` |
 | Highlight | `accounts.deleteAccount`, `fighters.publishHighlight`, `fighters.manageHighlight`, `moderation.resolveReport` |
 | Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.setRecordPublic`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport`, `moderation.decidirVeladaPasada` |
 | Event | `bouts.addBout`, `bouts.removeMyBout`, `events.createEvent`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `moderation.decidirVeladaPasada`, `registrations.setRegistration` |
@@ -279,12 +283,13 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `moderation.decidirVeladaPasada`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
-| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `bouts.addBout`, `bouts.respondBout`, `events.addCartelBout`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
-| Report | `bouts.respondBout`, `community.createReport`, `moderation.resolveReport` |
-| Follow | `accounts.saveInterests`, `community.toggleFollow`, `moderation.decideClaim` |
+| AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `community.bloquearUsuario`, `community.desbloquearUsuario`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `moderation.decidirVeladaPasada`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `bouts.addBout`, `bouts.respondBout`, `community.avisarSinCuenta`, `events.addCartelBout`, `moderation.resolveReport`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| Report | `bouts.respondBout`, `community.createReport`, `community.avisarSinCuenta`, `moderation.resolveReport` |
+| Block | `community.bloquearUsuario`, `community.desbloquearUsuario` |
+| Follow | `accounts.saveInterests`, `community.toggleFollow`, `community.bloquearUsuario`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `moderation.resolveReport` |
-| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass` |
+| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass` |
 | Profile | `accounts.deleteAccount`, `moderation.decideOrganizer`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 | SupportAccreditation | `accounts.deleteAccount`, `trajectory.setSupportAccreditation` |
 | FighterAchievement | `accounts.deleteAccount`, `fighters.removeDiscipline`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
@@ -364,8 +369,9 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 
 | Fichero | Exporta |
 |---|---|
-| `notify.ts` | `notifyAuthorOfAnswer`, `notifyDecision`, `notifyFollowersOfBout`, `notifyRivalOfBout` |
-| `reports.ts` | `MAX_REPORTS_PER_DAY`, `REASONS_BY_ENTITY`, `REPORT_ENTITIES`, `REPORT_REASONS`, `ReportEntity` |
+| `bloqueos.ts` | `ORIGENES_DE_BLOQUEO`, `OrigenDeBloqueo`, `bloqueadosPor`, `bloquear`, `cuentaDe`, `esOrigenDeBloqueo`, `hayBloqueo` |
+| `notify.ts` | `acusarReciboDeAviso`, `notificarResolucionDeAviso`, `notifyAuthorOfAnswer`, `notifyDecision`, `notifyFollowersOfBout`, `notifyRivalOfBout` |
+| `reports.ts` | `AVISOS_SIN_CUENTA_POR_DIA`, `AVISO_EXPLICACION_MAX`, `AVISO_EXPLICACION_MIN`, `AvisoSinCuenta`, `MAX_REPORTS_PER_DAY`, `REASONS_BY_ENTITY`, `REPORT_ENTITIES`, `REPORT_REASONS`, `ReportEntity`, `parseAvisoSinCuenta`, `rutaDeLona` |
 | `siguiendo.ts` | `VELADAS_NO_PUBLICAS`, `filtrosSiguiendo` |
 
 ### `lib/events`

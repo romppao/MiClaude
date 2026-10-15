@@ -8,6 +8,7 @@ import { DISCIPLINE_LABEL, DISCIPLINE_ORDER } from "../../../../lib/common/disci
 import { publicFighterName } from "../../../../lib/common/names";
 import { PROPOSAL_MESSAGE_MAX, PROPOSAL_PLACE_MAX, PROPOSAL_DAYS_AHEAD, parseProposalKind } from "../../../../lib/fighters/proposals";
 import { proposeFight } from "../../../actions/proposals";
+import { hayBloqueo } from "../../../../lib/community/bloqueos";
 
 export const metadata: Metadata = { title: "Retar o proponer sparring", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ export default async function Proponer({ params, searchParams }: { params: Promi
   const tipo = parseProposalKind((await searchParams).tipo ?? "") ?? "FIGHT";
   const disciplinas = DISCIPLINE_ORDER.filter((d) => rival.disciplines.some((x) => x.discipline === d));
   const comun = user?.fighter ? (await db.fighterDiscipline.findMany({ where: { fighterId: user.fighter.id }, select: { discipline: true } })).map((d) => d.discipline).find((d) => disciplinas.includes(d)) : undefined;
+  const bloqueo = await hayBloqueo(user?.id, rival.userId);
   const hoy = todayMadrid();
   const ultimo = new Date(Date.parse(`${hoy}T00:00:00Z`) + PROPOSAL_DAYS_AHEAD * 864e5).toISOString().slice(0, 10);
   return (
@@ -36,6 +38,8 @@ export default async function Proponer({ params, searchParams }: { params: Promi
         <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Primero <Link href="/verificar">confirma tu correo electrónico</Link>.</div>
       ) : !user.fighter ? (
         <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Para retar o proponer un sparring necesitas tu ficha de peleador. <Link href="/mi-ficha">Crear o reclamar mi ficha</Link></div>
+      ) : bloqueo ? (
+        <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>No puedes contactar con esta persona: una de las dos ha bloqueado a la otra. Si fuiste tú, puedes desbloquearla en <Link href="/mi-cuenta#pestana-bloqueos">Mi cuenta, pestaña «Bloqueos»</Link>.</div>
       ) : user.fighter.id === rival.id ? (
         <p className="mut">Esta es tu ficha. Busca a otro peleador en <Link href="/propuestas#proponer">Mis propuestas</Link>.</p>
       ) : !rival.userId ? (

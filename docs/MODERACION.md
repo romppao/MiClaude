@@ -21,7 +21,7 @@ Tiene tres bloques, de arriba abajo:
 
    | Cola | Qué contiene | Qué decide el moderador |
    |---|---|---|
-   | Avisos de usuarios | Alguien avisa de que un combate, una ficha, un aura o una foto o vídeo está mal (`Report`). | Corregir y retirar, solo dar por resuelto, o descartar. Puede añadir una nota; para ocultar una ficha la nota es obligatoria. |
+   | Avisos de usuarios | Alguien avisa de que un combate, una ficha, un aura o una foto o vídeo está mal (`Report`), o, con o sin cuenta, de cualquier página desde `/avisar` (DSA, art. 16). | Corregir y retirar, solo dar por resuelto, o descartar. Puede añadir una nota; para ocultar una ficha la nota es obligatoria. **La nota se envía por correo** a quien avisó y, si se retira algo, a su autor, junto con cómo reclamar (DSA, arts. 16.5 y 17). Los avisos sobre una página no tienen botón de retirar: se actúa en la propia página y luego se cierra el aviso. |
    | Fichas reclamadas | Alguien dice que una ficha es suya (`ClaimRequest`). | Aprobar o rechazar; el motivo es obligatorio al rechazar. |
    | Organizadores | Solicitudes de promotora, federación o club (`OrganizerRequest`). | Aprobar (con la evidencia comprobada) o rechazar. |
    | Gimnasios sin sello | Gimnasios que todavía no se han comprobado. | Dar o quitar el sello. |

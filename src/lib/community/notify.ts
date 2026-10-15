@@ -4,6 +4,7 @@ import { unsubscribeLink } from "../accounts/auth";
 import { fmtDate } from "../common/labels";
 import { oneLine } from "../common/text";
 import { registrarFallo } from "../common/fallos";
+import { titular } from "../common/titular";
 
 const fullName = (f: { firstName: string; lastName: string }) => oneLine(`${f.firstName} ${f.lastName}`);
 
@@ -90,4 +91,70 @@ export async function notifyAuthorOfAnswer(boutId: string, confirmed: boolean, m
     await registrarFallo({ origen: "AVISOS", contexto: "No se pudo avisar al autor de la respuesta de su rival", error: e });
     return false;
   }
+}
+
+/**
+ * Lo que la ley exige decir a quien se le retira algo y a quien avisa (DSA, arts. 16.5, 17 y 20): que lo ha decidido una persona, sin
+ * sistemas automáticos, y cómo reclamar (la reclamación interna va al contacto del aviso legal y la revisa otra persona del equipo).
+ */
+function comoReclamar(): string {
+  const { contacto } = titular();
+  return `Esta decisión la ha tomado una persona del equipo de moderación de Lona; no usamos sistemas automáticos para decidir.\n\nSi no estás de acuerdo, escribe ${contacto ? `a ${contacto}` : "al contacto que figura en el aviso legal"} en los próximos seis meses explicando por qué, e indica la referencia de abajo: otra persona del equipo revisará la decisión y te responderá. También puedes acudir a un órgano de resolución extrajudicial de litigios certificado o a los tribunales. Las normas están en ${APP_URL}/condiciones`;
+}
+
+/** Acusa recibo de un aviso enviado desde /avisar (DSA, art. 16.4). Nunca lanza. */
+export async function acusarReciboDeAviso(reportId: string, correo: string): Promise<boolean> {
+  try {
+    const r = await db.report.findUnique({ where: { id: reportId }, select: { id: true, entityId: true, reporterName: true } });
+    if (!r) return false;
+    return await sendMail(correo, "Hemos recibido tu aviso",
+      `Hola${r.reporterName ? ` ${oneLine(r.reporterName)}` : ""},\n\nHemos recibido tu aviso sobre ${APP_URL}${oneLine(r.entityId)}\n\nLo revisará una persona del equipo de moderación (no usamos sistemas automáticos para decidir) y te escribiremos con la decisión y sus motivos.\n\nReferencia del aviso: ${r.id}\n\nUn saludo,\nLona\n`);
+  } catch (e) {
+    await registrarFallo({ origen: "AVISOS", contexto: "No se pudo acusar recibo de un aviso", error: e });
+    return false;
+  }
+}
+
+/**
+ * Tras resolver un aviso, escribe a quien avisó con la decisión (DSA, art. 16.5) y, si se ha retirado algo, a su autor con los motivos
+ * (art. 17). `retirado` dice si moderación actuó sobre el contenido. Si la misma persona avisó y es la autora, solo recibe un correo. Nunca lanza.
+ */
+export async function notificarResolucionDeAviso(reportId: string, retirado: boolean, motivoLegible: string): Promise<void> {
+  try {
+    const r = await db.report.findUnique({ where: { id: reportId }, include: { user: { select: { id: true, email: true, name: true } } } });
+    if (!r) return;
+    const nota = r.resolutionNote ? `\n\nNota de moderación: ${r.resolutionNote}` : "";
+    const sobre = r.entity === "PAGINA" ? `la página ${APP_URL}${oneLine(r.entityId)}` : r.entity === "BOUT" ? "un combate" : r.entity === "FIGHTER" ? "una ficha" : r.entity === "AURA" ? "un comentario" : "un vídeo o una foto";
+    const decision = retirado ? "Hemos actuado: el contenido se ha retirado o ha dejado de contar mientras se revisa."
+      : r.status === "RESOLVED" ? "Hemos revisado el contenido y lo hemos corregido."
+      : "Hemos revisado el contenido y no hemos encontrado motivos para retirarlo.";
+    const destino = r.user?.email ?? r.reporterEmail;
+    const nombre = r.user?.name ?? r.reporterName;
+    if (destino) await sendMail(destino, "Hemos revisado tu aviso",
+      `Hola${nombre ? ` ${oneLine(nombre)}` : ""},\n\nHemos revisado tu aviso sobre ${sobre} (motivo: ${motivoLegible}).\n\n${decision}${nota}\n\n${comoReclamar()}\n\nReferencia del aviso: ${r.id}\n\nUn saludo,\nLona\n`);
+    if (!retirado) return;
+    const autor = await autorDe(r.entity, r.entityId);
+    if (!autor || autor.userId === r.userId) return;
+    await notifyDecision(autor.userId, "Hemos retirado un contenido tuyo",
+      `${autor.que}\n\nMotivo: ${motivoLegible}. Lo hemos decidido tras revisar un aviso, de acuerdo con nuestras condiciones de uso (${APP_URL}/condiciones).${nota}\n\n${comoReclamar()}\n\nReferencia: ${r.id}`);
+  } catch (e) {
+    await registrarFallo({ origen: "AVISOS", contexto: "No se pudo comunicar por correo la resolución de un aviso", error: e });
+  }
+}
+
+/** Quién publicó lo avisado y una frase que lo describa, para el correo de motivos. Las fichas y las páginas no tienen un autor al que avisar. */
+async function autorDe(entity: string, id: string): Promise<{ userId: string; que: string } | null> {
+  if (entity === "AURA") {
+    const a = await db.aura.findUnique({ where: { id }, select: { userId: true, comment: true, fighter: { select: { firstName: true, lastName: true } } } });
+    return a ? { userId: a.userId, que: `Hemos retirado tu comentario${a.comment ? ` «${oneLine(a.comment)}»` : ""} en la ficha de ${fullName(a.fighter)}. Tu aura se mantiene; solo deja de mostrarse el texto.` } : null;
+  }
+  if (entity === "MEDIA") {
+    const m = await db.mediaItem.findUnique({ where: { id }, select: { uploaderId: true, kind: true, caption: true, event: { select: { name: true } } } });
+    return m ? { userId: m.uploaderId, que: `Hemos retirado ${m.kind === "PHOTO" ? "tu foto" : "tu vídeo"}${m.caption ? ` «${oneLine(m.caption)}»` : ""} de la velada «${oneLine(m.event.name)}». Ya no se muestra en la velada ni en las fichas.` } : null;
+  }
+  if (entity === "BOUT") {
+    const b = await db.bout.findUnique({ where: { id }, select: { createdById: true, fighterA: { select: { firstName: true, lastName: true } }, fighterB: { select: { firstName: true, lastName: true } }, event: { select: { name: true } } } });
+    return b?.createdById ? { userId: b.createdById, que: `El combate que registraste (${fullName(b.fighterA)} contra ${fullName(b.fighterB)}, «${oneLine(b.event.name)}») ha pasado a «en revisión»: deja de contar en el récord y en el ránking hasta que se aclare.` } : null;
+  }
+  return null;
 }

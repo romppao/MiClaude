@@ -29,9 +29,11 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 - **Una función de moderación o una sanción nueva:** `/condiciones`, apartados 5 a 7.
 - **Cualquier cambio de texto:** actualizar `LEGAL_ACTUALIZADO`. Si el cambio es importante, avisar a los usuarios.
 
+## Hecho en la app (0.16.0, 15 de octubre de 2026)
+- **Bloquear a un usuario** (Apple 1.2): desde su ficha, su comentario, su vídeo o foto, su propuesta o su solicitud de clase. Corta el contacto en los dos sentidos (retar, sparring, clases, seguir) y oculta a quien bloquea lo que publica la otra persona; cancela lo pendiente entre ellas. No se avisa a la bloqueada ni cambia nada para los demás. Se deshace en «Mi cuenta» → «Bloqueos». Código: `src/lib/community/bloqueos.ts`.
+- **Correos de la decisión** (DSA, arts. 16.5 y 17): al cerrar un aviso, quien avisó recibe la decisión y la nota de moderación; si se retira algo (comentario, vídeo o foto, o el combate pasa a revisión), su autor recibe qué se ha hecho, el motivo, que lo ha decidido una persona y cómo reclamar (contacto del aviso legal, órgano extrajudicial o tribunales). Código: `notificarResolucionDeAviso` en `src/lib/community/notify.ts`. **La nota de moderación se envía tal cual**: escríbela pensando en que la leerán las dos personas.
+- **Aviso sin cuenta** (DSA, art. 16): `/avisar`, enlazado al pie de todas las páginas y en `/condiciones#avisos`. Pide la dirección dentro de Lona, el motivo, la explicación, el nombre, el correo y la declaración de buena fe (los avisos de abuso de menores se pueden enviar sin identificarse). Acusa recibo por correo y entra en la cola de avisos de moderación. Límite: 5 avisos al día por dirección IP.
+
 ## Pendiente en la app (programación)
-1. Bloquear a un usuario (Apple 1.2).
-2. Avisar por correo a quien denuncia y al afectado, con los motivos (DSA, arts. 16.5 y 17). Hoy se hace a mano.
-3. Formulario de aviso sin cuenta. Hoy la vía es el correo de contacto.
-4. T-013, aviso al salir hacia enlaces externos.
-5. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.
+1. T-013, aviso al salir hacia enlaces externos.
+2. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.
