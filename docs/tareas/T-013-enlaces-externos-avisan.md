@@ -2,7 +2,7 @@
 **Nivel:** N1 (ver [`../RANGOS.md`](../RANGOS.md): quién puede tomarla)  
 **Actualización del encargo (fundador, 15-10-2026):** ejecución por Codex desde la demo tras fusionar #73; reserva `codex/t-013-enlaces-externos-20261015`. Incluye condiciones, privacidad, Multimedia y los enlaces de moderación de #73 y la autoría generada por el mapa. Se permiten los registros, versión, catálogo y documentación exigidos en cada PR. Los paneles F/G/D/H y sus ramas quedan fuera del alcance.
 
-**Fase:** F1 · **Estado:** en curso · **Asignada a:** Codex (encargo del fundador, 15-10-2026) · **Depende de:** #73 fusionado (comprobado: 8c789bc)
+**Fase:** F1 · **Estado:** pendiente de revisión (PR #77) · **Asignada a:** Codex (encargo del fundador, 15-10-2026) · **Depende de:** #73 fusionado (comprobado: 8c789bc)
 
 ## Objetivo
 Que una persona que usa lector de pantalla (o que simplemente no espera que se abra otra pestaña) sepa **siempre** que un enlace sale de la aplicación. El inventario original era de ocho enlaces; tras #73 también faltan los avisos en los enlaces de moderación a fotos, vídeos y páginas.
@@ -30,4 +30,4 @@ Entrada breve en tu registro (`docs/APORTACIONES-<NOMBRE>.md`) y en `DIARIO.md`.
 
 ## Verificación y límites de esta ejecución
 
-Base final: demo 543a2a7 (#74, posterior a #73); entrega 0.16.2. Reproducción roja con selector y moderación originales: cuatro avisos agrupados ausentes. En la ejecución local posterior, las comprobaciones nuevas de pestañas pasan y la galería avisa visiblemente; el resultado global falla por diez autoenlaces previos en veladas, propuestas y filtros de fallos, sin modificar esos ficheros ni relajar la auditoría. El mapa dibujado se ha comprobado además con Chromium y software: aviso accesible y rel correctos en la autoría real. Detalle, incidencias y alcance de cada ejecución en APORTACIONES-CODEX. El CI completo de la base final está en https://github.com/romppao/MiClaude/actions/runs/38706572484.
+Base actual: demo d6a63d5 (#75, posterior a #73 y #74); entrega 0.17.1. Reproducción roja con selector y moderación originales: cuatro avisos agrupados ausentes. En la ejecución local posterior, las comprobaciones nuevas de pestañas pasan y la galería avisa visiblemente; el resultado global falla por diez autoenlaces previos en veladas, propuestas y filtros de fallos, sin modificar esos ficheros ni relajar la auditoría. El mapa dibujado se ha comprobado además con Chromium y software: aviso accesible y rel correctos en la autoría real. Detalle, incidencias y alcance de cada ejecución en APORTACIONES-CODEX. El CI anterior de 33398e6 sobre #74 está en https://github.com/romppao/MiClaude/actions/runs/38706572484. La base actual se valida en https://github.com/romppao/MiClaude/pull/77/checks.

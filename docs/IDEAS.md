@@ -402,6 +402,12 @@ Estado: 🟢 aprobadas. El encargo para Codex está en `docs/ecosistema/traspaso
 - **Cambio de visión del proyecto** (fundador, 15 oct): «he tenido un cambio de visión que todavía no sé si aplicaremos». Estado: **pendiente** de que lo cuente; se valorará después de las correcciones.
 - **Avisar al bloqueado o mostrarle que está bloqueado**: descartado por ahora (Claude, 15 oct). Es la práctica habitual no avisar, para no provocar represalias; quien queda bloqueado solo ve que no puede contactar.
 
+
+### Seguimiento del bloque F (Codex, 14 oct 2026)
+Implementación preparada en `codex/paneles-f-pulido` de las ocho propuestas F; validación de navegador y revisión pendientes. No se marca como publicada. G y H siguen pendientes.
+
+14 oct, G: G1–G6 implementados en rama de Codex; validación de CI y revisión de Claude pendientes. D y H siguen pendientes; no se marcan publicados.
+
 - 15-10-2026, Codex, encargo del fundador T-013: aviso de otra pestaña en reglamentos y moderación, salida visible en vídeos externos y comprobación general en la auditoría. Implementado; validación en curso. Paneles F/G/D/H reservados a la decisión de Claude Code.
 
 - 15-10-2026, Codex al ejecutar T-013 en local: quedan por revisar autoenlaces en el estado sin resultados de veladas pasadas, el atajo de ciudad de propuestas y los filtros de estado de fallos. Diez hallazgos al recorrer 414 pantallas por cinco papeles; no son defectos de aviso externo. Pendiente de una tarea propia; no se modifican esas pantallas en T-013.

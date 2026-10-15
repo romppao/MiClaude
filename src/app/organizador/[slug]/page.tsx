@@ -1,3 +1,6 @@
+import PreparacionVelada from "../../_inicio/PreparacionVelada";
+import { preparationAudience } from "../../../lib/events/preparation-data";
+import { availableFighters, isAvailable } from "../../../lib/fighters/availability";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "../../../lib/accounts/auth";
@@ -23,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 const MAX_LISTA = SUGERENCIAS_CARTEL;
 
-export default async function ManageEvent({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ roja?: string; azul?: string }> }) {
+export default async function ManageEvent({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ roja?: string; azul?: string; disponibles?: string }> }) {
   const [{ slug }, user] = await Promise.all([params, getUser()]);
   if (!user) redirect(loginPath(`/organizador/${slug}`));
   const event = await db.event.findUnique({ where: { slug }, include: { bouts: { orderBy: { order: "asc" }, include: { fighterA: true, fighterB: true } } } });
@@ -32,7 +35,9 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
   const paramsBusqueda = await searchParams;
   const roja = (typeof paramsBusqueda.roja === "string" ? paramsBusqueda.roja : "").slice(0, 80);
   const azul = (typeof paramsBusqueda.azul === "string" ? paramsBusqueda.azul : "").slice(0, 80);
-  const [fighters, fightersAzul] = await Promise.all([buscarParaCartel(event.discipline, roja), buscarParaCartel(event.discipline, azul)]);
+  const disponibles = paramsBusqueda.disponibles === "1";
+  const audiencia = await preparationAudience(event.id);
+  const [fighters, fightersAzul] = await Promise.all([buscarParaCartel(event.discipline, roja, disponibles), buscarParaCartel(event.discipline, azul, disponibles)]);
   const past = eventDayReached(event.date);
   // Inscripción: cuántas solicitudes esperan respuesta y quiénes están aceptados (salen primero al formar el cartel).
   const [porEstado, aceptados, plazas, filasCategoria] = await Promise.all([
@@ -48,7 +53,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
   const abierta = inscripcionAbierta(event, hoy);
   const diaEvento = event.date.toISOString().slice(0, 10);
   // Los aceptados en la inscripción siempre se pueden elegir, coincidan o no con la búsqueda, y salen primero.
-  const fichasAceptadas = idsAceptados.size ? await db.fighter.findMany({ where: { id: { in: [...idsAceptados] }, hiddenAt: null }, include: { gym: true }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }] }) : [];
+  const fichasAceptadas = idsAceptados.size ? await db.fighter.findMany({ where: { id: { in: [...idsAceptados] }, hiddenAt: null, ...(disponibles ? availableFighters() : {}) }, include: { gym: true }, orderBy: [{ lastName: "asc" }, { firstName: "asc" }, { id: "asc" }] }) : [];
   const opciones = (lista: typeof fighters, busqueda: string) => {
     const op = (b: (typeof fighters)[number]) => <option key={b.id} value={b.id}>{etiqueta(b)}</option>;
     const resto = lista.slice(0, MAX_LISTA).filter((b) => !idsAceptados.has(b.id));
@@ -60,7 +65,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
       : `Esquina ${esquina}: ${lista.length} ${busqueda ? "coincidencias" : "peleadores de la disciplina"}.`;
   const nombre = (b: { firstName: string; lastName: string; listed?: boolean; hiddenAt?: Date | null }) => publicFighterName(b); // como lo ve el público: una ficha provisional solo enseña la inicial del apellido
   // En la lista se distinguen los homónimos con el alias, la ciudad y el gimnasio.
-  const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
+  const etiqueta = (b: (typeof fighters)[number]) => [nombre(b), b.alias && `«${b.alias}»`, isAvailable(b) && `Disponible${b.currentWeightKg !== null ? ` · ${b.currentWeightKg} kg` : ""}`, [b.city, b.gym?.name].filter(Boolean).join(" · ")].filter(Boolean).join(" — ");
   return (
     <>
       <h1>{event.name}</h1>
@@ -70,7 +75,8 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
       {event.status === "CANCELLED" && <p className="notice notice-bad" role="note">Esta velada está cancelada. Sigue visible con esa etiqueta y sus combates no cuentan. Puedes volver a activarla abajo.</p>}
       <p><Link href="/organizador">← Volver a mis veladas</Link></p>
 
-      <h2>Datos de la velada</h2>
+      <PreparacionVelada event={event} asistentes={audiencia.asistentes} seguidores={audiencia.seguidores} />
+      <h2 id="datos">Datos de la velada</h2>
       <details>
         <summary>Corregir los datos de la velada — nombre, fecha, lugar, promotor y entradas</summary>
         <form className="search" action={updateEvent} style={{ marginTop: 8 }}>
@@ -167,6 +173,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
       <form method="get" action={`/organizador/${event.slug}#anadir-combate`} className="search" aria-label="Buscar peleadores para el cartel">
         <label className="field"><span>Buscar esquina roja</span><input name="roja" type="search" maxLength={80} defaultValue={roja} aria-describedby="ayuda-buscar-cartel" /></label>
         <label className="field"><span>Buscar esquina azul</span><input name="azul" type="search" maxLength={80} defaultValue={azul} aria-describedby="ayuda-buscar-cartel" /></label>
+        <label className="chip"><input type="checkbox" name="disponibles" value="1" defaultChecked={disponibles} />Solo disponibles para pelear</label>
         <button>Buscar peleadores</button>
         <p id="ayuda-buscar-cartel" className="hint">Busca por nombre, alias, gimnasio o ciudad. Solo aparecen peleadores de la disciplina de esta velada. Elige una sugerencia para cada esquina.</p>
       </form>
@@ -185,7 +192,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
         <button>Añadir al cartel</button>
       </form>
 
-      <h2>Cartel</h2>
+      <h2 id="cartel">Cartel</h2>
       {event.bouts.length === 0 ? <p className="mut">El cartel está vacío. Añade el primer combate con el formulario de arriba.</p> : (
         <div className="table-wrap">
           <table>

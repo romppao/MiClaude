@@ -1967,6 +1967,19 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - Claude monta y comprueba el primer despliegue.
 - Bloque D (gimnasios reales desde OpenStreetMap) para Codex.
 
+
+## 2026-10-14 — Paneles, bloque F (Codex)
+**Pedido:** ejecutar el encargo de paneles; el fundador autoriza expresamente avanzar en rama propia desde #55 sin esperar su integración.
+**Cambios:** pendientes, cuatro accesos, aura en panel, sugerencias por disciplinas, tarjetas de seguidos, solicitudes del entrenador, récord por disciplina y progreso de perfil. Se completa el editor del gimnasio del entrenador porque antes no había destino para esa carencia.
+**Validación:** tipos y 741 unitarias pasan; build inicial pasa. Pruebas de navegador nuevas y adaptadas preparadas para CI; Docker no está disponible localmente. No se afirma validación de navegador ni despliegue.
+**Siguiente paso:** CI del PR de F y revisión de Claude; G y H pendientes.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
+
 ## 2026-10-15 — Textos legales para el lanzamiento (Claude)
 
 **Qué se pidió:**
@@ -2118,6 +2131,54 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 - **El script del traslado no arrancaba.** Fallaba con `tsx` porque el proyecto compila a CommonJS y no admite `await` fuera de una función; se metió en `main()`.
 
 **Estado:** PR abierto. **Siguiente:** que el fundador cree la cuenta de R2 cuando monte la versión real (PRODUCCION.md, paso 9).
+**Después (15-10-2026):** el CI de #68 falló en dos pruebas de extremo a extremo (`flujo.mjs` y `categorias.mjs`) porque daban por buena la vía cerrada en C5-01: ponían resultado a una velada pasada sin autorizar. Ahora la autorizan primero. #67 y #68 fusionados por el fundador.
+
+## 15-10-2026. Claude Code: bloque F de los paneles (relevo de Codex)
+
+**Qué:** el trabajo de Codex en `codex/paneles-f-pulido` (9044fdb, sin subir) pasa a la rama `claude/paneles-f`, integrado sobre 0.15.0. El PR #56 queda sustituido.
+
+**Choques resueltos:**
+- «Peleadores que sigo»: se queda el diseño en tarjetas de F. `textoResultado` ya oculta el resultado si alguno tiene el récord amateur privado, y se añade la nota «récord amateur privado» (C3-01).
+- El gimnasio que el entrenador escribe al editar su perfil respeta la exclusión de Cataluña (`provinciaConGimnasios`, C5-02).
+- Se recuperan cuatro entradas del catálogo (páginas legales y `titular.ts`) que se habían perdido en la fusión, y se mantiene la prueba `paneles-pulido.mjs` en `test:e2e`.
+
+**Comprobado:** `tsc` sin errores; `vitest` 749 de 750 (falla `password.test.ts` por tiempo, como antes); catálogo con 395 archivos; mapa regenerado.
+
+## 15-10-2026. Claude Code: bloque G de los paneles (relevo de Codex)
+
+**Qué:** el trabajo de Codex en `codex/paneles-g-madrid` (a74abfe, con el arreglo local del selector «Buscar clases» que no llegó a subirse) pasa a `claude/paneles-g`, integrado sobre F (0.16.0). Sustituye a #62.
+
+**Revisión:**
+- la migración `20261014130000_paneles_agenda` solo añade columnas y la tabla `EventAttendance`, sin tocar datos;
+- «Voy a ir» solo en veladas programadas y futuras;
+- el calendario ICS solo de veladas publicadas;
+- la exportación de datos y el anonimato incluyen los campos nuevos;
+- la disponibilidad caduca a los 60 días.
+
+No se ha encontrado nada que corregir.
+
+**Comprobado:** `tsc` sin errores; `vitest` 769 de 770 (falla `password.test.ts` por tiempo, como antes); catálogo con 408 archivos; mapa regenerado.
+
+## 15-10-2026. Claude (nube): paneles F y G integrados sobre la 0.16.1 (0.17.0)
+
+**Qué se pidió:** el fundador: «Si ves que Codex ha fallado en alguna prueba o está a medias de algo, tú mismo ya corrígele… y le dices… cómo hacerlo. Esto para agilizar el trabajo es importante». Y no informarle de cada paso.
+
+**Qué se decidió:**
+- **Los paneles F y G estaban hechos dos veces:** Codex (#56, #62) y Claude Code (#69, #70).
+- **Comparación de árboles completos:** idénticos salvo tres ficheros, en los que la versión de Claude Code añade C5-02 (sin gimnasios en Cataluña desde el perfil de entrenador) y la prueba de inscripciones adaptada al menú. Se elige la de Claude Code.
+- **La integra esta sesión**, porque el portátil no ha tenido actividad desde las 05:35. Se hace en una rama propia, sin escribir en las ramas de Codex ni de Claude Code.
+
+**Qué se hizo:**
+- **Fusión de `claude/paneles-g`** (que incluye F) sobre la 0.16.1. Conflictos resueltos:
+  - en `profiles.ts`, el almacén de fotos y el gimnasio del entrenador;
+  - en `veladas/[slug]`, los imports de bloqueos y de asistencia;
+  - en `autorizacion.test.ts`, las acciones nuevas de los dos lados.
+- Versión 0.17.0, con las dos entradas del `CHANGELOG` unidas.
+- Se traen de Codex su registro (`APORTACIONES-CODEX.md`) y sus lecciones del 14 y 15 de octubre.
+- Revisión escrita en #56 y #62 (duplicados), #64 (D) y #71 (H), con lo que hay que cambiar.
+
+**Siguiente:** D y H, con las correcciones de la revisión, en ramas propias.
+
 
 ## 15 de octubre de 2026 — T-013: avisos de enlaces externos (Codex)
 
@@ -2138,3 +2199,5 @@ El fundador concretó la necesidad pendiente: elegir gimnasios de una ciudad y d
 **Resultados locales adicionales de T-013:** la reproducción roja acotada (`ENLACES_MAX=1`, más división y avisos preparados) detectó los avisos ausentes en reglamento, foto, vídeo y página de moderación. El rastreo posterior con Chromium y mapa por software recorrió 414 pantallas por cinco papeles y ejecutó los casos dirigidos: no encontró defectos de aviso o `rel`, pero el resultado global fue **fallido** por 10 autoenlaces anteriores, ajenos a los cambios de T-013: `/veladas?past=todas` (cinco papeles), el acceso «Buscar en mi ciudad» ya filtrado (peleador) y los cuatro estados de `/moderacion/fallos` (moderador). Esas tres pantallas y la comprobación de autoenlaces no se han modificado. No se oculta ni relaja ese fallo. La ejecución usó la compilación f26ec14 anterior al merge de #74; la base final la valida el CI de 33398e6.
 
 **Mapa dibujado, comprobación independiente:** con un punto GeoJSON y el estilo servido desde la propia prueba, Chromium dibujó el mapa y el enlace «OpenFreeMap» tuvo `aria-label="OpenFreeMap (se abre en otra pestaña)"` y `rel="noopener noreferrer"`. La primera sonda no esperó a la autoría y no la contó; la segunda esperó al enlace real antes de comprobarlo.
+
+**Base vigente tras #75:** la demo pasó a d6a63d5 (0.17.0) al integrar Claude los F/G elegidos en ESTADO.md. Se incorpora ese resultado en esta rama propia; no se actualiza ninguna rama ni PR de F/G/D/H. Se conservan íntegros sus ficheros y pruebas. T-013 queda en **0.17.1** usando el script de versión. Las pruebas anteriores se identifican por su SHA; la validación actual se consulta en los checks del PR de esta entrega. Revisión de Claude e integración del fundador pendientes.

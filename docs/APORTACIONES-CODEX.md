@@ -345,6 +345,23 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 
 14 oct, entrega de la pila en borrador #48/#50/#51/#52: búsqueda local 0.11.2 con reproducción roja, 33/33 en verde y capturas móviles en ambos temas; A usabilidad 52/52 y siete guiones 154/154; B usabilidad 52/52 con privacidad respetada. Cierre y distinción local/CI en el traspaso 2026-10-14-codex-ci48-51.md.
 
+
+## 2026-10-14 — Bloque F de paneles
+**Base:** 8146d0f (#55); **rama:** codex/paneles-f-pulido. El fundador autoriza avanzar sobre esta base antes de su integración.
+**Cambios:** componentes TeToca/CompletaPerfil; cuatro paneles; selección de disciplina; alta de intereses en dos pasos; aura sin JavaScript; respuestas del entrenador y editor de su gimnasio; menú y tarjetas de seguidos.
+**Comprobaciones:** tipos, 741 unitarias, build inicial. CI pendiente; sin PostgreSQL/Docker disponible localmente. No se ha desplegado.
+**Relevo:** revisar PR F antes de integrar; continuar G y H en PR separados. H4 conserva revisión de modelo previa a interfaz.
+
+## 2026-10-14 — Continuación del encargo de paneles
+F incorpora la principal 8f07985 sin borrar aportaciones. Pasa de 0.12.2 a 0.13.2 y su PR #56 se dirige a la principal. El CI anterior 38567763298 falló en la comprobación inmediata de inputs del segundo paso de intereses; los datos se guardaron correctamente según el mismo guion. La prueba espera ahora el formulario del segundo paso y comprueba los dos valores exactos. Tipos y 741 unitarias pasan localmente. Docker/PostgreSQL inaccesibles; navegador completo y revisión de Claude pendientes. G queda conservado en 944ee56 hasta actualizarlo. No se despliega.
+
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
+
+
+## 2026-10-15 — F sobre los textos legales de Claude
+Se conserva la versión legal 0.14.0 y sus cuatro entradas de catálogo al actualizar F a 0.14.1. La resolución inicial de conflictos documentales falló por una expresión regular y finales de línea Windows; se reconstruyeron los documentos desde los padres y su ancestro, comprobando JSON y ausencia de marcadores. Los cuatro ajustes móviles quedan reservados a Antigravity por encargo de Claude. Sin integración ni despliegue.
+
 ## 15 de octubre de 2026 — T-013: avisos de enlaces externos (Codex)
 
 **Encargo:** «T-013 enlaces externos»; partir de la demo con #73 fusionado; no tocar F/G/D/H (#56/#62/#64/#71), y después agrupar Dependabot en T-002. Reserva publicada con `node scripts/estado.mjs reservar codex "T-013 enlaces externos"`, desde 8c789bc (0.16.0).
@@ -364,3 +381,5 @@ A 0da663b y B 01bb8bd incorporan las correcciones de preparación de cuenta/cate
 **Resultados locales adicionales de T-013:** la reproducción roja acotada (`ENLACES_MAX=1`, más división y avisos preparados) detectó los avisos ausentes en reglamento, foto, vídeo y página de moderación. El rastreo posterior con Chromium y mapa por software recorrió 414 pantallas por cinco papeles y ejecutó los casos dirigidos: no encontró defectos de aviso o `rel`, pero el resultado global fue **fallido** por 10 autoenlaces anteriores, ajenos a los cambios de T-013: `/veladas?past=todas` (cinco papeles), el acceso «Buscar en mi ciudad» ya filtrado (peleador) y los cuatro estados de `/moderacion/fallos` (moderador). Esas tres pantallas y la comprobación de autoenlaces no se han modificado. No se oculta ni relaja ese fallo. La ejecución usó la compilación f26ec14 anterior al merge de #74; la base final la valida el CI de 33398e6.
 
 **Mapa dibujado, comprobación independiente:** con un punto GeoJSON y el estilo servido desde la propia prueba, Chromium dibujó el mapa y el enlace «OpenFreeMap» tuvo `aria-label="OpenFreeMap (se abre en otra pestaña)"` y `rel="noopener noreferrer"`. La primera sonda no esperó a la autoría y no la contó; la segunda esperó al enlace real antes de comprobarlo.
+
+**Base vigente tras #75:** la demo pasó a d6a63d5 (0.17.0) al integrar Claude los F/G elegidos en ESTADO.md. Se incorpora ese resultado en esta rama propia; no se actualiza ninguna rama ni PR de F/G/D/H. Se conservan íntegros sus ficheros y pruebas. T-013 queda en **0.17.1** usando el script de versión. Las pruebas anteriores se identifican por su SHA; la validación actual se consulta en los checks del PR de esta entrega. Revisión de Claude e integración del fundador pendientes.

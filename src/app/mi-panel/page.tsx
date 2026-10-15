@@ -14,10 +14,11 @@ export const dynamic = "force-dynamic";
  * «Mi panel»: lo propio de cada tipo de cuenta (diseño v3). Aficionado (y moderación, y una entidad pendiente de aprobar): sus peleadores
  * y sus vídeos y fotos. Peleador: su ficha y su próximo combate. Entrenador: sus clases y sus veladas. Entidad aprobada: su panel de veladas.
  */
-export default async function MiPanel() {
+export default async function MiPanel({ searchParams }: { searchParams: Promise<{ disciplina?: string }> }) {
   const user = await requireUser("/mi-panel");
+  const { disciplina } = await searchParams;
   const papel = papelDe(user);
-  const panel = papel === "entidad" ? <InicioEntidad user={user} /> : papel === "entrenador" ? <InicioEntrenador user={user} /> : papel === "peleador" ? <InicioPeleador user={user} /> : <InicioAficionado user={user} />;
+  const panel = papel === "entidad" ? <InicioEntidad user={user} /> : papel === "entrenador" ? <InicioEntrenador user={user} /> : papel === "peleador" ? <InicioPeleador user={user} disciplina={disciplina} /> : <InicioAficionado user={user} />;
   // «Mis vídeos y fotos»: siempre en el panel del aficionado; en los demás, solo si han compartido algo.
   return <>{panel}<MisSubidas userId={user.id} siempre={papel === "usuario"} /></>;
 }

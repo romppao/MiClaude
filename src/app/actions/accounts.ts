@@ -22,6 +22,7 @@ import { readOnboarding, type FighterIntent, type TrainerIntent } from "../../li
 import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
 import { parseClass, parseYears, pickDisciplines } from "../../lib/trainers/classes";
 import { safeHttpUrl } from "../../lib/common/url";
+import { PROVINCES } from "../../lib/common/labels";
 import { checkLengths, go, guard, readProvince, Rechazo, str } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
 import { borrarFotos } from "../../lib/media/fotos";
@@ -89,15 +90,18 @@ export async function register(f: FormData) {
 /** Registro del aficionado, último paso: disciplinas que le interesan y peleadores que quiere seguir (todo opcional). */
 export async function saveInterests(f: FormData) {
   const user = await requireUser("/registro/intereses");
+  const province = str(f, "province");
+  if (province && !PROVINCES.includes(province)) go("/registro/intereses", { problema: "provincia_no_valida" });
   const disciplinas = DISCIPLINE_ORDER.filter((d) => f.getAll("disciplina").includes(d));
   const ids = [...new Set(f.getAll("seguir").map(String))].filter((id) => id.length <= 40).slice(0, 30);
   // Solo fichas públicas y nunca la propia (igual que «Seguir» en la ficha).
   const fichas = ids.length ? await db.fighter.findMany({ where: { id: { in: ids }, listed: true, hiddenAt: null, NOT: { userId: user.id } }, select: { id: true } }) : [];
   await db.$transaction([
-    db.user.update({ where: { id: user.id }, data: { interests: disciplinas } }),
+    db.user.update({ where: { id: user.id }, data: { interests: disciplinas, province: province || null } }),
     db.follow.createMany({ data: fichas.map((x) => ({ userId: user.id, fighterId: x.id })), skipDuplicates: true }),
   ]);
   revalidatePath("/", "layout");
+  if (str(f, "paso") === "disciplinas") go("/registro/intereses?paso=seguir");
   go(user.emailVerifiedAt ? "/" : "/verificar", { aviso: fichas.length ? "intereses_y_seguidos" : "intereses_guardados" });
 }
 
@@ -244,8 +248,10 @@ export async function updateAccount(f: FormData) {
   const back = "/mi-cuenta";
   const name = oneLine(str(f, "name"));
   if (!name || name.length > LIMITS.name) go(back, { problema: "registro_datos" });
+  const province = f.has("province") ? str(f, "province") : user.province ?? "";
+  if (province && !PROVINCES.includes(province)) go(back, { problema: "provincia_no_valida" });
   const notifyEmails = f.get("notifyEmails") === "on";
-  await db.user.update({ where: { id: user.id }, data: { name, notifyEmails } });
+  await db.user.update({ where: { id: user.id }, data: { name, notifyEmails, province: province || null } });
   await audit({ userId: user.id, entity: "USER", entityId: user.id, action: "ACCOUNT_UPDATED", before: { name: user.name, notifyEmails: user.notifyEmails }, after: { name, notifyEmails } });
   revalidatePath("/", "layout");
   go(back, { aviso: "cuenta_guardada" });

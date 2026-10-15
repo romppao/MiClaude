@@ -89,6 +89,13 @@ Pruebas: `tests/e2e/cuenta.mjs`, `integridad.mjs`, `trayectoria.mjs`, `perfiles.
 
 Escribir desencadenante y resultado visible; enlazar pantalla, acción, guarda, regla, tablas y pruebas; explicar transacción, concurrencia, fallo de servicios externos y privacidad. Comprobar un éxito y un rechazo real con el rol afectado. No declarar implementado un flujo que solo aparece en una maqueta o en el plan.
 
+
+## Paneles por usuario, bloque F
+`/mi-panel` selecciona Aficionado/Peleador/Entrenador/Entidad. `TeToca` recibe cantidades completas y destinos; `CompletaPerfil` calcula el avance sin campos nuevos. Los botones de aura reutilizan `giveAura`/`removeAura` con vuelta fija al panel y las guardas existentes. `answerClassRequest` solo admite vuelta al panel o a Mis clases y mantiene autorización por titular. El gimnasio del entrenador se completa desde `saveProfile`, con el mismo permiso de edición, validación de longitud y auditoría en la transacción. El registro guarda disciplinas antes de consultar sugerencias filtradas. `paneles-pulido.test.tsx` cubre los componentes; `paneles-pulido.mjs` cubre aura sin JS y accesibilidad.
+
+## 2026-10-14 — Bloque G de paneles
+Implementa G1–G6 sobre F actualizado: provincia opcional, actividad local, Voy a ir, ICS, agenda, disponibilidad con filtros y caducidad, agenda del entrenador y preparación de veladas. Migración solo aditiva. Tipos y 761 unitarias aprobados; navegador, migración en base vacía y paridad de esquema se comprueban en CI, no disponibles localmente. Las clases no tienen fechas de oferta: se muestran como ofertas para solicitar esta semana, sin inventar confirmaciones. Aviso de caducidad en Mi ficha y Mi panel; el peso deja de publicarse inmediatamente al vencer aunque la limpieza aún no haya corrido. No hay carga real ni despliegue.
+
 ## Avisos de enlaces externos (T-013)
 
 Los enlaces con `target="_blank"` anuncian en su nombre accesible que abren otra pestaña o página web y conservan `rel="noopener"` o `noreferrer`. La galería de vídeos externos lo indica también visiblemente. No se incrustan reproductores de terceros; condiciones y privacidad explican la salida. `tests/e2e/enlaces.mjs` comprueba cada pantalla recorrida y prepara explícitamente una división deportiva y avisos de fotos, vídeo enlazado, vídeo subido y página para evitar auditar solo colas vacías. Espera al mapa o a su alternativa sin WebGL. `components/mapa/base.ts` añade el aviso y `rel` a los enlaces de autoría que generan MapLibre y el estilo, al cargar y al actualizar fuentes, estilo o terreno. No visita los destinos externos.

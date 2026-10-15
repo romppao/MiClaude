@@ -165,6 +165,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261014130000_paneles_agenda/migration.sql",
+    "purpose": "Migración aditiva G: provincia opcional, disponibilidad con caducidad, peso voluntario y asistencia única por cuenta/velada con borrado en cascada.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "prisma/migrations/20261015090000_bloqueos_y_avisos_sin_cuenta/migration.sql",
     "purpose": "Crea la tabla Block y permite avisos sin cuenta en Report (userId opcional, nombre y correo de quien avisa).",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -270,6 +275,16 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/_inicio/CercaDeTi.tsx",
+    "purpose": "Actividad por provincia: veladas de los siguientes siete días y ofertas de clases para solicitar, sin inventar un horario confirmado.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/_inicio/CompletaPerfil.tsx",
+    "purpose": "Progreso accesible del perfil calculado con campos existentes; desaparece al completar todos y enlaza los formularios pendientes.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/_inicio/Entidad.tsx",
     "purpose": "Panel de la entidad aprobada en /mi-panel con sus veladas, cifras y resultados pendientes del cartel.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -298,6 +313,16 @@
     "path": "src/app/_inicio/PortadaComun.tsx",
     "purpose": "Portada común con sesión: usa la portada de actualidad con el saludo, «Mi panel» y las disciplinas propias primero en el selector.",
     "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/_inicio/PreparacionVelada.tsx",
+    "purpose": "Lista informativa de preparación de una velada y cifras agregadas, sin publicar identidades de asistentes o seguidores.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/_inicio/TeToca.tsx",
+    "purpose": "Pendientes personales de cada panel: omite cantidades cero y enlaza cada acción con su recuento completo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "src/app/_inicio/Visitante.tsx",
@@ -1100,6 +1125,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/veladas/[slug]/calendario/route.ts",
+    "purpose": "GET público de calendario ICS solo para veladas publicadas; sin datos personales ni descarga de veladas ocultas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/veladas/[slug]/inscribirme/page.tsx",
     "purpose": "Formulario del peleador para pedir participar en un evento con su categoría, peso y mensaje; muestra y deja retirar la solicitud existente.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1300,6 +1330,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/periods.ts",
+    "purpose": "Plazo compartido de disponibilidad aprobado en G4, sin acoplar limpieza de cuentas con consultas deportivas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/lib/common/record-eligibility.ts",
     "purpose": "Filtro compartido de base de datos para r?cord, aura y r?nking; incluye declaraciones tras 24 horas y excluye disputas y veladas no autorizadas.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1365,6 +1400,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/events/calendar.ts",
+    "purpose": "Exportación ICS de día completo con escape de texto y plegado UTF-8 por octetos; nunca incluye asistencia.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/lib/events/cartel-search.ts",
     "purpose": "Normaliza y limita la búsqueda GET de peleadores para el cartel por nombre, alias, gimnasio y ciudad.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1373,6 +1413,16 @@
     "path": "src/lib/events/pairing.ts",
     "purpose": "Distancia y parecido entre dos peleadores (experiencia, peso, victorias, aura, edad) y avisos de diferencias para la ayuda a emparejar.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/events/preparation-data.ts",
+    "purpose": "Consulta cantidades de asistencia y relaciones Follow del cartel sin duplicar por combate ni exponer cuentas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/lib/events/preparation.ts",
+    "purpose": "Lista pura de comprobaciones antes y después de una velada; informa sin autorizar o certificar aptitud deportiva.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/lib/events/registrations-data.ts",
@@ -1393,6 +1443,11 @@
     "path": "src/lib/fighters/anonymize.ts",
     "purpose": "Anonimiza fichas conservando combates compartidos y limpia datos personales copiados en el historial.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/fighters/availability.ts",
+    "purpose": "Disponibilidad voluntaria efectiva durante 60 días y validación del peso opcional, usada por consultas y vistas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/lib/fighters/coherence.ts",
@@ -1508,6 +1563,11 @@
     "path": "src/lib/profiles/profiles.ts",
     "purpose": "Resuelve entidad visual, visibilidad y titular natural/asignado; devuelve selección pública y permiso de edición sin bytes de foto.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/trainers/agenda.ts",
+    "purpose": "Límites de semana de Madrid sobre DATE y texto de franjas del entrenador; conserva solicitudes antiguas sin día.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/lib/trainers/classes.ts",
@@ -1695,6 +1755,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/paneles-agenda.mjs",
+    "purpose": "Flujos G en CI con base de pruebas: marcar/quitar asistencia, agenda, provincia, calendario público, disponibilidad y preparación.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "tests/e2e/paneles-pulido.mjs",
+    "purpose": "Comprueba dar y quitar aura a ambos participantes desde el panel, con y sin JavaScript, accesibilidad y anchura móvil.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/paneles.mjs",
     "purpose": "Recorre paneles de organización/moderación, solicitudes, permisos y el destino tras entrar (portada común).",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1783,6 +1853,11 @@
     "path": "tests/unit/avisos.test.ts",
     "purpose": "Validación del aviso sin cuenta: dirección dentro de Lona, motivo, explicación, identidad y declaración, con la excepción de los avisos de abuso de menores.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/cartel-disponibilidad.test.ts",
+    "purpose": "Comprueba el filtro de disponibilidad y caducidad antes del límite tanto en sugerencias como en búsqueda SQL.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "tests/unit/coherence.test.ts",
@@ -1900,8 +1975,18 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/paneles-agenda.test.ts",
+    "purpose": "Casos límite G: caducidad exacta, peso inválido, semana en Madrid, preparación vacía y exportación ICS segura.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "tests/unit/paneles-fallos.test.ts",
     "purpose": "Prueba los filtros de «Peleadores que sigo» y el recuento de resultados por poner del panel de la entidad.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/paneles-pulido.test.tsx",
+    "purpose": "Verifica renderizado vacío y completo de pendientes, progreso del perfil y accesos conservados en el menú.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

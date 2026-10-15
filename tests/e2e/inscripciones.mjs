@@ -56,7 +56,8 @@ const cris = await peleador("Cris", "Valencia");
 const otro = await peleador("Otro", "Valencia", "BOXEO");
 sql(`update "Fighter" set "birthDate"='1998-05-01' where id='${ana.f.id}'; update "Fighter" set "birthDate"='2006-03-01' where id='${bea.f.id}';`);
 await ana.p.goto(B + "/mi-panel");
-check("el panel del peleador tiene «Inscribirme en una velada» y «Mis inscripciones»", await seen(ana.p.locator(".accion-principal", { hasText: "Inscribirme en una velada" })) && await seen(ana.p.locator(".accion-principal", { hasText: "Mis inscripciones" })));
+// Bloque F: el panel tiene como mucho cuatro accesos rápidos; «Mis inscripciones» está en el menú (Competiciones).
+check("el panel del peleador tiene «Inscribirme en una velada» y el menú «Mis inscripciones»", await seen(ana.p.locator(".accion-principal", { hasText: "Inscribirme en una velada" })) && await (async () => { await ana.p.getByRole("button", { name: "Menú", exact: true }).click(); const ok = await seen(ana.p.getByRole("dialog").getByRole("link", { name: "Mis inscripciones" })); await ana.p.keyboard.press("Escape"); return ok; })());
 await ana.p.goto(B + `/veladas/${slug}`);
 await ana.p.getByRole("link", { name: "Solicitar participar" }).click(); await ana.p.waitForURL("**/inscribirme");
 await axe(ana.p, "Pedir participar");

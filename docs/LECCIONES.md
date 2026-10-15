@@ -480,6 +480,23 @@ El fundador aclaró que el fallo era de comodidad en retos oficiales y sparring:
 | El CI falló en `tsc` por una prueba unitaria nueva (`{…} as NodeJS.ProcessEnv`) | Se pasó `typecheck` antes de escribir la prueba; las pruebas también se comprueban con `tsc` | `npm run typecheck` es lo último antes de cada commit, no lo primero; en las pruebas, los entornos falsos van con `as unknown as NodeJS.ProcessEnv` |
 | Una ficha de hace 9 días (T-004 parte 1, PR #23) proponía una interfaz pensada solo para perfiles | La ficha se escribió antes de existir el almacén de vídeos | Antes de seguir una ficha antigua, mirar qué existe ya en el código y reutilizarlo (aquí, las variables y la firma de R2 de los vídeos) |
 
+
+## 2026-10-14 — Pruebas de componentes y codificación en Windows
+La configuración de Vitest solo incluía `.test.ts`, por lo que no ejecutaba una prueba `.test.tsx` nueva. Se amplió el patrón y se configuró JSX en Oxc, el transformador instalado; las 4 pruebas nuevas ya pasan. La tubería de PowerShell a Python sustituyó inicialmente algunas tildes: corregidas y fijada salida UTF-8 antes de nuevas escrituras. Revisar siempre el diff y el recuento de pruebas.
+
+14 oct: esperar la URL de una transición React no acredita que el formulario nuevo esté montado. En registro, esperar el campo que identifica el paso y verificar sus valores; conservar la prueba de persistencia en base.
+
+14 oct, G: caducidad en filtros y vistas además de limpieza; DATE se interpreta como día elegido, semana según Madrid. Una oferta de clase sin fecha nunca se anuncia como reserva confirmada.
+
+## 2026-10-15 — Conflictos y finales de línea (Codex)
+Una expresión regular de resolución con DOTALL consumió contenido posterior al marcador y el primer reintento no contempló CRLF. Recuperar siempre desde los padres originales, normalizar finales de línea, acotar cada marcador a su línea y validar los documentos antes de confirmar. No encadenar una confirmación tras un script fallido.
+
+## 15 de octubre de 2026 — Integrar ramas ajenas (Claude, nube)
+
+| Hallazgo | Causa | Regla resultante |
+|---|---|---|
+| Al integrar F y G se quedaron fuera de `npm run test:e2e` sus dos pruebas nuevas (`paneles-pulido.mjs`, `paneles-agenda.mjs`) | En el conflicto de `package.json` se tomó entero el lado de la demo para quedarse con su versión | En `package.json` nunca se toma un lado entero: se toma la versión de un lado y el resto (scripts, dependencias) se une a mano. Después, `git diff <base>...<rama> -- package.json` para ver qué traía la rama |
+
 ## 15-10-2026 — Auditar enlaces con contenido real (Codex, T-013)
 La ficha contaba ocho enlaces, pero #73 añadió enlaces condicionales en moderación. Una cola vacía y un selector sin división no muestran esos enlaces: la auditoría debe preparar los datos y seleccionar la división antes de comprobar el aviso de otra pestaña. El script de versión exige escribir primero el contenido de «Sin publicar».
 
