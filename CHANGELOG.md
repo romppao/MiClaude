@@ -17,6 +17,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - El titular de un gimnasio invita a peleadores y entrenadores; cada persona acepta o rechaza sin que la invitación cambie su ficha. Se comprueban bloqueos, propiedad y afiliación al responder.
 
 
+## [0.18.7] — 2026-10-15
+
+PR de Claude Code: estado tras cerrar el relevo de Claude (nube) (documentación).
+
+### Cambiado
+- `docs/ESTADO.md`: relevo cerrado (#82, #84 y #83), recuento de gimnasios en la demo (1 publicado, 190 por revisar) y fallo de tiempo de espera de OpenStreetMap.
+
 ## [0.18.6] — 2026-10-15
 
 PR de Claude (nube): relevo a Claude Code (documentación).
