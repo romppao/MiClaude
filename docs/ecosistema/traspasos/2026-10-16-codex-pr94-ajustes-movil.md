@@ -22,7 +22,7 @@
 
 ## Pendiente
 
-1. Terminar el CI completo de #95 y fusionarlo solo si está apto y verde.
+1. #95 fusionado como `a19d103` tras el CI completo 38914459030 en verde. Su árbol coincide con el candidato `545018b` integrado en esta rama.
 2. Publicar la corrección de #94 desde la rama propia, comprobar CI completo y revisión independiente Luna antes de fusionar.
 3. Comprobar la versión servida por `/salud`; la consulta directa está bloqueada en las herramientas actuales. Render exige confirmar el workspace, pregunta ya enviada al fundador.
 
