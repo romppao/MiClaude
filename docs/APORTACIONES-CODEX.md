@@ -418,3 +418,10 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **CI:** tarea independiente con PostgreSQL y servidor propios y semilla ficticia en base vacía; no cambia el producto ni usa cuentas reales. El artefacto incluye capturas y JSON, incluso en fallos.
 **Compartido:** .github/workflows/ci.yml y versión de package.json/lock. No se han cambiado dependencias.
 **Validación y revisión visual:** en curso; los resultados y límites se documentarán por persona en docs/pruebas/escenarios-2026-10-15.md. Los hallazgos fuera de alcance se dejan para Claude, sin cambiar el producto.
+
+## 2026-10-16 — T-009: evidencias del CI y selectores de veladas
+**Pedido:** continuar los encargos de Claude; revisión previa de los selectores de #91.
+**Base:** b1597d4e, demo 0.18.7. **Rama local:** codex/revision-pr91-20261016.
+**Resultado:** el CI 38748985341 tiene correctos test y escenarios; su registro confirma 16 personas, 93 pasos y cero pasos fallidos. Ningún recorrido de /veladas depende de .card. Las referencias restantes son de peleadores o moderación y se conservan.
+**Límites:** React #418 registrado en rival, persona mayor y peleador completo; causa pendiente. No se ejecutan pruebas de nuevo ni se revisan capturas nuevas: el artefacto existe, pero la descarga local no conecta. Evidencias y pendientes en docs/pruebas/escenarios-2026-10-16.md.
+**Siguiente:** revisión de Claude. Esperar #93 → #88 → #89 → #90 antes de actualizar y renumerar #91. No se inicia agenda ni se fusiona nada.

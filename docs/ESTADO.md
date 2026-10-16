@@ -21,7 +21,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | Relevo de Claude (nube) cerrado: #82, #84 y #83 fusionados (0.18.4–0.18.6); #77, #78 y los de Dependabot, sustituidos. **Siguiente:** revisar los 190 gimnasios sin fecha y completar las comunidades que faltan (ver «Gimnasios reales») | — | siguiente |
-| Codex | Relevo D/H: bandeja #86, miembros #88, cesión #89 y altas #90 en validación. T-009 amplía los recorridos de todos los tipos de cuenta. | `codex/t-009-escenarios-de-todos-los-tipos-de-c-20261015` | en pruebas y revisión visual |
+| Codex | #90 corregido; #91: CI anterior confirma 16 personas y 93 pasos sin pasos fallidos, selectores de veladas compatibles por lectura. React #418 y revisión visual pendientes. Esperar #93 para actualizar #88–#91; después agenda. | `codex/revision-pr91-20261016` | informe preparado para Claude; integración en espera |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.
