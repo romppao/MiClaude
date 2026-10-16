@@ -174,7 +174,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 |---|---|---|---|---|---|
 | `cancelarMiReserva` | Cuenta con correo verificado | AuditLog, Notification, TicketReservation | EVENT: TICKETS_CANCELLED | — | entradas_canceladas |
 | `gestionarReserva` | Organizador (o moderación) con correo verificado | AppError, AuditLog, EmailOutbox, Notification, TicketReservation | EVENT: (varias) | Sí | — |
-| `guardarCartelYEntradas` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Event, EventPoster | EVENT: TICKETS_UPDATED | — | entradas_guardadas |
+| `guardarCartelYEntradas` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Event, EventPoster, TicketReservation | EVENT: TICKETS_UPDATED | — | entradas_guardadas |
 | `reservarEntradas` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, Notification, RateHit, TicketReservation | EVENT: TICKETS_RESERVED | Sí | entradas_reservadas |
 
 ### `events`
@@ -188,7 +188,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `setAttendance` | Cuenta con sesión iniciada | EventAttendance | — | — | — |
 | `setBoutResult` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Bout, Event, Fighter, Notification | BOUT: RESULT_SET | — | resultado_guardado |
 | `setEventStatus` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
-| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event | EVENT: PAST_EVENT_AUTHORIZATION_REQUESTED, EVENT: UPDATED | — | velada_actualizada |
+| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event, TicketReservation | EVENT: PAST_EVENT_AUTHORIZATION_REQUESTED, EVENT: UPDATED | — | velada_actualizada |
 
 ### `fighters`
 
@@ -337,7 +337,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | NewsItem | `news.refreshNewsNow`, `news.toggleNewsItem` |
 | EventAttendance | `events.setAttendance` |
 | EmailOutbox | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `community.avisarSinCuenta`, `entradas.reservarEntradas`, `entradas.gestionarReserva`, `gyms.decideGymClaim`, `gyms.transferGym`, `moderation.resolveReport`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
-| TicketReservation | `entradas.reservarEntradas`, `entradas.cancelarMiReserva`, `entradas.gestionarReserva` |
+| TicketReservation | `entradas.guardarCartelYEntradas`, `entradas.reservarEntradas`, `entradas.cancelarMiReserva`, `entradas.gestionarReserva`, `events.updateEvent` |
 | EventPoster | `entradas.guardarCartelYEntradas` |
 
 ## Lógica compartida (`src/lib`)
@@ -431,7 +431,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `calendar.ts` | `eventCalendar` |
 | `cartel-search.ts` | `SUGERENCIAS_CARTEL`, `buscarParaCartel` |
-| `entradas.ts` | `ESTADO_ENTRADA`, `FILTROS_RESERVAS`, `FiltroReservas`, `HORAS_CIERRE_ANTES`, `HORAS_PARA_SENAL`, `HORA_POR_DEFECTO`, `MAX_ENTRADAS`, `OCUPAN_PLAZA`, `caducarVencidas`, `cierreDeReservas`, `fmtBizum`, `fmtHora`, `inicioDeVelada`, `motivoSinReserva`, `nuevoCodigo`, `parseBizum`, `parseFiltroReservas`, `parseHora`, `plazasOcupadas`, `plazoDeSenal`, `reservasDeVelada`, `senal`, `urlCartel`, `ventaAbierta` |
+| `entradas.ts` | `ESTADO_ENTRADA`, `FILTROS_RESERVAS`, `FiltroReservas`, `HORAS_CIERRE_ANTES`, `HORAS_PARA_SENAL`, `HORA_POR_DEFECTO`, `MAX_ENTRADAS`, `OCUPAN_PLAZA`, `caducarVencidas`, `cierreDeReservas`, `fmtBizum`, `fmtHora`, `inicioDeVelada`, `motivoSinConfirmacion`, `motivoSinReserva`, `nuevoCodigo`, `parseBizum`, `parseFiltroReservas`, `parseHora`, `plazasOcupadas`, `plazoDeSenal`, `reservaOcupaPlaza`, `reservasDeVelada`, `senal`, `urlCartel`, `ventaAbierta` |
 | `pairing.ts` | `DatosPareja`, `OpcionesPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `comparaEdad`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
 | `preparation-data.ts` | `preparationAudience` |
 | `preparation.ts` | `eventPreparation` |

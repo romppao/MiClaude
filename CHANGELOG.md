@@ -31,6 +31,13 @@ PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas
 - **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
 - **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
 
+### Corregido tras la revisión crítica (16-10-2026)
+Una revisión independiente de `gpt-6-astra` halló cinco fallos reales en las reservas; Claude los comprobó uno a uno, Codex (`gpt-6.1-sol`) los arregló y `gpt-6-luna` revisó los arreglos:
+- **Señal tardía:** al confirmar una reserva cuyo plazo ya venció (aunque aún no figurase como caducada), se comprueba el aforo y que la persona no tenga otra reserva activa. Mensaje nuevo para la promotora: «Esa persona ya tiene otra reserva activa en esta velada…».
+- **Aforo y reservas a la vez:** guardar el aforo y reservar comparten el mismo bloqueo por velada, y la reserva relee el aforo, el precio y el horario dentro del bloqueo. Ya no se puede dejar un aforo por debajo de lo reservado ni pasarse del aforo por dos peticiones simultáneas.
+- **Plazos al cambiar la fecha:** al adelantar la velada (fecha u hora) se acortan los plazos de señal pendientes al nuevo cierre de reservas; nunca se alargan.
+- **Cambio de horario:** el inicio y el cierre de reservas ya no se desplazan una hora los días de cambio de hora (29-03 y 25-10-2026).
+- Si se rechaza el guardado de los datos de entradas, el cartel nuevo ya subido se retira en vez de quedar huérfano.
 ## [0.18.9] — 2026-10-15
 
 PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.

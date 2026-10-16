@@ -53,20 +53,26 @@ export async function guardarCartelYEntradas(f: FormData) {
     startMinute: hora, ticketPriceEuros: precio, doorPriceEuros: puerta, ticketCapacity: aforo, bizumPhone: bizum, ticketNote: str(f, "nota") || null, ticketsOpen: abrir,
     ...(cartel && { posterKey: cartel.clave, posterAt: cartel.clave || cartel.bytes ? new Date() : null }),
   };
-  await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
-    if (aforo !== null && aforo < (await plazasOcupadas(tx, event.id))) throw new Rechazo("aforo_menor_que_reservas");
-    const actual = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
-    const startMinute = f.has("hora") ? hora : actual.startMinute;
-    await tx.event.update({ where: { id: event.id }, data: { ...data, startMinute } });
-    // También cubre los formularios antiguos que todavía envían la hora desde aquí.
-    if (startMinute !== actual.startMinute) {
-      const cierre = cierreDeReservas(actual.date, startMinute);
-      await tx.ticketReservation.updateMany({ where: { eventId: event.id, status: "PENDING_DEPOSIT", depositUntil: { gt: cierre } }, data: { depositUntil: cierre } });
-    }
-    // Sin almacén, los bytes van a EventPoster; con almacén (o al quitar el cartel), esa fila sobra.
-    if (cartel?.bytes) await tx.eventPoster.upsert({ where: { eventId: event.id }, create: { eventId: event.id, bytes: cartel.bytes }, update: { bytes: cartel.bytes } });
-    else if (cartel) await tx.eventPoster.deleteMany({ where: { eventId: event.id } });
-  }));
+  try {
+    await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
+      if (aforo !== null && aforo < (await plazasOcupadas(tx, event.id))) throw new Rechazo("aforo_menor_que_reservas");
+      const actual = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
+      const startMinute = f.has("hora") ? hora : actual.startMinute;
+      await tx.event.update({ where: { id: event.id }, data: { ...data, startMinute } });
+      // También cubre los formularios antiguos que todavía envían la hora desde aquí.
+      if (startMinute !== actual.startMinute) {
+        const cierre = cierreDeReservas(actual.date, startMinute);
+        await tx.ticketReservation.updateMany({ where: { eventId: event.id, status: "PENDING_DEPOSIT", depositUntil: { gt: cierre } }, data: { depositUntil: cierre } });
+      }
+      // Sin almacén, los bytes van a EventPoster; con almacén (o al quitar el cartel), esa fila sobra.
+      if (cartel?.bytes) await tx.eventPoster.upsert({ where: { eventId: event.id }, create: { eventId: event.id, bytes: cartel.bytes }, update: { bytes: cartel.bytes } });
+      else if (cartel) await tx.eventPoster.deleteMany({ where: { eventId: event.id } });
+    }));
+  } catch (e) {
+    // Si se rechaza el guardado (por ejemplo, aforo menor que las reservas), la imagen nueva ya subida no queda asociada a nada: se retira.
+    if (cartel?.clave && cartel.clave !== event.posterKey) await borrarFotos([cartel.clave]).catch(() => undefined);
+    throw e;
+  }
   if (cartel && event.posterKey && event.posterKey !== cartel.clave) await borrarFotos([event.posterKey]);
   await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "TICKETS_UPDATED", after: { hora, precio, puerta, aforo, abrir, cartel: cartel ? (cartel.clave || cartel.bytes ? "nuevo" : "quitado") : "sin cambios" } });
   revalidatePath("/", "layout");
