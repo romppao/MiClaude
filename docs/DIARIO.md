@@ -2460,3 +2460,11 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Qué se hizo:** `valoracionGimnasio` (aura + peleadores + entrenadores + sello) y `mejoresDeLaZona` se sustituyen por `popularidadGimnasio` (peleadores + entrenadores, sin aura ni sello) y `popularesDeLaZona`; se quitan los puestos de las tarjetas, la ordenación «Mejores» (ahora «Populares») y la consulta del aura de cada gimnasio en `/gimnasios` (una consulta menos por visita). La prueba del mapa ahora comprueba que no aparecen puestos ni la palabra «mejor». No hay ránking de entrenadores en ningún sitio (se revisó).
 
 **Regla nueva para todos los asistentes** (también en `CLAUDE.md`): solo los peleadores se clasifican; gimnasios y entrenadores, nunca «mejores» ni puestos; «populares» sí.
+
+## 16 de octubre de 2026, noche (3) — «Probar como aficionado» enseñaba al peleador (Claude Code)
+
+**Aviso del fundador (llevaba días queriendo decirlo):** desde su cuenta de creador, «cuando me pongo como aficionado me sale la misma pantalla que como peleador; para los demás usuarios sí me sale su interfaz». No podía ver el punto de vista del aficionado.
+
+**Causa:** `demoCambiarPapel` solo cambia `User.role`; pero `papelDe` devuelve «peleador» también cuando la cuenta tiene una ficha vinculada (`user.fighter`), y la cuenta del creador conservaba la de cuando probó «Peleador». Entrenador, organizadora y moderador no se veían afectados porque `papelDe` los resuelve antes de mirar la ficha.
+
+**Arreglo:** `ignorarFichaVinculada(role, demo)`: en la demo, si el tipo elegido no es «Peleador», `getUser()` devuelve la cuenta sin ficha, así toda la aplicación (portada, menú, panel, acciones) ve a un aficionado. Fuera de la demo no cambia nada. No se borra ninguna ficha: al volver a «Peleador» reaparece. Prueba unitaria `tests/unit/demo-papel.test.ts`.

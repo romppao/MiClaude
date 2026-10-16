@@ -17,6 +17,7 @@ PR de Claude Code: los gimnasios dejan de clasificarse (avisos del fundador del 
 
 ### Cambiado
 - **Gimnasios — «Los más populares de tu zona» / «Los más cercanos a ti»** (lo que aparece primero, debajo del mapa): carteles con la foto o cabecera del gimnasio, la etiqueta «Verificado», sus datos y, con ubicación, la distancia («a 400 m»). En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+- **Cuenta de creador en la demo — «Probar como aficionado»:** enseñaba la pantalla del peleador (aviso del fundador, 16-10-2026: «no puedo ver el punto de vista del usuario aficionado»). La causa: quien probó «Peleador» se queda con su ficha vinculada y la aplicación elegía la pantalla mirando también esa ficha. En la demo, el tipo que se elige manda; fuera de la demo no cambia nada.
 - **Sin ránking de gimnasios:** se quitan «Los mejores», la valoración (que sumaba el aura de sus peleadores y un extra por estar verificado), la ordenación «Mejores» y los puestos (#1, #2…). El orden «Populares» cuenta solo cuánta gente hay (peleadores y entrenadores), y la explicación lo dice. Tampoco hay ránking de entrenadores: el ránking es solo de peleadores.
 
 ## [0.22.0] — 2026-10-16
