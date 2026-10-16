@@ -2317,3 +2317,6 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 **CI:** tarea independiente con PostgreSQL y servidor propios y semilla ficticia en base vacía; no cambia el producto ni usa cuentas reales. El artefacto incluye capturas y JSON, incluso en fallos.
 **Compartido:** .github/workflows/ci.yml y versión de package.json/lock. No se han cambiado dependencias.
 **Validación y revisión visual:** en curso; los resultados y límites se documentarán por persona en docs/pruebas/escenarios-2026-10-15.md. Los hallazgos fuera de alcance se dejan para Claude, sin cambiar el producto.
+
+## 16 de octubre de 2026 — Evidencias de T-009
+Codex contrasta el CI 38748985341 y sus registros: 16 recorridos, 93 pasos, cero pasos fallidos sobre b1597d4e (demo 0.18.7). Los selectores de veladas ya utilizan texto visible y no dependen de .card. Hay avisos React #418 en tres personas; siguen pendientes de diagnóstico. No se repite la batería ni se declara completada la revisión visual: el artefacto no pudo descargarse al disco. Informe actualizado en docs/pruebas/escenarios-2026-10-16.md. #93 continúa sin fusionar; se respeta el orden del encargo de Claude.
