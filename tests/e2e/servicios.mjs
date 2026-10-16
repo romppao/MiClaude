@@ -6,6 +6,7 @@ import { B, rnd, browser, newUser, btn, check, seen, sql, esperarCorreo, termina
 
 const db = new PrismaClient();
 const axe = async (p, que) => {
+  await p.waitForTimeout(600); // deja terminar las transiciones de color antes de medir el contraste (como accesibilidad.mjs: en tema oscuro fallaba de forma intermitente)
   const r = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   check(`${que}: sin problemas de accesibilidad${r.violations.length ? ` (${r.violations.map((v) => v.id).join(", ")})` : ""}`, r.violations.length === 0);
 };

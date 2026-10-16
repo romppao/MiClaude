@@ -1,5 +1,6 @@
 import { availableFighters, isAvailable } from "../../lib/fighters/availability";
-import ProfileThumbnail from "../components/ProfileThumbnail";
+import { TarjetaPersona } from "../components/TarjetasDirectorio";
+import { ChipsDisciplina, DirectorioNav } from "../components/DirectorioNav";
 import { graduationLabel } from "../../lib/fighters/graduation";
 import Link from "next/link";
 import type { Discipline, Level, Prisma } from "@prisma/client";
@@ -51,7 +52,9 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
   return (
     <>
       <h1>Peleadores</h1>
-      <form className="search" role="search" aria-label="Filtrar peleadores">
+      <DirectorioNav actual="peleadores" />
+      <ChipsDisciplina ruta="/peleadores" actual={discipline} conservar={{ q, level, province, disponibles, categoria, divisionId }} />
+      <form className="search search-directorio" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
         <MasFiltros activos={activos.filter((x) => !x.claves.includes("q")).length}>
@@ -62,18 +65,20 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       </form>
       <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId, disponibles }} activos={activos} />
       <p aria-live="polite" className="mut">{total === 0 ? "Ningún peleador coincide con estos filtros." : `${plural(total, "peleador encontrado", "peleadores encontrados")}.`}</p>
-      {/* Lista compacta: foto a la izquierda y datos a la derecha (revisión del 8 de octubre de 2026: cada tarjeta ocupaba media pantalla en el móvil). */}
-      <div className="grid lista-compacta">
-        {fighters.map((b) => (
-          <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">
-            {isAvailable(b) && <span className="pildora">Disponible para pelear{b.currentWeightKg !== null ? ` · ${b.currentWeightKg} kg` : ""}</span>}
-            <ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong>
-            <div className="mut">{b.alias ? `“${b.alias}”` : ""}{b.alias && (b.province || b.gym) ? " · " : ""}{[b.province, b.gym?.name].filter(Boolean).join(" · ")}</div>
-            {[...b.disciplines].sort((x, y) => DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline)).map((d) => (
-              <div key={d.discipline} className="mut">{DISCIPLINE_LABEL[d.discipline]} · {levelName(d.level)} · {categoryLabel(d.discipline, d.level, d.divisionId, d.weightClass)}</div>
-            ))}
-          </Link>
-        ))}
+      {/* Carteles (16 de octubre de 2026: «que se vea directamente la imagen»): foto a toda la tarjeta, dos columnas en el móvil. Antes, lista compacta. */}
+      <div className="grid grid-cartel">
+        {fighters.map((b) => {
+          const discs = [...b.disciplines].sort((x, y) => Number(y.discipline === discipline) - Number(x.discipline === discipline) || DISCIPLINE_ORDER.indexOf(x.discipline) - DISCIPLINE_ORDER.indexOf(y.discipline));
+          const principal = discs[0];
+          return (
+            <TarjetaPersona key={b.id} href={`/peleadores/${b.slug}`} tipo="peleador" id={b.id} nombre={`${b.firstName} ${b.lastName}`} disciplina={principal?.discipline ?? null}
+              pildora={isAvailable(b) ? `Disponible para pelear${b.currentWeightKg !== null ? ` · ${b.currentWeightKg} kg` : ""}` : undefined}
+              lineas={[
+                principal ? `${DISCIPLINE_LABEL[principal.discipline]} · ${levelName(principal.level)}${discs.length > 1 ? ` (+${discs.length - 1})` : ""}` : "Sin disciplina",
+                [b.province, b.gym?.name].filter(Boolean).join(" · "),
+              ].filter(Boolean)} extra={[principal ? categoryLabel(principal.discipline, principal.level, principal.divisionId, principal.weightClass) : null, b.alias ? `“${b.alias}”` : null].filter((x): x is string => !!x)} />
+          );
+        })}
       </div>
       {fighters.length === 0 && <p className="mut">Prueba a quitar algún filtro (pulsa sobre él, arriba) o a escribir solo una parte del nombre.</p>}
       <Paginacion ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId, disponibles }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["peleador", "peleadores"]} />

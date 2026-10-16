@@ -112,7 +112,11 @@ check("la pantalla explica qué se borra antes de pedir la contraseña", (await 
 await adios.p.fill("[name=current]", "incorrecta-1"); await adios.p.locator("[name=confirm]").check();
 await btn(adios.p, "Eliminar mi cuenta definitivamente");
 check("con la contraseña equivocada no se elimina nada", await seen(malo(adios.p, "contraseña actual no es correcta")));
-await adios.p.evaluate(() => document.querySelector("[name=confirm]").removeAttribute("required"));
+// El aviso puede aparecer antes que el formulario en la respuesta: esperamos la vuelta y el campo, sin consultar el DOM a ciegas.
+await adios.p.waitForURL((u) => u.pathname === "/mi-cuenta/eliminar" && u.searchParams.get("problema") === "contrasena_actual_incorrecta");
+const confirmarEliminacion = adios.p.locator('input[name=confirm]');
+await confirmarEliminacion.uncheck();
+await confirmarEliminacion.evaluate((campo) => campo.removeAttribute("required"));
 await adios.p.fill("[name=current]", "contraseña123");
 await btn(adios.p, "Eliminar mi cuenta definitivamente");
 check("sin marcar la casilla de confirmación tampoco", await seen(malo(adios.p, "Marca la casilla")));
