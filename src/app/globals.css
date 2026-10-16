@@ -888,6 +888,40 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .separador-o{display:flex;align-items:center;gap:12px;margin:4px 0;color:var(--mut);font-size:16px}
 .separador-o::before,.separador-o::after{content:"";flex:1;border-top:1px solid var(--line)}
 
+/* Directorios con foto (16 de octubre de 2026, petición del fundador: «que se vea directamente la imagen», como en las veladas): peleadores,
+   entrenadores y gimnasios en carteles de dos columnas en el móvil. Reutilizan .tarjeta-foto (foto, tinte de la disciplina y degradado inferior
+   para leer el texto) y conservan .card porque las pruebas de navegador cuentan con esa clase. components/TarjetasDirectorio.tsx. */
+.grid.grid-cartel{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 24px}
+@media(min-width:640px){.grid.grid-cartel{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}}
+.card.cartel-persona{padding:0;border:0;min-height:310px;margin:0;justify-content:space-between}
+.cartel-persona::after{background:linear-gradient(180deg,rgba(var(--bg-rgb),.12),rgba(var(--bg-rgb),.35) 25%,rgba(var(--bg-rgb),.94) 52%,rgba(var(--bg-rgb),.98))}
+.cartel-persona .iniciales{font-size:76px}
+.cartel-persona .arriba{position:relative;inset:auto;padding:12px;align-items:flex-start;flex-wrap:wrap;z-index:1}
+.cartel-persona .abajo{padding:14px 14px 16px;gap:6px;min-width:0;margin-top:auto}
+.cartel-persona .abajo strong{font:800 19px/1.2 var(--font);letter-spacing:-.025em;text-wrap:balance;overflow-wrap:anywhere}
+.cartel-persona .meta-acc,.cartel-persona .cartel-dato{font:600 16px/1.4 var(--font);overflow-wrap:anywhere}
+.cartel-persona .cartel-dato{font-weight:500;color:rgba(var(--ink),.82)}
+.cartel-persona .pildora{max-width:100%;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+.cartel-persona .arriba>.pildora:last-child{margin-left:auto}
+.cartel-icono{flex:none;margin-left:auto;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(var(--bg-rgb),.55);color:var(--acc)}
+.cartel-logo{position:relative;flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:rgba(var(--bg-rgb),.62);color:var(--text);font:800 16px var(--font);border:2px solid rgba(var(--ink),.22)}
+.cartel-logo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.directorio-nav{display:flex;width:100%;margin:4px 0 12px}
+.directorio-nav>a,.filtros-disciplina>a{font-size:16px}
+.directorio-nav>a.directorio-enlace{flex:1 1 0;text-decoration:none}
+.filtros-disciplina.desliza-fila{margin-bottom:12px}
+/* Buscador compacto de los directorios: el campo y su botón en la misma línea para que los carteles empiecen antes. */
+form.search.search-directorio{gap:8px;margin:8px 0 12px}
+form.search.search-directorio>.field{flex:1 1 0;min-width:0}
+form.search.search-directorio>button{flex:none;white-space:nowrap}
+form.search.search-directorio>.chip{flex:none}
+.cartel-extra{display:none}
+@media(min-width:640px){.cartel-persona .cartel-extra{display:block}}
+.cartel-persona .abajo .pildora{align-self:flex-start;max-width:100%;margin-bottom:4px;padding:5px 10px;border-radius:14px;font-size:16px;line-height:1.2}
+@media(min-width:640px){.cartel-persona .cartel-extra{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}}
+/* Los gimnasios son una lista (ul/li) para lectores de pantalla; cada tarjeta ocupa toda su celda. */
+ul.lista-cartel{list-style:none;padding:0}
+ul.lista-cartel>li{display:block;min-width:0}
 /* Pantallas de acción guiadas (16 de octubre de 2026, petición del fundador: «muy poco visuales e intuitivas» para quien no domina el móvil):
    pasos, carteles que se eligen tocando, accesos grandes arriba y ayuda recogida. components/GuiaAcciones.tsx. */
 .pasos-guia{list-style:none;margin:0;padding:0;display:flex;gap:8px}

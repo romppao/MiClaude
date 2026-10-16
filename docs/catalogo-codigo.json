@@ -645,6 +645,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/DirectorioNav.tsx",
+    "purpose": "Cabecera común de los directorios (peleadores, entrenadores y gimnasios): selector entre los tres y fila deslizable de disciplinas con filtro por enlace.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/DisciplineFields.tsx",
     "purpose": "Formulario de disciplina, nivel, categoría y antecedentes declarados; comparte catálogo con validación del servidor.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -822,6 +827,11 @@
   {
     "path": "src/app/components/Tarjetas.tsx",
     "purpose": "Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/TarjetasDirectorio.tsx",
+    "purpose": "Carteles con foto de los directorios: TarjetaPersona (peleador o entrenador) y TarjetaGimnasioCartel; sin foto usan el color de la disciplina y las iniciales.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -2137,6 +2147,11 @@
   {
     "path": "tests/unit/dates.test.ts",
     "purpose": "Prueba días reales, nacimiento y límites/formatos en zona de Madrid, incluidos casos de calendario.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/directorio-disciplina.test.ts",
+    "purpose": "Regresión del enlace de disciplina de los directorios: repetir la disciplina activa conserva categoría y división; cambiarla las limpia.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

@@ -2418,3 +2418,29 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
 - Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.
+
+## 16 de octubre de 2026 — Directorios con foto: peleadores, entrenadores y gimnasios (Claude Code)
+
+**Encargo:** el fundador pidió que las pantallas de listados «aburridas» se vean como las veladas (la imagen por delante) y que el aficionado tenga una pantalla de entrenadores, «ya que quizás quiera tomar clases de un entrenador en concreto».
+
+**Decisiones:** una sola familia de tarjetas (`components/TarjetasDirectorio.tsx`) sobre `.tarjeta-foto`, con foto a toda la tarjeta y el tinte de la disciplina cuando no hay foto. Conservan `class="card"` y el nombre en `<strong>` porque los recorridos de navegador cuentan con ellos. El acceso del aficionado a Entrenadores es un selector común a los tres directorios; el menú no admite más de cinco enlaces por bloque y la prueba de paneles exige `/clases`, así que no se tocó. Movimiento: solo la entrada `data-reveal` que ya existía y el pulsado, porque un listado se recorre muchas veces al día.
+
+**Qué salió mal:** la primera versión quitó la categoría de la tarjeta de peleador y `filtros.mjs` falló («Wélter · hasta 66,7 kg»); se recuperó. En la revisión a 375 px, la etiqueta «Disponible para pelear · 70.25 kg» se partía en tres líneas sobre la foto y los enlaces del selector salían subrayados por la regla de enlaces sueltos; se corrigieron. El catálogo guarda la huella de cada archivo: hay que regenerarlo después de cada cambio de código.
+
+**Validación:** revisado en pantalla a 375 y 1280 px, en tema claro y oscuro, con y sin fotos y con nombres muy largos, sin desbordes. Tipos, 891 pruebas unitarias, `filtros`, `flujo`, `diseno`, `paneles-agenda`, `menu`, `enlaces`, `busqueda`, `movil` y la medición de accesibilidad en verde. El resto de recorridos los pasa el CI.
+
+**Pendiente:** menos scroll en perfiles, panel y ficha; pantallas de acción guiadas (subir vídeos, buscar clases, perfil y trayectoria); datos en tiempo real (encargo a Codex en `docs/ecosistema/traspasos/2026-10-16-claude-encargo-codex-listados-y-pantallas-de-accion.md`). Acceso directo a Entrenadores desde el menú: a decidir.
+
+## 16 de octubre de 2026 — Pantallas de acción guiadas, menos desplazamiento y datos al día (Claude Code)
+
+**Encargo:** el fundador pidió que las pantallas donde se hace algo (subir lo grabado, buscar clases, configurar el perfil del peleador, registrar la trayectoria) sean más visuales e intuitivas para quien no domina el móvil, que no haya que deslizar tanto para llegar a lo importante (alternando filas horizontales y verticales) y que los datos estén al día para todos.
+
+**Medición previa (móvil, 390 px, en alturas de pantalla):** ayuda 8,4; portada del visitante 4,9; mi ficha 3,4; mi panel 3,1; trayectoria 2,8 con su botón principal a 2,3 pantallas; veladas y ficha de gimnasio 2,8.
+
+**Decisiones:** piezas comunes en `components/GuiaAcciones.tsx` (pasos, carteles para elegir, accesos con icono, ayuda plegable, «Completa tu ficha») para no rehacer cada pantalla distinta. Se conservan los campos, los textos de botón y las reglas de cada pantalla. Datos al día: lo más barato que cubre lo importante (volver a pedir al servidor al volver a la pestaña y cada 90 s, solo en pantallas de lectura); eventos del servidor quedan para donde el sondeo no baste (entradas, plazas). La regla de «nav» hace que sus hijos pasen a la línea siguiente: una fila deslizable necesita `flex-wrap:nowrap`.
+
+**Qué salió mal:** la primera fila de carteles salió apilada en vertical por esa regla; el primer cartel quedaba pegado al borde por el imán de desplazamiento (`scroll-padding`); compilar con el servidor de desarrollo abierto en la misma carpeta rompe la compilación; `git add docs` arrastró registros sueltos de Codex (se retiraron).
+
+**Validación:** revisado en pantalla a 390 px; una velada creada con la página abierta aparece sola al volver a la pestaña; pruebas unitarias del refresco; recorridos de navegador en local y CI.
+
+**Pendiente:** portada del visitante y del aficionado (4,9 y 2,6 pantallas), ficha de gimnasio, `/mi-panel`; pantalla de configurar el perfil paso a paso (hoy «Completa tu ficha» guía hacia ella); acceso directo a Entrenadores en el menú; eventos del servidor para entradas y plazas.

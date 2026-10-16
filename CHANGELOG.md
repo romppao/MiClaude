@@ -11,6 +11,32 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.22.0] — 2026-10-16
+
+PR de Claude Code: pantallas de acción guiadas, menos desplazamiento y datos al día (peticiones del fundador del 16-10-2026: «muchas de las pantallas en las que se hacen acciones se ven muy poco visuales e intuitivas […] para un usuario que no tenga muchas nociones», «tienes que scrollear mucho hacia abajo» y «todos los datos […] actualizados y sincronizados en tiempo real»).
+
+### Añadido
+- **Completa tu ficha** (peleador): barra de progreso, el siguiente paso con un botón grande (foto, primer combate, trayectoria anterior, primer vídeo o foto) y la lista de pasos recogida.
+- **Datos al día sin recargar:** las pantallas que solo se leen (inicio, veladas, peleadores, entrenadores, gimnasios, ránking, clases, avisos, panel, reservas…) se vuelven a pedir al servidor al volver a la pestaña, al recuperar la conexión y cada pocos minutos. No se actualiza mientras la persona escribe ni en pantallas con formulario.
+- **Ayuda con índice:** una fila que se desliza de lado lleva a cada tema sin recorrer la página entera.
+
+### Cambiado
+- **Subir vídeos o fotos:** va por pasos («Elige la velada» → «Sube tu foto o vídeo»); las veladas son carteles que se eligen tocando, en una fila que se desliza, y el buscador pasa a ser lo secundario; «Una foto» y «O un vídeo» llevan icono.
+- **Buscar clases:** deportes con su dibujo en una fila deslizable, «Todas · Individuales · Colectivas» en un toque, el icono del deporte en cada clase y un estado vacío con salida («Ver entrenadores»).
+- **Mi trayectoria y aura:** accesos grandes con icono arriba («Declarar un título» el principal) y la ayuda larga recogida en «¿Cómo cuenta mi trayectoria?».
+
+
+PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan a carteles con foto, como las veladas (petición del fundador del 16-10-2026: «que se vea directamente la imagen» y que el aficionado tenga una pantalla de entrenadores para elegir con quién dar clase).
+
+### Añadido
+- **Entrenadores con filtros:** se busca por nombre, disciplina, provincia, si da clases en Lona y si entrena en un gimnasio o por su cuenta. Cada tarjeta dice cuántas clases da y desde qué precio.
+- **Selector «Peleadores · Entrenadores · Gimnasios»** arriba de los tres directorios: el aficionado llega a los entrenadores desde Peleadores, que ya está en su barra inferior.
+- **Fila deslizable de disciplinas** para filtrar de un toque, sin abrir «Más filtros».
+
+### Cambiado
+- **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
+- **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
+
 ## [0.20.5] — 2026-10-16
 
 
