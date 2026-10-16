@@ -21,7 +21,8 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | 16-10: #92 fusionado; #93 (fase 1, 0.20.0) con las correcciones de la revisión crítica, esperando CI y el «sí» del fundador. **Red de seguridad y flota** (este PR): `APROBADO.md`, `npm run verificar`, CI que no se para en el primer fallo, `scripts/flota.mjs` y `MODELOS-Y-ESFUERZO.md`. Siguiente: regresión visual. | `claude-code/veladas-entradas` (#93), `claude-code/red-seguridad` | en curso |
-| Codex | Bandeja única de moderación sobre la demo 0.18.6; después invitaciones, cesión, altas desde fichas y T-009. T-013 (#77) y T-002 (#78) los integra Claude: no se actualizan. | `codex/bandeja-unica-de-moderacion-20261015` | PR #86, pendiente de revisión y CI |
+| Codex | Revisión de #95 y corrección de #94 conforme a Claude; listados con foto guardados aparte. | `codex/pr94-ajustes-movil-20261016` | 0.20.2: tipos y 891 unitarias correctos; CI y revisión pendientes. #95 fusionado tras CI verde. |
+| Antigravity | Cuatro ajustes de móvil en Lona (375 px): portada, gimnasios, veladas y peleadores. Tipos, 858 unitarias y capturas antes/después verificadas. Versión 0.18.10. | `antigravity/ajustes-movil` | Completado localmente, pendiente de revisión de Claude Code |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

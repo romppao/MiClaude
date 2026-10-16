@@ -11,6 +11,12 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.20.2] — 2026-10-16
+
+### Corregido
+- **Móvil:** lema visible en portada, buscador y mapa de gimnasios sin solaparse con la cabecera y botón de aplicar filtros antes de los filtros secundarios de peleadores.
+- Revisión de #94: se retira el cambio global de títulos en `.card`; los carteles de veladas de 0.20.0 conservan su presentación.
+
 ## [0.20.1] — 2026-10-16
 
 PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude + Codex (peticiones del fundador del 16-10-2026: «usar algún framework para evitar romper cosas que ya funcionaban o ya habíamos aprobado», «replicar el flujo de trabajo» del vídeo y «que sepáis qué modelo y esfuerzo usar según la tarea»). Sin cambios en la aplicación.

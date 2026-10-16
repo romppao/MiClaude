@@ -2313,6 +2313,27 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 ## 2026-10-15 — Relevo D/H: bandeja única de moderación
 El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
 
+## 2026-10-15 — Antigravity — Cuatro ajustes de móvil en Lona (375 px)
+
+**Pedido:** Encargo de Claude Code (`2026-10-15-claude-encargo-antigravity-ajustes-movil.md`): resolver los 4 desajustes visuales detectados en la auditoría de demo a 375 px (iPhone SE), limitándose a cambios de presentación/CSS en una rama propia aislada.
+
+**Base:** `origin/claude/ring-espana-mvp` (0.18.9). **Rama:** `antigravity/ajustes-movil`.
+
+**Cambios:**
+1. **Portada (`/`):** Acotada la altura de `.portada-visita` a 400 px y tipografía de `.lema-portada` a 16 px en móvil para que el subtítulo «Tu comunidad de deportes de contacto en toda España» no quede tapado por la barra inferior fija antes de hacer scroll.
+2. **Gimnasios (`/gimnasios`):** Declarado `scroll-margin-top: 96px` en `.mapa-gimnasios` y añadido margen inferior en `form.search` para que el botón verde «Aplicar filtros» no quede cortado horizontalmente por detrás de la cabecera fija al desplazarse hacia el mapa.
+3. **Veladas (`/veladas`):** Título de la velada en bloque (`display: block; margin: 6px 0 2px`) en las tarjetas para que aparezca siempre debajo de las etiquetas en su propia línea, evitando que títulos cortos como «Yess» se coloquen horizontalmente junto a «Inscripción abierta».
+4. **Peleadores (`/peleadores`):** Reubicado `BotonesFiltro` («Aplicar filtros») antes del desplegable `MasFiltros` para que sea inmediatamente visible al abrir los filtros sin requerir scroll, y añadido un botón de envío repetido al final de los campos desplegados para comodidad al filtrar.
+
+**Comprobaciones:**
+- `npx tsc --noEmit`: 0 errores.
+- `npx vitest run`: 59 archivos de pruebas pasados, 858 pruebas unitarias pasadas al 100% (incluyendo nuevo test `tests/unit/ajustes-movil.test.ts`).
+- Generadas capturas de verificación en `docs/logs/antigravity-ajustes-movil/` a 375 px (móvil) y 1280 px (escritorio) para las 4 pantallas, comparadas contra las capturas del antes. En escritorio no se altera la composición.
+- Versión actualizada a **0.18.10** con `node scripts/version.mjs subir parche` y documentada en `CHANGELOG.md`.
+
+**Siguiente:** Revisión de Claude Code y confirmación del fundador.
+
+
 ## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
 
 **Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
@@ -2336,3 +2357,12 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Decisiones:** el registro `APROBADO.md` ancla cada función aprobada a una prueba concreta; el CI deja de pararse en el primer recorrido que falla; la flota nunca guarda ni fusiona por su cuenta; el revisor crítico (Astra) solo se usa con dinero, permisos, datos personales o secretos. Se instaló el plugin oficial `codex@openai-codex`; no se usó `npx -y codex mcp-server` porque el paquete npm «codex» es otro proyecto y ese modo no existe en Codex 0.160.1.
 
 **Validación:** pruebas de documentación nuevas (19), comprobadas también a la inversa (fallan al quitar una comprobación aprobada o un recorrido); simulacros de la flota; la orden `revisar` usada de verdad sobre los arreglos del #93 (Luna aprobó); `e2e-local.mjs` usado de verdad (6 de 6 recorridos). La regresión visual queda para el siguiente PR.
+
+
+## 2026-10-16 - Codex - Revisión de los ajustes móviles #94 (0.20.2)
+
+**Encargo:** seguir el comentario de Claude en #94 y el orden de relevo de #95. Rama propia `codex/pr94-ajustes-movil-20261016`; no se modifica la rama de Antigravity.
+
+**Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
+
+**Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.
