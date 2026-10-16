@@ -17,15 +17,7 @@ export const EXPLORAR: SeccionMenu = {
     { href: "/veladas", texto: "Veladas y resultados" },
     { href: "/ranking", texto: "Ránking de aura" },
     { href: "/gimnasios", texto: "Gimnasios" },
-  ],
-};
-
-/** Quien quiere dar clase con un entrenador en concreto llega a las dos pantallas desde el menú (petición del fundador, 16-10-2026). */
-export const CLASES_Y_ENTRENADORES: SeccionMenu = {
-  titulo: "Clases y entrenadores",
-  enlaces: [
-    { href: "/clases", texto: "Buscar clases" },
-    { href: "/entrenadores", texto: "Entrenadores" },
+    { href: "/clases", texto: "Clases y entrenadores" },
   ],
 };
 
@@ -79,5 +71,5 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
     // Las entidades también pueden solicitar clases: su acceso va aquí si cabe (como mucho cinco enlaces por bloque).
     if (papel === "entidad" && cuenta.length < 5) cuenta.push(RESERVAS);
   }
-  return [...propias, EXPLORAR, CLASES_Y_ENTRENADORES, { titulo: papel === "visitante" ? "Ayuda" : "Tu cuenta y ayuda", enlaces: cuenta }];
+  return [...propias, EXPLORAR, { titulo: papel === "visitante" ? "Ayuda" : "Tu cuenta y ayuda", enlaces: cuenta }];
 }
