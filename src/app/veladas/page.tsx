@@ -64,7 +64,7 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
             {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
             {!e.organizerId && <span className="tag">No oficial</span>}
             {e.registrationOpen && e.status === "SCHEDULED" && <span className="tag" style={{ background: "var(--acc)", color: "var(--acc-ink)" }}>Inscripción abierta</span>}
-            <strong style={{ display: "block", marginTop: 6, marginBottom: 2 }}>{e.name}</strong>
+            <strong>{e.name}</strong>
             <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
           </Link>
         ))}

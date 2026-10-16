@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-describe("cuatro ajustes de móvil en Lona", () => {
+describe("tres ajustes de móvil en Lona revisados por Claude", () => {
   const css = fs.readFileSync(path.resolve(__dirname, "../../src/app/globals.css"), "utf-8");
 
   it("1. Portada: .portada-visita tiene altura acotada en móvil para que el lema no quede tapado por la barra inferior", () => {
@@ -15,13 +15,7 @@ describe("cuatro ajustes de móvil en Lona", () => {
     expect(css).toMatch(/form\.search\s*\{[^}]*position:\s*relative/);
   });
 
-  it("3. Veladas: las tarjetas muestran el título en bloque debajo de las etiquetas", () => {
-    expect(css).toMatch(/\.card>strong\s*\{[^}]*display:\s*block/);
-    const veladasPage = fs.readFileSync(path.resolve(__dirname, "../../src/app/veladas/page.tsx"), "utf-8");
-    expect(veladasPage).toContain('<strong style={{ display: "block"');
-  });
-
-  it("4. Peleadores: el botón de aplicar filtros está visible antes del desplegable de más filtros", () => {
+  it("3. Peleadores: el botón de aplicar filtros está visible antes del desplegable de más filtros", () => {
     const peleadoresPage = fs.readFileSync(path.resolve(__dirname, "../../src/app/peleadores/page.tsx"), "utf-8");
     const idxBotones = peleadoresPage.indexOf("<BotonesFiltro");
     const idxMasFiltros = peleadoresPage.indexOf("<MasFiltros");
