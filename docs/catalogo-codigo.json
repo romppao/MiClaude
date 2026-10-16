@@ -340,6 +340,11 @@
     "guide": "docs/GIMNASIOS-REALES.md"
   },
   {
+    "path": "scripts/logos-gimnasios.ts",
+    "purpose": "Busca el logotipo de cada gimnasio en su propia web (nunca en redes), lo recorta y lo deja en 512 px, y anota de dónde salió en docs/datos/gimnasios-logos.json.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "scripts/retirar-gimnasios-ficticios.ts",
     "purpose": "Cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo cuando ya hay gimnasios reales; solo con DEMO_MODE=si y desde el botón de GitHub.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -1520,6 +1525,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/logos-gimnasios.ts",
+    "purpose": "Dirección del logotipo hallado de un gimnasio a partir del registro docs/datos/gimnasios-logos.json; el que sube el propio gimnasio manda sobre este.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/mail-transporte.ts",
     "purpose": "Entrega de un correo al proveedor (Resend) o al registro en desarrollo; sin cola. Solo la usa la cola de correos.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -2025,6 +2035,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/logos-gimnasios.mjs",
+    "purpose": "Recorrido de los logotipos de gimnasios: la ruta de imagen redirige al hallado, respeta el que sube el gimnasio y la lista y la ficha lo muestran cargado y accesible.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/mapa.mjs",
     "purpose": "Prueba de navegador del mapa de gimnasios: marcadores, ubicación, más cercanos ordenados, sin permiso, dirección en el perfil y accesibilidad en los dos temas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2268,6 +2283,11 @@
     "path": "tests/unit/landing.test.ts",
     "purpose": "Prueba destino tras acceso por papel y mantenimiento de la regla centralizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/logos-gimnasios.test.ts",
+    "purpose": "Registro de logotipos: cada archivo existe, anota su origen (nunca una red social) y la búsqueda no se deja engañar por claves del prototipo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/mail.test.ts",

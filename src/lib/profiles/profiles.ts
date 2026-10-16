@@ -3,6 +3,7 @@ import type { User } from "@prisma/client";
 import { publicUserName } from "../common/names";
 import { db } from "../common/db";
 import { provinciaConGimnasios } from "../common/territorio";
+import { logoDeGimnasio } from "../common/logos-gimnasios";
 export const PROFILE_KINDS = ["peleador", "gimnasio", "entrenador", "promotor", "federacion"] as const;
 export type ProfileKind = typeof PROFILE_KINDS[number];
 /** Resuelve únicamente tipos visuales admitidos; null evita consultas con un tipo arbitrario recibido por URL/formulario. */
@@ -17,16 +18,16 @@ export const profileSelect = { id: true, kind: true, entityId: true, ownerId: tr
 export async function profileSource(kind: ProfileKind, id: string) {
   if (kind === "peleador") {
     const f = await db.fighter.findUnique({ where: { id } });
-    return f ? { name: `${f.firstName} ${f.lastName}`, href: `/peleadores/${f.slug}`, ownerId: f.userId, visible: f.listed && !f.hiddenAt } : null;
+    return f ? { name: `${f.firstName} ${f.lastName}`, href: `/peleadores/${f.slug}`, ownerId: f.userId, visible: f.listed && !f.hiddenAt, logo: null as string | null } : null;
   }
-  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: g.ownerUserId, visible: gymIsPublic(g) } : null; }
-  if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: t.userId, visible: true } : null; }
+  if (kind === "gimnasio") { const g = await db.gym.findUnique({ where: { id } }); return g ? { name: g.name, href: `/gimnasios/${g.slug}`, ownerId: g.ownerUserId, visible: gymIsPublic(g), logo: logoDeGimnasio(g.slug) } : null; }
+  if (kind === "entrenador") { const t = await db.trainer.findUnique({ where: { id } }); return t ? { name: t.name, href: `/entrenadores/${t.slug}`, ownerId: t.userId, visible: true, logo: null as string | null } : null; }
   if (kind === "promotor") {
     const u = await db.user.findUnique({ where: { id }, include: { organizerRequest: true } });
-    return u?.role === "ORGANIZER" ? { name: u.organizerRequest?.orgName ?? publicUserName(u.name), href: `/promotores/${u.id}`, ownerId: u.id, visible: true } : null;
+    return u?.role === "ORGANIZER" ? { name: u.organizerRequest?.orgName ?? publicUserName(u.name), href: `/promotores/${u.id}`, ownerId: u.id, visible: true, logo: null as string | null } : null;
   }
   const p = await db.profile.findUnique({ where: { kind_entityId: { kind, entityId: id } }, select: profileSelect });
-  return p ? { name: p.name ?? "Federación", href: `/federaciones/${id}`, ownerId: p.ownerId, visible: true } : null;
+  return p ? { name: p.name ?? "Federación", href: `/federaciones/${id}`, ownerId: p.ownerId, visible: true, logo: null as string | null } : null;
 }
 /** Decide edición por moderación, titular natural o asignado; no valida correo ni existencia, que comprueba la acción. */
 export function canEditProfile(user: Pick<User, "id" | "role"> | null, ownerId: string | null, assignedOwner: string | null) {
