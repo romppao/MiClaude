@@ -30,6 +30,7 @@ import { almacenDeVideos } from "../../lib/media/storage";
 import SubirVideo from "../components/SubirVideo";
 import Pestanas from "../components/Pestanas";
 import InputFoto from "../components/InputFoto";
+import { CompletaTuFicha } from "../components/GuiaAcciones";
 import { GaleriaMedios, SELECT_MEDIO } from "../components/Multimedia";
 
 export const metadata = { title: "Mi ficha" };
@@ -142,6 +143,12 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         {principal && <span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em", color: "var(--acc-text)" }}>{recP.w}-{recP.l}-{recP.d}</span>}
       </div>
       {toConfirm.length > 0 && <p className="notice"><span aria-hidden="true">ℹ </span>Tu rival ha declarado {toConfirm.length === 1 ? "un combate" : `${toConfirm.length} combates`} contigo. <a href="#por-confirmar">Revisarlos</a></p>}
+      <CompletaTuFicha pasos={[
+        { hecho: !!perfil?.hasAvatar, titulo: "Foto de perfil", detalle: "Con una foto te reconocen en el cartel y en el ránking.", href: `/perfiles/peleador/${me.id}/editar`, accion: "Añadir mi foto" },
+        { hecho: bouts.length > 0, titulo: "Tu primer combate", detalle: "Cuenta un combate para empezar tu récord y tu aura.", href: "#pestana-combates", accion: "Contar mi primer combate" },
+        { hecho: titulosVigentes.length > 0 || (principal?.priorTotal ?? 0) > 0, titulo: "Tu trayectoria", detalle: "Si ya peleabas antes, cuéntalo: tus títulos y tu récord anterior.", href: "/mi-ficha/trayectoria#declarar-titulo", accion: "Contar mi trayectoria anterior" },
+        { hecho: misHighlights.length > 0, titulo: "Tu primer vídeo o foto", detalle: "Sube un vídeo o una foto para que se vea en tu ficha pública.", href: "#highlights", accion: "Publicar mi primer vídeo o foto" },
+      ]} />
       {/* Secciones agrupadas que se cambian deslizando a los lados (petición del fundador, 8 de octubre de 2026: menos desplazamiento hacia abajo). */}
       <section id="disponibilidad" className="tarjeta" aria-label="Disponible para pelear">
         <h2>Disponible para pelear</h2>

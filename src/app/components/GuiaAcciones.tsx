@@ -69,3 +69,22 @@ export function AyudaPlegable({ titulo, children }: { titulo: string; children: 
     </details>
   );
 }
+
+/** «Completa tu ficha»: lo que falta, de uno en uno, con un botón grande para el siguiente paso. Desaparece cuando todo está hecho. */
+export function CompletaTuFicha({ pasos }: { pasos: { hecho: boolean; titulo: string; detalle: string; href: string; accion: string }[] }) {
+  const hechos = pasos.filter((p) => p.hecho).length;
+  const siguiente = pasos.find((p) => !p.hecho);
+  if (!siguiente) return null;
+  return (
+    <section className="tarjeta completa-ficha" aria-label="Completa tu ficha">
+      <div className="completa-cabecera"><strong>Completa tu ficha</strong><span className="completa-cuenta">{hechos} de {pasos.length}</span></div>
+      <div className="barra-progreso" role="progressbar" aria-valuemin={0} aria-valuemax={pasos.length} aria-valuenow={hechos} aria-label="Pasos de tu ficha completados"><span style={{ width: `${(hechos / pasos.length) * 100}%` }} /></div>
+      <p className="completa-detalle">{siguiente.detalle}</p>
+      <Link className="btn completa-siguiente" href={siguiente.href}>{siguiente.accion}</Link>
+      <details className="completa-lista">
+        <summary>Ver todos los pasos</summary>
+        <ol>{pasos.map((p) => <li key={p.titulo} className={p.hecho ? "hecho" : undefined}><span className="completa-marca" aria-hidden="true">{p.hecho && <Icono nombre="check" tam={14} grosor={3} />}</span><span>{p.titulo}<span className="sr-only">{p.hecho ? ": hecho" : ": pendiente"}</span></span></li>)}</ol>
+      </details>
+    </section>
+  );
+}

@@ -790,6 +790,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/RefrescoVivo.tsx",
+    "purpose": "Vuelve a pedir al servidor los datos de la pantalla leída al volver a la pestaña, al recuperar la conexión y cada pocos minutos; no pinta nada.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/ReservaEntradas.tsx",
     "purpose": "Formulario de reserva de entradas con el desglose al momento: total, señal por Bizum y lo que queda para la puerta.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1527,6 +1532,11 @@
   {
     "path": "src/lib/common/record-time.ts",
     "purpose": "Constante y c?lculo del plazo de 24 horas para incorporar al r?cord una declaraci?n propia.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/refresco.ts",
+    "purpose": "Datos al día sin recargar: qué pantallas de solo lectura se actualizan solas, cada cuánto y cuándo no hacerlo (si la persona escribe o hay una ventana abierta).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -2318,6 +2328,11 @@
     "path": "tests/unit/recuperar.test.ts",
     "purpose": "Prueba lógica de enlaces de recuperación, consumo y comportamiento de acceso asociado mediante simulación.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/refresco.test.ts",
+    "purpose": "Regresión de los datos al día: pantallas que se actualizan solas, las de formulario que no, y cuándo toca refrescar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/rivales.test.ts",
