@@ -11,6 +11,23 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.18.10] — 2026-10-16
+
+PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude + Codex (peticiones del fundador del 16-10-2026: «usar algún framework para evitar romper cosas que ya funcionaban o ya habíamos aprobado», «replicar el flujo de trabajo» del vídeo y «que sepáis qué modelo y esfuerzo usar según la tarea»). Sin cambios en la aplicación.
+
+### Añadido
+- **Registro de funciones aprobadas** (`docs/APROBADO.md`, 15 filas): cada función aprobada por el fundador apunta a la prueba que la vigila; `tests/documentacion/aprobado.test.mjs` falla si esa prueba desaparece o deja de contener la comprobación.
+- **Ningún recorrido fuera del CI:** lista `tests/e2e/orden.json` y prueba `tests/documentacion/e2e.test.mjs`, que falla si un archivo de `tests/e2e` no está en la lista ni declarado aparte.
+- **`npm run verificar`:** todas las puertas del CI en un comando, sin pararse en la primera que falla; con `--e2e`, los recorridos de navegador en una base desechable de Docker (`scripts/e2e-local.mjs`, con sustituto de `psql` en Windows).
+- **La flota** (`scripts/flota.mjs`, `/flota`, `docs/tareas/PLANTILLA-FLOTA.md`): Codex ejecuta una ficha en una copia aparte, pasan las puertas y revisa Luna (o Astra si es crítico) con veredicto en JSON; Claude verifica y decide. Elige modelo y esfuerzo según la complejidad y el riesgo de la ficha.
+- **Documentación:** `docs/RED-DE-SEGURIDAD.md` (capas y flujo), `docs/MODELOS-Y-ESFUERZO.md` (qué modelo y esfuerzo para cada tipo de tarea) y `docs/COBERTURA-CONCEPTOS.md` (cruce con la lista de conceptos de ingeniería que mandó el fundador).
+- **El flujo en pantalla:** barra de estado de Claude Code (`scripts/flota-barra.mjs`) y panel en vivo en <http://localhost:4777> (`scripts/flota-panel.mjs`) con lo que hace cada modelo en cada momento; el estado se guarda en `~/.lona-flota/estado.json` (`scripts/flota-estado.mjs`).
+- Prueba unitaria de que el nombre antiguo, «Ring España», no vuelve al código.
+
+### Cambiado
+- `npm run test:e2e` ejecuta todos los recorridos aunque falle uno y resume al final cuáles fallaron (antes el CI se paraba en el primero).
+- Las pruebas llaman a `psql` de forma que también funciona en Windows (`tests/e2e/ayudas.mjs`, `flujo.mjs`, `integridad.mjs`).
+
 ## [0.18.9] — 2026-10-15
 
 PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.

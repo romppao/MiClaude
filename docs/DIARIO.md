@@ -2312,3 +2312,11 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 ## 2026-10-15 — Relevo D/H: bandeja única de moderación
 El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
+
+## 16 de octubre de 2026 — Red de seguridad y flujo Claude + Codex (Claude Code)
+
+**Encargo:** el fundador pidió un sistema para no romper lo ya aprobado, replicar el flujo del vídeo de @robles.ia (Opus planifica y decide, Codex ejecuta, dos revisores) y una política de modelos y esfuerzo para Claude y Codex.
+
+**Decisiones:** el registro `APROBADO.md` ancla cada función aprobada a una prueba concreta; el CI deja de pararse en el primer recorrido que falla; la flota nunca guarda ni fusiona por su cuenta; el revisor crítico (Astra) solo se usa con dinero, permisos, datos personales o secretos. Se instaló el plugin oficial `codex@openai-codex`; no se usó `npx -y codex mcp-server` porque el paquete npm «codex» es otro proyecto y ese modo no existe en Codex 0.160.1.
+
+**Validación:** pruebas de documentación nuevas (19), comprobadas también a la inversa (fallan al quitar una comprobación aprobada o un recorrido); simulacros de la flota; la orden `revisar` usada de verdad sobre los arreglos del #93 (Luna aprobó); `e2e-local.mjs` usado de verdad (6 de 6 recorridos). La regresión visual queda para el siguiente PR.

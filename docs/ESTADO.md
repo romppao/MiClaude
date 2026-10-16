@@ -20,7 +20,7 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
-| Claude Code (portátil) | Relevo de Claude (nube) cerrado: #82, #84 y #83 fusionados (0.18.4–0.18.6); #77, #78 y los de Dependabot, sustituidos. **Siguiente:** revisar los 190 gimnasios sin fecha y completar las comunidades que faltan (ver «Gimnasios reales») | — | siguiente |
+| Claude Code (portátil) | 16-10: #92 fusionado; #93 (fase 1, 0.20.0) con las correcciones de la revisión crítica, esperando CI y el «sí» del fundador. **Red de seguridad y flota** (este PR): `APROBADO.md`, `npm run verificar`, CI que no se para en el primer fallo, `scripts/flota.mjs` y `MODELOS-Y-ESFUERZO.md`. Siguiente: regresión visual. | `claude-code/veladas-entradas` (#93), `claude-code/red-seguridad` | en curso |
 | Codex | Bandeja única de moderación sobre la demo 0.18.6; después invitaciones, cesión, altas desde fichas y T-009. T-013 (#77) y T-002 (#78) los integra Claude: no se actualizan. | `codex/bandeja-unica-de-moderacion-20261015` | PR #86, pendiente de revisión y CI |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 

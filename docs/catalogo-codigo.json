@@ -245,6 +245,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/e2e-local.mjs",
+    "purpose": "Recorridos de navegador en el propio equipo con un solo comando: base PostgreSQL desechable en Docker, migraciones, compilación, servidor, recorridos y limpieza; sustituto de psql en Windows.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/e2e-todos.mjs",
+    "purpose": "Ejecuta los recorridos de tests/e2e/orden.json sin pararse en el primero que falla y resume al final cuáles fallaron (npm run test:e2e, también en el CI).",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
     "path": "scripts/entorno-aislado.sh",
     "purpose": "Gestiona base y servidor propios por nombre/puerto para que asistentes no compartan datos de pruebas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -253,6 +263,31 @@
     "path": "scripts/estado.mjs",
     "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/flota-barra.mjs",
+    "purpose": "Barra de estado de Claude Code con el flujo de la flota: modelo de la sesión, tarea, ronda y estado de cada paso, leídos de ~/.lona-flota/estado.json. Autónoma para poder instalarse en ~/.claude.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-estado.mjs",
+    "purpose": "Estado en vivo de la flota en ~/.lona-flota/estado.json: pasos, quién los hace, tiempos, veredicto e historial; lo escriben scripts/flota.mjs y Claude, y lo leen la barra y el panel.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-panel.mjs",
+    "purpose": "Panel local (http://localhost:4777) con el diagrama del flujo Claude + Codex en vivo: paso activo, reloj, veredicto, hallazgos e historial.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-veredicto.schema.json",
+    "purpose": "Esquema JSON del veredicto que devuelven los revisores de la flota (aprobar, cambios o rechazar, con resumen y hallazgos).",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota.mjs",
+    "purpose": "Flujo Claude + Codex: Codex ejecuta una ficha en una copia aparte, pasan las puertas y revisa Luna o Astra; elige modelo y esfuerzo según complejidad y riesgo. Nunca guarda ni fusiona.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "scripts/fotos-al-almacen.ts",
@@ -293,6 +328,11 @@
     "path": "scripts/ubicar-gimnasios.ts",
     "purpose": "Ubica de una vez en el mapa los gimnasios publicados sin coordenadas (Nominatim, una consulta por segundo) tras una carga grande; se lanza desde el botón de GitHub de la demo.",
     "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/verificar.mjs",
+    "purpose": "Todas las puertas del CI en un comando (versión, documentación, catálogo, mapa, tipos, pruebas y, con --e2e, recorridos), sin pararse en la primera que falla.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "scripts/version.mjs",
@@ -1715,9 +1755,19 @@
     "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   },
   {
+    "path": "tests/documentacion/aprobado.test.mjs",
+    "purpose": "Vigila docs/APROBADO.md: cada función aprobada por el fundador conserva la prueba y la comprobación exacta que la protegen.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
     "path": "tests/documentacion/catalogo.test.mjs",
     "purpose": "Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar.",
     "guide": "docs/mantenimiento/README.md"
+  },
+  {
+    "path": "tests/documentacion/e2e.test.mjs",
+    "purpose": "Vigila tests/e2e/orden.json: ningún recorrido de navegador queda fuera del CI por olvido ni figura sin existir.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "tests/documentacion/estado.test.mjs",
@@ -1863,6 +1913,11 @@
     "path": "tests/e2e/movil.mjs",
     "purpose": "Mide desbordes, tamaño de texto, zonas táctiles y navegación en emulaciones móviles; no acredita iOS/Android físicos.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/orden.json",
+    "purpose": "Lista ordenada de los recorridos de navegador que ejecuta el CI y de los archivos de tests/e2e que van aparte, con su motivo.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "tests/e2e/paneles-agenda.mjs",
@@ -2093,6 +2148,11 @@
     "path": "tests/unit/multimedia.test.ts",
     "purpose": "Comprueba reglas de vídeos y fotos, claves por usuario, rutas sin salir de la carpeta, elección de almacén y configuración R2 incompleta.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/nombre-lona.test.ts",
+    "purpose": "Comprueba que el nombre retirado de la app («Ring España») no vuelve a ningún texto del código ni de la semilla.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "tests/unit/noticias.test.ts",

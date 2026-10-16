@@ -1,8 +1,7 @@
 // Pruebas de integridad de la verificación y del aura (lo que la auditoría marcó como fallos confirmados):
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
-import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
-import { execFileSync } from "node:child_process";
+import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -24,7 +23,7 @@ await registrar(ana, { evento: `Velada de Hoy ${rnd}`, fecha: hoyMadrid, rivalNo
 await ana.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
 // Este escenario comprueba el récord de un combate autodeclarado ya maduro.
 // El flujo de uno recién declarado (que aún no suma durante 24 h) se prueba en flujo.mjs.
-execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}'`]);
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}';`);
 await ana.reload();
 check("un combate de hoy conserva su resultado en el récord", await seen(ana.locator(".rec", { hasText: /^\s*1-0-0\s*$/ }).first()));
 await registrar(ana, { evento: `Velada Futura Ana ${rnd}`, fecha: enDias(10), rivalNombre: "Carlos", rivalApellidos: `Futuro${rnd}` });
