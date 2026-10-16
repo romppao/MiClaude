@@ -10,7 +10,8 @@ import { CENTROS_PROVINCIA, CENTRO_ESPANA, puntoDeGimnasio, valoracionGimnasio }
 import { ubicarPendientes } from "../../lib/common/geo";
 import Paginacion from "../components/Paginacion";
 import { BotonesFiltro, CampoFiltro } from "../components/Filtros";
-import ProfileThumbnail from "../components/ProfileThumbnail";
+import { TarjetaGimnasioCartel } from "../components/TarjetasDirectorio";
+import { DirectorioNav } from "../components/DirectorioNav";
 import MapaGimnasios, { type GimnasioEnMapa } from "../components/MapaGimnasios";
 import { PROVINCES } from "../../lib/common/labels";
 import { gimnasiosVisibles } from "../../lib/common/territorio";
@@ -57,6 +58,7 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <h1>Gimnasios</h1>
+      <DirectorioNav actual="gimnasios" />
       <Link className="btn secondary" href="/mis-gimnasios">¿Es tu gimnasio? Búscalo y reclámalo</Link>
       <p className="meta" style={{ fontSize: 16 }}><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", minHeight: 44 }}>© colaboradores de OpenStreetMap · datos ODbL</a></p>
       <form className="search" role="search" aria-label="Filtrar gimnasios">
@@ -68,20 +70,11 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
       {/* La lista completa sigue aquí (la necesita quien no ve el mapa o no da su ubicación), pero recogida: lo primero es el mapa y los mejores. */}
       <details className="lista-completa" open={!!pagina && pagina !== "1"}>
         <summary><span id="todos-los-gimnasios">{q || province ? `Ver todos los gimnasios de tu búsqueda (${total})` : `Ver todos los gimnasios (${total})`}</span></summary>
-      <ul className="lista-gimnasios" aria-labelledby="todos-los-gimnasios">
+      <div className="grid grid-cartel">
         {gyms.map((g) => (
-          <li key={g.id}>
-            <Link href={`/gimnasios/${g.slug}`} className="tarjeta-gimnasio">
-              <ProfileThumbnail kind="gimnasio" id={g.id} name={g.name} />
-              <span className="cuerpo">
-                <strong>{g.name}</strong>
-                <span className="meta">{g.city} ({g.province})</span>
-                <span className="meta">{g.verifiedAt && <span className="sello-verificado" title="Verificado por un moderador"><span aria-hidden="true">✓ </span>Verificado</span>}{g._count.fighters === 1 ? "1 peleador" : `${g._count.fighters} peleadores`}</span>
-              </span>
-            </Link>
-          </li>
+          <TarjetaGimnasioCartel key={g.id} id={g.id} slug={g.slug} nombre={g.name} ciudad={g.city} provincia={g.province} peleadores={g._count.fighters} verificado={!!g.verifiedAt} />
         ))}
-      </ul>
+      </div>
       {gyms.length === 0 && <p className="mut">No hay gimnasios con esos filtros. Prueba a quitar alguno o a escribir solo una parte del nombre.</p>}
       <Paginacion ruta="/gimnasios" params={{ q, province }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["gimnasio", "gimnasios"]} />
       </details>

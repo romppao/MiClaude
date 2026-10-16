@@ -885,3 +885,22 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .boton-google img{flex:none}
 .separador-o{display:flex;align-items:center;gap:12px;margin:4px 0;color:var(--mut);font-size:16px}
 .separador-o::before,.separador-o::after{content:"";flex:1;border-top:1px solid var(--line)}
+
+/* Directorios con foto (16 de octubre de 2026, petición del fundador: «que se vea directamente la imagen», como en las veladas): peleadores,
+   entrenadores y gimnasios en carteles de dos columnas en el móvil. Reutilizan .tarjeta-foto (foto, tinte de la disciplina y degradado inferior
+   para leer el texto) y conservan .card porque las pruebas de navegador cuentan con esa clase. components/TarjetasDirectorio.tsx. */
+.grid.grid-cartel{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 24px}
+@media(min-width:640px){.grid.grid-cartel{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}}
+.card.cartel-persona{aspect-ratio:4/5;padding:0;border:0;min-height:0;margin:0}
+.cartel-persona .iniciales{font-size:76px}
+.cartel-persona .arriba{align-items:flex-start;z-index:1}
+.cartel-persona .abajo{padding:14px 14px 16px;gap:4px;min-width:0}
+.cartel-persona .abajo strong{font:800 19px/1.1 var(--font);letter-spacing:-.025em;text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.cartel-persona .meta-acc,.cartel-persona .cartel-dato{font:600 15px/1.3 var(--font);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cartel-persona .cartel-dato{font-weight:500;color:rgba(var(--ink),.82)}
+.cartel-persona .pildora{max-width:calc(100% - 42px);font-size:14px;line-height:1.25}
+.cartel-icono{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(10,10,12,.55);color:var(--acc)}
+.cartel-logo{position:relative;flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:rgba(10,10,12,.62);color:#fff;font:800 15px var(--font);border:2px solid rgba(255,255,255,.22)}
+.cartel-logo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.directorio-nav{display:flex;width:100%;margin:4px 0 12px}
+.chips-disciplina{margin-bottom:12px}

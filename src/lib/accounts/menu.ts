@@ -17,7 +17,7 @@ export const EXPLORAR: SeccionMenu = {
     { href: "/veladas", texto: "Veladas y resultados" },
     { href: "/ranking", texto: "Ránking de aura" },
     { href: "/gimnasios", texto: "Gimnasios" },
-    { href: "/clases", texto: "Clases y entrenadores" },
+    { href: "/entrenadores", texto: "Entrenadores y clases" },
   ],
 };
 
