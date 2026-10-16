@@ -419,3 +419,11 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Siguiente:** revisión de Claude y T-009 en PR separado. No se cambia el estado histórico de gimnasios ya existentes.
 
 **Revisión de #90:** tipos, 15 unitarias específicas, documentación y controles locales pasan. El CI detectó dos expectativas de búsqueda que daban por publicado el gimnasio de una ficha; el guion comprueba ahora que permanece fuera de la búsqueda antes de revisión y lo publica desde moderación antes de comprobar búsqueda y metadatos. No se cambia la política ni se rebaja ninguna afirmación de búsqueda.
+
+## 2026-10-16 — Corrección del recorrido de altas de gimnasios (#90)
+**Pedido:** continuar las tareas de Lona según el encargo del 15 de octubre.
+**Cambio:** `gimnasios-altas.mjs` abre «Mis datos» y «Corregir los datos de mi ficha» antes de localizar el formulario, en las tres ediciones. El campo `gym` existe; el selector por botón no encontraba el formulario porque el desplegable cerrado oculta ese botón. Se mantienen las comprobaciones de revisión y estados, sin modificar el producto.
+**Validación:** sintaxis JavaScript correcta; catálogo y mapa se comprueban al cerrar esta entrega. Recorrido completo de navegador pendiente de CI; las ayudas utilizan psql con sintaxis de shell Unix. No se usa la base real para probar.
+**Siguiente:** esperar a #93, después #88 y #89; actualizar y renumerar #90 a 0.20.3 cuando le corresponda. No se fusiona nada.
+
+**Cierre de validación local (16-10):** `node --check tests/e2e/gimnasios-altas.mjs`, TypeScript (`node node_modules/typescript/bin/tsc --noEmit`), catálogo (445 archivos) y mapa comprobados correctamente. Las pruebas del catálogo dan 10 correctas y 1 bloqueada por EPERM al crear un enlace simbólico en Windows; no se modifica esa prueba. Recorrido real pendiente del CI.

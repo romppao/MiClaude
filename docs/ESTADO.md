@@ -21,7 +21,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | Relevo de Claude (nube) cerrado: #82, #84 y #83 fusionados (0.18.4–0.18.6); #77, #78 y los de Dependabot, sustituidos. **Siguiente:** revisar los 190 gimnasios sin fecha y completar las comunidades que faltan (ver «Gimnasios reales») | — | siguiente |
-| Codex | Bandeja #86 y miembros #88 en pruebas; cesión en PR separado. Gimnasios desde fichas sujetos a revisión en preparación; después T-009. | `codex/gimnasios-desde-fichas-en-revision-20261015` | en pruebas |
+| Codex | Corrección del recorrido de altas de gimnasio (#90): abre pestaña y desplegable. Tipos, sintaxis, catálogo y mapa correctos; navegador pendiente de CI. #93 sigue abierto: esperar para actualizar #88–#91 y empezar agenda. Petición nueva: fotos y banners con logos reales de gimnasios, alcance por concretar. | `codex/corregir-pr90-20261016` | corrección preparada |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

@@ -525,3 +525,6 @@ La ejecución de unitarias junto al navegador agotó el límite de dos pruebas d
 - 15-10-2026: una regla de publicación también debe aplicarse a los alta indirectas y a los valores por defecto. La revisión de gimnasio y su sello de verificación son independientes; las pruebas deben pasar por ambas decisiones cuando las necesitan.
 
 - 15-10-2026: al introducir revisión previa, las pruebas de búsqueda y metadatos deben preparar la aprobación mediante la interfaz y comprobar la invisibilidad antes de ella; no basta adaptar el recorrido principal.
+
+## 16 de octubre de 2026 — Selectores de formularios plegados
+Si `form` se localiza por un botón con `getByRole`, el botón debe estar expuesto. Abrir primero la pestaña y el `summary` correspondiente, también al volver a la página. Un tiempo de espera no demuestra que se haya eliminado un campo.
