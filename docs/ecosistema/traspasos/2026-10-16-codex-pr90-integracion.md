@@ -22,3 +22,8 @@
 ## Siguiente paso
 
 Esperar #89 apto y fusionado, comprobar el árbol de la base y actualizar el PR propio #90. Comprobar nuevas indicaciones de Claude, revisión de integración y CI completo antes de fusionar.
+
+## Corrección del recorrido tras CI 38942511433
+- El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
+- Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
+- Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.
