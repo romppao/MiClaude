@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapaLibre, Marker } from "maplibre-gl";
 import { distanciaKm, mejoresDeLaZona, textoDistancia, type OrigenUbicacion, type Punto } from "../../lib/common/mapa";
 import { crearMapa } from "./mapa/base";
+import { TarjetaGimnasioCartel } from "./TarjetasDirectorio";
 
 /**
  * Mapa de gimnasios (petición del fundador, 13 de octubre de 2026: «que el usuario, en vez de que le salga una lista muy aburrida y larga
@@ -149,17 +150,12 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
               </div>
             )}
           </div>
-          <ol id="lista-mejores" className="lista-gimnasios">
+          <ol id="lista-mejores" className="desliza desliza-gimnasios">
             {mejores.map((g, i) => (
               <li key={g.id}>
-                <Link href={`/gimnasios/${g.slug}`} className="tarjeta-gimnasio">
-                  {g.km !== null ? <span className="distancia">{textoDistancia(g.km)}</span> : <span className="puesto"><span className="sr-only">Puesto </span>{i + 1}</span>}
-                  <span className="cuerpo">
-                    <strong>{g.nombre}</strong>
-                    <span className="meta">{g.ciudad} ({g.provincia}){!["direccion", "osm"].includes(g.origen) && " · ubicación aproximada"}</span>
-                    <span className="meta">{g.verificado && <span className="sello-verificado"><span aria-hidden="true">✓ </span>Verificado</span>}{razones(g)}</span>
-                  </span>
-                </Link>
+                <TarjetaGimnasioCartel id={g.id} slug={g.slug} nombre={g.nombre} ciudad={g.ciudad} provincia={g.provincia} verificado={g.verificado}
+                  puesto={g.km === null ? i + 1 : undefined} distancia={g.km !== null ? textoDistancia(g.km) : undefined}
+                  detalles={[razones(g), ["direccion", "osm"].includes(g.origen) ? "" : "Ubicación aproximada"].filter(Boolean)} />
               </li>
             ))}
           </ol>

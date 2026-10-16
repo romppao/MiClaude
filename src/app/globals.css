@@ -980,3 +980,7 @@ h2[id]{scroll-margin-top:84px}
 .indice-ayuda{flex-wrap:nowrap;flex:none}
 .desliza-personas{flex-wrap:nowrap;gap:12px;padding-bottom:8px;scroll-padding:0 16px}
 .desliza-personas>.cartel-persona{flex:none;width:200px;scroll-snap-align:start}
+.desliza-gimnasios{list-style:none;margin:0;flex-wrap:nowrap;gap:12px;padding-bottom:8px;scroll-padding:0 16px}
+.desliza-gimnasios>li{flex:none;width:210px;scroll-snap-align:start;list-style:none}
+.cartel-puesto{margin-left:auto;padding:6px 12px;border-radius:999px;background:rgba(10,10,12,.62);color:#fff;font:800 16px/1.1 var(--font);font-variant-numeric:tabular-nums}
+@media(min-width:900px){.desliza-gimnasios{flex-wrap:wrap;overflow:visible;margin:0;padding:0}.desliza-gimnasios>li{width:calc((100% - 36px) / 4)}}

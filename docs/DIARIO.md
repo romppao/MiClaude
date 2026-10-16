@@ -2444,3 +2444,11 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Validación:** revisado en pantalla a 390 px; una velada creada con la página abierta aparece sola al volver a la pestaña; pruebas unitarias del refresco; recorridos de navegador en local y CI.
 
 **Pendiente:** portada del visitante y del aficionado (4,9 y 2,6 pantallas), ficha de gimnasio, `/mi-panel`; pantalla de configurar el perfil paso a paso (hoy «Completa tu ficha» guía hacia ella); acceso directo a Entrenadores en el menú; eventos del servidor para entradas y plazas.
+
+## 16 de octubre de 2026, noche — «Los mejores» de gimnasios como carteles (Claude Code)
+
+**Aviso del fundador:** con una captura de `/gimnasios` en escritorio, «todavía la lista de gimnasios no se ve como te pedí». Tenía razón: en la 0.21.0 convertí la lista completa (recogida en «Ver todos los gimnasios»), pero la que se ve primero, «Los mejores de tu zona» (componente del mapa), seguía en texto.
+
+**Qué se hizo:** `TarjetaGimnasioCartel` admite puesto o distancia y líneas de detalle propias; `MapaGimnasios` la usa dentro de `ol#lista-mejores` (se conserva la lista y su id, que usa la prueba del mapa). Móvil: fila deslizable; escritorio: cuadrícula de cuatro.
+
+**Lección:** al cambiar «la lista de X» hay que buscar todas las listas de X (aquí eran dos: la del mapa y la completa), no la primera que se encuentra.

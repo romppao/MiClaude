@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.22.1] — 2026-10-16
+
+PR de Claude Code: «Los mejores» de la pantalla de gimnasios (la lista que aparece primero, debajo del mapa) pasa de texto a carteles con foto (aviso del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí»).
+
+### Cambiado
+- **Gimnasios — «Los mejores de tu zona» / «Los más cercanos a ti»:** carteles con la foto o la cabecera del gimnasio, el puesto (#1, #2…) o la distancia («a 400 m»), la etiqueta «Verificado» y sus datos. En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+
 ## [0.22.0] — 2026-10-16
 
 PR de Claude Code: pantallas de acción guiadas, menos desplazamiento y datos al día (peticiones del fundador del 16-10-2026: «muchas de las pantallas en las que se hacen acciones se ven muy poco visuales e intuitivas […] para un usuario que no tenga muchas nociones», «tienes que scrollear mucho hacia abajo» y «todos los datos […] actualizados y sincronizados en tiempo real»).
