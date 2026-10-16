@@ -11,6 +11,12 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.20.3] — 2026-10-16
+
+### Añadido
+- El titular de un gimnasio invita a peleadores y entrenadores; cada persona acepta o rechaza sin que la invitación cambie su ficha. Se comprueban bloqueos, propiedad y afiliación al responder.
+
+
 ## [0.20.2] — 2026-10-16
 
 ### Corregido

@@ -421,3 +421,9 @@ Ficha [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md) y
 
 ## Avisos y referencias de vídeos (H)
 `Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.
+
+## Vinculación consentida de miembros de gimnasio (15-10-2026)
+
+GymMemberInvitation referencia gimnasio, remitente, destinatario y una única ficha (Fighter o Trainer; CHECK en PostgreSQL). Invitar no cambia gymId. El titular verificado del gimnasio publicado invita y la cuenta titular de la ficha acepta/rechaza en Mis gimnasios. Se admite el titular del Profile de entrenador cuando Trainer.userId está vacío. Caduca a los 14 días; el remitente puede cancelar. Moderación conserva setGymMember.
+
+Las operaciones se serializan por gimnasio. La aceptación vuelve a comprobar destinatario, propiedad, bloqueos, caducidad y titular de la ficha. Actualizar la afiliación exige que aún coincida con previousGymId; una edición o aceptación posterior no se pisa. El bloqueo cancela las invitaciones pendientes y las listas privadas excluyen cuentas bloqueadas. La copia de datos incluye las invitaciones de la cuenta y las FK las borran al eliminar cuenta/ficha/gimnasio. Los avisos se crean en la misma transacción; no se publican solicitudes en el directorio.

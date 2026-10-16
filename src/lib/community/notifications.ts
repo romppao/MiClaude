@@ -6,7 +6,7 @@ import { registrarFallo } from "../common/fallos";
 import { eventDayReached, todayMadrid } from "../common/dates";
 import { hayBloqueo } from "./bloqueos";
 
-export type NotificationKind = "BOUT_ANNOUNCED" | "BOUT_RESULT" | "AURA_RECEIVED" | "BOUT_DECLARED" | "PROPOSAL" | "CLASS_REQUEST" | "CLASS_ANSWER" | "REGISTRATION" | "BOUT_VIDEO" | "MEDIA_HIGHLIGHT" | "TICKET";
+export type NotificationKind = "GYM_MEMBER" | "BOUT_ANNOUNCED" | "BOUT_RESULT" | "AURA_RECEIVED" | "BOUT_DECLARED" | "PROPOSAL" | "CLASS_REQUEST" | "CLASS_ANSWER" | "REGISTRATION" | "BOUT_VIDEO" | "MEDIA_HIGHLIGHT" | "TICKET";
 
 /** Clave estable por destinatario/hecho. Evita duplicados de reintentos sin revelar identificadores en títulos. */
 export const notificationId = (userId: string, key: string) => createHash("sha256").update(`${userId}\0${key}`).digest("hex").slice(0, 32);

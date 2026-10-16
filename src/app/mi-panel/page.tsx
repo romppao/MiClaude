@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { requireUser } from "../../lib/accounts/auth";
 import { papelDe } from "../../lib/accounts/landing";
@@ -20,5 +21,5 @@ export default async function MiPanel({ searchParams }: { searchParams: Promise<
   const papel = papelDe(user);
   const panel = papel === "entidad" ? <InicioEntidad user={user} /> : papel === "entrenador" ? <InicioEntrenador user={user} /> : papel === "peleador" ? <InicioPeleador user={user} disciplina={disciplina} /> : <InicioAficionado user={user} />;
   // «Mis vídeos y fotos»: siempre en el panel del aficionado; en los demás, solo si han compartido algo.
-  return <>{panel}<MisSubidas userId={user.id} siempre={papel === "usuario"} /></>;
+  return <><Link className="btn secondary" href="/mis-gimnasios#invitaciones">Ver mis invitaciones de gimnasio</Link>{panel}<MisSubidas userId={user.id} siempre={papel === "usuario"} /></>;
 }
