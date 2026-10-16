@@ -28,7 +28,5 @@ describe("cuatro ajustes de móvil en Lona", () => {
     expect(idxBotones).toBeGreaterThan(-1);
     expect(idxMasFiltros).toBeGreaterThan(-1);
     expect(idxBotones).toBeLessThan(idxMasFiltros);
-    // Y además se repite un botón al final de los campos desplegados
-    expect(peleadoresPage).toMatch(/<button type="submit">Aplicar filtros<\/button>/);
   });
 });

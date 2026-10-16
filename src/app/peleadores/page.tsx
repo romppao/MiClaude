@@ -58,9 +58,6 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
         <SelectorCategoria modo="filtro" nombres={{ discipline: "disciplina", level: "level", weightClass: "categoria" }} defaults={{ discipline: discipline ?? "", level: nivel ?? "", divisionId: divisionId ?? "", weightClass: categoria ?? "" }} />
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <label className="chip"><input type="checkbox" name="disponibles" value="1" defaultChecked={disponibles === "1"} />Disponibles para pelear</label>
-        <div style={{ flex: "1 1 100%", marginTop: 4 }}>
-          <button type="submit">Aplicar filtros</button>
-        </div>
         </MasFiltros>
       </form>
       <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId, disponibles }} activos={activos} />

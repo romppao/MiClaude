@@ -30,8 +30,8 @@ Dar cumplimiento al encargo `2026-10-15-claude-encargo-antigravity-ajustes-movil
    - **Resultado:** Títulos cortos como «Yess» se muestran siempre en su propia línea debajo de las etiquetas descriptivas («Inscripción abierta»), eliminando el apelotonamiento horizontal.
 
 4. **Peleadores (`/peleadores`):**
-   - En `src/app/peleadores/page.tsx`, se reordenó el componente de `<BotonesFiltro>` antes del contenedor `<MasFiltros>`, y adicionalmente se integró un botón de envío secundario al final de los campos desplegados.
-   - **Resultado:** Al pulsar en «Más filtros», el botón principal de aplicar queda visible de inmediato sin requerir scroll. Si el usuario navega hasta el final de las opciones avanzadas, dispone de un botón directo de envío al pie.
+   - En `src/app/peleadores/page.tsx`, se reordenó el componente `<BotonesFiltro>` antes del contenedor `<MasFiltros>`.
+   - **Resultado:** Al pulsar en «Más filtros», el botón «Aplicar filtros» queda visible de inmediato en la parte superior sin requerir scroll en móvil de 375 px, manteniendo un único botón en el formulario para satisfacer la invariante de usabilidad (`count() === 1`).
 
 ---
 
