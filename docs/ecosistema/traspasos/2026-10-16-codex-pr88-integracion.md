@@ -21,4 +21,4 @@
 
 ## Próximo paso
 
-Esperar la fusión del cambio móvil #96; comprobar que su árbol coincide con esta base. Publicar entonces la actualización de #88, conservar la revisión de Claude y comprobar todas las puertas del CI antes de plantear fusión. No se declara listo ni publicado todavía.
+#96 fusionado como `a5315ea8aa7cd93decf016df46ddd23ff2aa0309`, tras CI completo 38920179025 verde y revisión Luna sin hallazgos. Su árbol coincide exactamente con la base candidata usada aquí. Se actualiza el PR propio #88 conservando su historial, con la principal real como padre adicional. La revisión de Claude sobre permisos sigue documentada; CI completo de esta integración pendiente antes de plantear fusión.
