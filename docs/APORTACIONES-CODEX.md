@@ -411,6 +411,23 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
 
+## 2026-10-15 — Gimnasios aportados desde fichas, pendientes de revisión
+**Pedido:** cuarto punto del relevo: PENDING si no lo hace moderación.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/gimnasios-desde-fichas-en-revision-20261015`.
+**Cambios:** política de altas indirectas común en fighters.ts (alta y edición), profiles.ts (edición de entrenador) y trainers.ts (alta de entrenador, también publicaba por defecto). Solo moderación y con provincia admitida publica; los upsert existentes mantienen update vacío, sin cambiar estados ya revisados/retirados. Sin migración. El recorrido flujo revisa y publica expresamente su gimnasio antes de comprobar el sello, que sigue siendo independiente.
+**Pruebas:** matriz de roles y territorio; nuevo recorrido real de alta/edición de peleador y entrenador, moderación y conservación del estado existente. Validación en curso.
+**Siguiente:** revisión de Claude y T-009 en PR separado. No se cambia el estado histórico de gimnasios ya existentes.
+
+**Revisión de #90:** tipos, 15 unitarias específicas, documentación y controles locales pasan. El CI detectó dos expectativas de búsqueda que daban por publicado el gimnasio de una ficha; el guion comprueba ahora que permanece fuera de la búsqueda antes de revisión y lo publica desde moderación antes de comprobar búsqueda y metadatos. No se cambia la política ni se rebaja ninguna afirmación de búsqueda.
+
+## 2026-10-16 — Corrección del recorrido de altas de gimnasios (#90)
+**Pedido:** continuar las tareas de Lona según el encargo del 15 de octubre.
+**Cambio:** `gimnasios-altas.mjs` abre «Mis datos» y «Corregir los datos de mi ficha» antes de localizar el formulario, en las tres ediciones. El campo `gym` existe; el selector por botón no encontraba el formulario porque el desplegable cerrado oculta ese botón. Se mantienen las comprobaciones de revisión y estados, sin modificar el producto.
+**Validación:** sintaxis JavaScript correcta; catálogo y mapa se comprueban al cerrar esta entrega. Recorrido completo de navegador pendiente de CI; las ayudas utilizan psql con sintaxis de shell Unix. No se usa la base real para probar.
+**Siguiente:** esperar a #93, después #88 y #89; actualizar y renumerar #90 a 0.20.3 cuando le corresponda. No se fusiona nada.
+
+**Cierre de validación local (16-10):** `node --check tests/e2e/gimnasios-altas.mjs`, TypeScript (`node node_modules/typescript/bin/tsc --noEmit`), catálogo (445 archivos) y mapa comprobados correctamente. Las pruebas del catálogo dan 10 correctas y 1 bloqueada por EPERM al crear un enlace simbólico en Windows; no se modifica esa prueba. Recorrido real pendiente del CI.
+
 ## 2026-10-15 — Cesión de gimnasio con aceptación
 **Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/cesion-de-gimnasio-con-aceptacion-20261015`.
@@ -478,3 +495,14 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Encargo:** relevo de Claude en #95; cesión consentida aprobada por Claude comentario6195354039. Rama propia `codex/pr89-integracion-20261016`; merge de la base candidata0.20.3. Publicación después de fusionar #88.
 **Integración:** conserva modelos, acciones y pruebas de miembros, cesiones y entradas. Se unifican imports y las dos paginaciones de Mis gimnasios usan variables independientes. El recorrido gimnasios-cesion entra en orden.json sin quitar los anteriores. Migraciones originales intactas. Versión por script, ambas historias documentales conservadas.
 **Validación:** Prisma válido y generado; tipos, 910 unitarias, versión, catálogo y mapa correctos. Compilación completa BUILD_EXIT=0. Documentación33/34 por EPERMWindows al crear enlace simbólico, prueba intacta. Sin migraciones ni datos reales alterados; CI remoto pendiente.
+
+
+## 2026-10-16 - Codex - Integración local de #90 (0.20.5)
+**Encargo:** relevo de Claude en #95 y corrección del campo gym en Mi ficha. Se conserva la apertura de la pestaña y el desplegable antes de buscar el formulario, ya publicada en6b62681.
+**Integración:** merge de base candidata1174eac (invitaciones, cesiones y entradas) en rama propia codex/pr90-integracion-20261016. Traspaso remoto anterior preservado. El recorrido gimnasios-altas entra en orden.json. Sin cambios en las reglas de alta aprobadas por Claude, sin rebase.
+**Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos. Compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, prueba intacta. Sin migraciones ni cambios de datos reales. CI remoto pendiente; publicación después de fusionar #89.
+
+## Corrección del recorrido tras CI 38942511433
+- El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
+- Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
+- Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.

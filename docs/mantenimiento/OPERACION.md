@@ -72,3 +72,6 @@ La revisión de documentación requiere que la otra persona compruebe un flujo y
 
 ## Revisión visual aislada en desarrollo
 /revision-ui reutiliza la vista pública con fixtures ficticias por propiedades. No consulta contenido ni escribe datos. Solo desarrollo: producción devuelve 404. Estados en ?data=demo|extremo|vacio|uno|mil; vista=comun comprueba actualidad. tests/browser/responsive.mjs necesita servidor local dev y Chromium; CHROMIUM_PATH indica el ejecutable. Contratos y límites: [revisión del 13 de octubre](../REVISION-RESPONSIVE-20261013.md). No reemplaza la batería con base y permisos.
+
+### Recorrido de altas de gimnasios
+`tests/e2e/gimnasios-altas.mjs` abre la pestaña «Mis datos» y el resumen «Corregir los datos de mi ficha» antes de localizar el formulario por su botón. Un botón dentro de un `details` cerrado no está expuesto a `getByRole`; repetir la apertura después de navegar evita confundir un formulario cerrado con un campo ausente. No usar `includeHidden` ni `force` para omitir esos pasos.

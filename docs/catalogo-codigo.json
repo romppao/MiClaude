@@ -2368,5 +2368,10 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-altas.mjs",
+    "purpose": "Comprueba alta y edición desde peleador/entrenador, revisión previa, excepción de moderación y conservación del estado de clubes publicados o retirados.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

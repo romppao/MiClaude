@@ -21,7 +21,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | 16-10: #92 fusionado; #93 (fase 1, 0.20.0) con las correcciones de la revisión crítica, esperando CI y el «sí» del fundador. **Red de seguridad y flota** (este PR): `APROBADO.md`, `npm run verificar`, CI que no se para en el primer fallo, `scripts/flota.mjs` y `MODELOS-Y-ESFUERZO.md`. Siguiente: regresión visual. | `claude-code/veladas-entradas` (#93), `claude-code/red-seguridad` | en curso |
-| Codex | Actualiza #89 tras #88; revisiones de Claude y orden de fusión conservados. | `codex/pr89-integracion-20261016` | Preparación local sobre la base candidata 0.20.3; CI pendiente. |
+| Codex | Actualiza #90 tras invitaciones y cesiones; corrección de selector conservada. | `codex/pr90-integracion-20261016` | Preparación local sobre base candidata0.20.4; CI pendiente. |
 | Antigravity | Cuatro ajustes de móvil en Lona (375 px): portada, gimnasios, veladas y peleadores. Tipos, 858 unitarias y capturas antes/después verificadas. Versión 0.18.10. | `antigravity/ajustes-movil` | Completado localmente, pendiente de revisión de Claude Code |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 

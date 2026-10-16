@@ -309,6 +309,12 @@ check("el calendario marca como «no oficial» la velada que indicó un peleador
 await fan.goto(B + "/siguiendo");
 check("«Peleadores que sigo» muestra el próximo combate", await fan.locator("body").innerText().then((t) => t.includes(`Velada Futura ${rnd}`)));
 
+// El gimnasio aportado desde una ficha se revisa antes de publicarse; el sello es una decisión independiente.
+await admin.p.goto(B + "/moderacion/gimnasios");
+const gymPending = admin.p.locator('#pendientes article', { hasText: `Gym Test ${rnd}` });
+await gymPending.locator('select[name=status]').selectOption("PUBLISHED");
+await gymPending.getByRole("button", { name: "Guardar gimnasio", exact: true }).click();
+await admin.p.locator('.notice-ok').waitFor();
 // Sello de verificado del gimnasio (exige nota con la evidencia) e historial de cambios
 await admin.p.goto(B + "/moderacion");
 const gymRow = () => admin.p.locator("tr, article[data-cola]", { hasText: `Gym Test ${rnd}` });

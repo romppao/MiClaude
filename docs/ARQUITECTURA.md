@@ -422,6 +422,10 @@ Ficha [`tareas/T-015-entrar-con-google.md`](tareas/T-015-entrar-con-google.md) y
 ## Avisos y referencias de vídeos (H)
 `Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.
 
+## Revisión de gimnasios aportados desde fichas (15-10-2026)
+
+`newGymStatus` centraliza el alta indirecta: PENDING salvo moderación y provincia conocida/admitida. La usan el alta y edición del peleador, el alta del entrenador y la edición de su gimnasio. El estado se aplica solo en create del upsert; update vacío conserva los clubes ya publicados o retirados. Pertenecer a una ficha pública no publica el gimnasio: moderación lo revisa en /moderacion/gimnasios. Dar el sello y publicar son decisiones distintas. No se modifica el histórico.
+
 ## Cesiones de gimnasio con aceptación (15-10-2026)
 
 El titular invita a un correo, registrado o no. La respuesta y redirección no dependen de la existencia de cuenta, de un bloqueo o del cupo de invitaciones. Solo se contacta cuando corresponde: hayBloqueo se comprueba con la cuenta actual y de nuevo al responder, por si se creó después. El enlace aleatorio de 256 bits se guarda como SHA-256, caduca a los 14 días y exige el correo destinatario confirmado. No se exporta el hash ni el enlace secreto en la copia de datos.
