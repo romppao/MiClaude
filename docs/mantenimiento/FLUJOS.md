@@ -47,6 +47,8 @@ sequenceDiagram
 
 `setBoutResult` anota resultados; `updateEvent` y `setEventStatus` modifican datos/estado y los cálculos excluyen cancelaciones. No asumir que esas acciones envían avisos de todos los cambios: verificar sus llamadas a `after` antes de prometerlo. La ficha incluye entradas externas si existe `ticketUrl`; la retransmisión no tiene campo dedicado en esta base.
 
+Las reservas de entradas en Lona se coordinan con el bloqueo `entradas:<eventId>`: reservar relee las condiciones de venta, el aforo, el precio y el horario; confirmar una señal relee la reserva y el aforo. Una pendiente vencida no ocupa plaza aunque aún no figure como `EXPIRED`: para confirmarla tarde debe caber y no debe existir otra activa de esa persona (pendiente vigente o confirmada, con otro identificador). Guardar las condiciones comprueba y actualiza el aforo bajo el mismo bloqueo, tras subir el cartel y antes de borrar el anterior. Editar fecha u hora acorta los plazos pendientes que superen el nuevo cierre, dentro de la misma transacción, sin alargarlos ni cambiar directamente su estado. El horario de Madrid se calcula en dos pasadas; las pruebas unitarias cubren los cambios de marzo y octubre de 2026. Las pruebas de acciones usan una transacción simulada: no acreditan concurrencia real en PostgreSQL.
+
 Si falta un correo: comprobar origen de la llamada, fecha, seguimiento, `emailVerifiedAt`, `notifyEmails`, configuración y resultado del proveedor. Una escritura correcta no demuestra envío. Pruebas: `notify.test.ts`, `tests/e2e/paneles.mjs`, `calendario.mjs`.
 
 ## 4. Dar aura y consultar ránking

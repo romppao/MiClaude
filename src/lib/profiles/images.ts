@@ -1,18 +1,20 @@
 import sharp from "sharp";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+// El cartel de una velada suele ser vertical: cabe en 1200×1800 sin recortarse.
+const TAMANO = { avatar: { width: 640, height: 640 }, banner: { width: 1920, height: 1200 }, poster: { width: 1200, height: 1800 } };
 /**
  * Devuelve bytes WebP de JPEG/PNG/WebP estático de hasta 4 MiB y 25 millones de píxeles.
  * Orienta según metadatos, reduce dentro del tamaño del slot y no amplía. El formato declarado por
  * el formulario no es suficiente: sharp comprueba la imagen real. Rechaza vacío, exceso o animación
  * con imagen_invalida; errores de decodificación también se propagan y la acción los traduce.
  */
-export async function normalizeImage(file: File, slot: "avatar" | "banner") {
+export async function normalizeImage(file: File, slot: "avatar" | "banner" | "poster") {
   if (file.size > MAX_IMAGE_BYTES || !file.size) throw new Error("imagen_invalida");
   const input = Buffer.from(await file.arrayBuffer());
   const pipeline = sharp(input, { limitInputPixels: 25000000, failOn: "warning" });
   const metadata = await pipeline.metadata();
   if (!metadata.format || !["jpeg", "png", "webp"].includes(metadata.format) || (metadata.pages ?? 1) > 1) throw new Error("imagen_invalida");
-  return new Uint8Array(await pipeline.rotate().resize({ width: slot === "avatar" ? 640 : 1920, height: slot === "avatar" ? 640 : 1200, fit: "inside", withoutEnlargement: true }).webp({ quality: 85 }).toBuffer());
+  return new Uint8Array(await pipeline.rotate().resize({ ...TAMANO[slot], fit: "inside", withoutEnlargement: true }).webp({ quality: 85 }).toBuffer());
 }
 /** Porcentaje entero 0–100 para encuadre; devuelve null ante vacío, signo, decimal o valor fuera del rango. */
 export function imagePosition(raw: string) {

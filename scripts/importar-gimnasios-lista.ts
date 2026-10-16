@@ -4,6 +4,8 @@
 //
 //   npx tsx scripts/importar-gimnasios-lista.ts              → recuento: qué se crearía, qué ya existe y qué se descarta. No escribe nada.
 //   npx tsx scripts/importar-gimnasios-lista.ts --aplicar    → lo carga. Solo con DEMO_MODE=si (nunca en la versión real sin el fundador).
+//   npx tsx scripts/importar-gimnasios-lista.ts --actualizar → solo pone la dirección y la ciudad de la lista en los gimnasios ya cargados
+//                                                              desde ella (GYM_IMPORTED_LIST) que nadie ha reclamado, y los vuelve a ubicar.
 //
 // Reglas: nunca toca un gimnasio que ya exista con el mismo nombre en la misma provincia (ni reclamados ni corregidos); descarta Cataluña;
 // solo se publica con confianza «alta» y fuente de menos de un año (`fechaFuente`); el resto queda «por revisar» en moderación. Cada ficha
@@ -52,6 +54,24 @@ async function main() {
   if (aplicar && process.env.DEMO_MODE !== "si") throw new Error("La carga solo se hace en la demo (DEMO_MODE=si). En la versión real, primero el fundador.");
   const filas: Fila[] = JSON.parse(readFileSync(resolve(process.cwd(), "docs/datos/gimnasios-investigados.json"), "utf8"));
   const db = new PrismaClient();
+  if (process.argv.includes("--actualizar")) {
+    if (process.env.DEMO_MODE !== "si") throw new Error("Solo en la demo (DEMO_MODE=si).");
+    const cargados = new Set((await db.auditLog.findMany({ where: { entity: "GYM", action: "GYM_IMPORTED_LIST" }, select: { entityId: true } })).map((a) => a.entityId));
+    const gyms = await db.gym.findMany({ where: { id: { in: [...cargados] }, ownerUserId: null }, select: { id: true, name: true, province: true, city: true, address: true } });
+    const porClave = new Map(gyms.map((g) => [`${gymNameKey(g.name)}|${g.province}`, g]));
+    let actualizados = 0;
+    for (const fila of filas) {
+      const p = prepararFila(fila);
+      const g = p.ok ? porClave.get(`${gymNameKey(p.datos.name)}|${p.datos.province}`) : undefined;
+      if (!p.ok || !g || (g.address === p.datos.address && g.city === p.datos.city) || !p.datos.address) continue;
+      await db.gym.update({ where: { id: g.id }, data: { address: p.datos.address, city: p.datos.city, lat: null, lng: null, geoSource: null, geocodedAt: null } });
+      await db.auditLog.create({ data: { entity: "GYM", entityId: g.id, action: "GYM_LIST_ADDRESS_UPDATED", before: { address: g.address, city: g.city }, after: { address: p.datos.address, city: p.datos.city } } });
+      actualizados++;
+    }
+    console.log(`Direcciones actualizadas: ${actualizados}.`);
+    await db.$disconnect();
+    return;
+  }
   const existentes = await db.gym.findMany({ select: { name: true, province: true } });
   const yaEstan = new Set(existentes.map((g) => `${gymNameKey(g.name)}|${g.province}`));
   const recuento = { crear: 0, publicados: 0, porRevisar: 0, yaExisten: 0, descartados: 0, provincias: {} as Record<string, number>, motivos: {} as Record<string, number> };

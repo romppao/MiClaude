@@ -200,6 +200,21 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261015180000_invitaciones_miembros/migration.sql",
+    "purpose": "Añade invitaciones de miembros con claves foráneas, índices y restricción que exige una única ficha de peleador o entrenador; sin cambiar afiliaciones existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261015190000_cesion_con_aceptacion/migration.sql",
+    "purpose": "Añade invitaciones de cesión con hash único del enlace, correo destinatario e índices y claves foráneas de gimnasio y remitente; no altera propietarios.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "prisma/migrations/20261016090000_entradas_y_cartel/migration.sql",
+    "purpose": "Hora de inicio, cartel (posterKey/posterAt y la tabla EventPoster), condiciones de las entradas de la velada y la tabla TicketReservation.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -245,6 +260,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "scripts/e2e-local.mjs",
+    "purpose": "Recorridos de navegador en el propio equipo con un solo comando: base PostgreSQL desechable en Docker, migraciones, compilación, servidor, recorridos y limpieza; sustituto de psql en Windows.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/e2e-todos.mjs",
+    "purpose": "Ejecuta los recorridos de tests/e2e/orden.json sin pararse en el primero que falla y resume al final cuáles fallaron (npm run test:e2e, también en el CI).",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
     "path": "scripts/entorno-aislado.sh",
     "purpose": "Gestiona base y servidor propios por nombre/puerto para que asistentes no compartan datos de pruebas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -253,6 +278,31 @@
     "path": "scripts/estado.mjs",
     "purpose": "Estado vivo del trabajo en equipo: versión de la demo, ramas y PR en curso, ficheros que dos trabajos tocan a la vez y «reservar» un trabajo con una rama vacía que no lanza el CI. Complementa a docs/ESTADO.md.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "scripts/flota-barra.mjs",
+    "purpose": "Barra de estado de Claude Code con el flujo de la flota: modelo de la sesión, tarea, ronda y estado de cada paso, leídos de ~/.lona-flota/estado.json. Autónoma para poder instalarse en ~/.claude.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-estado.mjs",
+    "purpose": "Estado en vivo de la flota en ~/.lona-flota/estado.json: pasos, quién los hace, tiempos, veredicto e historial; lo escriben scripts/flota.mjs y Claude, y lo leen la barra y el panel.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-panel.mjs",
+    "purpose": "Panel local (http://localhost:4777) con el diagrama del flujo Claude + Codex en vivo: paso activo, reloj, veredicto, hallazgos e historial.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota-veredicto.schema.json",
+    "purpose": "Esquema JSON del veredicto que devuelven los revisores de la flota (aprobar, cambios o rechazar, con resumen y hallazgos).",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
+    "path": "scripts/flota.mjs",
+    "purpose": "Flujo Claude + Codex: Codex ejecuta una ficha en una copia aparte, pasan las puertas y revisa Luna o Astra; elige modelo y esfuerzo según complejidad y riesgo. Nunca guarda ni fusiona.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "scripts/fotos-al-almacen.ts",
@@ -283,6 +333,21 @@
     "path": "scripts/importar-gimnasios-osm.mjs",
     "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
     "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/retirar-gimnasios-ficticios.ts",
+    "purpose": "Cuenta o retira (REMOVED, reversible) los gimnasios ficticios de la demo cuando ya hay gimnasios reales; solo con DEMO_MODE=si y desde el botón de GitHub.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/ubicar-gimnasios.ts",
+    "purpose": "Ubica de una vez en el mapa los gimnasios publicados sin coordenadas (Nominatim, una consulta por segundo) tras una carga grande; se lanza desde el botón de GitHub de la demo.",
+    "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/verificar.mjs",
+    "purpose": "Todas las puertas del CI en un comando (versión, documentación, catálogo, mapa, tipos, pruebas y, con --e2e, recorridos), sin pararse en la primera que falla.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "scripts/version.mjs",
@@ -397,6 +462,11 @@
   {
     "path": "src/app/actions/demo.ts",
     "purpose": "Confirma correo y cambia papel solo en copia de demostración habilitada; no debe habilitarse para personas/datos reales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/entradas.ts",
+    "purpose": "Cartel y entradas de una velada: la promotora guarda cartel, precio, aforo y Bizum; el público reserva y cancela; la promotora confirma la señal, valida en la puerta, deshace y cancela.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -715,6 +785,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/ReservaEntradas.tsx",
+    "purpose": "Formulario de reserva de entradas con el desglose al momento: total, señal por Bizum y lo que queda para la puerta.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/SeleccionLote.tsx",
     "purpose": "«Marcar todas» y recuento de casillas marcadas para responder a varias solicitudes a la vez.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -960,6 +1035,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/mis-entradas/page.tsx",
+    "purpose": "Pantalla «Mis entradas»: reservas de la persona con el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/mis-gimnasios/page.tsx",
     "purpose": "Área privada de búsqueda, reclamación y gestión del gimnasio propio, con edición, miembros, retirada y cesión de propiedad.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -1006,7 +1086,7 @@
   },
   {
     "path": "src/app/moderacion/page.tsx",
-    "purpose": "Colas moderadoras de combates, avisos (con vídeos y fotos), reclamaciones, organizadores y gimnasios; enlaza a fuentes de noticias; conserva filtros tras decidir.",
+    "purpose": "Bandeja única protegida de moderación por urgencia, con páginas independientes, avisos sin cuenta/PAGINA y decisiones según entidad y estado; conserva versiones de combate y notas de resolución.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1032,6 +1112,16 @@
   {
     "path": "src/app/organizador/[slug]/emparejar/page.tsx",
     "purpose": "Ayuda para emparejar: nivel de cada aceptado y los rivales más parecidos de su categoría, con botón para añadir el combate al cartel.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/entradas/csv/route.ts",
+    "purpose": "Descarga en CSV de las reservas de entradas de una velada con los mismos filtros que la pantalla; solo su organizador o la administración.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/entradas/page.tsx",
+    "purpose": "Reservas de entradas de una velada para su promotora: resumen, filtros por estado, búsqueda por código y botones de señal, puerta, deshacer y cancelar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1187,6 +1277,11 @@
   {
     "path": "src/app/veladas/[slug]/calendario/route.ts",
     "purpose": "GET público de calendario ICS solo para veladas publicadas; sin datos personales ni descarga de veladas ocultas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/veladas/[slug]/cartel/route.ts",
+    "purpose": "Imagen del cartel de una velada visible (WebP), del almacén de fotos o de EventPoster; caché larga si la dirección lleva versión.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1505,6 +1600,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "src/lib/events/entradas.ts",
+    "purpose": "Reglas de las entradas: señal del 50 %, plazos (24 h y cierre 3 h antes), códigos LONA-, Bizum, plazas ocupadas, caducidad y lista de reservas de la promotora.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/events/pairing.ts",
     "purpose": "Distancia y parecido entre dos peleadores (experiencia, peso, victorias, aura, edad) y avisos de diferencias para la ayuda a emparejar.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1705,9 +1805,19 @@
     "guide": "docs/REVISION-RESPONSIVE-20261013.md"
   },
   {
+    "path": "tests/documentacion/aprobado.test.mjs",
+    "purpose": "Vigila docs/APROBADO.md: cada función aprobada por el fundador conserva la prueba y la comprobación exacta que la protegen.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
     "path": "tests/documentacion/catalogo.test.mjs",
     "purpose": "Prueba el control de cobertura en repositorios temporales: altas/bajas, duplicados, guías, rutas, cambios, estabilidad y escritura solo al generar.",
     "guide": "docs/mantenimiento/README.md"
+  },
+  {
+    "path": "tests/documentacion/e2e.test.mjs",
+    "purpose": "Vigila tests/e2e/orden.json: ningún recorrido de navegador queda fuera del CI por olvido ni figura sin existir.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "tests/documentacion/estado.test.mjs",
@@ -1780,6 +1890,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/entradas.mjs",
+    "purpose": "Prueba de navegador del cartel y las entradas: abrir la venta, reservar, señal, puerta, deshacer, cancelar, aforo, caducidad, CSV y permisos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/escenarios.mjs",
     "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1802,6 +1917,16 @@
   {
     "path": "tests/e2e/flujo.mjs",
     "purpose": "Recorre cuentas y combate de extremo a extremo, respuesta del rival, aura y resultados con estados visibles.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-cesion.mjs",
+    "purpose": "Cesión real por invitación: cuenta existente y posterior al correo, respuesta indistinguible, aceptación única, ajenos, bloqueos, cancelación, caducidad y confirmaciones a ambas personas.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-invitaciones.mjs",
+    "purpose": "Recorre invitaciones reales de miembros: consentimiento de peleador y entrenador, rechazo/cancelación, bloqueos, cambio de titular y copia privada de datos.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1855,13 +1980,18 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/orden.json",
+    "purpose": "Lista ordenada de los recorridos de navegador que ejecuta el CI y de los archivos de tests/e2e que van aparte, con su motivo.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
+  },
+  {
     "path": "tests/e2e/paneles-agenda.mjs",
     "purpose": "Flujos G en CI con base de pruebas: marcar/quitar asistencia, agenda, provincia, calendario público, disponibilidad y preparación.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "tests/e2e/paneles-avisos.mjs",
-    "purpose": "Comprueba avisos y exportación propios, manipulación de destinatario, referencias y retirada del vídeo original, prioridad/anclas de moderación y axe.",
+    "purpose": "Recorridos reales de avisos privados, referencias de highlights y bandeja única: prioridades, remitente sin cuenta, PAGINA, las tres decisiones de combate y accesibilidad.",
     "guide": "docs/AVISOS.md"
   },
   {
@@ -1935,6 +2065,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/ajustes-movil.test.ts",
+    "purpose": "Prueba los cuatro ajustes de móvil en Lona (portada, gimnasios, veladas y filtros de peleadores).",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/arquitectura.test.ts",
     "purpose": "Vigila dominios/importaciones, separación lib/app, directivas y exportaciones de acciones y ausencia de rutas antiguas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2005,6 +2140,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/entradas.test.ts",
+    "purpose": "Reglas de las entradas: señal redondeada, horas, Bizum, plazos, cierre y motivos para no reservar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/env.test.ts",
     "purpose": "Prueba validación de entorno y requisitos al arrancar producción sin depender de secretos reales.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2017,6 +2157,11 @@
   {
     "path": "tests/unit/fotos.test.ts",
     "purpose": "Almacén de fotos en disco, sin almacén y en R2 simulado: firma, lectura, 404, rechazo y borrado que no lanza.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/geo-direcciones.test.ts",
+    "purpose": "Comprueba las formas sencillas de una dirección (sin nave, local, paréntesis ni artículos) que se prueban cuando el mapa no reconoce la original.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -2078,6 +2223,11 @@
     "path": "tests/unit/multimedia.test.ts",
     "purpose": "Comprueba reglas de vídeos y fotos, claves por usuario, rutas sin salir de la carpeta, elección de almacén y configuración R2 incompleta.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/nombre-lona.test.ts",
+    "purpose": "Comprueba que el nombre retirado de la app («Ring España») no vuelve a ningún texto del código ni de la semilla.",
+    "guide": "docs/RED-DE-SEGURIDAD.md"
   },
   {
     "path": "tests/unit/noticias.test.ts",
@@ -2217,16 +2367,6 @@
   {
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
-    "guide": "docs/mantenimiento/OPERACION.md"
-  },
-  {
-    "path": "prisma/migrations/20261015190000_cesion_con_aceptacion/migration.sql",
-    "purpose": "Añade invitaciones de cesión con hash único del enlace, correo destinatario e índices y claves foráneas de gimnasio y remitente; no altera propietarios.",
-    "guide": "docs/mantenimiento/DATOS.md"
-  },
-  {
-    "path": "tests/e2e/gimnasios-cesion.mjs",
-    "purpose": "Cesión real por invitación: cuenta existente y posterior al correo, respuesta indistinguible, aceptación única, ajenos, bloqueos, cancelación, caducidad y confirmaciones a ambas personas.",
     "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["veredicto", "resumen", "hallazgos"],
+  "properties": {
+    "veredicto": { "type": "string", "enum": ["aprobar", "cambios", "rechazar"] },
+    "resumen": { "type": "string" },
+    "hallazgos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["archivo", "problema", "gravedad"],
+        "properties": {
+          "archivo": { "type": "string" },
+          "problema": { "type": "string" },
+          "gravedad": { "type": "string", "enum": ["alta", "media", "baja"] }
+        }
+      }
+    }
+  }
+}
