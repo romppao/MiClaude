@@ -13,8 +13,6 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [0.23.1] — 2026-10-17
 
-## [0.23.1] — 2026-10-17
-
 PR de Claude Code: **logotipos de gimnasios** (petición del fundador: «las imágenes de los gimnasios» y «los logos se pueden encontrar muy fácil… en su web»). Hasta ahora ningún gimnasio de la demo tenía foto, y la lista solo enseñaba iniciales.
 
 ### Añadido
