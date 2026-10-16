@@ -2,6 +2,7 @@
 // Todo lo que se exporta aquí es un punto de entrada público del servidor (POST): los ayudantes van sin exportar o en ./shared.
 "use server";
 
+import { cierreDeReservas, parseHora } from "../../lib/events/entradas";
 import { notifyFollowedBout } from "../../lib/community/notifications";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
@@ -21,7 +22,7 @@ import { WITHOUT_BOUT_BACKING } from "../../lib/aura/trajectory";
 import { pairKey, validateOutcome } from "../../lib/bouts/rules";
 import { LIMITS } from "../../lib/common/text";
 import { parseTipoDeEntidad } from "../../lib/accounts/landing";
-import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug } from "./shared";
+import { Rechazo, checkLengths, coherenceFlagsFor, ensureDiscipline, go, guard, intOrNull, listFighters, ownEvent, readProvince, str, uniqueSlug, withLock } from "./shared";
 import { registrarFallo } from "../../lib/common/fallos";
 
 /** Marca o retira intención de asistir; las cuentas solo pueden modificar su propia marca. */
@@ -76,6 +77,8 @@ export async function createEvent(f: FormData) {
   const ticketRaw = str(f, "ticketUrl");
   const ticketUrl = ticketRaw ? safeHttpsUrl(ticketRaw) : null;
   if (ticketRaw && !ticketUrl) go(back, { problema: "entradas_https" });
+  const startMinute = str(f, "hora") ? parseHora(str(f, "hora")) : null;
+  if (str(f, "hora") && startMinute === null) go(back, { problema: "hora_invalida" });
   const base = slugify(`${name} ${dayKey(date)}`) || `velada-${dayKey(date)}`;
   if (await db.event.findFirst({ where: { organizerId: user.id, slug: { startsWith: base }, name, date } })) go(back, { problema: "velada_duplicada" });
   const created = await guard(back, async () => {
@@ -83,7 +86,7 @@ export async function createEvent(f: FormData) {
     return db.event.create({
       data: {
         slug, name, kind, date, discipline, level, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province,
-        promoter: str(f, "promoter") || null, ticketUrl, organizerId: user.id, createdById: user.id,
+        promoter: str(f, "promoter") || null, ticketUrl, startMinute, organizerId: user.id, createdById: user.id,
         // Inscripción de peleadores abierta desde el principio si el organizador lo deja marcado (y el evento aún no se ha celebrado).
         registrationOpen: str(f, "inscripcion") === "1" && dayKey(date) >= todayMadrid(),
         status: dayKey(date) < todayMadrid() && user.role !== "ADMIN" ? "PENDING_AUTHORIZATION" : "SCHEDULED",
@@ -186,6 +189,9 @@ export async function updateEvent(f: FormData) {
   const ticketRaw = str(f, "ticketUrl");
   const ticketUrl = ticketRaw ? safeHttpsUrl(ticketRaw) : null;
   if (ticketRaw && !ticketUrl) go(back, { problema: "entradas_https" });
+  // La hora solo cambia si el formulario la trae (vacía = sin hora).
+  const startMinute = f.has("hora") ? (str(f, "hora") ? parseHora(str(f, "hora")) : null) : event.startMinute;
+  if (str(f, "hora") && startMinute === null) go(back, { problema: "hora_invalida" });
   const disciplineRaw = str(f, "discipline");
   const discipline: Discipline = isDiscipline(disciplineRaw) ? disciplineRaw : event.discipline;
   const kind = parseEventKind(str(f, "kind")) ?? event.kind;
@@ -194,15 +200,23 @@ export async function updateEvent(f: FormData) {
   const status = ["PENDING_AUTHORIZATION", "REJECTED"].includes(event.status)
     ? (dayKey(date) < todayMadrid() ? "PENDING_AUTHORIZATION" as const : "SCHEDULED" as const)
     : pasaAPasada && event.status !== "CANCELLED" ? "PENDING_AUTHORIZATION" as const : undefined;
-  const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl,
+  const data = { name, kind, date, discipline, venue: str(f, "venue") || "Por confirmar", city: str(f, "city") || province, province, promoter: str(f, "promoter") || null, ticketUrl, startMinute,
     ...(status && { status }) };
-  await guard(back, () => db.$transaction(async (tx) => {
+  await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
     // Los métodos de terminar combate y las categorías dependen de la disciplina: no se cambia con combates en el cartel.
     if (discipline !== event.discipline && (await tx.bout.count({ where: { eventId: event.id } })) > 0) throw new Rechazo("velada_disciplina_con_cartel");
     const bouts = await tx.bout.findMany({ where: { eventId: event.id }, include: { fighterA: true, fighterB: true } });
     if (bouts.some(b => !knownBoxingAgeEligible(event.discipline,event.level,b.fighterA.birthDate,date) || !knownBoxingAgeEligible(event.discipline,event.level,b.fighterB.birthDate,date) || (b.divisionId !== null && (!divisionEligible(b.divisionId, b.fighterA.birthDate, date) || !divisionEligible(b.divisionId, b.fighterB.birthDate, date))))) throw new Rechazo("categoria_edad_combate");
     if (dayKey(date) !== dayKey(event.date) || name !== event.name) await tx.bout.updateMany({ where: { eventId: event.id }, data: WITHOUT_BOUT_BACKING });
-    await tx.event.update({ where: { id: event.id }, data });
+    const actual = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
+    const hora = f.has("hora") ? startMinute : actual.startMinute;
+    await tx.event.update({ where: { id: event.id }, data: { ...data, startMinute: hora } });
+    // Un cambio de fecha u hora solo acorta plazos, incluso cuando el nuevo cierre ya pasó.
+    // Comparar y escribir bajo el bloqueo impide que una reserva nazca con el horario anterior.
+    if (date.getTime() !== actual.date.getTime() || hora !== actual.startMinute) {
+      const cierre = cierreDeReservas(date, hora);
+      await tx.ticketReservation.updateMany({ where: { eventId: event.id, status: "PENDING_DEPOSIT", depositUntil: { gt: cierre } }, data: { depositUntil: cierre } });
+    }
     if (pasaAPasada) await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "PAST_EVENT_AUTHORIZATION_REQUESTED", after: { status: status ?? event.status, date } }, tx);
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "UPDATED", before: { name: event.name, kind: event.kind, date: event.date, discipline: event.discipline, venue: event.venue, city: event.city, province: event.province }, after: { name, kind, date, discipline, venue: data.venue, city: data.city, province } }, tx);
   }));

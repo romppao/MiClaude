@@ -193,7 +193,7 @@ export async function newUser(name, role = "FAN", verify = true, contextOptions 
 /** Ejecuta SQL directamente en la base de pruebas (solo para preparar datos que la web no permite crear en bloque). */
 /** Dirección (slug) de la ficha cuyo apellido es `apellidos`: las fichas provisionales de rivales no llevan el apellido en la dirección, así que se lee de la base de datos. */
 export const slugDe = (apellidos) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "select slug from \\"Fighter\\" where \\"lastName\\"='${apellidos}'"`).toString().trim();
-export const sql = (sentencias) => execSync('psql "$DATABASE_URL" -v ON_ERROR_STOP=1', { input: sentencias, env: process.env, stdio: ["pipe", "ignore", "inherit"] });
+export const sql = (sentencias) => execSync(`psql "${process.env.DATABASE_URL}" -v ON_ERROR_STOP=1`, { input: sentencias, env: process.env, stdio: ["pipe", "ignore", "inherit"] });
 
 /** Convierte a un usuario en moderador (solo posible con acceso a la base de datos). */
 export const hacerAdmin = (email) => execSync(`psql "${process.env.DATABASE_URL}" -c "update \\"User\\" set role='ADMIN' where email='${email}'"`);
@@ -217,7 +217,7 @@ export async function anadirAlCartel(p, nombreRojo, nombreAzul) {
 /** Un moderador aprueba la solicitud de organizador anotando la evidencia comprobada (es obligatoria) y espera a que salga de la cola. */
 export async function aprobarOrganizador(mod, nombreOrg) {
   await mod.goto(B + "/moderacion");
-  const fila = mod.locator("tr", { hasText: nombreOrg });
+  const fila = mod.locator("tr, article[data-cola]", { hasText: nombreOrg });
   await fila.locator("input[name=note]").fill("Web y redes comprobadas");
   await fila.locator("button:has-text('Aprobar')").click();
   await fila.waitFor({ state: "detached" });

@@ -40,6 +40,7 @@ export async function GET(request: Request) {
   const inscripciones = fighter ? await db.eventRegistration.findMany({ where: { fighterId: fighter.id }, include: { event: true }, orderBy: { createdAt: "desc" } }) : [];
   const solicitudesRecibidas = entrenador ? await db.classRequest.findMany({ where: { class: { trainerId: entrenador.id } }, include: { class: true, user: { select: { name: true } } }, orderBy: { createdAt: "desc" } }) : [];
 
+  const misEntradas = await db.ticketReservation.findMany({ where: { userId: user.id }, include: { event: { select: { name: true, date: true } } }, orderBy: { createdAt: "desc" } });
   const agenda = await db.eventAttendance.findMany({ where: { userId: user.id }, include: { event: { select: { name: true, date: true } } }, orderBy: { createdAt: "desc" } });
 
   const [misGimnasios, reclamacionesGimnasio, avisosPersonales] = await Promise.all([
@@ -74,6 +75,7 @@ export async function GET(request: Request) {
     invitacionesDeMiembroDeGimnasio: invitations.map(i => ({ gimnasio: i.gym.name, enviadaPorMi: i.senderId === user.id, estado: i.status, creadaEl: i.createdAt, caducaEl: i.expiresAt, respondidaEl: i.answeredAt })),
     gimnasiosQueGestiono: misGimnasios.map((g) => ({ nombre: g.name, ciudad: g.city, provincia: g.province, telefonoProfesional: g.phone, correoProfesional: g.email, estado: g.status, reclamadoEl: g.claimedAt })),
     reclamacionesDeGimnasio: reclamacionesGimnasio.map((c) => ({ gimnasio: c.gym.name, prueba: c.evidence, enlaceDePrueba: c.evidenceUrl, estado: c.status, nota: c.note, creadaEl: c.createdAt, revisadaEl: c.reviewedAt })),
+    entradasQueHeReservado: misEntradas.map((r) => ({ velada: r.event.name, fecha: r.event.date, codigo: r.code, entradas: r.quantity, totalEuros: r.totalEuros, senalEuros: r.depositEuros, estado: r.status, reservadaEl: r.createdAt, plazoDeLaSenal: r.depositUntil, confirmadaEl: r.confirmedAt, validadaEl: r.checkedInAt, canceladaEl: r.cancelledAt, canceladaPor: r.cancelledBy })),
     veladasQueHeMarcado: agenda.map((a) => ({ evento: a.event.name, fecha: a.event.date, marcadaEl: a.createdAt })),
     avisosDentroDeLaAplicacion: avisosPersonales.map((a) => ({ tipo: a.kind, titulo: a.title, destino: a.href, creadoEl: a.createdAt, leidoEl: a.readAt })),
     disponibilidadParaPelear: fighter && { activada: fighter.availableToFight, desde: fighter.availableSince, pesoDeclaradoKg: fighter.currentWeightKg },
