@@ -1,0 +1,548 @@
+{
+  "fecha": "2026-10-16T17:57:48.055Z",
+  "alcance": "Componentes reales con datos ficticios, sin base ni hidratación Next",
+  "cases": 36,
+  "results": [
+    {
+      "name": "peleadores-375-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 380.703125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 380.703125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 426.296875,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 426.296875,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none"
+        ],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "entrenadores-375-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 348.328125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 348.328125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 393.921875,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 393.921875,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "gimnasios-375-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 330.34375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 375.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "peleadores-375-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 380.703125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 380.703125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 426.296875,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 426.296875,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none"
+        ],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "entrenadores-375-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 348.328125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 348.328125,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 393.921875,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 393.921875,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "gimnasios-375-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 330.34375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 375.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "peleadores-1280-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root"
+        ],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "entrenadores-1280-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "gimnasios-1280-dark",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 330.34375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "peleadores-1280-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 395.90625,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root",
+          "flow-root"
+        ],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "entrenadores-1280-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 325.9375,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    },
+    {
+      "name": "gimnasios-1280-light",
+      "measures": {
+        "overflow": false,
+        "cards": [
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 330.34375,
+            "clipped": false,
+            "small": false
+          },
+          {
+            "height": 310,
+            "clipped": false,
+            "small": false
+          }
+        ],
+        "extra": [],
+        "targets": [
+          46,
+          46,
+          46,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      },
+      "violations": []
+    }
+  ],
+  "failures": []
+}

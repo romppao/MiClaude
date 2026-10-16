@@ -887,3 +887,45 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .boton-google img{flex:none}
 .separador-o{display:flex;align-items:center;gap:12px;margin:4px 0;color:var(--mut);font-size:16px}
 .separador-o::before,.separador-o::after{content:"";flex:1;border-top:1px solid var(--line)}
+
+/* Pantallas de acción guiadas (16 de octubre de 2026, petición del fundador: «muy poco visuales e intuitivas» para quien no domina el móvil):
+   pasos, carteles que se eligen tocando, accesos grandes arriba y ayuda recogida. components/GuiaAcciones.tsx. */
+.pasos-guia{list-style:none;margin:0;padding:0;display:flex;gap:8px}
+.pasos-guia li{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:22px;background:var(--soft);color:var(--mut);font:600 16px/1.2 var(--font)}
+.pasos-guia .num{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(var(--ink),.12);color:var(--text);font:800 16px var(--font)}
+.pasos-guia li.actual{background:var(--acc);color:var(--acc-ink)}
+.pasos-guia li.actual .num{background:var(--acc-ink);color:var(--acc)}
+.pasos-guia li.hecho{color:var(--text)}
+.pasos-guia li.hecho .num{background:var(--acc);color:var(--acc-ink)}
+.desliza-veladas{flex-wrap:nowrap;gap:12px;padding-bottom:8px;scroll-padding:0 16px}
+.desliza-veladas>.velada-elegir{flex:none;width:232px;scroll-snap-align:start}
+.leyenda-accion{display:flex;align-items:center;gap:10px;font:700 18px/1.2 var(--font);color:var(--text)}
+.leyenda-accion svg{flex:none;color:var(--acc-text)}
+.accesos-rapidos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex:none}
+.accesos-rapidos>.acceso-rapido:first-child{grid-column:1 / -1}
+.accesos-rapidos>.acceso-rapido:not(:first-child){flex-direction:column;align-items:flex-start;gap:8px}
+@media (min-width:640px){.accesos-rapidos{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.accesos-rapidos>.acceso-rapido:first-child{grid-column:auto}.accesos-rapidos>.acceso-rapido:not(:first-child){flex-direction:row;align-items:center;gap:12px}}
+.acceso-rapido{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 16px;border-radius:24px;background:var(--card);border:1px solid rgba(var(--ink),.07);color:var(--text);text-decoration:none;transition:transform .16s cubic-bezier(.23,1,.32,1),border-color .16s}
+.acceso-rapido:first-child{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.acceso-icono{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(var(--ink),.1);color:var(--acc-text)}
+.acceso-rapido:first-child .acceso-icono{background:var(--acc-ink);color:var(--acc)}
+.acceso-texto{display:flex;flex-direction:column;gap:2px;min-width:0}
+.acceso-texto strong{font:700 17px/1.2 var(--font)}
+.acceso-texto .meta{font-size:16px;line-height:1.3;color:inherit;opacity:.78}
+.acceso-rapido:active,.velada-elegir:active{transform:scale(.98)}
+@media (hover: hover) and (pointer: fine){.acceso-rapido:hover{border-color:var(--line-strong);color:var(--text)}.acceso-rapido:first-child:hover{color:var(--acc-ink);border-color:var(--acc)}}
+h2[id]{scroll-margin-top:84px}
+.ayuda-plegable{border-radius:22px;background:var(--soft)}
+.ayuda-plegable>summary{display:flex;align-items:center;min-height:48px;padding:0 18px;font-weight:600;cursor:pointer}
+.ayuda-plegable-cuerpo{padding:0 18px 14px}
+.ayuda-plegable-cuerpo>p{margin:0}
+.segmentos-tipo{display:flex;gap:2px;padding:4px;border-radius:28px;background:var(--soft)}
+.segmentos-tipo>.segmento{flex:1 1 0;min-height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:24px;color:rgba(var(--ink),.75);font:600 16px var(--font);text-decoration:none;text-align:center}
+.segmentos-tipo>.segmento[aria-current]{background:var(--inv);color:var(--inv-ink)}
+@media (hover: hover) and (pointer: fine){.segmentos-tipo>.segmento:hover{color:var(--text)}}
+.clase-icono{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--acc-text)}
+.vacio-guia{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:28px 20px;border-radius:28px;background:var(--card);border:1px solid rgba(var(--ink),.07)}
+.vacio-guia p{margin:0}
+.vacio-icono{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--acc-text)}
+.vacio-acciones{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
+@media (prefers-reduced-motion: reduce){.acceso-rapido,.velada-elegir{transition:none}.acceso-rapido:active,.velada-elegir:active{transform:none}}

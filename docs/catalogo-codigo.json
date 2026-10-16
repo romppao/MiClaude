@@ -685,6 +685,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/GuiaAcciones.tsx",
+    "purpose": "Piezas de las pantallas de acción guiadas: pasos («Paso 1 de 2»), carteles de velada para elegir tocando, accesos grandes con icono y ayuda plegable.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/Icono.tsx",
     "purpose": "Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control.",
     "guide": "docs/mantenimiento/MODULOS.md"

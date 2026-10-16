@@ -1,0 +1,10 @@
+﻿{"comprobacion":"Récord amateur oculto en siguiendo","recordPublic":false,"resultadoPublico":true,"metodoPublico":true}
+{"comprobacion":"Galería y fichas provisionales","apellidoCompletoPublicado":true}
+{"comprobacion":"Páginas legales","condiciones":false,"cookies":false,"privacidad":true}
+{"comprobacion":"Fecha inexistente","tipo":"sparring","aceptada":true,"fechaGuardada":"2026-12-01T00:00:00.000Z","texto":null}
+{"comprobacion":"Fecha inexistente","tipo":"clase","aceptada":true,"fechaGuardada":"2026-12-01T00:00:00.000Z","texto":"martes 1 de diciembre"}
+{"comprobacion":"Récord mixto en sparring","privacidadAmateur":true,"recordPublicado":"1-1-0"}
+{"comprobacion":"Resultado sin autorización","estadoInicial":"PENDING_AUTHORIZATION","estadoFinal":"COMPLETED","url":"/organizador/velada?aviso=resultado_guardado"}
+{"comprobacion":"Resultado sin autorización","estadoInicial":"REJECTED","estadoFinal":"COMPLETED","url":"/organizador/velada?aviso=resultado_guardado"}
+{"comprobacion":"Cancelar y reabrir sin autorización","estadoCancelado":"CANCELLED","estadoFinal":"COMPLETED"}
+{"comprobacion":"Mover futura a pasada","estadoFinal":"SCHEDULED","fecha":"2026-10-09T12:00:00.000Z"}
