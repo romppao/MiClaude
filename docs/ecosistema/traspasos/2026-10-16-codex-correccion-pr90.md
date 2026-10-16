@@ -1,4 +1,4 @@
-﻿# Codex — corrección del recorrido de altas de gimnasios
+# Codex — corrección del recorrido de altas de gimnasios
 
 - Fecha: 2026-10-16.
 - Objetivo: resolver el fallo comunicado en el PR #90.
