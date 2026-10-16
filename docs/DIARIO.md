@@ -2333,3 +2333,36 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 
 **Siguiente:** Revisión de Claude Code y confirmación del fundador.
 
+
+## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
+
+**Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
+
+**Decisiones:**
+- Los bytes del cartel, cuando no hay almacén de fotos, van a una tabla aparte (`EventPoster`). Muchas consultas leen la velada entera; con la imagen en `Event` la habrían arrastrado todas. Se probó a omitirla con el `omit` global de Prisma, pero cambia el tipo del cliente y rompía una decena de sitios. `Event.posterAt` dice si hay cartel y versiona su dirección, así la caché puede ser larga.
+- La hora se edita en «Datos de la velada» (también al crearla). El formulario de entradas ya no la toca, para no borrarla sin querer.
+- El precio solo se anuncia en la tarjeta del calendario cuando se puede reservar: si la venta está cerrada, podría estar desfasado.
+- Cancelar una reserva desde la promotora pide confirmación (no se puede deshacer). Validar en la puerta sí se puede deshacer.
+- La promotora ve el nombre y el correo de quien reserva (lo necesita para devolver una señal). Se avisa en el formulario de reserva.
+
+**Validación:** tipos y compilación correctos; 851 de 853 pruebas unitarias en este portátil. Fallan las dos de contraseñas por pasar de 5 s con el equipo cargado, como ya pasó otras veces en local. Las de entradas pasan. La prueba de navegador `tests/e2e/entradas.mjs` se ejecuta en el CI (Linux), porque las ayudas de las pruebas usan `psql` y variables de shell que no hay en Windows.
+
+**Pendiente:** el #92 ya está fusionado (autorizado por el fundador el 15-10 por la noche). Quedan este PR (#93) y los de Codex #88–#91, que se fusionan solo con el «sí» del fundador (el clasificador de seguridad de Claude Code no deja fusionar sin esa autorización). Después, la fase 2 (agenda del entrenador).
+**16-10-2026 — Revisión crítica de la fase 1 (flujo Claude + Codex):** `gpt-6-astra` revisó el PR #93 en solo lectura y señaló cinco fallos (confirmación de señal tardía sin comprobar aforo ni reserva activa, aforo guardado fuera del bloqueo, reserva con datos leídos antes del bloqueo, plazos que no se acortaban al adelantar la velada y desfase de una hora en los cambios de horario). Claude los verificó leyendo el código; Codex (`gpt-6.1-sol`, esfuerzo medio, ≈ 91.000 tokens) los arregló en una copia aparte con 34 pruebas nuevas; `gpt-6-luna` revisó los arreglos y aprobó. Claude añadió la retirada del cartel huérfano. Comprobado: tipos, 887 pruebas unitarias y los recorridos `entradas`, `calendario`, `inscripciones`, `veladas-pasadas`, `plazas` y `paneles-avisos` en local. No se probó concurrencia real contra PostgreSQL (solo lógica y bloqueos en pruebas con transacciones simuladas).
+
+## 16 de octubre de 2026 — Red de seguridad y flujo Claude + Codex (Claude Code)
+
+**Encargo:** el fundador pidió un sistema para no romper lo ya aprobado, replicar el flujo del vídeo de @robles.ia (Opus planifica y decide, Codex ejecuta, dos revisores) y una política de modelos y esfuerzo para Claude y Codex.
+
+**Decisiones:** el registro `APROBADO.md` ancla cada función aprobada a una prueba concreta; el CI deja de pararse en el primer recorrido que falla; la flota nunca guarda ni fusiona por su cuenta; el revisor crítico (Astra) solo se usa con dinero, permisos, datos personales o secretos. Se instaló el plugin oficial `codex@openai-codex`; no se usó `npx -y codex mcp-server` porque el paquete npm «codex» es otro proyecto y ese modo no existe en Codex 0.160.1.
+
+**Validación:** pruebas de documentación nuevas (19), comprobadas también a la inversa (fallan al quitar una comprobación aprobada o un recorrido); simulacros de la flota; la orden `revisar` usada de verdad sobre los arreglos del #93 (Luna aprobó); `e2e-local.mjs` usado de verdad (6 de 6 recorridos). La regresión visual queda para el siguiente PR.
+
+
+## 2026-10-16 - Codex - Revisión de los ajustes móviles #94 (0.20.2)
+
+**Encargo:** seguir el comentario de Claude en #94 y el orden de relevo de #95. Rama propia `codex/pr94-ajustes-movil-20261016`; no se modifica la rama de Antigravity.
+
+**Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
+
+**Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.

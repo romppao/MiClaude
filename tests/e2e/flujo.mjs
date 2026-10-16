@@ -1,8 +1,8 @@
-import { mostrar, datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
+import { mostrar, datosDeAlta, B, rnd, MAIL_LOG, browser, seen, check, btn, esperarCorreo, hoyMadrid, enDias, registrar, newUser, hacerAdmin, sql, solicitarOrganizador, anadirAlCartel, aprobarOrganizador, terminarDiagnosticos } from "./ayudas.mjs";
 // Prueba de extremo a extremo del flujo principal. Requiere el servidor en marcha con la BD de pruebas.
 // Variables de entorno: ver tests/e2e/ayudas.mjs.
 import { readFileSync } from "node:fs";
-import { execFileSync, execSync } from "node:child_process";
+import { execSync } from "node:child_process";
 const futura = enDias(120); // la aplicación no admite veladas a más de un año vista
 
 // 1) email sin verificar: no puede dar aura ni crear ficha
@@ -269,7 +269,7 @@ await vet.locator(".notice-ok", { hasText: "disciplina en tu ficha" }).waitFor()
 await registrar(vet, { disciplina: "MMA", evento: `Velada MMA Vet ${rnd}`, fecha: "2026-05-01", rivalNombre: "Vet", rivalApellidos: `Rival mma${rnd}`, metodo: "SUBMISSION" });
 await vet.locator(".notice-ok", { hasText: "Combate registrado" }).waitFor();
 // Para comprobar la vista pública con récord habilitado, madura ambos combates declarados de prueba.
-execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}')`]);
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name in ('Velada Vet ${rnd}', 'Velada MMA Vet ${rnd}');`);
 // Pasadas las 24 horas, el combate declarado ya suma: 10-3-1 de partida + 1-0-0 (comprobación recuperada el 14 de octubre de 2026).
 await vet.goto(B + "/mi-ficha");
 const recordMaduro = vet.locator(".rec", { hasText: /^\s*11-3-1\s*$/ }).first();
