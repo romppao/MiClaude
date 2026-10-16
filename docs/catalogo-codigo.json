@@ -635,6 +635,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/DirectorioNav.tsx",
+    "purpose": "Cabecera común de los directorios (peleadores, entrenadores y gimnasios): selector entre los tres y fila deslizable de disciplinas con filtro por enlace.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/DisciplineFields.tsx",
     "purpose": "Formulario de disciplina, nivel, categoría y antecedentes declarados; comparte catálogo con validación del servidor.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -802,6 +807,11 @@
   {
     "path": "src/app/components/Tarjetas.tsx",
     "purpose": "Tarjetas v3 de veladas, disciplinas, peleadores y gráfico de aura; reciben datos y no consultan la base.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/TarjetasDirectorio.tsx",
+    "purpose": "Carteles con foto de los directorios: TarjetaPersona (peleador o entrenador) y TarjetaGimnasioCartel; sin foto usan el color de la disciplina y las iniciales.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
