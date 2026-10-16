@@ -17,10 +17,19 @@ async function pending(name, label) {
   check(label, g.status === "PENDING" && (await fighter.p.request.get(B + `/gimnasios/${g.slug}`)).status() === 404);
   return g;
 }
+// El botón del formulario no está expuesto mientras el desplegable está cerrado.
+// Abrimos primero la pestaña y el resumen, también después de cada navegación.
+async function editarFicha(p) {
+  await p.goto(B + "/mi-ficha");
+  await p.getByRole("link", { name: "Mis datos", exact: true }).click();
+  await p.locator("summary", { hasText: "Corregir los datos de mi ficha" }).click();
+  const form = p.locator("form", { has: p.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }) });
+  await form.locator("[name=gym]").waitFor({ state: "visible" });
+  return form;
+}
 const initial = await createFighter(fighter, `Club Ficha Alta ${rnd}`);
 await pending(initial.name, "el gimnasio creado con la ficha del peleador queda pendiente y no se publica");
-await fighter.p.goto(B + "/mi-ficha");
-const edit = fighter.p.locator('form', { has: fighter.p.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }) });
+let edit = await editarFicha(fighter.p);
 await edit.locator('[name=gym]').fill(`Club Ficha Editada ${rnd}`); await edit.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }).click(); await fighter.p.locator('.notice-ok').waitFor();
 await pending(`Club Ficha Editada ${rnd}`, "también queda pendiente el gimnasio aportado al editar el peleador");
 await trainer.p.goto(B + "/mi-panel");
@@ -34,10 +43,10 @@ await pending(`Club Entrenador Editado ${rnd}`, "editar el gimnasio del entrenad
 const adminGym = await createFighter(mod, `Club Moderación Alta ${rnd}`);
 check("moderación puede crear un gimnasio publicado desde su ficha", adminGym.status === "PUBLISHED");
 // Vincular un club existente conserva su revisión, no lo retira ni lo vuelve a publicar.
-await fighter.p.goto(B + "/mi-ficha"); await edit.locator('[name=gym]').fill(adminGym.name); await edit.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }).click(); await fighter.p.locator('.notice-ok').waitFor();
+edit = await editarFicha(fighter.p); await edit.locator('[name=gym]').fill(adminGym.name); await edit.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }).click(); await fighter.p.locator('.notice-ok').waitFor();
 check("elegir un gimnasio ya publicado no cambia su estado", (await db.gym.findUniqueOrThrow({ where: { id: adminGym.id } })).status === "PUBLISHED");
 await db.gym.update({ where: { id: adminGym.id }, data: { status: "REMOVED" } });
-await fighter.p.goto(B + "/mi-ficha"); await edit.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }).click(); await fighter.p.locator('.notice-ok').waitFor();
+edit = await editarFicha(fighter.p); await edit.getByRole("button", { name: "Guardar los datos de mi ficha", exact: true }).click(); await fighter.p.locator('.notice-ok').waitFor();
 check("elegir un gimnasio retirado no lo republica", (await db.gym.findUniqueOrThrow({ where: { id: adminGym.id } })).status === "REMOVED");
 await mod.p.goto(B + "/moderacion/gimnasios");
 check("el gimnasio pendiente queda disponible para revisión", await mod.p.locator('#pendientes article', { hasText: initial.name }).count() === 1);

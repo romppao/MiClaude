@@ -2316,3 +2316,6 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 **Cambios:** política de altas indirectas común en fighters.ts (alta y edición), profiles.ts (edición de entrenador) y trainers.ts (alta de entrenador, también publicaba por defecto). Solo moderación y con provincia admitida publica; los upsert existentes mantienen update vacío, sin cambiar estados ya revisados/retirados. Sin migración. El recorrido flujo revisa y publica expresamente su gimnasio antes de comprobar el sello, que sigue siendo independiente.
 **Pruebas:** matriz de roles y territorio; nuevo recorrido real de alta/edición de peleador y entrenador, moderación y conservación del estado existente. Validación en curso.
 **Siguiente:** revisión de Claude y T-009 en PR separado. No se cambia el estado histórico de gimnasios ya existentes.
+
+## 16 de octubre de 2026 — Recorrido de edición de gimnasio
+Codex corrige la prueba de altas (#90): abre la pestaña «Mis datos» y el desplegable de corrección en cada visita antes de buscar el botón del formulario. El campo de gimnasio ya existía. No cambian permisos, datos ni comportamiento de la aplicación. Sintaxis comprobada; validación completa pendiente del CI. #93 sigue abierto, comprobado mediante el conector de GitHub; se mantiene el orden de integración acordado.

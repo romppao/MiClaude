@@ -419,3 +419,6 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - 15-10-2026, fundador → Codex: T-002 agrupa #17/#18/#19/#65/#66 en un único PR (0.17.2) tras T-013. Implementación preparada; pruebas en curso. Los PR originales quedan para cerrar tras integrar, sin alterar el calendario ni la política de saltos mayores de Dependabot.
 
 - 15-10-2026, fundador: unificar las altas de gimnasio desde fichas con la revisión previa del directorio; en pruebas.
+
+## 16 de octubre de 2026 — Perfiles de gimnasios
+Petición del fundador: dejar los perfiles de los gimnasios listos, con foto de perfil y banner con el logo del gimnasio. Alcance de clubes pendiente de concretar. Revisados el listado investigado (sin campos de imagen) y la vía existente de edición de perfiles. Preparar recursos con identidad real y fuente identificada; la carga queda pendiente de revisar destino y recursos.
