@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EXPLORAR, menuDe } from "../../src/lib/accounts/menu";
+import { CLASES_Y_ENTRENADORES, EXPLORAR, menuDe } from "../../src/lib/accounts/menu";
 
 const enlaces = (...a: Parameters<typeof menuDe>) => menuDe(...a).flatMap((s) => s.enlaces.map((e) => e.href.split("#")[0]));
 
@@ -33,6 +33,9 @@ describe("menú por tipo de cuenta (decisión del fundador, 8 de octubre de 2026
   });
   it("«Explorar» es igual para todos, y moderación y respaldo solo aparecen con permiso", () => {
     for (const p of ["visitante", "usuario", "peleador", "entrenador", "entidad"] as const) expect(menuDe(p)).toContainEqual(EXPLORAR);
+    // El aficionado (y cualquiera) llega a las clases y a los entrenadores desde el menú.
+    for (const p of ["visitante", "usuario", "peleador", "entrenador", "entidad"] as const) expect(menuDe(p).flatMap((s) => s.enlaces.map((x) => x.href))).toEqual(expect.arrayContaining(["/clases", "/entrenadores"]));
+    expect(CLASES_Y_ENTRENADORES.enlaces).toHaveLength(2);
     expect(enlaces("usuario", { admin: true, canSupport: true })).toEqual(expect.arrayContaining(["/moderacion", "/respaldar"]));
   });
   it("ningún bloque tiene más de cinco enlaces (navegación corta)", () => {

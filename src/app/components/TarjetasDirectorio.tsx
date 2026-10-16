@@ -36,20 +36,24 @@ export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, li
 }
 
 /** Gimnasio: su cabecera (banner) a toda la tarjeta y su logotipo, o las iniciales, en un círculo arriba. */
-export function TarjetaGimnasioCartel({ id, slug, nombre, ciudad, provincia, peleadores, verificado }: {
-  id: string; slug: string; nombre: string; ciudad: string; provincia: string; peleadores: number; verificado: boolean;
+export function TarjetaGimnasioCartel({ id, slug, nombre, ciudad, provincia, peleadores, verificado, distancia, detalles }: {
+  id: string; slug: string; nombre: string; ciudad: string; provincia: string; peleadores?: number; verificado: boolean;
+  /** Distancia escrita («a 400 m», con ubicación). Los gimnasios no se numeran ni se clasifican (decisión del fundador, 16-10-2026). */
+  distancia?: string; detalles?: string[];
 }) {
   return (
     <Link href={`/gimnasios/${slug}`} className="card tarjeta-foto cartel-persona cartel-gimnasio" style={tinte(null)} data-reveal>
       <Foto src={`/imagenes/gimnasio/${id}/banner`} />
       <span className="arriba">
         <span className="cartel-logo"><span aria-hidden="true">{iniciales(nombre)}</span><Foto src={`/imagenes/gimnasio/${id}/avatar`} /></span>
+        {distancia && <span className="cartel-puesto">{distancia}</span>}
       </span>
       <span className="abajo">
         {verificado && <span className="pildora pildora-acc" title="Verificado por un moderador">Verificado</span>}
         <strong>{nombre}</strong>
         <span className="meta-acc">{ciudad} ({provincia})</span>
-        <span className="cartel-dato">{peleadores === 1 ? "1 peleador" : `${peleadores} peleadores`}</span>
+        {peleadores !== undefined && <span className="cartel-dato">{peleadores === 1 ? "1 peleador" : `${peleadores} peleadores`}</span>}
+        {detalles?.map((d) => <span key={d} className="cartel-dato">{d}</span>)}
       </span>
     </Link>
   );

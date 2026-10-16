@@ -11,6 +11,17 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.22.1] — 2026-10-16
+
+PR de Claude Code: los gimnasios dejan de clasificarse (avisos del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí» y «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial; únicamente para los peleadores […] puedes poner los más populares, pero no un ránking de quién es mejor que otro»).
+
+### Cambiado
+- **Gimnasios — «Los más populares de tu zona» / «Los más cercanos a ti»** (lo que aparece primero, debajo del mapa): carteles con la foto o cabecera del gimnasio, la etiqueta «Verificado», sus datos y, con ubicación, la distancia («a 400 m»). En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+- **Cuenta de creador en la demo — «Probar como aficionado»:** enseñaba la pantalla del peleador (aviso del fundador, 16-10-2026: «no puedo ver el punto de vista del usuario aficionado»). La causa: quien probó «Peleador» se queda con su ficha vinculada y la aplicación elegía la pantalla mirando también esa ficha. En la demo, el tipo que se elige manda; fuera de la demo no cambia nada.
+- **Menú — «Clases y entrenadores»:** bloque propio con «Buscar clases» y «Entrenadores», para que el aficionado llegue a la pantalla de entrenadores desde el menú de cualquier tipo de cuenta (antes, solo desde el selector de los directorios y desde Clases).
+- **Crear mi ficha (peleador):** el formulario se agrupa en tres secciones numeradas («1 Quién eres», «2 Dónde entrenas», «3 Tu deporte»); los campos y el botón no cambian.
+- **Sin ránking de gimnasios:** se quitan «Los mejores», la valoración (que sumaba el aura de sus peleadores y un extra por estar verificado), la ordenación «Mejores» y los puestos (#1, #2…). El orden «Populares» cuenta solo cuánta gente hay (peleadores y entrenadores), y la explicación lo dice. Tampoco hay ránking de entrenadores: el ránking es solo de peleadores.
+
 ## [0.22.0] — 2026-10-16
 
 PR de Claude Code: pantallas de acción guiadas, menos desplazamiento y datos al día (peticiones del fundador del 16-10-2026: «muchas de las pantallas en las que se hacen acciones se ven muy poco visuales e intuitivas […] para un usuario que no tenga muchas nociones», «tienes que scrollear mucho hacia abajo» y «todos los datos […] actualizados y sincronizados en tiempo real»).

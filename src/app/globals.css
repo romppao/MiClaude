@@ -844,8 +844,8 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 @media (min-width:760px){.mapa-ficha{height:300px}}
 .marcador-sitio{width:28px;height:28px;border-radius:50%;background:#D4F67C;border:4px solid #0A0A0C;box-shadow:0 0 0 6px rgba(212,246,124,.35),0 2px 8px rgba(0,0,0,.45);pointer-events:none}
 /* «Los mejores de tu zona» y la lista completa recogida (gimnasios) */
-.mapa-mejores{margin-top:20px}
-.mapa-mejores .segmentos{min-width:260px}
+.mapa-populares{margin-top:20px}
+.mapa-populares .segmentos{min-width:260px}
 .tarjeta-gimnasio .puesto{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--inv);color:var(--inv-ink);font:800 18px/1 var(--font)}
 .como-se-valora{margin:4px 0 0}
 .como-se-valora summary,.lista-completa>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700}
@@ -980,3 +980,11 @@ h2[id]{scroll-margin-top:84px}
 .indice-ayuda{flex-wrap:nowrap;flex:none}
 .desliza-personas{flex-wrap:nowrap;gap:12px;padding-bottom:8px;scroll-padding:0 16px}
 .desliza-personas>.cartel-persona{flex:none;width:200px;scroll-snap-align:start}
+.desliza-gimnasios{list-style:none;margin:0;flex-wrap:nowrap;gap:12px;padding-bottom:8px;scroll-padding:0 16px}
+.desliza-gimnasios>li{flex:none;width:210px;scroll-snap-align:start;list-style:none}
+.cartel-puesto{margin-left:auto;padding:6px 12px;border-radius:999px;background:rgba(10,10,12,.62);color:#fff;font:800 16px/1.1 var(--font);font-variant-numeric:tabular-nums}
+@media(min-width:900px){.desliza-gimnasios{flex-wrap:wrap;overflow:visible;margin:0;padding:0}.desliza-gimnasios>li{width:calc((100% - 36px) / 4)}}
+.paso-ficha{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.paso-ficha>legend{display:flex;align-items:center;gap:10px;padding:0;margin-bottom:12px;font:700 18px/1.2 var(--font);color:var(--text)}
+.paso-ficha>legend .num{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--acc);color:var(--acc-ink);font:800 16px var(--font)}
+form.search>.paso-ficha{flex:1 1 100%}

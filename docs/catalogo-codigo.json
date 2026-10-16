@@ -2150,6 +2150,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/demo-papel.test.ts",
+    "purpose": "Regresión de «probar como otra persona» en la demo: el tipo elegido manda sobre la ficha de peleador vinculada, para que el aficionado vea la pantalla de aficionado.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "tests/unit/directorio-disciplina.test.ts",
     "purpose": "Regresión del enlace de disciplina de los directorios: repetir la disciplina activa conserva categoría y división; cambiarla las limpia.",
     "guide": "docs/mantenimiento/OPERACION.md"

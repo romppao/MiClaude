@@ -40,23 +40,25 @@ describe("mapa de gimnasios", () => {
   });
 });
 
-import { mejoresDeLaZona, valoracionGimnasio } from "../../src/lib/common/mapa";
+import { popularesDeLaZona, popularidadGimnasio } from "../../src/lib/common/mapa";
 
-describe("los mejores gimnasios de la zona", () => {
-  it("la valoración suma aura, peleadores, entrenadores y el sello", () => {
-    expect(valoracionGimnasio({ aura: 10, peleadores: 2, entrenadores: 1, verificado: true })).toBe(10 + 10 + 3 + 20);
-    expect(valoracionGimnasio({ aura: 0, peleadores: 0, entrenadores: 0, verificado: false })).toBe(0);
+describe("los gimnasios más populares de la zona (sin ránking de calidad)", () => {
+  it("la popularidad cuenta solo a la gente: peleadores + entrenadores, sin aura ni sello", () => {
+    expect(popularidadGimnasio({ peleadores: 2, entrenadores: 1 })).toBe(3);
+    expect(popularidadGimnasio({ peleadores: 0, entrenadores: 0 })).toBe(0);
+    // Un gimnasio con mucha aura o verificado no sube: no se mide calidad (decisión del fundador, 16-10-2026).
+    expect(popularidadGimnasio({ peleadores: 2, entrenadores: 1, aura: 999, verificado: true } as { peleadores: number; entrenadores: number })).toBe(3);
   });
   const madrid = CENTROS_PROVINCIA["Madrid"];
-  const g = (nombre: string, lat: number, lng: number, valoracion: number) => ({ nombre, lat, lng, valoracion });
+  const g = (nombre: string, lat: number, lng: number, popularidad: number) => ({ nombre, lat, lng, popularidad });
   const lista = [g("Cerca flojo", 40.42, -3.70, 5), g("Cerca bueno", 40.45, -3.68, 50), g("Toledo top", 39.86, -4.03, 900), g("Getafe medio", 40.30, -3.73, 20)];
-  it("con ubicación, solo los de la zona, del mejor al peor", () => {
-    expect(mejoresDeLaZona(lista, madrid).map((x) => x.nombre)).toEqual(["Cerca bueno", "Getafe medio", "Cerca flojo"]);
+  it("con ubicación, solo los de la zona, los más populares primero", () => {
+    expect(popularesDeLaZona(lista, madrid).map((x) => x.nombre)).toEqual(["Cerca bueno", "Getafe medio", "Cerca flojo"]);
   });
   it("si en la zona hay menos de 3, amplía el radio", () => {
-    expect(mejoresDeLaZona(lista.slice(1, 3), madrid).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
+    expect(popularesDeLaZona(lista.slice(1, 3), madrid).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
   });
-  it("sin ubicación, todos por valoración", () => {
-    expect(mejoresDeLaZona(lista, null, 2).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
+  it("sin ubicación, todos por popularidad", () => {
+    expect(popularesDeLaZona(lista, null, 2).map((x) => x.nombre)).toEqual(["Toledo top", "Cerca bueno"]);
   });
 });

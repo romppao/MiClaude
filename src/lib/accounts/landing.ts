@@ -16,6 +16,14 @@ export function papelDe(user: { role: string; fighter?: unknown } | null): Papel
   return "usuario";
 }
 
+/**
+ * En la versión de demostración, el tipo de cuenta que se elige en «Mi cuenta → probar como otra persona» manda sobre la ficha de peleador
+ * vinculada (aviso del fundador, 16 de octubre de 2026: «me aparece lo mismo cuando me pongo como aficionado que como peleador»). Quien
+ * probó «Peleador» se queda con su ficha, y sin esta regla «Aficionado» seguía viendo la pantalla del peleador. Fuera de la demo, una
+ * cuenta con ficha vinculada (por ejemplo, tras reclamarla) sigue siendo de peleador.
+ */
+export const ignorarFichaVinculada = (role: string, demo: boolean): boolean => demo && role !== "FIGHTER";
+
 /** Quién puede crear veladas e interclubs: entidades aprobadas, entrenadores (decisión del fundador, 8 de octubre de 2026) y moderación. */
 export const puedeOrganizar = (role: string) => role === "ORGANIZER" || role === "TRAINER" || role === "ADMIN";
 

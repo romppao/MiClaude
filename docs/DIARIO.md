@@ -2444,3 +2444,27 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Validación:** revisado en pantalla a 390 px; una velada creada con la página abierta aparece sola al volver a la pestaña; pruebas unitarias del refresco; recorridos de navegador en local y CI.
 
 **Pendiente:** portada del visitante y del aficionado (4,9 y 2,6 pantallas), ficha de gimnasio, `/mi-panel`; pantalla de configurar el perfil paso a paso (hoy «Completa tu ficha» guía hacia ella); acceso directo a Entrenadores en el menú; eventos del servidor para entradas y plazas.
+
+## 16 de octubre de 2026, noche — «Los mejores» de gimnasios como carteles (Claude Code)
+
+**Aviso del fundador:** con una captura de `/gimnasios` en escritorio, «todavía la lista de gimnasios no se ve como te pedí». Tenía razón: en la 0.21.0 convertí la lista completa (recogida en «Ver todos los gimnasios»), pero la que se ve primero, «Los mejores de tu zona» (componente del mapa), seguía en texto.
+
+**Qué se hizo:** `TarjetaGimnasioCartel` admite puesto o distancia y líneas de detalle propias; `MapaGimnasios` la usa dentro de `ol#lista-mejores` (se conserva la lista y su id, que usa la prueba del mapa). Móvil: fila deslizable; escritorio: cuadrícula de cuatro.
+
+**Lección:** al cambiar «la lista de X» hay que buscar todas las listas de X (aquí eran dos: la del mapa y la completa), no la primera que se encuentra.
+
+## 16 de octubre de 2026, noche (2) — Sin ránking de gimnasios ni de entrenadores (Claude Code)
+
+**Decisión del fundador:** «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial, únicamente para los peleadores; para entrenadores y gimnasios no lo hagas; puedes poner los más populares, pero no un ránking de quién es mejor que otro». Sustituye a su petición del 13-10 («los mejores gimnasios de su zona según la valoración»).
+
+**Qué se hizo:** `valoracionGimnasio` (aura + peleadores + entrenadores + sello) y `mejoresDeLaZona` se sustituyen por `popularidadGimnasio` (peleadores + entrenadores, sin aura ni sello) y `popularesDeLaZona`; se quitan los puestos de las tarjetas, la ordenación «Mejores» (ahora «Populares») y la consulta del aura de cada gimnasio en `/gimnasios` (una consulta menos por visita). La prueba del mapa ahora comprueba que no aparecen puestos ni la palabra «mejor». No hay ránking de entrenadores en ningún sitio (se revisó).
+
+**Regla nueva para todos los asistentes** (también en `CLAUDE.md`): solo los peleadores se clasifican; gimnasios y entrenadores, nunca «mejores» ni puestos; «populares» sí.
+
+## 16 de octubre de 2026, noche (3) — «Probar como aficionado» enseñaba al peleador (Claude Code)
+
+**Aviso del fundador (llevaba días queriendo decirlo):** desde su cuenta de creador, «cuando me pongo como aficionado me sale la misma pantalla que como peleador; para los demás usuarios sí me sale su interfaz». No podía ver el punto de vista del aficionado.
+
+**Causa:** `demoCambiarPapel` solo cambia `User.role`; pero `papelDe` devuelve «peleador» también cuando la cuenta tiene una ficha vinculada (`user.fighter`), y la cuenta del creador conservaba la de cuando probó «Peleador». Entrenador, organizadora y moderador no se veían afectados porque `papelDe` los resuelve antes de mirar la ficha.
+
+**Arreglo:** `ignorarFichaVinculada(role, demo)`: en la demo, si el tipo elegido no es «Peleador», `getUser()` devuelve la cuenta sin ficha, así toda la aplicación (portada, menú, panel, acciones) ve a un aficionado. Fuera de la demo no cambia nada. No se borra ninguna ficha: al volver a «Peleador» reaparece. Prueba unitaria `tests/unit/demo-papel.test.ts`.

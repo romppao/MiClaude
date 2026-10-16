@@ -62,25 +62,20 @@ export function puntoDeGimnasio(g: { id: string; lat: number | null; lng: number
 }
 
 /**
- * Valoración Lona de un gimnasio, para «Los mejores de tu zona» (petición del fundador, 13 de octubre de 2026: «los mejores gimnasios
- * de su zona según la valoración de Google o algo similar»). No se usan las valoraciones de Google: exigen su servicio de pago y sus
- * condiciones no permiten mostrarlas fuera de un mapa de Google. Esta valoración sale de datos reales de la comunidad y se explica en
- * la propia pantalla:
- *   aura que la comunidad ha dado a sus peleadores + 5 por cada peleador + 3 por cada entrenador + 20 si está verificado.
- * Cambiar los pesos aquí cambia el orden en toda la aplicación (y la explicación de /gimnasios, que usa estas mismas constantes).
+ * Popularidad de un gimnasio, para «Los más populares de tu zona». **Decisión del fundador, 16 de octubre de 2026:** «no pongas un ránking
+ * de gimnasios, ya que esto puede ser muy perjudicial; únicamente para los peleadores. Para entrenadores y gimnasios no lo hagas; puedes
+ * poner los más populares, pero no un ránking de quién es mejor que otro». Por eso solo cuenta cuánta gente de la comunidad está en el
+ * gimnasio (peleadores + entrenadores): no usa el aura de sus peleadores, ni el sello de «verificado», ni ninguna medida de calidad, y la
+ * pantalla no numera los puestos ni habla de «mejores». Para entrenadores tampoco hay ránking.
  */
-export const PESOS_VALORACION = { aura: 1, peleador: 5, entrenador: 3, verificado: 20 } as const;
-
-export function valoracionGimnasio(g: { aura: number; peleadores: number; entrenadores: number; verificado: boolean }): number {
-  return g.aura * PESOS_VALORACION.aura + g.peleadores * PESOS_VALORACION.peleador + g.entrenadores * PESOS_VALORACION.entrenador + (g.verificado ? PESOS_VALORACION.verificado : 0);
-}
+export const popularidadGimnasio = (g: { peleadores: number; entrenadores: number }): number => g.peleadores + g.entrenadores;
 
 /**
- * Los mejores gimnasios «de tu zona»: con ubicación, los que están a menos de `radioKm` (si hay menos de 3, se amplía a 3 veces el
- * radio); sin ubicación, todos los recibidos (la página ya los filtra por provincia o búsqueda). Ordenados por valoración y, a igualdad,
- * por cercanía y nombre.
+ * Los gimnasios más populares «de tu zona»: con ubicación, los que están a menos de `radioKm` (si hay menos de 3, se amplía a 3 veces el
+ * radio); sin ubicación, todos los recibidos (la página ya los filtra por provincia o búsqueda). Ordenados por popularidad y, a igualdad,
+ * por cercanía y nombre. Es un orden para empezar por los más activos, no una clasificación de calidad.
  */
-export function mejoresDeLaZona<T extends Punto & { valoracion: number; nombre: string }>(gimnasios: T[], yo: Punto | null, cuantos = 6, radioKm = 30): (T & { km: number | null })[] {
+export function popularesDeLaZona<T extends Punto & { popularidad: number; nombre: string }>(gimnasios: T[], yo: Punto | null, cuantos = 6, radioKm = 30): (T & { km: number | null })[] {
   const conDistancia = gimnasios.map((g) => ({ ...g, km: yo ? distanciaKm(yo, g) : null }));
   let zona = conDistancia;
   if (yo) {
@@ -88,7 +83,7 @@ export function mejoresDeLaZona<T extends Punto & { valoracion: number; nombre: 
     if (zona.length < 3) zona = conDistancia.filter((g) => (g.km ?? 0) <= radioKm * 3);
     if (zona.length === 0) zona = [...conDistancia].sort((a, b) => (a.km ?? 0) - (b.km ?? 0)).slice(0, cuantos);
   }
-  return zona.sort((a, b) => b.valoracion - a.valoracion || (a.km ?? 0) - (b.km ?? 0) || a.nombre.localeCompare(b.nombre, "es")).slice(0, cuantos);
+  return zona.sort((a, b) => b.popularidad - a.popularidad || (a.km ?? 0) - (b.km ?? 0) || a.nombre.localeCompare(b.nombre, "es")).slice(0, cuantos);
 }
 
 /** Enlace «Cómo llegar» con la aplicación de mapas del teléfono (Google Maps abre la del móvil; es solo un enlace: sin coste ni clave). */
