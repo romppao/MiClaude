@@ -34,6 +34,13 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 - **Correos de la decisión** (DSA, arts. 16.5 y 17): al cerrar un aviso, quien avisó recibe la decisión y la nota de moderación; si se retira algo (comentario, vídeo o foto, o el combate pasa a revisión), su autor recibe qué se ha hecho, el motivo, que lo ha decidido una persona y cómo reclamar (contacto del aviso legal, órgano extrajudicial o tribunales). Código: `notificarResolucionDeAviso` en `src/lib/community/notify.ts`. **La nota de moderación se envía tal cual**: escríbela pensando en que la leerán las dos personas.
 - **Aviso sin cuenta** (DSA, art. 16): `/avisar`, enlazado al pie de todas las páginas y en `/condiciones#avisos`. Pide la dirección dentro de Lona, el motivo, la explicación, el nombre, el correo y la declaración de buena fe (los avisos de abuso de menores se pueden enviar sin identificarse). Acusa recibo por correo y entra en la cola de avisos de moderación. Límite: 5 avisos al día por dirección IP.
 
+## Invitaciones a peleadores (0.23.0, 17 de octubre de 2026)
+- **Quién puede escribir:** solo organizaciones con solicitud aprobada y entrenadores, con el correo verificado. Los aficionados no. 10 invitaciones al día como máximo, una pendiente por peleador y tipo, y 30 días de espera tras un rechazo.
+- **Qué dato se comparte y cuándo:** ninguno hasta que el peleador **acepta**; entonces, solo el canal que él eligió (correo de la cuenta, teléfono o Instagram) y solo con quien invitó. Queda anotado en la invitación y en el registro de actividad. Rechazar no comparte nada.
+- **Menores:** no se puede invitar a personas menores de 18 años ni a fichas sin titular. Hasta resolver T-014, la edad de la ficha es la que declara su titular.
+- **Control del peleador:** puede cerrar las invitaciones, rechazar sin explicar y bloquear (el bloqueo cierra las pendientes y no se comunica a la otra persona).
+- **Para el abogado:** contacto no solicitado entre cuentas, base jurídica del tratamiento del teléfono o Instagram compartidos y texto de `/privacidad` (finalidad «invitaciones»). Hasta entonces, solo en la demo.
+
 ## Pendiente en la app (programación)
 1. T-013, aviso al salir hacia enlaces externos: implementado en 0.17.1 (rama de Codex, pendiente de revisión e integración). Reglamentos, moderación y autoría del mapa anuncian la pestaña nueva; los vídeos externos lo avisan visiblemente y condiciones/privacidad explican la salida. `tests/e2e/enlaces.mjs` vigila el aviso y `rel` en las pantallas recorridas.
 2. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.

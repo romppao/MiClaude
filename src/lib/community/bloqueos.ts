@@ -30,7 +30,7 @@ export async function hayBloqueo(a: string | null | undefined, b: string | null 
 }
 
 /** Desde dónde se bloquea: lo que la persona ve en pantalla, para no tener que mostrar identificadores de usuario. */
-export const ORIGENES_DE_BLOQUEO = ["peleador", "aura", "medio", "propuesta", "solicitud"] as const;
+export const ORIGENES_DE_BLOQUEO = ["peleador", "aura", "medio", "propuesta", "solicitud", "invitacion"] as const;
 export type OrigenDeBloqueo = (typeof ORIGENES_DE_BLOQUEO)[number];
 
 export function esOrigenDeBloqueo(v: string): v is OrigenDeBloqueo {
@@ -52,6 +52,14 @@ export async function cuentaDe(origen: OrigenDeBloqueo, id: string, quien: strin
       if (!p) return null;
       if (p.to.userId === quien) return p.from.userId;
       if (p.from.userId === quien) return p.to.userId;
+      return null;
+    }
+    case "invitacion": {
+      // Solo vale una invitación que sea de quien bloquea (recibida o enviada).
+      const i = await db.invitation.findUnique({ where: { id }, select: { fromUserId: true, to: { select: { userId: true } } } });
+      if (!i) return null;
+      if (i.to.userId === quien) return i.fromUserId;
+      if (i.fromUserId === quien) return i.to.userId;
       return null;
     }
     case "solicitud": {
@@ -79,6 +87,9 @@ export async function bloquear(tx: Prisma.TransactionClient, blockerId: string, 
     await tx.fightProposal.updateMany({ where: { fromId: suyo.id, toId: mio.id, status: "PENDING" }, data: { status: "DECLINED", answeredAt: ahora } });
     await tx.fightProposal.updateMany({ where: { fromId: mio.id, toId: suyo.id, status: "PENDING" }, data: { status: "CANCELLED" } });
   }
+  const ahoraInv = new Date();
+  await tx.invitation.updateMany({ where: { status: "PENDING", fromUserId: blockedId, to: { userId: blockerId } }, data: { status: "DECLINED", answeredAt: ahoraInv } });
+  await tx.invitation.updateMany({ where: { status: "PENDING", fromUserId: blockerId, to: { userId: blockedId } }, data: { status: "WITHDRAWN", answeredAt: ahoraInv } });
   await tx.classRequest.updateMany({ where: { userId: blockedId, status: "PENDING", class: { trainer: { userId: blockerId } } }, data: { status: "DECLINED", answeredAt: new Date() } });
   await tx.classRequest.updateMany({ where: { userId: blockerId, status: "PENDING", class: { trainer: { userId: blockedId } } }, data: { status: "CANCELLED" } });
   const correos = await tx.user.findMany({ where: { id: { in: [blockerId, blockedId] } }, select: { id: true, email: true } });

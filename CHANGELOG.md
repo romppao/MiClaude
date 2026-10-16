@@ -11,6 +11,23 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.23.0] — 2026-10-17
+
+PR de Claude Code: **contacto entre usuarios** (plan aprobado por el fundador el 17-10-2026: «no deja ponernos en contacto con peleadores»). Las organizaciones aprobadas y los entrenadores pueden invitar a un peleador concreto; el peleador decide y solo entonces se comparte su contacto. Sin chat.
+
+### Añadido
+- **Invitar a un peleador** (botón «Invitar a este peleador» en su ficha, solo para organizaciones aprobadas y entrenadores con el correo verificado): a una velada con inscripción abierta, a un sparring en nombre de uno de los peleadores del entrenador o a entrenar juntos. Mensaje opcional de hasta 500 caracteres. Límite de 10 al día, una sola pendiente por peleador y tipo, y 30 días de espera tras un rechazo.
+- **Pestaña «Invitaciones» en Mis propuestas** (la primera): el peleador acepta, rechaza (sin dar motivo) o bloquea. Al aceptar se comparte **solo el canal que él haya elegido** (correo de la cuenta, teléfono o Instagram) y, si era una velada, aparece «Inscribirme en la velada». Caducan a los 14 días.
+- **Ajustes de contacto** del peleador: puede cerrar las invitaciones y elegir qué contacto se comparte al aceptar.
+- **Mis invitaciones** (`/invitaciones`) para organizaciones y entrenadores: enviadas, estado y contacto compartido; se pueden retirar mientras esperan. Acceso desde el menú («Contactar con peleadores»).
+- **Avisos y correos:** al peleador cuando le invitan; a quien invitó cuando acepta (con el contacto elegido) o rechaza (sin ningún dato).
+- **Bloqueo** también corta invitaciones: las pendientes entre las dos personas se cierran y no se puede volver a invitar, sin decir nunca que hay un bloqueo.
+- Migración `20261016224505_invitaciones`: solo añade (tabla `Invitation`, ajustes de contacto del peleador); no toca datos existentes.
+- Pruebas: 30 unitarias de las reglas y el recorrido `invitaciones.mjs` (permisos, menores y cierre de invitaciones sin explicar el motivo, aceptar, rechazar, repetir, retirar, bloqueo y accesibilidad).
+
+### Seguridad
+- Quien tiene una invitación pendiente no puede ver datos de contacto del peleador: solo se comparten al aceptar, y solo el canal elegido. Las personas menores de 18 años y las fichas sin titular no se pueden invitar, con el mismo mensaje que cualquier otra ficha no disponible.
+
 ## [0.22.2] — 2026-10-17
 
 PR de Claude Code: el menú vuelve a tener tres bloques para el visitante (el CI de la 0.22.1 falló en `menu.mjs`: «el menú móvil del visitante se abre con tres bloques comprensibles»).

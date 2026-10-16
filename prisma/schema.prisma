@@ -357,6 +357,13 @@ model Highlight {
 }
 
 model Fighter {
+  // Invitaciones de organizadores y entrenadores (16-10-2026, petición del fundador). El peleador puede cerrarlas y elige qué canal se comparte al aceptar.
+  acceptsInvitations Boolean @default(true)
+  contactChannel     String  @default("EMAIL") // EMAIL | PHONE | INSTAGRAM
+  contactPhone       String?
+  contactInstagram   String?
+  invitationsReceived Invitation[] @relation("InvitacionesRecibidas")
+  invitationsOnBehalf Invitation[] @relation("InvitacionesEnNombreDe")
   gymInvitations GymMemberInvitation[]
   availableToFight Boolean @default(false)
   currentWeightKg Decimal? @db.Decimal(5, 2)
@@ -414,6 +421,7 @@ enum EventKind {
 }
 
 model Event {
+  invitations Invitation[]
   attendances EventAttendance[]
   id                String              @id @default(cuid())
   slug              String              @unique
@@ -523,6 +531,7 @@ model Notification {
 }
 
 model User {
+  invitationsSent Invitation[] @relation("InvitacionesEnviadas")
   sentGymTransfers GymTransferInvitation[] @relation("GymTransferSender")
   sentGymMemberInvitations GymMemberInvitation[] @relation("GymMemberSender")
   receivedGymMemberInvitations GymMemberInvitation[] @relation("GymMemberRecipient")
@@ -1092,4 +1101,50 @@ model GymTransferInvitation {
   @@index([gymId, status])
   @@index([senderId])
   @@index([recipientEmail, status])
+}
+
+/**
+ * Invitación de un organizador (promotora, federación, club) o de un entrenador a un peleador concreto: participar en una velada, un
+ * sparring para un peleador del entrenador o entrenar juntos. El peleador acepta o rechaza; solo al aceptar se comparte el canal de contacto
+ * que él haya elegido (instantánea en `contactShared`). Sin chat. Reglas en src/lib/community/invitations.ts.
+ */
+enum InvitationKind {
+  EVENT
+  SPARRING
+  TRAIN
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+  EXPIRED
+}
+
+model Invitation {
+  id            String           @id @default(cuid())
+  kind          InvitationKind
+  fromUserId    String
+  fromUser      User             @relation("InvitacionesEnviadas", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toId          String
+  to            Fighter          @relation("InvitacionesRecibidas", fields: [toId], references: [id], onDelete: Cascade)
+  eventId       String?
+  event         Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  // Sparring: el peleador del entrenador en cuyo nombre se propone.
+  onBehalfOfId  String?
+  onBehalfOf    Fighter?         @relation("InvitacionesEnNombreDe", fields: [onBehalfOfId], references: [id], onDelete: SetNull)
+  discipline    Discipline?
+  message       String?
+  status        InvitationStatus @default(PENDING)
+  reply         String?
+  // Canal que el peleador compartió al aceptar (por ejemplo «Correo: ana@…», «Teléfono: 6…»).
+  contactShared String?
+  createdAt     DateTime         @default(now())
+  expiresAt     DateTime
+  answeredAt    DateTime?
+
+  @@index([toId, status])
+  @@index([fromUserId, createdAt])
+  @@index([eventId])
 }

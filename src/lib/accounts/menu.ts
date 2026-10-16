@@ -61,6 +61,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
       ],
     });
   }
+  if (papel === "entrenador" || papel === "entidad") propias.push({ titulo: "Contactar con peleadores", enlaces: [{ href: "/invitaciones", texto: "Mis invitaciones" }, { href: "/peleadores", texto: "Buscar un peleador al que invitar" }] });
   if (papel === "entrenador" || papel === "entidad") propias.push({ titulo: "Mis gimnasios", enlaces: [{ href: "/mis-gimnasios", texto: "Buscar, reclamar o gestionar mi gimnasio" }] });
   const cuenta: EnlaceMenu[] = [{ href: "/ayuda", texto: "¿Cómo funciona?" }];
   if (papel !== "visitante") {
