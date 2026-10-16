@@ -71,6 +71,7 @@ export default async function Organizer({ searchParams }: { searchParams: Promis
         </fieldset>
         <label className="field" style={{ flex: 1, minWidth: 240 }}><span>Nombre del evento</span><input name="name" required maxLength={LIMITS.eventName} /></label>
         <label className="field"><span>Fecha</span><input name="date" type="date" required min="1980-01-01" /></label>
+        <label className="field"><span>Hora de inicio (opcional)</span><input name="hora" type="time" /></label>
         <label className="field"><span>Disciplina</span><select name="discipline" defaultValue="" required><option value="">Elige una disciplina</option>{DISCIPLINE_ORDER.map((d) => <option key={d} value={d}>{DISCIPLINE_LABEL[d]}</option>)}</select></label>
         <label className="field"><span>Nivel</span><select name="level" defaultValue="" required><option value="">Elige tu nivel</option><option value="AMATEUR">Amateur</option><option value="PRO">Profesional</option></select></label>
         <label className="field"><span>Recinto (opcional)</span><input name="venue" maxLength={LIMITS.venue} /><span className="hint">Si aún no lo sabes, déjalo vacío: aparecerá «Por confirmar».</span></label>

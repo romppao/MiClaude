@@ -335,6 +335,7 @@ export async function deleteAccount(f: FormData) {
       data: { before: Prisma.DbNull, after: Prisma.DbNull },
     });
     await audit({ userId: null, entity: "USER", entityId: user.id, action: "ACCOUNT_DELETED", after: { role: user.role, ficha } }, tx);
+    await tx.gymTransferInvitation.deleteMany({ where: { recipientEmail: user.email.toLowerCase() } });
     await tx.user.delete({ where: { id: user.id } });
   }));
   const almacen = almacenDeVideos();

@@ -422,3 +422,9 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 ## 16 de octubre de 2026 — Perfiles de gimnasios
 Petición del fundador: dejar los perfiles de los gimnasios listos, con foto de perfil y banner con el logo del gimnasio. Alcance de clubes pendiente de concretar. Revisados el listado investigado (sin campos de imagen) y la vía existente de edición de perfiles. Preparar recursos con identidad real y fuente identificada; la carga queda pendiente de revisar destino y recursos.
+
+- 15-10-2026, fundador: cesión de gimnasio consentida por correo sin revelar si hay cuenta; implementación en pruebas, separada de la vinculación de miembros.
+
+- 15-10-2026, fundador: vinculación de miembros con invitación y aceptación; en pruebas en rama de Codex. Moderación mantiene su acción directa.
+
+- 15-10-2026, fundador: ejecutar el relevo D/H en cuatro PR independientes y después T-009; RFC-002 queda fuera de este encargo. Bandeja única en pruebas.
