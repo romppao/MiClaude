@@ -76,7 +76,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
               lineas={[
                 principal ? `${DISCIPLINE_LABEL[principal.discipline]} · ${levelName(principal.level)}${discs.length > 1 ? ` (+${discs.length - 1})` : ""}` : "Sin disciplina",
                 [b.province, b.gym?.name].filter(Boolean).join(" · "),
-              ].filter(Boolean)} extra={b.alias ? `“${b.alias}”` : undefined} />
+              ].filter(Boolean)} extra={[principal ? categoryLabel(principal.discipline, principal.level, principal.divisionId, principal.weightClass) : null, b.alias ? `“${b.alias}”` : null].filter((x): x is string => !!x)} />
           );
         })}
       </div>

@@ -14,7 +14,7 @@ const tinte = (d: Discipline | null | undefined) => ({ "--tinte": tinteDe(d) }) 
 
 /** Peleador o entrenador: retrato, nombre y, debajo, lo que más sirve para elegir. La primera línea va en lima. */
 export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, lineas, extra }: {
-  href: string; tipo: "peleador" | "entrenador"; id: string; nombre: string; disciplina: Discipline | null; pildora?: string; lineas: string[]; extra?: string;
+  href: string; tipo: "peleador" | "entrenador"; id: string; nombre: string; disciplina: Discipline | null; pildora?: string; lineas: string[]; extra?: string[];
 }) {
   return (
     <Link href={href} className="card tarjeta-foto cartel-persona" style={tinte(disciplina)} data-reveal>
@@ -29,7 +29,7 @@ export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, li
         {pildora && <span className="pildora pildora-acc">{pildora}</span>}
         <strong>{nombre}</strong>
         {lineas.map((l, i) => <span key={i} className={i === 0 ? "meta-acc" : "cartel-dato"}>{l}</span>)}
-        {extra && <span className="cartel-dato cartel-extra">{extra}</span>}
+        {extra?.map((x, i) => <span key={i} className="cartel-dato cartel-extra" title={x}>{x}</span>)}
       </span>
     </Link>
   );
