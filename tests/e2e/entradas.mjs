@@ -69,7 +69,7 @@ await axe(fan.p, "Mis entradas");
 
 // 5) No puede reservar dos veces la misma velada; otro aficionado no puede pasar del aforo (3).
 await fan.p.goto(B + `/veladas/${slug}#entradas`);
-check("con una reserva activa, la ficha enseña su estado en vez del formulario", await seen(fan.p.locator(".mi-reserva").getByText(reserva.code)) && (await fan.p.locator("#entradas select[name=cantidad]").count()) === 0);
+check("con una reserva activa, la ficha enseña su estado en vez del formulario", await seen(fan.p.locator(".mi-reserva").getByText(reserva.code).first()) && (await fan.p.locator("#entradas select[name=cantidad]").count()) === 0);
 const otro = await newUser("Segundo", "FAN");
 await otro.p.goto(B + `/veladas/${slug}#entradas`);
 check("solo se ofrecen las entradas que quedan (1)", (await otro.p.locator("#entradas select[name=cantidad] option").count()) === 1);
@@ -99,7 +99,7 @@ check("ni abre la lista de reservas", new URL(fan.p.url()).pathname === "/organi
 await fan.p.goto(B + "/mis-entradas");
 await fan.p.getByRole("button", { name: `Cancelar la reserva para ${nombre}` }).click();
 check("quien reservó la cancela", await ok(fan.p, "Reserva cancelada") && (await db.ticketReservation.findUniqueOrThrow({ where: { id: reserva.id } })).status === "CANCELLED");
-await otro.p.goto(B + `/veladas/${slug}#entradas`);
+await otro.p.reload(); // misma dirección con «#entradas»: un goto solo movería el ancla y dejaría la página vieja
 check("al cancelar se liberan las plazas (vuelven a ser 3)", (await otro.p.locator("#entradas select[name=cantidad] option").count()) === 3);
 const datos = await (await fan.p.request.get(B + "/mi-cuenta/datos")).json();
 check("la descarga de datos personales incluye las entradas reservadas", datos.entradasQueHeReservado?.[0]?.codigo === reserva.code);

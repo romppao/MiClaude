@@ -127,8 +127,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
           <div className="cartel-editor">
             {cartel ? <img src={cartel} alt="Cartel actual" className="entrada-mini" style={{ width: 96, height: 144 }} /> : <span className="entrada-mini" aria-hidden="true" style={{ width: 96, height: 144, display: "grid", placeItems: "center", color: "var(--mut)", fontSize: 13, textAlign: "center", padding: 8 }}>Sin cartel</span>}
             <div className="field" style={{ flex: 1, minWidth: 220 }}>
-              <span>{cartel ? "Cambiar el cartel" : "Cartel (opcional)"}</span>
-              <InputFoto name="cartel" />
+              <label className="field"><span>{cartel ? "Cambiar el cartel" : "Cartel (opcional)"}</span><InputFoto name="cartel" /></label>
               <span className="hint">JPG, PNG o WebP de hasta 4 MB. Mejor vertical: es lo primero que ve el público en el calendario.</span>
               {cartel && <label style={{ display: "flex", gap: 10, alignItems: "center", minHeight: 44 }}><input type="checkbox" name="quitarCartel" value="1" style={{ width: 22, height: 22 }} /> Quitar el cartel</label>}
             </div>
