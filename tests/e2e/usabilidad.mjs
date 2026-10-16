@@ -102,7 +102,7 @@ const nombreOrg = `Club Respuesta ${rnd}`;
 await solicitarOrganizador(solicitante.p, nombreOrg);
 const mod = await newUser("Moderadorausa", "FAN"); hacerAdmin(mod.email);
 await mod.p.goto(B + "/moderacion");
-const fila = () => mod.p.locator("tr", { hasText: nombreOrg });
+const fila = () => mod.p.locator("tr, article[data-cola]", { hasText: nombreOrg });
 await fila().locator("button:has-text('Rechazar')").click();
 check("rechazar sin escribir el motivo no se permite y se explica por qué", await seen(malo(mod.p, "Escribe el motivo")));
 await fila().locator("input[name=note]").fill("No encontramos la web del club");

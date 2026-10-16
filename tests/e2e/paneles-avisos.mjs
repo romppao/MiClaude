@@ -40,5 +40,41 @@ await owner.p.reload();
 check("ocultar el original también oculta su highlight", await owner.p.getByText(media.caption, { exact: true }).count() === 0);
 await db.mediaItem.delete({ where: { id: media.id } });
 check("borrar el original retira la referencia en cascada", await db.highlight.count({ where: { id: copy.id } }) === 0);
-// La lista única de moderación por urgencia (H) no se integró: queda para que Codex la rehaga (revisión de Claude en #71, 15-10-2026).
+// La bandeja reúne las colas sin cambiar los contratos de las decisiones.
+const mod = await newUser("BandejaH"); hacerAdmin(mod.email);
+await db.bout.update({ where: { id: bout.id }, data: { verification: "SELF_REPORTED", flags: ["MISMO_DIA"] } });
+const gym = await db.gym.create({ data: { name: `Gimnasio H ${rnd}`, slug: `gimnasio-h-${rnd}`, city: "Madrid", province: "Madrid" } });
+await db.report.create({ data: { userId: fanUser.id, entity: "GYM", entityId: gym.id, reason: "DATOS", message: `Aviso gimnasio ${rnd}` } });
+const pagina = await db.report.create({ data: { entity: "PAGINA", entityId: `/veladas/${event.slug}`, reporterName: `Sin cuenta ${rnd}`, reporterEmail: `sin-cuenta-${rnd}@example.test`, reason: "DATOS", message: `Página anónima ${rnd}` } });
+await mod.p.goto(B + "/moderacion");
+const bandeja = mod.p.getByRole("list", { name: "Bandeja de moderación ordenada por urgencia" });
+check("una sola bandeja accesible sin pestañas de colas", await seen(bandeja) && await mod.p.getByRole("navigation", { name: "Colas de moderación" }).count() === 0);
+for (const ancla of ["avisos", "reclamaciones", "organizadores", "gimnasios", "senales", "combates", "revision"]) {
+  check(`el ancla antigua #${ancla} existe una sola vez`, await mod.p.locator(`[id="${ancla}"]`).count() === 1);
+}
+check("GYM conserva el enlace a su gestión", await mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso gimnasio ${rnd}` }).getByRole("link", { name: `Gimnasio: ${gym.name}` }).getAttribute("href") === `/mis-gimnasios?gimnasio=${gym.id}`);
+check("el combate conserva el acceso a su velada para comprobar los datos", await mod.p.locator('article[data-cola]', { has: mod.p.locator(`input[name=boutId][value="${bout.id}"]`) }).locator(`a[href="/veladas/${event.slug}"]`).count() === 1);
+const avisoGym = mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso gimnasio ${rnd}` });
+check("GYM ofrece su propia etiqueta de retirada", await avisoGym.getByRole("button", { name: "Resolver y retirar el gimnasio", exact: true }).count() === 1);
+const prioridades = await bandeja.locator(":scope > li").evaluateAll(items => items.map(i => Number(i.dataset.prioridad)));
+check("las prioridades no retroceden entre elementos", prioridades.every((p, i) => i === 0 || p >= prioridades[i - 1]));
+const avisoPagina = mod.p.locator('article[data-cola="avisos"]', { hasText: `Página anónima ${rnd}` });
+check("avisos sin cuenta conservan nombre y correo", await seen(avisoPagina.getByText(`Sin cuenta · Sin cuenta ${rnd} · sin-cuenta-${rnd}@example.test`, { exact: true })));
+check("PAGINA enlaza a la página, explica dónde actuar y no ofrece retirar", await avisoPagina.locator(`a[href="/veladas/${event.slug}"]`).count() === 1 && (await avisoPagina.innerText()).includes("desde la propia página") && await avisoPagina.locator('button[value=hide]').count() === 0);
+await avisoPagina.locator('[name=note]').fill("Comprobado en la página de la velada");
+await avisoPagina.getByRole("button", { name: /^Cerrar: ya está corregido/ }).click();
+await mod.p.locator('.notice-ok').waitFor();
+check("se puede resolver un aviso sin cuenta", (await db.report.findUniqueOrThrow({ where: { id: pagina.id } })).status === "RESOLVED");
+await avisoGym.getByRole("button", { name: "Resolver y retirar el gimnasio", exact: true }).click();
+await avisoGym.waitFor({ state: "detached" });
+check("retirar un aviso GYM actúa sobre el gimnasio indicado", (await db.gym.findUniqueOrThrow({ where: { id: gym.id } })).status === "REMOVED");
+const combate = () => mod.p.locator('article[data-cola]', { has: mod.p.locator(`input[name=boutId][value="${bout.id}"]`) });
+for (const [boton, estado] of [["Poner en revisión el combate:", "DISPUTED"], ["Restaurar como pendiente el combate:", "SELF_REPORTED"], ["Verificar combate:", "VERIFIED"]]) {
+  await mod.p.goto(B + "/moderacion");
+  await combate().getByRole("button", { name: new RegExp(`^${boton}`) }).click();
+  await mod.p.locator('.notice-ok').waitFor();
+  check(`«${boton}» cambia el estado real a ${estado}`, (await db.bout.findUniqueOrThrow({ where: { id: bout.id } })).verification === estado);
+}
+const axe = await new AxeBuilder({ page: mod.p }).include('main').withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+check("bandeja sin incumplimientos de accesibilidad detectados por axe", axe.violations.length === 0);
 await terminarDiagnosticos(); await db.$disconnect(); await browser.close();

@@ -81,7 +81,7 @@ check("tras confirmar el correo se ofrece ver el estado de la solicitud", await 
 // 5) Moderación: ve el tipo y la web, y al aprobar la federación tiene su perfil y su titular
 const mod = await newUser("Moderapaneles", "FAN"); hacerAdmin(mod.email);
 await mod.p.goto(B + "/moderacion");
-const fila = mod.p.locator("tr", { hasText: nombreFed });
+const fila = mod.p.locator("tr, article[data-cola]", { hasText: nombreFed });
 check("la cola de moderación muestra el tipo de entidad y el enlace aportado", await seen(fila.locator(".tag", { hasText: "Federación" })) && await fila.locator("a[href='https://federacion-panel.example/']").count() === 1);
 await aprobarOrganizador(mod.p, nombreFed);
 check("al aprobar, la persona pasa a ser organizadora", consulta(`select role from "User" where email='${correoFed}'`) === "ORGANIZER");

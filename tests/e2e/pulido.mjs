@@ -68,14 +68,14 @@ try {
   const reportPage = Math.floor(reportOrder.findIndex(r => r.id === id("r", 104)) / 50) + 1;
   await p.goto(B + `/moderacion?${keys.map(k => `${k}=${k === "avisos" ? reportPage : 3}`).join("&")}`);
   const twin = await p.context().newPage(); await twin.goto(p.url());
-  const reportRow = p.locator("tr").filter({ has: p.locator(`input[name=reportId][value="${id("r", 104)}"]`) });
+  const reportRow = p.locator("tr, article[data-cola]").filter({ has: p.locator(`input[name=reportId][value="${id("r", 104)}"]`) });
   await reportRow.getByRole("button", { name: /Cerrar: no hay error/ }).click();
   await p.locator(".notice-ok").waitFor();
   check("resolver un caso conserva páginas y sección", p.url().includes(`avisos=${reportPage}`) && p.url().includes("gimnasios=3") && p.url().includes("seccion=avisos") && await p.getByRole("link", { name: "Volver a los avisos", exact: true }).count() === 1);
   await p.waitForFunction(() => document.activeElement?.classList.contains("notice-ok"));
   await p.waitForFunction(() => { const r = document.querySelector(".notice-ok")?.getBoundingClientRect(); return r && r.top >= 0 && r.bottom <= innerHeight; });
   check("el aviso queda visible y enfocado aunque la cola esté lejos de la cabecera", await p.locator(".notice-ok").evaluate(el => { const r = el.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }));
-  await twin.locator("tr").filter({ has: twin.locator(`input[name=reportId][value="${id("r", 104)}"]`) }).getByRole("button", { name: /Cerrar: no hay error/ }).click();
+  await twin.locator("tr, article[data-cola]").filter({ has: twin.locator(`input[name=reportId][value="${id("r", 104)}"]`) }).getByRole("button", { name: /Cerrar: no hay error/ }).click();
   await twin.locator(".notice-bad").waitFor();
   check("una pantalla antigua no escribe otra resolución del mismo aviso", await db.auditLog.count({ where: { entity: "REPORT", entityId: id("r", 104) } }) === 1);
   await twin.close();
@@ -84,7 +84,7 @@ try {
   const boutOrder = await db.bout.findMany({ where: { verification: { in: ["SELF_REPORTED", "CONFIRMED"] }, flags: { isEmpty: true } }, orderBy: [{ event: { date: "desc" } }, { id: "asc" }], select: { id: true } });
   const boutPage = Math.floor(boutOrder.findIndex(b => b.id === boutId) / 50) + 1;
   await p.goto(B + `/moderacion?combates=${boutPage}`);
-  const boutRow = p.locator("tr").filter({ has: p.locator(`input[name=boutId][value="${boutId}"]`) });
+  const boutRow = p.locator("tr, article[data-cola]").filter({ has: p.locator(`input[name=boutId][value="${boutId}"]`) });
   await db.bout.update({ where: { id: boutId }, data: { result: "B_WIN" } });
   await boutRow.getByRole("button", { name: /^Verificar combate:/ }).click();
   await p.locator(".notice-bad", { hasText: "El combate ha cambiado" }).waitFor();

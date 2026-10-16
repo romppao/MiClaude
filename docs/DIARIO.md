@@ -2319,3 +2319,97 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 ## 16 de octubre de 2026 — Recorrido de edición de gimnasio
 Codex corrige la prueba de altas (#90): abre la pestaña «Mis datos» y el desplegable de corrección en cada visita antes de buscar el botón del formulario. El campo de gimnasio ya existía. No cambian permisos, datos ni comportamiento de la aplicación. Sintaxis comprobada; validación completa pendiente del CI. #93 sigue abierto, comprobado mediante el conector de GitHub; se mantiene el orden de integración acordado.
+
+## 2026-10-15 — Cesión de gimnasio con aceptación
+**Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/cesion-de-gimnasio-con-aceptacion-20261015`.
+**Cambios:** GymTransferInvitation con FK de gimnasio/remitente, correo destinatario sin requisito de cuenta previa y hash del enlace. Caduca en 14 días. Una nueva invitación cancela la anterior; máximo cinco al día por titular/gimnasio. Se acepta con correo confirmado coincidente, vuelve a comprobar propiedad y bloqueos y cambia Gym/Profile en la misma transacción. Confirmaciones a ambas personas por sendMail. Los bloqueos cancelan las cesiones pendientes; copia y eliminación de datos incluyen el correo destinatario. Se conserva la intervención directa de moderación.
+**Compartidos:** esquema, migración aditiva, package.json (se conserva y amplía el guion e2e).
+**Validación:** tipos aprobados; pendientes migraciones/paridad, pruebas unitarias y recorrido real de correo con/sin cuenta, repetición, cancelación, caducidad y bloqueos.
+**Siguiente:** revisión de Claude y cuarto punto en PR separado. No hay cambios de proveedor ni dominio.
+
+## 2026-10-15 — Vinculación a gimnasios por invitación
+**Pedido:** segundo punto del relevo: el titular invita y la persona acepta, con hayBloqueo. Se mantiene la vinculación directa de moderación.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/invitaciones-de-miembros-de-gimnasio-20261015`.
+**Cambios:** GymMemberInvitation con claves foráneas y una sola ficha por invitación, caducidad de 14 días, aceptación/rechazo/cancelación, bandeja privada paginada y avisos dentro de la aplicación. Se revalidan propiedad, cuenta destinataria, bloqueos y gimnasio anterior. Los bloqueos cancelan invitaciones pendientes. La copia de datos incorpora las invitaciones propias. Entrenadores con titular de Profile también pueden aceptar.
+**Archivos compartidos:** esquema y migración aditiva; package.json conserva todos los scripts y añade el nuevo recorrido.
+**Pruebas:** autorización y recorrido real de peleador/entrenador, rechazo, cancelación, bloqueo y cesión posterior; validación en curso.
+**Siguiente:** revisión de Claude; cesión de gimnasio en PR separado. No se toca RFC-002.
+
+## 2026-10-15 — Relevo D/H: bandeja única de moderación
+El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
+
+## 2026-10-15 — Antigravity — Cuatro ajustes de móvil en Lona (375 px)
+
+**Pedido:** Encargo de Claude Code (`2026-10-15-claude-encargo-antigravity-ajustes-movil.md`): resolver los 4 desajustes visuales detectados en la auditoría de demo a 375 px (iPhone SE), limitándose a cambios de presentación/CSS en una rama propia aislada.
+
+**Base:** `origin/claude/ring-espana-mvp` (0.18.9). **Rama:** `antigravity/ajustes-movil`.
+
+**Cambios:**
+1. **Portada (`/`):** Acotada la altura de `.portada-visita` a 400 px y tipografía de `.lema-portada` a 16 px en móvil para que el subtítulo «Tu comunidad de deportes de contacto en toda España» no quede tapado por la barra inferior fija antes de hacer scroll.
+2. **Gimnasios (`/gimnasios`):** Declarado `scroll-margin-top: 96px` en `.mapa-gimnasios` y añadido margen inferior en `form.search` para que el botón verde «Aplicar filtros» no quede cortado horizontalmente por detrás de la cabecera fija al desplazarse hacia el mapa.
+3. **Veladas (`/veladas`):** Título de la velada en bloque (`display: block; margin: 6px 0 2px`) en las tarjetas para que aparezca siempre debajo de las etiquetas en su propia línea, evitando que títulos cortos como «Yess» se coloquen horizontalmente junto a «Inscripción abierta».
+4. **Peleadores (`/peleadores`):** Reubicado `BotonesFiltro` («Aplicar filtros») antes del desplegable `MasFiltros` para que sea inmediatamente visible al abrir los filtros sin requerir scroll, y añadido un botón de envío repetido al final de los campos desplegados para comodidad al filtrar.
+
+**Comprobaciones:**
+- `npx tsc --noEmit`: 0 errores.
+- `npx vitest run`: 59 archivos de pruebas pasados, 858 pruebas unitarias pasadas al 100% (incluyendo nuevo test `tests/unit/ajustes-movil.test.ts`).
+- Generadas capturas de verificación en `docs/logs/antigravity-ajustes-movil/` a 375 px (móvil) y 1280 px (escritorio) para las 4 pantallas, comparadas contra las capturas del antes. En escritorio no se altera la composición.
+- Versión actualizada a **0.18.10** con `node scripts/version.mjs subir parche` y documentada en `CHANGELOG.md`.
+
+**Siguiente:** Revisión de Claude Code y confirmación del fundador.
+
+
+## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
+
+**Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
+
+**Decisiones:**
+- Los bytes del cartel, cuando no hay almacén de fotos, van a una tabla aparte (`EventPoster`). Muchas consultas leen la velada entera; con la imagen en `Event` la habrían arrastrado todas. Se probó a omitirla con el `omit` global de Prisma, pero cambia el tipo del cliente y rompía una decena de sitios. `Event.posterAt` dice si hay cartel y versiona su dirección, así la caché puede ser larga.
+- La hora se edita en «Datos de la velada» (también al crearla). El formulario de entradas ya no la toca, para no borrarla sin querer.
+- El precio solo se anuncia en la tarjeta del calendario cuando se puede reservar: si la venta está cerrada, podría estar desfasado.
+- Cancelar una reserva desde la promotora pide confirmación (no se puede deshacer). Validar en la puerta sí se puede deshacer.
+- La promotora ve el nombre y el correo de quien reserva (lo necesita para devolver una señal). Se avisa en el formulario de reserva.
+
+**Validación:** tipos y compilación correctos; 851 de 853 pruebas unitarias en este portátil. Fallan las dos de contraseñas por pasar de 5 s con el equipo cargado, como ya pasó otras veces en local. Las de entradas pasan. La prueba de navegador `tests/e2e/entradas.mjs` se ejecuta en el CI (Linux), porque las ayudas de las pruebas usan `psql` y variables de shell que no hay en Windows.
+
+**Pendiente:** el #92 ya está fusionado (autorizado por el fundador el 15-10 por la noche). Quedan este PR (#93) y los de Codex #88–#91, que se fusionan solo con el «sí» del fundador (el clasificador de seguridad de Claude Code no deja fusionar sin esa autorización). Después, la fase 2 (agenda del entrenador).
+**16-10-2026 — Revisión crítica de la fase 1 (flujo Claude + Codex):** `gpt-6-astra` revisó el PR #93 en solo lectura y señaló cinco fallos (confirmación de señal tardía sin comprobar aforo ni reserva activa, aforo guardado fuera del bloqueo, reserva con datos leídos antes del bloqueo, plazos que no se acortaban al adelantar la velada y desfase de una hora en los cambios de horario). Claude los verificó leyendo el código; Codex (`gpt-6.1-sol`, esfuerzo medio, ≈ 91.000 tokens) los arregló en una copia aparte con 34 pruebas nuevas; `gpt-6-luna` revisó los arreglos y aprobó. Claude añadió la retirada del cartel huérfano. Comprobado: tipos, 887 pruebas unitarias y los recorridos `entradas`, `calendario`, `inscripciones`, `veladas-pasadas`, `plazas` y `paneles-avisos` en local. No se probó concurrencia real contra PostgreSQL (solo lógica y bloqueos en pruebas con transacciones simuladas).
+
+## 16 de octubre de 2026 — Red de seguridad y flujo Claude + Codex (Claude Code)
+
+**Encargo:** el fundador pidió un sistema para no romper lo ya aprobado, replicar el flujo del vídeo de @robles.ia (Opus planifica y decide, Codex ejecuta, dos revisores) y una política de modelos y esfuerzo para Claude y Codex.
+
+**Decisiones:** el registro `APROBADO.md` ancla cada función aprobada a una prueba concreta; el CI deja de pararse en el primer recorrido que falla; la flota nunca guarda ni fusiona por su cuenta; el revisor crítico (Astra) solo se usa con dinero, permisos, datos personales o secretos. Se instaló el plugin oficial `codex@openai-codex`; no se usó `npx -y codex mcp-server` porque el paquete npm «codex» es otro proyecto y ese modo no existe en Codex 0.160.1.
+
+**Validación:** pruebas de documentación nuevas (19), comprobadas también a la inversa (fallan al quitar una comprobación aprobada o un recorrido); simulacros de la flota; la orden `revisar` usada de verdad sobre los arreglos del #93 (Luna aprobó); `e2e-local.mjs` usado de verdad (6 de 6 recorridos). La regresión visual queda para el siguiente PR.
+
+
+## 2026-10-16 - Codex - Revisión de los ajustes móviles #94 (0.20.2)
+
+**Encargo:** seguir el comentario de Claude en #94 y el orden de relevo de #95. Rama propia `codex/pr94-ajustes-movil-20261016`; no se modifica la rama de Antigravity.
+
+**Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
+
+**Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.
+
+
+## 2026-10-16 - Codex - Actualización de #88 sobre la base candidata 0.20.2
+
+**Encargo:** relevo de Claude en #95 y aprobación de #88 (comentario6195353236). Rama propia `codex/pr88-integracion-20261016`, sin rebase. Preparación local mientras termina el CI de #96; no se publica hasta que el anterior esté fusionado.
+
+**Integración:** se conservan las invitaciones originales y las entradas/carteles de la principal. El esquema mantiene ambos modelos y los avisos admiten GYM_MEMBER y TICKET. El nuevo recorrido `gimnasios-invitaciones` entra en `tests/e2e/orden.json`; se conserva el ejecutor nuevo que completa todos los recorridos. Historial de documentos preservado; versión 0.20.3 por el script oficial. No se modifican las reglas de permisos aprobadas por Claude.
+
+**Validación:** esquema Prisma válido; tipos, 901 unitarias, versión, catálogo y mapa correctos. Compilación completa con BUILD_EXIT=0. Documentación33/34 por EPERM de enlaces simbólicos en Windows, sin alterar la prueba. No se ejecutan migraciones ni se alteran datos locales o remotos. CI con base vacía requerido antes de fusionar.
+
+
+## 2026-10-16 - Codex - Integración local de #89 (0.20.4)
+**Encargo:** relevo de Claude en #95; cesión consentida aprobada por Claude comentario6195354039. Rama propia `codex/pr89-integracion-20261016`; merge de la base candidata0.20.3. Publicación después de fusionar #88.
+**Integración:** conserva modelos, acciones y pruebas de miembros, cesiones y entradas. Se unifican imports y las dos paginaciones de Mis gimnasios usan variables independientes. El recorrido gimnasios-cesion entra en orden.json sin quitar los anteriores. Migraciones originales intactas. Versión por script, ambas historias documentales conservadas.
+**Validación:** Prisma válido y generado; tipos, 910 unitarias, versión, catálogo y mapa correctos. Compilación completa BUILD_EXIT=0. Documentación33/34 por EPERMWindows al crear enlace simbólico, prueba intacta. Sin migraciones ni datos reales alterados; CI remoto pendiente.
+
+
+## 2026-10-16 - Codex - Integración local de #90 (0.20.5)
+**Encargo:** relevo de Claude en #95 y corrección del campo gym en Mi ficha. Se conserva la apertura de la pestaña y el desplegable antes de buscar el formulario, ya publicada en6b62681.
+**Integración:** merge de base candidata1174eac (invitaciones, cesiones y entradas) en rama propia codex/pr90-integracion-20261016. Traspaso remoto anterior preservado. El recorrido gimnasios-altas entra en orden.json. Sin cambios en las reglas de alta aprobadas por Claude, sin rebase.
+**Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos. Compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, prueba intacta. Sin migraciones ni cambios de datos reales. CI remoto pendiente; publicación después de fusionar #89.
