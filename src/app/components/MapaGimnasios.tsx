@@ -3,27 +3,29 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapaLibre, Marker } from "maplibre-gl";
-import { distanciaKm, mejoresDeLaZona, textoDistancia, type OrigenUbicacion, type Punto } from "../../lib/common/mapa";
+import { distanciaKm, popularesDeLaZona, textoDistancia, type OrigenUbicacion, type Punto } from "../../lib/common/mapa";
 import { crearMapa } from "./mapa/base";
+import { TarjetaGimnasioCartel } from "./TarjetasDirectorio";
 
 /**
  * Mapa de gimnasios (petición del fundador, 13 de octubre de 2026: «que el usuario, en vez de que le salga una lista muy aburrida y larga
- * hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los mejores gimnasios de su zona según la valoración»).
+ * hacia abajo, mire directamente en el mapa. Que le salga un mapa y luego los gimnasios de su zona»). El 16 de octubre de 2026 el fundador
+ * pidió **no clasificar gimnasios** («puede ser muy perjudicial»): se muestran los más populares, sin ránking ni «mejores».
  *
  * - Mapa libre (components/mapa/base.ts). En el tema oscuro se invierte por CSS.
- * - «Los mejores de tu zona»: por la valoración Lona (lib/common/mapa.ts: aura de sus peleadores, peleadores, entrenadores y sello).
- *   Sin ubicación, los mejores de la búsqueda o provincia; con «Usar mi ubicación», los de alrededor, y se puede ordenar por cercanía.
+ * - «Los más populares de tu zona»: por cuánta gente hay en cada gimnasio (lib/common/mapa.ts: peleadores + entrenadores), sin puestos.
+ *   Sin ubicación, los de la búsqueda o provincia; con «Usar mi ubicación», los de alrededor, y se puede ordenar por cercanía.
  * - La ubicación **no sale del dispositivo** (la distancia se calcula aquí) y no se guarda.
  * - Accesible: los marcadores son botones con nombre y 44 px de zona táctil; lo que hay en el mapa está también en texto.
  */
 export type GimnasioEnMapa = Punto & {
   id: string; slug: string; nombre: string; ciudad: string; provincia: string; verificado: boolean;
-  peleadores: number; entrenadores: number; aura: number; valoracion: number; origen: OrigenUbicacion;
+  peleadores: number; entrenadores: number; popularidad: number; origen: OrigenUbicacion;
 };
 
 const CUANTOS = 6;
 type Estado = { tipo: "inicio" | "buscando" | "listo" | "sin-permiso" | "sin-ubicacion" | "sin-mapa"; texto: string };
-type Orden = "valoracion" | "cercania";
+type Orden = "popularidad" | "cercania";
 
 export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimnasios: GimnasioEnMapa[]; centro: Punto; zoom: number; zona: string }) {
   const contenedor = useRef<HTMLDivElement>(null);
@@ -31,7 +33,7 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
   const marcaYo = useRef<Marker | null>(null);
   const libreria = useRef<typeof import("maplibre-gl") | null>(null);
   const [yo, setYo] = useState<Punto | null>(null);
-  const [orden, setOrden] = useState<Orden>("valoracion");
+  const [orden, setOrden] = useState<Orden>("popularidad");
   const [estado, setEstado] = useState<Estado>({ tipo: "inicio", texto: "" });
   const [mapaListo, setMapaListo] = useState(false);
 
@@ -97,9 +99,9 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
     return () => { cancelado = true; m?.remove(); mapa.current = null; };
   }, []);
 
-  const mejores = useMemo(() => {
+  const populares = useMemo(() => {
     if (yo && orden === "cercania") return gimnasios.map((g) => ({ ...g, km: distanciaKm(yo, g) as number | null })).sort((a, b) => (a.km ?? 0) - (b.km ?? 0)).slice(0, CUANTOS);
-    return mejoresDeLaZona(gimnasios, yo, CUANTOS);
+    return popularesDeLaZona(gimnasios, yo, CUANTOS);
   }, [yo, orden, gimnasios]);
 
   const usarMiUbicacion = () => {
@@ -109,7 +111,7 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
       (pos) => {
         const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setYo(p);
-        setEstado({ tipo: "listo", texto: "Te mostramos los mejores gimnasios de tu zona. Tu ubicación no se guarda." });
+        setEstado({ tipo: "listo", texto: "Te mostramos los gimnasios más populares de tu zona. Tu ubicación no se guarda." });
         const m = mapa.current, ml = libreria.current;
         if (m && ml) {
           marcaYo.current?.remove();
@@ -127,45 +129,40 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
     );
   };
 
-  const titulo = yo ? (orden === "cercania" ? "Los más cercanos a ti" : "Los mejores de tu zona") : `Los mejores ${zona}`;
+  const titulo = yo ? (orden === "cercania" ? "Los más cercanos a ti" : "Los más populares de tu zona") : `Los más populares ${zona}`;
   return (
     <section className="mapa-gimnasios" aria-labelledby="titulo-mapa">
       <div className="mapa-cabecera">
         <h2 id="titulo-mapa">Gimnasios en el mapa</h2>
         <button type="button" onClick={usarMiUbicacion} disabled={estado.tipo === "buscando"} aria-controls="mapa-gimnasios-lienzo">Usar mi ubicación</button>
       </div>
-      <p className="mut mapa-ayuda">Toca un punto para ver el gimnasio. Con «Usar mi ubicación» te mostramos los mejores de tu zona; tu ubicación se usa solo en tu dispositivo y no se guarda.</p>
+      <p className="mut mapa-ayuda">Toca un punto para ver el gimnasio. Con «Usar mi ubicación» te mostramos los más populares de tu zona; tu ubicación se usa solo en tu dispositivo y no se guarda.</p>
       <p role="status" aria-live="polite" className={estado.tipo === "sin-permiso" || estado.tipo === "sin-ubicacion" || estado.tipo === "sin-mapa" ? "notice notice-info" : "sr-only"}>{estado.texto}</p>
       <div ref={contenedor} id="mapa-gimnasios-lienzo" className="mapa-lienzo" data-listo={mapaListo ? "si" : "no"} hidden={estado.tipo === "sin-mapa"} />
 
-      {mejores.length > 0 && (
-        <section aria-labelledby="titulo-mejores" className="mapa-mejores">
+      {populares.length > 0 && (
+        <section aria-labelledby="titulo-populares" className="mapa-populares">
           <div className="mapa-cabecera">
-            <h2 id="titulo-mejores">{titulo}</h2>
+            <h2 id="titulo-populares">{titulo}</h2>
             {yo && (
               <div className="segmentos" role="group" aria-label="Ordenar">
-                <button type="button" aria-controls="lista-mejores" aria-pressed={orden === "valoracion"} className={orden === "valoracion" ? "activo" : undefined} onClick={() => setOrden("valoracion")}>Mejores</button>
-                <button type="button" aria-controls="lista-mejores" aria-pressed={orden === "cercania"} className={orden === "cercania" ? "activo" : undefined} onClick={() => setOrden("cercania")}>Más cerca</button>
+                <button type="button" aria-controls="lista-populares" aria-pressed={orden === "popularidad"} className={orden === "popularidad" ? "activo" : undefined} onClick={() => setOrden("popularidad")}>Populares</button>
+                <button type="button" aria-controls="lista-populares" aria-pressed={orden === "cercania"} className={orden === "cercania" ? "activo" : undefined} onClick={() => setOrden("cercania")}>Más cerca</button>
               </div>
             )}
           </div>
-          <ol id="lista-mejores" className="lista-gimnasios">
-            {mejores.map((g, i) => (
+          <ol id="lista-populares" className="desliza desliza-gimnasios">
+            {populares.map((g) => (
               <li key={g.id}>
-                <Link href={`/gimnasios/${g.slug}`} className="tarjeta-gimnasio">
-                  {g.km !== null ? <span className="distancia">{textoDistancia(g.km)}</span> : <span className="puesto"><span className="sr-only">Puesto </span>{i + 1}</span>}
-                  <span className="cuerpo">
-                    <strong>{g.nombre}</strong>
-                    <span className="meta">{g.ciudad} ({g.provincia}){!["direccion", "osm"].includes(g.origen) && " · ubicación aproximada"}</span>
-                    <span className="meta">{g.verificado && <span className="sello-verificado"><span aria-hidden="true">✓ </span>Verificado</span>}{razones(g)}</span>
-                  </span>
-                </Link>
+                <TarjetaGimnasioCartel id={g.id} slug={g.slug} nombre={g.nombre} ciudad={g.ciudad} provincia={g.provincia} verificado={g.verificado}
+                  distancia={g.km !== null ? textoDistancia(g.km) : undefined}
+                  detalles={[razones(g), ["direccion", "osm"].includes(g.origen) ? "" : "Ubicación aproximada"].filter(Boolean)} />
               </li>
             ))}
           </ol>
           <details className="como-se-valora">
-            <summary>¿Cómo se valoran los gimnasios?</summary>
-            <p>Con lo que pasa de verdad en Lona: el aura que la comunidad ha dado a sus peleadores, cuántos peleadores y entrenadores tiene y si un moderador lo ha verificado. Nadie puede pagar para salir antes.</p>
+            <summary>¿Cómo se eligen los más populares?</summary>
+            <p>Por cuánta gente de Lona hay en cada gimnasio: sus peleadores y sus entrenadores. No es una clasificación de calidad ni compara unos gimnasios con otros: es solo para empezar por los más activos.</p>
           </details>
         </section>
       )}
@@ -176,7 +173,7 @@ export default function MapaGimnasios({ gimnasios, centro, zoom, zona }: { gimna
 /** «12 peleadores · 3 entrenadores · 140 de aura»: por qué está en la lista, en palabras. */
 function razones(g: GimnasioEnMapa): string {
   const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
-  return [plural(g.peleadores, "peleador", "peleadores"), g.entrenadores > 0 && plural(g.entrenadores, "entrenador", "entrenadores"), g.aura > 0 && `${g.aura} de aura`].filter(Boolean).join(" · ");
+  return [plural(g.peleadores, "peleador", "peleadores"), g.entrenadores > 0 && plural(g.entrenadores, "entrenador", "entrenadores")].filter(Boolean).join(" · ");
 }
 
 /** Agrupa los puntos que en pantalla quedan a menos de `radio` píxeles del primero de cada grupo (suficiente para unos cientos). */

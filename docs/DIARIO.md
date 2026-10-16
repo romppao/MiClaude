@@ -2321,6 +2321,7 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 ## 16 de octubre de 2026 — Evidencias de T-009
 Codex contrasta el CI 38748985341 y sus registros: 16 recorridos, 93 pasos, cero pasos fallidos sobre b1597d4e (demo 0.18.7). Los selectores de veladas ya utilizan texto visible y no dependen de .card. Hay avisos React #418 en tres personas; siguen pendientes de diagnóstico. No se repite la batería ni se declara completada la revisión visual: el artefacto no pudo descargarse al disco. Informe actualizado en docs/pruebas/escenarios-2026-10-16.md. #93 continúa sin fusionar; se respeta el orden del encargo de Claude.
 
+
 ## 2026-10-15 — Gimnasios aportados desde fichas, pendientes de revisión
 **Pedido:** cuarto punto del relevo: PENDING si no lo hace moderación.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/gimnasios-desde-fichas-en-revision-20261015`.
@@ -2330,6 +2331,7 @@ Codex contrasta el CI 38748985341 y sus registros: 16 recorridos, 93 pasos, cero
 
 ## 16 de octubre de 2026 — Recorrido de edición de gimnasio
 Codex corrige la prueba de altas (#90): abre la pestaña «Mis datos» y el desplegable de corrección en cada visita antes de buscar el botón del formulario. El campo de gimnasio ya existía. No cambian permisos, datos ni comportamiento de la aplicación. Sintaxis comprobada; validación completa pendiente del CI. #93 sigue abierto, comprobado mediante el conector de GitHub; se mantiene el orden de integración acordado.
+
 
 
 ## 2026-10-15 — Cesión de gimnasio con aceptación
@@ -2432,6 +2434,7 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Cambios:** caret:initial en ambas capturas, lección y causa actualizadas con atribución a la reproducción de Claude; escenarios solo manual/al fusionar/PR etiquetado. Etiqueta escenarios añadida a #91 antes de actualizarlo para comprobarlo completo una vez. Se retira encType redundante en Mi ficha como indicó Claude; sin cambio de acción ni permisos. Todos los recorridos de la base conservados.
 **Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos; compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, caso intacto. Ejecución de los dieciséis escenarios pendiente del CI completo tras #90. Sin datos reales alterados.
 
+
 ## Corrección del recorrido tras CI 38942511433
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
@@ -2460,3 +2463,57 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 - #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
 - Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
 - La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.
+
+## 16 de octubre de 2026 — Pantallas de acción guiadas, menos desplazamiento y datos al día (Claude Code)
+
+**Encargo:** el fundador pidió que las pantallas donde se hace algo (subir lo grabado, buscar clases, configurar el perfil del peleador, registrar la trayectoria) sean más visuales e intuitivas para quien no domina el móvil, que no haya que deslizar tanto para llegar a lo importante (alternando filas horizontales y verticales) y que los datos estén al día para todos.
+
+**Medición previa (móvil, 390 px, en alturas de pantalla):** ayuda 8,4; portada del visitante 4,9; mi ficha 3,4; mi panel 3,1; trayectoria 2,8 con su botón principal a 2,3 pantallas; veladas y ficha de gimnasio 2,8.
+
+**Decisiones:** piezas comunes en `components/GuiaAcciones.tsx` (pasos, carteles para elegir, accesos con icono, ayuda plegable, «Completa tu ficha») para no rehacer cada pantalla distinta. Se conservan los campos, los textos de botón y las reglas de cada pantalla. Datos al día: lo más barato que cubre lo importante (volver a pedir al servidor al volver a la pestaña y cada 90 s, solo en pantallas de lectura); eventos del servidor quedan para donde el sondeo no baste (entradas, plazas). La regla de «nav» hace que sus hijos pasen a la línea siguiente: una fila deslizable necesita `flex-wrap:nowrap`.
+
+**Qué salió mal:** la primera fila de carteles salió apilada en vertical por esa regla; el primer cartel quedaba pegado al borde por el imán de desplazamiento (`scroll-padding`); compilar con el servidor de desarrollo abierto en la misma carpeta rompe la compilación; `git add docs` arrastró registros sueltos de Codex (se retiraron).
+
+**Validación:** revisado en pantalla a 390 px; una velada creada con la página abierta aparece sola al volver a la pestaña; pruebas unitarias del refresco; recorridos de navegador en local y CI.
+
+**Pendiente:** portada del visitante y del aficionado (4,9 y 2,6 pantallas), ficha de gimnasio, `/mi-panel`; pantalla de configurar el perfil paso a paso (hoy «Completa tu ficha» guía hacia ella); acceso directo a Entrenadores en el menú; eventos del servidor para entradas y plazas.
+
+## 16 de octubre de 2026, noche — «Los mejores» de gimnasios como carteles (Claude Code)
+
+**Aviso del fundador:** con una captura de `/gimnasios` en escritorio, «todavía la lista de gimnasios no se ve como te pedí». Tenía razón: en la 0.21.0 convertí la lista completa (recogida en «Ver todos los gimnasios»), pero la que se ve primero, «Los mejores de tu zona» (componente del mapa), seguía en texto.
+
+**Qué se hizo:** `TarjetaGimnasioCartel` admite puesto o distancia y líneas de detalle propias; `MapaGimnasios` la usa dentro de `ol#lista-mejores` (se conserva la lista y su id, que usa la prueba del mapa). Móvil: fila deslizable; escritorio: cuadrícula de cuatro.
+
+**Lección:** al cambiar «la lista de X» hay que buscar todas las listas de X (aquí eran dos: la del mapa y la completa), no la primera que se encuentra.
+
+## 16 de octubre de 2026, noche (2) — Sin ránking de gimnasios ni de entrenadores (Claude Code)
+
+**Decisión del fundador:** «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial, únicamente para los peleadores; para entrenadores y gimnasios no lo hagas; puedes poner los más populares, pero no un ránking de quién es mejor que otro». Sustituye a su petición del 13-10 («los mejores gimnasios de su zona según la valoración»).
+
+**Qué se hizo:** `valoracionGimnasio` (aura + peleadores + entrenadores + sello) y `mejoresDeLaZona` se sustituyen por `popularidadGimnasio` (peleadores + entrenadores, sin aura ni sello) y `popularesDeLaZona`; se quitan los puestos de las tarjetas, la ordenación «Mejores» (ahora «Populares») y la consulta del aura de cada gimnasio en `/gimnasios` (una consulta menos por visita). La prueba del mapa ahora comprueba que no aparecen puestos ni la palabra «mejor». No hay ránking de entrenadores en ningún sitio (se revisó).
+
+**Regla nueva para todos los asistentes** (también en `CLAUDE.md`): solo los peleadores se clasifican; gimnasios y entrenadores, nunca «mejores» ni puestos; «populares» sí.
+
+## 16 de octubre de 2026, noche (3) — «Probar como aficionado» enseñaba al peleador (Claude Code)
+
+**Aviso del fundador (llevaba días queriendo decirlo):** desde su cuenta de creador, «cuando me pongo como aficionado me sale la misma pantalla que como peleador; para los demás usuarios sí me sale su interfaz». No podía ver el punto de vista del aficionado.
+
+**Causa:** `demoCambiarPapel` solo cambia `User.role`; pero `papelDe` devuelve «peleador» también cuando la cuenta tiene una ficha vinculada (`user.fighter`), y la cuenta del creador conservaba la de cuando probó «Peleador». Entrenador, organizadora y moderador no se veían afectados porque `papelDe` los resuelve antes de mirar la ficha.
+
+**Arreglo:** `ignorarFichaVinculada(role, demo)`: en la demo, si el tipo elegido no es «Peleador», `getUser()` devuelve la cuenta sin ficha, así toda la aplicación (portada, menú, panel, acciones) ve a un aficionado. Fuera de la demo no cambia nada. No se borra ninguna ficha: al volver a «Peleador» reaparece. Prueba unitaria `tests/unit/demo-papel.test.ts`.
+
+## 17 de octubre de 2026 — El menú vuelve a tres bloques (Claude Code)
+
+**Qué pasó:** la 0.22.1 añadió al menú un bloque «Clases y entrenadores» para dar acceso directo a Entrenadores. El recorrido `menu.mjs` exige tres bloques comprensibles para el visitante (navegación corta, regla del fundador) y el CI de la principal falló. Se fusionó antes de que acabara el CI.
+
+**Arreglo:** se restaura el menú de la 0.22.0 (un solo enlace «Clases y entrenadores» a `/clases`). El acceso del aficionado a Entrenadores es la pestaña «Clases | Entrenadores» de `/clases` y el selector de los directorios.
+
+**Lección:** cualquier cambio en la estructura del menú pide pasar `menu` y `paneles-pulido` en local antes de subirlo; la prueba que fallaba estaba en la lista y no la lancé.
+
+
+## 17-10-2026 — Reconciliación con Claude
+- #97, #99 y #100 ya están fusionados; #98 cerrado como superado tras comprobar que cuenta.mjs coincide con la corrección incorporada.
+- #91 incorpora la candidata del menú #101 sin cambiar la carpeta ni el índice de Claude: preparación con objetos Git e índice aislado, sin clon ni node_modules duplicados.
+- Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
+- La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
+- Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.

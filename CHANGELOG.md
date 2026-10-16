@@ -11,7 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.21.2] — 2026-10-16
+## [0.22.3] — 2026-10-17
 
 ### Añadido
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
@@ -22,14 +22,39 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - Las capturas de los escenarios conservan el cursor original para evitar el aviso artificial de hidratación React#418 detectado por Claude. Se retira encType redundante del formulario de highlight con acción de función, que causaba un aviso en desarrollo.
 - Los escenarios no consumen minutos en cada PR: solo al fusionar, manualmente o en PR etiquetado escenarios.
 
+## [0.22.2] — 2026-10-17
 
-## [0.21.1] — 2026-10-16
+PR de Claude Code: el menú vuelve a tener tres bloques para el visitante (el CI de la 0.22.1 falló en `menu.mjs`: «el menú móvil del visitante se abre con tres bloques comprensibles»).
 
 ### Corregido
-- Los gimnasios nuevos aportados al crear o editar fichas de peleador o entrenador quedan pendientes de moderación. Se mantiene el estado de los gimnasios existentes y la excepción de publicación de moderación.
+- **Menú:** se retira el bloque «Clases y entrenadores» que añadió la 0.22.1 (dejaba el menú del visitante en cuatro bloques). Vuelve «Clases y entrenadores» como un solo enlace de «Explorar».
+- El aficionado sigue llegando a la pantalla de **Entrenadores** con un toque desde ese enlace: en `/clases` está la pestaña «Clases | Entrenadores», y los tres directorios (peleadores, entrenadores y gimnasios) llevan el selector.
 
+## [0.22.1] — 2026-10-16
 
-## [0.21.0] — 2026-10-16
+PR de Claude Code: los gimnasios dejan de clasificarse (avisos del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí» y «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial; únicamente para los peleadores […] puedes poner los más populares, pero no un ránking de quién es mejor que otro»).
+
+### Cambiado
+- **Gimnasios — «Los más populares de tu zona» / «Los más cercanos a ti»** (lo que aparece primero, debajo del mapa): carteles con la foto o cabecera del gimnasio, la etiqueta «Verificado», sus datos y, con ubicación, la distancia («a 400 m»). En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+- **Cuenta de creador en la demo — «Probar como aficionado»:** enseñaba la pantalla del peleador (aviso del fundador, 16-10-2026: «no puedo ver el punto de vista del usuario aficionado»). La causa: quien probó «Peleador» se queda con su ficha vinculada y la aplicación elegía la pantalla mirando también esa ficha. En la demo, el tipo que se elige manda; fuera de la demo no cambia nada.
+- **Menú — «Clases y entrenadores»:** bloque propio con «Buscar clases» y «Entrenadores», para que el aficionado llegue a la pantalla de entrenadores desde el menú de cualquier tipo de cuenta (antes, solo desde el selector de los directorios y desde Clases).
+- **Crear mi ficha (peleador):** el formulario se agrupa en tres secciones numeradas («1 Quién eres», «2 Dónde entrenas», «3 Tu deporte»); los campos y el botón no cambian.
+- **Sin ránking de gimnasios:** se quitan «Los mejores», la valoración (que sumaba el aura de sus peleadores y un extra por estar verificado), la ordenación «Mejores» y los puestos (#1, #2…). El orden «Populares» cuenta solo cuánta gente hay (peleadores y entrenadores), y la explicación lo dice. Tampoco hay ránking de entrenadores: el ránking es solo de peleadores.
+
+## [0.22.0] — 2026-10-16
+
+PR de Claude Code: pantallas de acción guiadas, menos desplazamiento y datos al día (peticiones del fundador del 16-10-2026: «muchas de las pantallas en las que se hacen acciones se ven muy poco visuales e intuitivas […] para un usuario que no tenga muchas nociones», «tienes que scrollear mucho hacia abajo» y «todos los datos […] actualizados y sincronizados en tiempo real»).
+
+### Añadido
+- **Completa tu ficha** (peleador): barra de progreso, el siguiente paso con un botón grande (foto, primer combate, trayectoria anterior, primer vídeo o foto) y la lista de pasos recogida.
+- **Datos al día sin recargar:** las pantallas que solo se leen (inicio, veladas, peleadores, entrenadores, gimnasios, ránking, clases, avisos, panel, reservas…) se vuelven a pedir al servidor al volver a la pestaña, al recuperar la conexión y cada pocos minutos. No se actualiza mientras la persona escribe ni en pantallas con formulario.
+- **Ayuda con índice:** una fila que se desliza de lado lleva a cada tema sin recorrer la página entera.
+
+### Cambiado
+- **Subir vídeos o fotos:** va por pasos («Elige la velada» → «Sube tu foto o vídeo»); las veladas son carteles que se eligen tocando, en una fila que se desliza, y el buscador pasa a ser lo secundario; «Una foto» y «O un vídeo» llevan icono.
+- **Buscar clases:** deportes con su dibujo en una fila deslizable, «Todas · Individuales · Colectivas» en un toque, el icono del deporte en cada clase y un estado vacío con salida («Ver entrenadores»).
+- **Mi trayectoria y aura:** accesos grandes con icono arriba («Declarar un título» el principal) y la ayuda larga recogida en «¿Cómo cuenta mi trayectoria?».
+
 
 PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan a carteles con foto, como las veladas (petición del fundador del 16-10-2026: «que se vea directamente la imagen» y que el aficionado tenga una pantalla de entrenadores para elegir con quién dar clase).
 
@@ -41,6 +66,14 @@ PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan
 ### Cambiado
 - **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
 - **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
+
+## [0.20.5] — 2026-10-16
+
+
+
+### Corregido
+- Los gimnasios nuevos aportados al crear o editar fichas de peleador o entrenador quedan pendientes de moderación. Se mantiene el estado de los gimnasios existentes y la excepción de publicación de moderación.
+
 
 ## [0.20.4] — 2026-10-16
 

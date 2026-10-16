@@ -32,3 +32,11 @@ Luna detectó que la guarda final aún admitía doce personas. Se refuerza para 
 - #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
 - Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
 - La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.
+
+
+## 17-10-2026 — Reconciliación con Claude
+- #97, #99 y #100 ya están fusionados; #98 cerrado como superado tras comprobar que cuenta.mjs coincide con la corrección incorporada.
+- #91 incorpora la candidata del menú #101 sin cambiar la carpeta ni el índice de Claude: preparación con objetos Git e índice aislado, sin clon ni node_modules duplicados.
+- Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
+- La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
+- Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.

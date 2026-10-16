@@ -437,3 +437,16 @@ GymTransferInvitation referencia gimnasio y remitente; el destinatario se identi
 GymMemberInvitation referencia gimnasio, remitente, destinatario y una única ficha (Fighter o Trainer; CHECK en PostgreSQL). Invitar no cambia gymId. El titular verificado del gimnasio publicado invita y la cuenta titular de la ficha acepta/rechaza en Mis gimnasios. Se admite el titular del Profile de entrenador cuando Trainer.userId está vacío. Caduca a los 14 días; el remitente puede cancelar. Moderación conserva setGymMember.
 
 Las operaciones se serializan por gimnasio. La aceptación vuelve a comprobar destinatario, propiedad, bloqueos, caducidad y titular de la ficha. Actualizar la afiliación exige que aún coincida con previousGymId; una edición o aceptación posterior no se pisa. El bloqueo cancela las invitaciones pendientes y las listas privadas excluyen cuentas bloqueadas. La copia de datos incluye las invitaciones de la cuenta y las FK las borran al eliminar cuenta/ficha/gimnasio. Los avisos se crean en la misma transacción; no se publican solicitudes en el directorio.
+
+
+## Datos al día para todos (16 de octubre de 2026)
+
+**Requisito del fundador:** «todos los datos […] actualizados y sincronizados en tiempo real para todos los usuarios, así no se pierde nadie las cosas que pasan». Y también gastar lo mínimo (Render y Neon gratuitos).
+
+**Cómo se cubre hoy (0.22.0):** las pantallas que solo se leen (`lib/common/refresco.ts`: inicio, veladas, peleadores, entrenadores, gimnasios, ránking, clases, avisos, panel, reservas, inscripciones…) se vuelven a pedir al servidor con `router.refresh()` (`RefrescoVivo`) **al volver a la pestaña**, **al recuperar la conexión** y **cada ~100 s** mientras están a la vista; **cada ~35 s** en una velada (entradas y plazas), en los avisos y en las inscripciones. No se actualiza mientras la persona escribe, con una ventana abierta, ni en pantallas con formulario (ficha, registro, organizador, moderación).
+
+**Qué garantiza y qué no:** un dato nuevo tarda como máximo ~35-110 s en verse en una pantalla abierta, y es inmediato al volver a la pestaña. **No es de «segundo a segundo».** Lo crítico no depende del refresco: las reservas y las plazas se protegen en el servidor con bloqueos y transacciones (0.20.0), así que ver un dato viejo nunca permite pasarse del aforo.
+
+**Coste:** cada pestaña a la vista pide una renderización cada 35-110 s: con 100 pestañas abiertas a la vez, entre 1 y 3 consultas por segundo a la base de datos. No hay conexiones abiertas, servicios nuevos ni gasto añadido.
+
+**Si hace falta más inmediatez** (por ejemplo, «quedan 3 entradas» en una velada que se agota): eventos del servidor (SSE) solo en la ficha de esa velada. Supone una conexión larga por visitante en Render gratuito y consultas periódicas en el servidor para detectar cambios; **se decide con el fundador antes de hacerlo**, con una prueba de carga. Alternativa más barata: bajar el intervalo solo mientras una velada tiene entradas a la venta.

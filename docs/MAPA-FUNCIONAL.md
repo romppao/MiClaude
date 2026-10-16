@@ -32,7 +32,7 @@
 | `/entrenadores/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | — | Trainer |
 | `/federaciones` | Federaciones | Pública (cambia lo que ve según la cuenta) | `profiles.createFederation` | Profile |
 | `/federaciones/:id` | (ficha individual: el título depende del elemento) | Pública | — | Profile |
-| `/gimnasios` | Gimnasios | Pública | — | Aura, Fighter, Gym |
+| `/gimnasios` | Gimnasios | Pública | — | Gym |
 | `/gimnasios/:slug` | (ficha individual: el título depende del elemento) | Pública | `community.createReport` | Gym |
 | `/highlights/:id/imagen` | Foto de un highlight. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. Revalida con ETag, como las fotos de perfil. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
 | `/highlights/:id/video` | Vídeo de un highlight subido a la aplicación. Solo si la ficha es pública (o es la propia) y el highlight no se ha retirado. | Pública (cambia lo que ve según la cuenta) | — | Highlight |
@@ -360,7 +360,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `backing.ts` | `canEndorse`, `requireSupportActor` |
 | `creador.ts` | `EstadoCodigos`, `correoCreador`, `esCreador` |
 | `google.ts` | `COOKIE_GOOGLE`, `DURACION_VIAJE_S`, `DecisionCuenta`, `GOOGLE_AUTORIZACION`, `GOOGLE_TOKENS`, `IdentidadGoogle`, `ViajeGoogle`, `canjearCodigo`, `configGoogle`, `decidirCuenta`, `escribirViaje`, `googleDisponible`, `leerViaje`, `nuevoViaje`, `urlDeAutorizacion`, `validarIdToken` |
-| `landing.ts` | `PASOS_REGISTRO`, `PASO_TRAS_DATOS`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
+| `landing.ts` | `PASOS_REGISTRO`, `PASO_TRAS_DATOS`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `ignorarFichaVinculada`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
 | `menu.ts` | `EXPLORAR`, `EnlaceMenu`, `ExtrasMenu`, `SeccionMenu`, `menuDe` |
 | `onboarding.ts` | `ClassDraft`, `FighterIntent`, `Onboarding`, `TrainerIntent`, `readOnboarding` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
@@ -406,7 +406,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `fmtFechaHoraMadrid`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail-transporte.ts` | `entregarCorreo`, `hayTransporte`, `logMode` |
 | `mail.ts` | `APP_URL`, `sendMail` |
-| `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `PESOS_VALORACION`, `Punto`, `distanciaKm`, `enlaceComoLlegar`, `mejoresDeLaZona`, `puntoDeGimnasio`, `textoDistancia`, `valoracionGimnasio` |
+| `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `Punto`, `distanciaKm`, `enlaceComoLlegar`, `popularesDeLaZona`, `popularidadGimnasio`, `puntoDeGimnasio`, `textoDistancia` |
 | `messages.ts` | `AVISOS`, `PROBLEMAS` |
 | `names.ts` | `normalizeName`, `publicFighterName`, `publicUserName` |
 | `pagination.ts` | `PAGE_SIZE`, `pageNumber`, `pageWindow` |
@@ -414,6 +414,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `periods.ts` | `FIGHTER_AVAILABILITY_DAYS`, `notificationCutoff` |
 | `record-eligibility.ts` | `boutsQueCuentan` |
 | `record-time.ts` | `HORAS_PARA_CONTAR_DECLARADO`, `fechaInicioEnRecord` |
+| `refresco.ts` | `INTERVALO_RAPIDO_MS`, `INTERVALO_REFRESCO_MS`, `MINIMO_ENTRE_REFRESCOS_MS`, `intervaloDe`, `rutaConRefresco`, `tocaRefrescar` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `sentry.ts` | `Dsn`, `FalloParaSentry`, `avisarASentry`, `leerDsn`, `sobre` |

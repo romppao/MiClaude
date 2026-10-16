@@ -30,6 +30,7 @@ import { almacenDeVideos } from "../../lib/media/storage";
 import SubirVideo from "../components/SubirVideo";
 import Pestanas from "../components/Pestanas";
 import InputFoto from "../components/InputFoto";
+import { CompletaTuFicha } from "../components/GuiaAcciones";
 import { GaleriaMedios, SELECT_MEDIO } from "../components/Multimedia";
 
 export const metadata = { title: "Mi ficha" };
@@ -96,13 +97,19 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         <h2>Si no apareces, crea tu ficha</h2>
         {intento && <p className="notice notice-info" role="note">Hemos rellenado tu disciplina, tu categoría y tu provincia con lo que elegiste al registrarte. Revísalo, escribe tu nombre y apellidos y pulsa «Crear mi ficha».</p>}
         <form className="search" action={createMyFighter} style={{ flexDirection: "column", alignItems: "stretch", maxWidth: 560 }}>
+          <fieldset className="paso-ficha"><legend><span className="num" aria-hidden="true">1</span>Quién eres</legend>
           <label className="field"><span>Nombre</span><input name="firstName" required maxLength={LIMITS.firstName} autoComplete="given-name" /></label>
           <label className="field"><span>Apellidos</span><input name="lastName" required maxLength={LIMITS.lastName} autoComplete="family-name" /></label>
           <label className="field"><span>Alias (opcional)</span><input name="alias" maxLength={LIMITS.alias} /></label>
+          </fieldset>
+          <fieldset className="paso-ficha"><legend><span className="num" aria-hidden="true">2</span>Dónde entrenas</legend>
           <label className="field"><span>Gimnasio (opcional)</span><input name="gym" maxLength={LIMITS.gym} /></label>
           <label className="field"><span>Ciudad</span><input name="city" maxLength={LIMITS.city} /></label>
           <label className="field"><span>Provincia</span><select name="province" defaultValue={intento?.province ?? ""} required><option value="">Elige una provincia</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></label>
+          </fieldset>
+          <fieldset className="paso-ficha"><legend><span className="num" aria-hidden="true">3</span>Tu deporte</legend>
           <DisciplineFields defaults={intento?.discipline ? { discipline: intento.discipline, level: intento.level, divisionId: intento.divisionId, weightClass: intento.weightClass } : undefined} />
+          </fieldset>
           {confirmarNueva && <input type="hidden" name="confirmarNueva" value="1" />}
           <button>Crear mi ficha</button>
         </form>
@@ -142,6 +149,12 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
         {principal && <span style={{ font: "800 26px var(--font)", letterSpacing: "-.03em", color: "var(--acc-text)" }}>{recP.w}-{recP.l}-{recP.d}</span>}
       </div>
       {toConfirm.length > 0 && <p className="notice"><span aria-hidden="true">ℹ </span>Tu rival ha declarado {toConfirm.length === 1 ? "un combate" : `${toConfirm.length} combates`} contigo. <a href="#por-confirmar">Revisarlos</a></p>}
+      <CompletaTuFicha pasos={[
+        { hecho: !!perfil?.hasAvatar, titulo: "Foto de perfil", detalle: "Con una foto te reconocen en el cartel y en el ránking.", href: `/perfiles/peleador/${me.id}/editar`, accion: "Añadir mi foto" },
+        { hecho: bouts.length > 0, titulo: "Tu primer combate", detalle: "Cuenta un combate para empezar tu récord y tu aura.", href: "#pestana-combates", accion: "Contar mi primer combate" },
+        { hecho: titulosVigentes.length > 0 || (principal?.priorTotal ?? 0) > 0, titulo: "Tu trayectoria", detalle: "Si ya peleabas antes, cuéntalo: tus títulos y tu récord anterior.", href: "/mi-ficha/trayectoria#declarar-titulo", accion: "Contar mi trayectoria anterior" },
+        { hecho: misHighlights.length > 0, titulo: "Tu primer vídeo o foto", detalle: "Sube un vídeo o una foto para que se vea en tu ficha pública.", href: "#highlights", accion: "Publicar mi primer vídeo o foto" },
+      ]} />
       {/* Secciones agrupadas que se cambian deslizando a los lados (petición del fundador, 8 de octubre de 2026: menos desplazamiento hacia abajo). */}
       <section id="disponibilidad" className="tarjeta" aria-label="Disponible para pelear">
         <h2>Disponible para pelear</h2>

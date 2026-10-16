@@ -10,8 +10,12 @@ export default function Help() {
       <h1>¿Cómo funciona Lona?</h1>
       <p>Lona reúne a la comunidad de deportes de contacto de toda España: boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai. Puedes consultar y compartir trayectorias amateur y profesionales, encontrar veladas, gimnasios y entrenadores, y reconocer las actuaciones que has visto. Elige tu disciplina y tu provincia para encontrar lo que te interesa.</p>
       <p className="mut">No necesitas una cuenta para consultar veladas, fichas y el ránking. Para dar aura, registrar combates o publicar sí es necesario registrarse.</p>
+      {/* Pantalla larga: un índice que se desliza de lado lleva a cada tema sin recorrerla entera. */}
+      <nav className="chips-desliza indice-ayuda" aria-label="Ir a un tema de la ayuda">
+        {[["aficionado", "Aficionado"], ["peleador", "Peleador"], ["organizas", "Organizar veladas"], ["respaldo", "Etiquetas de un combate"], ["fiables", "Datos fiables"], ["aura", "El aura"], ["google", "Entrar con Google"], ["error", "Avisar de un error"]].map(([id, texto]) => <a key={id} href={`#${id}`} className="chip">{texto}</a>)}
+      </nav>
 
-      <h2>Si eres aficionado</h2>
+      <h2 id="aficionado">Si eres aficionado</h2>
       <ol>
         <li><Link href="/registro">Crea tu cuenta</Link> eligiendo «Usuario» y confirma tu correo electrónico.</li>
         <li>Busca a un peleador en <Link href="/peleadores">Peleadores</Link> o mira quién compite en <Link href="/veladas">Veladas</Link>.</li>
@@ -20,7 +24,7 @@ export default function Help() {
       </ol>
       <p className="mut">Solo se puede dar aura por un combate que ya se ha celebrado, una vez por combate y peleador, y no pueden darla quienes han participado en él. Si cambias de opinión, puedes quitar tu aura.</p>
 
-      <h2>Si eres peleador</h2>
+      <h2 id="peleador">Si eres peleador</h2>
       <ol>
         <li><Link href="/registro">Crea tu cuenta</Link> eligiendo «Peleador» y confirma tu correo electrónico.</li>
         <li>Si alguien ya registró un combate tuyo, busca tu ficha y pide que pase a ser tuya. Si no aparece, crea una nueva.</li>
@@ -29,7 +33,7 @@ export default function Help() {
         <li>La confirmación del rival es opcional. Si discrepa, su aviso pide revisión a moderación; no elimina automáticamente el resultado ni su aura. Puedes declarar títulos anteriores desde «Mis títulos y mi aura», aunque aún no haya entrenadores ni federaciones en la aplicación.</li>
       </ol>
 
-      <h2>Si organizas veladas</h2>
+      <h2 id="organizas">Si organizas veladas</h2>
       <p>Solicita el acceso de organizador en <Link href="/organizador">Organizadores</Link>. Un moderador revisa la solicitud. Después podrás crear tus veladas, montar el cartel y anotar los resultados, que quedan marcados como verificados.</p>
 
       <h2 id="respaldo">Qué significan las etiquetas de un combate</h2>
@@ -47,7 +51,7 @@ export default function Help() {
       </table>
 </div>
 
-      <h2>Cómo cuidamos que los datos sean fiables</h2>
+      <h2 id="fiables">Cómo cuidamos que los datos sean fiables</h2>
       <p>Mostramos cuánto respaldo tiene cada combate. Los resultados sin confirmar y el récord anterior declarado se identifican como tales. El reconocimiento de la comunidad está ligado a un combate concreto, se limita por usuario y solo pueden darlo personas registradas con el correo confirmado. Los cambios importantes quedan registrados.</p>
       <p>Un combate autodeclarado con resultado empieza a contar en el récord 24 horas después de registrarse. Si el rival lo rechaza o moderación lo pone en revisión, no llega a contar; si el rival lo confirma o una persona organizadora o moderadora lo verifica antes, cuenta en ese momento. El plazo se calcula desde la fecha de registro.</p>
       <p>El <Link href="/ranking">ránking de aura</Link> combina trayectoria, respaldo y reconocimiento de la comunidad. No es una clasificación deportiva oficial ni cambia el resultado de un combate.</p>
@@ -64,7 +68,7 @@ export default function Help() {
       <h2 id="google">Entrar con Google</h2>
       <p>Si ves el botón «Continuar con Google», puedes entrar o crear tu cuenta con tu cuenta de Google, sin inventar otra contraseña. Si ya tenías una cuenta en Lona con el mismo correo, entrarás en ella. Si no, se crea una nueva con el correo ya confirmado. Si algún día quieres entrar también con contraseña, elige una en «¿Has olvidado tu contraseña?».</p>
 
-      <h2>¿Has visto un error?</h2>
+      <h2 id="error">¿Has visto un error?</h2>
       <p>En la ficha de cualquier peleador encontrarás la opción <strong>«¿Hay un error? Avísanos»</strong>, disponible para usuarios registrados. Un moderador revisará tu aviso.</p>
       <p className="mut">Versión {VERSION} de Lona.</p>
     </>

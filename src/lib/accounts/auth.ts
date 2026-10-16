@@ -7,6 +7,8 @@ import { APP_URL, sendMail } from "../common/mail";
 import { oneLine } from "../common/text";
 import { internalPath, loginPath } from "../common/paths";
 import { esCreador } from "./creador";
+import { demoActiva } from "../common/demo";
+import { ignorarFichaVinculada } from "./landing";
 
 const COOKIE = "session";
 const SESSION_DAYS = 30;
@@ -44,6 +46,8 @@ export async function getUser() {
   const s = await db.session.findUnique({ where: { id: sha256(token) }, include: { user: { include: { fighter: { include: { disciplines: true } } } } } });
   if (!s || s.expiresAt < new Date()) return null;
   if (esCreador(s.user) && !s.secondFactorAt) return null; // la cuenta del creador, sin el segundo paso, no está dentro
+  // En la demo, el tipo probado manda sobre la ficha vinculada (ver ignorarFichaVinculada): así «Aficionado» ve de verdad al aficionado.
+  if (s.user.fighter && ignorarFichaVinculada(s.user.role, demoActiva())) return { ...s.user, fighter: null };
   return s.user;
 }
 

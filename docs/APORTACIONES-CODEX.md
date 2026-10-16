@@ -426,6 +426,7 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Límites:** React #418 registrado en rival, persona mayor y peleador completo; causa pendiente. No se ejecutan pruebas de nuevo ni se revisan capturas nuevas: el artefacto existe, pero la descarga local no conecta. Evidencias y pendientes en docs/pruebas/escenarios-2026-10-16.md.
 **Siguiente:** revisión de Claude. Esperar #93 → #88 → #89 → #90 antes de actualizar y renumerar #91. No se inicia agenda ni se fusiona nada.
 
+
 ## 2026-10-15 — Gimnasios aportados desde fichas, pendientes de revisión
 **Pedido:** cuarto punto del relevo: PENDING si no lo hace moderación.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/gimnasios-desde-fichas-en-revision-20261015`.
@@ -523,6 +524,7 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Cambios:** caret:initial en ambas capturas, lección y causa actualizadas con atribución a la reproducción de Claude; escenarios solo manual/al fusionar/PR etiquetado. Etiqueta escenarios añadida a #91 antes de actualizarlo para comprobarlo completo una vez. Se retira encType redundante en Mi ficha como indicó Claude; sin cambio de acción ni permisos. Todos los recorridos de la base conservados.
 **Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos; compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, caso intacto. Ejecución de los dieciséis escenarios pendiente del CI completo tras #90. Sin datos reales alterados.
 
+
 ## Corrección del recorrido tras CI 38942511433
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
@@ -539,3 +541,12 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
 - Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
 - La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.
+
+
+
+## 17-10-2026 — Reconciliación con Claude
+- #97, #99 y #100 ya están fusionados; #98 cerrado como superado tras comprobar que cuenta.mjs coincide con la corrección incorporada.
+- #91 incorpora la candidata del menú #101 sin cambiar la carpeta ni el índice de Claude: preparación con objetos Git e índice aislado, sin clon ni node_modules duplicados.
+- Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
+- La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
+- Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.

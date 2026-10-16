@@ -26,20 +26,22 @@ check("el mapa se dibuja (o, si el dispositivo no puede, lo dice y deja la lista
 if (hayMapa) check("los gimnasios de la búsqueda salen en el mapa (sueltos o agrupados)", (await p.locator(".marcador-gimnasio, .marcador-grupo").count()) >= 1);
 check("la lista completa tiene los tres gimnasios", (await p.locator(".lista-completa li").count()) === 3);
 
-// Sin ubicación: «Los mejores de tu búsqueda», por valoración Lona (el verificado, primero).
-check("sin ubicación salen «Los mejores» de la búsqueda", await seen(p.getByRole("heading", { name: "Los mejores de tu búsqueda" })));
-check("ordenados por valoración: el verificado va primero", (await p.locator("#lista-mejores li").first().innerText()).includes("Gimnasio Medio"));
+// Sin ubicación: «Los más populares de tu búsqueda», por cuánta gente hay (un entrenador pone primero al de «Cerca»). Sin ránking.
+check("sin ubicación salen «Los más populares» de la búsqueda", await seen(p.getByRole("heading", { name: "Los más populares de tu búsqueda" })));
+check("ordenados por popularidad: el que tiene un entrenador va primero", (await p.locator("#lista-populares li").first().innerText()).includes("Gimnasio Cerca"));
+const textoPopulares = await p.locator("#lista-populares").innerText();
+check("no hay puestos ni «mejores»: los gimnasios no se clasifican (decisión del fundador, 16-10-2026)", !/#\d/.test(textoPopulares) && !/mejor/i.test(await p.locator(".mapa-populares").innerText()));
 check("la lista completa sigue, recogida en «Ver todos los gimnasios»", await seen(p.locator("summary", { hasText: "Ver todos los gimnasios" })));
 await p.getByRole("button", { name: "Usar mi ubicación" }).click();
-check("con la ubicación salen «Los mejores de tu zona»", await seen(p.getByRole("heading", { name: "Los mejores de tu zona" })));
-const zona = await p.locator("#lista-mejores li").allInnerTexts();
-check("en tu zona no entra el de Sevilla, y el verificado sigue primero", zona.length === 2 && zona[0].includes("Gimnasio Medio") && !zona.join(" ").includes("Gimnasio Lejos"));
+check("con la ubicación salen «Los más populares de tu zona»", await seen(p.getByRole("heading", { name: "Los más populares de tu zona" })));
+const zona = await p.locator("#lista-populares li").allInnerTexts();
+check("en tu zona no entra el de Sevilla, y el más popular va primero", zona.length === 2 && zona[0].includes("Gimnasio Cerca") && !zona.join(" ").includes("Gimnasio Lejos"));
 await p.getByRole("button", { name: "Más cerca" }).click();
 check("«Más cerca» los ordena por distancia", await seen(p.getByRole("heading", { name: "Los más cercanos a ti" })));
-const cercanos = await p.locator("#lista-mejores li").allInnerTexts();
+const cercanos = await p.locator("#lista-populares li").allInnerTexts();
 check("ordenados por distancia: primero el de al lado, el de Sevilla el último", cercanos.length === 3 && cercanos[0].includes("Gimnasio Cerca") && cercanos[2].includes("Gimnasio Lejos"));
 check("con la distancia escrita («a 400 m»)", /a \d+ m/.test(cercanos[0]) && /a [\d.]+ km/.test(cercanos[2]));
-check("avisa de que la ubicación es aproximada cuando no hay dirección", cercanos[1].includes("ubicación aproximada") && !cercanos[0].includes("ubicación aproximada"));
+check("avisa de que la ubicación es aproximada cuando no hay dirección", /ubicación aproximada/i.test(cercanos[1]) && !/ubicación aproximada/i.test(cercanos[0]));
 for (const tema of ["light", "dark"]) {
   await p.emulateMedia({ colorScheme: tema }); await p.waitForTimeout(600);
   const r = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();

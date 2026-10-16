@@ -524,6 +524,7 @@ La ejecución de unitarias junto al navegador agotó el límite de dos pruebas d
 
 - 15-10-2026: los escenarios de persona necesitan un entorno propio con datos ficticios y sus capturas. Un paso bloqueante interrumpe ese recorrido conservando el fallo; no se relajan las afirmaciones ni se disimula el resto como aprobado.
 
+
 - 15-10-2026: una regla de publicación también debe aplicarse a los alta indirectas y a los valores por defecto. La revisión de gimnasio y su sello de verificación son independientes; las pruebas deben pasar por ambas decisiones cuando las necesitan.
 
 - 15-10-2026: al introducir revisión previa, las pruebas de búsqueda y metadatos deben preparar la aprobación mediante la interfaz y comprobar la invisibilidad antes de ella; no basta adaptar el recorrido principal.

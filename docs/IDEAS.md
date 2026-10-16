@@ -420,6 +420,7 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 - 15-10-2026, fundador: escenarios definitivos para todos los tipos de cuenta, después del relevo D/H. T-009 en ejecución por Codex.
 
+
 - 15-10-2026, fundador: unificar las altas de gimnasio desde fichas con la revisión previa del directorio; en pruebas.
 
 ## 16 de octubre de 2026 — Perfiles de gimnasios

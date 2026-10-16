@@ -11,6 +11,9 @@ import { almacenDeVideos } from "../../lib/media/storage";
 import InputFoto from "../components/InputFoto";
 import { shareMedia } from "../actions/media";
 import SubirVideo from "../components/SubirVideo";
+import Icono from "../components/Icono";
+import { PasosGuia, TarjetaElegirVelada } from "../components/GuiaAcciones";
+import { urlCartel } from "../../lib/events/entradas";
 
 export const metadata: Metadata = { title: "Subir vídeos o fotos", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -37,16 +40,18 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
     return (
       <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
         <div><h1>Subir vídeos o fotos de una velada</h1><p className="lead" style={{ fontSize: 16 }}>Comparte lo que grabaste para que los peleadores tengan las imágenes de sus combates. Primero, elige la velada.</p></div>
+        <PasosGuia pasos={["Elige la velada", "Sube tu foto o vídeo"]} actual={1} />
         {velada && <div className="notice notice-bad" role="alert"><span aria-hidden="true">⚠ </span>No encontramos esa velada. Búscala en la lista.</div>}
+        {veladas.length ? (
+          <nav className="desliza desliza-veladas" aria-label="Veladas de los últimos meses">
+            {veladas.map((v) => <TarjetaElegirVelada key={v.id} href={`/compartir?velada=${v.slug}`} nombre={v.name} fecha={v.date} lugar={`${v.venue}, ${v.city}`} disciplina={v.discipline} cartel={urlCartel(v)} />)}
+          </nav>
+        ) : <p className="mut">{texto ? "No hay veladas de los últimos cuatro meses con ese nombre o ciudad." : "No hay veladas celebradas en los últimos cuatro meses."} Si la velada no está en Lona, su organizador puede publicarla, o puedes buscarla en el <Link href="/veladas">calendario</Link>.</p>}
+        <p className="mut" style={{ margin: 0 }}>¿No ves tu velada? Búscala por su nombre o su ciudad:</p>
         <form role="search" aria-label="Buscar la velada" className="search" style={{ alignItems: "flex-end" }}>
           <label className="field" style={{ flex: 1, minWidth: 200 }}><span>Nombre o ciudad de la velada</span><input name="q" defaultValue={texto} maxLength={80} /></label>
           <button className="secondary">Buscar la velada</button>
         </form>
-        {veladas.length ? (
-          <nav className="lista" aria-label="Veladas de los últimos meses">
-            {veladas.map((v) => <Link key={v.id} href={`/compartir?velada=${v.slug}`} className="fila"><span className="cuerpo"><span className="nombre">{v.name}</span><span className="meta">{EVENT_KIND_LABEL[v.kind]} · {fmtDate(v.date)} · {v.city} · {DISCIPLINE_LABEL[v.discipline]}</span></span></Link>)}
-          </nav>
-        ) : <p className="mut">{texto ? "No hay veladas de los últimos cuatro meses con ese nombre o ciudad." : "No hay veladas celebradas en los últimos cuatro meses."} Si la velada no está en Lona, su organizador puede publicarla, o puedes buscarla en el <Link href="/veladas">calendario</Link>.</p>}
       </div>
     );
   }
@@ -57,6 +62,7 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
     <div className="pantalla pantalla-formulario" style={{ gap: 18 }}>
       <p style={{ margin: 0 }}><Link href="/compartir">← Elegir otra velada</Link></p>
       <div><h1>Subir vídeos o fotos</h1><p className="lead" style={{ fontSize: 16 }}>{e.name} · {fmtDate(e.date)} · {e.city}</p></div>
+      <PasosGuia pasos={["Elige la velada", "Sube tu foto o vídeo"]} actual={2} />
       {estado !== "ok" ? <div className="notice notice-bad" role="alert"><span aria-hidden="true">⚠ </span>{MOTIVO[estado]}</div>
         : !user.emailVerifiedAt ? <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Para compartir vídeos y fotos, primero <Link href="/verificar">confirma tu correo electrónico</Link>.</div>
         : (
@@ -69,11 +75,11 @@ export default async function Compartir({ searchParams }: { searchParams: Promis
               </label>
             )}
             <fieldset className="tarjeta" style={{ margin: 0 }}>
-              <legend className="leyenda">Una foto</legend>
+              <legend className="leyenda leyenda-accion"><Icono nombre="camara" tam={22} /> Una foto</legend>
               <label className="field"><span>Elige una foto de tu móvil o de tu ordenador</span><InputFoto name="image" /></label>
             </fieldset>
             <fieldset className="tarjeta" style={{ margin: 0 }}>
-              <legend className="leyenda">O un vídeo</legend>
+              <legend className="leyenda leyenda-accion"><Icono nombre="play" tam={22} /> O un vídeo</legend>
               <SubirVideo disponible={!!almacen} maxBytes={almacen?.maxBytes ?? 0} />
               <label className="field"><span>{almacen ? "Si ya está en internet, pega su enlace en lugar de subirlo" : "Enlace del vídeo (YouTube, Instagram, TikTok…)"}</span><input name="videoUrl" type="url" inputMode="url" maxLength={500} placeholder="https://…" /></label>
               {almacen?.tipo === "disco" && <p className="mut" style={{ margin: 0 }}>Versión de prueba: los vídeos subidos aquí se guardan en el servidor de pruebas y pueden borrarse.</p>}
