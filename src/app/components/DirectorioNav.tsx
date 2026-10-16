@@ -12,20 +12,25 @@ const DIRECTORIOS = [["peleadores", "Peleadores", "/peleadores"], ["entrenadores
 export function DirectorioNav({ actual }: { actual: (typeof DIRECTORIOS)[number][0] }) {
   return (
     <nav className="pestanas-barra directorio-nav" aria-label="Directorios de la comunidad">
-      {DIRECTORIOS.map(([clave, texto, href]) => <Link key={clave} href={href} className="directorio-enlace" aria-current={clave === actual ? "page" : undefined}>{texto}</Link>)}
+      {DIRECTORIOS.map(([clave, texto, href]) => <Link key={clave} href={href} className="pestana directorio-enlace" aria-current={clave === actual ? "page" : undefined}>{texto}</Link>)}
     </nav>
   );
 }
 
 /** Fila deslizable de disciplinas: «Todas» más una por deporte. `conservar` son los demás filtros que se mantienen al elegir una. */
+export function enlaceDisciplina(ruta: string, actual: Discipline | undefined, destino: Discipline | undefined, conservar: Record<string, string | undefined>) {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(conservar)) {
+    // Categoría y división dependen del deporte: repetir el filtro activo no es cambiarlo.
+    if (v && (destino === actual || (k !== "categoria" && k !== "divisionId"))) p.set(k, v);
+  }
+  if (destino) p.set("disciplina", destino);
+  const s = p.toString();
+  return s ? `${ruta}?${s}` : ruta;
+}
+
 export function ChipsDisciplina({ ruta, actual, conservar }: { ruta: string; actual?: Discipline; conservar: Record<string, string | undefined> }) {
-  const hacia = (d?: Discipline) => {
-    const p = new URLSearchParams();
-    for (const [k, v] of Object.entries(conservar)) if (v) p.set(k, v);
-    if (d) p.set("disciplina", d);
-    const s = p.toString();
-    return s ? `${ruta}?${s}` : ruta;
-  };
+  const hacia = (d?: Discipline) => enlaceDisciplina(ruta, actual, d, conservar);
   return (
     <nav className="filtros-disciplina desliza-fila" aria-label="Filtrar por disciplina">
       <Link href={hacia()} aria-current={!actual ? "page" : undefined}>Todas</Link>

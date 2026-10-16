@@ -2135,6 +2135,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/directorio-disciplina.test.ts",
+    "purpose": "Regresión del enlace de disciplina de los directorios: repetir la disciplina activa conserva categoría y división; cambiarla las limpia.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/unit/disciplines.test.ts",
     "purpose": "Prueba catálogos de disciplina/nivel/peso/método y rechazo de elecciones no admitidas.",
     "guide": "docs/mantenimiento/OPERACION.md"
