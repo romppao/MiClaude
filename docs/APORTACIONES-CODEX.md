@@ -411,6 +411,16 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
 
+## 2026-10-15 — Vinculación a gimnasios por invitación
+**Pedido:** segundo punto del relevo: el titular invita y la persona acepta, con hayBloqueo. Se mantiene la vinculación directa de moderación.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/invitaciones-de-miembros-de-gimnasio-20261015`.
+**Cambios:** GymMemberInvitation con claves foráneas y una sola ficha por invitación, caducidad de 14 días, aceptación/rechazo/cancelación, bandeja privada paginada y avisos dentro de la aplicación. Se revalidan propiedad, cuenta destinataria, bloqueos y gimnasio anterior. Los bloqueos cancelan invitaciones pendientes. La copia de datos incorpora las invitaciones propias. Entrenadores con titular de Profile también pueden aceptar.
+**Archivos compartidos:** esquema y migración aditiva; package.json conserva todos los scripts y añade el nuevo recorrido.
+**Pruebas:** autorización y recorrido real de peleador/entrenador, rechazo, cancelación, bloqueo y cesión posterior; validación en curso.
+**Siguiente:** revisión de Claude; cesión de gimnasio en PR separado. No se toca RFC-002.
+
+**Validación local de #88:** migraciones y paridad, tipos, 15 comprobaciones documentales y compilación aprobados. 849/851 unitarias pasaron en la ejecución con carga; las dos agotadas por tiempo pasan aisladas junto con autorización: 287/287. En navegador pasan invitación, duplicado, aceptación de peleador y entrenador, rechazo y cancelación. La prueba de bloqueo conserva la pantalla anterior a bloquear para verificar también la guarda del servidor, ya que la lista oculta las invitaciones bloqueadas al recargar. El recorrido completo posterior pasa: invitación, duplicado, ambas fichas, rechazo, cancelación, bloqueo posterior/inverso, cambio de titular y copia de datos. Un intento intermedio no llegó a registrar por pérdida temporal de conexión a Postgres; el contenedor seguía activo y la repetición completa pasó.
+
 ## 2026-10-15 — Bandeja única de moderación, rehecha sobre 0.18.0
 **Pedido:** puntos 1–4 del relevo de Claude y después T-009, cada uno en su PR. No actualizar T-013 ni T-002.
 **Base:** `claude/ring-espana-mvp`, `5995bd7`. **Rama:** `codex/bandeja-unica-de-moderacion-20261015`.
@@ -443,3 +453,12 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
 
 **Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.
+
+
+## 2026-10-16 - Codex - Actualización de #88 sobre la base candidata 0.20.2
+
+**Encargo:** relevo de Claude en #95 y aprobación de #88 (comentario6195353236). Rama propia `codex/pr88-integracion-20261016`, sin rebase. Preparación local mientras termina el CI de #96; no se publica hasta que el anterior esté fusionado.
+
+**Integración:** se conservan las invitaciones originales y las entradas/carteles de la principal. El esquema mantiene ambos modelos y los avisos admiten GYM_MEMBER y TICKET. El nuevo recorrido `gimnasios-invitaciones` entra en `tests/e2e/orden.json`; se conserva el ejecutor nuevo que completa todos los recorridos. Historial de documentos preservado; versión 0.20.3 por el script oficial. No se modifican las reglas de permisos aprobadas por Claude.
+
+**Validación:** esquema Prisma válido; tipos, 901 unitarias, versión, catálogo y mapa correctos. Compilación completa con BUILD_EXIT=0. Documentación33/34 por EPERM de enlaces simbólicos en Windows, sin alterar la prueba. No se ejecutan migraciones ni se alteran datos locales o remotos. CI con base vacía requerido antes de fusionar.

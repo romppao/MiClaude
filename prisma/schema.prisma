@@ -107,6 +107,7 @@ enum GymClaimStatus {
 }
 
 model Gym {
+  memberInvitations GymMemberInvitation[]
   id           String    @id @default(cuid())
   slug         String    @unique
   name         String
@@ -165,6 +166,7 @@ model GymClaimRequest {
 }
 
 model Trainer {
+  gymInvitations GymMemberInvitation[]
   id            String          @id @default(cuid())
   slug          String          @unique
   name          String
@@ -354,6 +356,7 @@ model Highlight {
 }
 
 model Fighter {
+  gymInvitations GymMemberInvitation[]
   availableToFight Boolean @default(false)
   currentWeightKg Decimal? @db.Decimal(5, 2)
   availableSince DateTime?
@@ -519,6 +522,8 @@ model Notification {
 }
 
 model User {
+  sentGymMemberInvitations GymMemberInvitation[] @relation("GymMemberSender")
+  receivedGymMemberInvitations GymMemberInvitation[] @relation("GymMemberRecipient")
   notifications Notification[]
   ownedGyms Gym[] @relation("GymOwner")
   gymClaims GymClaimRequest[] @relation("GymClaimApplicant")
@@ -997,6 +1002,33 @@ model EmailOutbox {
 
   @@index([status, priority, nextAttemptAt])
   @@index([sentAt])
+}
+
+// Una invitación no cambia la ficha: solo la aceptación de su titular vincula el gimnasio.
+// Conserva la afiliación al invitar para no pisar una edición posterior de la persona.
+model GymMemberInvitation {
+  id String @id @default(cuid())
+  gymId String
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  senderId String
+  sender User @relation("GymMemberSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient User @relation("GymMemberRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  fighterId String?
+  fighter Fighter? @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  trainerId String?
+  trainer Trainer? @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  previousGymId String?
+  status ClassRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  answeredAt DateTime?
+
+  @@index([gymId, status])
+  @@index([recipientId, status])
+  @@index([senderId])
+  @@index([fighterId])
+  @@index([trainerId])
 }
 
 enum TicketStatus {

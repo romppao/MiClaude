@@ -2358,5 +2358,15 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "prisma/migrations/20261015180000_invitaciones_miembros/migration.sql",
+    "purpose": "Añade invitaciones de miembros con claves foráneas, índices y restricción que exige una única ficha de peleador o entrenador; sin cambiar afiliaciones existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
+    "path": "tests/e2e/gimnasios-invitaciones.mjs",
+    "purpose": "Recorre invitaciones reales de miembros: consentimiento de peleador y entrenador, rechazo/cancelación, bloqueos, cambio de titular y copia privada de datos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   }
 ]

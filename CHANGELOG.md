@@ -24,6 +24,12 @@ PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan
 - **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
 - **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
 
+## [0.20.3] — 2026-10-16
+
+### Añadido
+- El titular de un gimnasio invita a peleadores y entrenadores; cada persona acepta o rechaza sin que la invitación cambie su ficha. Se comprueban bloqueos, propiedad y afiliación al responder.
+
+
 ## [0.20.2] — 2026-10-16
 
 ### Corregido
