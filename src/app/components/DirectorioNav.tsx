@@ -12,7 +12,7 @@ const DIRECTORIOS = [["peleadores", "Peleadores", "/peleadores"], ["entrenadores
 export function DirectorioNav({ actual }: { actual: (typeof DIRECTORIOS)[number][0] }) {
   return (
     <nav className="pestanas-barra directorio-nav" aria-label="Directorios de la comunidad">
-      {DIRECTORIOS.map(([clave, texto, href]) => <Link key={clave} href={href} aria-current={clave === actual ? "page" : undefined}>{texto}</Link>)}
+      {DIRECTORIOS.map(([clave, texto, href]) => <Link key={clave} href={href} className="directorio-enlace" aria-current={clave === actual ? "page" : undefined}>{texto}</Link>)}
     </nav>
   );
 }
@@ -27,9 +27,9 @@ export function ChipsDisciplina({ ruta, actual, conservar }: { ruta: string; act
     return s ? `${ruta}?${s}` : ruta;
   };
   return (
-    <nav className="chips-desliza chips-disciplina" aria-label="Filtrar por disciplina">
-      <Link href={hacia()} className="chip" aria-current={!actual ? "page" : undefined}>Todas</Link>
-      {DISCIPLINE_ORDER.map((d) => <Link key={d} href={hacia(d)} className="chip" aria-current={actual === d ? "page" : undefined}>{DISCIPLINE_LABEL[d]}</Link>)}
+    <nav className="filtros-disciplina desliza-fila" aria-label="Filtrar por disciplina">
+      <Link href={hacia()} aria-current={!actual ? "page" : undefined}>Todas</Link>
+      {DISCIPLINE_ORDER.map((d) => <Link key={d} href={hacia(d)} aria-current={actual === d ? "page" : undefined}>{DISCIPLINE_LABEL[d]}</Link>)}
     </nav>
   );
 }

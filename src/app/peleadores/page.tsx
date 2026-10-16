@@ -54,7 +54,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       <h1>Peleadores</h1>
       <DirectorioNav actual="peleadores" />
       <ChipsDisciplina ruta="/peleadores" actual={discipline} conservar={{ q, level, province, disponibles }} />
-      <form className="search" role="search" aria-label="Filtrar peleadores">
+      <form className="search search-directorio" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
         <MasFiltros activos={activos.filter((x) => !x.claves.includes("q")).length}>
@@ -75,8 +75,8 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
               pildora={isAvailable(b) ? `Disponible para pelear${b.currentWeightKg !== null ? ` · ${b.currentWeightKg} kg` : ""}` : undefined}
               lineas={[
                 principal ? `${DISCIPLINE_LABEL[principal.discipline]} · ${levelName(principal.level)}${discs.length > 1 ? ` (+${discs.length - 1})` : ""}` : "Sin disciplina",
-                [b.alias ? `“${b.alias}”` : null, b.province, b.gym?.name].filter(Boolean).join(" · "),
-              ].filter(Boolean)} />
+                [b.province, b.gym?.name].filter(Boolean).join(" · "),
+              ].filter(Boolean)} extra={b.alias ? `“${b.alias}”` : undefined} />
           );
         })}
       </div>

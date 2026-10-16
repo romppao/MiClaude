@@ -13,8 +13,8 @@ import IconoDisciplina from "./IconoDisciplina";
 const tinte = (d: Discipline | null | undefined) => ({ "--tinte": tinteDe(d) }) as CSSProperties;
 
 /** Peleador o entrenador: retrato, nombre y, debajo, lo que más sirve para elegir. La primera línea va en lima. */
-export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, lineas }: {
-  href: string; tipo: "peleador" | "entrenador"; id: string; nombre: string; disciplina: Discipline | null; pildora?: string; lineas: string[];
+export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, lineas, extra }: {
+  href: string; tipo: "peleador" | "entrenador"; id: string; nombre: string; disciplina: Discipline | null; pildora?: string; lineas: string[]; extra?: string;
 }) {
   return (
     <Link href={href} className="card tarjeta-foto cartel-persona" style={tinte(disciplina)} data-reveal>
@@ -22,12 +22,14 @@ export function TarjetaPersona({ href, tipo, id, nombre, disciplina, pildora, li
       {/* La foto es decorativa: el nombre ya está escrito en la tarjeta. */}
       <Foto src={`/imagenes/${tipo}/${id}/avatar`} />
       <span className="arriba">
-        {pildora ? <span className="pildora pildora-acc">{pildora}</span> : <span />}
+        <span />
         {disciplina && <span className="cartel-icono"><IconoDisciplina d={disciplina} tam={20} grosor={1.7} /></span>}
       </span>
       <span className="abajo">
+        {pildora && <span className="pildora pildora-acc">{pildora}</span>}
         <strong>{nombre}</strong>
         {lineas.map((l, i) => <span key={i} className={i === 0 ? "meta-acc" : "cartel-dato"}>{l}</span>)}
+        {extra && <span className="cartel-dato cartel-extra">{extra}</span>}
       </span>
     </Link>
   );
@@ -42,9 +44,9 @@ export function TarjetaGimnasioCartel({ id, slug, nombre, ciudad, provincia, pel
       <Foto src={`/imagenes/gimnasio/${id}/banner`} />
       <span className="arriba">
         <span className="cartel-logo"><span aria-hidden="true">{iniciales(nombre)}</span><Foto src={`/imagenes/gimnasio/${id}/avatar`} /></span>
-        {verificado && <span className="pildora pildora-acc" title="Verificado por un moderador">Verificado</span>}
       </span>
       <span className="abajo">
+        {verificado && <span className="pildora pildora-acc" title="Verificado por un moderador">Verificado</span>}
         <strong>{nombre}</strong>
         <span className="meta-acc">{ciudad} ({provincia})</span>
         <span className="cartel-dato">{peleadores === 1 ? "1 peleador" : `${peleadores} peleadores`}</span>

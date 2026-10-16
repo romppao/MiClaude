@@ -49,15 +49,15 @@ export default async function Trainers({ searchParams }: { searchParams: Promise
       <h1>Entrenadores</h1>
       <DirectorioNav actual="entrenadores" />
       <ChipsDisciplina ruta="/entrenadores" actual={discipline} conservar={{ q, province, clases, entrena }} />
-      <form className="search" role="search" aria-label="Filtrar entrenadores">
+      <form className="search search-directorio" role="search" aria-label="Filtrar entrenadores">
         <CampoFiltro etiqueta="Nombre del entrenador"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <BotonesFiltro ruta="/entrenadores" hayFiltros={activos.length > 0} />
         <label className="chip"><input type="checkbox" name="clases" value="1" defaultChecked={clases === "1"} />Da clases en Lona</label>
         <MasFiltros activos={[province, dondeEntrena].filter(Boolean).length}>
           <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
           <CampoFiltro etiqueta="Dónde entrena"><select name="entrena" defaultValue={dondeEntrena ?? ""}><option value="">Gimnasio o por su cuenta</option><option value="gimnasio">En un gimnasio</option><option value="independiente">Por su cuenta</option></select></CampoFiltro>
         </MasFiltros>
         {discipline && <input type="hidden" name="disciplina" value={discipline} />}
-        <BotonesFiltro ruta="/entrenadores" hayFiltros={activos.length > 0} />
       </form>
       <FiltrosActivos ruta="/entrenadores" params={parametros} activos={activos} />
       <p aria-live="polite" className="mut">{total === 0 ? "Ningún entrenador coincide con estos filtros." : `${plural(total, "entrenador encontrado", "entrenadores encontrados")}.`} <Link href="/clases">Ver las clases disponibles</Link></p>
