@@ -200,6 +200,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261016090000_entradas_y_cartel/migration.sql",
+    "purpose": "Hora de inicio, cartel (posterKey/posterAt y la tabla EventPoster), condiciones de las entradas de la velada y la tabla TicketReservation.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -407,6 +412,11 @@
   {
     "path": "src/app/actions/demo.ts",
     "purpose": "Confirma correo y cambia papel solo en copia de demostración habilitada; no debe habilitarse para personas/datos reales.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/actions/entradas.ts",
+    "purpose": "Cartel y entradas de una velada: la promotora guarda cartel, precio, aforo y Bizum; el público reserva y cancela; la promotora confirma la señal, valida en la puerta, deshace y cancela.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -725,6 +735,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/ReservaEntradas.tsx",
+    "purpose": "Formulario de reserva de entradas con el desglose al momento: total, señal por Bizum y lo que queda para la puerta.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/components/SeleccionLote.tsx",
     "purpose": "«Marcar todas» y recuento de casillas marcadas para responder a varias solicitudes a la vez.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -970,6 +985,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/mis-entradas/page.tsx",
+    "purpose": "Pantalla «Mis entradas»: reservas de la persona con el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/mis-gimnasios/page.tsx",
     "purpose": "Área privada de búsqueda, reclamación y gestión del gimnasio propio, con edición, miembros, retirada y cesión de propiedad.",
     "guide": "docs/GIMNASIOS-REALES.md"
@@ -1042,6 +1062,16 @@
   {
     "path": "src/app/organizador/[slug]/emparejar/page.tsx",
     "purpose": "Ayuda para emparejar: nivel de cada aceptado y los rivales más parecidos de su categoría, con botón para añadir el combate al cartel.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/entradas/csv/route.ts",
+    "purpose": "Descarga en CSV de las reservas de entradas de una velada con los mismos filtros que la pantalla; solo su organizador o la administración.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/organizador/[slug]/entradas/page.tsx",
+    "purpose": "Reservas de entradas de una velada para su promotora: resumen, filtros por estado, búsqueda por código y botones de señal, puerta, deshacer y cancelar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1197,6 +1227,11 @@
   {
     "path": "src/app/veladas/[slug]/calendario/route.ts",
     "purpose": "GET público de calendario ICS solo para veladas publicadas; sin datos personales ni descarga de veladas ocultas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/veladas/[slug]/cartel/route.ts",
+    "purpose": "Imagen del cartel de una velada visible (WebP), del almacén de fotos o de EventPoster; caché larga si la dirección lleva versión.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1515,6 +1550,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "src/lib/events/entradas.ts",
+    "purpose": "Reglas de las entradas: señal del 50 %, plazos (24 h y cierre 3 h antes), códigos LONA-, Bizum, plazas ocupadas, caducidad y lista de reservas de la promotora.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/events/pairing.ts",
     "purpose": "Distancia y parecido entre dos peleadores (experiencia, peso, victorias, aura, edad) y avisos de diferencias para la ayuda a emparejar.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1790,6 +1830,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/entradas.mjs",
+    "purpose": "Prueba de navegador del cartel y las entradas: abrir la venta, reservar, señal, puerta, deshacer, cancelar, aforo, caducidad, CSV y permisos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/escenarios.mjs",
     "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2012,6 +2057,11 @@
   {
     "path": "tests/unit/enlaces-correo.test.ts",
     "purpose": "Comprueba rutas y configuración de enlaces generados para correos de acceso/avisos.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/entradas.test.ts",
+    "purpose": "Reglas de las entradas: señal redondeada, horas, Bizum, plazos, cierre y motivos para no reservar.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

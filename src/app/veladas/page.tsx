@@ -8,8 +8,10 @@ import Paginacion from "../components/Paginacion";
 import { BotonesFiltro, CampoFiltro, FiltrosActivos, MasFiltros } from "../components/Filtros";
 import { calendarDayStart } from "../../lib/common/dates";
 import { plural } from "../../lib/common/text";
-import { LEVEL_LABEL, PROVINCES, fmtDate } from "../../lib/common/labels";
+import { LEVEL_LABEL, PROVINCES } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL, DISCIPLINE_ORDER, isDiscipline } from "../../lib/common/disciplines";
+import { fmtHora, urlCartel, ventaAbierta } from "../../lib/events/entradas";
+import { TarjetaVelada } from "../components/Tarjetas";
 
 export const metadata = { title: "Calendario de veladas" };
 export const dynamic = "force-dynamic";
@@ -31,13 +33,14 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
     ...(ids && { id: { in: ids } }),
     ...(conInscripcion && { registrationOpen: true, status: "SCHEDULED" as const, OR: [{ registrationUntil: null }, { registrationUntil: { gte: dayStart } }] }),
   };
+  const ahora = new Date();
   const total = await db.event.count({ where });
   const w = pageWindow(total, pageNumber(pagina));
   const events = await db.event.findMany({ where, orderBy: [{ date: period === "1" ? "desc" : "asc" }, { id: "asc" }], skip: w.skip, take: w.take, include: { _count: { select: { bouts: { where: { verification: { not: "DISPUTED" } } } } } } });
   return (
     <>
       <h1>Calendario de veladas</h1>
-      <p className="mut">Consulta el cartel y los resultados de cada velada. Las canceladas llevan un aviso.</p>
+      <p className="mut">Carteles, horarios y entradas de cada velada, y sus resultados cuando terminan. Las canceladas llevan un aviso.</p>
       <form className="search" role="search" aria-label="Filtrar veladas">
         <CampoFiltro etiqueta="Velada, ciudad o recinto"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <MasFiltros activos={[disciplina, level, province, period, conInscripcion ? "1" : ""].filter(Boolean).length}>
@@ -57,17 +60,24 @@ export default async function Events({ searchParams }: { searchParams: Promise<R
         ...(period ? [{ texto: period === "1" ? "Ya celebradas" : "Todas las fechas", claves: ["past"] }] : []),
         ...(conInscripcion ? [{ texto: "Con inscripción abierta", claves: ["inscripcion"] }] : []),
       ]} />
-      <div className="grid">
-        {events.map((e) => (
-          <Link key={e.id} href={`/veladas/${e.slug}`} className="card">
-            <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
-            {e.status === "CANCELLED" && <span className="tag">Cancelada</span>}
-            {!e.organizerId && <span className="tag">No oficial</span>}
-            {e.registrationOpen && e.status === "SCHEDULED" && <span className="tag" style={{ background: "var(--acc)", color: "var(--acc-ink)" }}>Inscripción abierta</span>}
-            <strong>{e.name}</strong>
-            <div className="mut">{fmtDate(e.date)}<br />{e.venue}, {e.city} ({e.province})<br />{plural(e._count.bouts, "combate", "combates")}</div>
-          </Link>
-        ))}
+      <div className="grid velada-grid">
+        {events.map((e) => {
+          const reservar = ventaAbierta(e, ahora);
+          return (
+            <TarjetaVelada key={e.id} e={{
+              slug: e.slug, name: e.name, date: e.date, discipline: e.discipline, level: e.level, venue: e.venue, city: e.city,
+              hora: e.startMinute !== null ? fmtHora(e.startMinute) : null, cartel: urlCartel(e),
+              // El precio solo se anuncia si se puede reservar en Lona; si no, podría estar desfasado.
+              precio: reservar ? e.ticketPriceEuros : null, reservar,
+              etiquetas: [
+                ...(e.status === "CANCELLED" ? ["Cancelada"] : []),
+                ...(!e.organizerId ? ["No oficial"] : []),
+                ...(e.registrationOpen && e.status === "SCHEDULED" ? ["Inscripción abierta"] : []),
+                ...(e._count.bouts ? [plural(e._count.bouts, "combate", "combates")] : []),
+              ],
+            }} />
+          );
+        })}
       </div>
       {events.some((e) => !e.organizerId) && <p className="mut">«No oficial»: la velada no la ha publicado un organizador, la indicó un peleador al registrar su combate y sus datos pueden estar incompletos.</p>}
       {events.length === 0 && <p className="mut">No hay veladas con esos filtros. Puedes quitar un filtro en «Estás viendo» o <Link href="/veladas?past=todas">consultar todas las fechas sin filtros</Link>.</p>}

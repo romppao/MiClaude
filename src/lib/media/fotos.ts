@@ -6,7 +6,8 @@ import { carpetaEnDisco, configuracionR2 } from "./storage";
 import { registrarFallo } from "../common/fallos";
 
 /**
- * Almacén de las fotos que sube la gente: foto y banner de los perfiles, fotos de los highlights y fotos del público en las veladas
+ * Almacén de las fotos que sube la gente: foto y banner de los perfiles, fotos de los highlights, fotos del público en las veladas
+ * y carteles de las veladas
  * (T-004, parte 2; aprobado por el fundador el 15 de octubre de 2026). Hasta la 0.16 se guardaban dentro de PostgreSQL, y la base gratuita
  * (0,5 GB) se habría llenado con unos miles de fotos.
  *
@@ -19,8 +20,8 @@ import { registrarFallo } from "../common/fallos";
  * Las filas guardan la clave (`avatarKey`, `bannerKey`, `imageKey`) o, si no hay almacén, los bytes. Al leer, manda la clave; las fotos
  * antiguas sin clave se siguen leyendo de la base hasta que se trasladen (scripts/fotos-al-almacen.ts).
  */
-export type CarpetaDeFotos = "perfiles" | "highlights" | "medios";
-export const CLAVE_DE_FOTO = /^fotos\/(perfiles|highlights|medios)\/[0-9a-f-]{36}\.webp$/;
+export type CarpetaDeFotos = "perfiles" | "highlights" | "medios" | "carteles";
+export const CLAVE_DE_FOTO = /^fotos\/(perfiles|highlights|medios|carteles)\/[0-9a-f-]{36}\.webp$/;
 export const nuevaClaveDeFoto = (carpeta: CarpetaDeFotos) => `fotos/${carpeta}/${randomUUID()}.webp`;
 
 export type AlmacenDeFotos = {

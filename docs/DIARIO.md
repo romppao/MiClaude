@@ -2312,3 +2312,19 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 ## 2026-10-15 — Relevo D/H: bandeja única de moderación
 El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se reservó una rama desde 5995bd7 (0.18.0), conservando sin cambios T-013/T-002 para que Claude los integre. La bandeja conserva las acciones, notas, avisos anónimos, PAGINA y la paginación de cada cola. Se añaden decisiones de combate reales a paneles-avisos. Validación en curso.
+
+## 15 de octubre de 2026 — Fase 1: veladas visuales y entradas con señal por Bizum (Claude Code)
+
+**Encargo:** el fundador pidió veladas «con la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y poder reservar entradas pagando la mitad por Bizum para evitar reservas falsas. Claude programa mientras Codex no tiene créditos. La otra cuenta de Claude Code dejó hecha la base (migración, reglas y acciones) en la rama `claude-code/veladas-entradas`; esta sesión hizo las pantallas, la prueba y la documentación.
+
+**Decisiones:**
+- Los bytes del cartel, cuando no hay almacén de fotos, van a una tabla aparte (`EventPoster`). Muchas consultas leen la velada entera; con la imagen en `Event` la habrían arrastrado todas. Se probó a omitirla con el `omit` global de Prisma, pero cambia el tipo del cliente y rompía una decena de sitios. `Event.posterAt` dice si hay cartel y versiona su dirección, así la caché puede ser larga.
+- La hora se edita en «Datos de la velada» (también al crearla). El formulario de entradas ya no la toca, para no borrarla sin querer.
+- El precio solo se anuncia en la tarjeta del calendario cuando se puede reservar: si la venta está cerrada, podría estar desfasado.
+- Cancelar una reserva desde la promotora pide confirmación (no se puede deshacer). Validar en la puerta sí se puede deshacer.
+- La promotora ve el nombre y el correo de quien reserva (lo necesita para devolver una señal). Se avisa en el formulario de reserva.
+
+**Validación:** tipos y compilación correctos; 851 de 853 pruebas unitarias en este portátil. Fallan las dos de contraseñas por pasar de 5 s con el equipo cargado, como ya pasó otras veces en local. Las de entradas pasan. La prueba de navegador `tests/e2e/entradas.mjs` se ejecuta en el CI (Linux), porque las ayudas de las pruebas usan `psql` y variables de shell que no hay en Windows.
+
+**Pendiente:** el #92 ya está fusionado (autorizado por el fundador el 15-10 por la noche). Quedan este PR (#93) y los de Codex #88–#91, que se fusionan solo con el «sí» del fundador (el clasificador de seguridad de Claude Code no deja fusionar sin esa autorización). Después, la fase 2 (agenda del entrenador).
+**16-10-2026 — Revisión crítica de la fase 1 (flujo Claude + Codex):** `gpt-6-astra` revisó el PR #93 en solo lectura y señaló cinco fallos (confirmación de señal tardía sin comprobar aforo ni reserva activa, aforo guardado fuera del bloqueo, reserva con datos leídos antes del bloqueo, plazos que no se acortaban al adelantar la velada y desfase de una hora en los cambios de horario). Claude los verificó leyendo el código; Codex (`gpt-6.1-sol`, esfuerzo medio, ≈ 91.000 tokens) los arregló en una copia aparte con 34 pruebas nuevas; `gpt-6-luna` revisó los arreglos y aprobó. Claude añadió la retirada del cartel huérfano. Comprobado: tipos, 887 pruebas unitarias y los recorridos `entradas`, `calendario`, `inscripciones`, `veladas-pasadas`, `plazas` y `paneles-avisos` en local. No se probó concurrencia real contra PostgreSQL (solo lógica y bloqueos en pruebas con transacciones simuladas).
