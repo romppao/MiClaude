@@ -13,10 +13,11 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [0.22.1] — 2026-10-16
 
-PR de Claude Code: «Los mejores» de la pantalla de gimnasios (la lista que aparece primero, debajo del mapa) pasa de texto a carteles con foto (aviso del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí»).
+PR de Claude Code: los gimnasios dejan de clasificarse (avisos del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí» y «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial; únicamente para los peleadores […] puedes poner los más populares, pero no un ránking de quién es mejor que otro»).
 
 ### Cambiado
-- **Gimnasios — «Los mejores de tu zona» / «Los más cercanos a ti»:** carteles con la foto o la cabecera del gimnasio, el puesto (#1, #2…) o la distancia («a 400 m»), la etiqueta «Verificado» y sus datos. En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+- **Gimnasios — «Los más populares de tu zona» / «Los más cercanos a ti»** (lo que aparece primero, debajo del mapa): carteles con la foto o cabecera del gimnasio, la etiqueta «Verificado», sus datos y, con ubicación, la distancia («a 400 m»). En el móvil, una fila que se desliza; en el escritorio, una cuadrícula de cuatro columnas.
+- **Sin ránking de gimnasios:** se quitan «Los mejores», la valoración (que sumaba el aura de sus peleadores y un extra por estar verificado), la ordenación «Mejores» y los puestos (#1, #2…). El orden «Populares» cuenta solo cuánta gente hay (peleadores y entrenadores), y la explicación lo dice. Tampoco hay ránking de entrenadores: el ránking es solo de peleadores.
 
 ## [0.22.0] — 2026-10-16
 
