@@ -2488,3 +2488,17 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Lección (fallo que costó una hora):** un campo oculto llamado `id` dentro de un formulario con botones con nombre rompe el envío: React construye el formulario con `form.id`, que en ese caso devuelve el campo y no el texto, y pierde el botón pulsado (`decision` llegaba vacío). Los campos de identificador se llaman `invitationId`, `proposalId`… nunca `id` ni `method` ni `action`.
 
 **Pendiente:** denunciar una invitación y suspender el envío (PR3), y el papel de moderador con su barra y su pantalla «Hoy» (PR4 y PR5).
+
+## 17 de octubre de 2026, noche — Logotipos de gimnasios (Claude Code)
+
+**Petición del fundador:** «no se agregaron las imágenes a los gimnasios como pedí» y, después, «los logos de los gimnasios se pueden encontrar muy fácil con una simple búsqueda en Google o su Instagram, luego pedirle a Codex que mejore las imágenes».
+
+**Qué había:** la tarjeta ya sabía pintar la foto de un gimnasio, pero solo si el propio gimnasio la subía. Ningún gimnasio de la demo (95) la había subido, así que la lista solo enseñaba iniciales.
+
+**Qué se hizo (0.23.1):** una herramienta que lee la página de inicio de cada gimnasio de la lista investigada que tiene web (52), saca su logotipo y lo prepara. Salieron 37; el resto no tiene logotipo utilizable (la web no existe, no carga, lo prohíbe `robots.txt` o no hay imagen suya). Se revisaron a ojo en una hoja de contactos y se quitaron los que no eran el logotipo del gimnasio. La ruta `/imagenes/gimnasio/<id>/avatar` redirige al logotipo hallado cuando el gimnasio no tiene uno subido, así lo ven la lista, el mapa, la ficha y cualquier miniatura sin tocar cada pantalla.
+
+**Lo que no se hizo y por qué:** Instagram. Para ~100 gimnasios la única presencia en internet es su Instagram, que exige iniciar sesión y cuyas condiciones no permiten leerlo de forma automática; probé la búsqueda normal para encontrar webs de los que no la tienen y salieron solo directorios. Esos gimnasios siguen con iniciales hasta que alguien suba su logotipo (el gimnasio reclamado puede hacerlo desde su perfil). La mejora de imágenes con Codex no se pudo pedir (sin créditos): la hace el propio programa (recorta márgenes, centra, elige fondo claro u oscuro).
+
+**Lección (revisar a ojo lo que se baja de internet):** el primer pase dio 42 «logotipos» y cinco eran otra cosa: el logo de una marca de material (Fairtex), un icono genérico de pesas, un cuadrado dorado, el icono por defecto de WordPress y un favicon borroso. Un recorrido de comprobación no los habría detectado; hizo falta mirarlos.
+
+**Pendiente:** si el fundador consigue la autorización de los gimnasios, subir sus logotipos de Instagram; texto legal para el abogado (derechos sobre los logotipos).
