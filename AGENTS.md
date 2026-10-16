@@ -16,6 +16,8 @@ Prioridad vigente: **móvil primero** (iOS y Android; objetivo: App Store y Goog
 
 **Proveedores y costes:** no contrates ni cambies proveedores (base de datos, almacenamiento, correo, errores, alojamiento) sin una propuesta aprobada por el fundador; las vigentes están en [`docs/decisiones/ADR-003-proveedores-fase-0.md`](docs/decisiones/ADR-003-proveedores-fase-0.md). Principio del fundador: mínimo coste al empezar, escalable y fácil de cambiar. No escribas precios sin haberlos leído en la página oficial.
 
+**Qué modelo y esfuerzo usar (política completa del 16 oct 2026, para todos los asistentes): [`docs/MODELOS-Y-ESFUERZO.md`](docs/MODELOS-Y-ESFUERZO.md).** Resumen: lo mecánico y los textos, con el modelo económico (Haiku o `gpt-6-luna`) en esfuerzo bajo; lo normal, con Sonnet o `gpt-6.1-sol` en medio; lo complejo, en alto; lo crítico (dinero, permisos, datos personales, secretos, migraciones), con esfuerzo alto y la revisión independiente de `gpt-6-astra`. Si subes de nivel, apúntalo en una línea del PR. El flujo Claude + Codex (ficha, ejecución en copia aparte, puertas automáticas, revisión y decisión de Claude) está en [`docs/RED-DE-SEGURIDAD.md`](docs/RED-DE-SEGURIDAD.md); las funciones aprobadas por el fundador y sus pruebas, en [`docs/APROBADO.md`](docs/APROBADO.md): **no se debilita una prueba aprobada para que pase una actualización**.
+
 **Uso proporcional de modelos (petición del fundador, 14 oct 2026):** el razonamiento alto gasta muchos créditos y tiempo.
 - **Por defecto:** esfuerzo medio.
 - **Alto, solo para:** seguridad y permisos, fallos difíciles, migraciones y arquitectura.

@@ -45,7 +45,7 @@ await axe(org.p, "Gestión del evento con la inscripción");
 // 2) Un visitante lo encuentra entre los eventos con inscripción abierta.
 const visita = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
 await visita.goto(B + `/veladas?inscripcion=abierta&q=${encodeURIComponent(nombreEvento)}&past=todas`);
-check("el calendario filtra los eventos con inscripción abierta y los marca", await seen(visita.locator("a.card", { hasText: nombreEvento }).getByText("Inscripción abierta")));
+check("el calendario filtra los eventos con inscripción abierta y los marca", await seen(visita.locator("a.velada-cartel", { hasText: nombreEvento }).getByText("Inscripción abierta")));
 await visita.goto(B + `/veladas/${slug}`);
 check("la página pública enseña los requisitos y «Solicitar participar»", await seen(visita.getByText("Mínimo un combate amateur")) && await seen(visita.getByRole("link", { name: "Solicitar participar" })));
 

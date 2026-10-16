@@ -11,15 +11,56 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.18.10] — 2026-10-15
+## [0.20.2] — 2026-10-16
 
 ### Corregido
-- **Móvil (375 px):** cuatro ajustes de presentación y maquetación detectados en la auditoría de la demo:
-  - **Portada:** altura acotada de `.portada-visita` (400 px) y tipografía ajustada de `.lema-portada` para que el subtítulo no quede tapado por el degradado de la barra inferior fija en pantallas de 375 × 667 px antes de hacer scroll.
-  - **Gimnasios:** `scroll-margin-top: 96px` en `.mapa-gimnasios` y margen inferior en el formulario de búsqueda para que el botón «Aplicar filtros» no quede cortado horizontalmente por detrás de la cabecera fija al desplazarse hacia el mapa.
-  - **Veladas:** visualización en bloque (`display: block`) del título de la velada en `.card` para que aparezca siempre debajo de las etiquetas, evitando que títulos cortos queden comprimidos en la misma línea que «Inscripción abierta».
-  - **Peleadores:** botón «Aplicar filtros» posicionado antes del desplegable «Más filtros» para que sea inmediatamente accesible sin hacer scroll al abrir los filtros, con botón de envío repetido al pie de los campos secundarios.
+- **Móvil:** lema visible en portada, buscador y mapa de gimnasios sin solaparse con la cabecera y botón de aplicar filtros antes de los filtros secundarios de peleadores.
+- Revisión de #94: se retira el cambio global de títulos en `.card`; los carteles de veladas de 0.20.0 conservan su presentación.
 
+## [0.20.1] — 2026-10-16
+
+PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude + Codex (peticiones del fundador del 16-10-2026: «usar algún framework para evitar romper cosas que ya funcionaban o ya habíamos aprobado», «replicar el flujo de trabajo» del vídeo y «que sepáis qué modelo y esfuerzo usar según la tarea»). Sin cambios en la aplicación.
+
+### Añadido
+- **Registro de funciones aprobadas** (`docs/APROBADO.md`, 15 filas): cada función aprobada por el fundador apunta a la prueba que la vigila; `tests/documentacion/aprobado.test.mjs` falla si esa prueba desaparece o deja de contener la comprobación.
+- **Ningún recorrido fuera del CI:** lista `tests/e2e/orden.json` y prueba `tests/documentacion/e2e.test.mjs`, que falla si un archivo de `tests/e2e` no está en la lista ni declarado aparte.
+- **`npm run verificar`:** todas las puertas del CI en un comando, sin pararse en la primera que falla; con `--e2e`, los recorridos de navegador en una base desechable de Docker (`scripts/e2e-local.mjs`, con sustituto de `psql` en Windows).
+- **La flota** (`scripts/flota.mjs`, `/flota`, `docs/tareas/PLANTILLA-FLOTA.md`): Codex ejecuta una ficha en una copia aparte, pasan las puertas y revisa Luna (o Astra si es crítico) con veredicto en JSON; Claude verifica y decide. Elige modelo y esfuerzo según la complejidad y el riesgo de la ficha.
+- **Documentación:** `docs/RED-DE-SEGURIDAD.md` (capas y flujo), `docs/MODELOS-Y-ESFUERZO.md` (qué modelo y esfuerzo para cada tipo de tarea) y `docs/COBERTURA-CONCEPTOS.md` (cruce con la lista de conceptos de ingeniería que mandó el fundador).
+- **El flujo en pantalla:** barra de estado de Claude Code (`scripts/flota-barra.mjs`) y panel en vivo en <http://localhost:4777> (`scripts/flota-panel.mjs`) con lo que hace cada modelo en cada momento; el estado se guarda en `~/.lona-flota/estado.json` (`scripts/flota-estado.mjs`).
+- Prueba unitaria de que el nombre antiguo, «Ring España», no vuelve al código.
+
+### Cambiado
+- `npm run test:e2e` ejecuta todos los recorridos aunque falle uno y resume al final cuáles fallaron (antes el CI se paraba en el primero).
+- Las pruebas llaman a `psql` de forma que también funciona en Windows (`tests/e2e/ayudas.mjs`, `flujo.mjs`, `integridad.mjs`).
+
+## [0.20.0] — 2026-10-15
+
+PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas (peticiones del fundador del 15-10-2026: «que aparezcan directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y «que se puedan comprar entradas… se deberá pagar la mitad vía Bizum para reservar»). La numeración salta a 0.20.0 para dejar la 0.19.x a los PR de Codex #88–#91.
+
+### Añadido
+- **Entradas reservadas en Lona.** La promotora pone el precio, el aforo (opcional), el precio en taquilla (opcional), una nota y su Bizum, y abre la venta. Se reservan de 1 a 6 entradas, con una reserva activa por persona y velada; se respetan los bloqueos.
+  - Al reservar se pide una **señal del 50 %** (redondeada al euro hacia arriba) por Bizum a la promotora, con el código `LONA-XXXXXX` como concepto. Hay 24 horas para enviarla, nunca más tarde de 3 horas antes del inicio. Si no llega, la reserva caduca y libera las plazas. El resto se paga en la puerta.
+  - Lona no cobra ni guarda dinero: solo lleva la cuenta de las reservas (pendiente de señal, confirmada, validada en la puerta, cancelada o caducada).
+- **Cartel de la velada:** la promotora sube una imagen (JPG, PNG o WebP de hasta 4 MB) que se guarda en el almacén de fotos (carpeta `carteles`) y se sirve en `/veladas/[slug]/cartel`, solo de las veladas visibles.
+- **Hora de inicio** de la velada al crearla y al corregir sus datos.
+- **«Mis entradas»** (`/mis-entradas`): el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar. Se enlaza desde «Mi cuenta» y desde el panel, que avisa en «Te toca» de las señales pendientes.
+- **Reservas de la promotora** (`/organizador/[slug]/entradas`): resumen (reservadas, validadas, señales recibidas y lo que queda por cobrar en la puerta), filtros por estado, búsqueda por código, nombre o correo, y botones «Señal recibida» (también tarde, si queda sitio), «Validar en la puerta», «Deshacer la validación» y «Cancelar la reserva». Se descarga en CSV.
+- Avisos dentro de la aplicación y correos: a la promotora con cada reserva o cancelación; a quien reserva, con las instrucciones del Bizum y al confirmarse la señal.
+- La descarga de datos personales (`/mi-cuenta/datos`) incluye las entradas reservadas.
+- Prueba de navegador `tests/e2e/entradas.mjs` y pruebas unitarias de las reglas (`tests/unit/entradas.test.ts`).
+
+### Cambiado
+- **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
+- **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
+
+### Corregido tras la revisión crítica (16-10-2026)
+Una revisión independiente de `gpt-6-astra` halló cinco fallos reales en las reservas; Claude los comprobó uno a uno, Codex (`gpt-6.1-sol`) los arregló y `gpt-6-luna` revisó los arreglos:
+- **Señal tardía:** al confirmar una reserva cuyo plazo ya venció (aunque aún no figurase como caducada), se comprueba el aforo y que la persona no tenga otra reserva activa. Mensaje nuevo para la promotora: «Esa persona ya tiene otra reserva activa en esta velada…».
+- **Aforo y reservas a la vez:** guardar el aforo y reservar comparten el mismo bloqueo por velada, y la reserva relee el aforo, el precio y el horario dentro del bloqueo. Ya no se puede dejar un aforo por debajo de lo reservado ni pasarse del aforo por dos peticiones simultáneas.
+- **Plazos al cambiar la fecha:** al adelantar la velada (fecha u hora) se acortan los plazos de señal pendientes al nuevo cierre de reservas; nunca se alargan.
+- **Cambio de horario:** el inicio y el cierre de reservas ya no se desplazan una hora los días de cambio de hora (29-03 y 25-10-2026).
+- Si se rechaza el guardado de los datos de entradas, el cartel nuevo ya subido se retira en vez de quedar huérfano.
 ## [0.18.9] — 2026-10-15
 
 PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.
