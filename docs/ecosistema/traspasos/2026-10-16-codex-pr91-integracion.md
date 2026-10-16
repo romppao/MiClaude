@@ -22,3 +22,7 @@
 ## Siguiente paso
 
 Tras #90 apto y fusionado, comprobar árbol de la base y nuevas indicaciones de Claude, actualizar #91 y verificar **ambos trabajos del CI**. Leer también el informe y los avisos de consola; un trabajo verde no basta para afirmar que desapareció #418. Revisión independiente antes de fusionar.
+
+
+## Hallazgo de la revisión independiente
+Luna detectó que la guarda final aún admitía doce personas. Se refuerza para exigir las dieciséis identidades esperadas, sin omisiones, duplicados ni sustituciones. La ejecución parcial conserva su comportamiento anterior. Comprobación de sintaxis y catálogo actualizados; la ejecución real del nuevo control sigue pendiente del CI.

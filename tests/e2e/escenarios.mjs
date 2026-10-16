@@ -396,7 +396,11 @@ if (SOLO.length && existsSync(`${DIR}/informe.json`)) {
   informe.push(...anteriores.filter(i => !repetidas.has(i.nombre)));
 }
 comprobar(informe.length > 0, "No se ha ejecutado ninguna persona: comprueba el nombre del escenario solicitado");
-if (!SOLO.length) comprobar(informe.length >= 12, "La batería completa debe cubrir al menos doce personas");
+if (!SOLO.length) {
+  const esperadas = ["visitante", "aficionado", "peleador", "promotora", "federacion", "rival", "reclamacion", "entrenador-titular", "gimnasio-titular", "moderadora", "mayor", "cuenta", "peleador-completo", "club", "sin-verificar", "creador"];
+  const ejecutadas = new Set(informe.map(i => i.nombre));
+  comprobar(informe.length === esperadas.length && ejecutadas.size === esperadas.length && esperadas.every(nombre => ejecutadas.has(nombre)), "La batería completa debe cubrir las dieciséis personas esperadas, sin omisiones ni duplicados");
+}
 writeFileSync(`${DIR}/informe.json`, JSON.stringify(informe, null, 1));
 console.log("\n══ RESUMEN POR PERSONA ══");
 for (const i of informe) {
