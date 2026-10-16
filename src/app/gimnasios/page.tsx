@@ -70,11 +70,13 @@ export default async function Gyms({ searchParams }: { searchParams: Promise<Rec
       {/* La lista completa sigue aquí (la necesita quien no ve el mapa o no da su ubicación), pero recogida: lo primero es el mapa y los mejores. */}
       <details className="lista-completa" open={!!pagina && pagina !== "1"}>
         <summary><span id="todos-los-gimnasios">{q || province ? `Ver todos los gimnasios de tu búsqueda (${total})` : `Ver todos los gimnasios (${total})`}</span></summary>
-      <div className="grid grid-cartel">
+      <ul className="grid grid-cartel lista-cartel" aria-labelledby="todos-los-gimnasios">
         {gyms.map((g) => (
-          <TarjetaGimnasioCartel key={g.id} id={g.id} slug={g.slug} nombre={g.name} ciudad={g.city} provincia={g.province} peleadores={g._count.fighters} verificado={!!g.verifiedAt} />
+          <li key={g.id}>
+            <TarjetaGimnasioCartel id={g.id} slug={g.slug} nombre={g.name} ciudad={g.city} provincia={g.province} peleadores={g._count.fighters} verificado={!!g.verifiedAt} />
+          </li>
         ))}
-      </div>
+      </ul>
       {gyms.length === 0 && <p className="mut">No hay gimnasios con esos filtros. Prueba a quitar alguno o a escribir solo una parte del nombre.</p>}
       <Paginacion ruta="/gimnasios" params={{ q, province }} actual={w.current} paginas={w.pages} desde={w.from} hasta={w.to} total={total} unidad={["gimnasio", "gimnasios"]} />
       </details>

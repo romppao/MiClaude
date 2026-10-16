@@ -916,3 +916,6 @@ form.search.search-directorio>.chip{flex:none}
 @media(min-width:640px){.cartel-persona .cartel-extra{display:block}}
 .cartel-persona .abajo .pildora{align-self:flex-start;max-width:100%;margin-bottom:4px;padding:5px 10px;border-radius:14px;font-size:14px;line-height:1.2}
 @media(min-width:640px){.cartel-persona .cartel-extra{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}}
+/* Los gimnasios son una lista (ul/li) para lectores de pantalla; cada tarjeta ocupa toda su celda. */
+ul.lista-cartel{list-style:none;padding:0}
+ul.lista-cartel>li{display:block;min-width:0}
