@@ -49,6 +49,10 @@ export default async function BuscarClases({ searchParams }: { searchParams: Pro
   return (
     <div className="pantalla" style={{ gap: 16 }}>
       <div><h1>Buscar clases</h1><p className="lead" style={{ fontSize: 16 }}>Clases con entrenadores de toda España. Elige una y pulsa «Solicitar esta clase»: el entrenador te responderá. Se paga directamente al entrenador.</p></div>
+      <nav className="segmentos-tipo" aria-label="Clases o entrenadores">
+        <Link className="segmento" href="/clases" aria-current="page">Clases</Link>
+        <Link className="segmento" href="/entrenadores">Entrenadores</Link>
+      </nav>
       <nav className="filtros-disciplina desliza-fila con-dibujo" aria-label="Elige un deporte">
         <Link href={hacia({ disciplina: undefined })} aria-current={!discipline ? "page" : undefined}><Icono nombre="capas" tam={28} grosor={1.6} />Todos</Link>
         {DISCIPLINE_ORDER.map((d) => <Link key={d} href={hacia({ disciplina: d })} aria-current={d === discipline ? "page" : undefined}><IconoDisciplina d={d} tam={30} grosor={1.6} />{DISCIPLINE_LABEL[d]}</Link>)}

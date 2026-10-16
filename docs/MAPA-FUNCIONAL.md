@@ -414,7 +414,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `periods.ts` | `FIGHTER_AVAILABILITY_DAYS`, `notificationCutoff` |
 | `record-eligibility.ts` | `boutsQueCuentan` |
 | `record-time.ts` | `HORAS_PARA_CONTAR_DECLARADO`, `fechaInicioEnRecord` |
-| `refresco.ts` | `INTERVALO_REFRESCO_MS`, `MINIMO_ENTRE_REFRESCOS_MS`, `rutaConRefresco`, `tocaRefrescar` |
+| `refresco.ts` | `INTERVALO_RAPIDO_MS`, `INTERVALO_REFRESCO_MS`, `MINIMO_ENTRE_REFRESCOS_MS`, `intervaloDe`, `rutaConRefresco`, `tocaRefrescar` |
 | `safe.ts` | `flatParams`, `hasOwn`, `lookup`, `oneParam` |
 | `search.ts` | `ACCENT_FROM`, `ACCENT_TO`, `MAX_SEARCH_IDS`, `SearchKind`, `searchIds`, `searchWords` |
 | `sentry.ts` | `Dsn`, `FalloParaSentry`, `avisarASentry`, `leerDsn`, `sobre` |

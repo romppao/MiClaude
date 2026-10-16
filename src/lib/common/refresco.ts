@@ -20,12 +20,16 @@ const PANTALLAS_VIVAS: RegExp[] = [
   /^\/mi-panel$/,
   /^\/siguiendo$/,
   /^\/mis-reservas$/,
+  /^\/mis-inscripciones$/,
 ];
 
 export const rutaConRefresco = (pathname: string) => PANTALLAS_VIVAS.some((r) => r.test(pathname));
 
 /** Cada cuánto se actualiza una pantalla que sigue abierta y a la vista (con algo de variación para que no coincidan todas). */
 export const INTERVALO_REFRESCO_MS = 90_000;
+/** Donde alguien puede perder una plaza o una entrada si ve un dato viejo (una velada con entradas, los avisos), cada medio minuto. */
+export const INTERVALO_RAPIDO_MS = 30_000;
+export const intervaloDe = (pathname: string) => (/^\/veladas\/[^/]+$/.test(pathname) || pathname === "/avisos" || pathname === "/mis-inscripciones" ? INTERVALO_RAPIDO_MS : INTERVALO_REFRESCO_MS);
 /** Entre dos actualizaciones, como mínimo: volver a la pestaña varias veces seguidas no repite la petición. */
 export const MINIMO_ENTRE_REFRESCOS_MS = 20_000;
 

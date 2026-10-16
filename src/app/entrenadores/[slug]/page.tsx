@@ -1,5 +1,5 @@
 import { gymIsPublic, excludedGymProvince } from "../../../lib/common/gym-policy";
-import ProfileThumbnail from "../../components/ProfileThumbnail";
+import { TarjetaPersona } from "../../components/TarjetasDirectorio";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileDetails from "../../components/ProfileDetails";
 import { cache } from "react";
@@ -57,8 +57,9 @@ export default async function TrainerPage({ params }: { params: Promise<{ slug: 
       </>}
       <h2>Peleadores</h2>
       {t.fighters.length === 0 && <p className="mut">Todavía no hay peleadores de este entrenador en Lona.</p>}
-      <div className="grid">
-        {t.fighters.map((b) => <Link key={b.id} href={`/peleadores/${b.slug}`} className="card">{b.disciplines.map(d => <span key={d.discipline} className={`tag ${d.level}`}>{DISCIPLINE_LABEL[d.discipline]} · {LEVEL_LABEL[d.level]}</span>)}<ProfileThumbnail kind="peleador" id={b.id} name={`${b.firstName} ${b.lastName}`}/><strong>{b.firstName} {b.lastName}</strong></Link>)}
+      <div className="desliza desliza-personas" role="region" tabIndex={0} aria-label="Peleadores de este entrenador (desliza para ver más)">
+        {t.fighters.map((b) => <TarjetaPersona key={b.id} href={`/peleadores/${b.slug}`} tipo="peleador" id={b.id} nombre={`${b.firstName} ${b.lastName}`} disciplina={b.disciplines[0]?.discipline ?? null}
+          lineas={[b.disciplines[0] ? `${DISCIPLINE_LABEL[b.disciplines[0].discipline]} · ${LEVEL_LABEL[b.disciplines[0].level]}${b.disciplines.length > 1 ? ` (+${b.disciplines.length - 1})` : ""}` : "Sin disciplina"]} />)}
       </div>
     </>
   );

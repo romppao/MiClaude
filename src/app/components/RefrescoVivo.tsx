@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { INTERVALO_REFRESCO_MS, rutaConRefresco, tocaRefrescar } from "../../lib/common/refresco";
+import { intervaloDe, rutaConRefresco, tocaRefrescar } from "../../lib/common/refresco";
 
 /**
  * Vuelve a pedir al servidor los datos de la pantalla que se está leyendo: al volver a la pestaña, al recuperar la conexión y cada
@@ -30,7 +30,7 @@ export default function RefrescoVivo() {
     document.addEventListener("visibilitychange", alVolver);
     window.addEventListener("online", refrescar);
     // Un poco de variación por persona para que miles de pestañas no pidan a la vez.
-    const reloj = setInterval(refrescar, INTERVALO_REFRESCO_MS + Math.round(Math.random() * 15_000));
+    const reloj = setInterval(refrescar, intervaloDe(ruta) + Math.round(Math.random() * 10_000));
     return () => { document.removeEventListener("visibilitychange", alVolver); window.removeEventListener("online", refrescar); clearInterval(reloj); };
   }, [ruta, router]);
 
