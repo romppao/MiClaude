@@ -11,7 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.18.10] — 2026-10-16
+## [0.20.1] — 2026-10-16
 
 PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude + Codex (peticiones del fundador del 16-10-2026: «usar algún framework para evitar romper cosas que ya funcionaban o ya habíamos aprobado», «replicar el flujo de trabajo» del vídeo y «que sepáis qué modelo y esfuerzo usar según la tarea»). Sin cambios en la aplicación.
 
@@ -28,6 +28,33 @@ PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude
 - `npm run test:e2e` ejecuta todos los recorridos aunque falle uno y resume al final cuáles fallaron (antes el CI se paraba en el primero).
 - Las pruebas llaman a `psql` de forma que también funciona en Windows (`tests/e2e/ayudas.mjs`, `flujo.mjs`, `integridad.mjs`).
 
+## [0.20.0] — 2026-10-15
+
+PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas (peticiones del fundador del 15-10-2026: «que aparezcan directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y «que se puedan comprar entradas… se deberá pagar la mitad vía Bizum para reservar»). La numeración salta a 0.20.0 para dejar la 0.19.x a los PR de Codex #88–#91.
+
+### Añadido
+- **Entradas reservadas en Lona.** La promotora pone el precio, el aforo (opcional), el precio en taquilla (opcional), una nota y su Bizum, y abre la venta. Se reservan de 1 a 6 entradas, con una reserva activa por persona y velada; se respetan los bloqueos.
+  - Al reservar se pide una **señal del 50 %** (redondeada al euro hacia arriba) por Bizum a la promotora, con el código `LONA-XXXXXX` como concepto. Hay 24 horas para enviarla, nunca más tarde de 3 horas antes del inicio. Si no llega, la reserva caduca y libera las plazas. El resto se paga en la puerta.
+  - Lona no cobra ni guarda dinero: solo lleva la cuenta de las reservas (pendiente de señal, confirmada, validada en la puerta, cancelada o caducada).
+- **Cartel de la velada:** la promotora sube una imagen (JPG, PNG o WebP de hasta 4 MB) que se guarda en el almacén de fotos (carpeta `carteles`) y se sirve en `/veladas/[slug]/cartel`, solo de las veladas visibles.
+- **Hora de inicio** de la velada al crearla y al corregir sus datos.
+- **«Mis entradas»** (`/mis-entradas`): el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar. Se enlaza desde «Mi cuenta» y desde el panel, que avisa en «Te toca» de las señales pendientes.
+- **Reservas de la promotora** (`/organizador/[slug]/entradas`): resumen (reservadas, validadas, señales recibidas y lo que queda por cobrar en la puerta), filtros por estado, búsqueda por código, nombre o correo, y botones «Señal recibida» (también tarde, si queda sitio), «Validar en la puerta», «Deshacer la validación» y «Cancelar la reserva». Se descarga en CSV.
+- Avisos dentro de la aplicación y correos: a la promotora con cada reserva o cancelación; a quien reserva, con las instrucciones del Bizum y al confirmarse la señal.
+- La descarga de datos personales (`/mi-cuenta/datos`) incluye las entradas reservadas.
+- Prueba de navegador `tests/e2e/entradas.mjs` y pruebas unitarias de las reglas (`tests/unit/entradas.test.ts`).
+
+### Cambiado
+- **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
+- **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
+
+### Corregido tras la revisión crítica (16-10-2026)
+Una revisión independiente de `gpt-6-astra` halló cinco fallos reales en las reservas; Claude los comprobó uno a uno, Codex (`gpt-6.1-sol`) los arregló y `gpt-6-luna` revisó los arreglos:
+- **Señal tardía:** al confirmar una reserva cuyo plazo ya venció (aunque aún no figurase como caducada), se comprueba el aforo y que la persona no tenga otra reserva activa. Mensaje nuevo para la promotora: «Esa persona ya tiene otra reserva activa en esta velada…».
+- **Aforo y reservas a la vez:** guardar el aforo y reservar comparten el mismo bloqueo por velada, y la reserva relee el aforo, el precio y el horario dentro del bloqueo. Ya no se puede dejar un aforo por debajo de lo reservado ni pasarse del aforo por dos peticiones simultáneas.
+- **Plazos al cambiar la fecha:** al adelantar la velada (fecha u hora) se acortan los plazos de señal pendientes al nuevo cierre de reservas; nunca se alargan.
+- **Cambio de horario:** el inicio y el cierre de reservas ya no se desplazan una hora los días de cambio de hora (29-03 y 25-10-2026).
+- Si se rechaza el guardado de los datos de entradas, el cartel nuevo ya subido se retira en vez de quedar huérfano.
 ## [0.18.9] — 2026-10-15
 
 PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.

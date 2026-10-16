@@ -29,6 +29,11 @@ export default async function InicioAficionado({ user }: { user: User }) {
   const deSeguidos = { OR: [{ fighterAId: { in: seguidos } }, { fighterBId: { in: seguidos } }] };
   // Solicitudes de clase abiertas (esperando respuesta o ya aceptadas): acceso directo a «Mis reservas».
   const reservas = await db.classRequest.count({ where: { userId: user.id, status: { in: ["PENDING", "ACCEPTED"] } } });
+  // Entradas de veladas que vienen: las que esperan la señal salen en «Te toca»; todas, como acceso directo a «Mis entradas».
+  const [entradas, sinSenal] = await Promise.all([
+    db.ticketReservation.count({ where: { userId: user.id, event: { date: { gte: calendarDayStart() } }, OR: [{ status: "CONFIRMED" }, { status: "PENDING_DEPOSIT", depositUntil: { gte: new Date() } }] } }),
+    db.ticketReservation.count({ where: { userId: user.id, status: "PENDING_DEPOSIT", depositUntil: { gte: new Date() } } }),
+  ]);
   const [proximo, auras, enDirecto, resultados, solicitud] = await Promise.all([
     seguidos.length ? db.bout.findFirst({ where: { ...deSeguidos, event: { date: { gte: calendarDayStart() }, status: "SCHEDULED" } }, include: { event: true, fighterA: conRecord, fighterB: conRecord }, orderBy: [{ event: { date: "asc" } }, { order: "asc" }] }) : null,
     db.aura.count({ where: { userId: user.id } }),
@@ -54,11 +59,13 @@ export default async function InicioAficionado({ user }: { user: User }) {
         { texto: "Confirmar el correo", href: "/verificar", cantidad: user.emailVerifiedAt ? 0 : 1 },
         { texto: "Combates sin tu aura", href: "/mi-panel#resultados", cantidad: sinAura },
         { texto: "Respuestas a tus solicitudes de clase", href: "/mis-reservas", cantidad: respuestas },
+        { texto: "Enviar la señal de tus entradas", href: "/mis-entradas", cantidad: sinSenal },
       ]} />
       <CompletaPerfil campos={[{ texto: "Elegir disciplinas", completo: user.interests.length > 0, href: "/registro/intereses" }, { texto: "Elegir provincia", completo: !!user.province, href: "/mi-cuenta" }]} />
       <AccionesPrincipales acciones={[
         { href: user.province ? `/clases?provincia=${encodeURIComponent(user.province)}` : "/clases", titulo: "Buscar clases", detalle: "Clases con entrenadores cerca de ti", icono: "calendario" },
         ...(reservas ? [{ href: "/mis-reservas", titulo: "Mis reservas", detalle: "Tus clases solicitadas", icono: "bandeja" as const, aviso: reservas }] : []),
+        ...(entradas ? [{ href: "/mis-entradas", titulo: "Mis entradas", detalle: "Tus reservas para veladas", icono: "calendario" as const, aviso: entradas }] : []),
         { href: "/compartir", titulo: "Subir vídeos o fotos", detalle: "De una velada a la que fuiste", icono: "camara" },
         { href: "/siguiendo", titulo: "Peleadores que sigo", detalle: "Sus próximos combates", icono: "personas" },
       ]} />

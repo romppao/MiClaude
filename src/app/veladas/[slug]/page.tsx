@@ -18,6 +18,9 @@ import { bloquearUsuario, createReport } from "../../actions/community";
 import { bloqueadosPor } from "../../../lib/community/bloqueos";
 import { setAttendance } from "../../actions/events";
 import { calendarDayStart } from "../../../lib/common/dates";
+import { ESTADO_ENTRADA, MAX_ENTRADAS, cierreDeReservas, fmtBizum, fmtHora, motivoSinReserva, plazasOcupadas, urlCartel } from "../../../lib/events/entradas";
+import { reservarEntradas } from "../../actions/entradas";
+import ReservaEntradas from "../../components/ReservaEntradas";
 
 export const dynamic = "force-dynamic";
 
@@ -56,13 +59,35 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     user ? db.eventAttendance.findUnique({ where: { userId_eventId: { userId: user.id, eventId: e.id } } }) : null,
   ]);
   const compartir = veladaAbiertaAlPublico(e, todayMadrid());
+  // Entradas en Lona: la reserva activa de quien mira y las plazas que quedan (lib/events/entradas.ts).
+  const motivo = motivoSinReserva(e, ahora);
+  const conEntradas = e.ticketsOpen && !!e.ticketPriceEuros && !!e.bizumPhone && e.status === "SCHEDULED";
+  const [miReserva, ocupadas] = conEntradas ? await Promise.all([
+    user ? db.ticketReservation.findFirst({ where: { eventId: e.id, userId: user.id, OR: [{ status: { in: ["CONFIRMED", "CHECKED_IN"] } }, { status: "PENDING_DEPOSIT", depositUntil: { gte: ahora } }] }, orderBy: { createdAt: "desc" } }) : null,
+    plazasOcupadas(db, e.id, ahora),
+  ]) : [null, 0];
+  const libres = e.ticketCapacity !== null ? Math.max(0, e.ticketCapacity - ocupadas) : null;
+  const cartel = urlCartel(e);
+  const hora = e.startMinute !== null ? fmtHora(e.startMinute) : null;
   return (
     <>
       {e.kind === "INTERCLUB" && <span className="tag">Interclub</span>}
       <span className="tag">{DISCIPLINE_LABEL[e.discipline]}</span><span className={`tag ${e.level}`}>{LEVEL_LABEL[e.level]}</span>
       {e.status === "CANCELLED" && <span className="tag">velada cancelada</span>}
       {!e.organizerId && <span className="tag">No oficial</span>}
-      <h1>{e.name}</h1>
+      <div className={cartel ? "velada-hero" : undefined}>
+        {cartel && <figure className="velada-poster"><img src={cartel} alt={`Cartel de ${e.name}`} /></figure>}
+        <div className="velada-hero-datos">
+          <h1>{e.name}</h1>
+          <dl className="datos-velada">
+            <div><dt>Fecha</dt><dd>{fmtDate(e.date)}</dd></div>
+            {hora && <div><dt>Hora</dt><dd>{hora}</dd></div>}
+            <div><dt>Lugar</dt><dd>{e.venue}<br /><span className="mut">{e.city} ({e.province})</span></dd></div>
+            {conEntradas && <div><dt>Entrada</dt><dd>{e.ticketPriceEuros} €{e.doorPriceEuros && e.doorPriceEuros !== e.ticketPriceEuros ? <span className="mut"> · en taquilla {e.doorPriceEuros} €</span> : null}</dd></div>}
+          </dl>
+          {conEntradas && !motivo && <p className="acciones" style={{ margin: 0 }}><a className="btn" href="#entradas">{miReserva ? "Ver mi reserva" : "Reservar entradas"}</a></p>}
+        </div>
+      </div>
       <p>{asistentes} van a ir</p>
       {e.status === "SCHEDULED" && e.date >= calendarDayStart() && <section className="tarjeta" aria-label="Asistencia y calendario">
         {user ? <form action={setAttendance}><input type="hidden" name="eventId" value={e.id} /><input type="hidden" name="asistir" value={asistencia ? "0" : "1"} /><button>{asistencia ? "Ya no voy a ir" : "Voy a ir"}</button></form> : <Link className="btn secondary" href={`/entrar?next=${encodeURIComponent(`/veladas/${e.slug}`)}`}>Entra para marcar «Voy a ir»</Link>}
@@ -70,11 +95,37 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       </section>}
       {!e.organizerId && <p className="mut">Esta velada no la ha publicado un organizador: la indicó un peleador al registrar su combate. Los datos pueden estar incompletos.</p>}
       <p className="mut">
-        {fmtDate(e.date)} · {e.venue}, {e.city} ({e.province})
         {oficial && <> · Publicada por <strong>{org?.orgName}</strong> <span className="tag PRO" title="Organizador verificado por un moderador">✓ organizador verificado</span></>}
         {entrenador && <> · Organiza el entrenador <Link href={`/entrenadores/${entrenador.slug}`}>{entrenador.name}</Link></>}
         {e.promoter && <> · Promotor indicado por el organizador: {e.promoter}</>}
       </p>
+      {conEntradas && (
+        <section id="entradas" className="tarjeta entradas-velada" aria-labelledby="titulo-entradas">
+          <div className="titulo-seccion"><h2 id="titulo-entradas">Entradas</h2>{libres !== null && !motivo && <span className="meta-acc">{libres === 0 ? "Agotadas" : libres === 1 ? "Queda 1" : `Quedan ${libres}`}</span>}</div>
+          {e.ticketNote && <p style={{ margin: 0 }}>{e.ticketNote}</p>}
+          {miReserva ? (
+            <div className="mi-reserva">
+              <p style={{ margin: 0 }}><span className={`tag estado-${miReserva.status}`}>{ESTADO_ENTRADA[miReserva.status]}</span> {miReserva.quantity === 1 ? "1 entrada" : `${miReserva.quantity} entradas`} · código <strong className="codigo">{miReserva.code}</strong></p>
+              {miReserva.status === "PENDING_DEPOSIT" && <p style={{ margin: 0 }}>Envía <strong>{miReserva.depositEuros} €</strong> por Bizum al <strong>{fmtBizum(e.bizumPhone!)}</strong> con el concepto <strong>{miReserva.code}</strong> antes del {miReserva.depositUntil.toLocaleString("es-ES", { timeZone: "Europe/Madrid", dateStyle: "long", timeStyle: "short" })}.</p>}
+              <Link className="btn secondary" href="/mis-entradas" style={{ alignSelf: "flex-start" }}>Ver en «Mis entradas»</Link>
+            </div>
+          ) : motivo === "entradas_cerradas" ? (
+            <p className="mut" style={{ margin: 0 }}>Las reservas en Lona se cerraron 3 horas antes del inicio. Pregunta a la promotora por la taquilla.</p>
+          ) : user?.id === e.organizerId ? (
+            <p style={{ margin: 0 }}>Es tu velada. <Link href={`/organizador/${e.slug}/entradas`}>Ver las reservas</Link></p>
+          ) : libres === 0 ? (
+            <p className="mut" style={{ margin: 0 }}>No quedan entradas en Lona.{e.doorPriceEuros ? ` Puede que haya en taquilla (${e.doorPriceEuros} €).` : ""}</p>
+          ) : !user ? (
+            <>
+              <p style={{ margin: 0 }}>Reserva aquí y paga la mitad por Bizum a la promotora para confirmarla; el resto, en la puerta.</p>
+              <Link className="btn" href={`/entrar?next=${encodeURIComponent(`/veladas/${e.slug}#entradas`)}`} style={{ alignSelf: "flex-start" }}>Entra para reservar</Link>
+            </>
+          ) : (
+            <ReservaEntradas eventId={e.id} precio={e.ticketPriceEuros!} maximo={Math.min(MAX_ENTRADAS, libres ?? MAX_ENTRADAS)} accion={reservarEntradas} />
+          )}
+          <p className="meta" style={{ margin: 0 }}>Lona no cobra ni guarda dinero: la señal va directa a la promotora. Reservas hasta el {cierreDeReservas(e.date, e.startMinute).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}.</p>
+        </section>
+      )}
       {e.ticketUrl && <p className="acciones"><a className="btn" href={e.ticketUrl} target="_blank" rel="noopener noreferrer nofollow">Comprar entradas<span aria-hidden="true"> ↗</span><span className="sr-only"> (se abre en otra página web)</span></a></p>}
       {/* Inscripción de peleadores (propuesta n.º 3 del diseño v3): visible mientras el organizador la tenga abierta. */}
       {/* Cerrada en un evento futuro de un organizador: se dice, para que el peleador no busque un botón que no está (9 de octubre de 2026). */}
