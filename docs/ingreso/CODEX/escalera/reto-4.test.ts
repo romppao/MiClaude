@@ -1,0 +1,3 @@
+import {expect,it} from "vitest";import{crearLimitador}from "./reto-4";
+it("aplica ventana estricta y no registra denegaciones",()=>{let t=0;const l=crearLimitador({maximo:2,ventanaMs:10,ahora:()=>t});expect(l.permitir("x")).toMatchObject({permitido:true,restantes:1});expect(l.permitir("x")).toMatchObject({permitido:true,restantes:0});expect(l.permitir("x")).toEqual({permitido:false,restantes:0,reintentarEnMs:10});t=10;expect(l.permitir("x").permitido).toBe(true);});
+it("tolera claves especiales, reloj atrás y LRU",()=>{let t=5;const l=crearLimitador({maximo:1,ventanaMs:10,maxClaves:2,ahora:()=>t});l.permitir("__proto__");l.permitir("a");l.permitir("__proto__");l.permitir("b");expect(l.tamano()).toBe(2);t=1;expect(l.permitir("__proto__").permitido).toBe(false);});
