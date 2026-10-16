@@ -111,3 +111,6 @@ Scripts: arranque de demo, entorno aislado, mapas y examen de ingreso tienen obj
 
 ## Avisos y referencias de vídeos (H)
 `Notification` pertenece a User con borrado en cascada e índices por destinatario/lectura y fecha. La lista, contador y exportación comparten el corte de doce meses. `Highlight.sourceMediaId` es opcional, único por peleador/original y se borra con el MediaItem; lecturas y entrega verifican visibilidad del original. Los avisos internos no cambian preferencias de correo ni conceden acreditaciones. La bandeja mantiene paginación y permisos existentes. Contratos y límites en `docs/AVISOS.md` (desde las guías de mantenimiento, `../AVISOS.md`). H4 sigue como RFC-002 sin migración activa.
+
+### Filtros y legibilidad de los directorios (revisión de #97)
+DirectorioNav.enlaceDisciplina conserva categoría y división al pulsar la disciplina activa; solo elimina esos filtros dependientes cuando cambia el deporte. La página de peleadores debe pasarlos en conservar. Las cinco regresiones de tests/unit/directorio-disciplina.test.ts cubren repetición, cambio y Todas, con mantenimiento de los filtros transversales. El CSS permite crecer a las tarjetas y envolver nombres/metadatos; su texto principal es de al menos 16 px y los enlaces de navegación tienen 44 px de altura. Los gimnasios conservan la lista ul/li de Claude y la prueba del mapa original.

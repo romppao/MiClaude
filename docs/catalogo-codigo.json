@@ -2378,5 +2378,10 @@
     "path": "vitest.config.mts",
     "purpose": "Configura batería unitaria del producto; las herramientas documentales usan Node test y las entregas de ingreso otro config.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/directorio-disciplina.test.ts",
+    "purpose": "Comprueba filtros del directorio al repetir o cambiar de disciplina, conservando los filtros transversales.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   }
 ]

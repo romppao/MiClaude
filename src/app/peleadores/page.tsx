@@ -53,7 +53,7 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
     <>
       <h1>Peleadores</h1>
       <DirectorioNav actual="peleadores" />
-      <ChipsDisciplina ruta="/peleadores" actual={discipline} conservar={{ q, level, province, disponibles }} />
+      <ChipsDisciplina ruta="/peleadores" actual={discipline} conservar={{ q, level, province, disponibles, categoria, divisionId }} />
       <form className="search search-directorio" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
         <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />

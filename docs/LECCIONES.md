@@ -531,3 +531,5 @@ La ejecución de unitarias junto al navegador agotó el límite de dos pruebas d
 - 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
 
 - 15-10-2026: al sacar un enlace de una celda y convertirlo en hijo directo de una tarjeta flex, su zona táctil puede quedar en 25 px. El CI móvil detectó la regresión en la bandeja; los accesos de gimnasio pasan a botón de enlace con altura mínima, sin relajar la prueba.
+
+- 16-10-2026, revisión #97: repetir una opción activa no equivale a cambiarla. Categoría y división deben sobrevivir al enlace de la disciplina activa; cinco regresiones lo comprueban. Un nombre largo se resuelve dejando crecer la tarjeta, con texto de 16 px, sin ocultarlo con elipsis. La solución accesible ul/li de Claude conserva la prueba original del mapa.

@@ -423,3 +423,6 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - 15-10-2026, fundador: vinculación de miembros con invitación y aceptación; en pruebas en rama de Codex. Moderación mantiene su acción directa.
 
 - 15-10-2026, fundador: ejecutar el relevo D/H en cuatro PR independientes y después T-009; RFC-002 queda fuera de este encargo. Bandeja única en pruebas.
+
+## 16-10-2026 — Acceso directo a Entrenadores (propuesta, sin aprobar)
+Propuesta del encargo de listados: «Clases y entrenadores» en Explorar con destino /entrenadores, y acción destacada «Buscar clases» hacia /clases en ese directorio. Claude/fundador debe aprobarla antes de cambiar menu.ts o la comprobación de paneles. En esta entrega no se modifica el menú; continúa el acceso desde el selector de Peleadores.

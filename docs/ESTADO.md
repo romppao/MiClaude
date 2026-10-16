@@ -21,7 +21,7 @@
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
 | Claude Code (portátil) | 16-10 (tarde): directorios de peleadores, entrenadores y gimnasios como carteles con foto (0.21.0, rama `claude-code/listados-con-imagen-peleadores-entrenado-20261016`); antes: #92 fusionado; #93 (fase 1, 0.20.0) con las correcciones de la revisión crítica, esperando CI y el «sí» del fundador. **Red de seguridad y flota** (este PR): `APROBADO.md`, `npm run verificar`, CI que no se para en el primer fallo, `scripts/flota.mjs` y `MODELOS-Y-ESFUERZO.md`. Siguiente: regresión visual. | `claude-code/veladas-entradas` (#93), `claude-code/red-seguridad` | en curso |
-| Codex | Actualiza #89 tras #88; revisiones de Claude y orden de fusión conservados. | `codex/pr89-integracion-20261016` | Preparación local sobre la base candidata 0.20.3; CI pendiente. |
+| Codex | Correcciones de Luna para #97 desde 00038d6: legibilidad y filtros; conserva ul/li de Claude. | `codex/pr97-correcciones-legibilidad-20261016` | 0.21.1 preparada; publicar hacia la rama de Claude tras #90 y #91. |
 | Antigravity | Cuatro ajustes de móvil en Lona (375 px): portada, gimnasios, veladas y peleadores. Tipos, 858 unitarias y capturas antes/después verificadas. Versión 0.18.10. | `antigravity/ajustes-movil` | Completado localmente, pendiente de revisión de Claude Code |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 

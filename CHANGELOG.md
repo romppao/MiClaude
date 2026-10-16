@@ -11,6 +11,12 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.21.1] — 2026-10-16
+
+### Corregido
+- Los nombres y metadatos largos de los directorios se leen completos, con texto de al menos 16 px y tarjetas de altura adaptable.
+- Repetir la disciplina seleccionada conserva la categoría y la división; cambiarla limpia esos dos filtros y mantiene los demás.
+
 ## [0.21.0] — 2026-10-16
 
 PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan a carteles con foto, como las veladas (petición del fundador del 16-10-2026: «que se vea directamente la imagen» y que el aficionado tenga una pantalla de entrenadores para elegir con quién dar clase).
