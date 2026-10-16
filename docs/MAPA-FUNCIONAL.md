@@ -41,17 +41,18 @@
 | `/medios/:id/imagen` | Foto que el público subió a una velada (guardada ya normalizada en WebP). ?descargar=1 la descarga. | Pública | — | MediaItem |
 | `/medios/:id/video` | Vídeo que el público subió a una velada. ?descargar=1 lo descarga (para que el peleador lo guarde). | Pública | — | MediaItem |
 | `/mi-cuenta` | Mi cuenta | Cuenta con sesión iniciada | `accounts.changePassword`, `accounts.updateAccount`, `community.desbloquearUsuario`, `demo.demoCambiarPapel` | Block, Profile, Report, SupportAccreditation |
-| `/mi-cuenta/datos` | Una foto de la copia de datos, en base64 (del almacén de fotos o de la base). | Cuenta con sesión iniciada | — | AuditLog, Aura, Block, Bout, ClaimRequest, ClassRequest, Event, EventAttendance, EventRegistration, FightProposal, FighterAchievement, Follow, Gym, GymClaimRequest, Highlight, Notification, OrganizerRequest, Profile, Report, SupportAccreditation, Trainer |
+| `/mi-cuenta/datos` | Una foto de la copia de datos, en base64 (del almacén de fotos o de la base). | Cuenta con sesión iniciada | — | AuditLog, Aura, Block, Bout, ClaimRequest, ClassRequest, Event, EventAttendance, EventRegistration, FightProposal, FighterAchievement, Follow, Gym, GymClaimRequest, GymMemberInvitation, GymTransferInvitation, Highlight, Notification, OrganizerRequest, Profile, Report, SupportAccreditation, TicketReservation, Trainer |
 | `/mi-cuenta/eliminar` | Eliminar mi cuenta | Cuenta con sesión iniciada | `accounts.deleteAccount` | Bout |
 | `/mi-ficha` | ¿Ya apareces en Lona? | Cuenta con correo verificado | `bouts.addBout`, `bouts.removeMyBout`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.setMyBoutResult`, `fighters.createMyFighter`, `fighters.manageHighlight`, `fighters.publishHighlight`, `fighters.removeDiscipline`, `fighters.requestClaim`, `fighters.saveDiscipline`, `fighters.setAvailability`, `fighters.setRecordPublic`, `fighters.updateMyFighter` | Bout, ClaimRequest, Fighter, FighterAchievement, Gym, Highlight, MediaItem, Profile |
 | `/mi-ficha/rival` | ¿Quién es tu rival? | Cuenta con correo verificado | `bouts.addBout` | Bout |
 | `/mi-ficha/trayectoria` | Mi trayectoria y aura | Cuenta con correo verificado | `trajectory.requestAchievementReview`, `trajectory.restoreOwnAchievement`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement` | FighterAchievement |
 | `/mi-panel` | (respuesta técnica, sin pantalla) | Cuenta con sesión iniciada | — | — |
 | `/mis-clases` | Solicitudes | Cuenta con sesión iniciada | `community.bloquearUsuario`, `trainers.answerClassRequest`, `trainers.createClass`, `trainers.toggleClass` | ClassRequest, Trainer |
-| `/mis-gimnasios` | Mis gimnasios | Cuenta con correo verificado | `gyms.requestGymClaim`, `gyms.saveGym`, `gyms.setGymMember`, `gyms.transferGym` | Fighter, Gym, GymClaimRequest, Trainer |
+| `/mis-entradas` | Mis entradas | Cuenta con sesión iniciada | `entradas.cancelarMiReserva` | TicketReservation |
+| `/mis-gimnasios` | Mis gimnasios | Cuenta con correo verificado | `gyms.answerGymMemberInvitation`, `gyms.answerGymTransfer`, `gyms.cancelGymMemberInvitation`, `gyms.cancelGymTransfer`, `gyms.inviteGymMember`, `gyms.inviteGymTransfer`, `gyms.requestGymClaim`, `gyms.saveGym`, `gyms.setGymMember`, `gyms.transferGym` | Fighter, Gym, GymClaimRequest, GymMemberInvitation, GymTransferInvitation, Profile, Trainer |
 | `/mis-inscripciones` | Mis inscripciones | Cuenta con sesión iniciada | `registrations.withdrawRegistration` | EventRegistration, EventSlot |
 | `/mis-reservas` | Mis reservas de clases | Cuenta con sesión iniciada | `trainers.cancelClassRequest` | ClassRequest |
-| `/moderacion` | Moderación | Moderación | `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Fighter, Gym, MediaItem, NewsSource, OrganizerRequest, Report |
+| `/moderacion` | Moderación | Moderación | `gyms.decideGymClaim`, `moderation.actualizarFallo`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.decidirVeladaPasada`, `moderation.resolveReport`, `moderation.setGymVerified` | AppError, AuditLog, Aura, Bout, ClaimRequest, Event, Fighter, Gym, GymClaimRequest, MediaItem, NewsSource, OrganizerRequest, Report |
 | `/moderacion/acreditaciones` | Acreditaciones para respaldar | Moderación | `trajectory.setSupportAccreditation` | SupportAccreditation |
 | `/moderacion/fallos` | Fallos de la aplicación | Moderación | — | AppError |
 | `/moderacion/fallos/:id` | Detalle de un fallo | Moderación | `moderation.actualizarFallo` | AppError, AuditLog, User |
@@ -62,8 +63,10 @@
 | `/moderacion/veladas` | Veladas pasadas pendientes de autorización ( | Moderación | `moderation.decidirVeladaPasada` | Event |
 | `/noticias` | Noticias | Pública | — | — |
 | `/organizador` | Organizadores de veladas | Pública (cambia lo que ve según la cuenta) | `events.createEvent`, `events.requestOrganizer` | Event, OrganizerRequest |
-| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent`, `registrations.removeSlot`, `registrations.setRegistration`, `registrations.setSlot` | Event, EventRegistration, EventSlot, Fighter |
+| `/organizador/:slug` | (ficha individual: el título depende del elemento) | Moderación | `bouts.setBoutEvidence`, `entradas.guardarCartelYEntradas`, `events.addCartelBout`, `events.removeCartelBout`, `events.setBoutResult`, `events.setEventStatus`, `events.updateEvent`, `registrations.removeSlot`, `registrations.setRegistration`, `registrations.setSlot` | Event, EventRegistration, EventSlot, Fighter, TicketReservation |
 | `/organizador/:slug/emparejar` | Ayuda para emparejar | Moderación | `events.addCartelBout` | Event |
+| `/organizador/:slug/entradas` | Reservas de entradas | Moderación | `entradas.gestionarReserva` | Event, TicketReservation |
+| `/organizador/:slug/entradas/csv` | Una celda de CSV: entre comillas, y sin que una hoja de cálculo la tome por una fórmula (como en la lista de solicitudes). | Cuenta con sesión iniciada | — | Event |
 | `/organizador/:slug/inscripciones` | Solicitudes para participar | Moderación | `registrations.answerRegistrations` | Event, EventSlot |
 | `/organizador/:slug/inscripciones/csv` | Una celda de CSV: entre comillas, y sin que una hoja de cálculo la tome por una fórmula (empieza por =, +, - o @). | Cuenta con sesión iniciada | — | Event |
 | `/peleadores` | Peleadores | Pública | — | Fighter |
@@ -89,8 +92,9 @@
 | `/subidas` | (respuesta técnica, sin pantalla) | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/subidas/:...clave` | Recibe un vídeo cuando el almacén es el disco del servidor (desarrollo, pruebas y demo). Con R2, el navegador sube directamente allí. | Pública (cambia lo que ve según la cuenta) | — | — |
 | `/veladas` | Calendario de veladas | Pública | — | Event |
-| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.bloquearUsuario`, `community.createReport`, `events.setAttendance` | Event, EventAttendance, EventRegistration, EventSlot, MediaItem |
+| `/veladas/:slug` | (ficha individual: el título depende del elemento) | Pública (cambia lo que ve según la cuenta) | `community.bloquearUsuario`, `community.createReport`, `entradas.reservarEntradas`, `events.setAttendance` | Event, EventAttendance, EventRegistration, EventSlot, MediaItem, TicketReservation |
 | `/veladas/:slug/calendario` | Descarga pública de una velada publicada. Nunca exporta datos de asistencia. | Pública | — | Event |
+| `/veladas/:slug/cartel` | Cartel de una velada (WebP ya normalizado). Solo el de las veladas visibles: las pendientes de autorizar o rechazadas no se sirven. | Pública | — | Event |
 | `/veladas/:slug/inscribirme` | Solicitar participar | Pública (cambia lo que ve según la cuenta) | `registrations.requestRegistration`, `registrations.withdrawRegistration` | Bout, Event, EventRegistration, EventSlot, FighterDiscipline |
 | `/verificar` | Confirmar tu correo electrónico | Pública (cambia lo que ve según la cuenta) | `accounts.resendVerification`, `accounts.verifyEmail`, `demo.demoConfirmarCorreo` | OrganizerRequest |
 
@@ -105,7 +109,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `changePassword` | Cuenta con sesión iniciada | AppError, AuditLog, EmailOutbox, RateHit, Session, User | — | Sí | contrasena_guardada |
-| `deleteAccount` | Cuenta con sesión iniciada | AppError, AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
+| `deleteAccount` | Cuenta con sesión iniciada | AppError, AuditLog, Bout, Fighter, FighterAchievement, FighterDiscipline, GymTransferInvitation, Highlight, Profile, RateHit, Session, SupportAccreditation, Trainer, User | USER: ACCOUNT_DELETED | — | cuenta_eliminada |
 | `login` | Cualquiera | AuditLog, RateHit, Session, User | USER: CREADOR_PERMISOS | — | — |
 | `logout` | Cualquiera | Session | — | — | sesion_cerrada |
 | `register` | Cualquiera | AppError, AuditLog, EmailOutbox, EmailToken, OrganizerRequest, RateHit, Session, User | — | Sí | cuenta_creada, registro_entidad |
@@ -142,7 +146,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
 | `avisarSinCuenta` | Cualquiera | AppError, AuditLog, EmailOutbox, RateHit, Report | REPORT: CREATED | Sí | aviso_pagina_recibido |
-| `bloquearUsuario` | Cualquiera | AuditLog, Block, ClassRequest, FightProposal, Follow | USER: BLOCKED | — | bloqueado |
+| `bloquearUsuario` | Cualquiera | AuditLog, Block, ClassRequest, FightProposal, Follow, GymMemberInvitation, GymTransferInvitation | USER: BLOCKED | — | bloqueado |
 | `createReport` | Cuenta con correo verificado | AuditLog, Report | REPORT: CREATED | — | reporte_enviado |
 | `desbloquearUsuario` | Cualquiera | AuditLog, Block | USER: UNBLOCKED | — | desbloqueado |
 | `toggleFollow` | Cualquiera | Follow | — | — | — |
@@ -164,6 +168,15 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `demoCambiarPapel` | Cuenta con sesión iniciada | AuditLog, OrganizerRequest, User | USER: DEMO_ROLE_CHANGED | — | demo_papel_cambiado |
 | `demoConfirmarCorreo` | Cuenta con sesión iniciada | AuditLog, User | USER: DEMO_EMAIL_VERIFIED | — | correo_verificado |
 
+### `entradas`
+
+| Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
+|---|---|---|---|---|---|
+| `cancelarMiReserva` | Cuenta con correo verificado | AuditLog, Notification, TicketReservation | EVENT: TICKETS_CANCELLED | — | entradas_canceladas |
+| `gestionarReserva` | Organizador (o moderación) con correo verificado | AppError, AuditLog, EmailOutbox, Notification, TicketReservation | EVENT: (varias) | Sí | — |
+| `guardarCartelYEntradas` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Event, EventPoster, TicketReservation | EVENT: TICKETS_UPDATED | — | entradas_guardadas |
+| `reservarEntradas` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, Notification, RateHit, TicketReservation | EVENT: TICKETS_RESERVED | Sí | entradas_reservadas |
+
 ### `events`
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
@@ -175,7 +188,7 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 | `setAttendance` | Cuenta con sesión iniciada | EventAttendance | — | — | — |
 | `setBoutResult` | Organizador (o moderación) con correo verificado | AppError, AuditLog, Bout, Event, Fighter, Notification | BOUT: RESULT_SET | — | resultado_guardado |
 | `setEventStatus` | Organizador (o moderación) con correo verificado | AuditLog, Event | EVENT: (varias) | — | — |
-| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event | EVENT: PAST_EVENT_AUTHORIZATION_REQUESTED, EVENT: UPDATED | — | velada_actualizada |
+| `updateEvent` | Organizador (o moderación) con correo verificado | AuditLog, Bout, Event, TicketReservation | EVENT: PAST_EVENT_AUTHORIZATION_REQUESTED, EVENT: UPDATED | — | velada_actualizada |
 
 ### `fighters`
 
@@ -196,7 +209,13 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Acción | Quién puede | Escribe en | Registro de cambios | Correo | Avisos de éxito |
 |---|---|---|---|---|---|
+| `answerGymMemberInvitation` | Cuenta con correo verificado | AuditLog, Fighter, GymMemberInvitation, Notification, Trainer | GYM: (varias) | — | gimnasio_invitacion_respondida |
+| `answerGymTransfer` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, Gym, GymTransferInvitation, Profile | GYM: (varias) | Sí | — |
+| `cancelGymMemberInvitation` | Cuenta con correo verificado | AuditLog, GymMemberInvitation | GYM: GYM_MEMBER_CANCELLED | — | gimnasio_invitacion_cancelada |
+| `cancelGymTransfer` | Cuenta con correo verificado | AuditLog, GymTransferInvitation | GYM: GYM_TRANSFER_CANCELLED | — | gimnasio_cesion_cancelada |
 | `decideGymClaim` | Moderación | AppError, AuditLog, EmailOutbox, Gym, GymClaimRequest, Profile | GYM: (varias), GYM: GYM_CLAIM_CONFLICT | Sí | — |
+| `inviteGymMember` | Cuenta con correo verificado | AuditLog, GymMemberInvitation, Notification | GYM: GYM_MEMBER_INVITED | — | gimnasio_invitacion_enviada |
+| `inviteGymTransfer` | Cuenta con correo verificado | AppError, AuditLog, EmailOutbox, GymTransferInvitation, RateHit | GYM: GYM_TRANSFER_INVITED | Sí | gimnasio_cesion_invitada |
 | `requestGymClaim` | Cuenta con correo verificado | AuditLog, GymClaimRequest | GYM: GYM_CLAIM_REQUESTED | — | gimnasio_reclamado |
 | `saveGym` | Cuenta con correo verificado | AppError, AuditLog, Gym, GymClaimRequest | GYM: (varias) | — | gimnasio_guardado |
 | `setGymMember` | Cuenta con correo verificado | AuditLog, Fighter, Trainer | — | — | gimnasio_vinculo |
@@ -290,40 +309,44 @@ Cada acción es un punto de entrada público del servidor (`src/app/actions/<mó
 
 | Tabla | Acciones que escriben |
 |---|---|
-| Gym | `fighters.createMyFighter`, `fighters.updateMyFighter`, `gyms.saveGym`, `gyms.decideGymClaim`, `gyms.transferGym`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `trainers.createMyTrainer` |
+| Gym | `fighters.createMyFighter`, `fighters.updateMyFighter`, `gyms.saveGym`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.answerGymTransfer`, `moderation.setGymVerified`, `moderation.resolveReport`, `profiles.saveProfile`, `trainers.createMyTrainer` |
 | GymClaimRequest | `gyms.saveGym`, `gyms.requestGymClaim`, `gyms.decideGymClaim` |
-| Trainer | `accounts.deleteAccount`, `gyms.setGymMember`, `profiles.saveProfile`, `trainers.createMyTrainer` |
+| Trainer | `accounts.deleteAccount`, `gyms.setGymMember`, `gyms.answerGymMemberInvitation`, `profiles.saveProfile`, `trainers.createMyTrainer` |
 | TrainingClass | `trainers.createMyTrainer`, `trainers.createClass`, `trainers.toggleClass` |
 | ClassRequest | `community.bloquearUsuario`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | EventSlot | `registrations.setSlot`, `registrations.removeSlot` |
 | EventRegistration | `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations` |
 | FightProposal | `community.bloquearUsuario`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal` |
 | Highlight | `accounts.deleteAccount`, `fighters.addPublicVideoHighlight`, `fighters.publishHighlight`, `fighters.manageHighlight`, `moderation.resolveReport` |
-| Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.setRecordPublic`, `gyms.setGymMember`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport`, `moderation.decidirVeladaPasada` |
-| Event | `bouts.addBout`, `bouts.removeMyBout`, `events.createEvent`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `moderation.decidirVeladaPasada`, `registrations.setRegistration` |
+| Fighter | `accounts.deleteAccount`, `bouts.addBout`, `bouts.respondBout`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.setRecordPublic`, `gyms.setGymMember`, `gyms.answerGymMemberInvitation`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.resolveReport`, `moderation.decidirVeladaPasada` |
+| Event | `bouts.addBout`, `bouts.removeMyBout`, `entradas.guardarCartelYEntradas`, `events.createEvent`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `moderation.decidirVeladaPasada`, `registrations.setRegistration` |
 | Bout | `accounts.deleteAccount`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.removeCartelBout`, `moderation.adminDecide`, `moderation.resolveReport`, `trajectory.endorseBout` |
-| Notification | `aura.giveAura`, `bouts.addBout`, `bouts.setMyBoutResult`, `events.setBoutResult`, `fighters.addPublicVideoHighlight`, `media.shareMedia`, `notifications.readNotification`, `notifications.readAllNotifications`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass`, `trainers.answerClassRequest` |
+| Notification | `aura.giveAura`, `bouts.addBout`, `bouts.setMyBoutResult`, `entradas.reservarEntradas`, `entradas.cancelarMiReserva`, `entradas.gestionarReserva`, `events.setBoutResult`, `fighters.addPublicVideoHighlight`, `gyms.inviteGymMember`, `gyms.answerGymMemberInvitation`, `media.shareMedia`, `notifications.readNotification`, `notifications.readAllNotifications`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass`, `trainers.answerClassRequest` |
 | User | `accounts.register`, `accounts.saveInterests`, `accounts.saveFighterIntent`, `accounts.saveTrainerIntent`, `accounts.saveTrainerClassIntent`, `accounts.login`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.unsubscribeEmails`, `accounts.deleteAccount`, `accounts.verifyEmail`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `fighters.createMyFighter`, `moderation.decideOrganizer`, `trainers.createMyTrainer` |
 | Session | `accounts.register`, `accounts.login`, `accounts.logout`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.cerrarSesionesDe` |
 | Aura | `aura.giveAura`, `aura.removeAura`, `moderation.decideClaim`, `moderation.resolveReport` |
 | EmailToken | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.verifyEmail`, `accounts.resendVerification` |
 | ClaimRequest | `fighters.requestClaim`, `moderation.decideClaim` |
 | OrganizerRequest | `accounts.register`, `demo.demoCambiarPapel`, `events.requestOrganizer`, `moderation.decideOrganizer` |
-| AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `community.bloquearUsuario`, `community.desbloquearUsuario`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.addPublicVideoHighlight`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `gyms.saveGym`, `gyms.requestGymClaim`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.setGymMember`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `moderation.decidirVeladaPasada`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
-| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `community.avisarSinCuenta`, `events.addCartelBout`, `events.setBoutResult`, `fighters.publishHighlight`, `fighters.manageHighlight`, `gyms.saveGym`, `gyms.decideGymClaim`, `gyms.transferGym`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| AuditLog | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.updateAccount`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `bouts.setBoutEvidence`, `bouts.removeMyBout`, `community.createReport`, `community.bloquearUsuario`, `community.desbloquearUsuario`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `demo.demoConfirmarCorreo`, `demo.demoCambiarPapel`, `entradas.guardarCartelYEntradas`, `entradas.reservarEntradas`, `entradas.cancelarMiReserva`, `entradas.gestionarReserva`, `events.createEvent`, `events.addCartelBout`, `events.setBoutResult`, `events.updateEvent`, `events.setEventStatus`, `events.removeCartelBout`, `fighters.addPublicVideoHighlight`, `fighters.setAvailability`, `fighters.createMyFighter`, `fighters.updateMyFighter`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `fighters.setRecordPublic`, `fighters.publishHighlight`, `fighters.manageHighlight`, `gyms.saveGym`, `gyms.requestGymClaim`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.setGymMember`, `gyms.inviteGymTransfer`, `gyms.answerGymTransfer`, `gyms.cancelGymTransfer`, `gyms.inviteGymMember`, `gyms.answerGymMemberInvitation`, `gyms.cancelGymMemberInvitation`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.adminDecide`, `moderation.decideClaim`, `moderation.decideOrganizer`, `moderation.setGymVerified`, `moderation.resolveReport`, `moderation.actualizarFallo`, `moderation.decidirVeladaPasada`, `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource`, `news.toggleNewsItem`, `profiles.saveProfile`, `profiles.createFederation`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.setRegistration`, `registrations.setSlot`, `registrations.removeSlot`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.createMyTrainer`, `trainers.createClass`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement`, `trajectory.endorseBout`, `trajectory.setSupportAccreditation` |
+| AppError | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `bouts.addBout`, `bouts.setMyBoutResult`, `bouts.respondBout`, `community.avisarSinCuenta`, `entradas.guardarCartelYEntradas`, `entradas.reservarEntradas`, `entradas.gestionarReserva`, `events.addCartelBout`, `events.setBoutResult`, `fighters.publishHighlight`, `fighters.manageHighlight`, `gyms.saveGym`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.inviteGymTransfer`, `gyms.answerGymTransfer`, `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport`, `moderation.actualizarFallo`, `profiles.saveProfile`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
 | Report | `bouts.respondBout`, `community.createReport`, `community.avisarSinCuenta`, `moderation.resolveReport` |
 | Block | `community.bloquearUsuario`, `community.desbloquearUsuario` |
 | Follow | `accounts.saveInterests`, `community.toggleFollow`, `community.bloquearUsuario`, `moderation.decideClaim` |
 | FighterDiscipline | `accounts.deleteAccount`, `bouts.addBout`, `events.addCartelBout`, `fighters.saveDiscipline`, `fighters.removeDiscipline`, `moderation.resolveReport` |
-| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass` |
-| Profile | `accounts.deleteAccount`, `gyms.decideGymClaim`, `gyms.transferGym`, `moderation.decideOrganizer`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
+| RateHit | `accounts.register`, `accounts.login`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.deleteAccount`, `accounts.resendVerification`, `community.avisarSinCuenta`, `creador.comprobarSegundoPaso`, `creador.activarSegundoPaso`, `creador.regenerarCodigos`, `entradas.reservarEntradas`, `gyms.inviteGymTransfer`, `proposals.proposeFight`, `registrations.requestRegistration`, `trainers.requestClass` |
+| Profile | `accounts.deleteAccount`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.answerGymTransfer`, `moderation.decideOrganizer`, `moderation.resolveReport`, `profiles.saveProfile`, `profiles.createFederation` |
 | SupportAccreditation | `accounts.deleteAccount`, `trajectory.setSupportAccreditation` |
 | FighterAchievement | `accounts.deleteAccount`, `fighters.removeDiscipline`, `moderation.resolveReport`, `trajectory.saveAchievement`, `trajectory.withdrawAchievement`, `trajectory.restoreOwnAchievement`, `trajectory.requestAchievementReview`, `trajectory.reviewAchievement` |
 | MediaItem | `media.shareMedia`, `media.deleteMyMedia`, `moderation.resolveReport` |
 | NewsSource | `news.refreshNewsNow`, `news.addNewsSource`, `news.toggleNewsSource` |
 | NewsItem | `news.refreshNewsNow`, `news.toggleNewsItem` |
 | EventAttendance | `events.setAttendance` |
-| EmailOutbox | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `community.avisarSinCuenta`, `gyms.decideGymClaim`, `gyms.transferGym`, `moderation.resolveReport`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| EmailOutbox | `accounts.register`, `accounts.requestPasswordReset`, `accounts.resetPassword`, `accounts.changePassword`, `accounts.resendVerification`, `community.avisarSinCuenta`, `entradas.reservarEntradas`, `entradas.gestionarReserva`, `gyms.decideGymClaim`, `gyms.transferGym`, `gyms.inviteGymTransfer`, `gyms.answerGymTransfer`, `moderation.resolveReport`, `proposals.proposeFight`, `proposals.answerProposal`, `proposals.cancelProposal`, `registrations.requestRegistration`, `registrations.withdrawRegistration`, `registrations.answerRegistrations`, `trainers.requestClass`, `trainers.answerClassRequest`, `trainers.cancelClassRequest` |
+| GymMemberInvitation | `community.bloquearUsuario`, `gyms.inviteGymMember`, `gyms.answerGymMemberInvitation`, `gyms.cancelGymMemberInvitation` |
+| TicketReservation | `entradas.guardarCartelYEntradas`, `entradas.reservarEntradas`, `entradas.cancelarMiReserva`, `entradas.gestionarReserva`, `events.updateEvent` |
+| EventPoster | `entradas.guardarCartelYEntradas` |
+| GymTransferInvitation | `accounts.deleteAccount`, `community.bloquearUsuario`, `gyms.inviteGymTransfer`, `gyms.answerGymTransfer`, `gyms.cancelGymTransfer` |
 
 ## Lógica compartida (`src/lib`)
 
@@ -376,10 +399,10 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `disciplines.ts` | `CategoriaPeso`, `DISCIPLINE_LABEL`, `DISCIPLINE_ORDER`, `DISCIPLINE_SLUG`, `LEVEL_ORDER`, `METHODS_BY_DISCIPLINE`, `PESOS`, `PesosDe`, `categoryLabel`, `disciplineFromSlug`, `isDiscipline`, `isLevel`, `isTournamentStyle`, `isWeightClass`, `levelName`, `parseCompetitionChoice`, `parseDisciplineChoice`, `weightClassLabel`, `weightClassesFor`, `weightNote` |
 | `env.ts` | `validateEnv` |
 | `fallos.ts` | `DatosFallo`, `ESTADOS_FALLO`, `EstadoFallo`, `ORIGENES_FALLO`, `OrigenFallo`, `huellaFallo`, `normalizarMensaje`, `normalizarRuta`, `registrarFallo`, `tacharDatos` |
-| `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes` |
+| `geo.ts` | `buscarCoordenadas`, `ubicarGimnasio`, `ubicarPendientes`, `variantesDireccion` |
 | `gym-directory.ts` | `publicGyms` |
 | `gym-osm.ts` | `gymNameKey`, `osmAreaProvince`, `osmGymCandidate`, `osmProvince` |
-| `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `osmMayUpdate` |
+| `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `newGymStatus`, `osmMayUpdate` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `fmtFechaHoraMadrid`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
 | `mail-transporte.ts` | `entregarCorreo`, `hayTransporte`, `logMode` |
 | `mail.ts` | `APP_URL`, `sendMail` |
@@ -416,6 +439,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `calendar.ts` | `eventCalendar` |
 | `cartel-search.ts` | `SUGERENCIAS_CARTEL`, `buscarParaCartel` |
+| `entradas.ts` | `ESTADO_ENTRADA`, `FILTROS_RESERVAS`, `FiltroReservas`, `HORAS_CIERRE_ANTES`, `HORAS_PARA_SENAL`, `HORA_POR_DEFECTO`, `MAX_ENTRADAS`, `OCUPAN_PLAZA`, `caducarVencidas`, `cierreDeReservas`, `fmtBizum`, `fmtHora`, `inicioDeVelada`, `motivoSinConfirmacion`, `motivoSinReserva`, `nuevoCodigo`, `parseBizum`, `parseFiltroReservas`, `parseHora`, `plazasOcupadas`, `plazoDeSenal`, `reservaOcupaPlaza`, `reservasDeVelada`, `senal`, `urlCartel`, `ventaAbierta` |
 | `pairing.ts` | `DatosPareja`, `OpcionesPareja`, `PARECIDO_LABEL`, `Parecido`, `Sugerencia`, `avisos`, `comparaEdad`, `distancia`, `parecido`, `porcentajeVictorias`, `sugerirRivales` |
 | `preparation-data.ts` | `preparationAudience` |
 | `preparation.ts` | `eventPreparation` |

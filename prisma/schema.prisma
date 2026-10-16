@@ -107,6 +107,8 @@ enum GymClaimStatus {
 }
 
 model Gym {
+  transferInvitations GymTransferInvitation[]
+  memberInvitations GymMemberInvitation[]
   id           String    @id @default(cuid())
   slug         String    @unique
   name         String
@@ -165,6 +167,7 @@ model GymClaimRequest {
 }
 
 model Trainer {
+  gymInvitations GymMemberInvitation[]
   id            String          @id @default(cuid())
   slug          String          @unique
   name          String
@@ -354,6 +357,7 @@ model Highlight {
 }
 
 model Fighter {
+  gymInvitations GymMemberInvitation[]
   availableToFight Boolean @default(false)
   currentWeightKg Decimal? @db.Decimal(5, 2)
   availableSince DateTime?
@@ -436,6 +440,23 @@ model Event {
   registrationUntil DateTime?           @db.Date
   registrations     EventRegistration[]
   slots             EventSlot[]
+  // Hora de inicio (minutos desde las 00:00, hora peninsular) y cartel de la velada (petición del fundador, 15-10-2026: «que aparezcan
+  // directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio de la entrada»). El cartel va al almacén de fotos
+  // (posterKey) o, sin almacén, a una tabla aparte (EventPoster) para que las consultas de veladas no arrastren la imagen.
+  startMinute       Int?
+  posterKey         String?
+  posterBytes       EventPoster?
+  // Cuándo se subió el cartel actual (null si no hay): dice si hay cartel sin leer los bytes y versiona la dirección de la imagen.
+  posterAt          DateTime?
+  // Entradas reservadas en Lona (lib/events/entradas.ts): la promotora fija el precio y cobra ella. Se paga la mitad por Bizum para
+  // confirmar la reserva y el resto en la puerta. Lona no toca el dinero.
+  ticketsOpen       Boolean             @default(false)
+  ticketPriceEuros  Int?
+  doorPriceEuros    Int?
+  ticketCapacity    Int?
+  bizumPhone        String?
+  ticketNote        String?
+  tickets           TicketReservation[]
 
   @@index([discipline, date])
   @@index([organizerId])
@@ -502,6 +523,9 @@ model Notification {
 }
 
 model User {
+  sentGymTransfers GymTransferInvitation[] @relation("GymTransferSender")
+  sentGymMemberInvitations GymMemberInvitation[] @relation("GymMemberSender")
+  receivedGymMemberInvitations GymMemberInvitation[] @relation("GymMemberRecipient")
   notifications Notification[]
   ownedGyms Gym[] @relation("GymOwner")
   gymClaims GymClaimRequest[] @relation("GymClaimApplicant")
@@ -536,6 +560,7 @@ model User {
   trainer               Trainer?
   media                 MediaItem[]
   classRequests         ClassRequest[]
+  ticketReservations    TicketReservation[]
   // Disciplinas que le interesan (registro de aficionado): ordenan su inicio.
   interests             Discipline[]           @default([])
   // Lo que eligió en el último paso del registro (ficha de peleador o perfil de entrenador), para rellenar el formulario tras confirmar el correo.
@@ -979,4 +1004,92 @@ model EmailOutbox {
 
   @@index([status, priority, nextAttemptAt])
   @@index([sentAt])
+}
+
+// Una invitación no cambia la ficha: solo la aceptación de su titular vincula el gimnasio.
+// Conserva la afiliación al invitar para no pisar una edición posterior de la persona.
+model GymMemberInvitation {
+  id String @id @default(cuid())
+  gymId String
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  senderId String
+  sender User @relation("GymMemberSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient User @relation("GymMemberRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  fighterId String?
+  fighter Fighter? @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+  trainerId String?
+  trainer Trainer? @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  previousGymId String?
+  status ClassRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  answeredAt DateTime?
+
+  @@index([gymId, status])
+  @@index([recipientId, status])
+  @@index([senderId])
+  @@index([fighterId])
+  @@index([trainerId])
+}
+
+enum TicketStatus {
+  PENDING_DEPOSIT
+  CONFIRMED
+  CHECKED_IN
+  CANCELLED
+  EXPIRED
+}
+
+// Reserva de entradas de una velada (15-10-2026). Se crea «pendiente de señal»: quien reserva envía la mitad por Bizum a la promotora con
+// el código como concepto antes de depositUntil; la promotora la confirma al recibirla y marca la entrada en la puerta, donde se paga el
+// resto. Sin señal a tiempo, caduca y libera las plazas. Una reserva activa por persona y velada.
+model TicketReservation {
+  id           String       @id @default(cuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity     Int
+  unitEuros    Int
+  totalEuros   Int
+  depositEuros Int
+  code         String       @unique
+  status       TicketStatus @default(PENDING_DEPOSIT)
+  depositUntil DateTime
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+  checkedInAt  DateTime?
+  cancelledAt  DateTime?
+  // Quién la canceló: «comprador» o «promotora».
+  cancelledBy  String?
+
+  @@index([eventId, status])
+  @@index([userId, createdAt])
+}
+
+// Bytes del cartel cuando no hay almacén de fotos (desarrollo y pruebas). Aparte de Event para no leerlos en cada consulta de veladas.
+model EventPoster {
+  eventId String @id
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bytes   Bytes
+}
+
+// El correo puede no tener cuenta aún. La invitación solo se acepta con ese correo confirmado y el enlace secreto.
+model GymTransferInvitation {
+  id String @id @default(cuid())
+  gymId String
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  senderId String
+  sender User @relation("GymTransferSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientEmail String
+  tokenHash String @unique
+  status ClassRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  answeredAt DateTime?
+
+  @@index([gymId, status])
+  @@index([senderId])
+  @@index([recipientEmail, status])
 }

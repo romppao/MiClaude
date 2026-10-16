@@ -44,7 +44,7 @@ async function persona(nombre, descripcion, guion) {
     if (ms > 4000 && estado === "ok") fricciones.push(`«${texto}»: tardó ${(ms / 1000).toFixed(1)} s`);
     numPaso++;
     const archivo = `${nombre}-${String(pasos.length + 1).padStart(2, "0")}.png`;
-    await p.screenshot({ path: `${DIR}/${archivo}`, fullPage: false }).catch(() => {});
+    await p.screenshot({ caret: "initial", path: `${DIR}/${archivo}`, fullPage: false }).catch(() => {});
     pasos.push({ texto, estado, detalle, archivo, url: new URL(p.url()).pathname + new URL(p.url()).search });
     console.log(`${estado === "ok" ? "  ✓" : "  ✗"} [${nombre}] ${texto}${detalle ? " → " + detalle : ""}`);
     if (estado !== "ok") throw new RecorridoInterrumpido(detalle);
@@ -210,7 +210,7 @@ await persona("promotora", "Clara, 41 años, organiza veladas amateur: pide ser 
     const mctx = await browser.newContext({ ...devices["iPhone 14"], reducedMotion: "reduce" }); const m = await mctx.newPage();
     const memail = await registrarse(m, "Moderadora", "FAN"); await confirmarCorreo(m, memail); hacerAdmin(memail);
     await m.goto(B + "/moderacion");
-    const fila = m.locator("tr, article[data-cola], .card", { hasText: org }).first();
+    const fila = m.locator("tr, article[data-cola], li, .card", { hasText: org }).first();
     await fila.locator("input[name=note]").fill("Web y redes comprobadas");
     await fila.getByRole("button", { name: /Aprobar/ }).click(); await m.locator("[role=status]", { hasText: /aprobad/i }).first().waitFor({ timeout: 8000 });
     await mctx.close();
@@ -284,7 +284,7 @@ await persona("rival", "Iker, peleador, recibe dos declaraciones de combate: con
     await p.goto(B + "/mi-ficha");
   });
   await paso("confirma el primer combate", async () => { const fila = p.locator('li', { hasText: `Combate confirmado Iker ${rnd}` }); await fila.locator("button:has-text('Sí, es correcto')").click(); await aviso(p, "Has confirmado el combate"); });
-  await paso("el autor ve la confirmación y recibe el correo", async () => { await autor.p.goto(B + "/mi-ficha"); const etiqueta = autor.p.locator("tr", { hasText: `Combate confirmado Iker ${rnd}` }).locator(".tag", { hasText: /confirmado/i }); await mostrar(etiqueta); await etiqueta.waitFor(); await autor.p.screenshot({ path: `${DIR}/rival-autor-confirmacion.png` }); comprobar(await esperarCorreo(autor.email, "ha confirmado tu combate"), "el autor no recibió la confirmación"); });
+  await paso("el autor ve la confirmación y recibe el correo", async () => { await autor.p.goto(B + "/mi-ficha"); const etiqueta = autor.p.locator("tr", { hasText: `Combate confirmado Iker ${rnd}` }).locator(".tag", { hasText: /confirmado/i }); await mostrar(etiqueta); await etiqueta.waitFor(); await autor.p.screenshot({ caret: "initial", path: `${DIR}/rival-autor-confirmacion.png` }); comprobar(await esperarCorreo(autor.email, "ha confirmado tu combate"), "el autor no recibió la confirmación"); });
   await paso("pide revisión del segundo explicando el motivo", async () => { await p.goto(B + "/mi-ficha"); const fila = p.locator('li', { hasText: `Combate revisión Iker ${rnd}` }); await fila.locator('[name=motivo]').fill("No combatimos en esa fecha; revisad el acta."); await fila.locator("button:has-text('No es correcto')").click(); await aviso(p, "Has solicitado revisión"); });
   await paso("el autor recibe la respuesta completa y el motivo", async () => { comprobar(await esperarCorreo(autor.email, "No combatimos en esa fecha"), "el autor no recibe el motivo de la revisión"); await p.goto(B + "/mi-ficha"); });
 });

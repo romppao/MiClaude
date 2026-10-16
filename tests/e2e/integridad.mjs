@@ -1,8 +1,7 @@
 // Pruebas de integridad de la verificación y del aura (lo que la auditoría marcó como fallos confirmados):
 // combates de hoy y futuros, fichas de terceros sin listar, combates rechazados que no cuentan, comentarios de aura
 // denunciables y claves heredadas de objetos en las direcciones. Requiere el servidor en marcha (ver ayudas.mjs).
-import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
-import { execFileSync } from "node:child_process";
+import { datosDeAlta, slugDe, B, rnd, browser, seen, check, btn, hoyMadrid, enDias, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
 
 const anon = await (await browser.newContext()).newPage();
 const cuerpo = (p) => p.locator("body").innerText();
@@ -24,7 +23,7 @@ await registrar(ana, { evento: `Velada de Hoy ${rnd}`, fecha: hoyMadrid, rivalNo
 await ana.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
 // Este escenario comprueba el récord de un combate autodeclarado ya maduro.
 // El flujo de uno recién declarado (que aún no suma durante 24 h) se prueba en flujo.mjs.
-execFileSync("psql", [process.env.DATABASE_URL, "-c", `update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}'`]);
+sql(`update "Bout" b set "createdAt" = now() - interval '25 hours' from "Event" e where b."eventId" = e.id and e.name = 'Velada de Hoy ${rnd}';`);
 await ana.reload();
 check("un combate de hoy conserva su resultado en el récord", await seen(ana.locator(".rec", { hasText: /^\s*1-0-0\s*$/ }).first()));
 await registrar(ana, { evento: `Velada Futura Ana ${rnd}`, fecha: enDias(10), rivalNombre: "Carlos", rivalApellidos: `Futuro${rnd}` });
@@ -56,9 +55,9 @@ await fan.locator(".notice-ok", { hasText: "aura" }).waitFor();
 check("el aura se suma en la ficha", await seen(fan.locator(".rec", { hasText: /^\s*1\s*$/ }).first()));
 check("no se puede dar aura dos veces al mismo combate", await fan.locator("button:has-text('Dar aura')").count() === 0 && await fan.locator("button:has-text('Quitar mi aura')").count() === 1);
 
-const filaCombate = () => mod.locator("tr", { hasText: `Velada de Hoy ${rnd}` });
+const filaCombate = () => mod.locator("tr, article[data-cola]", { hasText: `Velada de Hoy ${rnd}` });
 await mod.goto(B + "/moderacion");
-await filaCombate().locator("button:has-text('Marcar como no correcto')").click();
+await filaCombate().locator("button:has-text('Poner en revisión')").click();
 await filaCombate().locator("button:has-text('Restaurar')").waitFor();
 await anon.goto(B + `/peleadores/ana-integra${rnd}`);
 const rechazado = await cuerpo(anon);
@@ -68,7 +67,7 @@ check("y no se muestra el resultado como un hecho: se dice que está en revisió
 await mod.goto(B + "/moderacion");
 check("los combates rechazados aparecen en la cola «en revisión» de moderación", await seen(filaCombate().locator("button:has-text('Restaurar')")));
 await filaCombate().locator("button:has-text('Restaurar')").click();
-await filaCombate().locator("button:has-text('Marcar como no correcto')").waitFor();
+await filaCombate().locator("button:has-text('Poner en revisión')").waitFor();
 await anon.goto(B + `/peleadores/ana-integra${rnd}`);
 check("al restaurarlo vuelve a contar el aura recibida", await seen(anon.locator(".rec", { hasText: /^\s*1\s*$/ }).first()) && (await cuerpo(anon)).includes(`Gran pelea ${rnd}`));
 
@@ -80,7 +79,7 @@ await detalles.locator("select[name=reason]").selectOption({ index: 1 });
 await detalles.locator("button:has-text('Enviar aviso')").click();
 await aviso.locator(".notice-ok").waitFor();
 await mod.goto(B + "/moderacion");
-const filaAviso = mod.locator("tr", { hasText: `Gran pelea ${rnd}` });
+const filaAviso = mod.locator("tr, article[data-cola]", { hasText: `Gran pelea ${rnd}` });
 check("el moderador ve el comentario denunciado", await seen(filaAviso.first()));
 await filaAviso.locator("button:has-text('Resolver y retirar el comentario')").click();
 await filaAviso.waitFor({ state: "detached" });

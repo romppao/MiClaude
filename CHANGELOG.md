@@ -11,7 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.19.3] — 2026-10-15
+## [0.20.6] — 2026-10-16
 
 
 
@@ -19,6 +19,110 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 ### Añadido
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
 
+
+
+### Corregido
+- Las capturas de los escenarios conservan el cursor original para evitar el aviso artificial de hidratación React#418 detectado por Claude. Se retira encType redundante del formulario de highlight con acción de función, que causaba un aviso en desarrollo.
+- Los escenarios no consumen minutos en cada PR: solo al fusionar, manualmente o en PR etiquetado escenarios.
+
+## [0.20.5] — 2026-10-16
+
+
+
+### Corregido
+- Los gimnasios nuevos aportados al crear o editar fichas de peleador o entrenador quedan pendientes de moderación. Se mantiene el estado de los gimnasios existentes y la excepción de publicación de moderación.
+
+
+## [0.20.4] — 2026-10-16
+
+
+### Añadido
+- Cesión de gimnasios por invitación al correo: aceptación expresa, respuesta idéntica con y sin cuenta, bloqueos, enlace con caducidad y confirmación a las dos personas mediante sendMail.
+
+
+
+## [0.20.3] — 2026-10-16
+
+### Añadido
+- El titular de un gimnasio invita a peleadores y entrenadores; cada persona acepta o rechaza sin que la invitación cambie su ficha. Se comprueban bloqueos, propiedad y afiliación al responder.
+
+
+## [0.20.2] — 2026-10-16
+
+### Corregido
+- **Móvil:** lema visible en portada, buscador y mapa de gimnasios sin solaparse con la cabecera y botón de aplicar filtros antes de los filtros secundarios de peleadores.
+- Revisión de #94: se retira el cambio global de títulos en `.card`; los carteles de veladas de 0.20.0 conservan su presentación.
+
+## [0.20.1] — 2026-10-16
+
+PR de Claude Code: red de seguridad contra regresiones y flujo de trabajo Claude + Codex (peticiones del fundador del 16-10-2026: «usar algún framework para evitar romper cosas que ya funcionaban o ya habíamos aprobado», «replicar el flujo de trabajo» del vídeo y «que sepáis qué modelo y esfuerzo usar según la tarea»). Sin cambios en la aplicación.
+
+### Añadido
+- **Registro de funciones aprobadas** (`docs/APROBADO.md`, 15 filas): cada función aprobada por el fundador apunta a la prueba que la vigila; `tests/documentacion/aprobado.test.mjs` falla si esa prueba desaparece o deja de contener la comprobación.
+- **Ningún recorrido fuera del CI:** lista `tests/e2e/orden.json` y prueba `tests/documentacion/e2e.test.mjs`, que falla si un archivo de `tests/e2e` no está en la lista ni declarado aparte.
+- **`npm run verificar`:** todas las puertas del CI en un comando, sin pararse en la primera que falla; con `--e2e`, los recorridos de navegador en una base desechable de Docker (`scripts/e2e-local.mjs`, con sustituto de `psql` en Windows).
+- **La flota** (`scripts/flota.mjs`, `/flota`, `docs/tareas/PLANTILLA-FLOTA.md`): Codex ejecuta una ficha en una copia aparte, pasan las puertas y revisa Luna (o Astra si es crítico) con veredicto en JSON; Claude verifica y decide. Elige modelo y esfuerzo según la complejidad y el riesgo de la ficha.
+- **Documentación:** `docs/RED-DE-SEGURIDAD.md` (capas y flujo), `docs/MODELOS-Y-ESFUERZO.md` (qué modelo y esfuerzo para cada tipo de tarea) y `docs/COBERTURA-CONCEPTOS.md` (cruce con la lista de conceptos de ingeniería que mandó el fundador).
+- **El flujo en pantalla:** barra de estado de Claude Code (`scripts/flota-barra.mjs`) y panel en vivo en <http://localhost:4777> (`scripts/flota-panel.mjs`) con lo que hace cada modelo en cada momento; el estado se guarda en `~/.lona-flota/estado.json` (`scripts/flota-estado.mjs`).
+- Prueba unitaria de que el nombre antiguo, «Ring España», no vuelve al código.
+
+### Cambiado
+- `npm run test:e2e` ejecuta todos los recorridos aunque falle uno y resume al final cuáles fallaron (antes el CI se paraba en el primero).
+- Las pruebas llaman a `psql` de forma que también funciona en Windows (`tests/e2e/ayudas.mjs`, `flujo.mjs`, `integridad.mjs`).
+
+## [0.20.0] — 2026-10-15
+
+PR de Claude Code: fase 1 de la ronda de utilidades, veladas visuales y entradas (peticiones del fundador del 15-10-2026: «que aparezcan directamente la imagen de la cartelera, el lugar, la fecha, la hora y el precio» y «que se puedan comprar entradas… se deberá pagar la mitad vía Bizum para reservar»). La numeración salta a 0.20.0 para dejar la 0.19.x a los PR de Codex #88–#91.
+
+### Añadido
+- **Entradas reservadas en Lona.** La promotora pone el precio, el aforo (opcional), el precio en taquilla (opcional), una nota y su Bizum, y abre la venta. Se reservan de 1 a 6 entradas, con una reserva activa por persona y velada; se respetan los bloqueos.
+  - Al reservar se pide una **señal del 50 %** (redondeada al euro hacia arriba) por Bizum a la promotora, con el código `LONA-XXXXXX` como concepto. Hay 24 horas para enviarla, nunca más tarde de 3 horas antes del inicio. Si no llega, la reserva caduca y libera las plazas. El resto se paga en la puerta.
+  - Lona no cobra ni guarda dinero: solo lleva la cuenta de las reservas (pendiente de señal, confirmada, validada en la puerta, cancelada o caducada).
+- **Cartel de la velada:** la promotora sube una imagen (JPG, PNG o WebP de hasta 4 MB) que se guarda en el almacén de fotos (carpeta `carteles`) y se sirve en `/veladas/[slug]/cartel`, solo de las veladas visibles.
+- **Hora de inicio** de la velada al crearla y al corregir sus datos.
+- **«Mis entradas»** (`/mis-entradas`): el código grande para la puerta, el Bizum, el importe y el plazo de la señal, y el botón para cancelar. Se enlaza desde «Mi cuenta» y desde el panel, que avisa en «Te toca» de las señales pendientes.
+- **Reservas de la promotora** (`/organizador/[slug]/entradas`): resumen (reservadas, validadas, señales recibidas y lo que queda por cobrar en la puerta), filtros por estado, búsqueda por código, nombre o correo, y botones «Señal recibida» (también tarde, si queda sitio), «Validar en la puerta», «Deshacer la validación» y «Cancelar la reserva». Se descarga en CSV.
+- Avisos dentro de la aplicación y correos: a la promotora con cada reserva o cancelación; a quien reserva, con las instrucciones del Bizum y al confirmarse la señal.
+- La descarga de datos personales (`/mi-cuenta/datos`) incluye las entradas reservadas.
+- Prueba de navegador `tests/e2e/entradas.mjs` y pruebas unitarias de las reglas (`tests/unit/entradas.test.ts`).
+
+### Cambiado
+- **Calendario de veladas en carteles:** cada velada es una tarjeta con su cartel (o el color de su disciplina), la fecha, la hora, el lugar, el precio y «Reservar entradas» si se puede reservar.
+- **Ficha de la velada:** el cartel grande al lado de los datos (encima en el móvil), los datos en bloques (fecha, hora, lugar y entrada) y el bloque «Entradas» con el desglose al momento del total, la señal y lo que se paga en la puerta.
+
+### Corregido tras la revisión crítica (16-10-2026)
+Una revisión independiente de `gpt-6-astra` halló cinco fallos reales en las reservas; Claude los comprobó uno a uno, Codex (`gpt-6.1-sol`) los arregló y `gpt-6-luna` revisó los arreglos:
+- **Señal tardía:** al confirmar una reserva cuyo plazo ya venció (aunque aún no figurase como caducada), se comprueba el aforo y que la persona no tenga otra reserva activa. Mensaje nuevo para la promotora: «Esa persona ya tiene otra reserva activa en esta velada…».
+- **Aforo y reservas a la vez:** guardar el aforo y reservar comparten el mismo bloqueo por velada, y la reserva relee el aforo, el precio y el horario dentro del bloqueo. Ya no se puede dejar un aforo por debajo de lo reservado ni pasarse del aforo por dos peticiones simultáneas.
+- **Plazos al cambiar la fecha:** al adelantar la velada (fecha u hora) se acortan los plazos de señal pendientes al nuevo cierre de reservas; nunca se alargan.
+- **Cambio de horario:** el inicio y el cierre de reservas ya no se desplazan una hora los días de cambio de hora (29-03 y 25-10-2026).
+- Si se rechaza el guardado de los datos de entradas, el cartel nuevo ya subido se retira en vez de quedar huérfano.
+## [0.18.9] — 2026-10-15
+
+PR de Codex (#86), integrado por Claude Code: bandeja única de moderación.
+
+### Cambiado
+- Moderación reúne sus colas en una bandeja por urgencia, mantiene las páginas y los avisos sin cuenta/PAGINA/GYM. «Poner en revisión» envía `dispute`; se conservan notas y avisos al abrir enlaces.
+
+## [0.18.8] — 2026-10-15
+
+PR de Claude Code: revisión de la lista de gimnasios reales (petición del fundador: información de menos de un año; de momento, solo Madrid a fondo).
+
+### Cambiado
+- `docs/datos/gimnasios-investigados.json`: **93 gimnasios publicables** (54 en Madrid), frente a 1 antes de la revisión. Se publica lo que tiene web viva con contenido de 2025 o 2026, o un Instagram con publicaciones de menos de un año; la `fechaFuente` es la de esa comprobación o la de la última publicación.
+  - Webs: se abrieron las 52 fichas con web propia (20 publicables).
+  - Instagram: los 56 perfiles apuntados (46 activos) y, en Madrid, se buscaron los clubes sin web ni Instagram (26 activos más).
+  - Quedan por revisar, con una nota que explica el motivo: perfiles inactivos o vacíos, gimnasios que parecen de fitness, sedes con la ciudad sin confirmar y los 7 clubes de Madrid sin perfil encontrado.
+- Se quitan dos repetidos: Lotus Club Chamberí (es BJJ Madrid Academy - Lotus Club) y Muay Thai Las Rozas Madrid (es Slava Legacy Muay Thai, en Las Rozas). Los nombres son siempre el nombre comercial del club, no el usuario de Instagram.
+
+### Añadido
+- Opciones «ficticios-recuento» y «ficticios-retirar» del botón «Cargar gimnasios reales en la demo» (`scripts/retirar-gimnasios-ficticios.ts`): retiran de la demo los gimnasios ficticios (estado REMOVED, reversible) sin romper los peleadores de prueba enlazados. Petición del fundador: «borra todos los demás gimnasios demo».
+- Opción «ubicar» del mismo botón (`scripts/ubicar-gimnasios.ts`): pone en el mapa, de una vez, los gimnasios sin coordenadas (por su calle o, si no la hay, por su ciudad). En la app se hacía poco a poco y, tras cargar la lista, el mapa los mostraba en el centro de la provincia.
+
+### Corregido
+- **Mapa:** si la dirección de un gimnasio no se encuentra tal cual, se prueban formas más sencillas (sin nave, local, paréntesis ni artículos) antes de ponerlo en el centro de su ciudad (`variantesDireccion`). De 13 direcciones que fallaban se recuperan 10. «ubicar» reintenta los que tenían dirección y quedaron en la ciudad.
+- Opción «lista-actualizar» del botón de la demo: pone la dirección y la ciudad corregidas de la lista en los gimnasios ya cargados desde ella que nadie ha reclamado (la carga normal nunca toca los existentes).
+- Dirección de 16 gimnasios publicados de Madrid, sacada de su web o de su bio de Instagram. Morales Box Alcalá estaba en Alcalá de Henares por error: es la calle de Alcalá, 507 (Madrid).
 
 ## [0.18.7] — 2026-10-15
 

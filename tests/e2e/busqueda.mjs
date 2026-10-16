@@ -1,6 +1,6 @@
 // Pruebas de búsqueda, paginación, cabeceras de seguridad y buscadores (robots, mapa del sitio, salud).
 // Requiere el servidor en marcha (ver ayudas.mjs).
-import { datosDeAlta, B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, sql, terminarDiagnosticos } from "./ayudas.mjs";
+import { datosDeAlta, B, rnd, browser, seen, check, btn, hoyMadrid, registrar, newUser, hacerAdmin, sql, terminarDiagnosticos } from "./ayudas.mjs";
 import { readFileSync } from "node:fs";
 
 const cuerpo = (p) => p.locator("body").innerText();
@@ -16,6 +16,16 @@ await datosDeAlta(alvaro.p); await btn(alvaro.p, "Crear mi ficha");
 await alvaro.p.locator(".notice-ok", { hasText: "ficha de peleador se ha creado" }).waitFor();
 await registrar(alvaro.p, { evento: `Velada Búsqueda ${rnd}`, fecha: hoyMadrid, rivalNombre: "Rival", rivalApellidos: `Oculto${rnd}` });
 await alvaro.p.locator("[role=status]", { hasText: "Combate registrado" }).waitFor();
+
+// Un gimnasio aportado desde una ficha no entra en el buscador hasta que moderación lo publique.
+await anon.goto(B + `/buscar?q=${encodeURIComponent(`Gimnasio Meta ${rnd}`)}`);
+check("el buscador no publica el gimnasio aportado antes de revisarlo", await anon.locator(`a[href="/gimnasios/gimnasio-meta-${rnd}-madrid"]`).count() === 0);
+const moderadora = await newUser("ModeraBusqueda"); hacerAdmin(moderadora.email);
+await moderadora.p.goto(B + "/moderacion/gimnasios");
+const pendiente = moderadora.p.locator('#pendientes article', { hasText: `Gimnasio Meta ${rnd}` });
+await pendiente.locator('select[name=status]').selectOption("PUBLISHED");
+await pendiente.getByRole("button", { name: "Guardar gimnasio", exact: true }).click();
+await moderadora.p.locator('.notice-ok').waitFor();
 
 // 1) Búsqueda sin tildes, sin mayúsculas y con varias palabras en cualquier orden
 const buscar = async (q) => { await anon.goto(B + `/buscar?q=${encodeURIComponent(q)}`); return cuerpo(anon); };

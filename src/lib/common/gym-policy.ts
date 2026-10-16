@@ -23,3 +23,8 @@ export function gymDistanceMetres(a: { lat: number; lng: number }, b: { lat: num
 export function osmMayUpdate(g: { ownerUserId: string | null; source: string; verifiedAt: Date | null }) {
   return !g.ownerUserId && g.source === "OSM" && !g.verifiedAt;
 }
+
+/** Alta indirecta desde una ficha: solo moderación publica, y nunca fuera del territorio admitido. */
+export function newGymStatus(role: string, province: string): "PENDING" | "PUBLISHED" {
+  return role === "ADMIN" && !!province && !excludedGymProvince(province) ? "PUBLISHED" : "PENDING";
+}

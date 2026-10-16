@@ -425,3 +425,100 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Resultado:** el CI 38748985341 tiene correctos test y escenarios; su registro confirma 16 personas, 93 pasos y cero pasos fallidos. Ningún recorrido de /veladas depende de .card. Las referencias restantes son de peleadores o moderación y se conservan.
 **Límites:** React #418 registrado en rival, persona mayor y peleador completo; causa pendiente. No se ejecutan pruebas de nuevo ni se revisan capturas nuevas: el artefacto existe, pero la descarga local no conecta. Evidencias y pendientes en docs/pruebas/escenarios-2026-10-16.md.
 **Siguiente:** revisión de Claude. Esperar #93 → #88 → #89 → #90 antes de actualizar y renumerar #91. No se inicia agenda ni se fusiona nada.
+
+## 2026-10-15 — Gimnasios aportados desde fichas, pendientes de revisión
+**Pedido:** cuarto punto del relevo: PENDING si no lo hace moderación.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/gimnasios-desde-fichas-en-revision-20261015`.
+**Cambios:** política de altas indirectas común en fighters.ts (alta y edición), profiles.ts (edición de entrenador) y trainers.ts (alta de entrenador, también publicaba por defecto). Solo moderación y con provincia admitida publica; los upsert existentes mantienen update vacío, sin cambiar estados ya revisados/retirados. Sin migración. El recorrido flujo revisa y publica expresamente su gimnasio antes de comprobar el sello, que sigue siendo independiente.
+**Pruebas:** matriz de roles y territorio; nuevo recorrido real de alta/edición de peleador y entrenador, moderación y conservación del estado existente. Validación en curso.
+**Siguiente:** revisión de Claude y T-009 en PR separado. No se cambia el estado histórico de gimnasios ya existentes.
+
+**Revisión de #90:** tipos, 15 unitarias específicas, documentación y controles locales pasan. El CI detectó dos expectativas de búsqueda que daban por publicado el gimnasio de una ficha; el guion comprueba ahora que permanece fuera de la búsqueda antes de revisión y lo publica desde moderación antes de comprobar búsqueda y metadatos. No se cambia la política ni se rebaja ninguna afirmación de búsqueda.
+
+## 2026-10-16 — Corrección del recorrido de altas de gimnasios (#90)
+**Pedido:** continuar las tareas de Lona según el encargo del 15 de octubre.
+**Cambio:** `gimnasios-altas.mjs` abre «Mis datos» y «Corregir los datos de mi ficha» antes de localizar el formulario, en las tres ediciones. El campo `gym` existe; el selector por botón no encontraba el formulario porque el desplegable cerrado oculta ese botón. Se mantienen las comprobaciones de revisión y estados, sin modificar el producto.
+**Validación:** sintaxis JavaScript correcta; catálogo y mapa se comprueban al cerrar esta entrega. Recorrido completo de navegador pendiente de CI; las ayudas utilizan psql con sintaxis de shell Unix. No se usa la base real para probar.
+**Siguiente:** esperar a #93, después #88 y #89; actualizar y renumerar #90 a 0.20.3 cuando le corresponda. No se fusiona nada.
+
+**Cierre de validación local (16-10):** `node --check tests/e2e/gimnasios-altas.mjs`, TypeScript (`node node_modules/typescript/bin/tsc --noEmit`), catálogo (445 archivos) y mapa comprobados correctamente. Las pruebas del catálogo dan 10 correctas y 1 bloqueada por EPERM al crear un enlace simbólico en Windows; no se modifica esa prueba. Recorrido real pendiente del CI.
+
+## 2026-10-15 — Cesión de gimnasio con aceptación
+**Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/cesion-de-gimnasio-con-aceptacion-20261015`.
+**Cambios:** GymTransferInvitation con FK de gimnasio/remitente, correo destinatario sin requisito de cuenta previa y hash del enlace. Caduca en 14 días. Una nueva invitación cancela la anterior; máximo cinco al día por titular/gimnasio. Se acepta con correo confirmado coincidente, vuelve a comprobar propiedad y bloqueos y cambia Gym/Profile en la misma transacción. Confirmaciones a ambas personas por sendMail. Los bloqueos cancelan las cesiones pendientes; copia y eliminación de datos incluyen el correo destinatario. Se conserva la intervención directa de moderación.
+**Compartidos:** esquema, migración aditiva, package.json (se conserva y amplía el guion e2e).
+**Validación:** tipos aprobados; pendientes migraciones/paridad, pruebas unitarias y recorrido real de correo con/sin cuenta, repetición, cancelación, caducidad y bloqueos.
+**Siguiente:** revisión de Claude y cuarto punto en PR separado. No hay cambios de proveedor ni dominio.
+
+**Resultado local de #89:** migraciones en base vacía, paridad, tipos, compilación y 15 comprobaciones documentales aprobados. El recorrido completo de cesión pasa: ambos tipos de destinatario, enlace ajeno y repetido, dos correos de confirmación, ambos sentidos de bloqueo, cancelación y caducidad. Las unitarias locales detectaron un código de error en AVISOS: corregido a PROBLEMAS y prueba de mensajes aprobada. Cuatro comprobaciones de contraseña siguen agotando 5 segundos en esta máquina, incluso en una repetición sin otras compilaciones; no se atribuye todo a la carga ni se alteran los límites. El CI 38743105233 sí ha pasado las unitarias sobre la corrección y está recorriendo navegador.
+
+## 2026-10-15 — Vinculación a gimnasios por invitación
+**Pedido:** segundo punto del relevo: el titular invita y la persona acepta, con hayBloqueo. Se mantiene la vinculación directa de moderación.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/invitaciones-de-miembros-de-gimnasio-20261015`.
+**Cambios:** GymMemberInvitation con claves foráneas y una sola ficha por invitación, caducidad de 14 días, aceptación/rechazo/cancelación, bandeja privada paginada y avisos dentro de la aplicación. Se revalidan propiedad, cuenta destinataria, bloqueos y gimnasio anterior. Los bloqueos cancelan invitaciones pendientes. La copia de datos incorpora las invitaciones propias. Entrenadores con titular de Profile también pueden aceptar.
+**Archivos compartidos:** esquema y migración aditiva; package.json conserva todos los scripts y añade el nuevo recorrido.
+**Pruebas:** autorización y recorrido real de peleador/entrenador, rechazo, cancelación, bloqueo y cesión posterior; validación en curso.
+**Siguiente:** revisión de Claude; cesión de gimnasio en PR separado. No se toca RFC-002.
+
+**Validación local de #88:** migraciones y paridad, tipos, 15 comprobaciones documentales y compilación aprobados. 849/851 unitarias pasaron en la ejecución con carga; las dos agotadas por tiempo pasan aisladas junto con autorización: 287/287. En navegador pasan invitación, duplicado, aceptación de peleador y entrenador, rechazo y cancelación. La prueba de bloqueo conserva la pantalla anterior a bloquear para verificar también la guarda del servidor, ya que la lista oculta las invitaciones bloqueadas al recargar. El recorrido completo posterior pasa: invitación, duplicado, ambas fichas, rechazo, cancelación, bloqueo posterior/inverso, cambio de titular y copia de datos. Un intento intermedio no llegó a registrar por pérdida temporal de conexión a Postgres; el contenedor seguía activo y la repetición completa pasó.
+
+## 2026-10-15 — Bandeja única de moderación, rehecha sobre 0.18.0
+**Pedido:** puntos 1–4 del relevo de Claude y después T-009, cada uno en su PR. No actualizar T-013 ni T-002.
+**Base:** `claude/ring-espana-mvp`, `5995bd7`. **Rama:** `codex/bandeja-unica-de-moderacion-20261015`.
+**Cambios:** bandeja por urgencia con paginación independiente, decisiones de combate válidas, contratos actuales de avisos sin cuenta y PAGINA. Se adaptan los ocho guiones solicitados y se recuperan las comprobaciones de la bandeja en paneles-avisos. Fichero compartido: package.json y lock solo por versión.
+**Validación inicial (0.18.0):** tipos, 827 unitarias, 15 comprobaciones de documentación, compilación, catálogo y mapa aprobados. La prueba de bandeja y pulido pasan en navegador. Al publicar, la demo había avanzado a 0.18.6: se incorpora, se conservan los avisos de enlaces y se renumera a 0.18.7; validación de esa base en curso. No se modifican ramas sustituidas ni los PR #77/#78.
+
+**Revisión de #86:** el CI 38739924528 pasó tipos, unitarias, compilación, flujos y auditoría de enlaces, pero detectó el acceso de gimnasio con altura táctil insuficiente. Se corrige usando el botón de enlace compartido; nuevo CI pendiente. La ejecución local simultánea de flujo agotó 30 s al navegar a Mi ficha; no se alteran esperas ni afirmaciones.
+
+**Revisión de contratos de la bandeja:** se mantienen también los accesos a la velada del combate, la ficha reclamada y la web profesional del gimnasio, con zona táctil suficiente. El CI anterior ya había superado e2e y accesibilidad; esta conservación de accesos vuelve a validarse sobre el nuevo commit.
+
+**Comprobación de etiquetas por entidad:** el caso GYM heredaba el texto de retirar comentario de la demo; ahora dice «Resolver y retirar el gimnasio» y el recorrido pulsa ese botón y comprueba REMOVED en ese gimnasio. El CI 38745856730 pasó completo sobre b9cc10f; este ajuste de etiqueta y su recorrido añadido vuelven a validarse en el siguiente CI.
+
+## 16 de octubre de 2026 — T-017: correcciones de reservas de entradas (#93)
+
+**Pedido:** ejecutar las cinco correcciones verificadas por Claude en `flota/entradas-correcciones`, dejando los cambios sin commit y sin cambiar de rama. Sin red ni instalaciones. El fundador reserva a Claude la versión, CHANGELOG, DIARIO, ESTADO, catálogo y mapa: no se modifican ni se ejecutan sus generadores; tampoco se hace fetch ni se ejecuta el script de estado, que consulta la red.
+
+**Qué cambié y por qué:** las acciones de entradas releen reserva y condiciones de venta bajo el bloqueo de la velada, comprueban aforo y ausencia de otra activa al confirmar tarde y guardan el aforo dentro de ese bloqueo. El correo usa los datos releídos. Editar fecha u hora acorta pendientes al nuevo cierre en la misma transacción; se conserva la hora actual si el formulario no la envía, también al guardar el cartel. La biblioteca de entradas incorpora reglas puras de ocupación/confirmación y convierte la hora de Madrid en dos pasadas; el nuevo problema `entradas_otra_activa` explica cómo resolver el conflicto. El flujo de mantenimiento documenta estos contratos.
+
+**Pruebas añadidas:** 34 casos en `tests/unit/entradas.test.ts`: inicio, cierre y señal en los cambios de horario de 2026 y en verano/invierno; hora inexistente/repetida; límites de ocupación y confirmación; acciones con lecturas distintas antes y después del bloqueo, aforo, duplicados activos, precio/Bizum/plazo actualizados, orden del cartel y acortamiento de pendientes con cierre futuro o pasado. Transacciones simuladas, sin PostgreSQL ni navegador: no se acredita concurrencia real.
+
+**Qué ejecuté:** `npx.cmd tsc --noEmit`: salida vacía, código 0. `npx.cmd vitest run tests/unit/entradas.test.ts tests/unit/messages.test.ts`: 2 archivos y 46 pruebas correctas, código 0. `npx.cmd vitest run`: 59 archivos y 887 pruebas correctas, código 0. npm en modo sin conexión y sin instalación. PowerShell rechazó inicialmente `npx` por bloquear `npx.ps1`; se usó `npx.cmd` sin cambiar la política. La primera batería completa falló en una prueba de autorización por una lectura nueva anterior al rechazo de disciplina; se corrigió el orden y la batería completa posterior pasó. Ninguna prueba se relajó.
+
+**Relevo:** Claude revisa y guarda los cambios y completa los archivos reservados. No hay commit, cambio de rama ni despliegue. Comportamiento visible previsto: una señal tardía puede rechazarse por aforo o por otra reserva activa; adelantar el inicio puede vencer inmediatamente un plazo. La subida del cartel sigue precediendo a la transacción: un rechazo posterior puede dejar la imagen nueva sin asociar (el cartel anterior no se borra).
+
+
+## 2026-10-16 - Codex - Revisión de los ajustes móviles #94 (0.20.2)
+
+**Encargo:** seguir el comentario de Claude en #94 y el orden de relevo de #95. Rama propia `codex/pr94-ajustes-movil-20261016`; no se modifica la rama de Antigravity.
+
+**Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
+
+**Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.
+
+
+## 2026-10-16 - Codex - Actualización de #88 sobre la base candidata 0.20.2
+
+**Encargo:** relevo de Claude en #95 y aprobación de #88 (comentario6195353236). Rama propia `codex/pr88-integracion-20261016`, sin rebase. Preparación local mientras termina el CI de #96; no se publica hasta que el anterior esté fusionado.
+
+**Integración:** se conservan las invitaciones originales y las entradas/carteles de la principal. El esquema mantiene ambos modelos y los avisos admiten GYM_MEMBER y TICKET. El nuevo recorrido `gimnasios-invitaciones` entra en `tests/e2e/orden.json`; se conserva el ejecutor nuevo que completa todos los recorridos. Historial de documentos preservado; versión 0.20.3 por el script oficial. No se modifican las reglas de permisos aprobadas por Claude.
+
+**Validación:** esquema Prisma válido; tipos, 901 unitarias, versión, catálogo y mapa correctos. Compilación completa con BUILD_EXIT=0. Documentación33/34 por EPERM de enlaces simbólicos en Windows, sin alterar la prueba. No se ejecutan migraciones ni se alteran datos locales o remotos. CI con base vacía requerido antes de fusionar.
+
+
+## 2026-10-16 - Codex - Integración local de #89 (0.20.4)
+**Encargo:** relevo de Claude en #95; cesión consentida aprobada por Claude comentario6195354039. Rama propia `codex/pr89-integracion-20261016`; merge de la base candidata0.20.3. Publicación después de fusionar #88.
+**Integración:** conserva modelos, acciones y pruebas de miembros, cesiones y entradas. Se unifican imports y las dos paginaciones de Mis gimnasios usan variables independientes. El recorrido gimnasios-cesion entra en orden.json sin quitar los anteriores. Migraciones originales intactas. Versión por script, ambas historias documentales conservadas.
+**Validación:** Prisma válido y generado; tipos, 910 unitarias, versión, catálogo y mapa correctos. Compilación completa BUILD_EXIT=0. Documentación33/34 por EPERMWindows al crear enlace simbólico, prueba intacta. Sin migraciones ni datos reales alterados; CI remoto pendiente.
+
+
+## 2026-10-16 - Codex - Integración local de #90 (0.20.5)
+**Encargo:** relevo de Claude en #95 y corrección del campo gym en Mi ficha. Se conserva la apertura de la pestaña y el desplegable antes de buscar el formulario, ya publicada en6b62681.
+**Integración:** merge de base candidata1174eac (invitaciones, cesiones y entradas) en rama propia codex/pr90-integracion-20261016. Traspaso remoto anterior preservado. El recorrido gimnasios-altas entra en orden.json. Sin cambios en las reglas de alta aprobadas por Claude, sin rebase.
+**Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos. Compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, prueba intacta. Sin migraciones ni cambios de datos reales. CI remoto pendiente; publicación después de fusionar #89.
+
+
+## 2026-10-16 - Codex - Integración T009 y comentarios de Claude (0.20.6)
+**Encargo:** comentarios6216529851 y6216656220 de #91 y relevo de #95. Merge de base candidata f495208, sin rebase, en codex/pr91-integracion-20261016. Traspaso remoto previo preservado.
+**Cambios:** caret:initial en ambas capturas, lección y causa actualizadas con atribución a la reproducción de Claude; escenarios solo manual/al fusionar/PR etiquetado. Etiqueta escenarios añadida a #91 antes de actualizarlo para comprobarlo completo una vez. Se retira encType redundante en Mi ficha como indicó Claude; sin cambio de acción ni permisos. Todos los recorridos de la base conservados.
+**Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos; compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, caso intacto. Ejecución de los dieciséis escenarios pendiente del CI completo tras #90. Sin datos reales alterados.

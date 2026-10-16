@@ -182,7 +182,7 @@ export default async function MyProfile({ searchParams }: { searchParams: Promis
             ))}
             <details id="publicar-highlight" className="opcionales" open={misHighlights.length === 0} style={{ scrollMarginTop: 80 }}>
               <summary>Publicar un highlight</summary>
-              <form action={publishHighlight} encType="multipart/form-data" style={{ display: "flex", flexDirection: "column", gap: 14, paddingBottom: 12 }}>
+              <form action={publishHighlight} style={{ display: "flex", flexDirection: "column", gap: 14, paddingBottom: 12 }}>
                 <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
                   <legend className="leyenda">Tipo</legend>
                   <div className="segmentos"><label><input type="radio" name="kind" value="VIDEO" defaultChecked required />Vídeo</label><label><input type="radio" name="kind" value="PHOTO" />Foto</label></div>

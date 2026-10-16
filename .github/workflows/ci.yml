@@ -81,7 +81,7 @@ jobs:
         run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - name: Comprobar cobertura y vigencia de la documentación del código
         run: |
-          node --test tests/documentacion/catalogo.test.mjs tests/documentacion/estado.test.mjs
+          node --test tests/documentacion/catalogo.test.mjs tests/documentacion/estado.test.mjs tests/documentacion/aprobado.test.mjs tests/documentacion/e2e.test.mjs
           node scripts/generar-catalogo.mjs --comprobar
       - run: npm run typecheck
       - name: Comprobar que el mapa funcional está al día (npm run mapa)
@@ -123,6 +123,8 @@ jobs:
 
   # T-009: servidor y PostgreSQL propios; no consume ni altera los datos de los demás recorridos.
   escenarios:
+    # Solo manual, al fusionar o por petición explícita con la etiqueta del PR (Claude, 16-10-2026).
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'escenarios')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     services:

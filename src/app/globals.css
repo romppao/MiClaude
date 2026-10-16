@@ -114,7 +114,7 @@ main{max-width:1240px;margin:auto;padding:32px 24px 72px}
 .sin-corte{white-space:nowrap}
 .skip{position:absolute;left:-999px;top:0;background:var(--acc);color:var(--acc-ink);padding:10px 14px;z-index:100;border-radius:12px}
 .skip:focus{left:8px;top:8px}
-form.search{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;align-items:flex-end}
+form.search{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;align-items:flex-end;position:relative}
 .field{display:flex;flex-direction:column;gap:8px;min-width:160px;max-width:100%}
 .field>span{font:500 16px/1.35 var(--font);color:var(--mut)}
 .field .hint{font-size:16px;color:rgba(var(--ink),.6);padding-left:6px}
@@ -433,6 +433,56 @@ dialog.hoja h2{margin:0;font-size:28px}
 .panel-tipo .accion{font-weight:600;color:var(--acc-text)}
 .aviso-flotante{position:fixed;top:12px;left:16px;right:16px;max-width:520px;margin:auto;z-index:95}
 
+.velada-grid{margin-bottom:16px}
+/* Veladas como carteles (fase 1 de entradas): imagen del cartel arriba con la fecha y el precio, datos debajo sobre fondo liso. */
+.velada-cartel{display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:var(--card);border:1px solid rgba(var(--ink),.07);color:var(--text);text-decoration:none;transition:transform 160ms var(--ease-out)}
+@media (hover: hover) and (pointer: fine){.velada-cartel:hover{color:var(--text);border-color:var(--line-strong)}}
+.velada-cartel:active{transform:scale(.98)}
+.velada-cartel-imagen{position:relative;aspect-ratio:4/5;background:linear-gradient(160deg,var(--tinte,rgba(212,246,124,.38)),var(--hueco) 75%);isolation:isolate}
+.velada-cartel-imagen>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1}
+.velada-cartel-icono{position:absolute;inset:0;display:grid;place-items:center;color:var(--acc-text);opacity:.55;z-index:-1}
+.velada-cartel-arriba{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:12px}
+.velada-cartel-abajo{display:flex;flex-direction:column;gap:4px;padding:14px 16px 16px;flex:1}
+.velada-cartel-abajo strong{font:800 22px/1.1 var(--font);letter-spacing:-.03em;text-wrap:balance}
+.velada-etiquetas{display:flex;flex-wrap:wrap}
+.velada-etiquetas .tag{font-size:14px;padding:2px 10px}
+.velada-precio{font:800 18px/1 var(--font);padding:10px 14px;border-radius:999px;background:rgba(10,10,12,.78);color:#fff;font-variant-numeric:tabular-nums}
+.velada-reservar{align-self:flex-start;margin-top:10px;font:700 15px/1 var(--font);padding:12px 16px;border-radius:999px;background:var(--acc);color:var(--acc-ink)}
+@media(prefers-reduced-motion:reduce){.velada-cartel:active{transform:none}}
+/* Ficha de la velada: cartel grande al lado de los datos (encima en el móvil) y bloque de entradas. */
+.velada-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;margin:8px 0 16px}
+@media(min-width:760px){.velada-hero{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}}
+.velada-poster{margin:0;border-radius:28px;overflow:hidden;background:var(--hueco);aspect-ratio:2/3;max-height:80vh}
+.velada-poster img{display:block;width:100%;height:100%;object-fit:cover}
+.velada-hero-datos{display:flex;flex-direction:column;gap:16px}
+.velada-hero-datos h1{margin:0}
+.datos-velada{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px;margin:0}
+.datos-velada>div{padding:14px 16px;border-radius:20px;background:var(--card);border:1px solid rgba(var(--ink),.07)}
+.datos-velada dt{font:600 13px/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.datos-velada dd{margin:4px 0 0;font:700 18px/1.3 var(--font);font-variant-numeric:tabular-nums}
+.entradas-velada{border:1.5px solid var(--acc);margin:16px 0;scroll-margin-top:80px}
+.reserva-entradas{display:flex;flex-direction:column;gap:14px}
+.desglose{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.desglose>div{padding:12px;border-radius:18px;background:rgba(var(--ink),.05)}
+.desglose dt{font:500 14px/1.3 var(--font);color:var(--mut)}
+.desglose dd{margin:4px 0 0;font:800 24px/1 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.desglose .desglose-senal{background:var(--acc);color:var(--acc-ink)}
+.desglose .desglose-senal dt{color:var(--acc-ink)}
+.mi-reserva{display:flex;flex-direction:column;gap:10px}
+.codigo{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.tag.estado-PENDING_DEPOSIT{background:var(--info-bg);color:var(--info)}
+.tag.estado-CONFIRMED{background:var(--ok-bg);color:var(--ok)}
+.tag.estado-CHECKED_IN{background:var(--acc);color:var(--acc-ink)}
+.tag.estado-CANCELLED,.tag.estado-EXPIRED{background:var(--bad-bg);color:var(--bad)}
+/* Mis entradas: el código se lee de lejos en la puerta. */
+.entrada-cabecera{display:flex;gap:14px;align-items:flex-start}
+.entrada-mini{flex:none;width:64px;height:96px;object-fit:cover;border-radius:14px;background:var(--hueco)}
+.entrada-codigo{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 16px;border-radius:22px;background:var(--inv);color:var(--inv-ink);text-align:center}
+.entrada-codigo .kicker,.entrada-codigo .meta{color:inherit;opacity:.7}
+.entrada-codigo strong{font-size:clamp(30px,9vw,44px);line-height:1;font-weight:800}
+.entrada-pasos{display:flex;flex-direction:column;gap:10px}
+@media(max-width:480px){.desglose{grid-template-columns:minmax(0,1fr)}.desglose>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.desglose dd{margin:0}}
+.cartel-editor{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 /* 7) Adaptaciones */
 @media(max-width:900px){
   header.top .cuenta{flex-wrap:nowrap;margin-left:auto}
@@ -448,6 +498,8 @@ dialog.hoja h2{margin:0;font-size:28px}
   .a-sangre{margin-left:-16px;margin-right:-16px}
   .chips-desliza,.desliza{margin:0 -16px;padding-left:16px;padding-right:16px}
   .home-hero{padding:26px 22px;min-height:520px}
+  .portada-visita{min-height:400px;padding-bottom:14px;gap:10px}
+  .portada-visita .lema-portada{font-size:16px;line-height:1.35}
   .profile-hero{padding:24px 20px}
   .profile-identity{align-items:flex-start;gap:16px}
   .profile-avatar{width:96px;height:96px;font-size:2rem}
@@ -752,7 +804,7 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .herramientas-moderacion li a{font-weight:700;min-height:44px;display:inline-flex;align-items:center}
 /* Mapa de gimnasios (13 de octubre de 2026): components/MapaGimnasios.tsx. El mapa base es claro (OpenFreeMap «positron»); en el tema
    oscuro se invierte con un filtro para que case con la aplicación. Los marcadores van fuera del lienzo y no se invierten. */
-.mapa-gimnasios{margin:20px 0 28px}
+.mapa-gimnasios{margin:20px 0 28px;scroll-margin-top:96px}
 .mapa-cabecera{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mapa-cabecera h2{margin:0}
 .mapa-ayuda{margin:8px 0 12px}

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { ubicarGimnasio } from "../../lib/common/geo";
-import { excludedGymProvince } from "../../lib/common/gym-policy";
+import { excludedGymProvince, newGymStatus } from "../../lib/common/gym-policy";
 import { db } from "../../lib/common/db";
 import { requireVerifiedUser } from "../../lib/accounts/auth";
 import { profileKind, profileAccess } from "../../lib/profiles/profiles";
@@ -70,7 +70,7 @@ export async function saveProfile(f: FormData) {
         const name = oneLine(str(f, "trainerGym"));
         const city = trainer.city ?? trainer.province ?? "";
         // En las provincias sin gimnasios en Lona (Cataluña) el entrenador se queda sin gimnasio vinculado (T-016, C5-02).
-        const gymId = name && provinciaConGimnasios(trainer.province) ? (await tx.gym.upsert({ where: { slug: slugName(name, city) }, create: { name, slug: slugName(name, city), city, province: trainer.province ?? "" }, update: {} })).id : null;
+        const gymId = name && provinciaConGimnasios(trainer.province) ? (await tx.gym.upsert({ where: { slug: slugName(name, city) }, create: { name, slug: slugName(name, city), city, province: trainer.province ?? "", status: newGymStatus(user.role, trainer.province ?? "") }, update: {} })).id : null;
         await tx.trainer.update({ where: { id }, data: { gymId } });
         await audit({ userId: user.id, entity: "TRAINER", entityId: id, action: "PROFILE_UPDATED", before: { gymId: trainer.gymId }, after: { gymId } }, tx);
       }

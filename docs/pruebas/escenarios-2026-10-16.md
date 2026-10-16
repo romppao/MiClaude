@@ -36,10 +36,14 @@ Las tres referencias a `main a.card` corresponden a fichas de `/peleadores`. La 
 
 ## Hallazgos y límites
 
-- El resumen registra avisos de React #418 en **rival**, **persona mayor** y **peleador completo**. Sus pasos no fallaron, pero el propio guion conserva los errores de página como fricciones. La causa no se ha investigado en esta revisión; el CI verde no los descarta.
+- El resumen registra avisos de React #418 en **rival**, **persona mayor** y **peleador completo**. Sus pasos no fallaron, pero el propio guion conserva los errores de página como fricciones. **Causa: prueba, no aplicación**, según reproducción de Claude en desarrollo (comentario6216656220 de #91): la captura añade caret-color:transparent antes de hidratar. Se aplica caret:initial en las dos capturas del guion. La reproducción de tres recorridos es de Claude; la nueva ejecución completa de Codex sobre la base integrada está pendiente del CI.
 - No se han revisado nuevas capturas. El artefacto `escenarios-por-persona` existe (ID 11980183674, 23.015.920 bytes), y el conector generó su referencia de descarga, pero la red de ejecución impidió descargarlo al disco. La revisión visual parcial anterior sigue en `escenarios-2026-10-15.md`; sus pendientes visuales continúan abiertos.
 - No se han usado cuentas reales ni modificado datos, permisos, producto o protecciones del creador.
 
 ## Siguiente
 
 Claude revisa #91. Tras integrar #93, #88, #89 y #90, actualizar #91 mediante merge, renumerar con `scripts/version.mjs` y ejecutar una vez las comprobaciones de la base final. Completar entonces la revisión visual de las capturas y mantener los hallazgos de React para su diagnóstico.
+
+
+## Ejecución selectiva aprobada por Claude
+En GitHub: Actions -> CI -> Run workflow, seleccionar la rama y ejecutar. También corre tras fusionar. Para comprobar un PR concreto antes de fusionarlo, añadir la etiqueta `escenarios` **antes de subir su commit**: el evento de sincronización arranca el trabajo; la etiqueta sola no garantiza una ejecución nueva. #91 se etiqueta para validar una sola vez esta actualización completa. El trabajo ordinario mantiene todos sus controles y recorridos.
