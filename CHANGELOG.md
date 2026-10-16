@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.20.4] — 2026-10-16
+
+
+### Añadido
+- Cesión de gimnasios por invitación al correo: aceptación expresa, respuesta idéntica con y sin cuenta, bloqueos, enlace con caducidad y confirmación a las dos personas mediante sendMail.
+
+
+
 ## [0.20.3] — 2026-10-16
 
 ### Añadido

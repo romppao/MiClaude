@@ -49,6 +49,8 @@ export async function GET(request: Request) {
     db.notification.findMany({ where: { userId: user.id, createdAt: { gte: notificationCutoff() } }, select: { kind: true, title: true, href: true, createdAt: true, readAt: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
   ]);
 
+  const transfers = await db.gymTransferInvitation.findMany({ where: { OR: [{ senderId: user.id }, { recipientEmail: user.email.toLowerCase() }] }, include: { gym: { select: { name: true } } } });
+
   const invitations = await db.gymMemberInvitation.findMany({ where: { OR: [{ senderId: user.id }, { recipientId: user.id }] }, include: { gym: { select: { name: true } } } });
 
   const datos = {
@@ -72,6 +74,8 @@ export async function GET(request: Request) {
     solicitudesRecibidasEnMisClases: solicitudesRecibidas.map((r) => ({ clase: r.class.title, persona: r.user.name, cuandoLeVieneBien: r.preferred, estado: r.status, fecha: r.createdAt })),
     retosYSparrings: propuestas.map((p) => ({ tipo: p.kind, enviadaPorMi: p.fromId === fighter?.id, otroPeleador: publicFighterName(p.fromId === fighter?.id ? p.to : p.from), disciplina: p.discipline, fecha: p.day, lugar: p.place, mensaje: p.message, estado: p.status, respuesta: p.reply, creadaEl: p.createdAt })),
     inscripcionesEnVeladas: inscripciones.map((r) => ({ evento: r.event.name, fecha: r.event.date, categoria: r.weightClass, divisionDeportiva: r.divisionId, pesoDeclaradoKg: r.weightKg, mensaje: r.message, estado: r.status, respuesta: r.reply, solicitadaEl: r.createdAt, respondidaEl: r.answeredAt })),
+    invitacionesDeCesionDeGimnasio: transfers.map(i => ({ gimnasio: i.gym.name, enviadaPorMi: i.senderId === user.id, estado: i.status, creadaEl: i.createdAt, caducaEl: i.expiresAt, respondidaEl: i.answeredAt })),
+
     invitacionesDeMiembroDeGimnasio: invitations.map(i => ({ gimnasio: i.gym.name, enviadaPorMi: i.senderId === user.id, estado: i.status, creadaEl: i.createdAt, caducaEl: i.expiresAt, respondidaEl: i.answeredAt })),
     gimnasiosQueGestiono: misGimnasios.map((g) => ({ nombre: g.name, ciudad: g.city, provincia: g.province, telefonoProfesional: g.phone, correoProfesional: g.email, estado: g.status, reclamadoEl: g.claimedAt })),
     reclamacionesDeGimnasio: reclamacionesGimnasio.map((c) => ({ gimnasio: c.gym.name, prueba: c.evidence, enlaceDePrueba: c.evidenceUrl, estado: c.status, nota: c.note, creadaEl: c.createdAt, revisadaEl: c.reviewedAt })),

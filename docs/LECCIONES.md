@@ -522,6 +522,10 @@ Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir u
 
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
 
+- 15-10-2026: si un destinatario puede registrarse después de recibir una invitación, no basta comprobar bloqueos al enviarla: deben comprobarse otra vez con la cuenta verificada al aceptar. La respuesta del remitente no revela la existencia de esa cuenta.
+
+- 15-10-2026: la comprobación automática de mensajes detectó un código de error colocado por error entre los avisos de éxito; se mueve a PROBLEMAS y se vuelve a ejecutar la prueba.
+
 - 15-10-2026: una invitación guarda quién tenía la ficha y su afiliación al enviarse. Al aceptarla hay que comprobar de nuevo ambas: ni una cesión del gimnasio ni una edición personal pueden quedar pisadas por una pantalla antigua.
 
 - 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
