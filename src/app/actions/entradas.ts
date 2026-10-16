@@ -17,7 +17,7 @@ import { hayBloqueo } from "../../lib/community/bloqueos";
 import { putNotification } from "../../lib/community/notifications";
 import { borrarFotos, guardarFoto } from "../../lib/media/fotos";
 import { normalizeImage } from "../../lib/profiles/images";
-import { MAX_ENTRADAS, caducarVencidas, fmtBizum, fmtHora, motivoSinReserva, nuevoCodigo, parseBizum, parseHora, plazasOcupadas, plazoDeSenal, senal } from "../../lib/events/entradas";
+import { MAX_ENTRADAS, caducarVencidas, cierreDeReservas, fmtBizum, fmtHora, motivoSinConfirmacion, motivoSinReserva, nuevoCodigo, parseBizum, parseHora, plazasOcupadas, plazoDeSenal, reservaOcupaPlaza, senal } from "../../lib/events/entradas";
 import { Rechazo, checkLengths, go, guard, ownEvent, str, withLock } from "./shared";
 
 const euros = (n: number) => `${n} €`;
@@ -40,7 +40,6 @@ export async function guardarCartelYEntradas(f: FormData) {
   if (str(f, "bizum") && !bizum) go(back, { problema: "bizum_invalido" });
   const abrir = str(f, "abrir") === "1";
   if (abrir && (!precio || !bizum)) go(back, { problema: "entradas_incompletas" });
-  if (aforo !== null && aforo < (await plazasOcupadas(db, event.id))) go(back, { problema: "aforo_menor_que_reservas" });
 
   // Cartel: se sustituye si llega uno nuevo y se quita si se marca «quitar».
   const archivo = f.get("cartel");
@@ -54,12 +53,20 @@ export async function guardarCartelYEntradas(f: FormData) {
     startMinute: hora, ticketPriceEuros: precio, doorPriceEuros: puerta, ticketCapacity: aforo, bizumPhone: bizum, ticketNote: str(f, "nota") || null, ticketsOpen: abrir,
     ...(cartel && { posterKey: cartel.clave, posterAt: cartel.clave || cartel.bytes ? new Date() : null }),
   };
-  await db.$transaction(async (tx) => {
-    await tx.event.update({ where: { id: event.id }, data });
+  await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
+    if (aforo !== null && aforo < (await plazasOcupadas(tx, event.id))) throw new Rechazo("aforo_menor_que_reservas");
+    const actual = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
+    const startMinute = f.has("hora") ? hora : actual.startMinute;
+    await tx.event.update({ where: { id: event.id }, data: { ...data, startMinute } });
+    // También cubre los formularios antiguos que todavía envían la hora desde aquí.
+    if (startMinute !== actual.startMinute) {
+      const cierre = cierreDeReservas(actual.date, startMinute);
+      await tx.ticketReservation.updateMany({ where: { eventId: event.id, status: "PENDING_DEPOSIT", depositUntil: { gt: cierre } }, data: { depositUntil: cierre } });
+    }
     // Sin almacén, los bytes van a EventPoster; con almacén (o al quitar el cartel), esa fila sobra.
     if (cartel?.bytes) await tx.eventPoster.upsert({ where: { eventId: event.id }, create: { eventId: event.id, bytes: cartel.bytes }, update: { bytes: cartel.bytes } });
     else if (cartel) await tx.eventPoster.deleteMany({ where: { eventId: event.id } });
-  });
+  }));
   if (cartel && event.posterKey && event.posterKey !== cartel.clave) await borrarFotos([event.posterKey]);
   await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "TICKETS_UPDATED", after: { hora, precio, puerta, aforo, abrir, cartel: cartel ? (cartel.clave || cartel.bytes ? "nuevo" : "quitado") : "sin cambios" } });
   revalidatePath("/", "layout");
@@ -80,21 +87,24 @@ export async function reservarEntradas(f: FormData) {
   if (await hayBloqueo(user.id, event.organizerId)) go(back, { problema: "bloqueo_contacto" });
   if (!(await allow(`entradas:${user.id}`, 10, HORA))) go(back, { problema: "entradas_limite" });
 
-  const ahora = new Date();
-  const reserva = await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
+  const { reserva, velada } = await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
+    const velada = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
+    const ahora = new Date();
+    const motivo = motivoSinReserva(velada, ahora);
+    if (motivo) throw new Rechazo(motivo);
     await caducarVencidas(tx, event.id, ahora);
     if (await tx.ticketReservation.findFirst({ where: { eventId: event.id, userId: user.id, status: { in: ["PENDING_DEPOSIT", "CONFIRMED"] } } })) throw new Rechazo("entradas_ya_reservadas");
-    if (event.ticketCapacity !== null && (await plazasOcupadas(tx, event.id, ahora)) + cantidad > event.ticketCapacity) throw new Rechazo("entradas_agotadas");
-    const unidad = event.ticketPriceEuros!, total = unidad * cantidad;
-    const creada = await tx.ticketReservation.create({ data: { eventId: event.id, userId: user.id, quantity: cantidad, unitEuros: unidad, totalEuros: total, depositEuros: senal(total), code: nuevoCodigo(), depositUntil: plazoDeSenal(ahora, event.date, event.startMinute) } });
+    if (velada.ticketCapacity !== null && (await plazasOcupadas(tx, event.id, ahora)) + cantidad > velada.ticketCapacity) throw new Rechazo("entradas_agotadas");
+    const unidad = velada.ticketPriceEuros!, total = unidad * cantidad;
+    const creada = await tx.ticketReservation.create({ data: { eventId: event.id, userId: user.id, quantity: cantidad, unitEuros: unidad, totalEuros: total, depositEuros: senal(total), code: nuevoCodigo(), depositUntil: plazoDeSenal(ahora, velada.date, velada.startMinute) } });
     await audit({ userId: user.id, entity: "EVENT", entityId: event.id, action: "TICKETS_RESERVED", after: { reserva: creada.id, cantidad } }, tx);
     if (event.organizerId) await putNotification(event.organizerId, "TICKET", `Nueva reserva de ${cantidad === 1 ? "1 entrada" : `${cantidad} entradas`} para ${event.name}`, `/organizador/${event.slug}/entradas`, `ticket:${creada.id}`, tx);
-    return creada;
+    return { reserva: creada, velada };
   }));
-  after(() => sendMail(user.email, `Tu reserva para ${oneLine(event.name)}: envía la señal`, [
-    `Has reservado ${reserva.quantity === 1 ? "1 entrada" : `${reserva.quantity} entradas`} para ${oneLine(event.name)} (${fmtDate(event.date)}${event.startMinute !== null ? `, ${fmtHora(event.startMinute)}` : ""}, ${oneLine(event.venue)}).`,
+  after(() => sendMail(user.email, `Tu reserva para ${oneLine(velada.name)}: envía la señal`, [
+    `Has reservado ${reserva.quantity === 1 ? "1 entrada" : `${reserva.quantity} entradas`} para ${oneLine(velada.name)} (${fmtDate(velada.date)}${velada.startMinute !== null ? `, ${fmtHora(velada.startMinute)}` : ""}, ${oneLine(velada.venue)}).`,
     ``,
-    `Para confirmarla, envía ${euros(reserva.depositEuros)} por Bizum al ${fmtBizum(event.bizumPhone!)} con este concepto: ${reserva.code}`,
+    `Para confirmarla, envía ${euros(reserva.depositEuros)} por Bizum al ${fmtBizum(velada.bizumPhone!)} con este concepto: ${reserva.code}`,
     `Tienes hasta el ${reserva.depositUntil.toLocaleString("es-ES", { timeZone: "Europe/Madrid", dateStyle: "long", timeStyle: "short" })}. Si no, la reserva caduca.`,
     `El resto, ${euros(reserva.totalEuros - reserva.depositEuros)}, se paga en la puerta.`,
     ``,
@@ -140,7 +150,19 @@ export async function gestionarReserva(f: FormData) {
   const paso = PASOS[str(f, "paso") as keyof typeof PASOS];
   if (!paso) go(back, { problema: "opcion_invalida" });
   await guard(back, () => withLock(`entradas:${event.id}`, async (tx) => {
-    if (paso === PASOS.senal && r.status === "EXPIRED" && event.ticketCapacity !== null && (await plazasOcupadas(tx, event.id)) + r.quantity > event.ticketCapacity) throw new Rechazo("entradas_agotadas");
+    if (paso === PASOS.senal) {
+      const actual = await tx.ticketReservation.findUniqueOrThrow({ where: { id: r.id } });
+      const velada = await tx.event.findUniqueOrThrow({ where: { id: event.id } });
+      const ahora = new Date();
+      const noCuenta = !reservaOcupaPlaza(actual, ahora);
+      const otraActiva = noCuenta && !!(await tx.ticketReservation.findFirst({ where: {
+        eventId: event.id, userId: actual.userId, id: { not: actual.id },
+        OR: [{ status: "CONFIRMED" }, { status: "PENDING_DEPOSIT", depositUntil: { gte: ahora } }],
+      } }));
+      const ocupadas = noCuenta ? await plazasOcupadas(tx, event.id, ahora) : 0;
+      const motivo = motivoSinConfirmacion(actual, ahora, velada.ticketCapacity, ocupadas, otraActiva);
+      if (motivo) throw new Rechazo(motivo);
+    }
     const hecho = await tx.ticketReservation.updateMany({
       where: { id: r.id, status: { in: [...paso.desde] } },
       data: { status: paso.a, ...(paso.a === "CONFIRMED" && paso === PASOS.senal && { confirmedAt: new Date() }), ...(paso.a === "CHECKED_IN" && { checkedInAt: new Date() }), ...(paso === PASOS.deshacer && { checkedInAt: null }), ...(paso.a === "CANCELLED" && { cancelledAt: new Date(), cancelledBy: "promotora" }) },

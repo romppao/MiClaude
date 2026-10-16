@@ -47,11 +47,17 @@ export const fmtHora = (minutos: number) => `${String(Math.floor(minutos / 60)).
 export function inicioDeVelada(fecha: Date, startMinute: number | null | undefined): Date {
   const minutos = startMinute ?? HORA_POR_DEFECTO;
   const local = Date.parse(`${dayKey(fecha)}T00:00:00Z`) + minutos * 60_000;
-  // Diferencia de Madrid con UTC en ese instante aproximado (1 o 2 horas).
-  const partes = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(local));
-  const h = Number(partes.find((p) => p.type === "hour")?.value), min = Number(partes.find((p) => p.type === "minute")?.value);
-  const desfase = ((h * 60 + min - (minutos % 1440)) + 1440) % 1440;
-  return new Date(local - desfase * 60_000);
+  const formato = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const desfaseEn = (instante: number) => {
+    const utc = new Date(instante), partes = formato.formatToParts(utc);
+    const h = Number(partes.find((p) => p.type === "hour")?.value), min = Number(partes.find((p) => p.type === "minute")?.value);
+    return (h * 60 + min - utc.getUTCHours() * 60 - utc.getUTCMinutes() + 1440) % 1440;
+  };
+  // Dos pasadas: el UTC aproximado puede estar al otro lado del cambio de horario.
+  // La hora repetida de otoño elige la segunda aparición; la inexistente de primavera
+  // se desplaza hacia delante (02:30 pasa a 03:30). No se itera para evitar oscilaciones.
+  const estimado = local - desfaseEn(local) * 60_000;
+  return new Date(local - desfaseEn(estimado) * 60_000);
 }
 
 /** Último momento para reservar (3 horas antes del inicio). */
@@ -60,6 +66,22 @@ export const cierreDeReservas = (fecha: Date, startMinute: number | null | undef
 /** Plazo para enviar la señal: 24 horas o, si llega antes, el cierre de reservas. */
 export function plazoDeSenal(ahora: Date, fecha: Date, startMinute: number | null | undefined): Date {
   return new Date(Math.min(ahora.getTime() + HORAS_PARA_SENAL * 3_600_000, cierreDeReservas(fecha, startMinute).getTime()));
+}
+
+type ReservaConPlazo = { status: TicketStatus; depositUntil: Date };
+
+/** Misma regla que plazasOcupadas: el instante exacto del plazo aún ocupa plaza. */
+export const reservaOcupaPlaza = (r: ReservaConPlazo, ahora: Date): boolean =>
+  r.status === "CONFIRMED" || r.status === "CHECKED_IN" || (r.status === "PENDING_DEPOSIT" && r.depositUntil >= ahora);
+
+/** Confirmar una señal tardía vuelve a consumir plazas; los datos deben leerse bajo el bloqueo de entradas. */
+export function motivoSinConfirmacion(r: ReservaConPlazo & { quantity: number }, ahora: Date, capacidad: number | null, ocupadas: number, otraActiva: boolean): string | null {
+  if (r.status !== "PENDING_DEPOSIT" && r.status !== "EXPIRED") return "solicitud_cambiada";
+  if (!reservaOcupaPlaza(r, ahora)) {
+    if (otraActiva) return "entradas_otra_activa";
+    if (capacidad !== null && ocupadas + r.quantity > capacidad) return "entradas_agotadas";
+  }
+  return null;
 }
 
 /** Número de Bizum de la promotora: un móvil español (6 o 7 y ocho cifras más), con o sin +34. Devuelve las 9 cifras o null. */

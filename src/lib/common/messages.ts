@@ -148,6 +148,7 @@ export const PROBLEMAS: Record<string, string> = {
   entradas_propias: "No puedes reservar entradas de tu propia velada.",
   entradas_limite: "Has hecho muchas reservas seguidas. Inténtalo dentro de un rato.",
   entradas_ya_reservadas: "Ya tienes una reserva para esta velada. Puedes verla o cancelarla en «Mis entradas».",
+  entradas_otra_activa: "Esa persona ya tiene otra reserva activa en esta velada. Cancela una de las dos antes de confirmar la señal.",
   entradas_agotadas: "No quedan entradas suficientes.",
   highlight_ya_anadido: "Ese vídeo ya está en tus highlights.",
   gimnasio_contacto: "Revisa el teléfono y el correo profesional del gimnasio.",
