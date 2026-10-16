@@ -34,7 +34,10 @@ await edit.locator('[name=gym]').fill(`Club Ficha Editada ${rnd}`); await edit.g
 await pending(`Club Ficha Editada ${rnd}`, "también queda pendiente el gimnasio aportado al editar el peleador");
 await trainer.p.goto(B + "/mi-panel");
 const publish = trainer.p.locator('form', { has: trainer.p.getByRole("button", { name: "Publicar mi perfil", exact: true }) });
-await publish.locator('input[name=disciplina][value=BOXEO]').check(); await publish.locator('[name=province]').selectOption("Madrid"); await publish.locator('[name=city]').fill("Madrid"); await publish.locator('[name=gym]').fill(`Club Entrenador Alta ${rnd}`);
+// La casilla de la chip es transparente y no recibe clics: una persona pulsa su etiqueta visible.
+await publish.locator('label.chip:has(input[name=disciplina][value=BOXEO])').click();
+check("se elige Boxeo desde su opción visible", await publish.locator('input[name=disciplina][value=BOXEO]').isChecked());
+await publish.locator('[name=province]').selectOption("Madrid"); await publish.locator('[name=city]').fill("Madrid"); await publish.locator('[name=gym]').fill(`Club Entrenador Alta ${rnd}`);
 await publish.getByRole("button", { name: "Publicar mi perfil", exact: true }).click(); await trainer.p.locator('.notice-ok').waitFor();
 await pending(`Club Entrenador Alta ${rnd}`, "la publicación del entrenador no publica automáticamente su gimnasio");
 const trainerRow = await db.trainer.findFirstOrThrow({ where: { user: { email: trainer.email } } });

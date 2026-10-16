@@ -2413,3 +2413,8 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Encargo:** relevo de Claude en #95 y corrección del campo gym en Mi ficha. Se conserva la apertura de la pestaña y el desplegable antes de buscar el formulario, ya publicada en6b62681.
 **Integración:** merge de base candidata1174eac (invitaciones, cesiones y entradas) en rama propia codex/pr90-integracion-20261016. Traspaso remoto anterior preservado. El recorrido gimnasios-altas entra en orden.json. Sin cambios en las reglas de alta aprobadas por Claude, sin rebase.
 **Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos. Compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, prueba intacta. Sin migraciones ni cambios de datos reales. CI remoto pendiente; publicación después de fusionar #89.
+
+## Corrección del recorrido tras CI 38942511433
+- El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
+- Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
+- Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.
