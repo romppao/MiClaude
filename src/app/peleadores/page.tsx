@@ -56,12 +56,12 @@ export default async function Fighters({ searchParams }: { searchParams: Promise
       <ChipsDisciplina ruta="/peleadores" actual={discipline} conservar={{ q, level, province, disponibles }} />
       <form className="search" role="search" aria-label="Filtrar peleadores">
         <CampoFiltro etiqueta="Nombre o alias"><input name="q" defaultValue={q} maxLength={80} /></CampoFiltro>
+        <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
         <MasFiltros activos={activos.filter((x) => !x.claves.includes("q")).length}>
         <SelectorCategoria modo="filtro" nombres={{ discipline: "disciplina", level: "level", weightClass: "categoria" }} defaults={{ discipline: discipline ?? "", level: nivel ?? "", divisionId: divisionId ?? "", weightClass: categoria ?? "" }} />
         <CampoFiltro etiqueta="Provincia"><select name="province" defaultValue={province ?? ""}><option value="">Todas las provincias</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></CampoFiltro>
         <label className="chip"><input type="checkbox" name="disponibles" value="1" defaultChecked={disponibles === "1"} />Disponibles para pelear</label>
         </MasFiltros>
-        <BotonesFiltro ruta="/peleadores" hayFiltros={activos.length > 0} />
       </form>
       <FiltrosActivos ruta="/peleadores" params={{ q, level, province, disciplina, categoria, divisionId, disponibles }} activos={activos} />
       <p aria-live="polite" className="mut">{total === 0 ? "Ningún peleador coincide con estos filtros." : `${plural(total, "peleador encontrado", "peleadores encontrados")}.`}</p>

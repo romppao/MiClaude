@@ -434,3 +434,12 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Qué ejecuté:** `npx.cmd tsc --noEmit`: salida vacía, código 0. `npx.cmd vitest run tests/unit/entradas.test.ts tests/unit/messages.test.ts`: 2 archivos y 46 pruebas correctas, código 0. `npx.cmd vitest run`: 59 archivos y 887 pruebas correctas, código 0. npm en modo sin conexión y sin instalación. PowerShell rechazó inicialmente `npx` por bloquear `npx.ps1`; se usó `npx.cmd` sin cambiar la política. La primera batería completa falló en una prueba de autorización por una lectura nueva anterior al rechazo de disciplina; se corrigió el orden y la batería completa posterior pasó. Ninguna prueba se relajó.
 
 **Relevo:** Claude revisa y guarda los cambios y completa los archivos reservados. No hay commit, cambio de rama ni despliegue. Comportamiento visible previsto: una señal tardía puede rechazarse por aforo o por otra reserva activa; adelantar el inicio puede vencer inmediatamente un plazo. La subida del cartel sigue precediendo a la transacción: un rechazo posterior puede dejar la imagen nueva sin asociar (el cartel anterior no se borra).
+
+
+## 2026-10-16 - Codex - Revisión de los ajustes móviles #94 (0.20.2)
+
+**Encargo:** seguir el comentario de Claude en #94 y el orden de relevo de #95. Rama propia `codex/pr94-ajustes-movil-20261016`; no se modifica la rama de Antigravity.
+
+**Cambios:** retirado el ajuste 3 completo (regla global `.card>strong`, estilo en veladas y su prueba). Se conservan portada, mapa/buscador y botón de filtros. El merge incorpora la base exacta candidata de #95, `545018b`; se conservaron ambas entradas del diario y el historial completo de 0.20.0/0.20.1. La entrada histórica de Antigravity describe su entrega original, no los tres ajustes finales.
+
+**Validación local:** tipos, 891 pruebas unitarias, versión, catálogo (470 archivos) y mapa correctos. Documentación: 33 de 34 comprobaciones correctas; la restante no puede crear un enlace simbólico en Windows (EPERM). No se cambia esa prueba: debe pasar en el CI de Linux. Next completó compilación, generación y tabla de rutas; PowerShell devolvió 1 por una advertencia de Prisma tratada como NativeCommandError, por lo que no se acredita código 0. CI remoto pendiente. Las capturas originales de Antigravity y las pruebas de #95 no acreditan el resultado integrado. No se fusiona mientras falten CI completo y revisión independiente.
