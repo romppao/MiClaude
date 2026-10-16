@@ -20,8 +20,9 @@
 | Quién | Qué | Rama y PR | Estado |
 |---|---|---|---|
 | Claude (nube, el chat del móvil) | **En pausa** (15-10, tarde). Su relevo está en `docs/ecosistema/traspasos/2026-10-15-claude-nube-a-claude-code.md` | — | en pausa |
-| Claude Code (portátil) | Relevo de Claude (nube) cerrado: #82, #84 y #83 fusionados (0.18.4–0.18.6); #77, #78 y los de Dependabot, sustituidos. **Siguiente:** revisar los 190 gimnasios sin fecha y completar las comunidades que faltan (ver «Gimnasios reales») | — | siguiente |
-| Codex | Bandeja #86 y miembros #88 en pruebas; cesión con aceptación en preparación. Después altas desde fichas y T-009. | `codex/cesion-de-gimnasio-con-aceptacion-20261015` | PR #89, pendiente de revisión y CI |
+| Claude Code (portátil) | 16-10: #92 fusionado; #93 (fase 1, 0.20.0) con las correcciones de la revisión crítica, esperando CI y el «sí» del fundador. **Red de seguridad y flota** (este PR): `APROBADO.md`, `npm run verificar`, CI que no se para en el primer fallo, `scripts/flota.mjs` y `MODELOS-Y-ESFUERZO.md`. Siguiente: regresión visual. | `claude-code/veladas-entradas` (#93), `claude-code/red-seguridad` | en curso |
+| Codex | Actualiza #89 tras #88; revisiones de Claude y orden de fusión conservados. | `codex/pr89-integracion-20261016` | Preparación local sobre la base candidata 0.20.3; CI pendiente. |
+| Antigravity | Cuatro ajustes de móvil en Lona (375 px): portada, gimnasios, veladas y peleadores. Tipos, 858 unitarias y capturas antes/después verificadas. Versión 0.18.10. | `antigravity/ajustes-movil` | Completado localmente, pendiente de revisión de Claude Code |
 | Dependabot | Actualizaciones de librerías | #17, #19, #20 | sin revisar |
 
 ⚠ **El encargo de los paneles** (bloques F, G y H) que citan el diario y `IDEAS.md` —`docs/ecosistema/traspasos/2026-10-14-claude-encargo-codex-paneles-por-usuario.md`— **no está en el repositorio**: no existe en ninguna rama. Quien lo tenga (el portátil) debe subirlo; sin él, nadie más puede continuar G y H.

@@ -17,3 +17,6 @@ docs/ingreso/.clave-temporal/
 
 # Trabajador de MapLibre: lo copia scripts/copiar-maplibre.mjs al compilar (no se sube)
 /public/vendor/
+
+# Informes de la flota (scripts/flota.mjs): locales, no se guardan en Git
+docs/logs/flota/
