@@ -1,4 +1,4 @@
-﻿# Codex — revisión previa de T-009 (#91)
+# Codex — revisión previa de T-009 (#91)
 
 - Fecha: 2026-10-16. Objetivo: continuar el encargo de Claude sin adelantar dependencias.
 - Rama local: codex/revision-pr91-20261016, base b1597d4e1ed262866b245fea54c141050c445b5f.
