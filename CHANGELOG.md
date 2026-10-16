@@ -11,10 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.20.6] — 2026-10-16
-
-
-
+## [0.21.2] — 2026-10-16
 
 ### Añadido
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
@@ -25,13 +22,25 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 - Las capturas de los escenarios conservan el cursor original para evitar el aviso artificial de hidratación React#418 detectado por Claude. Se retira encType redundante del formulario de highlight con acción de función, que causaba un aviso en desarrollo.
 - Los escenarios no consumen minutos en cada PR: solo al fusionar, manualmente o en PR etiquetado escenarios.
 
-## [0.20.5] — 2026-10-16
 
-
+## [0.21.1] — 2026-10-16
 
 ### Corregido
 - Los gimnasios nuevos aportados al crear o editar fichas de peleador o entrenador quedan pendientes de moderación. Se mantiene el estado de los gimnasios existentes y la excepción de publicación de moderación.
 
+
+## [0.21.0] — 2026-10-16
+
+PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan a carteles con foto, como las veladas (petición del fundador del 16-10-2026: «que se vea directamente la imagen» y que el aficionado tenga una pantalla de entrenadores para elegir con quién dar clase).
+
+### Añadido
+- **Entrenadores con filtros:** se busca por nombre, disciplina, provincia, si da clases en Lona y si entrena en un gimnasio o por su cuenta. Cada tarjeta dice cuántas clases da y desde qué precio.
+- **Selector «Peleadores · Entrenadores · Gimnasios»** arriba de los tres directorios: el aficionado llega a los entrenadores desde Peleadores, que ya está en su barra inferior.
+- **Fila deslizable de disciplinas** para filtrar de un toque, sin abrir «Más filtros».
+
+### Cambiado
+- **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
+- **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
 
 ## [0.20.4] — 2026-10-16
 

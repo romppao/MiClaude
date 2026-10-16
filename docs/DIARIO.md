@@ -2331,6 +2331,7 @@ Codex contrasta el CI 38748985341 y sus registros: 16 recorridos, 93 pasos, cero
 ## 16 de octubre de 2026 — Recorrido de edición de gimnasio
 Codex corrige la prueba de altas (#90): abre la pestaña «Mis datos» y el desplegable de corrección en cada visita antes de buscar el botón del formulario. El campo de gimnasio ya existía. No cambian permisos, datos ni comportamiento de la aplicación. Sintaxis comprobada; validación completa pendiente del CI. #93 sigue abierto, comprobado mediante el conector de GitHub; se mantiene el orden de integración acordado.
 
+
 ## 2026-10-15 — Cesión de gimnasio con aceptación
 **Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/cesion-de-gimnasio-con-aceptacion-20261015`.
@@ -2435,3 +2436,27 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
 - Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.
+
+## 16 de octubre de 2026 — Directorios con foto: peleadores, entrenadores y gimnasios (Claude Code)
+
+**Encargo:** el fundador pidió que las pantallas de listados «aburridas» se vean como las veladas (la imagen por delante) y que el aficionado tenga una pantalla de entrenadores, «ya que quizás quiera tomar clases de un entrenador en concreto».
+
+**Decisiones:** una sola familia de tarjetas (`components/TarjetasDirectorio.tsx`) sobre `.tarjeta-foto`, con foto a toda la tarjeta y el tinte de la disciplina cuando no hay foto. Conservan `class="card"` y el nombre en `<strong>` porque los recorridos de navegador cuentan con ellos. El acceso del aficionado a Entrenadores es un selector común a los tres directorios; el menú no admite más de cinco enlaces por bloque y la prueba de paneles exige `/clases`, así que no se tocó. Movimiento: solo la entrada `data-reveal` que ya existía y el pulsado, porque un listado se recorre muchas veces al día.
+
+**Qué salió mal:** la primera versión quitó la categoría de la tarjeta de peleador y `filtros.mjs` falló («Wélter · hasta 66,7 kg»); se recuperó. En la revisión a 375 px, la etiqueta «Disponible para pelear · 70.25 kg» se partía en tres líneas sobre la foto y los enlaces del selector salían subrayados por la regla de enlaces sueltos; se corrigieron. El catálogo guarda la huella de cada archivo: hay que regenerarlo después de cada cambio de código.
+
+**Validación:** revisado en pantalla a 375 y 1280 px, en tema claro y oscuro, con y sin fotos y con nombres muy largos, sin desbordes. Tipos, 891 pruebas unitarias, `filtros`, `flujo`, `diseno`, `paneles-agenda`, `menu`, `enlaces`, `busqueda`, `movil` y la medición de accesibilidad en verde. El resto de recorridos los pasa el CI.
+
+**Pendiente:** menos scroll en perfiles, panel y ficha; pantallas de acción guiadas (subir vídeos, buscar clases, perfil y trayectoria); datos en tiempo real (encargo a Codex en `docs/ecosistema/traspasos/2026-10-16-claude-encargo-codex-listados-y-pantallas-de-accion.md`). Acceso directo a Entrenadores desde el menú: a decidir.
+
+## Nuevo orden autorizado comunicado por Claude
+- Comentario6221715692 de #97: Claude incorporó las correcciones de Luna en26bffc4 y comunica autorización del fundador para adelantar los listados. Los archivos de CSS, navegación, filtros y regresiones son idénticos a los de nuestra rama revisada f5cdd1b; verificado con git diff sin diferencias.
+- Se prepara #90 sobre26bffc4 para publicarlo tras la fusión apta de #97. Se conservan todas las reglas de alta y el clic visible de Boxeo. La versión pasa a0.21.1 mediante el script; #91 deberá renumerarse después.
+- No se requiere el PR corrector de listados: Claude ya incorporó esos cambios. La rama propia publicada a3b224d3 queda como evidencia sin PR, evitando una entrega duplicada.
+- Esta preparación todavía no se ha publicado ni fusionado. Se comprobarán versión, catálogo, mapa, tipos, unitarias y compilación sobre la combinación nueva; el CI completo final sigue siendo necesario.
+
+## Actualización tras adelantar listados (#97)
+- Claude comunicó en comentario6221715692 la autorización del fundador para adelantar #97 e incorporó las correcciones en26bffc4. #90 se prepara sobre esa base como0.21.1 (3812d33), conservando la corrección visible de Boxeo.
+- #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
+- Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
+- La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.

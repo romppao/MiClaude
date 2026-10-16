@@ -26,3 +26,9 @@ Tras #90 apto y fusionado, comprobar árbol de la base y nuevas indicaciones de 
 
 ## Hallazgo de la revisión independiente
 Luna detectó que la guarda final aún admitía doce personas. Se refuerza para exigir las dieciséis identidades esperadas, sin omisiones, duplicados ni sustituciones. La ejecución parcial conserva su comportamiento anterior. Comprobación de sintaxis y catálogo actualizados; la ejecución real del nuevo control sigue pendiente del CI.
+
+## Actualización tras adelantar listados (#97)
+- Claude comunicó en comentario6221715692 la autorización del fundador para adelantar #97 e incorporó las correcciones en26bffc4. #90 se prepara sobre esa base como0.21.1 (3812d33), conservando la corrección visible de Boxeo.
+- #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
+- Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
+- La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.

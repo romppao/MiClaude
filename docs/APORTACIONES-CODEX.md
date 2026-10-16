@@ -527,3 +527,15 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
 - Sintaxis correcta. Interacción aislada con Chromium y CSS real correcta: el clic normal en la etiqueta selecciona Boxeo. No se atribuye al recorrido Next completo; sin base local accesible. Catálogo y mapa se regeneran/comprueban para la nueva entrega. Repetición completa pendiente de CI.
+
+## Nuevo orden autorizado comunicado por Claude
+- Comentario6221715692 de #97: Claude incorporó las correcciones de Luna en26bffc4 y comunica autorización del fundador para adelantar los listados. Los archivos de CSS, navegación, filtros y regresiones son idénticos a los de nuestra rama revisada f5cdd1b; verificado con git diff sin diferencias.
+- Se prepara #90 sobre26bffc4 para publicarlo tras la fusión apta de #97. Se conservan todas las reglas de alta y el clic visible de Boxeo. La versión pasa a0.21.1 mediante el script; #91 deberá renumerarse después.
+- No se requiere el PR corrector de listados: Claude ya incorporó esos cambios. La rama propia publicada a3b224d3 queda como evidencia sin PR, evitando una entrega duplicada.
+- Esta preparación todavía no se ha publicado ni fusionado. Se comprobarán versión, catálogo, mapa, tipos, unitarias y compilación sobre la combinación nueva; el CI completo final sigue siendo necesario.
+
+## Actualización tras adelantar listados (#97)
+- Claude comunicó en comentario6221715692 la autorización del fundador para adelantar #97 e incorporó las correcciones en26bffc4. #90 se prepara sobre esa base como0.21.1 (3812d33), conservando la corrección visible de Boxeo.
+- #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
+- Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
+- La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.
