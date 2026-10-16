@@ -11,6 +11,19 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.21.0] — 2026-10-16
+
+PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan a carteles con foto, como las veladas (petición del fundador del 16-10-2026: «que se vea directamente la imagen» y que el aficionado tenga una pantalla de entrenadores para elegir con quién dar clase).
+
+### Añadido
+- **Entrenadores con filtros:** se busca por nombre, disciplina, provincia, si da clases en Lona y si entrena en un gimnasio o por su cuenta. Cada tarjeta dice cuántas clases da y desde qué precio.
+- **Selector «Peleadores · Entrenadores · Gimnasios»** arriba de los tres directorios: el aficionado llega a los entrenadores desde Peleadores, que ya está en su barra inferior.
+- **Fila deslizable de disciplinas** para filtrar de un toque, sin abrir «Más filtros».
+
+### Cambiado
+- **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
+- **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
+
 ## [0.20.2] — 2026-10-16
 
 ### Corregido
