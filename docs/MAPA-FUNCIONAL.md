@@ -361,7 +361,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `creador.ts` | `EstadoCodigos`, `correoCreador`, `esCreador` |
 | `google.ts` | `COOKIE_GOOGLE`, `DURACION_VIAJE_S`, `DecisionCuenta`, `GOOGLE_AUTORIZACION`, `GOOGLE_TOKENS`, `IdentidadGoogle`, `ViajeGoogle`, `canjearCodigo`, `configGoogle`, `decidirCuenta`, `escribirViaje`, `googleDisponible`, `leerViaje`, `nuevoViaje`, `urlDeAutorizacion`, `validarIdToken` |
 | `landing.ts` | `PASOS_REGISTRO`, `PASO_TRAS_DATOS`, `Papel`, `ROL_INICIAL`, `TIPOS_DE_CUENTA`, `TIPOS_DE_ENTIDAD`, `TIPO_DE_ENTIDAD_ETIQUETA`, `TipoDeCuenta`, `TipoDeEntidad`, `ignorarFichaVinculada`, `landingFor`, `papelDe`, `parseTipoDeCuenta`, `parseTipoDeEntidad`, `puedeOrganizar` |
-| `menu.ts` | `CLASES_Y_ENTRENADORES`, `EXPLORAR`, `EnlaceMenu`, `ExtrasMenu`, `SeccionMenu`, `menuDe` |
+| `menu.ts` | `EXPLORAR`, `EnlaceMenu`, `ExtrasMenu`, `SeccionMenu`, `menuDe` |
 | `onboarding.ts` | `ClassDraft`, `FighterIntent`, `Onboarding`, `TrainerIntent`, `readOnboarding` |
 | `password.ts` | `dummyHash`, `hashPassword`, `needsRehash`, `verifyPassword` |
 | `permissions.ts` | `requireAdmin`, `requireCreador`, `requireOrganizer` |

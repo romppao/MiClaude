@@ -2468,3 +2468,11 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Causa:** `demoCambiarPapel` solo cambia `User.role`; pero `papelDe` devuelve «peleador» también cuando la cuenta tiene una ficha vinculada (`user.fighter`), y la cuenta del creador conservaba la de cuando probó «Peleador». Entrenador, organizadora y moderador no se veían afectados porque `papelDe` los resuelve antes de mirar la ficha.
 
 **Arreglo:** `ignorarFichaVinculada(role, demo)`: en la demo, si el tipo elegido no es «Peleador», `getUser()` devuelve la cuenta sin ficha, así toda la aplicación (portada, menú, panel, acciones) ve a un aficionado. Fuera de la demo no cambia nada. No se borra ninguna ficha: al volver a «Peleador» reaparece. Prueba unitaria `tests/unit/demo-papel.test.ts`.
+
+## 17 de octubre de 2026 — El menú vuelve a tres bloques (Claude Code)
+
+**Qué pasó:** la 0.22.1 añadió al menú un bloque «Clases y entrenadores» para dar acceso directo a Entrenadores. El recorrido `menu.mjs` exige tres bloques comprensibles para el visitante (navegación corta, regla del fundador) y el CI de la principal falló. Se fusionó antes de que acabara el CI.
+
+**Arreglo:** se restaura el menú de la 0.22.0 (un solo enlace «Clases y entrenadores» a `/clases`). El acceso del aficionado a Entrenadores es la pestaña «Clases | Entrenadores» de `/clases` y el selector de los directorios.
+
+**Lección:** cualquier cambio en la estructura del menú pide pasar `menu` y `paneles-pulido` en local antes de subirlo; la prueba que fallaba estaba en la lista y no la lancé.

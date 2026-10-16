@@ -11,6 +11,14 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.22.2] — 2026-10-17
+
+PR de Claude Code: el menú vuelve a tener tres bloques para el visitante (el CI de la 0.22.1 falló en `menu.mjs`: «el menú móvil del visitante se abre con tres bloques comprensibles»).
+
+### Corregido
+- **Menú:** se retira el bloque «Clases y entrenadores» que añadió la 0.22.1 (dejaba el menú del visitante en cuatro bloques). Vuelve «Clases y entrenadores» como un solo enlace de «Explorar».
+- El aficionado sigue llegando a la pantalla de **Entrenadores** con un toque desde ese enlace: en `/clases` está la pestaña «Clases | Entrenadores», y los tres directorios (peleadores, entrenadores y gimnasios) llevan el selector.
+
 ## [0.22.1] — 2026-10-16
 
 PR de Claude Code: los gimnasios dejan de clasificarse (avisos del fundador del 16-10-2026: «todavía la lista de gimnasios no se ve como te pedí» y «no pongas un ránking de gimnasios, ya que esto puede ser muy perjudicial; únicamente para los peleadores […] puedes poner los más populares, pero no un ránking de quién es mejor que otro»).
