@@ -24,6 +24,14 @@ PR de Claude Code: los directorios de peleadores, entrenadores y gimnasios pasan
 - **Peleadores, entrenadores y gimnasios** se ven como carteles de dos columnas en el móvil: la foto ocupa toda la tarjeta; sin foto, el color de la disciplina y las iniciales. Disponibilidad, «Verificado» y número de clases van sobre la foto con el texto legible. La categoría y el alias se ven en tarjetas anchas.
 - **Buscador más compacto en móvil:** el campo y su botón en una línea, para que las tarjetas empiecen antes.
 
+## [0.20.4] — 2026-10-16
+
+
+### Añadido
+- Cesión de gimnasios por invitación al correo: aceptación expresa, respuesta idéntica con y sin cuenta, bloqueos, enlace con caducidad y confirmación a las dos personas mediante sendMail.
+
+
+
 ## [0.20.3] — 2026-10-16
 
 ### Añadido

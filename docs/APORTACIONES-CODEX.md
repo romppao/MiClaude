@@ -411,6 +411,16 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
 
+## 2026-10-15 — Cesión de gimnasio con aceptación
+**Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/cesion-de-gimnasio-con-aceptacion-20261015`.
+**Cambios:** GymTransferInvitation con FK de gimnasio/remitente, correo destinatario sin requisito de cuenta previa y hash del enlace. Caduca en 14 días. Una nueva invitación cancela la anterior; máximo cinco al día por titular/gimnasio. Se acepta con correo confirmado coincidente, vuelve a comprobar propiedad y bloqueos y cambia Gym/Profile en la misma transacción. Confirmaciones a ambas personas por sendMail. Los bloqueos cancelan las cesiones pendientes; copia y eliminación de datos incluyen el correo destinatario. Se conserva la intervención directa de moderación.
+**Compartidos:** esquema, migración aditiva, package.json (se conserva y amplía el guion e2e).
+**Validación:** tipos aprobados; pendientes migraciones/paridad, pruebas unitarias y recorrido real de correo con/sin cuenta, repetición, cancelación, caducidad y bloqueos.
+**Siguiente:** revisión de Claude y cuarto punto en PR separado. No hay cambios de proveedor ni dominio.
+
+**Resultado local de #89:** migraciones en base vacía, paridad, tipos, compilación y 15 comprobaciones documentales aprobados. El recorrido completo de cesión pasa: ambos tipos de destinatario, enlace ajeno y repetido, dos correos de confirmación, ambos sentidos de bloqueo, cancelación y caducidad. Las unitarias locales detectaron un código de error en AVISOS: corregido a PROBLEMAS y prueba de mensajes aprobada. Cuatro comprobaciones de contraseña siguen agotando 5 segundos en esta máquina, incluso en una repetición sin otras compilaciones; no se atribuye todo a la carga ni se alteran los límites. El CI 38743105233 sí ha pasado las unitarias sobre la corrección y está recorriendo navegador.
+
 ## 2026-10-15 — Vinculación a gimnasios por invitación
 **Pedido:** segundo punto del relevo: el titular invita y la persona acepta, con hayBloqueo. Se mantiene la vinculación directa de moderación.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/invitaciones-de-miembros-de-gimnasio-20261015`.
@@ -462,3 +472,9 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 **Integración:** se conservan las invitaciones originales y las entradas/carteles de la principal. El esquema mantiene ambos modelos y los avisos admiten GYM_MEMBER y TICKET. El nuevo recorrido `gimnasios-invitaciones` entra en `tests/e2e/orden.json`; se conserva el ejecutor nuevo que completa todos los recorridos. Historial de documentos preservado; versión 0.20.3 por el script oficial. No se modifican las reglas de permisos aprobadas por Claude.
 
 **Validación:** esquema Prisma válido; tipos, 901 unitarias, versión, catálogo y mapa correctos. Compilación completa con BUILD_EXIT=0. Documentación33/34 por EPERM de enlaces simbólicos en Windows, sin alterar la prueba. No se ejecutan migraciones ni se alteran datos locales o remotos. CI con base vacía requerido antes de fusionar.
+
+
+## 2026-10-16 - Codex - Integración local de #89 (0.20.4)
+**Encargo:** relevo de Claude en #95; cesión consentida aprobada por Claude comentario6195354039. Rama propia `codex/pr89-integracion-20261016`; merge de la base candidata0.20.3. Publicación después de fusionar #88.
+**Integración:** conserva modelos, acciones y pruebas de miembros, cesiones y entradas. Se unifican imports y las dos paginaciones de Mis gimnasios usan variables independientes. El recorrido gimnasios-cesion entra en orden.json sin quitar los anteriores. Migraciones originales intactas. Versión por script, ambas historias documentales conservadas.
+**Validación:** Prisma válido y generado; tipos, 910 unitarias, versión, catálogo y mapa correctos. Compilación completa BUILD_EXIT=0. Documentación33/34 por EPERMWindows al crear enlace simbólico, prueba intacta. Sin migraciones ni datos reales alterados; CI remoto pendiente.

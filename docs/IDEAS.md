@@ -418,6 +418,8 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - 15-10-2026, Codex al ejecutar T-013 en local: quedan por revisar autoenlaces en el estado sin resultados de veladas pasadas, el atajo de ciudad de propuestas y los filtros de estado de fallos. Diez hallazgos al recorrer 414 pantallas por cinco papeles; no son defectos de aviso externo. Pendiente de una tarea propia; no se modifican esas pantallas en T-013.
 - 15-10-2026, fundador → Codex: T-002 agrupa #17/#18/#19/#65/#66 en un único PR (0.17.2) tras T-013. Implementación preparada; pruebas en curso. Los PR originales quedan para cerrar tras integrar, sin alterar el calendario ni la política de saltos mayores de Dependabot.
 
+- 15-10-2026, fundador: cesión de gimnasio consentida por correo sin revelar si hay cuenta; implementación en pruebas, separada de la vinculación de miembros.
+
 - 15-10-2026, fundador: vinculación de miembros con invitación y aceptación; en pruebas en rama de Codex. Moderación mantiene su acción directa.
 
 - 15-10-2026, fundador: ejecutar el relevo D/H en cuatro PR independientes y después T-009; RFC-002 queda fuera de este encargo. Bandeja única en pruebas.
