@@ -690,6 +690,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/components/GuiaAcciones.tsx",
+    "purpose": "Piezas de las pantallas de acción guiadas: pasos («Paso 1 de 2»), carteles de velada para elegir tocando, accesos grandes con icono y ayuda plegable.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/app/components/Icono.tsx",
     "purpose": "Iconos decorativos de trazo y marca del diseño v3; la acción se identifica por el texto accesible del control.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -787,6 +792,11 @@
   {
     "path": "src/app/components/RecordarCampos.tsx",
     "purpose": "Recuerda campos de formularios admitidos y restaura borrador tras volver; excluye secretos y distingue formularios por firma/orden.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/components/RefrescoVivo.tsx",
+    "purpose": "Vuelve a pedir al servidor los datos de la pantalla leída al volver a la pestaña, al recuperar la conexión y cada pocos minutos; no pinta nada.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1532,6 +1542,11 @@
   {
     "path": "src/lib/common/record-time.ts",
     "purpose": "Constante y c?lculo del plazo de 24 horas para incorporar al r?cord una declaraci?n propia.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/common/refresco.ts",
+    "purpose": "Datos al día sin recargar: qué pantallas de solo lectura se actualizan solas, cada cuánto y cuándo no hacerlo (si la persona escribe o hay una ventana abierta).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -2328,6 +2343,11 @@
     "path": "tests/unit/recuperar.test.ts",
     "purpose": "Prueba lógica de enlaces de recuperación, consumo y comportamiento de acceso asociado mediante simulación.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/refresco.test.ts",
+    "purpose": "Regresión de los datos al día: pantallas que se actualizan solas, las de formulario que no, y cuándo toca refrescar.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/rivales.test.ts",

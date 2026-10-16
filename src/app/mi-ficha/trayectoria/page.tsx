@@ -12,6 +12,7 @@ import {
 } from "../../actions/trajectory";
 import SelectorCategoria from "../../components/SelectorCategoria";
 import TrajectoryList from "../../components/TrajectoryList";
+import { AccesosRapidos, AyudaPlegable } from "../../components/GuiaAcciones";
 import AuraBreakdown from "../../components/AuraBreakdown";
 
 export const metadata = { title: "Mi trayectoria y aura" };
@@ -100,14 +101,21 @@ export default async function Trajectory() {
         <Link href="/mi-ficha">Volver a mi ficha</Link> ·{" "}
         <Link href="/ayuda#aura">Cómo se calcula el aura</Link>
       </p>
-      <p>
-        Puedes contar tu trayectoria desde el primer día. El respaldo de
-        entrenadores, organizadores o federaciones es opcional; tu rival no
-        tiene que aprobar un título.
-      </p>
-      <h2>Mi aura por categoría</h2>
+      <AccesosRapidos etiqueta="Qué quieres hacer" accesos={[
+        { href: "#declarar-titulo", icono: "trofeo", titulo: "Declarar un título", detalle: "Cuenta qué has ganado" },
+        { href: "#mis-titulos", icono: "capas", titulo: "Mis títulos", detalle: achievements.length === 1 ? "1 declarado" : `${achievements.length} declarados` },
+        { href: "#mi-aura", icono: "aura", titulo: "Mi aura", detalle: "Por categoría" },
+      ]} />
+      <AyudaPlegable titulo="¿Cómo cuenta mi trayectoria?">
+        <p>
+          Puedes contar tu trayectoria desde el primer día. El respaldo de
+          entrenadores, organizadores o federaciones es opcional; tu rival no
+          tiene que aprobar un título.
+        </p>
+      </AyudaPlegable>
+      <h2 id="mi-aura">Mi aura por categoría</h2>
       <AuraBreakdown groups={groups} />
-      <h2>Mis títulos</h2>
+      <h2 id="mis-titulos">Mis títulos</h2>
       <TrajectoryList achievements={achievements} />
       <p className="mut">
         Solo se toma el título con mayor aporte de cada categoría. Repetir
@@ -203,7 +211,7 @@ export default async function Trajectory() {
           )}
         </details>
       ))}
-      <h2>Declarar un título anterior</h2>
+      <h2 id="declarar-titulo">Declarar un título anterior</h2>
       <form action={saveAchievement} className="search">
         {fields()}
         <button>Guardar título declarado</button>

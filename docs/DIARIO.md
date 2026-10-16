@@ -2430,3 +2430,17 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Validación:** revisado en pantalla a 375 y 1280 px, en tema claro y oscuro, con y sin fotos y con nombres muy largos, sin desbordes. Tipos, 891 pruebas unitarias, `filtros`, `flujo`, `diseno`, `paneles-agenda`, `menu`, `enlaces`, `busqueda`, `movil` y la medición de accesibilidad en verde. El resto de recorridos los pasa el CI.
 
 **Pendiente:** menos scroll en perfiles, panel y ficha; pantallas de acción guiadas (subir vídeos, buscar clases, perfil y trayectoria); datos en tiempo real (encargo a Codex en `docs/ecosistema/traspasos/2026-10-16-claude-encargo-codex-listados-y-pantallas-de-accion.md`). Acceso directo a Entrenadores desde el menú: a decidir.
+
+## 16 de octubre de 2026 — Pantallas de acción guiadas, menos desplazamiento y datos al día (Claude Code)
+
+**Encargo:** el fundador pidió que las pantallas donde se hace algo (subir lo grabado, buscar clases, configurar el perfil del peleador, registrar la trayectoria) sean más visuales e intuitivas para quien no domina el móvil, que no haya que deslizar tanto para llegar a lo importante (alternando filas horizontales y verticales) y que los datos estén al día para todos.
+
+**Medición previa (móvil, 390 px, en alturas de pantalla):** ayuda 8,4; portada del visitante 4,9; mi ficha 3,4; mi panel 3,1; trayectoria 2,8 con su botón principal a 2,3 pantallas; veladas y ficha de gimnasio 2,8.
+
+**Decisiones:** piezas comunes en `components/GuiaAcciones.tsx` (pasos, carteles para elegir, accesos con icono, ayuda plegable, «Completa tu ficha») para no rehacer cada pantalla distinta. Se conservan los campos, los textos de botón y las reglas de cada pantalla. Datos al día: lo más barato que cubre lo importante (volver a pedir al servidor al volver a la pestaña y cada 90 s, solo en pantallas de lectura); eventos del servidor quedan para donde el sondeo no baste (entradas, plazas). La regla de «nav» hace que sus hijos pasen a la línea siguiente: una fila deslizable necesita `flex-wrap:nowrap`.
+
+**Qué salió mal:** la primera fila de carteles salió apilada en vertical por esa regla; el primer cartel quedaba pegado al borde por el imán de desplazamiento (`scroll-padding`); compilar con el servidor de desarrollo abierto en la misma carpeta rompe la compilación; `git add docs` arrastró registros sueltos de Codex (se retiraron).
+
+**Validación:** revisado en pantalla a 390 px; una velada creada con la página abierta aparece sola al volver a la pestaña; pruebas unitarias del refresco; recorridos de navegador en local y CI.
+
+**Pendiente:** portada del visitante y del aficionado (4,9 y 2,6 pantallas), ficha de gimnasio, `/mi-panel`; pantalla de configurar el perfil paso a paso (hoy «Completa tu ficha» guía hacia ella); acceso directo a Entrenadores en el menú; eventos del servidor para entradas y plazas.
