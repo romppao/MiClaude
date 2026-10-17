@@ -187,6 +187,12 @@ export default async function FighterPage({ params }: { params: Promise<{ slug: 
           <Link href={`/peleadores/${fighter.slug}/proponer?tipo=SPARRING`} className="btn secondary" style={{ flex: 1 }}>Proponer sparring</Link>
         </div>
       )}
+      {/* Invitar (17-10-2026): una organización aprobada o un entrenador invita a un peleador concreto; el peleador acepta o rechaza. */}
+      {publica && fighter.userId && fighter.userId !== user?.id && (user?.role === "ORGANIZER" || user?.role === "TRAINER") && !bloqueoMutuo && (
+        <div style={{ marginTop: 10 }}>
+          {fighter.acceptsInvitations ? <Link href={`/peleadores/${fighter.slug}/invitar`} className="btn">Invitar a este peleador</Link> : <p className="mut" style={{ margin: 0 }}>No recibe invitaciones ahora mismo.</p>}
+        </div>
+      )}
       {user && fighter.userId && fighter.userId !== user.id && (
         <div style={{ marginTop: 10 }}>
           {leBloqueo ? <Desbloquear accion={desbloquearUsuario} userId={fighter.userId} back={back} nombre={nombre} />

@@ -41,7 +41,8 @@
     "entradas",
     "gimnasios-invitaciones",
     "gimnasios-cesion",
-    "gimnasios-altas"
+    "gimnasios-altas",
+    "invitaciones"
   ],
   "aparte": {
     "accesibilidad": "paso propio del CI (npm run test:a11y)",

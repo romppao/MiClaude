@@ -13,6 +13,8 @@ import { bloquearUsuario } from "../actions/community";
 import { BotonBloquear } from "../components/Bloquear";
 import { bloqueadosPor } from "../../lib/community/bloqueos";
 import Pestanas from "../components/Pestanas";
+import PestanaInvitaciones from "./Invitaciones";
+import { puedeResponderInvitacion } from "../../lib/community/invitations";
 import type { Discipline, Prisma } from "@prisma/client";
 import { DISCIPLINE_ORDER, categoryLabel, weightClassesFor } from "../../lib/common/disciplines";
 import { LEVEL_LABEL, PROVINCES, STANCE_LABEL } from "../../lib/common/labels";
@@ -102,6 +104,13 @@ export default async function Propuestas({ searchParams }: { searchParams: Promi
   const ids = filtros.texto ? await searchIds("fighter", filtros.texto) : null;
   const { fichas, recortado } = await buscarRivales(filtros, me.id, ids);
   const yoFicha = await db.fighter.findUniqueOrThrow({ where: { id: me.id }, include: { disciplines: true, gym: true } });
+  // Invitaciones de organizaciones y entrenadores (plan del 17-10-2026): lo que ha recibido y sus ajustes de contacto.
+  const ahoraInv = new Date();
+  const invitaciones = await db.invitation.findMany({
+    where: { toId: me.id }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 50,
+    include: { fromUser: { select: { role: true, name: true, organizerRequest: { select: { orgName: true } }, trainer: { select: { name: true, slug: true } } } }, event: { select: { name: true, slug: true, date: true } }, onBehalfOf: { select: { firstName: true, lastName: true } } },
+  });
+  const invitacionesPendientes = invitaciones.filter((i) => puedeResponderInvitacion(i, ahoraInv)).length;
   const nivel = await nivelDe([...fichas, yoFicha], filtros);
   const yo = nivel.get(me.id)!;
   const compatibles = filtrarYOrdenarRivales(fichas.map((x) => ({ ...x, nombre: publicFighterName(x), ...nivel.get(x.id)! })), filtros, yo);
@@ -180,7 +189,8 @@ export default async function Propuestas({ searchParams }: { searchParams: Promi
         ))}
       </section>
 
-      <Pestanas etiqueta="Mis propuestas" inicial={pendientes || !enviadas.length ? 0 : 1} pestanas={[
+      <Pestanas etiqueta="Mis propuestas" inicial={invitacionesPendientes ? 0 : pendientes || !enviadas.length ? 1 : 2} pestanas={[
+        { id: "pestana-invitaciones", titulo: `Invitaciones (${invitacionesPendientes})`, contenido: <PestanaInvitaciones invitaciones={invitaciones} ajustes={{ acceptsInvitations: yoFicha.acceptsInvitations, contactChannel: yoFicha.contactChannel, contactPhone: yoFicha.contactPhone, contactInstagram: yoFicha.contactInstagram }} ahora={ahoraInv} /> },
         { id: "pestana-recibidas", titulo: `Recibidas (${pendientes})`, contenido: <>
           <h2 className="sr-only">Propuestas recibidas</h2>
           {recibidas.length === 0 && <p className="mut" style={{ margin: 0 }}>Todavía nadie te ha retado ni propuesto un sparring.</p>}

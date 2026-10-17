@@ -2476,3 +2476,15 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Arreglo:** se restaura el menú de la 0.22.0 (un solo enlace «Clases y entrenadores» a `/clases`). El acceso del aficionado a Entrenadores es la pestaña «Clases | Entrenadores» de `/clases` y el selector de los directorios.
 
 **Lección:** cualquier cambio en la estructura del menú pide pasar `menu` y `paneles-pulido` en local antes de subirlo; la prueba que fallaba estaba en la lista y no la lancé.
+
+## 17 de octubre de 2026, tarde — Invitaciones a peleadores (Claude Code)
+
+**Petición del fundador:** «cuando entro como moderador… no deja ponernos en contacto con peleadores». Plan aprobado: primero el contacto entre usuarios, después la estructura del moderador, en PR pequeños.
+
+**Qué se hizo (0.23.0):** las organizaciones aprobadas y los entrenadores invitan a un peleador concreto (velada, sparring en nombre de uno de los suyos, entrenar juntos). El peleador acepta o rechaza desde Mis propuestas; el contacto solo se comparte al aceptar y solo el canal que él elige. Sin chat. Reglas puras en `src/lib/community/invitations.ts` (30 pruebas), acciones en `src/app/actions/invitations.ts`, migración solo aditiva.
+
+**Decisiones:** las personas menores de 18 años y las fichas sin titular no se pueden invitar, con el mismo mensaje que una ficha no disponible (no se revela por qué); el bloqueo corta las invitaciones en los dos sentidos sin decir que hay bloqueo; 10 invitaciones al día, 14 días para responder y 30 de espera tras un rechazo.
+
+**Lección (fallo que costó una hora):** un campo oculto llamado `id` dentro de un formulario con botones con nombre rompe el envío: React construye el formulario con `form.id`, que en ese caso devuelve el campo y no el texto, y pierde el botón pulsado (`decision` llegaba vacío). Los campos de identificador se llaman `invitationId`, `proposalId`… nunca `id` ni `method` ni `action`.
+
+**Pendiente:** denunciar una invitación y suspender el envío (PR3), y el papel de moderador con su barra y su pantalla «Hoy» (PR4 y PR5).
