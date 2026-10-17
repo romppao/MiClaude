@@ -28,6 +28,7 @@ check("no sale nada de aficionado («todavía no sigues a ningún peleador»)", 
 const siguiente = mod.p.locator("a.siguiente-tarea");
 check("hay un botón grande con la siguiente tarea", await seen(siguiente));
 check("la siguiente tarea son las denuncias, que van antes que nada", (await siguiente.innerText()).includes("Denuncias de usuarios"));
+check("y lleva a la bandeja filtrada por denuncias", (await siguiente.getAttribute("href")) === "/moderacion?ver=avisos");
 check("los tres grupos de trabajo", (await mod.p.locator("main h2").allInnerTexts()).filter((t) => ["Personas", "Contenido", "Datos y sistema"].includes(t)).length === 3);
 const tarjeta = (texto) => mod.p.locator(".hoy-tareas a", { hasText: texto });
 check("«Gimnasios por revisar» cuenta el que acabo de crear", Number((await tarjeta("Gimnasios por revisar").locator("strong").innerText()).trim()) >= 1);
@@ -47,6 +48,15 @@ await barra.getByRole("link", { name: "Bandeja" }).click();
 await mod.p.waitForURL(/\/moderacion$/);
 check("«Bandeja» abre la bandeja de moderación", await seen(mod.p.getByRole("heading", { name: "Bandeja de moderación" })));
 check("en la bandeja, solo «Bandeja» está activa", (await barra.locator("a[aria-current=page]").allInnerTexts()).map((t) => t.trim()).join("|") === "Bandeja");
+// La bandeja por tipo: un filtro arriba; «Denuncias» enseña solo las denuncias.
+const filtro = mod.p.getByRole("navigation", { name: "Ver la bandeja por tipo" });
+check("la bandeja tiene un filtro por tipo, con «Todo» elegido", await seen(filtro) && (await filtro.locator("a[aria-current=page]").innerText()).trim() === "Todo");
+await filtro.getByRole("link", { name: /^Denuncias/ }).click();
+await mod.p.waitForURL(/ver=avisos/);
+check("«Denuncias» enseña solo las denuncias", await seen(mod.p.getByRole("heading", { name: "Bandeja de moderación: Denuncias" })) && await seen(mod.p.locator('article[data-cola="avisos"]', { hasText: `Aviso de prueba ${rnd}` })) && (await mod.p.locator('article[data-cola]:not([data-cola="avisos"])').count()) === 0);
+await mod.p.getByRole("link", { name: "Ver todas las colas" }).click();
+await mod.p.waitForURL((u) => !u.search.includes("ver="));
+check("y «Ver todas las colas» vuelve a enseñarlas juntas", await seen(mod.p.getByRole("heading", { name: "Bandeja de moderación", exact: true })));
 await barra.getByRole("link", { name: "Historial" }).click();
 await mod.p.waitForURL(/\/moderacion\/historial$/);
 check("en el historial, solo «Historial» está activa", (await barra.locator("a[aria-current=page]").allInnerTexts()).map((t) => t.trim()).join("|") === "Historial");

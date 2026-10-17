@@ -21,16 +21,16 @@ export type Tarea = {
 
 /** Todos los tipos de trabajo de moderación, sin números. Una sola fuente para «Hoy» y para las pruebas. */
 export const TAREAS: readonly Tarea[] = [
-  { clave: "denuncias", texto: "Denuncias de usuarios", ayuda: "Avisos de contenido o de personas.", grupo: "Contenido", href: "/moderacion#avisos", prioridad: 1 },
+  { clave: "denuncias", texto: "Denuncias de usuarios", ayuda: "Avisos de contenido o de personas.", grupo: "Contenido", href: "/moderacion?ver=avisos", prioridad: 1 },
   { clave: "veladas", texto: "Veladas por autorizar", ayuda: "Veladas con fecha pasada que piden permiso.", grupo: "Contenido", href: "/moderacion/veladas", prioridad: 2 },
-  { clave: "senales", texto: "Combates con señales", ayuda: "Resultados con datos que no cuadran.", grupo: "Datos y sistema", href: "/moderacion#senales", prioridad: 3 },
-  { clave: "revision", texto: "Combates en revisión", ayuda: "Resultados puestos en duda.", grupo: "Datos y sistema", href: "/moderacion#revision", prioridad: 4 },
+  { clave: "senales", texto: "Combates con señales", ayuda: "Resultados con datos que no cuadran.", grupo: "Datos y sistema", href: "/moderacion?ver=senales", prioridad: 3 },
+  { clave: "revision", texto: "Combates en revisión", ayuda: "Resultados puestos en duda.", grupo: "Datos y sistema", href: "/moderacion?ver=revision", prioridad: 4 },
   { clave: "fallos", texto: "Fallos sin resolver", ayuda: "Lo que ha fallado en la aplicación.", grupo: "Datos y sistema", href: "/moderacion/fallos", prioridad: 5 },
-  { clave: "fichas", texto: "Fichas reclamadas", ayuda: "Alguien dice que una ficha es suya.", grupo: "Personas", href: "/moderacion#reclamaciones", prioridad: 6 },
-  { clave: "organizaciones", texto: "Organizaciones por aprobar", ayuda: "Promotoras, federaciones y clubes que piden organizar.", grupo: "Personas", href: "/moderacion#organizadores", prioridad: 7 },
-  { clave: "reclamaciones-gimnasio", texto: "Gimnasios reclamados", ayuda: "Alguien dice que un gimnasio es suyo.", grupo: "Personas", href: "/moderacion#reclamaciones-gimnasio", prioridad: 8 },
+  { clave: "fichas", texto: "Fichas reclamadas", ayuda: "Alguien dice que una ficha es suya.", grupo: "Personas", href: "/moderacion?ver=reclamaciones", prioridad: 6 },
+  { clave: "organizaciones", texto: "Organizaciones por aprobar", ayuda: "Promotoras, federaciones y clubes que piden organizar.", grupo: "Personas", href: "/moderacion?ver=organizadores", prioridad: 7 },
+  { clave: "reclamaciones-gimnasio", texto: "Gimnasios reclamados", ayuda: "Alguien dice que un gimnasio es suyo.", grupo: "Personas", href: "/moderacion?ver=reclamaciones-gimnasio", prioridad: 8 },
   { clave: "gimnasios", texto: "Gimnasios por revisar", ayuda: "Altas de gimnasios sin publicar.", grupo: "Contenido", href: "/moderacion/gimnasios", prioridad: 9 },
-  { clave: "verificar", texto: "Combates por verificar", ayuda: "Resultados declarados sin señales.", grupo: "Datos y sistema", href: "/moderacion#combates", prioridad: 10 },
+  { clave: "verificar", texto: "Combates por verificar", ayuda: "Resultados declarados sin señales.", grupo: "Datos y sistema", href: "/moderacion?ver=combates", prioridad: 10 },
   { clave: "noticias", texto: "Fuentes de noticias que fallan", ayuda: "Fuentes que no se pueden leer.", grupo: "Datos y sistema", href: "/moderacion/noticias", prioridad: 11 },
 ];
 

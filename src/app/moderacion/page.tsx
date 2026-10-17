@@ -73,6 +73,20 @@ const nombreCombate = (b: {
 }) =>
   `${b.fighterA.firstName} ${b.fighterA.lastName} contra ${b.fighterB.firstName} ${b.fighterB.lastName} en ${b.event.name}`;
 
+/** Colas de la bandeja, en orden de urgencia, con el nombre que se enseña en el filtro. */
+const COLAS = [
+  ["avisos", "Denuncias"],
+  ["veladas", "Veladas pasadas"],
+  ["senales", "Combates con señales"],
+  ["revision", "Combates en revisión"],
+  ["fallos", "Fallos"],
+  ["reclamaciones", "Fichas reclamadas"],
+  ["organizadores", "Organizaciones"],
+  ["reclamaciones-gimnasio", "Gimnasios reclamados"],
+  ["gimnasios", "Gimnasios"],
+  ["combates", "Combates por verificar"],
+] as const;
+
 export default async function Moderation({
   searchParams,
 }: {
@@ -142,7 +156,11 @@ export default async function Moderation({
   const windows = Object.fromEntries(
     keys.map((k, i) => [k, pageWindow(counts[i], pageNumber(raw[k]), LIMITE)]),
   );
+  // Bandeja por tipo (17-10-2026, petición del fundador: «las pantallas del moderador son muy confusas»): ?ver=<cola> enseña solo esa cola.
+  const ver = (keys as readonly string[]).includes(raw.ver ?? "") ? (raw.ver as (typeof keys)[number]) : null;
+  const mostrar = (k: (typeof keys)[number]) => !ver || ver === k;
   const pageParams = {
+    ...(ver ? { ver: ver as string } : {}),
     ...Object.fromEntries(
       keys.map((k) => [
         k,
@@ -444,29 +462,14 @@ export default async function Moderation({
 
       <section aria-labelledby="titulo-pendiente" style={{ margin: "20px 0" }}>
         <h2 id="titulo-pendiente">Pendiente de revisar</h2>
-        <div className="resumen-moderacion">
-          {(
-            [
-              ["avisos", "Denuncias de usuarios", nReports],
-              ["reclamaciones", "Fichas reclamadas", nClaims],
-              ["organizadores", "Organizadores", nOrganizers],
-              ["gimnasios", "Gimnasios sin sello", nSinSello],
-              ["senales", "Combates con señales", nFlags],
-              ["combates", "Combates por verificar", nUnflagged],
-              ["revision", "Combates en revisión", nRevision],
-            ] as const
-          ).map(([ancla, texto, n]) => (
-            <a
-              key={ancla}
-              href={`#${ancla}`}
-              className={n > 0 ? "dato con-pendientes" : "dato"}
-              aria-label={`${texto}: ${n}`}
-            >
-              <span className="clave">{texto}</span>
-              <strong>{n}</strong>
-            </a>
-          ))}
-        </div>
+        <p className="mut" style={{ marginTop: 0 }}>Elige un tipo para ver solo esa cola, o «Todo» para verlas juntas por urgencia.</p>
+        <nav className="chips-desliza" aria-label="Ver la bandeja por tipo">
+          <Link href="/moderacion" className="chip" aria-current={!ver ? "page" : undefined}>Todo</Link>
+          {COLAS.map(([k, texto]) => {
+            const n = windows[k].total;
+            return <Link key={k} href={`/moderacion?ver=${k}`} className="chip" aria-current={ver === k ? "page" : undefined} aria-label={`${texto}: ${n}`}>{texto} · {n}</Link>;
+          })}
+        </nav>
       </section>
 
       {/* El estado de la aplicación (fallos, fuentes de noticias, versión) y las herramientas están en «Hoy»: aquí solo van las colas, sin duplicados. */}
@@ -476,7 +479,8 @@ export default async function Moderation({
       </h2>
 
       {/* Una bandeja por prioridad; cada cola mantiene páginas independientes y su ancla de retorno. */}
-      <h2>Bandeja de moderación</h2>
+      <h2>{ver ? `Bandeja de moderación: ${COLAS.find(([k]) => k === ver)?.[1] ?? ""}` : "Bandeja de moderación"}</h2>
+      {ver && <p style={{ margin: 0 }}><Link href="/moderacion">Ver todas las colas</Link></p>}
       <p>
         Primero las veladas pendientes; después señales, fallos, reclamaciones,
         organizadores, gimnasios y combates sin señales. «Poner en revisión»
@@ -510,7 +514,7 @@ export default async function Moderation({
             ["combates", "combates sin señales", ["combate", "combates"]],
             ["revision", "combates en revisión", ["combate", "combates"]],
           ] as [string, string, [string, string]][]
-        ).map(([key, label, unit]) => (
+        ).filter(([key]) => mostrar(key as (typeof keys)[number])).map(([key, label, unit]) => (
           <div key={key}>{paging(key, unit, label)}</div>
         ))}
       </div>
@@ -527,7 +531,7 @@ export default async function Moderation({
         aria-label="Bandeja de moderación ordenada por urgencia"
         style={{ listStyle: "none", padding: 0 }}
       >
-        {pasadas.map((e, i) => (
+        {mostrar("veladas") && pasadas.map((e, i) => (
           <li key={`event-${e.id}`} data-prioridad="1">
             <article className="tarjeta" data-cola="veladas">
               {i === 0 && <span id="veladas" style={{ scrollMarginTop: 80 }} />}
@@ -555,11 +559,11 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {conSenales.map((b, i) => boutItem(b, "senales", 2, i === 0))}
-        {enRevision
+        {mostrar("senales") && conSenales.map((b, i) => boutItem(b, "senales", 2, i === 0))}
+        {mostrar("revision") && enRevision
           .filter((b) => b.flags.length > 0)
           .map((b, i) => boutItem(b, "revision", 2, i === 0))}
-        {fallos.map((f, i) => (
+        {mostrar("fallos") && fallos.map((f, i) => (
           <li key={`error-${f.id}`} data-prioridad="3">
             <article className="tarjeta" data-cola="fallos">
               {i === 0 && <span id="fallos" style={{ scrollMarginTop: 80 }} />}
@@ -599,7 +603,7 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {reports.map((r, i) => {
+        {mostrar("avisos") && reports.map((r, i) => {
           const bout = reportedBouts.find((b) => b.id === r.entityId);
           const fighter = reportedFighters.find((b) => b.id === r.entityId);
           const aura = reportedAuras.find((b) => b.id === r.entityId);
@@ -825,7 +829,7 @@ export default async function Moderation({
             </li>
           );
         })}
-        {claims.map((c, i) => (
+        {mostrar("reclamaciones") && claims.map((c, i) => (
           <li key={`claim-${c.id}`} data-prioridad="4">
             <article className="tarjeta" data-cola="reclamaciones">
               {i === 0 && (
@@ -848,7 +852,7 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {reclamacionesGym.map((c, i) => (
+        {mostrar("reclamaciones-gimnasio") && reclamacionesGym.map((c, i) => (
           <li key={`gymclaim-${c.id}`} data-prioridad="4">
             <article className="tarjeta" data-cola="reclamaciones-gimnasio">
               {i === 0 && (
@@ -905,7 +909,7 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {organizers.map((r, i) => (
+        {mostrar("organizadores") && organizers.map((r, i) => (
           <li key={`org-${r.id}`} data-prioridad="5">
             <article className="tarjeta" data-cola="organizadores">
               {i === 0 && (
@@ -943,7 +947,7 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {gyms.map((g, i) => (
+        {mostrar("gimnasios") && gyms.map((g, i) => (
           <li key={`gym-${g.id}`} data-prioridad="6">
             <article className="tarjeta" data-cola="gimnasios">
               {i === 0 && (
@@ -989,8 +993,8 @@ export default async function Moderation({
             </article>
           </li>
         ))}
-        {sinSenales.map((b, i) => boutItem(b, "combates", 7, i === 0))}
-        {enRevision
+        {mostrar("combates") && sinSenales.map((b, i) => boutItem(b, "combates", 7, i === 0))}
+        {mostrar("revision") && enRevision
           .filter((b) => b.flags.length === 0)
           .map((b, i) =>
             boutItem(
@@ -1001,19 +1005,21 @@ export default async function Moderation({
             ),
           )}
       </ol>
-      {![
-        pasadas,
-        conSenales,
-        fallos,
-        reports,
-        claims,
-        reclamacionesGym,
-        organizers,
-        gyms,
-        sinSenales,
-        enRevision,
-      ].some((items) => items.length > 0) && (
-        <p>No hay elementos pendientes en la bandeja.</p>
+      {!(
+        [
+          ["veladas", pasadas],
+          ["senales", conSenales],
+          ["fallos", fallos],
+          ["avisos", reports],
+          ["reclamaciones", claims],
+          ["reclamaciones-gimnasio", reclamacionesGym],
+          ["organizadores", organizers],
+          ["gimnasios", gyms],
+          ["combates", sinSenales],
+          ["revision", enRevision],
+        ] as [(typeof keys)[number], unknown[]][]
+      ).some(([k, items]) => mostrar(k) && items.length > 0) && (
+        <p>{ver ? "No hay nada pendiente de este tipo." : "No hay elementos pendientes en la bandeja."}</p>
       )}
     </>
   );

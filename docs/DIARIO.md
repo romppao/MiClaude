@@ -2554,3 +2554,11 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Qué salió mal:** otro asistente tenía abierta una «demo local» (`next dev` en el puerto 3141) en la misma carpeta, quizá para la reunión del fundador: bloqueaba el motor de Prisma y compartía la carpeta de compilación. No se compiló en local para no romperla; los recorridos de navegador los pasa el CI.
 
 **Pendiente:** todo lo del fundador en `docs/ACCESO-ANTICIPADO.md` (versión real, dominio, abogado, Search Console).
+
+## 17 de octubre de 2026, tarde — Bandeja por tipo y limpieza del disco (Claude Code)
+
+**Bandeja por tipo (0.27.0):** lo que quedaba del plan del moderador. En vez de dividir la página de la bandeja en varias pantallas (habría movido decenas de anclas y pruebas), un filtro arriba (`?ver=<cola>`) enseña solo un tipo de trabajo con su paginación; los contadores de «Hoy» y su «Siguiente tarea» llevan a la cola ya filtrada. Sin filtro, la bandeja se ve como siempre.
+
+**Limpieza del disco C: (encargada a Codex, que se quedó sin créditos):** de 19,5 a unos 28–30 GB libres borrando solo lo que se regenera (caché de `npx`, árboles de trabajo antiguos ya subidos, navegadores de pruebas viejos, contenedores de pruebas parados). Se respetaron los contenedores en marcha (una «demo local» de otro asistente), los árboles con cambios sin subir y todo lo personal; el disco E: ni se miró. Los vídeos (2,65 GB) y compactar el disco de Docker quedan para que decida el fundador. Informe: `docs/ecosistema/traspasos/2026-10-17-claude-limpieza-de-disco.md`.
+
+**Lección:** el espacio que se libera dentro de Docker no se nota en Windows hasta compactar su disco virtual; medirlo antes y después en Windows evita prometer lo que no se ha liberado.

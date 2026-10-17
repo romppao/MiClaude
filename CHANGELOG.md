@@ -11,6 +11,17 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.27.0] — 2026-10-17
+
+PR de Claude Code: **bandeja de moderación por tipo** (lo último del plan del moderador aprobado el 17-10-2026).
+
+### Cambiado
+- La **bandeja** (`/moderacion`) tiene arriba un **filtro por tipo** (Todo · Denuncias · Veladas pasadas · Combates con señales · En revisión · Fallos · Fichas reclamadas · Organizaciones · Gimnasios reclamados · Gimnasios · Por verificar), cada uno con su número. Elegir uno enseña solo esa cola y su paginación; «Todo» las enseña juntas por urgencia, como hasta ahora. El filtro se conserva al pasar de página y al volver de una decisión.
+- Cada número de **«Hoy»** y su **«Siguiente tarea»** llevan a la bandeja ya filtrada por ese tipo.
+
+### Documentación
+- Informe de la limpieza del disco C: (`docs/ecosistema/traspasos/2026-10-17-claude-limpieza-de-disco.md`): de 19,5 a unos 28–30 GB libres sin tocar nada personal ni el disco E:.
+
 ## [0.26.0] — 2026-10-17
 
 PR de Claude Code: **acceso anticipado y buscadores** (petición del fundador, 17-10-2026: «que la web salga en las búsquedas de Google y que la gente pueda registrarse con su cuenta de Google. Haré un acceso anticipado a personas concretas»).
