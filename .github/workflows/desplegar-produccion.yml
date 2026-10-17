@@ -2,13 +2,15 @@ name: Desplegar la versión real (Cloud Run)
 
 # Versión real de Lona en Google Cloud Run (ADR-005, docs/PRODUCCION.md). Se lanza a mano desde la pestaña Actions
 # («Run workflow»), eligiendo la etiqueta o rama a publicar. No se despliega sola al fusionar: la versión real cambia
-# solo cuando alguien lo decide, después de probar en la demo.
+# solo cuando alguien lo decide, después de probar en la demo. Solo puede lanzarlo quien tiene permiso de escritura en el
+# repositorio (el fundador). El paso de aprobación del entorno «produccion» se quitó el 17-10-2026: los repositorios
+# privados del plan gratuito de GitHub no tienen entornos, y sus secretos dejarían de llegar.
 #
 # Sin claves guardadas en GitHub: la autenticación con Google es por Workload Identity Federation.
 # Variables del repositorio (Settings → Secrets and variables → Actions → Variables):
 #   GCP_PROJECT_ID, GCP_REGION (europe-west1), GCP_WIF_PROVIDER, GCP_DEPLOY_SA, GCP_RUN_SA, PROD_URL
 #   y, para la app, GOOGLE_CLIENT_ID, RESPONSABLE_NOMBRE y TITULAR_* (aviso legal) cuando existan.
-# Secreto del entorno «produccion»:
+# Secreto general del repositorio (Settings → Secrets and variables → Actions → Secrets):
 #   PROD_DATABASE_URL_DIRECT  (conexión DIRECTA de Neon, sin «-pooler»; solo para aplicar las migraciones)
 # Las claves de la aplicación viven en Secret Manager; el despliegue solo las enlaza por su nombre (docs/PRODUCCION.md).
 
@@ -31,7 +33,6 @@ jobs:
   desplegar:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: produccion
     env:
       REGION: ${{ vars.GCP_REGION }}
       PROYECTO: ${{ vars.GCP_PROJECT_ID }}

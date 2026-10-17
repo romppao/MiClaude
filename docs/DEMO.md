@@ -131,6 +131,8 @@ La escala inicial está centralizada para ajustarla con datos reales. El aura mi
 
 ## Mantener la demo despierta con UptimeRobot (13 de octubre de 2026)
 
+> **Actualización del 17-10-2026:** hecho de otra forma, sin crear cuentas nuevas. La visita cada 10 minutos la hace el trabajo **`despertar-demo` de Google Cloud Scheduler** (proyecto `lona-511614`, gratis hasta 3 trabajos), y la tarea de GitHub quedó solo para lanzarla a mano. UptimeRobot sigue siendo recomendable para que **te avise por correo si la web se cae**, pero ya no hace falta para mantenerla despierta.
+
 **Por qué.**
 - El plan gratuito de Render duerme la web tras 15 minutos sin visitas, y despertarla tarda cerca de un minuto.
 - Hasta ahora la mantenía despierta una tarea de GitHub (`mantener-demo-despierta.yml`) que la visitaba cada 10 minutos.

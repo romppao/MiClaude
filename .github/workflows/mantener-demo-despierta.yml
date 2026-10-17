@@ -10,9 +10,12 @@ name: Mantener despierta la demo
 # («sin alterar el funcionamiento de la aplicación») sigue activa hasta que esté en marcha el monitor de UptimeRobot
 # (gratuito, aprobado en ADR-003; pasos en docs/DEMO.md), que hace lo mismo sin gastar minutos de GitHub. Cuando el
 # fundador confirme que UptimeRobot funciona, se quita el bloque «schedule» y este flujo queda solo para lanzarlo a mano.
+#
+# 17-10-2026, hecho por otra vía: la visita cada 10 minutos la hace ahora el trabajo «despertar-demo» de Google Cloud
+# Scheduler (proyecto lona-511614, europe-west1; gratis hasta 3 trabajos por cuenta de facturación), sin gastar minutos de
+# GitHub ni crear otra cuenta. Este flujo queda solo para lanzarlo a mano. UptimeRobot sigue siendo útil para que avise
+# por correo si la web se cae (docs/DEMO.md).
 on:
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
