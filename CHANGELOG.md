@@ -11,6 +11,19 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.25.0] — 2026-10-17
+
+PR de Claude Code: **denunciar una invitación y pausar el envío** (cierra el plan de contacto entre usuarios aprobado el 17-10-2026: «con límites, denuncia y control del peleador»). Hasta ahora un peleador podía rechazar o bloquear, pero no avisar a moderación de una invitación abusiva.
+
+### Añadido
+- **«Denunciar esta invitación»** en la pestaña «Invitaciones» de Mis propuestas, con motivos propios (mensaje no solicitado o insistente, acoso o amenazas, suplantación, inapropiado, otro). Solo la puede denunciar quien la recibe. Al denunciarla, la invitación se cierra y no se comparte ningún contacto.
+- **Pausa automática del envío:** cuando tres personas distintas tienen abierta una denuncia sobre invitaciones de la misma cuenta, su envío queda en pausa y lo pendiente se retira hasta que lo revise moderación. Quien envía recibe un aviso, sin saber quién denunció.
+- **Moderación** ve la denuncia con su contexto (quién invitó, a quién y qué decía) y puede **suspender el envío de esa cuenta con un motivo obligatorio** (se le comunica por aviso y por correo, con cómo reclamar) o **levantar la pausa** con un aviso.
+- Migración aditiva (una columna vacía en cada cuenta), recorrido `invitaciones-abuso.mjs` y pruebas unitarias.
+
+### Cambiado
+- «Mis invitaciones» y el formulario de invitar explican que el envío está en pausa y cómo reclamar.
+
 ## [0.24.0] — 2026-10-17
 
 PR de Claude Code: **moderador con papel propio** (aviso del fundador, 17-10-2026: «cuando entro como moderador, las pantallas son muy confusas»). Hasta ahora una cuenta de moderación se trataba como la de un aficionado: su «Mi panel» decía «todavía no sigues a ningún peleador», la barra inferior no tenía «Moderación» y todo el trabajo estaba en una sola página de más de mil líneas, con avisos mezclados con combates y trabajo escondido sin contador.

@@ -9,10 +9,12 @@ export const REPORT_REASONS: Record<string, string> = {
   MI_IMAGEN: "Aparezco yo (o un menor a mi cargo) y no doy permiso para publicarlo",
   ILEGAL: "Es ilegal (delito, amenazas, odio, derechos de autor…)",
   MENORES: "Abuso o explotación sexual de menores",
+  NO_SOLICITADO: "Es un mensaje no solicitado o insistente",
+  ACOSO: "Me acosa, me presiona o me amenaza",
   OTRO: "Otro motivo",
 };
 
-export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA", "PAGINA", "GYM"] as const;
+export const REPORT_ENTITIES = ["BOUT", "FIGHTER", "AURA", "MEDIA", "PAGINA", "GYM", "INVITACION"] as const;
 export type ReportEntity = (typeof REPORT_ENTITIES)[number];
 
 /** Motivos que se ofrecen según lo que se avisa. */
@@ -24,7 +26,12 @@ export const REASONS_BY_ENTITY: Record<ReportEntity, string[]> = {
   // Aviso desde /avisar, con o sin cuenta (DSA, art. 16): sobre cualquier página de Lona.
   PAGINA: ["ILEGAL", "DATOS_PERSONALES", "MI_IMAGEN", "SUPLANTACION", "INAPROPIADO", "MENORES", "OTRO"],
   GYM: ["DATOS_PERSONALES", "OTRO"],
+  // Solo quien recibe la invitación puede denunciarla (17-10-2026).
+  INVITACION: ["NO_SOLICITADO", "ACOSO", "SUPLANTACION", "INAPROPIADO", "OTRO"],
 };
+
+/** Denuncias abiertas, de personas distintas, sobre invitaciones de una misma cuenta a partir de las cuales se pausa su envío hasta que lo revise moderación. */
+export const DENUNCIAS_PARA_PAUSAR_INVITACIONES = 3;
 
 export const MAX_REPORTS_PER_DAY = 10;
 

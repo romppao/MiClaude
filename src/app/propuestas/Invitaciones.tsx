@@ -2,7 +2,8 @@ import Link from "next/link";
 import { fmtDate } from "../../lib/common/labels";
 import { INVITATION_KIND_LABEL, INVITATION_REPLY_MAX, INVITATION_STATUS_LABEL, invitacionCaducada, puedeResponderInvitacion } from "../../lib/community/invitations";
 import { answerInvitation, setInvitationSettings } from "../actions/invitations";
-import { bloquearUsuario } from "../actions/community";
+import { bloquearUsuario, createReport } from "../actions/community";
+import { REASONS_BY_ENTITY, REPORT_REASONS } from "../../lib/community/reports";
 import { BotonBloquear } from "../components/Bloquear";
 import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 import type { Discipline, InvitationKind, InvitationStatus } from "@prisma/client";
@@ -56,6 +57,23 @@ export default function PestanaInvitaciones({ invitaciones, ajustes, ahora }: { 
               </form>
             )}
             <BotonBloquear accion={bloquearUsuario} origen="invitacion" id={i.id} back={RECIBIDAS} nombre={quien(i)} />
+            <details>
+              <summary className="mut">Denunciar esta invitación</summary>
+              <form action={createReport} style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
+                <input type="hidden" name="entity" value="INVITACION" />
+                <input type="hidden" name="entityId" value={i.id} />
+                <input type="hidden" name="back" value={RECIBIDAS} />
+                <label className="field"><span>Motivo</span>
+                  <select name="reason" defaultValue="" required>
+                    <option value="" disabled>Elige un motivo…</option>
+                    {REASONS_BY_ENTITY.INVITACION.map((k) => <option key={k} value={k}>{REPORT_REASONS[k]}</option>)}
+                  </select>
+                </label>
+                <label className="field"><span>Detalles (opcional)</span><input name="message" maxLength={500} /></label>
+                <p className="hint" style={{ margin: 0 }}>Al denunciarla, la invitación se cierra y no se comparte ningún contacto. Un moderador la revisará y, si hace falta, pausará el envío de esa cuenta.</p>
+                <button className="secondary">Enviar la denuncia</button>
+              </form>
+            </details>
           </article>
         );
       })}

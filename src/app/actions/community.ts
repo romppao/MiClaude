@@ -9,7 +9,8 @@ import { getUser, requireVerifiedUser } from "../../lib/accounts/auth";
 import { audit } from "../../lib/common/audit";
 import { internalPath, loginPath } from "../../lib/common/paths";
 import { AVISOS_SIN_CUENTA_POR_DIA, MAX_REPORTS_PER_DAY, REASONS_BY_ENTITY, REPORT_ENTITIES, REPORT_REASONS, parseAvisoSinCuenta, type ReportEntity } from "../../lib/community/reports";
-import { acusarReciboDeAviso } from "../../lib/community/notify";
+import { acusarReciboDeAviso, avisarDecision } from "../../lib/community/notify";
+import { debePausarse, denunciantesAbiertos, pausarInvitaciones } from "../../lib/community/invitaciones-pausa";
 import { allow, clientIp, HORA } from "../../lib/accounts/ratelimit";
 import { APP_URL } from "../../lib/common/mail";
 import { after } from "next/server";
@@ -27,8 +28,11 @@ export async function createReport(f: FormData) {
   const reason = str(f, "reason");
   if (str(f, "message").length > LIMITS.message) go(back, { problema: "texto_largo" });
   if (entity === "PAGINA" || !(REPORT_ENTITIES as readonly string[]).includes(entity) || !hasOwn(REPORT_REASONS, reason) || !REASONS_BY_ENTITY[entity as ReportEntity].includes(reason)) go(back, { problema: "reporte_datos" });
+  // Una invitación solo la denuncia quien la recibe (el titular de la ficha invitada): así nadie puede denunciar las de otras personas.
+  const invitacion = entity === "INVITACION" ? await db.invitation.findFirst({ where: { id: entityId, to: { userId: user.id } }, select: { id: true, fromUserId: true } }) : null;
   const exists =
-    entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } })
+    entity === "INVITACION" ? invitacion
+    : entity === "BOUT" ? await db.bout.findUnique({ where: { id: entityId } })
     : entity === "FIGHTER" ? await db.fighter.findUnique({ where: { id: entityId } })
     : entity === "GYM" ? await db.gym.findUnique({ where: { id: entityId } })
     : entity === "MEDIA" ? await db.mediaItem.findFirst({ where: { id: entityId, hiddenAt: null } })
@@ -39,8 +43,19 @@ export async function createReport(f: FormData) {
     if ((await tx.report.count({ where: { userId: user.id, createdAt: { gte: new Date(Date.now() - 864e5) } } })) >= MAX_REPORTS_PER_DAY) return "limite" as const;
     const report = await tx.report.create({ data: { userId: user.id, entity, entityId, reason, message: str(f, "message") || null } });
     await audit({ userId: user.id, entity: "REPORT", entityId: report.id, action: "CREATED", after: { entity, entityId, reason } }, tx);
+    if (invitacion) {
+      // Denunciarla la cierra sin compartir ningún contacto; si ya estaba respondida, no cambia de estado.
+      await tx.invitation.updateMany({ where: { id: invitacion.id, status: "PENDING" }, data: { status: "DECLINED", answeredAt: new Date() } });
+      // Varias personas distintas que avisan de la misma cuenta pausan su envío hasta que lo revise moderación.
+      if (debePausarse(await denunciantesAbiertos(tx, invitacion.fromUserId)) && (await pausarInvitaciones(tx, invitacion.fromUserId))) {
+        await audit({ userId: user.id, entity: "USER", entityId: invitacion.fromUserId, action: "INVITATIONS_AUTO_SUSPENDED", after: { reportId: report.id } }, tx);
+        return "pausada" as const;
+      }
+    }
     return "ok" as const;
   });
+  // Avisa a quien envió de que su envío queda en pausa (sin decir quién avisó). Nunca lanza: lo importante ya está guardado.
+  if (status === "pausada" && invitacion) await avisarDecision(invitacion.fromUserId, "Hemos pausado el envío de tus invitaciones mientras moderación revisa varios avisos", "/invitaciones", `pausa:${invitacion.fromUserId}`);
   if (status === "repetido") go(back, { problema: "reporte_repetido" });
   if (status === "limite") go(back, { problema: "reporte_limite" });
   go(back, { aviso: "reporte_enviado" });

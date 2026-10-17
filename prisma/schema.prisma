@@ -547,6 +547,8 @@ model User {
   passwordHash          String
   role                  Role                   @default(FAN)
   notifyEmails          Boolean                @default(true)
+  // Pausa del envío de invitaciones a peleadores (denuncias de quienes las reciben, o decisión de moderación). null = puede invitar.
+  invitationsSuspendedAt DateTime?
   emailVerifiedAt       DateTime?
   googleSub             String?                @unique // identificador de la cuenta de Google vinculada (entrar con Google, T-015)
   createdAt             DateTime               @default(now())

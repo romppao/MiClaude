@@ -220,6 +220,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261017120000_invitaciones_en_pausa/migration.sql",
+    "purpose": "Añade a cada cuenta desde cuándo tiene en pausa el envío de invitaciones a peleadores. Solo añade una columna vacía; no toca datos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -1635,6 +1640,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/community/invitaciones-pausa.ts",
+    "purpose": "Pausa del envío de invitaciones: cuántas denuncias de personas distintas la provocan, recuento de denunciantes y la pausa (retira lo pendiente).",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/community/invitations.ts",
     "purpose": "Reglas puras de las invitaciones: quién puede invitar, a quién, límites, caducidad, mayoría de edad y contacto que se comparte al aceptar.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -2045,6 +2055,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/invitaciones-abuso.mjs",
+    "purpose": "Recorrido de la denuncia de invitaciones: el peleador denuncia, tres personas distintas pausan el envío, y moderación suspende con motivo o levanta la pausa.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/invitaciones.mjs",
     "purpose": "Recorrido de las invitaciones: organización y entrenador invitan, el peleador acepta (solo entonces se comparte el contacto) o rechaza, repetición, bloqueo y casos no invitables.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2288,6 +2303,11 @@
     "path": "tests/unit/inscripciones.test.ts",
     "purpose": "Pruebas unitarias de las reglas de inscripción, filtros y órdenes.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/invitaciones-pausa.test.ts",
+    "purpose": "Pausa por denuncias: umbral de tres personas, cuenta en pausa que no invita y motivos propios de la denuncia de una invitación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/invitations.test.ts",

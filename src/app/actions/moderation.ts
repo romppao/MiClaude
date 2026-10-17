@@ -12,6 +12,7 @@ import { requireAdmin } from "../../lib/accounts/permissions";
 import { APP_URL } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
 import { avisarDecision, notificarResolucionDeAviso, notifyDecision } from "../../lib/community/notify";
+import { pausarInvitaciones } from "../../lib/community/invitaciones-pausa";
 import { REPORT_REASONS } from "../../lib/community/reports";
 import { lookup } from "../../lib/common/safe";
 import { anonymizeFighter, type ArchivosRetirados } from "../../lib/fighters/anonymize";
@@ -158,7 +159,10 @@ export async function resolveReport(f: FormData) {
   if (hide && report.entity === "FIGHTER" && !note) go(back, { problema: "ocultar_sin_nota" });
   // Un aviso sobre una página (desde /avisar) no señala un dato concreto: moderación actúa desde la propia página y luego lo cierra.
   if (hide && report.entity === "PAGINA") go(back, { problema: "decision_no_valida" });
+  // Suspender el envío de invitaciones de una cuenta se le comunica con el motivo (DSA, art. 17): sin nota no se puede.
+  if (hide && report.entity === "INVITACION" && !note) go(back, { problema: "suspender_sin_nota" });
   let retirados: ArchivosRetirados | null = null;
+  let suspendida: string | null = null;
   await guard(back, () => db.$transaction(async (tx) => {
     if (!(await tx.report.updateMany({ where: { id: report.id, status: "OPEN" }, data: { status, resolvedById: admin.id, resolvedAt: new Date(), resolutionNote: note } })).count) throw new Rechazo("solicitud_cambiada");
     if (hide) {
@@ -175,6 +179,13 @@ export async function resolveReport(f: FormData) {
         await audit({ userId: admin.id, entity: "GYM", entityId: report.entityId, action: "GYM_REMOVED_BY_REPORT", after: { reportId: report.id } }, tx);
       }
       else if (report.entity === "MEDIA") await tx.mediaItem.updateMany({ where: { id: report.entityId }, data: { hiddenAt: new Date() } });
+      else if (report.entity === "INVITACION") {
+        const inv = await tx.invitation.findUnique({ where: { id: report.entityId }, select: { fromUserId: true } });
+        if (!inv) throw new Rechazo("no_existe");
+        await pausarInvitaciones(tx, inv.fromUserId);
+        suspendida = inv.fromUserId;
+        await audit({ userId: admin.id, entity: "USER", entityId: inv.fromUserId, action: "INVITATIONS_SUSPENDED", after: { reportId: report.id, note } }, tx);
+      }
     }
     await audit({ userId: admin.id, entity: "REPORT", entityId: report.id, action: hide ? "RESOLVED_AND_HIDDEN" : status, before: { status: report.status }, after: { status, note, target: `${report.entity}:${report.entityId}` } }, tx);
   }));
@@ -185,10 +196,28 @@ export async function resolveReport(f: FormData) {
     const videos = almacenDeVideos();
     if (videos) await Promise.all(archivos.videos.map((v) => videos.borrar(v).catch(() => undefined)));
   }
+  await avisarDecision(suspendida, "Moderación ha suspendido el envío de tus invitaciones", "/invitaciones", `suspension:${report.id}`, note);
   // Correo a quien avisó y, si se retiró algo, a su autor, con los motivos y cómo reclamar (DSA, arts. 16.5 y 17). Después de responder.
   after(() => notificarResolucionDeAviso(report.id, hide, (lookup(REPORT_REASONS, report.reason) ?? "otro motivo").toLowerCase()));
   revalidatePath("/", "layout");
   go(back, { aviso: hide ? "aviso_resuelto_oculto" : status === "RESOLVED" ? "aviso_resuelto" : "aviso_descartado" });
+}
+
+/** Moderación levanta la pausa del envío de invitaciones de una cuenta (la automática por denuncias o la decidida al resolver un aviso). */
+export async function levantarSuspensionDeInvitaciones(f: FormData) {
+  const admin = await requireAdmin();
+  const back = returnTo(f, "/moderacion");
+  const userId = str(f, "userId");
+  const note = str(f, "note").slice(0, LIMITS.note) || null;
+  const levantada = await guard(back, () => db.$transaction(async (tx) => {
+    const n = (await tx.user.updateMany({ where: { id: userId, invitationsSuspendedAt: { not: null } }, data: { invitationsSuspendedAt: null } })).count;
+    if (n === 1) await audit({ userId: admin.id, entity: "USER", entityId: userId, action: "INVITATIONS_RESTORED", after: { note } }, tx);
+    return n === 1;
+  }));
+  if (!levantada) go(back, { problema: "suspension_no_existe" });
+  await avisarDecision(userId, "Moderación ha levantado la pausa de tus invitaciones: ya puedes volver a enviarlas", "/invitaciones", `reactivacion:${userId}`, note);
+  revalidatePath("/", "layout");
+  go(back, { aviso: "suspension_levantada" });
 }
 
 /**

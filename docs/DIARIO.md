@@ -2530,3 +2530,13 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Ampliación del mismo PR:** la bandeja deja de repetir el estado y las herramientas (están en «Hoy») y «Avisos de usuarios» pasa a «Denuncias de usuarios»; cada decisión de moderación (combates, ficha reclamada, organizador, sello de gimnasio, velada pasada) avisa dentro de la app al afectado con el motivo. `fallos.mjs`, que pedía el estado y las herramientas en la bandeja, mira ahora «Hoy» y comprueba que la bandeja ya no los repite.
 
 **Pendiente:** dividir la bandeja en secciones por tipo y la denuncia de invitaciones con suspensión de envío (PR3; #102 ya está fusionado).
+
+## 17 de octubre de 2026, noche — Denunciar una invitación y pausar el envío (Claude Code)
+
+**Qué faltaba del plan de contacto entre usuarios:** control de abuso. El peleador podía rechazar o bloquear, pero no avisar a moderación de una invitación abusiva, y moderación no tenía forma de frenar a una cuenta.
+
+**Qué se hizo (0.25.0):** la invitación es una entidad denunciable (solo por quien la recibe; la cierra sin compartir contacto). Tres personas distintas con denuncia abierta sobre la misma cuenta pausan su envío de forma automática (columna nueva `User.invitationsSuspendedAt`). Moderación ve el contexto en la bandeja, suspende con motivo obligatorio (aviso y correo con cómo reclamar) o levanta la pausa. La regla `puedeInvitar` ya tenía el parámetro de pausa desde la 0.23.0: solo faltaba el resto.
+
+**Decisiones:** la pausa automática no espera a moderación (el daño de una invitación abusiva es inmediato) pero siempre la revisa un humano y se puede levantar; a quien envía no se le dice quién denunció; el umbral de tres personas distintas evita que una sola persona pause a otra.
+
+**Pendiente:** dividir la bandeja en secciones; revisión del abogado de la pausa automática (ver `docs/LEGAL.md`).

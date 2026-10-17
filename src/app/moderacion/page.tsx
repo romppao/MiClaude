@@ -12,6 +12,7 @@ import {
   setGymVerified,
   decidirVeladaPasada,
   actualizarFallo,
+  levantarSuspensionDeInvitaciones,
 } from "../actions/moderation";
 import { REPORT_REASONS } from "../../lib/community/reports";
 import Paginacion from "../components/Paginacion";
@@ -264,6 +265,7 @@ export default async function Moderation({
     reportedAuras,
     reportedMedia,
     reportedGyms,
+    reportedInvitations,
   ] = await Promise.all([
     db.bout.findMany({
       where: { id: { in: ids("BOUT") } },
@@ -289,6 +291,14 @@ export default async function Moderation({
     db.gym.findMany({
       where: { id: { in: ids("GYM") } },
       select: { id: true, name: true },
+    }),
+    db.invitation.findMany({
+      where: { id: { in: ids("INVITACION") } },
+      select: {
+        id: true, kind: true, status: true, message: true, fromUserId: true,
+        fromUser: { select: { name: true, email: true, invitationsSuspendedAt: true } },
+        to: { select: { firstName: true, lastName: true, slug: true } },
+      },
     }),
   ]);
   // Quien recibe un «no» tiene derecho a saber por qué: el motivo es obligatorio al rechazar y lo ve la persona (en la aplicación y por correo).
@@ -595,6 +605,7 @@ export default async function Moderation({
           const aura = reportedAuras.find((b) => b.id === r.entityId);
           const gimnasio = reportedGyms.find((g) => g.id === r.entityId);
           const medio = reportedMedia.find((m) => m.id === r.entityId);
+          const invitacion = reportedInvitations.find((i) => i.id === r.entityId);
           return (
             <li key={`report-${r.id}`} data-prioridad="4">
               <article className="tarjeta" data-cola="avisos">
@@ -717,6 +728,16 @@ export default async function Moderation({
                       </div>
                     </>
                   )}
+                  {invitacion && (
+                    <>
+                      <span className="mut">Invitación de </span>
+                      {publicUserName(invitacion.fromUser.name)} · {invitacion.fromUser.email}
+                      <span className="mut"> a </span>
+                      <Link href={`/peleadores/${invitacion.to.slug}`}>{invitacion.to.firstName} {invitacion.to.lastName}</Link>
+                      {invitacion.message ? <>: «{invitacion.message}»</> : null}
+                      {invitacion.fromUser.invitationsSuspendedAt ? <div className="notice notice-info"><span aria-hidden="true">ℹ </span>El envío de invitaciones de esta cuenta está en pausa.</div> : null}
+                    </>
+                  )}
                   {gimnasio && (
                     <Link className="btn secondary" href={`/mis-gimnasios?gimnasio=${gimnasio.id}`}>
                       Gimnasio: {gimnasio.name}
@@ -727,6 +748,7 @@ export default async function Moderation({
                     !fighter &&
                     !aura &&
                     !medio &&
+                    !invitacion &&
                     !gimnasio && (
                       <span className="mut">El elemento ya no existe.</span>
                     )}
@@ -742,7 +764,9 @@ export default async function Moderation({
                       <span>
                         {fighter
                           ? "Nota (obligatoria para ocultar; se envía por correo)"
-                          : "Nota (opcional; se envía por correo)"}
+                          : invitacion
+                            ? "Nota (obligatoria para suspender; se le comunica por correo)"
+                            : "Nota (opcional; se envía por correo)"}
                       </span>
                       <input name="note" maxLength={500} />
                     </label>
@@ -765,7 +789,7 @@ export default async function Moderation({
                               ? "Borra los datos personales de la ficha (no se puede deshacer; exige una nota)"
                               : medio
                                 ? "Deja de mostrarse en la velada y en las fichas"
-                                : gimnasio ? "Retira el gimnasio del directorio" : "Retira el comentario"
+                                : gimnasio ? "Retira el gimnasio del directorio" : invitacion ? "Pausa el envío de invitaciones de esa cuenta y retira las que esperan respuesta" : "Retira el comentario"
                         }
                       >
                         {bout
@@ -776,7 +800,7 @@ export default async function Moderation({
                               ? medio.kind === "PHOTO"
                                 ? "Resolver y retirar la foto"
                                 : "Resolver y retirar el vídeo"
-                              : gimnasio ? "Resolver y retirar el gimnasio" : "Resolver y retirar el comentario"}
+                              : gimnasio ? "Resolver y retirar el gimnasio" : invitacion ? "Resolver y suspender el envío de invitaciones" : "Resolver y retirar el comentario"}
                       </button>
                     )}
                     <button
@@ -788,6 +812,14 @@ export default async function Moderation({
                       Cerrar: no hay error
                     </button>
                   </form>
+                  {invitacion?.fromUser.invitationsSuspendedAt && (
+                    <form action={levantarSuspensionDeInvitaciones} style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
+                      <input type="hidden" name="userId" value={invitacion.fromUserId} />
+                      <input type="hidden" name="back" value={back("avisos")} />
+                      <label className="field"><span>Nota para la persona (opcional)</span><input name="note" maxLength={500} /></label>
+                      <button className="secondary">Levantar la pausa de invitaciones</button>
+                    </form>
+                  )}
                 </div>
               </article>
             </li>

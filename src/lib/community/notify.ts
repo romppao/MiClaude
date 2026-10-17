@@ -138,7 +138,7 @@ export async function notificarResolucionDeAviso(reportId: string, retirado: boo
     const r = await db.report.findUnique({ where: { id: reportId }, include: { user: { select: { id: true, email: true, name: true } } } });
     if (!r) return;
     const nota = r.resolutionNote ? `\n\nNota de moderación: ${r.resolutionNote}` : "";
-    const sobre = r.entity === "PAGINA" ? `la página ${APP_URL}${oneLine(r.entityId)}` : r.entity === "BOUT" ? "un combate" : r.entity === "FIGHTER" ? "una ficha" : r.entity === "AURA" ? "un comentario" : r.entity === "GYM" ? "un gimnasio" : "un vídeo o una foto";
+    const sobre = r.entity === "PAGINA" ? `la página ${APP_URL}${oneLine(r.entityId)}` : r.entity === "BOUT" ? "un combate" : r.entity === "FIGHTER" ? "una ficha" : r.entity === "AURA" ? "un comentario" : r.entity === "GYM" ? "un gimnasio" : r.entity === "INVITACION" ? "una invitación" : "un vídeo o una foto";
     const decision = retirado ? "Hemos actuado: el contenido se ha retirado o ha dejado de contar mientras se revisa."
       : r.status === "RESOLVED" ? "Hemos revisado el contenido y lo hemos corregido."
       : "Hemos revisado el contenido y no hemos encontrado motivos para retirarlo.";
@@ -165,6 +165,10 @@ async function autorDe(entity: string, id: string): Promise<{ userId: string; qu
   if (entity === "MEDIA") {
     const m = await db.mediaItem.findUnique({ where: { id }, select: { uploaderId: true, kind: true, caption: true, event: { select: { name: true } } } });
     return m ? { userId: m.uploaderId, que: `Hemos retirado ${m.kind === "PHOTO" ? "tu foto" : "tu vídeo"}${m.caption ? ` «${oneLine(m.caption)}»` : ""} de la velada «${oneLine(m.event.name)}». Ya no se muestra en la velada ni en las fichas.` } : null;
+  }
+  if (entity === "INVITACION") {
+    const i = await db.invitation.findUnique({ where: { id }, select: { fromUserId: true } });
+    return i ? { userId: i.fromUserId, que: "Hemos suspendido el envío de invitaciones de tu cuenta: una persona invitada nos avisó de que una de ellas no era bienvenida y, tras revisarlo, hemos actuado." } : null;
   }
   if (entity === "GYM") {
     const g = await db.gym.findUnique({ where: { id }, select: { ownerUserId: true, name: true } });

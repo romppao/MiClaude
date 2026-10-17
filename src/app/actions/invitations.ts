@@ -47,7 +47,7 @@ async function nombreDeQuienInvita(user: { id: string; name: string; role: strin
 export async function sendInvitation(f: FormData) {
   const toId = str(f, "toId");
   const user = await requireVerifiedUser(ENVIADAS);
-  const quien = puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt });
+  const quien = puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt, invitacionesSuspendidas: !!user.invitationsSuspendedAt });
   if (!quien.ok) go(ENVIADAS, { problema: quien.problema });
   const hoy = todayMadrid();
   const destino = toId.length <= 40 ? await db.fighter.findUnique({ where: { id: toId }, include: { disciplines: true, user: true } }) : null;

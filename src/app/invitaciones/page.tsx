@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function MisInvitaciones() {
   const user = await requireUser("/invitaciones");
   if (user.role !== "ORGANIZER" && user.role !== "TRAINER") redirect(user.fighter ? "/propuestas#pestana-invitaciones" : "/mi-panel");
-  const permiso = puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt });
+  const permiso = puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt, invitacionesSuspendidas: !!user.invitationsSuspendedAt });
   const ahora = new Date();
   const enviadas = await db.invitation.findMany({
     where: { fromUserId: user.id }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: 100,
@@ -25,7 +25,7 @@ export default async function MisInvitaciones() {
   return (
     <div className="pantalla" style={{ gap: 18 }}>
       <div><h1>Mis invitaciones</h1><p className="lead" style={{ fontSize: 16 }}>Las invitaciones que has enviado a peleadores. Si aceptan, aquí verás el contacto que han elegido compartir contigo.</p></div>
-      {!permiso.ok && <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>{permiso.problema === "invitacion_sin_correo" ? <>Primero <Link href="/verificar">confirma tu correo electrónico</Link>.</> : "Tu cuenta no puede enviar invitaciones por ahora."}</div>}
+      {!permiso.ok && <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>{permiso.problema === "invitacion_sin_correo" ? <>Primero <Link href="/verificar">confirma tu correo electrónico</Link>.</> : permiso.problema === "invitacion_suspendida" ? "El envío de invitaciones de tu cuenta está en pausa mientras moderación revisa avisos. Si crees que es un error, cuéntanoslo desde «Avisar de un contenido» (al pie de cualquier pantalla)." : "Tu cuenta no puede enviar invitaciones por ahora."}</div>}
       <p style={{ margin: 0 }}><Link className="btn" href="/peleadores">Buscar un peleador al que invitar</Link></p>
       {enviadas.length === 0 && <p className="mut" style={{ margin: 0 }}>Todavía no has enviado ninguna invitación. Abre la ficha de un peleador y pulsa «Invitar a este peleador».</p>}
       {enviadas.map((i) => {
