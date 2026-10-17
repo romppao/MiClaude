@@ -16,6 +16,9 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 ### Añadido
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
 
+### Corregido
+- El recorrido de peleador espera a ver su combate después de guardarlo, también cuando el navegador tarda en actualizar la pestaña. El informe conserva los avisos de React e indica en qué pantalla se observaron.
+
 
 
 ### Corregido

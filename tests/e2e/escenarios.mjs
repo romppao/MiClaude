@@ -7,7 +7,7 @@ import { createHmac } from "node:crypto";
 import sharp from "sharp";
 import { devices } from "playwright-core";
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
-import { B, rnd, browser, link, hacerAdmin, sql, datosDeAlta, enDias, hoyMadrid, registrar, esperarEnlace, esperarCorreo, mostrar } from "./ayudas.mjs";
+import { B, rnd, browser, link, hacerAdmin, sql, datosDeAlta, enDias, hoyMadrid, registrar, esperarEnlace, esperarCorreo, mostrar, pestanaDeMiFicha } from "./ayudas.mjs";
 
 const DIR = process.env.ESC_DIR ?? "test-results/escenarios";
 const db = new PrismaClient();
@@ -30,7 +30,7 @@ async function persona(nombre, descripcion, guion) {
   const ctx = await browser.newContext({ ...devices["iPhone 14"], reducedMotion: "reduce" }) /* sin desplazamiento animado: Playwright no consigue pulsar un botón que se está desplazando */;
   const p = await ctx.newPage();
   const fricciones = [];
-  p.on("pageerror", (e) => fricciones.push(`error de la página: ${e.message.slice(0, 120)}`));
+  p.on("pageerror", (e) => fricciones.push(`error de la página en ${new URL(p.url()).pathname}: ${e.message.slice(0, 800)}`));
   p.on("console", (m) => { if (m.type() === "error" && !/favicon|Failed to load resource: the server responded with a status of 40[34]/.test(m.text())) fricciones.push(`consola: ${m.text().slice(0, 120)}`); });
   p.on("response", (r) => { if (r.status() >= 500) fricciones.push(`respuesta ${r.status()} en ${new URL(r.url()).pathname}`); });
   const pasos = [];
@@ -175,6 +175,9 @@ await persona("peleador", "Diego, 27 años, peleador amateur de boxeo: crea su f
     await registrar(p, { evento: `Velada Escenario ${rnd}`, fecha: enDias(-30), rivalNombre: "Rival", rivalApellidos: `Escenario${rnd}` }); await aviso(p, "Combate registrado");
   });
   await paso("ve su combate en «Mis combates» con su estado explicado", async () => {
+    // Espera al combate visible tras guardar, incluso en un dispositivo lento.
+    await pestanaDeMiFicha(p, "Combates");
+    await p.getByRole("row").filter({ hasText: `Velada Escenario ${rnd}` }).waitFor({ state: "visible" });
     const t = await texto(p);
     if (!t.includes(`Velada Escenario ${rnd}`)) throw new Error("el combate no aparece en «Mis combates»");
     if (!/declarado/i.test(t) || !/Contará en tu récord a partir|cuenta en el récord a partir/i.test(t)) throw new Error("no explica que es declarado y cuándo empezará a contar (regla de 24 horas)");
