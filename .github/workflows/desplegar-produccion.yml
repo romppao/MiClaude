@@ -6,10 +6,11 @@ name: Desplegar la versión real (Cloud Run)
 #
 # Sin claves guardadas en GitHub: la autenticación con Google es por Workload Identity Federation.
 # Variables del repositorio (Settings → Secrets and variables → Actions → Variables):
-#   GCP_PROJECT_ID, GCP_REGION (europe-west1), GCP_WIF_PROVIDER, GCP_DEPLOY_SA
-# Secreto del repositorio:
+#   GCP_PROJECT_ID, GCP_REGION (europe-west1), GCP_WIF_PROVIDER, GCP_DEPLOY_SA, GCP_RUN_SA, PROD_URL
+#   y, para la app, GOOGLE_CLIENT_ID, RESPONSABLE_NOMBRE y TITULAR_* (aviso legal) cuando existan.
+# Secreto del entorno «produccion»:
 #   PROD_DATABASE_URL_DIRECT  (conexión DIRECTA de Neon, sin «-pooler»; solo para aplicar las migraciones)
-# Las variables de la aplicación viven en Cloud Run y en Secret Manager, no aquí (docs/PRODUCCION.md).
+# Las claves de la aplicación viven en Secret Manager; el despliegue solo las enlaza por su nombre (docs/PRODUCCION.md).
 
 on:
   workflow_dispatch:
@@ -47,6 +48,41 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      - name: Preparar la configuración de la app
+        # Variables públicas (docs/PRODUCCION.md) y secretos de Secret Manager que ya tienen valor. Así el primer despliegue
+        # ya arranca configurado y nadie tiene que copiar ajustes a mano en Cloud Run. Los valores secretos nunca pasan por aquí:
+        # Cloud Run los lee de Secret Manager con la cuenta lona-web. La cuenta que despliega solo ve si existen (Secret Manager Viewer).
+        env:
+          APP_URL: ${{ vars.PROD_URL }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          RESPONSABLE_NOMBRE: ${{ vars.RESPONSABLE_NOMBRE }}
+          TITULAR_NOMBRE: ${{ vars.TITULAR_NOMBRE }}
+          TITULAR_NIF: ${{ vars.TITULAR_NIF }}
+          TITULAR_DOMICILIO: ${{ vars.TITULAR_DOMICILIO }}
+          TITULAR_REGISTRO: ${{ vars.TITULAR_REGISTRO }}
+        run: |
+          VARS="APP_URL=${APP_URL:-https://lonaclub.es}|MAIL_FROM=Lona <avisos@lonaclub.es>|CONTACT_EMAIL=info@lonaclub.es|TRUSTED_PROXY_HOPS=1"
+          for V in GOOGLE_CLIENT_ID RESPONSABLE_NOMBRE TITULAR_NOMBRE TITULAR_NIF TITULAR_DOMICILIO TITULAR_REGISTRO; do
+            if [ -n "${!V}" ]; then VARS="$VARS|$V=${!V}"; fi
+          done
+          tiene_valor() { gcloud secrets versions list "$1" --project "$PROYECTO" --filter="state=ENABLED" --limit=1 --format="value(name)" 2>/dev/null | grep -q .; }
+          SECRETOS=""
+          for S in DATABASE_URL GOOGLE_CLIENT_SECRET RESEND_API_KEY CRON_SECRET CREADOR_CORREO SENTRY_DSN; do
+            if tiene_valor "$S"; then SECRETOS="$SECRETOS,$S=$S:latest"; else echo "::warning::El secreto $S aún no tiene valor en Secret Manager: la app arranca sin él."; fi
+          done
+          case "$SECRETOS" in *DATABASE_URL=*) ;; *) echo "::error::Falta el valor del secreto DATABASE_URL (conexión pooled de Neon) en Secret Manager"; exit 1 ;; esac
+          # R2 va entero o no va: a medias la app no arranca (lib/common/env.ts). Sin R2, las fotos se guardan en la base.
+          R2_LISTO=si
+          for S in R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET; do tiene_valor "$S" || R2_LISTO=no; done
+          if [ "$R2_LISTO" = si ]; then
+            SECRETOS="$SECRETOS,R2_ACCOUNT_ID=R2_ACCOUNT_ID:latest,R2_ACCESS_KEY_ID=R2_ACCESS_KEY_ID:latest,R2_SECRET_ACCESS_KEY=R2_SECRET_ACCESS_KEY:latest,R2_BUCKET=R2_BUCKET:latest"
+            VARS="$VARS|R2_JURISDICCION=eu"
+          else
+            echo "::warning::R2 sin completar: las fotos se guardarán en la base de datos y los vídeos solo con enlace."
+          fi
+          echo "VARS_APP=^|^$VARS" >> "$GITHUB_ENV"
+          echo "SECRETOS_APP=${SECRETOS#,}" >> "$GITHUB_ENV"
+
       - name: Compilar y subir la imagen
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
@@ -67,10 +103,15 @@ jobs:
           npx prisma migrate deploy
 
       - name: Publicar en Cloud Run
+        env:
+          # La app funciona con su propia cuenta (lona-web), que solo puede leer sus claves; sin la variable, la de por defecto del proyecto.
+          CUENTA_APP: ${{ vars.GCP_RUN_SA }}
         run: |
           gcloud run deploy lona \
             --project "$PROYECTO" --region "$REGION" \
             --image "$IMAGEN:$(git rev-parse --short HEAD)" \
+            ${CUENTA_APP:+--service-account "$CUENTA_APP"} \
+            --update-env-vars "$VARS_APP" --update-secrets "$SECRETOS_APP" \
             --min-instances 0 --max-instances 2 --memory 512Mi --cpu 1 --cpu-throttling \
             --concurrency 40 --timeout 60 --allow-unauthenticated --quiet
 

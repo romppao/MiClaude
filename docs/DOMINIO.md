@@ -18,7 +18,7 @@ Lo que de verdad lo protege, y conviene comprobar ya en Infomaniak:
 | **Verificación en dos pasos** en la cuenta de Infomaniak | Infomaniak → Mi perfil → Seguridad | Si alguien consigue la contraseña, sin el segundo paso no entra. |
 | **Correo de la cuenta** al que tú siempre tengas acceso | Infomaniak → Mi perfil | Las alertas de caducidad y de transferencia llegan ahí. |
 
-## 2. Estado actual (15-10-2026)
+## 2. Estado actual (17-10-2026)
 
 | Registro | Tipo | Valor | Para qué |
 |---|---|---|---|
@@ -26,6 +26,8 @@ Lo que de verdad lo protege, y conviene comprobar ya en Infomaniak:
 | `www.lonaclub.es` | CNAME | `ring-espana-demo.onrender.com` | Igual, para www. |
 | MX, TXT `v=spf1…`, `_dmarc` | MX y TXT | Los de Infomaniak | El buzón info@lonaclub.es. **No tocar nunca.** |
 | TXT de verificación (Google, Search Console) | TXT | Los que haya | Prueban a Google que el dominio es tuyo. **No tocar.** |
+| `resend._domainkey` | DKIM (TXT) | Clave pública que da Resend | Firma los correos que envía la app con Resend. Añadido el 17-10-2026. |
+| `rsend` y `send` | CNAME | `rsend-euw1.forge.rmta.net` y `send.forge.rmta.net` | Permiten a Resend enviar en nombre de lonaclub.es. Añadidos el 17-10-2026. |
 
 **Antes de cambiar nada:** haz una captura de pantalla de toda la zona DNS en Infomaniak y guárdala. Es la copia para deshacer cualquier cosa.
 
@@ -65,6 +67,7 @@ Si algo sale mal (por ejemplo, deja de llegar el correo), se vuelve atrás en el
 |---|---|---|---|
 | 14-10-2026 | Claude (sesión del 14) | Pidió apuntar lonaclub.es a la demo de Render (A y CNAME) | Apaño provisional hasta montar la versión real. Fue un error: el fundador no lo quería (LECCIONES.md). |
 | 15-10-2026 | Claude (nube) | No cambia nada. Corrige el orden de los pasos: primero el DNS y luego Render | Evitar el hueco de un dominio que apunta a un servicio que no lo reclama. |
+| 17-10-2026 | Claude Code, **a petición expresa del fundador** («continúa tú de manera automática», con la pestaña de Infomaniak abierta por él) | **Solo añade** 3 registros para enviar correo con Resend (región UE): `TXT resend._domainkey` (clave DKIM que da Resend), `CNAME rsend → rsend-euw1.forge.rmta.net` y `CNAME send → send.forge.rmta.net`. **No** añade el MX en `@` que Resend ofrece para *recibir* correo (está apagado en Resend): habría desviado el correo de info@. No toca ningún registro existente. Comprobado después en el DNS público de Google (8.8.8.8): los 3 responden y el MX sigue siendo `mta-gw.infomaniak.ch`. | Correo real de la versión real (confirmar cuentas, avisos). **Deshacer:** borrar esos 3 registros en la zona DNS de Infomaniak; nada más depende de ellos. |
 
 ## 6. Cuando se monte la versión real
 

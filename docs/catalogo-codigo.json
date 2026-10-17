@@ -36,7 +36,7 @@
   },
   {
     "path": ".github/workflows/desplegar-produccion.yml",
-    "purpose": "Despliegue manual de la versión real: compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud.",
+    "purpose": "Despliegue manual de la versión real: prepara las variables y enlaza los secretos con valor, compila la imagen, aplica las migraciones en Neon, publica en Cloud Run y comprueba /salud.",
     "guide": "docs/PRODUCCION.md"
   },
   {

@@ -11,6 +11,16 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.27.1] — 2026-10-17
+
+PR de Claude Code: **preparar el montaje de la versión real** (el fundador levantó la pausa el 17-10-2026: «quiero montar el real y mientras iremos perfeccionando»).
+
+### Cambiado
+- El despliegue a Cloud Run usa la **cuenta de ejecución propia** `lona-web` (variable `GCP_RUN_SA`), que solo puede leer sus secretos, en vez de la cuenta por defecto del proyecto.
+- `docs/PRODUCCION.md`: facturación vinculada, alerta de presupuesto de 10 € (decisión del fundador), limpieza automática del registro de imágenes y la cuenta `lona-web`.
+- El despliegue **configura solo la app**: pone las variables públicas (dirección, remitente, contacto, ID de «Entrar con Google», datos del aviso legal si existen) y enlaza por su nombre los secretos de Secret Manager que ya tienen valor. Si falta la base de datos, se para con un mensaje claro; si R2 está a medias, no lo enlaza (las fotos siguen en la base). La cuenta que despliega solo ve si un secreto existe, nunca su valor.
+- `docs/DOMINIO.md`: anotados los 3 registros de Resend (DKIM y dos CNAME de envío) que se añadieron a petición del fundador, sin tocar el correo de info@.
+
 ## [0.27.0] — 2026-10-17
 
 PR de Claude Code: **bandeja de moderación por tipo** (lo último del plan del moderador aprobado el 17-10-2026).

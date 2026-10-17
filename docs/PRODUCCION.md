@@ -32,6 +32,8 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 
 ## Puesta en marcha (una sola vez)
+
+> **Estado a 17-10-2026 (Claude Code, con el «sí» del fundador; inventario previo de solo lectura):** pasos **1 a 5 hechos**. Por la noche: registros de Resend puestos en Infomaniak (a petición del fundador), variable `GOOGLE_CLIENT_ID` en GitHub y la cuenta `desplegar-lona` con «Secret Manager Viewer» (ve si un secreto existe, no su valor). La pantalla de «Entrar con Google» sigue **en prueba**: hay que publicarla para que entre cualquiera de la lista de acceso anticipado. Facturación vinculada (EUR) y alerta «Lona 10 EUR» (50/90/100 %); servicios Cloud Run, Artifact Registry, Secret Manager, IAM Credentials, STS y presupuestos activados; registro `lona` en `europe-west1` con limpieza (2 últimas imágenes); cuentas `desplegar-lona` (Cloud Run Admin, escritura en `lona`, puede actuar como `lona-web`) y `lona-web` (ejecución; sin permisos todavía: se le da acceso a cada secreto al crearlo); grupo y proveedor de Workload Identity `github` limitado a `romppao/MiClaude`; entorno de GitHub `produccion` con aprobación obligatoria de `romppao` y variables `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_DEPLOY_SA`, `GCP_RUN_SA`, `GCP_WIF_PROVIDER` y `PROD_URL`. **No se recrean.** Falta: secretos de GitHub (`PROD_DATABASE_URL_DIRECT`, `BACKUP_R2_*`, `PROD_CRON_SECRET`), secretos del servicio (Resend, R2, Google, creador…), primer despliegue y dominio.
 0. **Separar ya lonaclub.es de la demo** (petición del fundador, 15-10-2026: «quiero separar la aplicación web de la demo de render… ya»). Hasta que la versión real esté montada, lonaclub.es no debe enseñar la demo:
    - **Seguir [`DOMINIO.md`](DOMINIO.md), sección 3, al pie de la letra** (orden seguro, cómo comprobarlo y cómo deshacerlo). Resumen:
    - primero Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
@@ -39,22 +41,22 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
    - **no tocar** MX, SPF, `_dmarc` ni los TXT de verificación (Google, Search Console): el buzón info@ sigue funcionando.
    - La demo sigue en https://ring-espana-demo.onrender.com/ y, desde la 0.15.1, pide a los buscadores que no la muestren (`noindex` y sin mapa del sitio).
 1. **Proyecto y facturación.**
-   - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación y poner una alerta de presupuesto de 1 €.
+   - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación (**hecho el 17-10-2026**) y poner una alerta de presupuesto de **10 €** (avisa al 50, 90 y 100 %; el fundador quiere «todo gratis o un máximo de 10 €»). Es un aviso, no un corte: el tope real son `--max-instances 2` y `--cpu-throttling` (sin visitas, 0 €).
    - Activar Cloud Run, Artifact Registry, Secret Manager e IAM Credentials.
-2. **Repositorio de imágenes:** Artifact Registry `lona` (Docker) en `europe-west1`.
+2. **Repositorio de imágenes:** Artifact Registry `lona` (Docker) en `europe-west1`, con limpieza automática que guarda solo las 2 últimas imágenes (para no pasar de los 0,5 GB gratuitos).
 3. **Cuenta de servicio para desplegar** (`desplegar-lona@…`), con los roles:
    - Cloud Run Admin;
    - Artifact Registry Writer;
-   - Service Account User sobre la cuenta de ejecución.
+   - Service Account User sobre la cuenta de ejecución **`lona-web@…`**, con la que funciona la app (solo puede leer sus propios secretos, que se le dan uno a uno).
 4. **Workload Identity Federation para GitHub**, limitado al repositorio `romppao/MiClaude`.
-   - Variables del repositorio: `GCP_PROJECT_ID`, `GCP_REGION=europe-west1`, `GCP_WIF_PROVIDER` y `GCP_DEPLOY_SA`.
+   - Variables del repositorio: `GCP_PROJECT_ID`, `GCP_REGION=europe-west1`, `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA` y `GCP_RUN_SA` (la cuenta de ejecución `lona-web`; si falta, Cloud Run usa la de por defecto del proyecto).
    - Entorno de GitHub `produccion` con aprobación del fundador.
 5. **Secretos de GitHub:**
    - `PROD_DATABASE_URL_DIRECT`;
    - los cuatro `BACKUP_R2_*`;
    - `PROD_CRON_SECRET`;
    - variable `PROD_URL=https://lonaclub.es`.
-6. **Primer despliegue:** Actions → «Desplegar la versión real (Cloud Run)» → elegir la etiqueta. Después, añadir las variables y los secretos del servicio, y volver a desplegar.
+6. **Primer despliegue:** Actions → «Desplegar la versión real (Cloud Run)» → elegir la etiqueta. Desde la 0.27.1 el propio despliegue pone las variables públicas y enlaza los secretos que ya tienen valor en Secret Manager: basta con haber pegado antes al menos `DATABASE_URL`. Cada secreto que se añada después entra con el siguiente despliegue.
 7. **Dominio:**
    - verificar lonaclub.es en Search Console (registro TXT);
    - Cloud Run → «Gestionar dominios personalizados» → lonaclub.es y www;
@@ -116,7 +118,7 @@ Las claves de cada servicio solo están en Secret Manager o en los secretos de G
 | `lonaclub.es` | TXT | `v=spf1 include:spf.infomaniak.ch -all` | SPF del buzón | Solo para añadir un `include` si un proveedor lo exige |
 | `_dmarc.lonaclub.es` | TXT | `v=DMARC1; p=reject;` | Protección contra suplantación | **No** |
 | `lonaclub.es` y `www` | A, AAAA o CNAME | Los que indique Cloud Run. Hasta entonces, **ninguno** (paso 0): los antiguos A `216.24.57.1` y CNAME `ring-espana-demo.onrender.com` llevaban a la demo y hay que borrarlos | Web | Sí, al cambiar de alojamiento |
-| Registros de Resend | TXT/MX en su subdominio | Los que indique Resend | Envío de correos | Sí, si se cambia de proveedor |
+| `resend._domainkey`, `rsend` y `send` | DKIM (TXT) y CNAME | Clave de Resend, `rsend-euw1.forge.rmta.net` y `send.forge.rmta.net` (puestos el 17-10-2026) | Envío de correos con Resend | Sí, si se cambia de proveedor. **Nunca** el MX de recepción de Resend en `@` |
 
 ## Problemas conocidos y cómo resolverlos
 

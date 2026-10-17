@@ -2562,3 +2562,15 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Limpieza del disco C: (encargada a Codex, que se quedó sin créditos):** de 19,5 a unos 28–30 GB libres borrando solo lo que se regenera (caché de `npx`, árboles de trabajo antiguos ya subidos, navegadores de pruebas viejos, contenedores de pruebas parados). Se respetaron los contenedores en marcha (una «demo local» de otro asistente), los árboles con cambios sin subir y todo lo personal; el disco E: ni se miró. Los vídeos (2,65 GB) y compactar el disco de Docker quedan para que decida el fundador. Informe: `docs/ecosistema/traspasos/2026-10-17-claude-limpieza-de-disco.md`.
 
 **Lección:** el espacio que se libera dentro de Docker no se nota en Windows hasta compactar su disco virtual; medirlo antes y después en Windows evita prometer lo que no se ha liberado.
+
+## 17 de octubre de 2026, tarde — Se levanta la pausa: montar la versión real (Claude Code)
+
+**Decisión del fundador:** «decidí ponerlo en pausa porque no me convencía del todo, pero con las nuevas mejoras me siento confiado para publicarla y darle el acceso a ciertas personas; quiero montar el real y mientras iremos perfeccionando». Presupuesto: «todo gratis o un máximo de 10 euros».
+
+**Inventario antes de tocar nada** (el fundador temía que se rehiciera lo que ya configuró otra sesión): con la herramienta de Google Cloud instalada y su sesión iniciada con info@lonaclub.es, solo lectura. Existía el proyecto `lona-511614` y el cliente de «Entrar con Google»; no había facturación, ni servicios activados, ni cuentas de servicio, ni nada desplegado. En Neon, `lona-produccion` vacío y `lona-demo` en uso. En GitHub, ninguna variable ni secreto de producción. La versión real nunca se había llegado a montar.
+
+**Hecho por el fundador:** la facturación (en euros) vinculada al proyecto.
+
+**Preparado por Claude (sin ejecutar hasta el «sí» del fundador):** el guion de los pasos 1-5 de `PRODUCCION.md` (servicios, alerta de 10 €, registro de imágenes con limpieza, cuentas `desplegar-lona` y `lona-web`, puente GitHub→Google limitado al repositorio, entorno `produccion` con su aprobación), que comprueba antes de crear cada cosa si ya existe. Y este PR: el despliegue usa la cuenta `lona-web`.
+
+**Pendiente del fundador:** el «sí» a esos pasos; Resend y Cloudflare R2; pegar las claves (dirección directa de Neon, R2, Resend) donde se le indique; poner el repositorio en privado; mayores de 18 o política de menores; abogado.
