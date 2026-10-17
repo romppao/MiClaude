@@ -48,6 +48,17 @@ export async function notifyFollowersOfBout(boutId: string): Promise<number> {
 }
 
 /**
+ * Aviso dentro de la aplicación de una decisión de moderación, con el motivo si lo hay (17 de octubre de 2026: «siempre aviso al afectado con el motivo»).
+ * El título cabe en 160 caracteres: si el motivo no cabe, se recorta con puntos suspensivos. La clave evita duplicados si se repite la decisión.
+ * Nunca lanza: la decisión ya está guardada.
+ */
+export async function avisarDecision(userId: string | null | undefined, titulo: string, href: string, clave: string, motivo?: string | null): Promise<void> {
+  if (!userId) return;
+  const conMotivo = motivo ? `${titulo}. Motivo: ${oneLine(motivo)}` : titulo;
+  await notifyInApp(userId, "MODERATION", conMotivo.length > 160 ? `${conMotivo.slice(0, 157)}…` : conMotivo, href, `moderacion:${clave}`, true);
+}
+
+/**
  * Responde por correo a quien hizo una solicitud (reclamar una ficha, ser organizador) cuando un moderador decide.
  * Es un mensaje del servicio, no publicidad: se envía aunque la persona haya desactivado los avisos de nuevos combates.
  * Nunca lanza: si el correo falla, la decisión ya está guardada y la persona la verá igualmente en la aplicación.

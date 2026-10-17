@@ -11,7 +11,7 @@ import { db } from "../../lib/common/db";
 import { requireAdmin } from "../../lib/accounts/permissions";
 import { APP_URL } from "../../lib/common/mail";
 import { audit } from "../../lib/common/audit";
-import { notificarResolucionDeAviso, notifyDecision } from "../../lib/community/notify";
+import { avisarDecision, notificarResolucionDeAviso, notifyDecision } from "../../lib/community/notify";
 import { REPORT_REASONS } from "../../lib/community/reports";
 import { lookup } from "../../lib/common/safe";
 import { anonymizeFighter, type ArchivosRetirados } from "../../lib/fighters/anonymize";
@@ -41,6 +41,11 @@ export async function adminDecide(f: FormData) {
     await audit({ userId: admin.id, entity: "BOUT", entityId: bout.id, action: `ADMIN_${plan.next}`, before: { verification: bout.verification }, after: { verification: plan.next } }, tx);
   }));
   revalidatePath("/", "layout");
+  const titulares = await db.fighter.findMany({ where: { id: { in: [bout.fighterAId, bout.fighterBId] } }, select: { userId: true, slug: true } });
+  const titulo = plan.next === "VERIFIED" ? "Un moderador ha verificado un combate de tu ficha"
+    : plan.next === "DISPUTED" ? "Un moderador ha puesto en revisión un combate de tu ficha: no cuenta hasta que se aclare"
+    : "Un moderador ha devuelto un combate de tu ficha a «declarado»";
+  for (const t of titulares) await avisarDecision(t.userId, titulo, `/peleadores/${t.slug}`, `combate:${bout.id}:${plan.next}`);
   go(back, { aviso: plan.aviso });
 }
 
@@ -77,6 +82,7 @@ export async function decideClaim(f: FormData) {
   }));
   revalidatePath("/", "layout");
   const nombreFicha = `${claim.fighter.firstName} ${claim.fighter.lastName}`;
+  await avisarDecision(claim.userId, approved ? "Tu solicitud de ficha ha sido aprobada: la ficha ya es tuya" : "Tu solicitud de ficha no se ha aprobado", approved ? "/mi-ficha" : "/peleadores", `ficha:${claim.id}:${approved ? "ok" : "no"}`, approved ? null : note);
   after(async () => {
     await notifyDecision(claim.userId, approved ? "Tu solicitud de ficha en Lona ha sido aprobada" : "Tu solicitud de ficha en Lona no se ha aprobado",
       approved ? `Un moderador ha aprobado tu solicitud: la ficha de ${nombreFicha} ya es tuya. Puedes verla y corregir sus datos aquí: ${APP_URL}/mi-ficha`
@@ -109,6 +115,7 @@ export async function decideOrganizer(f: FormData) {
     await audit({ userId: admin.id, entity: "ORGANIZER", entityId: req.id, action: approve ? "APPROVED" : "REJECTED", after: { userId: req.userId, orgName: req.orgName, note } }, tx);
   }));
   revalidatePath("/", "layout");
+  await avisarDecision(req.userId, approve ? "Ya puedes publicar veladas en Lona" : "Tu solicitud de organizador no se ha aprobado", approve ? "/organizador" : "/organizador", `organizador:${req.id}:${approve ? "ok" : "no"}`, approve ? null : note);
   after(async () => {
     await notifyDecision(req.userId, approve ? "Ya puedes publicar veladas en Lona" : "Tu solicitud de organizador en Lona no se ha aprobado",
       approve ? `Un moderador ha aprobado tu solicitud como organizador de «${oneLine(req.orgName)}». Ya puedes crear veladas y montar sus carteles aquí: ${APP_URL}/organizador${req.kind === "FEDERACION" ? `\n\nTu federación ya tiene su perfil en el directorio: puedes completarlo desde Mi cuenta o en ${APP_URL}/federaciones` : ""}`
@@ -132,6 +139,7 @@ export async function setGymVerified(f: FormData) {
     audit({ userId: admin.id, entity: "GYM", entityId: gym.id, action: verify ? "VERIFIED" : "VERIFICATION_REVOKED", before: { verifiedAt: gym.verifiedAt, note: gym.verifiedNote }, after: { note } }, db),
   ]);
   revalidatePath("/", "layout");
+  await avisarDecision(gym.ownerUserId, verify ? `Tu gimnasio «${oneLine(gym.name)}» ya tiene el sello de verificado` : `Se ha retirado el sello de verificado de tu gimnasio «${oneLine(gym.name)}»`, `/gimnasios/${gym.slug}`, `sello:${gym.id}:${verify ? "si" : "no"}`, note);
   go(back, { aviso: verify ? "sello_concedido" : "sello_retirado" });
 }
 
@@ -230,6 +238,7 @@ export async function decidirVeladaPasada(f: FormData) {
     await audit({ userId: admin.id, entity: "EVENT", entityId: event.id, action: decision === "approve" ? "PAST_EVENT_APPROVED" : "PAST_EVENT_REJECTED", before: { status: event.status }, after: { status, note } }, tx);
   }));
   revalidatePath("/", "layout");
+  await avisarDecision(event.organizerId, decision === "approve" ? `Tu velada pasada «${oneLine(event.name)}» ha sido autorizada` : `Tu velada pasada «${oneLine(event.name)}» no se ha autorizado`, decision === "approve" ? `/veladas/${event.slug}` : "/organizador", `velada:${event.id}:${decision}`, note);
   after(() => notifyDecision(event.organizerId!, decision === "approve" ? "Tu velada pasada ha sido autorizada" : "Tu velada pasada no se ha autorizado",
     decision === "approve"
       ? `Un moderador ha autorizado la publicación de «${oneLine(event.name)}» (${event.date.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}). Nota: ${oneLine(note)}. Ya aparece en Lona: ${APP_URL}/veladas/${event.slug}`

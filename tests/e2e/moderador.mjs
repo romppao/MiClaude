@@ -1,8 +1,10 @@
 // Moderación con papel propio (17 de octubre de 2026, petición del fundador: «cuando entro como moderador, las pantallas son muy confusas»):
 // «Mi panel» es «Hoy», barra inferior propia, menú solo con su trabajo, un número por tipo de trabajo y la siguiente tarea.
 import AxeBuilder from "@axe-core/playwright";
+import { PrismaClient } from "@prisma/client";
 import { B, rnd, browser, newUser, check, seen, sql, hacerAdmin, terminarDiagnosticos } from "./ayudas.mjs";
 
+const db = new PrismaClient();
 const axe = async (p, que) => {
   const r = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   check(`${que}: sin problemas de accesibilidad${r.violations.length ? ` (${r.violations.map((v) => v.id).join(", ")})` : ""}`, r.violations.length === 0);
@@ -64,6 +66,25 @@ const fan = await newUser("Aficionada", "FAN");
 await fan.p.goto(B + "/moderacion/hoy");
 check("una persona sin permiso no ve «Hoy»", !/\/moderacion\/hoy$/.test(fan.p.url()) && (await fan.p.locator("a.siguiente-tarea").count()) === 0);
 
+// 7) Cada decisión de moderación avisa al afectado dentro de la app, con el motivo (17 de octubre de 2026).
+const duena = await newUser("DuenaGim", "FAN");
+const nombreGim = `Aaa Sello ${rnd}`;
+await db.gym.create({ data: { slug: `aaa-sello-${rnd}`, name: nombreGim, city: "Madrid", province: "Madrid", ownerUserId: (await db.user.findUniqueOrThrow({ where: { email: duena.email } })).id } });
+await mod.p.goto(B + "/moderacion");
+const fila = () => mod.p.locator("tr, article[data-cola]", { hasText: nombreGim });
+await fila().locator("input[name=note]").fill("Web y teléfono comprobados");
+await fila().locator("button:has-text('Verificar')").click();
+await fila().locator("button:has-text('Retirar sello')").waitFor();
+await duena.p.goto(B + "/avisos");
+check("quien lleva el gimnasio recibe un aviso con el sello y el motivo", await seen(duena.p.getByText(`«${nombreGim}» ya tiene el sello de verificado. Motivo: Web y teléfono comprobados`)));
+await fila().locator("input[name=note]").fill("Cambió de dirección");
+await fila().locator("button:has-text('Retirar sello')").click();
+await fila().locator("button:has-text('Verificar')").waitFor();
+await duena.p.goto(B + "/avisos");
+check("y otro cuando se le retira, también con el motivo", await seen(duena.p.getByText(`Se ha retirado el sello de verificado de tu gimnasio «${nombreGim}». Motivo: Cambió de dirección`)));
+check("la persona sin relación con el gimnasio no recibe nada", !(await fan.p.goto(B + "/avisos").then(() => fan.p.locator("main").innerText())).includes(nombreGim));
+
 await terminarDiagnosticos();
+await db.$disconnect();
 await browser.close();
 if (process.exitCode) console.error("Moderador: hay comprobaciones fallidas");
