@@ -63,9 +63,10 @@ import * as propuestas from "../../src/app/actions/proposals";
 import * as notificaciones from "../../src/app/actions/notifications";
 import * as gimnasios from "../../src/app/actions/gyms";
 import * as inscripciones from "../../src/app/actions/registrations";
+import * as accesoAnticipado from "../../src/app/actions/acceso-anticipado";
 import { hashPassword } from "../../src/lib/accounts/password";
 
-const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones, ...gimnasios, ...notificaciones };
+const acciones = { ...cuentas, ...peleadores, ...combates, ...aura, ...veladas, ...moderacion, ...comunidad, ...demo, ...trayectoria, ...entrenadores, ...noticias, ...medios, ...propuestas, ...inscripciones, ...gimnasios, ...notificaciones, ...accesoAnticipado };
 
 const fd = (campos: Record<string, string> = {}) => { const f = new FormData(); for (const [k, v] of Object.entries(campos)) f.set(k, v); return f; };
 const verificado = new Date("2026-01-01T00:00:00Z");
@@ -82,7 +83,7 @@ async function destino(accion: (f: FormData) => Promise<unknown>, campos: Record
 
 beforeEach(() => { mundo.estado.respuestas = {}; mundo.estado.escrituras = []; iniciarSesion(null); });
 
-const SOLO_MODERADORES = ["decideGymClaim","adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "levantarSuspensionDeInvitaciones", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
+const SOLO_MODERADORES = ["decideGymClaim","adminDecide", "decideClaim", "decideOrganizer", "setGymVerified", "resolveReport", "cambiarAccesoAnticipado", "invitarAccesoAnticipado", "quitarAccesoAnticipado", "levantarSuspensionDeInvitaciones", "setSupportAccreditation", "refreshNewsNow", "addNewsSource", "toggleNewsSource", "toggleNewsItem", "actualizarFallo", "decidirVeladaPasada"] as const;
 const SOLO_ORGANIZADORES = ["createEvent", "addCartelBout", "setBoutResult", "updateEvent", "setEventStatus", "removeCartelBout", "setRegistration", "answerRegistrations", "setSlot", "removeSlot"] as const;
 const EXIGEN_CORREO_VERIFICADO = ["inviteGymTransfer", "answerGymTransfer", "cancelGymTransfer","inviteGymMember", "answerGymMemberInvitation", "cancelGymMemberInvitation","addPublicVideoHighlight","saveGym", "requestGymClaim", "transferGym", "setGymMember","setAvailability", "createMyFighter", "updateMyFighter", "saveDiscipline", "addBout", "removeMyBout", "setMyBoutResult", "respondBout", "requestClaim", "requestOrganizer", "setBoutEvidence", "createReport", "saveAchievement", "withdrawAchievement", "restoreOwnAchievement", "requestAchievementReview", "reviewAchievement", "endorseBout", "setRecordPublic", "publishHighlight", "manageHighlight", "createMyTrainer", "createClass", "toggleClass", "shareMedia", "deleteMyMedia", "removeDiscipline", "requestClass", "answerClassRequest", "cancelClassRequest", "proposeFight", "answerProposal", "cancelProposal", "requestRegistration", "withdrawRegistration"] as const;
 const EXIGEN_SESION = ["readNotification", "readAllNotifications","setAttendance", "updateAccount", "changePassword", "deleteAccount", "resendVerification", "giveAura", "removeAura", "toggleFollow", "demoConfirmarCorreo", "demoCambiarPapel", "saveInterests", "saveFighterIntent", "saveTrainerIntent", "saveTrainerClassIntent", "bloquearUsuario", "desbloquearUsuario"] as const;

@@ -25,11 +25,16 @@ import Icono from "./components/Icono";
  * La demo (DEMO_MODE=si) pide a los buscadores que no la muestren: si alguien busca «Lona», debe encontrar la versión real, no la de
  * pruebas (petición del fundador, 15 de octubre de 2026). Se calcula en cada petición para leer la variable del servidor en marcha.
  */
+const DESCRIPCION = "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.";
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(APP_URL),
     title: { default: "Lona", template: "%s · Lona" },
-    description: "La comunidad de deportes de contacto de toda España: peleadores, récords, veladas, gimnasios y entrenadores de boxeo, jiu-jitsu, K-1, kickboxing, MMA y Muay Thai, amateur y profesional.",
+    description: DESCRIPCION,
+    // Tarjeta al compartir un enlace (17-10-2026). Sin título propio: cada red usa el título de la página que se comparte.
+    openGraph: { type: "website", siteName: "Lona", locale: "es_ES", description: DESCRIPCION, images: [{ url: "/brand/lona/lona-icono-1024.png", width: 1024, height: 1024, alt: "Lona" }] },
+    twitter: { card: "summary", description: DESCRIPCION, images: ["/brand/lona/lona-icono-1024.png"] },
     ...(demoActiva() ? { robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } } } : {}),
   };
 }

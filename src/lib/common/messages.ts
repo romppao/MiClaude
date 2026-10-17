@@ -3,6 +3,11 @@
  * y se traducen aquí, para que el texto esté en un solo sitio y sea claro, amable y profesional.
  */
 export const AVISOS: Record<string, string> = {
+  acceso_activado: "Acceso anticipado encendido: desde ahora solo crean cuenta las personas de la lista.",
+  acceso_desactivado: "Acceso anticipado apagado: cualquiera puede crear una cuenta.",
+  acceso_invitados: "Hecho: los correos están en la lista. Avísales de que ya pueden entrar.",
+  acceso_invitados_con_errores: "Hecho con los correos válidos. Algunos no parecían correos y no se han añadido: revísalos.",
+  acceso_quitado: "Hecho: ese correo ya no está en la lista. Si ya tenía cuenta, la conserva.",
   entradas_guardadas: "Cartel y entradas guardados.",
   entradas_reservadas: "Reserva hecha. Envía la señal por Bizum con tu código como concepto para confirmarla.",
   entradas_canceladas: "Reserva cancelada.",
@@ -150,6 +155,10 @@ export const AVISOS: Record<string, string> = {
 };
 
 export const PROBLEMAS: Record<string, string> = {
+  acceso_anticipado: "Lona está en acceso anticipado y ese correo no está en la lista de invitados. Si te han invitado, usa el mismo correo (o la misma cuenta de Google) que diste.",
+  acceso_correos_vacios: "Pega al menos un correo electrónico, uno por línea.",
+  acceso_correos_no_validos: "Ninguno de los textos parece un correo electrónico. Revisa que tengan la forma nombre@dominio.es.",
+  acceso_demasiados: "Son demasiados correos de una vez: añade como mucho 200 en cada envío.",
   hora_invalida: "Escribe la hora como 20:30.",
   entradas_numeros: "El precio y el aforo tienen que ser números enteros (el precio, entre 1 y 1.000 €).",
   bizum_invalido: "El Bizum tiene que ser un móvil español: 9 cifras que empiezan por 6 o 7.",

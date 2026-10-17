@@ -225,6 +225,11 @@
     "guide": "docs/mantenimiento/DATOS.md"
   },
   {
+    "path": "prisma/migrations/20261017140000_acceso_anticipado/migration.sql",
+    "purpose": "Crea la lista de correos del acceso anticipado y los ajustes que moderación cambia sin volver a desplegar. Solo añade tablas; no toca datos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -448,6 +453,11 @@
     "path": "src/app/_inicio/datos.ts",
     "purpose": "Consultas compartidas de veladas futuras y peleadores con aura del público; acota resultados y excluye revisión/cancelación.",
     "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/app/actions/acceso-anticipado.ts",
+    "purpose": "Acciones de moderación del acceso anticipado: encenderlo o apagarlo, añadir correos a la lista y quitarlos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/actions/accounts.ts",
@@ -1100,6 +1110,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/moderacion/acceso-anticipado/page.tsx",
+    "purpose": "Pantalla del acceso anticipado: estado (encendido o apagado), invitar correos y lista de invitados con si ya tienen cuenta.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/moderacion/acreditaciones/page.tsx",
     "purpose": "Cola/gestión moderadora de cuentas autorizadas para respaldar hechos por disciplina.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1367,6 +1382,11 @@
   {
     "path": "src/instrumentation.ts",
     "purpose": "Ejecuta validación de entorno al iniciar runtime de servidor en producción para detectar configuración imprescindible ausente.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/accounts/acceso-anticipado.ts",
+    "purpose": "Acceso anticipado: leer la lista pegada de correos, si está encendido y si un correo puede crear cuenta (con correo o con Google).",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1920,6 +1940,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/acceso-anticipado.mjs",
+    "purpose": "Recorrido del acceso anticipado: encender, registro rechazado y aceptado (correo y Google), quien ya tenía cuenta entra, quitar y apagar.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/acceso.mjs",
     "purpose": "Recorre guardas y rechazos por sesión/rol y destinos de retorno tras entrar.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2163,6 +2188,11 @@
     "path": "tests/e2e/veladas-pasadas.mjs",
     "purpose": "Recorre la solicitud de autorizaci?n, la cola moderadora, las decisiones auditadas y su efecto en la publicaci?n y el correo.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/acceso-anticipado.test.ts",
+    "purpose": "Acceso anticipado: lectura de la lista pegada de correos y decisión de quién puede crear cuenta.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/acciones-ayudantes.test.ts",

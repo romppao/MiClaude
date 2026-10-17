@@ -90,6 +90,10 @@ export default async function Hoy() {
             <span className="mut">Comprobar un resultado o un título con una prueba.</span>
           </li>
           <li>
+            <Link href="/moderacion/acceso-anticipado">Acceso anticipado</Link>
+            <span className="mut">Quién puede crear cuenta mientras Lona no está abierta a todo el mundo.</span>
+          </li>
+          <li>
             <Link href="/moderacion/acreditaciones">Gestionar acreditaciones</Link>
             <span className="mut">Quién puede respaldar resultados (entrenadores, federaciones).</span>
           </li>

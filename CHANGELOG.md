@@ -11,6 +11,18 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.26.0] — 2026-10-17
+
+PR de Claude Code: **acceso anticipado y buscadores** (petición del fundador, 17-10-2026: «que la web salga en las búsquedas de Google y que la gente pueda registrarse con su cuenta de Google. Haré un acceso anticipado a personas concretas»).
+
+### Añadido
+- **Acceso anticipado** (`/moderacion/acceso-anticipado`, enlazado desde «Hoy», el menú de moderación y Administración): se enciende o se apaga con un botón, sin volver a desplegar. Encendido, **solo crean cuenta —con correo o con Google— los correos de la lista**; quien ya tenía cuenta entra igual y la cuenta del creador siempre puede. Los correos se pegan uno por línea (se pasan a minúsculas, sin repetir; los que no son correos se señalan) y la lista dice quién ya ha creado su cuenta. Apagado por defecto: la demo no cambia.
+- El registro avisa mientras está encendido, y a quien no está en la lista se le dice por qué no puede crear su cuenta.
+- **Tarjeta al compartir** un enlace (WhatsApp, Instagram, X): nombre, descripción e icono de Lona; cada red usa el título de la página compartida.
+- **Datos estructurados** en la portada (nombre del sitio y su buscador) para que Google los muestre. No en la demo.
+- **Guía para el fundador** `docs/ACCESO-ANTICIPADO.md`: los pasos, en orden, para que lonaclub.es salga en Google y abrir el acceso anticipado.
+- Migración aditiva (dos tablas nuevas), recorrido `acceso-anticipado.mjs` y pruebas unitarias.
+
 ## [0.25.0] — 2026-10-17
 
 PR de Claude Code: **denunciar una invitación y pausar el envío** (cierra el plan de contacto entre usuarios aprobado el 17-10-2026: «con límites, denuncia y control del peleador»). Hasta ahora un peleador podía rechazar o bloquear, pero no avisar a moderación de una invitación abusiva.
