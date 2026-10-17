@@ -30,7 +30,7 @@ await abusa.p.setViewportSize({ width: 390, height: 844 });
 const remitente = await db.user.findUniqueOrThrow({ where: { email: abusa.email } });
 const receptores = [await peleador("Uno"), await peleador("Dos"), await peleador("Tres")];
 const invitaciones = [];
-for (const r of receptores) invitaciones.push(await db.invitation.create({ data: { fromUserId: remitente.id, toFighterId: r.f.id, kind: "TRAIN", message: `Hola ${r.f.firstName}, entrena conmigo ${rnd}`, expiresAt: new Date(Date.now() + 14 * 864e5) } }));
+for (const r of receptores) invitaciones.push(await db.invitation.create({ data: { fromUser: { connect: { id: remitente.id } }, to: { connect: { id: r.f.id } }, kind: "TRAIN", message: `Hola ${r.f.firstName}, entrena conmigo ${rnd}`, expiresAt: new Date(Date.now() + 14 * 864e5) } }));
 
 // 2) Denunciar desde la propia invitación.
 const [uno, dos, tres] = receptores;
@@ -79,7 +79,7 @@ check("la bandeja enseña quién invitó, a quién y qué decía", await seen(ta
 check("y que el envío de esa cuenta está en pausa", await seen(tarjeta("uno").getByText("está en pausa")));
 await tarjeta("uno").getByRole("button", { name: "Resolver y suspender el envío de invitaciones" }).click();
 check("suspender sin motivo no se deja (se le comunica a quien lo sufre)", await seen(mod.p.locator(".notice-bad", { hasText: "anota el motivo" })));
-await tarjeta("uno").locator("input[name=note]").fill("Tres personas distintas avisaron de mensajes no solicitados");
+await tarjeta("uno").locator("form").first().locator("input[name=note]").fill("Tres personas distintas avisaron de mensajes no solicitados");
 await tarjeta("uno").getByRole("button", { name: "Resolver y suspender el envío de invitaciones" }).click();
 await mod.p.locator(".notice-ok").waitFor();
 check("queda anotado en el historial", (await db.auditLog.count({ where: { action: "INVITATIONS_SUSPENDED", entityId: remitente.id } })) === 1);
@@ -90,8 +90,10 @@ await mod.p.goto(B + "/moderacion");
 await tarjeta("dos").getByRole("button", { name: "Levantar la pausa de invitaciones" }).click();
 await mod.p.locator(".notice-ok", { hasText: "vuelve a poder enviar invitaciones" }).waitFor();
 check("moderación puede levantar la pausa", !(await db.user.findUniqueOrThrow({ where: { id: remitente.id } })).invitationsSuspendedAt);
+await abusa.p.goto(B + "/invitaciones");
+check("y «Mis invitaciones» ya no dice que el envío está en pausa", await seen(abusa.p.getByRole("heading", { name: "Mis invitaciones" })) && (await abusa.p.locator(".notice-bad", { hasText: "está en pausa" }).count()) === 0);
 await abusa.p.goto(B + `/peleadores/${uno.f.slug}/invitar`);
-check("y quien enviaba vuelve a ver el formulario de invitar", await seen(abusa.p.getByRole("button", { name: "Enviar la invitación" })));
+check("ni el formulario de invitar", (await abusa.p.locator(".notice-bad", { hasText: "está en pausa" }).count()) === 0);
 await abusa.p.goto(B + "/avisos");
 check("con aviso de que ya puede invitar", await seen(abusa.p.getByText("ha levantado la pausa de tus invitaciones")));
 
