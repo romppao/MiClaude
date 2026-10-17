@@ -59,7 +59,8 @@ Moderación tiene su **propio papel** en la aplicación (`papelDe` devuelve `mod
 - **La bandeja** ya no repite el estado de la aplicación ni las herramientas: están en «Hoy». Aquí solo van las colas, y «Avisos de usuarios» se llama «Denuncias de usuarios» (la campana de avisos es otra cosa).
 - **Avisos a quien decide la moderación:** cada decisión avisa dentro de la app a la persona afectada, con el motivo si lo hay (`avisarDecision` en `src/lib/community/notify.ts`, tipo de aviso `MODERATION`): combates (a los dos peleadores), reclamación de ficha, organizador, sello de gimnasio (a quien lleva el gimnasio) y velada pasada. Las reclamaciones, organizadores y veladas además envían el correo de siempre.
 - **Denuncias de invitaciones:** aparecen en la bandeja con quién invitó, a quién y el mensaje. «Resolver y suspender el envío de invitaciones» (motivo obligatorio) pausa la cuenta y retira lo pendiente; «Levantar la pausa de invitaciones» la reactiva (aviso incluido). Con denuncias abiertas de tres personas distintas la pausa es automática y la decisión queda para moderación (`src/lib/community/invitaciones-pausa.ts`).
-- **Pendiente:** dividir la bandeja en secciones por tipo (hoy sigue siendo una página larga con sus anclas) y avisar también del cierre de una denuncia con el motivo dentro de la app.
+- **Bandeja por tipo (0.27.0):** arriba, un filtro (`?ver=<cola>`) enseña solo una cola con su paginación; «Todo» las junta por urgencia. «Hoy» enlaza cada número a su cola filtrada. Se conserva al paginar y al volver de cada decisión.
+- **Pendiente:** avisar también del cierre de una denuncia con el motivo dentro de la app (hoy va por correo).
 
 ## 3. Registro de fallos (`/moderacion/fallos`)
 
