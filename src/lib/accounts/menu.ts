@@ -48,6 +48,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
         { href: "/moderacion/acreditaciones", texto: "Acreditaciones" },
         { href: "/moderacion/gimnasios", texto: "Gimnasios" },
         { href: "/moderacion/noticias", texto: "Fuentes de noticias" },
+        { href: "/moderacion/acceso-anticipado", texto: "Acceso anticipado" },
         ...(x.creador ? [{ href: "/moderacion/usuarios", texto: "Administración: cuentas y moderadores" }] : []),
       ],
     });

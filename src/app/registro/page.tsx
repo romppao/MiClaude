@@ -28,6 +28,8 @@ const QUE_SIGUE: Record<TipoDeCuenta, string> = {
   entidad: "Un moderador revisará tu solicitud y te responderá por correo electrónico. Hasta entonces tu cuenta funciona como la de un aficionado.",
 };
 
+import { accesoAnticipadoActivo } from "../../lib/accounts/acceso-anticipado";
+
 export default async function Register({ searchParams }: { searchParams: Promise<{ next?: string; tipo?: string }> }) {
   const sp = await searchParams;
   const next = internalPath(oneParam(sp.next) ?? "", "");
@@ -35,6 +37,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
   const siguiente = next ? `&next=${encodeURIComponent(next)}` : "";
   const entrar = `/entrar${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   const volverAElegir = `/registro${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+  const avisoAcceso = (await accesoAnticipadoActivo()) && <p className="notice notice-info" role="note"><span aria-hidden="true">ℹ </span>Lona está en <strong>acceso anticipado</strong>: por ahora solo pueden crear cuenta las personas invitadas. Si te han invitado, usa el mismo correo (o la misma cuenta de Google) que nos diste.</p>;
   const avisoDestino = next && <p className="notice notice-info" role="note">Crea tu cuenta para continuar. Cuando confirmes tu correo electrónico podrás volver a la página donde estabas.</p>;
 
   if (!tipo) {
@@ -45,7 +48,9 @@ export default async function Register({ searchParams }: { searchParams: Promise
           <h1>Crear cuenta</h1>
           <p className="lead">¿Cómo vas a usar Lona? Elige el tipo de cuenta que necesitas: la aplicación se adapta a lo que haces.</p>
         </div>
-        {avisoDestino}
+        {avisoAcceso}
+        {avisoAcceso}
+      {avisoDestino}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {TIPOS_DE_CUENTA.map((t) => (
             <Link key={t} className="panel-tipo panel-registro" href={`/registro?tipo=${t}${siguiente}`} style={{ "--tinte": conAlfa(PANELES[t].color, 0.3), "--anillo": conAlfa(PANELES[t].color, 0.3), "--color": PANELES[t].color } as CSSProperties}>
@@ -69,6 +74,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         <span className="pildora pildora-acc">{panel.titulo}</span>
         <h1 style={{ margin: 0 }}>{panel.titular}</h1>
       </div>
+      {avisoAcceso}
       {avisoDestino}
       {googleDisponible() && (tipo === "entidad"
         ? <p className="hint mut" style={{ margin: 0 }}>Las promotoras, federaciones y clubes se registran con correo y contraseña, porque su solicitud necesita estos datos.</p>

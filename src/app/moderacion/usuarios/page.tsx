@@ -39,6 +39,8 @@ export default async function Administracion({ searchParams }: { searchParams: P
       <h1>Administración</h1>
       <p className="mut">Solo la ve la cuenta del creador. Desde aquí gestionas las cuentas y quién modera. Los combates, veladas, fichas, perfiles, noticias y avisos se gestionan desde <Link href="/moderacion">Moderación</Link>. Cada cambio queda en el <Link href="/moderacion/historial">historial</Link>.</p>
 
+      <p className="notice notice-info"><span aria-hidden="true">ℹ </span>Para dejar entrar solo a personas concretas mientras Lona no está abierta a todo el mundo, usa <Link href="/moderacion/acceso-anticipado">Acceso anticipado</Link>.</p>
+
       <h2>Cuentas ({total})</h2>
       <p className="mut">{ORDEN.map((r) => `${TIPO[r]}: ${porTipo.find((g) => g.role === r)?._count._all ?? 0}`).join(" · ")}</p>
       <form action="/moderacion/usuarios" role="search" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>

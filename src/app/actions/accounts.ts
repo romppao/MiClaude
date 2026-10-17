@@ -17,6 +17,7 @@ import { internalPath } from "../../lib/common/paths";
 import { anonymizeFighter, scrubFighterHistory } from "../../lib/fighters/anonymize";
 import { LIMITS, isEmail, oneLine } from "../../lib/common/text";
 import { almacenDeVideos } from "../../lib/media/storage";
+import { puedeCrearCuenta } from "../../lib/accounts/acceso-anticipado";
 import { PASO_TRAS_DATOS, ROL_INICIAL, landingFor, parseTipoDeCuenta, parseTipoDeEntidad, type TipoDeEntidad } from "../../lib/accounts/landing";
 import { readOnboarding, type FighterIntent, type TrainerIntent } from "../../lib/accounts/onboarding";
 import { DISCIPLINE_ORDER, parseCompetitionChoice } from "../../lib/common/disciplines";
@@ -72,6 +73,8 @@ export async function register(f: FormData) {
     if ((await getUser())?.email === email) go(siguiente);
     go(back, { problema: "registro_email_existe" });
   }
+  // Acceso anticipado (docs/ACCESO-ANTICIPADO.md): encendido, solo crean cuenta los correos invitados.
+  if (!(await puedeCrearCuenta(email))) go(back, { problema: "acceso_anticipado" });
   await maybePurge();
   const passwordHash = await hashPassword(password);
   // La cuenta y, en su caso, la solicitud de la entidad se crean juntas: o se guardan las dos o ninguna.

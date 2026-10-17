@@ -2540,3 +2540,17 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Decisiones:** la pausa automática no espera a moderación (el daño de una invitación abusiva es inmediato) pero siempre la revisa un humano y se puede levantar; a quien envía no se le dice quién denunció; el umbral de tres personas distintas evita que una sola persona pause a otra.
 
 **Pendiente:** dividir la bandeja en secciones; revisión del abogado de la pausa automática (ver `docs/LEGAL.md`).
+
+## 17 de octubre de 2026, tarde — Acceso anticipado y buscadores (Claude Code)
+
+**Petición del fundador:** «que la web salga en las búsquedas de Google y que la gente pueda registrarse con su cuenta de Google. Haré un acceso anticipado a personas concretas». Ese mismo día enseñaba la aplicación a un cliente por primera vez.
+
+**Qué había:** entrar con Google ya funcionaba (probado en la demo) y la versión real ya estaba preparada para los buscadores (mapa del sitio, `robots.txt`, títulos); la demo se bloquea a propósito. Faltaba una forma de dejar entrar solo a personas concretas y las tarjetas al compartir.
+
+**Qué se hizo (0.26.0):** el acceso anticipado se enciende y se lleva desde moderación, sin variables ni despliegues: encendido, solo crean cuenta (con correo o con Google) los correos de la lista; quien ya tenía cuenta entra igual. Tarjeta al compartir y datos estructurados en la portada. Y la guía `docs/ACCESO-ANTICIPADO.md` con los pasos del fundador en orden (decisiones, cuentas, montaje, dominio, abogado, pruebas, invitar, Search Console).
+
+**Decisiones:** el interruptor vive en la base de datos y no en una variable de entorno, para que el fundador invite sin tocar Cloud Run y para poder probarlo en el navegador sin afectar al resto de recorridos (que crean cuentas); la prueba lo deja siempre apagado al terminar. La pantalla es de moderación (el creador es moderador) y no solo de Administración, porque ayudar a gestionar invitados es trabajo de moderación.
+
+**Qué salió mal:** otro asistente tenía abierta una «demo local» (`next dev` en el puerto 3141) en la misma carpeta, quizá para la reunión del fundador: bloqueaba el motor de Prisma y compartía la carpeta de compilación. No se compiló en local para no romperla; los recorridos de navegador los pasa el CI.
+
+**Pendiente:** todo lo del fundador en `docs/ACCESO-ANTICIPADO.md` (versión real, dominio, abogado, Search Console).

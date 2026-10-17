@@ -53,6 +53,13 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 - **Decisión de moderación:** suspender el envío exige un motivo, que se comunica a la persona afectada por aviso y por correo, con cómo reclamar (mismo criterio que la retirada de contenido, DSA arts. 16 y 17). Moderación puede levantar la pausa con otro aviso. Todo queda en el registro de actividad.
 - **Para el abogado:** si la pausa automática, sin revisión humana previa, es proporcionada; plazo en que moderación debe revisarla; y si hace falta un procedimiento de reclamación propio para cuentas pausadas.
 
+## Acceso anticipado (0.26.0, 17 de octubre de 2026)
+- **Qué se guarda:** los correos que moderación apunta en la lista de invitados (y una nota opcional para quien modera). Sirven solo para dejar crear cuenta a esas personas mientras Lona no está abierta a todo el mundo.
+- **Quién lo ve:** solo moderación. En el registro de actividad queda cuántos correos se añadieron o se quitaron, nunca los correos.
+- **Cuándo se borra:** se puede quitar a cualquiera de la lista en cualquier momento; al abrir Lona a todo el mundo conviene vaciarla.
+- **Para el abogado:** base jurídica para guardar el correo de una persona invitada que todavía no ha creado su cuenta (interés legítimo de quien la invita, que se lo ha pedido), y si hay que avisarle al invitarla.
+
+
 ## Pendiente en la app (programación)
 1. T-013, aviso al salir hacia enlaces externos: implementado en 0.17.1 (rama de Codex, pendiente de revisión e integración). Reglamentos, moderación y autoría del mapa anuncian la pestaña nueva; los vídeos externos lo avisan visiblemente y condiciones/privacidad explican la salida. `tests/e2e/enlaces.mjs` vigila el aviso y `rel` en las pantallas recorridas.
 2. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.

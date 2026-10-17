@@ -1150,3 +1150,19 @@ model Invitation {
   @@index([fromUserId, createdAt])
   @@index([eventId])
 }
+
+// Acceso anticipado (17-10-2026, petición del fundador): mientras está encendido, solo crean cuenta (con correo o con Google) los correos de esta
+// lista. Lo gestiona moderación en /moderacion/acceso-anticipado. Quien ya tiene cuenta no se ve afectado.
+model EarlyAccessInvite {
+  email     String   @id
+  note      String?
+  addedById String?
+  createdAt DateTime @default(now())
+}
+
+// Ajustes que moderación cambia sin volver a desplegar (por ahora, encender o apagar el acceso anticipado).
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

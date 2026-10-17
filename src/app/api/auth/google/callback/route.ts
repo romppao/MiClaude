@@ -9,6 +9,7 @@ import { registrarFallo } from "../../../../../lib/common/fallos";
 import { createSession, destroyOtherSessions } from "../../../../../lib/accounts/auth";
 import { hashPassword } from "../../../../../lib/accounts/password";
 import { esCreador } from "../../../../../lib/accounts/creador";
+import { puedeCrearCuenta } from "../../../../../lib/accounts/acceso-anticipado";
 import { PASO_TRAS_DATOS, ROL_INICIAL, landingFor } from "../../../../../lib/accounts/landing";
 import { COOKIE_GOOGLE, canjearCodigo, configGoogle, decidirCuenta, leerViaje, validarIdToken } from "../../../../../lib/accounts/google";
 
@@ -73,6 +74,8 @@ export async function GET(req: Request) {
     await audit({ userId, entity: "USER", entityId: userId, action: "CUENTA_GOOGLE_VINCULADA", after: { contrasenaInvalidada: decision.protegerCuenta } });
     aviso = "google_vinculada";
   } else {
+    // Acceso anticipado (docs/ACCESO-ANTICIPADO.md): encendido, solo crean cuenta los correos invitados.
+    if (!(await puedeCrearCuenta(identidad.email))) return conMensaje("/registro", "problema", "acceso_anticipado");
     try {
       const creada = await db.user.create({
         data: {

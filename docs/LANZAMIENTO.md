@@ -20,6 +20,8 @@
 
 ## 2. Imprescindible antes de que entren usuarios reales
 
+> **17-10-2026:** el fundador quiere abrir primero un **acceso anticipado** a personas concretas. Pasos en orden y qué hace cada uno: [`ACCESO-ANTICIPADO.md`](ACCESO-ANTICIPADO.md).
+
 Estado a 13 de octubre de 2026. ❌ = no empezado · 🟡 = en marcha · ✅ = hecho.
 
 | # | Qué | Por qué | Quién | Estado |
