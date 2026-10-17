@@ -1,5 +1,10 @@
 [
   {
+    "path": "tests/e2e/datos-vivos.mjs",
+    "purpose": "Comprueba el refresco de una lista al recuperar foco o visibilidad y la conservación del filtro sin enviar, con cambios desde otra conexión al servidor.",
+    "guide": "docs/pruebas/auditoria-actualizacion-datos-2026-10-17.md"
+  },
+  {
     "path": ".env.example",
     "purpose": "Plantilla de nombres y significado de variables, sin credenciales reales; punto de partida para configuración local/producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1976,7 +1981,7 @@
   },
   {
     "path": "tests/e2e/escenarios.mjs",
-    "purpose": "Recorre guiones completos como distintas personas en móvil emulado, registra capturas y fricciones para revisión visual.",
+    "purpose": "Dieciséis recorridos móviles por persona y tipo de cuenta, con registro, interlocutores reales, decisiones, letra ampliada, protección del creador, capturas e informe de fallos/fricciones para revisión visual.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {

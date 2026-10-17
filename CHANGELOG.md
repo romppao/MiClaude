@@ -11,6 +11,20 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.24.1] — 2026-10-17
+
+### Añadido
+- Los gimnasios sin banner subido muestran su logotipo completo en la cabecera. La imagen propia tiene prioridad y no se inventa una marca cuando falta.
+- T-009: dieciséis recorridos por persona, guarda exacta de identidades, capturas e informe, ejecución selectiva de escenarios.
+- Prueba de datos vivos: cambios al recuperar el foco y protección del filtro sin enviar.
+
+### Corregido
+- Actualizar al volver a una ventana del navegador, conservando las protecciones al escribir y el límite entre peticiones.
+- Esperar el combate guardado y la imagen diferida antes de sus comprobaciones, sin eliminar aserciones.
+- Capturas con caret:initial y retirada de encType redundante de Mi ficha. Los avisos React no se consideran resueltos sin evidencia.
+- Auditoría de actualización y coste: una renderización puede requerir varias consultas, no se garantiza gasto cero.
+
+
 ## [0.24.0] — 2026-10-17
 
 PR de Claude Code: **moderador con papel propio** (aviso del fundador, 17-10-2026: «cuando entro como moderador, las pantallas son muy confusas»). Hasta ahora una cuenta de moderación se trataba como la de un aficionado: su «Mi panel» decía «todavía no sigues a ningún peleador», la barra inferior no tenía «Moderación» y todo el trabajo estaba en una sola página de más de mil líneas, con avisos mezclados con combates y trabajo escondido sin contador.

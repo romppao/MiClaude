@@ -522,6 +522,9 @@ Cambiar únicamente el mínimo de un rango y regenerar el bloqueo puede elegir u
 
 La ejecución de unitarias junto al navegador agotó el límite de dos pruebas de scrypt, incluso con dos trabajadores. La pasada aislada con un trabajador pasó las 754 en 28,98 s. En este entorno de dos CPU, separar los cálculos de contraseñas de la batería de navegador; conservar límites y parámetros criptográficos.
 
+- 15-10-2026: los escenarios de persona necesitan un entorno propio con datos ficticios y sus capturas. Un paso bloqueante interrumpe ese recorrido conservando el fallo; no se relajan las afirmaciones ni se disimula el resto como aprobado.
+
+
 - 15-10-2026: una regla de publicación también debe aplicarse a los alta indirectas y a los valores por defecto. La revisión de gimnasio y su sello de verificación son independientes; las pruebas deben pasar por ambas decisiones cuando las necesitan.
 
 - 15-10-2026: al introducir revisión previa, las pruebas de búsqueda y metadatos deben preparar la aprobación mediante la interfaz y comprobar la invisibilidad antes de ella; no basta adaptar el recorrido principal.
@@ -538,3 +541,7 @@ Si `form` se localiza por un botón con `getByRole`, el botón debe estar expues
 - 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
 
 - 15-10-2026: al sacar un enlace de una celda y convertirlo en hijo directo de una tarjeta flex, su zona táctil puede quedar en 25 px. El CI móvil detectó la regresión en la bandeja; los accesos de gimnasio pasan a botón de enlace con altura mínima, sin relajar la prueba.
+
+
+- 16-10-2026, diagnóstico de Claude (comentario6216656220 en #91): Playwright oculta el cursor al capturar y puede añadir caret-color:transparent antes de que React hidrate; eso provoca un falso aviso#418. Las capturas de los escenarios usan caret:initial. Claude contrastó los tres recorridos afectados en desarrollo sin capturas y con esa opción; Codex conserva esta atribución y deja la nueva ejecución completa al CI. No se debe arreglar la aplicación para compensar una mutación del navegador de prueba.
+- 16-10-2026: los recorridos de personas se ejecutan manualmente, al fusionar o en un PR con etiqueta escenarios; no en todos los PR, para conservar minutos. El formulario con acción de función deja a React fijar su codificación sin encType redundante.

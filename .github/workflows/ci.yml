@@ -121,6 +121,72 @@ jobs:
         if: failure()
         run: tail -n 100 "$MAIL_LOG" || true
 
+  # T-009: servidor y PostgreSQL propios; no consume ni altera los datos de los demás recorridos.
+  escenarios:
+    # Solo manual, al fusionar o por petición explícita con la etiqueta del PR (Claude, 16-10-2026).
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'escenarios')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: escenarios
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/escenarios
+      BASE_URL: http://localhost:3120
+      APP_URL: http://localhost:3120
+      MAIL_TRANSPORT: log
+      MAIL_LOG: ${{ github.workspace }}/escenarios-server.log
+      NEWS_FETCH: "no"
+      GEOCODIFICAR: "no"
+      DEMO_MODE: "si"
+      CREADOR_CORREO: creador@prueba.test
+      MEDIA_DIR: /tmp/lona-escenarios-subidas
+      FOTOS_EN_DISCO: "si"
+      ESC_DIR: test-results/escenarios
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Preparar la base local vacía con datos ficticios
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed
+      - run: npm run build
+      - name: Instalar Chromium
+        run: npx playwright-core install --with-deps chromium
+      - name: Arrancar el servidor independiente de escenarios
+        run: |
+          node node_modules/next/dist/bin/next start -p 3120 > "$MAIL_LOG" 2>&1 &
+          npx wait-on -t 60000 http://localhost:3120/salud
+      - name: Recorrer todos los tipos de cuenta
+        run: |
+          set -o pipefail
+          mkdir -p test-results/escenarios
+          npm run test:escenarios 2>&1 | tee test-results/escenarios/ejecucion.log
+      - name: Capturas e informe por persona, también cuando falla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: escenarios-por-persona
+          path: test-results/escenarios/
+          if-no-files-found: ignore
+      - name: Diagnóstico del servidor de escenarios
+        if: failure()
+        run: tail -n 80 "$MAIL_LOG" || true
+
   # Al fusionar en la rama de la demo y solo si todas las pruebas han pasado: crea la etiqueta vX.Y.Z de la versión (y de las
   # históricas del CHANGELOG que aún no la tengan). Es el único trabajo con permiso de escritura, y tarda unos segundos.
   etiquetar:

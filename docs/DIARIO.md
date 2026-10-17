@@ -2310,6 +2310,18 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 **Entrega T-002:** [PR #78](https://github.com/romppao/MiClaude/pull/78), versión 0.17.2, sobre la demo 0.17.0 elegida en #75. Las comprobaciones de esta base se consultan en [el CI del PR](https://github.com/romppao/MiClaude/pull/78/checks). Los CI completos anteriores a #75 terminaron en verde: [T-013, 33398e6](https://github.com/romppao/MiClaude/actions/runs/38706572484) y [T-002, d62b8d1](https://github.com/romppao/MiClaude/actions/runs/38706575120), incluidas accesibilidad y experiencia gráfica; su alcance no se confunde con el de la base nueva. Los PR originales de Dependabot y los de paneles quedan abiertos sin modificaciones por Codex. Primero se integra T-013; después, T-002. Claude revisa y el fundador decide la integración.
 
+## 2026-10-15 — T-009, todos los tipos de cuenta
+**Pedido:** después de los cuatro puntos D/H, ampliar T-009 para las pruebas definitivas antes del lanzamiento.
+**Base:** demo `059abd9` (0.18.6). **Rama:** `codex/t-009-escenarios-de-todos-los-tipos-de-c-20261015`.
+**Cambios:** 16 personas/recorridos, con pasos visibles y datos propios. Incluye rival que confirma y solicita revisión, reclamación provisional, entrenador y gimnasio con titular asignado por moderación, todas las colas de moderación, Carmen al 150/200 %, recuperación/cambio/descarga/eliminación de cuenta, foto/banner/título/respaldo, club y creador con el segundo paso real. Se actualiza el registro opcional para la pantalla actual. Los recorridos se interrumpen al fallar un paso y conservan el fallo y captura, para evitar errores en cascada.
+**CI:** tarea independiente con PostgreSQL y servidor propios y semilla ficticia en base vacía; no cambia el producto ni usa cuentas reales. El artefacto incluye capturas y JSON, incluso en fallos.
+**Compartido:** .github/workflows/ci.yml y versión de package.json/lock. No se han cambiado dependencias.
+**Validación y revisión visual:** en curso; los resultados y límites se documentarán por persona en docs/pruebas/escenarios-2026-10-15.md. Los hallazgos fuera de alcance se dejan para Claude, sin cambiar el producto.
+
+## 16 de octubre de 2026 — Evidencias de T-009
+Codex contrasta el CI 38748985341 y sus registros: 16 recorridos, 93 pasos, cero pasos fallidos sobre b1597d4e (demo 0.18.7). Los selectores de veladas ya utilizan texto visible y no dependen de .card. Hay avisos React #418 en tres personas; siguen pendientes de diagnóstico. No se repite la batería ni se declara completada la revisión visual: el artefacto no pudo descargarse al disco. Informe actualizado en docs/pruebas/escenarios-2026-10-16.md. #93 continúa sin fusionar; se respeta el orden del encargo de Claude.
+
+
 ## 2026-10-15 — Gimnasios aportados desde fichas, pendientes de revisión
 **Pedido:** cuarto punto del relevo: PENDING si no lo hace moderación.
 **Base:** demo `059abd9` (0.18.6). **Rama:** `codex/gimnasios-desde-fichas-en-revision-20261015`.
@@ -2319,6 +2331,8 @@ El fundador pide continuar. La comprobación final de la principal detecta #68 i
 
 ## 16 de octubre de 2026 — Recorrido de edición de gimnasio
 Codex corrige la prueba de altas (#90): abre la pestaña «Mis datos» y el desplegable de corrección en cada visita antes de buscar el botón del formulario. El campo de gimnasio ya existía. No cambian permisos, datos ni comportamiento de la aplicación. Sintaxis comprobada; validación completa pendiente del CI. #93 sigue abierto, comprobado mediante el conector de GitHub; se mantiene el orden de integración acordado.
+
+
 
 ## 2026-10-15 — Cesión de gimnasio con aceptación
 **Pedido:** tercer punto del relevo: invitación, misma respuesta tenga o no cuenta el correo, hayBloqueo y correo a las dos personas.
@@ -2414,6 +2428,13 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Integración:** merge de base candidata1174eac (invitaciones, cesiones y entradas) en rama propia codex/pr90-integracion-20261016. Traspaso remoto anterior preservado. El recorrido gimnasios-altas entra en orden.json. Sin cambios en las reglas de alta aprobadas por Claude, sin rebase.
 **Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos. Compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, prueba intacta. Sin migraciones ni cambios de datos reales. CI remoto pendiente; publicación después de fusionar #89.
 
+
+## 2026-10-16 - Codex - Integración T009 y comentarios de Claude (0.20.6)
+**Encargo:** comentarios6216529851 y6216656220 de #91 y relevo de #95. Merge de base candidata f495208, sin rebase, en codex/pr91-integracion-20261016. Traspaso remoto previo preservado.
+**Cambios:** caret:initial en ambas capturas, lección y causa actualizadas con atribución a la reproducción de Claude; escenarios solo manual/al fusionar/PR etiquetado. Etiqueta escenarios añadida a #91 antes de actualizarlo para comprobarlo completo una vez. Se retira encType redundante en Mi ficha como indicó Claude; sin cambio de acción ni permisos. Todos los recorridos de la base conservados.
+**Validación:** tipos, 915 unitarias, versión, catálogo y mapa correctos; compilación BUILD_EXIT=0. Documentación33/34 por EPERMWindows, caso intacto. Ejecución de los dieciséis escenarios pendiente del CI completo tras #90. Sin datos reales alterados.
+
+
 ## Corrección del recorrido tras CI 38942511433
 - El CI terminó con 40/41 recorridos correctos. Solo falla gimnasios-altas al seleccionar Boxeo: el input transparente con pointer-events:none está dentro de label.chip; .check() intenta pulsar el input y la etiqueta intercepta el clic (línea 37).
 - Se pulsa la etiqueta visible mediante label.chip:has(input[name=disciplina][value=BOXEO]) y se añade comprobación explícita de isChecked. Todas las afirmaciones de publicación, estados, moderación y territorio siguen intactas. No cambia código de aplicación, permisos ni CSS.
@@ -2430,6 +2451,18 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Validación:** revisado en pantalla a 375 y 1280 px, en tema claro y oscuro, con y sin fotos y con nombres muy largos, sin desbordes. Tipos, 891 pruebas unitarias, `filtros`, `flujo`, `diseno`, `paneles-agenda`, `menu`, `enlaces`, `busqueda`, `movil` y la medición de accesibilidad en verde. El resto de recorridos los pasa el CI.
 
 **Pendiente:** menos scroll en perfiles, panel y ficha; pantallas de acción guiadas (subir vídeos, buscar clases, perfil y trayectoria); datos en tiempo real (encargo a Codex en `docs/ecosistema/traspasos/2026-10-16-claude-encargo-codex-listados-y-pantallas-de-accion.md`). Acceso directo a Entrenadores desde el menú: a decidir.
+
+## Nuevo orden autorizado comunicado por Claude
+- Comentario6221715692 de #97: Claude incorporó las correcciones de Luna en26bffc4 y comunica autorización del fundador para adelantar los listados. Los archivos de CSS, navegación, filtros y regresiones son idénticos a los de nuestra rama revisada f5cdd1b; verificado con git diff sin diferencias.
+- Se prepara #90 sobre26bffc4 para publicarlo tras la fusión apta de #97. Se conservan todas las reglas de alta y el clic visible de Boxeo. La versión pasa a0.21.1 mediante el script; #91 deberá renumerarse después.
+- No se requiere el PR corrector de listados: Claude ya incorporó esos cambios. La rama propia publicada a3b224d3 queda como evidencia sin PR, evitando una entrega duplicada.
+- Esta preparación todavía no se ha publicado ni fusionado. Se comprobarán versión, catálogo, mapa, tipos, unitarias y compilación sobre la combinación nueva; el CI completo final sigue siendo necesario.
+
+## Actualización tras adelantar listados (#97)
+- Claude comunicó en comentario6221715692 la autorización del fundador para adelantar #97 e incorporó las correcciones en26bffc4. #90 se prepara sobre esa base como0.21.1 (3812d33), conservando la corrección visible de Boxeo.
+- #91 integra esa candidata con merge y se renumera con el script a0.21.2. Se conservan ambas capturas caret:initial, condición de escenarios manual/push/etiqueta, guarda de las dieciséis personas y retirada de encType redundante. No se modifica la lógica de listados ni de altas.
+- Esta combinación pasa tipos,920 unitarias, versión, catálogo478 y mapa. Documentación33/34 por EPERM Windows, caso intacto. Compilación nueva en curso al registrar. Sin navegador con DB local; CI definitivo pendiente.
+- La candidata es preparatoria, sin actualizar todavía el PR91 remoto. Esperar #97 apto y fusionado, publicar #90 actualizado, y después #91 cuando #90 esté apto.
 
 ## 16 de octubre de 2026 — Pantallas de acción guiadas, menos desplazamiento y datos al día (Claude Code)
 
@@ -2477,6 +2510,14 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 
 **Lección:** cualquier cambio en la estructura del menú pide pasar `menu` y `paneles-pulido` en local antes de subirlo; la prueba que fallaba estaba en la lista y no la lancé.
 
+
+## 17-10-2026 — Reconciliación con Claude
+- #97, #99 y #100 ya están fusionados; #98 cerrado como superado tras comprobar que cuenta.mjs coincide con la corrección incorporada.
+- #91 incorpora la candidata del menú #101 sin cambiar la carpeta ni el índice de Claude: preparación con objetos Git e índice aislado, sin clon ni node_modules duplicados.
+- Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
+- La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
+- Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.
+
 ## 17 de octubre de 2026, tarde — Invitaciones a peleadores (Claude Code)
 
 **Petición del fundador:** «cuando entro como moderador… no deja ponernos en contacto con peleadores». Plan aprobado: primero el contacto entre usuarios, después la estructura del moderador, en PR pequeños.
@@ -2502,6 +2543,11 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Lección (revisar a ojo lo que se baja de internet):** el primer pase dio 42 «logotipos» y cinco eran otra cosa: el logo de una marca de material (Fairtex), un icono genérico de pesas, un cuadrado dorado, el icono por defecto de WordPress y un favicon borroso. Un recorrido de comprobación no los habría detectado; hizo falta mirarlos.
 
 **Pendiente:** si el fundador consigue la autorización de los gimnasios, subir sus logotipos de Instagram; texto legal para el abogado (derechos sobre los logotipos).
+
+
+## 17-10-2026: T-009 integrado con invitaciones y logotipos
+
+Se integra por merge la principal 0.23.1 (#102 y #103), conservando los escenarios, sus aserciones y los cambios de Claude. Candidata 0.23.3 para no ocupar la 0.23.2 del arreglo de Render. El CI verde anterior acredita 317dc28, no esta nueva combinación: comprobaciones completas pendientes del nuevo CI. Los avisos React#418 siguen abiertos. No se modifica el arranque de Render ni la carpeta de Claude. Sin fusión.
 
 ## 17 de octubre de 2026, mañana — La demo no se actualizaba: migraciones bloqueadas en Neon (Claude Code)
 
@@ -2530,3 +2576,8 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Ampliación del mismo PR:** la bandeja deja de repetir el estado y las herramientas (están en «Hoy») y «Avisos de usuarios» pasa a «Denuncias de usuarios»; cada decisión de moderación (combates, ficha reclamada, organizador, sello de gimnasio, velada pasada) avisa dentro de la app al afectado con el motivo. `fallos.mjs`, que pedía el estado y las herramientas en la bandeja, mira ahora «Hoy» y comprueba que la bandeja ya no los repite.
 
 **Pendiente:** dividir la bandeja en secciones por tipo y la denuncia de invitaciones con suspensión de envío (PR3; #102 ya está fusionado).
+
+
+## 17-10-2026: entrega para el prototipo del cliente (Codex)
+
+Integra principal0.24.0 y el arranque de Render; candidata0.24.1 con banners de gimnasio desde su imagen propia o logo hallado, prioridad del banner subido, T-009 y actualización al recuperar foco. Recorridos locales de logos y datos vivos correctos;18 vistas de cabecera sin desbordes ni solapes. Tipos y1047 unitarias correctos; documentación33/34 por EPERM Windows, caso intacto. CI final pendiente. Se entrega inventario completo y auditoría de datos vivos; React#418 sigue abierto. Hallazgos de Astra en #106 enviados a Claude. No se modifica su carpeta ni se fusiona.

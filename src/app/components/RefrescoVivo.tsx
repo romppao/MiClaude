@@ -28,10 +28,11 @@ export default function RefrescoVivo() {
     };
     const alVolver = () => { if (document.visibilityState === "visible") refrescar(); };
     document.addEventListener("visibilitychange", alVolver);
+    window.addEventListener("focus", refrescar);
     window.addEventListener("online", refrescar);
     // Un poco de variación por persona para que miles de pestañas no pidan a la vez.
     const reloj = setInterval(refrescar, intervaloDe(ruta) + Math.round(Math.random() * 10_000));
-    return () => { document.removeEventListener("visibilitychange", alVolver); window.removeEventListener("online", refrescar); clearInterval(reloj); };
+    return () => { document.removeEventListener("visibilitychange", alVolver); window.removeEventListener("focus", refrescar); window.removeEventListener("online", refrescar); clearInterval(reloj); };
   }, [ruta, router]);
 
   return null;
