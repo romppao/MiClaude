@@ -416,6 +416,7 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 | `gym-osm.ts` | `gymNameKey`, `osmAreaProvince`, `osmGymCandidate`, `osmProvince` |
 | `gym-policy.ts` | `EXCLUDED_GYM_PROVINCES`, `excludedGymProvince`, `gymDistanceMetres`, `gymIsPublic`, `newGymStatus`, `osmMayUpdate` |
 | `labels.ts` | `AUDIT_ACTION_LABEL`, `AUDIT_ENTITY_LABEL`, `EVENT_KIND_AYUDA`, `EVENT_KIND_LABEL`, `LEVEL_LABEL`, `METHOD_LABEL`, `PROVINCES`, `STANCE_LABEL`, `VERIFICATION_LABEL`, `fmtDate`, `fmtFechaHoraMadrid`, `parseEventKind`, `resultWord`, `shortHash`, `slugName`, `slugify` |
+| `logos-gimnasios.ts` | `logoDeGimnasio` |
 | `mail-transporte.ts` | `entregarCorreo`, `hayTransporte`, `logMode` |
 | `mail.ts` | `APP_URL`, `sendMail` |
 | `mapa.ts` | `CENTROS_PROVINCIA`, `CENTRO_ESPANA`, `OrigenUbicacion`, `Punto`, `distanciaKm`, `enlaceComoLlegar`, `popularesDeLaZona`, `popularidadGimnasio`, `puntoDeGimnasio`, `textoDistancia` |

@@ -13,7 +13,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
   const where = { kind_entityId: { kind, entityId: id } };
   // Primero solo la versión (barato): si la persona ya tiene esa imagen, no se leen los bytes de la base de datos.
   const version = await db.profile.findUnique({ where, select: { updatedAt: true, hasAvatar: true, hasBanner: true } });
-  if (!version || !(slot === "avatar" ? version.hasAvatar : version.hasBanner)) return new Response(null, { status: 204 });
+  if (!version || !(slot === "avatar" ? version.hasAvatar : version.hasBanner)) {
+    // Un gimnasio sin logotipo propio enseña el que se encontró en su web (lib/common/logos-gimnasios.ts); el que suba él mismo siempre manda.
+    if (slot === "avatar" && source.logo) return new Response(null, { status: 302, headers: { ...CABECERAS, Location: source.logo } });
+    return new Response(null, { status: 204 });
+  }
   const etag = `"${slot}-${version.updatedAt.getTime()}"`;
   if (request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { ...CABECERAS, ETag: etag } });
   const image = await db.profile.findUnique({ where, select: { avatar: true, banner: true, avatarKey: true, bannerKey: true } });

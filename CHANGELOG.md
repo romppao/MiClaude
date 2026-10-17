@@ -11,6 +11,21 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.23.1] — 2026-10-17
+
+PR de Claude Code: **logotipos de gimnasios** (petición del fundador: «las imágenes de los gimnasios» y «los logos se pueden encontrar muy fácil… en su web»). Hasta ahora ningún gimnasio de la demo tenía foto, y la lista solo enseñaba iniciales.
+
+### Añadido
+- **Logotipos de 37 gimnasios**, sacados de su propia web y revisados uno a uno (se descartaron los que no eran su logotipo: el de una marca de material, un icono genérico de pesas, una miniatura borrosa). Cada uno anota de dónde salió en `docs/datos/gimnasios-logos.json`, por si un gimnasio pide retirarlo.
+- **Herramienta `scripts/logos-gimnasios.ts`**: lee solo la página de inicio de cada web (una petición, con identificación clara y pausa entre peticiones), respeta `robots.txt`, no usa redes sociales, recorta el logotipo y lo deja en 512 píxeles; si el logotipo es claro sobre transparente, lo pone sobre fondo oscuro para que se lea.
+
+### Cambiado
+- La **tarjeta de gimnasio** enseña el logotipo grande, en un círculo arriba (antes, un círculo de 44 píxeles); sin logotipo salen las iniciales en el mismo círculo. La distancia pasa a la esquina.
+- La **ficha del gimnasio** y todas las pantallas que enseñan su foto usan el logotipo hallado cuando el gimnasio no ha subido el suyo. **El que sube el propio gimnasio siempre manda.**
+
+### Pruebas
+- Recorrido `logos-gimnasios.mjs` (la ruta de imagen redirige al hallado, respeta el que sube el gimnasio, lista y ficha lo muestran cargado, accesibilidad) y prueba unitaria del registro (cada archivo existe, anota su origen y no es de una red social).
+
 ## [0.23.0] — 2026-10-17
 
 PR de Claude Code: **contacto entre usuarios** (plan aprobado por el fundador el 17-10-2026: «no deja ponernos en contacto con peleadores»). Las organizaciones aprobadas y los entrenadores pueden invitar a un peleador concreto; el peleador decide y solo entonces se comparte su contacto. Sin chat.
