@@ -11,6 +11,13 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.27.2] — 2026-10-17
+
+PR de Claude Code: **la prueba de accesibilidad de la bandeja dice qué falla**. Falló al fusionar #108 y #109 (en sus PR pasaba con el mismo código) sin decir qué regla incumplía.
+
+### Cambiado
+- `tests/e2e/paneles-avisos.mjs`: espera a que la bandeja termine de pintarse tras la decisión antes de revisarla con axe, y si encuentra algo escribe la regla, su gravedad y los elementos afectados. La comprobación no se relaja: sigue exigiendo cero incumplimientos.
+
 ## [0.27.1] — 2026-10-17
 
 PR de Claude Code: **preparar el montaje de la versión real** (el fundador levantó la pausa el 17-10-2026: «quiero montar el real y mientras iremos perfeccionando»).

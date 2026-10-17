@@ -75,6 +75,9 @@ for (const [boton, estado] of [["Poner en revisión el combate:", "DISPUTED"], [
   await mod.p.locator('.notice-ok').waitFor();
   check(`«${boton}» cambia el estado real a ${estado}`, (await db.bout.findUniqueOrThrow({ where: { id: bout.id } })).verification === estado);
 }
+// La bandeja se vuelve a pintar tras la decisión: se espera a que termine antes de revisarla (falló así al fusionar #108 y #109).
+await mod.p.waitForLoadState("networkidle");
 const axe = await new AxeBuilder({ page: mod.p }).include('main').withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+for (const v of axe.violations) console.log(`  axe: ${v.id} (${v.impact}) en ${v.nodes.length} elemento(s): ${v.nodes.slice(0, 3).map((n) => `${n.target.join(" ")} → ${n.html.slice(0, 120)}`).join(" | ")}`);
 check("bandeja sin incumplimientos de accesibilidad detectados por axe", axe.violations.length === 0);
 await terminarDiagnosticos(); await db.$disconnect(); await browser.close();
