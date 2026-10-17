@@ -2527,4 +2527,6 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 
 **Lección:** con un subconjunto de recorridos (`--solo`) el rastreo de enlaces ve páginas que en la ejecución completa no alcanza por el tope de 90; conviene pasar `enlaces` junto a `cuenta` antes de dar un cambio por bueno.
 
-**Pendiente:** PR de la bandeja (secciones, duplicados, «Avisos» → «Denuncias», avisos de decisiones a los afectados) y la denuncia de invitaciones con suspensión de envío (PR3, depende de #102).
+**Ampliación del mismo PR:** la bandeja deja de repetir el estado y las herramientas (están en «Hoy») y «Avisos de usuarios» pasa a «Denuncias de usuarios»; cada decisión de moderación (combates, ficha reclamada, organizador, sello de gimnasio, velada pasada) avisa dentro de la app al afectado con el motivo. `fallos.mjs`, que pedía el estado y las herramientas en la bandeja, mira ahora «Hoy» y comprueba que la bandeja ya no los repite.
+
+**Pendiente:** dividir la bandeja en secciones por tipo y la denuncia de invitaciones con suspensión de envío (PR3; #102 ya está fusionado).

@@ -56,7 +56,9 @@ Moderación tiene su **propio papel** en la aplicación (`papelDe` devuelve `mod
 - **Barra inferior:** Hoy · Bandeja · Historial · Cuenta. La **bandeja** es `/moderacion` (sin cambios; sus decisiones y colas siguen ahí) y todas sus pantallas hijas (veladas, fallos, noticias, gimnasios…).
 - **Dónde está en el código:** reglas puras en `src/lib/community/moderacion-tareas.ts` (tipos de trabajo, orden y agrupación), lectura de los números en `moderacion-contadores.ts` (mismos criterios que las colas), pantalla en `src/app/moderacion/hoy/page.tsx`, menú en `src/lib/accounts/menu.ts` y barra en `MobileNav.tsx`.
 - **Para añadir un tipo de trabajo:** una fila en `TAREAS` (clave, texto, ayuda, grupo, destino y prioridad única), su recuento en `moderacion-contadores.ts` y la prueba `moderacion-tareas.test.ts`.
-- **Pendiente (siguiente PR):** dividir la bandeja en secciones, quitar los duplicados que aún tiene (fallos y noticias aparecen varias veces), renombrar «Avisos» a «Denuncias» y avisar al afectado de cada decisión.
+- **La bandeja** ya no repite el estado de la aplicación ni las herramientas: están en «Hoy». Aquí solo van las colas, y «Avisos de usuarios» se llama «Denuncias de usuarios» (la campana de avisos es otra cosa).
+- **Avisos a quien decide la moderación:** cada decisión avisa dentro de la app a la persona afectada, con el motivo si lo hay (`avisarDecision` en `src/lib/community/notify.ts`, tipo de aviso `MODERATION`): combates (a los dos peleadores), reclamación de ficha, organizador, sello de gimnasio (a quien lleva el gimnasio) y velada pasada. Las reclamaciones, organizadores y veladas además envían el correo de siempre.
+- **Pendiente:** dividir la bandeja en secciones por tipo (hoy sigue siendo una página larga con sus anclas) y avisar también del cierre de una denuncia con el motivo dentro de la app.
 
 ## 3. Registro de fallos (`/moderacion/fallos`)
 

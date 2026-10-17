@@ -19,11 +19,13 @@ PR de Claude Code: **moderador con papel propio** (aviso del fundador, 17-10-202
 - **«Hoy»** (`/moderacion/hoy`), la primera pantalla de moderación: un número por tipo de trabajo (denuncias, veladas por autorizar, combates con señales, fallos, fichas reclamadas, organizaciones, gimnasios…), agrupado en Personas, Contenido y Datos y sistema, y un botón grande con la **siguiente tarea** (las denuncias de usuarios siempre van primero). Lo que no tiene trabajo dice «Al día».
 - **Barra inferior propia** para moderación: Hoy · Bandeja · Historial · Cuenta, con una sola pestaña activa cada vez.
 - **Menú propio**: «Trabajo de moderación» y «Personas y datos» (y «Cuentas y moderadores» solo para el creador), sin nada de aficionado.
+- **Aviso dentro de la app a la persona afectada por cada decisión de moderación, con el motivo**: combates (verificado, puesto en revisión o devuelto a «declarado», a los dos peleadores), reclamación de ficha, organizador, sello de gimnasio (concedido o retirado, a quien lleva el gimnasio) y velada pasada. Antes solo había correo en algunas decisiones, y en los combates y los sellos, nada.
 - Recorrido de navegador `moderador.mjs` y pruebas unitarias de las reglas de «Hoy».
 
 ### Cambiado
 - Una cuenta de moderación tiene su **propio papel**: «Mi panel» lleva a «Hoy», entrar lleva a «Hoy» y la cabecera dice «Hoy» en vez de «Mi panel».
-- La bandeja de siempre (`/moderacion`) no cambia; ahora es la segunda pestaña de la barra.
+- La **bandeja** (`/moderacion`) es la segunda pestaña de la barra y ya no repite el estado de la aplicación ni las herramientas (están en «Hoy»). «Avisos de usuarios» pasa a **«Denuncias de usuarios»** para no confundirse con la campana de avisos.
+- «Hoy» reúne todas las herramientas de moderación con los nombres de siempre (historial de cambios, acreditaciones, fallos, fuentes de noticias, veladas pasadas, respaldo).
 
 ### Corregido
 - Los botones «Completar» de la preparación de una velada, dentro de la propia pantalla de la velada, llevan solo al apartado (`#datos`) en vez de a la misma ruta completa, que parecía un enlace que no hace nada.
