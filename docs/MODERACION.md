@@ -48,6 +48,16 @@ Tiene tres bloques, de arriba abajo:
 
 **Toda decisión queda en el historial de cambios** (`AuditLog`, en `/moderacion/historial`): quién, cuándo, qué había antes y qué hay después. Nada se cambia en silencio.
 
+### «Hoy» y el papel de moderador (0.24.0, 17-10-2026)
+
+Moderación tiene su **propio papel** en la aplicación (`papelDe` devuelve `moderador` para `role = ADMIN`, también si la cuenta tiene ficha de peleador): menú, barra inferior y «Mi panel» propios, sin nada de aficionado.
+
+- **«Hoy»** (`/moderacion/hoy`) es lo primero que se ve al entrar. Un número por tipo de trabajo, agrupado en **Personas** (fichas reclamadas, organizaciones por aprobar, gimnasios reclamados), **Contenido** (denuncias de usuarios, veladas por autorizar, gimnasios por revisar) y **Datos y sistema** (combates con señales, en revisión y por verificar, fallos sin resolver, fuentes de noticias que fallan). El botón **«Siguiente tarea»** lleva a la de mayor prioridad con algo pendiente: denuncias, veladas, señales, revisión, fallos, fichas, organizaciones, gimnasios reclamados, gimnasios por revisar, combates por verificar y noticias.
+- **Barra inferior:** Hoy · Bandeja · Historial · Cuenta. La **bandeja** es `/moderacion` (sin cambios; sus decisiones y colas siguen ahí) y todas sus pantallas hijas (veladas, fallos, noticias, gimnasios…).
+- **Dónde está en el código:** reglas puras en `src/lib/community/moderacion-tareas.ts` (tipos de trabajo, orden y agrupación), lectura de los números en `moderacion-contadores.ts` (mismos criterios que las colas), pantalla en `src/app/moderacion/hoy/page.tsx`, menú en `src/lib/accounts/menu.ts` y barra en `MobileNav.tsx`.
+- **Para añadir un tipo de trabajo:** una fila en `TAREAS` (clave, texto, ayuda, grupo, destino y prioridad única), su recuento en `moderacion-contadores.ts` y la prueba `moderacion-tareas.test.ts`.
+- **Pendiente (siguiente PR):** dividir la bandeja en secciones, quitar los duplicados que aún tiene (fallos y noticias aparecen varias veces), renombrar «Avisos» a «Denuncias» y avisar al afectado de cada decisión.
+
 ## 3. Registro de fallos (`/moderacion/fallos`)
 
 ### Qué se registra solo

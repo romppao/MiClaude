@@ -59,6 +59,7 @@
 | `/moderacion/fallos/:id` | Detalle de un fallo | Moderación | `moderation.actualizarFallo` | AppError, AuditLog, User |
 | `/moderacion/gimnasios` | Revisar gimnasios | Moderación | `gyms.decideGymClaim`, `gyms.saveGym` | Gym, GymClaimRequest |
 | `/moderacion/historial` | Historial de cambios | Moderación | — | AuditLog |
+| `/moderacion/hoy` | Hoy | Moderación | — | — |
 | `/moderacion/noticias` | Fuentes de noticias | Moderación | `news.addNewsSource`, `news.refreshNewsNow`, `news.toggleNewsItem`, `news.toggleNewsSource` | NewsItem, NewsSource |
 | `/moderacion/usuarios` | Administración | Pública | `creador.cambiarTipoDeCuenta`, `creador.cerrarSesionesDe`, `creador.regenerarCodigos` | AuditLog, User |
 | `/moderacion/veladas` | Veladas pasadas pendientes de autorización ( | Moderación | `moderation.decidirVeladaPasada` | Event |
@@ -443,6 +444,8 @@ Sin interfaz y sin saber nada de las pantallas. Las dependencias permitidas entr
 |---|---|
 | `bloqueos.ts` | `ORIGENES_DE_BLOQUEO`, `OrigenDeBloqueo`, `bloqueadosPor`, `bloquear`, `cuentaDe`, `esOrigenDeBloqueo`, `hayBloqueo` |
 | `invitations.ts` | `AjustesDeContacto`, `AjustesParsed`, `CONTACT_CHANNELS`, `Comprobacion`, `ContactChannel`, `Destino`, `INVITATIONS_PER_DAY`, `INVITATION_DAYS_BEFORE_REPEAT`, `INVITATION_DAYS_TO_ANSWER`, `INVITATION_KIND_LABEL`, `INVITATION_MESSAGE_MAX`, `INVITATION_REPLY_MAX`, `INVITATION_STATUS_LABEL`, `InvitationInput`, `InvitationParsed`, `MIN_AGE_FOR_INVITATIONS`, `Remitente`, `VeladaInvitable`, `caducaEn`, `contactoCompartido`, `desdeRepeticion`, `destinoDisponible`, `edadEn`, `invitacionCaducada`, `parseAjustesDeContacto`, `parseInvitation`, `parseInvitationKind`, `puedeInvitar`, `puedeResponderInvitacion`, `puedeRetirarInvitacion`, `veladaInvitable` |
+| `moderacion-contadores.ts` | `contadoresDeModeracion` |
+| `moderacion-tareas.ts` | `Contador`, `GRUPOS`, `Grupo`, `TAREAS`, `Tarea`, `agrupar`, `contarTareas`, `siguienteTarea`, `totalPendiente` |
 | `notifications.ts` | `NotificationKind`, `dailyAuraKey`, `notificationId`, `notifyBoutVideo`, `notifyFollowedBout`, `notifyInApp`, `putNotification` |
 | `notify.ts` | `acusarReciboDeAviso`, `notificarResolucionDeAviso`, `notifyAuthorOfAnswer`, `notifyDecision`, `notifyFollowersOfBout`, `notifyRivalOfBout` |
 | `reports.ts` | `AVISOS_SIN_CUENTA_POR_DIA`, `AVISO_EXPLICACION_MAX`, `AVISO_EXPLICACION_MIN`, `AvisoSinCuenta`, `MAX_REPORTS_PER_DAY`, `REASONS_BY_ENTITY`, `REPORT_ENTITIES`, `REPORT_REASONS`, `ReportEntity`, `parseAvisoSinCuenta`, `rutaDeLona` |

@@ -83,7 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <>
                   {user.role === "ADMIN" && <Link href="/moderacion">Moderación</Link>}
                   <Link href="/avisos" className="siempre" aria-label={`Avisos: ${unread} sin leer`}><Icono nombre="campana" />{unread > 0 && <span className="pildora">{unread > 99 ? "99+" : unread}</span>}</Link>
-                  <Link href="/mi-panel" className="siempre mi-panel-cabecera">Mi panel</Link>
+                  <Link href={papel === "moderador" ? "/moderacion/hoy" : "/mi-panel"} className="siempre mi-panel-cabecera">{papel === "moderador" ? "Hoy" : "Mi panel"}</Link>
                   {papel === "entidad" && <Link href="/organizador" className="siempre">Mis veladas</Link>}
                   {papel === "entrenador" && <Link href="/mis-clases" className="siempre">Mis clases</Link>}
                   {papel === "peleador" && <Link href="/mi-ficha" className="siempre">Mi ficha</Link>}

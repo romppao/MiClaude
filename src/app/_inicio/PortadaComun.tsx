@@ -15,6 +15,7 @@ const QUE_HAY_EN_MI_PANEL: Record<Papel, string> = {
   peleador: "Tu próximo combate, tu récord, tu aura y lo que falta por confirmar.",
   entrenador: "Tus clases, tus veladas e interclubs y tu perfil.",
   entidad: "Tus veladas, los resultados pendientes y tu próxima cita.",
+  moderador: "Lo que espera a moderación hoy: avisos, reclamaciones y revisiones.",
 };
 
 type Usuario = User & { fighter: { disciplines: { discipline: Discipline }[] } | null };

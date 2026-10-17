@@ -802,6 +802,17 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .herramientas-moderacion{list-style:none;margin:0;padding:0}
 .herramientas-moderacion li{display:flex;flex-direction:column;gap:2px;padding:12px 18px}
 .herramientas-moderacion li a{font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+/* «Hoy» de moderación (17-10-2026): un botón grande con la siguiente tarea y los números por grupo. Sin movimiento: se mira muchas veces al día. */
+.siguiente-tarea{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:96px;margin:18px 0 6px;padding:18px 22px;border-radius:26px;background:var(--acc);color:var(--acc-ink);text-decoration:none}
+.siguiente-tarea small{display:block;font:700 16px/1.2 var(--font);letter-spacing:.04em;text-transform:uppercase;opacity:.78}
+.siguiente-tarea strong{display:block;margin-top:4px;font:800 24px/1.15 var(--font);letter-spacing:-.025em;text-wrap:balance}
+.siguiente-tarea .ayuda{display:block;margin-top:4px;font:500 16px/1.35 var(--font);opacity:.82}
+.siguiente-tarea .cifra{flex:none;font:800 48px/1 var(--font);letter-spacing:-.04em}
+.siguiente-tarea:focus-visible{outline:3px solid var(--foco);outline-offset:3px}
+.hoy-tareas{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.hoy-tareas .dato .clave{font-size:16px;color:var(--text)}
+.hoy-tareas .dato.al-dia{border-style:dashed}
+.hoy-tareas .al-dia-texto{font:600 16px/1.2 var(--font);color:var(--mut)}
 /* Mapa de gimnasios (13 de octubre de 2026): components/MapaGimnasios.tsx. El mapa base es claro (OpenFreeMap «positron»); en el tema
    oscuro se invierte con un filtro para que case con la aplicación. Los marcadores van fuera del lienzo y no se invierten. */
 .mapa-gimnasios{margin:20px 0 28px;scroll-margin-top:96px}
