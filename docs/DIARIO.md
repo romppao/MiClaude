@@ -2509,6 +2509,6 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 
 **Causa:** el registro del servicio mostraba `P1002 … Timed out trying to acquire a postgres advisory lock (pg_advisory_lock(72707369))` en el `prisma migrate deploy` de `scripts/arranque-demo.sh`. La base de la demo está en Neon y se usa su conexión «pooler» (PgBouncer): los bloqueos de sesión de Prisma se quedan colgados en el pooler y los siguientes arranques esperan 10 s y fallan.
 
-**Arreglo (0.23.2):** migrar por la conexión directa (sin «-pooler») y con `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. Solo arranca una instancia, así que no hay migraciones concurrentes. No se tocó ningún ajuste ni clave de Render.
+**Arreglo (0.23.2):** migrar por la conexión directa (el mismo servidor sin «-pooler»; solo se cambia el nombre del servidor, nunca la contraseña) y, si aun así hay un bloqueo colgado en el servidor, reintentar una vez con `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. La revisión de Codex señaló tres cosas que se corrigieron antes de fusionar: la sustitución debe tocar solo el servidor, quitar el bloqueo siempre permite carreras (por eso solo es el reintento) y desactivarlo no libera un bloqueo ya colgado, solo lo sortea. No se tocó ningún ajuste ni clave de Render.
 
 **Lección:** «/salud en verde» no prueba que el último despliegue funcione: hay que mirar los eventos de Render. Una demo que no se actualiza en silencio es peor que un fallo a la vista.

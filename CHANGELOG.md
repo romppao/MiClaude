@@ -16,7 +16,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 PR de Claude Code: **arreglo urgente del arranque de la demo en Render**. Los despliegues de la 0.21.0, 0.22.0, 0.22.1, 0.22.2 y 0.23.1 fallaban al arrancar («Exited with status 1») y la demo se quedaba en una versión anterior; el registro de Render decía `P1002: Timed out trying to acquire a postgres advisory lock`.
 
 ### Corregido
-- El arranque de la demo aplica las migraciones por la **conexión directa** de Neon (sin «-pooler») y **sin el bloqueo de sesión de Prisma**: el «pooler» (PgBouncer) deja colgado ese bloqueo y las migraciones esperaban para siempre. La aplicación sigue usando la misma `DATABASE_URL`. No cambia ningún ajuste ni clave de Render.
+- El arranque de la demo aplica las migraciones por la **conexión directa** de Neon (el mismo servidor sin «-pooler», cambiando solo el nombre del servidor y nunca la contraseña) y, **si aun así falla por un bloqueo colgado, lo reintenta una vez sin el bloqueo de sesión de Prisma**: el «pooler» (PgBouncer) deja colgado ese bloqueo y las migraciones esperaban para siempre. La aplicación sigue usando la misma `DATABASE_URL`. No cambia ningún ajuste ni clave de Render.
 
 ## [0.23.1] — 2026-10-17
 

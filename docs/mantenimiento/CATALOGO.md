@@ -576,7 +576,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
-| [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `5e97c2aa3dbef226` |
+| [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `1e174cd47c510c45` |
 | [scripts/avisos-ci.mjs](../../scripts/avisos-ci.mjs) | En el CI, si fallan las pruebas de navegador, resume en un solo aviso los fallos y el texto de las páginas guardadas en test-results, para leerlo desde el PR. | [Contexto](OPERACION.md) | — | `c353dd2c21e060f9` |
 | [scripts/copiar-maplibre.mjs](../../scripts/copiar-maplibre.mjs) | Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo. | [Contexto](OPERACION.md) | — | `3b0d17cb0d995776` |
 | [scripts/corregir-escalera.sh](../../scripts/corregir-escalera.sh) | Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto. | [Contexto](OPERACION.md) | — | `f39d6ef23d821f8a` |
