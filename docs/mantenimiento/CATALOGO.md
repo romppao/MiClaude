@@ -151,8 +151,8 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 | [.gitignore](../../.gitignore) | Excluye secretos, dependencias y resultados locales del control de versiones; revisar al añadir nuevas herramientas. | [Contexto](OPERACION.md) | — | `503d08bccbca21cd` |
 | [Dockerfile](../../Dockerfile) | Imagen de la versión real para Google Cloud Run: compila con salida standalone y arranca con node server.js, sin migrar al arrancar (ADR-005). | [Contexto](../PRODUCCION.md) | — | `a37c545d9200038b` |
 | [next.config.mjs](../../next.config.mjs) | Configura Next.js, tamaño máximo de Server Actions y cabeceras de seguridad/CSP (imágenes HTTPS de medios y YouTube, vídeos de R2); distingue desarrollo de producción. | [Contexto](OPERACION.md) | — | `c6cfb38ea606b658` |
-| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `e07f8e62ca43bfcf` |
-| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `5865464bfdd83fca` |
+| [package-lock.json](../../package-lock.json) | Fija árbol exacto de dependencias para npm ci; archivo generado por npm, sin edición manual de cada resolución. | [Contexto](OPERACION.md) | — | `595c69ad46960fdf` |
+| [package.json](../../package.json) | Define comandos, versiones admitidas y dependencias de ejecución/desarrollo; no añadir proveedores o saltos mayores sin decisión. | [Contexto](OPERACION.md) | — | `4b349f5d30d7a73f` |
 | [render.yaml](../../render.yaml) | Blueprint de despliegue de la demo y base asociada; configuración de demo no acredita preparación de producción. | [Contexto](OPERACION.md) | — | `2c5e93916ca8ac00` |
 | [shaders.config.ts](../../shaders.config.ts) | Configura la integración React de shaders sin activar autenticación ni telemetría. | [Contexto](../EXPERIENCIA-ELITE.md) | — | `6d3e8e67ca01ad01` |
 | [tsconfig.json](../../tsconfig.json) | Opciones de TypeScript y archivos incluidos; coherente con Next.js y convención de importaciones relativas. | [Contexto](OPERACION.md) | — | `33b5f6dc12863e5b` |
@@ -576,7 +576,7 @@ Alcance y exclusiones: [manual](README.md) y [operación](OPERACION.md).
 
 | Archivo | Responsabilidad | Guía | Declaraciones directas | SHA-256 |
 |---|---|---|---|---|
-| [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `d04ddc73375eeef3` |
+| [scripts/arranque-demo.sh](../../scripts/arranque-demo.sh) | Arranca el despliegue de demostración aplicando su preparación de base y servidor; leer alcance antes de usar fuera de demo. | [Contexto](OPERACION.md) | — | `1e174cd47c510c45` |
 | [scripts/avisos-ci.mjs](../../scripts/avisos-ci.mjs) | En el CI, si fallan las pruebas de navegador, resume en un solo aviso los fallos y el texto de las páginas guardadas en test-results, para leerlo desde el PR. | [Contexto](OPERACION.md) | — | `c353dd2c21e060f9` |
 | [scripts/copiar-maplibre.mjs](../../scripts/copiar-maplibre.mjs) | Copia el trabajador de MapLibre a public/vendor/maplibre/<versión> antes de compilar o arrancar en desarrollo. | [Contexto](OPERACION.md) | — | `3b0d17cb0d995776` |
 | [scripts/corregir-escalera.sh](../../scripts/corregir-escalera.sh) | Herramienta del líder para corregir entregas de examen; usa instrucciones/clave aisladas y no verifica el runtime del producto. | [Contexto](OPERACION.md) | — | `f39d6ef23d821f8a` |

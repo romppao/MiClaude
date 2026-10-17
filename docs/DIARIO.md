@@ -2502,3 +2502,13 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Lección (revisar a ojo lo que se baja de internet):** el primer pase dio 42 «logotipos» y cinco eran otra cosa: el logo de una marca de material (Fairtex), un icono genérico de pesas, un cuadrado dorado, el icono por defecto de WordPress y un favicon borroso. Un recorrido de comprobación no los habría detectado; hizo falta mirarlos.
 
 **Pendiente:** si el fundador consigue la autorización de los gimnasios, subir sus logotipos de Instagram; texto legal para el abogado (derechos sobre los logotipos).
+
+## 17 de octubre de 2026, mañana — La demo no se actualizaba: migraciones bloqueadas en Neon (Claude Code)
+
+**Qué pasó:** el fundador dejó abierta la pestaña de eventos de Render. Los despliegues de las versiones 0.21.0, 0.22.0, 0.22.1, 0.22.2 y 0.23.1 aparecían como fallidos («Exited with status 1 while running your code»), y solo la 0.23.0 llegó a estar en vivo. Yo daba la demo por actualizada mirando `/salud`, que enseña la versión de la última instancia que arrancó.
+
+**Causa:** el registro del servicio mostraba `P1002 … Timed out trying to acquire a postgres advisory lock (pg_advisory_lock(72707369))` en el `prisma migrate deploy` de `scripts/arranque-demo.sh`. La base de la demo está en Neon y se usa su conexión «pooler» (PgBouncer): los bloqueos de sesión de Prisma se quedan colgados en el pooler y los siguientes arranques esperan 10 s y fallan.
+
+**Arreglo (0.23.2):** migrar por la conexión directa (el mismo servidor sin «-pooler»; solo se cambia el nombre del servidor, nunca la contraseña) y, si aun así hay un bloqueo colgado en el servidor, reintentar una vez con `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. La revisión de Codex señaló tres cosas que se corrigieron antes de fusionar: la sustitución debe tocar solo el servidor, quitar el bloqueo siempre permite carreras (por eso solo es el reintento) y desactivarlo no libera un bloqueo ya colgado, solo lo sortea. No se tocó ningún ajuste ni clave de Render.
+
+**Lección:** «/salud en verde» no prueba que el último despliegue funcione: hay que mirar los eventos de Render. Una demo que no se actualiza en silencio es peor que un fallo a la vista.
