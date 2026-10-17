@@ -550,3 +550,8 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 - Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
 - La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
 - Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.
+
+
+## 17-10-2026: T-009 integrado con invitaciones y logotipos
+
+Se integra por merge la principal 0.23.1 (#102 y #103), conservando los escenarios, sus aserciones y los cambios de Claude. Candidata 0.23.3 para no ocupar la 0.23.2 del arreglo de Render. El CI verde anterior acredita 317dc28, no esta nueva combinación: comprobaciones completas pendientes del nuevo CI. Los avisos React#418 siguen abiertos. No se modifica el arranque de Render ni la carpeta de Claude. Sin fusión.

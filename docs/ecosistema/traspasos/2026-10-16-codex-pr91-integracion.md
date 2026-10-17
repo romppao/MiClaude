@@ -47,3 +47,8 @@ Luna detectó que la guarda final aún admitía doce personas. Se refuerza para 
 - Diagnóstico con base ficticia propia: ambos recorridos pasan normalmente en desarrollo. Con CPUx4 y carga de JavaScript retrasada, la comprobación inmediata de Mis combates puede leer la pestaña antes de estar lista; el diagnóstico Linux39011664196 reproduce ese fallo de la prueba, sin avisos React. No se cambió el producto ni se descartó una aserción.
 - La prueba abre Combates como una persona y espera a que la fila de su velada sea visible antes de verificar nombre, declaración y regla de24 horas. Los9 pasos pasan bajo la misma ralentización tras el ajuste. Los errores de página incluyen ahora la ruta y más detalle en el informe para investigar los avisos pendientes.
 - La instrumentación de CPU y registro completo solo existe en copias temporales o la rama manual de diagnóstico, no en el PR. Nueva ejecución CI necesaria para la cabeza que incorpora esta espera; no se confunde el resultado anterior con el de esa cabeza.
+
+
+## 17-10-2026: T-009 integrado con invitaciones y logotipos
+
+Se integra por merge la principal 0.23.1 (#102 y #103), conservando los escenarios, sus aserciones y los cambios de Claude. Candidata 0.23.3 para no ocupar la 0.23.2 del arreglo de Render. El CI verde anterior acredita 317dc28, no esta nueva combinación: comprobaciones completas pendientes del nuevo CI. Los avisos React#418 siguen abiertos. No se modifica el arranque de Render ni la carpeta de Claude. Sin fusión.

@@ -10,8 +10,8 @@ export function BotonBloquear({ accion, origen, id, back, nombre }: { accion: (f
       <form action={accion} style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
         <input type="hidden" name="origen" value={origen} /><input type="hidden" name="id" value={id} /><input type="hidden" name="back" value={back} />
         <p className="mut" style={{ margin: 0 }}>
-          Ya no podrá retarte, proponerte sparring, pedir tus clases ni seguirte, y dejarás de ver sus comentarios, vídeos y fotos. Se cancelan las
-          propuestas y solicitudes pendientes entre vosotros. No le avisamos. Puedes desbloquearla cuando quieras en «Mi cuenta».
+          Ya no podrá retarte, proponerte sparring, invitarte, pedir tus clases ni seguirte, y dejarás de ver sus comentarios, vídeos y fotos. Se cancelan las
+          propuestas, invitaciones y solicitudes pendientes entre vosotros. No le avisamos. Puedes desbloquearla cuando quieras en «Mi cuenta».
         </p>
         <button className="secondary">Bloquear a {nombre}</button>
       </form>

@@ -215,6 +215,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "prisma/migrations/20261016224505_invitaciones/migration.sql",
+    "purpose": "Crea las invitaciones a peleadores (tipos y estados), la tabla Invitation y los ajustes de contacto del peleador. Solo añade; no toca datos existentes.",
+    "guide": "docs/mantenimiento/DATOS.md"
+  },
+  {
     "path": "prisma/migrations/migration_lock.toml",
     "purpose": "Fija proveedor PostgreSQL del historial de Prisma para reproducir migraciones.",
     "guide": "docs/mantenimiento/DATOS.md"
@@ -333,6 +338,11 @@
     "path": "scripts/importar-gimnasios-osm.mjs",
     "purpose": "Importador OSM manual: por defecto solo recuento, caché de áreas, plan ligado a destino, protección de correcciones y guardas de carga real; nunca seed ni campañas.",
     "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "scripts/logos-gimnasios.ts",
+    "purpose": "Busca el logotipo de cada gimnasio en su propia web (nunca en redes), lo recorta y lo deja en 512 px, y anota de dónde salió en docs/datos/gimnasios-logos.json.",
+    "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
     "path": "scripts/retirar-gimnasios-ficticios.ts",
@@ -483,6 +493,11 @@
     "path": "src/app/actions/gyms.ts",
     "purpose": "Acciones verificadas de alta, reclamación, revisión, cesión y miembros del gimnasio; propiedad comprobada dentro de transacciones bloqueadas y auditoría.",
     "guide": "docs/GIMNASIOS-REALES.md"
+  },
+  {
+    "path": "src/app/actions/invitations.ts",
+    "purpose": "Acciones de las invitaciones: enviar (organización aprobada o entrenador), responder (aceptar comparte el contacto elegido), retirar y ajustar quién puede invitarme.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
     "path": "src/app/actions/media.ts",
@@ -990,6 +1005,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/app/invitaciones/page.tsx",
+    "purpose": "«Mis invitaciones» de organizaciones y entrenadores: enviadas, su estado y el contacto compartido al aceptar.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/laboratorio/page.tsx",
     "purpose": "Guarda de acceso al laboratorio: exige dos indicadores de demostración.",
     "guide": "docs/EXPERIENCIA-ELITE.md"
@@ -1170,6 +1190,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/peleadores/[slug]/invitar/page.tsx",
+    "purpose": "Formulario para invitar a un peleador concreto a una velada, a un sparring en nombre de uno de los propios o a entrenar juntos.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/peleadores/[slug]/page.tsx",
     "purpose": "Ficha pública con privacidad, récord, combates, títulos, highlights (vídeo subido o enlace), vídeos y fotos del público de sus combates, seguimiento y aura.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1202,6 +1227,11 @@
   {
     "path": "src/app/promotores/page.tsx",
     "purpose": "Directorio público de promotores/organizadores con enlaces a perfiles y veladas.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
+    "path": "src/app/propuestas/Invitaciones.tsx",
+    "purpose": "Pestaña «Invitaciones» de Mis propuestas: invitaciones recibidas (aceptar, rechazar, bloquear) y ajustes de quién puede invitar y qué contacto se comparte.",
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
@@ -1495,6 +1525,11 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/logos-gimnasios.ts",
+    "purpose": "Dirección del logotipo hallado de un gimnasio a partir del registro docs/datos/gimnasios-logos.json; el que sube el propio gimnasio manda sobre este.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/mail-transporte.ts",
     "purpose": "Entrega de un correo al proveedor (Resend) o al registro en desarrollo; sin cola. Solo la usa la cola de correos.",
     "guide": "docs/mantenimiento/MODULOS.md"
@@ -1592,6 +1627,11 @@
   {
     "path": "src/lib/community/bloqueos.ts",
     "purpose": "Bloqueos entre usuarios (Apple 1.2): a quién ha bloqueado alguien, si hay bloqueo entre dos personas, de quién es lo que se quiere bloquear y qué se cancela al bloquear.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/invitations.ts",
+    "purpose": "Reglas puras de las invitaciones: quién puede invitar, a quién, límites, caducidad, mayoría de edad y contacto que se comparte al aceptar.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
@@ -1990,6 +2030,16 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/invitaciones.mjs",
+    "purpose": "Recorrido de las invitaciones: organización y entrenador invitan, el peleador acepta (solo entonces se comparte el contacto) o rechaza, repetición, bloqueo y casos no invitables.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/e2e/logos-gimnasios.mjs",
+    "purpose": "Recorrido de los logotipos de gimnasios: la ruta de imagen redirige al hallado, respeta el que sube el gimnasio y la lista y la ficha lo muestran cargado y accesible.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/mapa.mjs",
     "purpose": "Prueba de navegador del mapa de gimnasios: marcadores, ubicación, más cercanos ordenados, sin permiso, dirección en el perfil y accesibilidad en los dos temas.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2220,6 +2270,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/unit/invitations.test.ts",
+    "purpose": "Reglas de las invitaciones: permisos del remitente, destinos válidos (menores, cerradas, sin titular), mensaje, velada, caducidad y contacto compartido.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "tests/unit/labels.test.ts",
     "purpose": "Prueba texto público de enums/resultados y generación de identificadores de nombres.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2228,6 +2283,11 @@
     "path": "tests/unit/landing.test.ts",
     "purpose": "Prueba destino tras acceso por papel y mantenimiento de la regla centralizada.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/logos-gimnasios.test.ts",
+    "purpose": "Registro de logotipos: cada archivo existe, anota su origen (nunca una red social) y la búsqueda no se deja engañar por claves del prototipo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/mail.test.ts",

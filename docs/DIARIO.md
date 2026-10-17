@@ -2517,3 +2517,34 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 - Conserva guías de acción, carteles y popularidad de gimnasios, cambio de papel en demo y refresco automático. Mantiene los dieciséis escenarios, caret:initial, ejecución manual/push/etiqueta y la guarda exacta de dieciséis personas.
 - La versión se renumera por encima de 0.22.2. No se publica hasta contrastar el resultado de #101 y la principal real.
 - Se comprueban sintaxis y documentación desde una copia temporal de fuentes bajo docs/logs, sin ejecutar navegador ni base de datos. Tipos, unitarias, build y escenarios completos de esta combinación quedan pendientes del CI.
+
+## 17 de octubre de 2026, tarde — Invitaciones a peleadores (Claude Code)
+
+**Petición del fundador:** «cuando entro como moderador… no deja ponernos en contacto con peleadores». Plan aprobado: primero el contacto entre usuarios, después la estructura del moderador, en PR pequeños.
+
+**Qué se hizo (0.23.0):** las organizaciones aprobadas y los entrenadores invitan a un peleador concreto (velada, sparring en nombre de uno de los suyos, entrenar juntos). El peleador acepta o rechaza desde Mis propuestas; el contacto solo se comparte al aceptar y solo el canal que él elige. Sin chat. Reglas puras en `src/lib/community/invitations.ts` (30 pruebas), acciones en `src/app/actions/invitations.ts`, migración solo aditiva.
+
+**Decisiones:** las personas menores de 18 años y las fichas sin titular no se pueden invitar, con el mismo mensaje que una ficha no disponible (no se revela por qué); el bloqueo corta las invitaciones en los dos sentidos sin decir que hay bloqueo; 10 invitaciones al día, 14 días para responder y 30 de espera tras un rechazo.
+
+**Lección (fallo que costó una hora):** un campo oculto llamado `id` dentro de un formulario con botones con nombre rompe el envío: React construye el formulario con `form.id`, que en ese caso devuelve el campo y no el texto, y pierde el botón pulsado (`decision` llegaba vacío). Los campos de identificador se llaman `invitationId`, `proposalId`… nunca `id` ni `method` ni `action`.
+
+**Pendiente:** denunciar una invitación y suspender el envío (PR3), y el papel de moderador con su barra y su pantalla «Hoy» (PR4 y PR5).
+
+## 17 de octubre de 2026, noche — Logotipos de gimnasios (Claude Code)
+
+**Petición del fundador:** «no se agregaron las imágenes a los gimnasios como pedí» y, después, «los logos de los gimnasios se pueden encontrar muy fácil con una simple búsqueda en Google o su Instagram, luego pedirle a Codex que mejore las imágenes».
+
+**Qué había:** la tarjeta ya sabía pintar la foto de un gimnasio, pero solo si el propio gimnasio la subía. Ningún gimnasio de la demo (95) la había subido, así que la lista solo enseñaba iniciales.
+
+**Qué se hizo (0.23.1):** una herramienta que lee la página de inicio de cada gimnasio de la lista investigada que tiene web (52), saca su logotipo y lo prepara. Salieron 37; el resto no tiene logotipo utilizable (la web no existe, no carga, lo prohíbe `robots.txt` o no hay imagen suya). Se revisaron a ojo en una hoja de contactos y se quitaron los que no eran el logotipo del gimnasio. La ruta `/imagenes/gimnasio/<id>/avatar` redirige al logotipo hallado cuando el gimnasio no tiene uno subido, así lo ven la lista, el mapa, la ficha y cualquier miniatura sin tocar cada pantalla.
+
+**Lo que no se hizo y por qué:** Instagram. Para ~100 gimnasios la única presencia en internet es su Instagram, que exige iniciar sesión y cuyas condiciones no permiten leerlo de forma automática; probé la búsqueda normal para encontrar webs de los que no la tienen y salieron solo directorios. Esos gimnasios siguen con iniciales hasta que alguien suba su logotipo (el gimnasio reclamado puede hacerlo desde su perfil). La mejora de imágenes con Codex no se pudo pedir (sin créditos): la hace el propio programa (recorta márgenes, centra, elige fondo claro u oscuro).
+
+**Lección (revisar a ojo lo que se baja de internet):** el primer pase dio 42 «logotipos» y cinco eran otra cosa: el logo de una marca de material (Fairtex), un icono genérico de pesas, un cuadrado dorado, el icono por defecto de WordPress y un favicon borroso. Un recorrido de comprobación no los habría detectado; hizo falta mirarlos.
+
+**Pendiente:** si el fundador consigue la autorización de los gimnasios, subir sus logotipos de Instagram; texto legal para el abogado (derechos sobre los logotipos).
+
+
+## 17-10-2026: T-009 integrado con invitaciones y logotipos
+
+Se integra por merge la principal 0.23.1 (#102 y #103), conservando los escenarios, sus aserciones y los cambios de Claude. Candidata 0.23.3 para no ocupar la 0.23.2 del arreglo de Render. El CI verde anterior acredita 317dc28, no esta nueva combinación: comprobaciones completas pendientes del nuevo CI. Los avisos React#418 siguen abiertos. No se modifica el arranque de Render ni la carpeta de Claude. Sin fusión.

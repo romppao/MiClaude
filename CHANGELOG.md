@@ -11,7 +11,7 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
-## [0.22.3] — 2026-10-17
+## [0.23.3] — 2026-10-17
 
 ### Añadido
 - T-009 amplía a 16 recorridos por persona: todos los tipos de cuenta, rival, reclamación, titulares de perfiles, moderación completa, letra ampliada, cuenta, trayectoria y creador con segundo paso. CI independiente con capturas e informe por persona.
@@ -24,6 +24,40 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 ### Corregido
 - Las capturas de los escenarios conservan el cursor original para evitar el aviso artificial de hidratación React#418 detectado por Claude. Se retira encType redundante del formulario de highlight con acción de función, que causaba un aviso en desarrollo.
 - Los escenarios no consumen minutos en cada PR: solo al fusionar, manualmente o en PR etiquetado escenarios.
+
+Integrado por merge con la principal 0.23.1: conserva invitaciones y logotipos de gimnasios. La 0.23.2 está reservada por Claude para el arranque de Render; esta entrega se numera 0.23.3.
+
+## [0.23.1] — 2026-10-17
+
+PR de Claude Code: **logotipos de gimnasios** (petición del fundador: «las imágenes de los gimnasios» y «los logos se pueden encontrar muy fácil… en su web»). Hasta ahora ningún gimnasio de la demo tenía foto, y la lista solo enseñaba iniciales.
+
+### Añadido
+- **Logotipos de 37 gimnasios**, sacados de su propia web y revisados uno a uno (se descartaron los que no eran su logotipo: el de una marca de material, un icono genérico de pesas, una miniatura borrosa). Cada uno anota de dónde salió en `docs/datos/gimnasios-logos.json`, por si un gimnasio pide retirarlo.
+- **Herramienta `scripts/logos-gimnasios.ts`**: lee solo la página de inicio de cada web (una petición, con identificación clara y pausa entre peticiones), respeta `robots.txt`, no usa redes sociales, recorta el logotipo y lo deja en 512 píxeles; si el logotipo es claro sobre transparente, lo pone sobre fondo oscuro para que se lea.
+
+### Cambiado
+- La **tarjeta de gimnasio** enseña el logotipo grande, en un círculo arriba (antes, un círculo de 44 píxeles); sin logotipo salen las iniciales en el mismo círculo. La distancia pasa a la esquina.
+- La **ficha del gimnasio** y todas las pantallas que enseñan su foto usan el logotipo hallado cuando el gimnasio no ha subido el suyo. **El que sube el propio gimnasio siempre manda.**
+
+### Pruebas
+- Recorrido `logos-gimnasios.mjs` (la ruta de imagen redirige al hallado, respeta el que sube el gimnasio, lista y ficha lo muestran cargado, accesibilidad) y prueba unitaria del registro (cada archivo existe, anota su origen y no es de una red social).
+
+## [0.23.0] — 2026-10-17
+
+PR de Claude Code: **contacto entre usuarios** (plan aprobado por el fundador el 17-10-2026: «no deja ponernos en contacto con peleadores»). Las organizaciones aprobadas y los entrenadores pueden invitar a un peleador concreto; el peleador decide y solo entonces se comparte su contacto. Sin chat.
+
+### Añadido
+- **Invitar a un peleador** (botón «Invitar a este peleador» en su ficha, solo para organizaciones aprobadas y entrenadores con el correo verificado): a una velada con inscripción abierta, a un sparring en nombre de uno de los peleadores del entrenador o a entrenar juntos. Mensaje opcional de hasta 500 caracteres. Límite de 10 al día, una sola pendiente por peleador y tipo, y 30 días de espera tras un rechazo.
+- **Pestaña «Invitaciones» en Mis propuestas** (la primera): el peleador acepta, rechaza (sin dar motivo) o bloquea. Al aceptar se comparte **solo el canal que él haya elegido** (correo de la cuenta, teléfono o Instagram) y, si era una velada, aparece «Inscribirme en la velada». Caducan a los 14 días.
+- **Ajustes de contacto** del peleador: puede cerrar las invitaciones y elegir qué contacto se comparte al aceptar.
+- **Mis invitaciones** (`/invitaciones`) para organizaciones y entrenadores: enviadas, estado y contacto compartido; se pueden retirar mientras esperan. Acceso desde el menú («Contactar con peleadores»).
+- **Avisos y correos:** al peleador cuando le invitan; a quien invitó cuando acepta (con el contacto elegido) o rechaza (sin ningún dato).
+- **Bloqueo** también corta invitaciones: las pendientes entre las dos personas se cierran y no se puede volver a invitar, sin decir nunca que hay un bloqueo.
+- Migración `20261016224505_invitaciones`: solo añade (tabla `Invitation`, ajustes de contacto del peleador); no toca datos existentes.
+- Pruebas: 30 unitarias de las reglas y el recorrido `invitaciones.mjs` (permisos, menores y cierre de invitaciones sin explicar el motivo, aceptar, rechazar, repetir, retirar, bloqueo y accesibilidad).
+
+### Seguridad
+- Quien tiene una invitación pendiente no puede ver datos de contacto del peleador: solo se comparten al aceptar, y solo el canal elegido. Las personas menores de 18 años y las fichas sin titular no se pueden invitar, con el mismo mensaje que cualquier otra ficha no disponible.
 
 ## [0.22.2] — 2026-10-17
 
