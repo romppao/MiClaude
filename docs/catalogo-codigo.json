@@ -351,7 +351,7 @@
   },
   {
     "path": "scripts/logos-gimnasios.ts",
-    "purpose": "Busca el logotipo de cada gimnasio en su propia web (nunca en redes), lo recorta y lo deja en 512 px, y anota de dónde salió en docs/datos/gimnasios-logos.json.",
+    "purpose": "Busca el logotipo de cada gimnasio en su propia web (nunca en redes), lo recorta y lo deja en 512 px, y anota de dónde salió en src/lib/common/gimnasios-logos.json.",
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
@@ -1555,8 +1555,13 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/common/gimnasios-logos.json",
+    "purpose": "Registro de los logotipos hallados en la web de cada gimnasio (archivo, origen, página y fecha); lo escribe scripts/logos-gimnasios.ts y va junto al código porque la imagen de producción no incluye docs/.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/common/logos-gimnasios.ts",
-    "purpose": "Dirección del logotipo hallado de un gimnasio a partir del registro docs/datos/gimnasios-logos.json; el que sube el propio gimnasio manda sobre este.",
+    "purpose": "Dirección del logotipo hallado de un gimnasio a partir del registro src/lib/common/gimnasios-logos.json; el que sube el propio gimnasio manda sobre este.",
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {

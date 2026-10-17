@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { logoDeGimnasio } from "../../src/lib/common/logos-gimnasios";
 
-const registro: Record<string, { archivo: string; origen: string; pagina: string; fecha: string }> = JSON.parse(readFileSync(resolve("docs/datos/gimnasios-logos.json"), "utf8"));
+const registro: Record<string, { archivo: string; origen: string; pagina: string; fecha: string }> = JSON.parse(readFileSync(resolve("src/lib/common/gimnasios-logos.json"), "utf8"));
 
 describe("logoDeGimnasio", () => {
   it("da la dirección del logotipo de un gimnasio conocido y null para el resto", () => {
@@ -20,7 +20,7 @@ describe("logoDeGimnasio", () => {
   });
 });
 
-describe("registro de logotipos (docs/datos/gimnasios-logos.json)", () => {
+describe("registro de logotipos (src/lib/common/gimnasios-logos.json)", () => {
   const filas = Object.entries(registro);
 
   it("tiene logotipos", () => expect(filas.length).toBeGreaterThan(20));

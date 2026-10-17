@@ -1,5 +1,5 @@
 // Logotipos de gimnasios (petición del fundador, 17-10-2026: «los logos se pueden encontrar muy fácil… y mejorar las imágenes»).
-// Un gimnasio sin logotipo propio enseña el que se encontró en su web (docs/datos/gimnasios-logos.json); el que sube él mismo siempre manda.
+// Un gimnasio sin logotipo propio enseña el que se encontró en su web (src/lib/common/gimnasios-logos.json); el que sube él mismo siempre manda.
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { PrismaClient } from "@prisma/client";
@@ -8,7 +8,7 @@ import { B, rnd, browser, check, seen, sql, terminarDiagnosticos } from "./ayuda
 const db = new PrismaClient();
 const nombre = `Logo${rnd}`;
 // Un gimnasio real del registro de logotipos (se toma el primero, para no depender de cuál sea).
-const SLUG_CON_LOGO = Object.keys(JSON.parse(readFileSync("docs/datos/gimnasios-logos.json", "utf8")))[0];
+const SLUG_CON_LOGO = Object.keys(JSON.parse(readFileSync("src/lib/common/gimnasios-logos.json", "utf8")))[0];
 const axe = async (p, que) => {
   const r = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   check(`${que}: sin problemas de accesibilidad${r.violations.length ? ` (${r.violations.map((v) => v.id).join(", ")})` : ""}`, r.violations.length === 0);

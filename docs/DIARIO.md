@@ -2574,3 +2574,25 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Preparado por Claude (sin ejecutar hasta el «sí» del fundador):** el guion de los pasos 1-5 de `PRODUCCION.md` (servicios, alerta de 10 €, registro de imágenes con limpieza, cuentas `desplegar-lona` y `lona-web`, puente GitHub→Google limitado al repositorio, entorno `produccion` con su aprobación), que comprueba antes de crear cada cosa si ya existe. Y este PR: el despliegue usa la cuenta `lona-web`.
 
 **Pendiente del fundador:** el «sí» a esos pasos; Resend y Cloudflare R2; pegar las claves (dirección directa de Neon, R2, Resend) donde se le indique; poner el repositorio en privado; mayores de 18 o política de menores; abogado.
+
+## 17 de octubre de 2026, noche — Claves, primera publicación y preparación del repositorio privado (Claude Code)
+
+**Qué pidió el fundador:** «continúa tú de manera automática»; «hazlo tú, por favor» (las claves); «sí, hazlo» (la publicación); «hazlo tú todo automáticamente y documéntalo para que me entere de todo el funcionamiento».
+
+**Qué se hizo:**
+- **Correo:** 3 registros DNS de Resend añadidos en Infomaniak a petición expresa del fundador, sin tocar los demás ([DOMINIO.md](DOMINIO.md)). Resend dice «Verified».
+- **«Entrar con Google»:** pantalla publicada («En producción»).
+- **Claves guardadas sin que nadie las viera** (botón «Copiar» de cada web → portapapeles → Secret Manager o GitHub): base de datos (las dos conexiones), Resend (solo envío, solo lonaclub.es), secreto de Google y correo del creador.
+- **Primera publicación:** la lanzó el fundador, porque el sistema de seguridad de Claude no permite publicar en producción. Falló al compilar porque el código leía un archivo de `docs/`, que la imagen no incluye. Arreglado en 0.27.2 (PR #110).
+- **Repositorio privado, preparado:**
+  - las 2 claves del entorno «produccion» copiadas a los secretos generales;
+  - la publicación ya no usa entornos;
+  - el despertador de la demo pasa de GitHub (unos 4.300 minutos al mes) a Google Cloud Scheduler (gratis).
+- **Documentación para el fundador:** [VERSION-REAL.md](VERSION-REAL.md).
+
+**Qué salió mal:**
+- Al copiar el secreto de Google, una herramienta del navegador devolvió su texto entero. Se inhabilitó y borró, y se creó otro sin leerlo ([LECCIONES.md](LECCIONES.md)).
+- La prueba axe de la bandeja falla siempre al fusionar y nunca en el PR, con el mismo código. El PR #110 la hace decir qué regla falla.
+- Dos mensajes de Claude salieron en inglés; el fundador pidió «háblame en español siempre».
+
+**Estado:** el PR #110 (0.27.2) contiene el arreglo de la compilación y la preparación del repositorio privado. Falta que el fundador lo fusione, vuelva a lanzar la publicación y ponga el repositorio en privado. Después: el dominio (con su permiso) y R2.

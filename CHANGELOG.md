@@ -11,6 +11,22 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.27.2] — 2026-10-17
+
+PR de Claude Code: **la versión real ya compila** y **la prueba de accesibilidad de la bandeja dice qué falla**. Falló al fusionar #108 y #109 (en sus PR pasaba con el mismo código) sin decir qué regla incumplía.
+
+### Cambiado
+- `tests/e2e/paneles-avisos.mjs`: espera a que la bandeja termine de pintarse tras la decisión antes de revisarla con axe, y si encuentra algo escribe la regla, su gravedad y los elementos afectados. La comprobación no se relaja: sigue exigiendo cero incumplimientos.
+
+- **Listo para pasar el repositorio a privado** (decisión del fundador del 13-10):
+  - `desplegar-produccion.yml` ya no usa el entorno `produccion`, que no existe en los repositorios privados gratuitos;
+  - `PROD_DATABASE_URL_DIRECT` y `PROD_CRON_SECRET` están ahora en los secretos generales;
+  - la visita cada 10 minutos a la demo la hace Google Cloud Scheduler (`despertar-demo`, gratis), y `mantener-demo-despierta.yml` queda solo manual (ahorra unos 4.300 minutos de GitHub al mes).
+- `docs/VERSION-REAL.md`: cómo funciona la versión real explicado sin tecnicismos (piezas, cómo se publica, claves, costes, qué hacer si algo falla), a petición del fundador.
+
+### Corregido
+- **La versión real no se podía compilar:** el registro de logotipos de gimnasios estaba en `docs/datos/`, y la imagen de producción no incluye `docs/` (`.dockerignore`). En la demo de Render no se notaba porque compila con todo el repositorio. Ahora está junto al código, en `src/lib/common/gimnasios-logos.json`. Era el único archivo que el código leía de fuera de `src/` (comprobado).
+
 ## [0.27.1] — 2026-10-17
 
 PR de Claude Code: **preparar el montaje de la versión real** (el fundador levantó la pausa el 17-10-2026: «quiero montar el real y mientras iremos perfeccionando»).

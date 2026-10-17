@@ -538,3 +538,15 @@ Si `form` se localiza por un botón con `getByRole`, el botón debe estar expues
 - 15-10-2026: al rehacer una pantalla integrada, conservar sus contratos actuales de acciones y sus casos nuevos (avisos sin cuenta y PAGINA); una presentación recuperada de una rama sustituida no los garantiza. Se comprueba cada decisión con su efecto real en la base.
 
 - 15-10-2026: al sacar un enlace de una celda y convertirlo en hijo directo de una tarjeta flex, su zona táctil puede quedar en 25 px. El CI móvil detectó la regresión en la bandeja; los accesos de gimnasio pasan a botón de enlace con altura mínima, sin relajar la prueba.
+
+## 17-10-2026 — La imagen de producción no incluye `docs/` (Claude Code)
+- **Qué pasó:** la primera publicación de la versión real falló al compilar. `src/lib/common/logos-gimnasios.ts` (0.23.1) importaba `docs/datos/gimnasios-logos.json`, y `.dockerignore` deja fuera `docs/`. En la demo de Render no se notó porque compila con todo el repositorio, y el CI tampoco compila la imagen.
+- **Regla:** el código de `src/` solo importa archivos de `src/`, `public/`, `prisma/` o `package.json`. Los datos que lee la app van junto al código, no en `docs/`.
+
+## 17-10-2026 — Una herramienta del navegador puede devolver una clave entera (Claude Code)
+- **Qué pasó:** al buscar con `find` el botón «Copiar» del secreto de Google, la herramienta devolvió el secreto completo, porque iba dentro de la etiqueta del botón. Hubo que inhabilitarlo, borrarlo y crear otro.
+- **Regla:** en una pantalla que muestra una clave, el botón de copiar se localiza y se pulsa con JavaScript sin devolver su texto. La clave pasa del portapapeles a Secret Manager o GitHub sin imprimirse.
+
+## 17-10-2026 — La prueba axe de la bandeja falla solo al fusionar (Claude Code)
+- **Qué pasó:** «bandeja sin incumplimientos de accesibilidad detectados por axe» falló al fusionar #108 y #109, y en un segundo intento, con el mismo árbol de Git que pasó en sus PR. La prueba no decía qué regla fallaba.
+- **Regla:** toda comprobación axe imprime la regla y los elementos cuando falla. Si una prueba falla siempre en un tipo de ejecución y nunca en otro, no es «mala suerte»: hay que buscar la diferencia.

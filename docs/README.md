@@ -37,6 +37,7 @@ Una página para saber **qué documento abrir según lo que quieras hacer**. Tod
 | **Evitar repetir un error** ya cometido | [`LECCIONES.md`](LECCIONES.md) |
 | **Conocer la competencia** (fuentes contrastadas y límites de la revisión) | [`COMPETENCIA.md`](COMPETENCIA.md) |
 | **Saber las reglas del fundador** (usabilidad para todos, idioma, diseño al final, aura, monetización) | [`../CLAUDE.md`](../CLAUDE.md) |
+| **Entender cómo funciona la versión real** sin tecnicismos: piezas, cómo se publica, claves, costes y qué hacer si algo falla | [`VERSION-REAL.md`](VERSION-REAL.md) (detalle técnico: [`PRODUCCION.md`](PRODUCCION.md)) |
 | **Poner en marcha, probar y desplegar** (comandos, variables de entorno) | [`../README.md`](../README.md) |
 
 ## Reglas para mantener la documentación
