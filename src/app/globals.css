@@ -150,6 +150,9 @@ a.card:hover{border-color:var(--line-strong);color:var(--text)}}
 .discipline-strip a{font-weight:700;min-height:44px;display:flex;align-items:center}
 .profile-hero{position:relative;isolation:isolate;overflow:hidden;border-radius:0 0 40px 40px;min-height:320px;padding:38px;background:linear-gradient(160deg,rgba(212,246,124,.22),var(--card) 75%);color:var(--text)}
 .profile-banner{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3}
+.profile-hero.profile-hero-logo{padding-block-start:160px}
+.profile-banner.profile-banner-logo{height:144px;object-fit:contain;object-position:center;padding:16px 28px;background:var(--card);z-index:-1}
+.profile-avatar img.profile-avatar-logo{object-fit:contain;padding:8px}
 .profile-shade{position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(10,10,12,.55),transparent 30%,rgba(10,10,12,.92))}
 .profile-identity{display:flex;gap:28px;align-items:flex-end;position:relative}
 .profile-avatar{flex:none;position:relative;width:150px;height:150px;border-radius:50%;background:var(--hueco);border:3px solid var(--acc);box-shadow:0 0 40px var(--acc-glow);overflow:hidden;display:grid;place-items:center;font-size:3rem;font-weight:800}
@@ -802,6 +805,17 @@ a.card:active,a.tarjeta:active,a.fila:active,a.tarjeta-foto:active,.mobile-nav a
 .herramientas-moderacion{list-style:none;margin:0;padding:0}
 .herramientas-moderacion li{display:flex;flex-direction:column;gap:2px;padding:12px 18px}
 .herramientas-moderacion li a{font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+/* «Hoy» de moderación (17-10-2026): un botón grande con la siguiente tarea y los números por grupo. Sin movimiento: se mira muchas veces al día. */
+.siguiente-tarea{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:96px;margin:18px 0 6px;padding:18px 22px;border-radius:26px;background:var(--acc);color:var(--acc-ink);text-decoration:none}
+.siguiente-tarea small{display:block;font:700 16px/1.2 var(--font);letter-spacing:.04em;text-transform:uppercase;opacity:.78}
+.siguiente-tarea strong{display:block;margin-top:4px;font:800 24px/1.15 var(--font);letter-spacing:-.025em;text-wrap:balance}
+.siguiente-tarea .ayuda{display:block;margin-top:4px;font:500 16px/1.35 var(--font);opacity:.82}
+.siguiente-tarea .cifra{flex:none;font:800 48px/1 var(--font);letter-spacing:-.04em}
+.siguiente-tarea:focus-visible{outline:3px solid var(--foco);outline-offset:3px}
+.hoy-tareas{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.hoy-tareas .dato .clave{font-size:16px;color:var(--text)}
+.al-dia-lista{margin:12px 0 0;font:500 16px/1.5 var(--font);color:var(--mut)}
+.al-dia-lista strong{color:var(--text)}
 /* Mapa de gimnasios (13 de octubre de 2026): components/MapaGimnasios.tsx. El mapa base es claro (OpenFreeMap «positron»); en el tema
    oscuro se invierte con un filtro para que case con la aplicación. Los marcadores van fuera del lienzo y no se invierten. */
 .mapa-gimnasios{margin:20px 0 28px;scroll-margin-top:96px}

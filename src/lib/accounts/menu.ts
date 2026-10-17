@@ -30,6 +30,27 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
   const propias: SeccionMenu[] = [];
   if (papel === "visitante") {
     propias.push({ titulo: "Empieza", enlaces: [{ href: "/registro", texto: "Crear una cuenta" }, { href: "/entrar", texto: "Entrar" }] });
+  } else if (papel === "moderador") {
+    // Moderación ve solo su trabajo: nada de «peleadores que sigo» ni de reservas (17 de octubre de 2026, petición del fundador).
+    propias.push({
+      titulo: "Trabajo de moderación",
+      enlaces: [
+        { href: "/moderacion/hoy", texto: "Hoy: lo que espera" },
+        { href: "/moderacion", texto: "Bandeja de avisos y revisiones" },
+        { href: "/moderacion/veladas", texto: "Autorizar veladas pasadas" },
+        { href: "/moderacion/fallos", texto: "Fallos de la aplicación" },
+        { href: "/moderacion/historial", texto: "Historial de cambios" },
+      ],
+    });
+    propias.push({
+      titulo: "Personas y datos",
+      enlaces: [
+        { href: "/moderacion/acreditaciones", texto: "Acreditaciones" },
+        { href: "/moderacion/gimnasios", texto: "Gimnasios" },
+        { href: "/moderacion/noticias", texto: "Fuentes de noticias" },
+        ...(x.creador ? [{ href: "/moderacion/usuarios", texto: "Administración: cuentas y moderadores" }] : []),
+      ],
+    });
   } else if (papel === "usuario") {
     propias.push({ titulo: "Tu espacio de aficionado", enlaces: [PANEL, SIGUIENDO, RESERVAS, COMPARTIR, { href: "/mi-panel#mis-subidas", texto: "Mis vídeos y fotos" }] });
   } else if (papel === "peleador") {
@@ -67,8 +88,9 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
   if (papel !== "visitante") {
     cuenta.push({ href: "/mi-cuenta", texto: "Mi cuenta" });
     if (x.canSupport) cuenta.push({ href: "/respaldar", texto: "Respaldar resultados y títulos" });
-    if (x.admin) cuenta.push({ href: "/moderacion", texto: "Moderación" });
-    if (x.creador) cuenta.push({ href: "/moderacion/usuarios", texto: "Administración" });
+    // El moderador ya tiene todo esto en «Trabajo de moderación» y «Personas y datos».
+    if (x.admin && papel !== "moderador") cuenta.push({ href: "/moderacion", texto: "Moderación" });
+    if (x.creador && papel !== "moderador") cuenta.push({ href: "/moderacion/usuarios", texto: "Administración" });
     // Las entidades también pueden solicitar clases: su acceso va aquí si cabe (como mucho cinco enlaces por bloque).
     if (papel === "entidad" && cuenta.length < 5) cuenta.push(RESERVAS);
   }

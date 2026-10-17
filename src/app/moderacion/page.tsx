@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { decideGymClaim } from "../actions/gyms";
 import { requireAdmin } from "../../lib/accounts/permissions";
-import { esCreador } from "../../lib/accounts/creador";
 import { db } from "../../lib/common/db";
 import { ORIGENES_FALLO } from "../../lib/common/fallos";
 import { FLAG_LABEL, type Flag } from "../../lib/fighters/coherence";
@@ -30,7 +29,6 @@ import {
 } from "../../lib/common/labels";
 import { DISCIPLINE_LABEL } from "../../lib/common/disciplines";
 import { publicUserName } from "../../lib/common/names";
-import { VERSION, commitDesplegado } from "../../lib/common/version";
 
 export const metadata = { title: "Moderación" };
 export const dynamic = "force-dynamic";
@@ -119,9 +117,8 @@ export default async function Moderation({
     db.bout.count({ where: { verification: "DISPUTED" } }),
     db.gym.count({ where: { verifiedAt: null } }),
   ]);
-  const [nFallos, nFuentesKo, nPasadas, nGymClaims] = await Promise.all([
+  const [nFallos, nPasadas, nGymClaims] = await Promise.all([
     db.appError.count({ where: { status: { in: ["OPEN", "INVESTIGATING"] } } }),
-    db.newsSource.count({ where: { active: true, lastError: { not: null } } }),
     db.event.count({
       where: { status: "PENDING_AUTHORIZATION", organizerId: { not: null } },
     }),
@@ -428,6 +425,7 @@ export default async function Moderation({
     <>
       {/* Panel de moderación (13 de octubre de 2026, petición del fundador: funciones bien estructuradas, con su panel de avisos y los fallos).
           Tres bloques: lo pendiente de revisar (las colas de abajo), el estado de la aplicación y las herramientas. Guía: docs/MODERACION.md. */}
+      <p><Link href="/moderacion/hoy">← Hoy: lo que espera</Link></p>
       <h1>Moderación</h1>
       <p className="lead">
         Revisas lo que la comunidad avisa, compruebas los datos y vigilas que la
@@ -439,7 +437,7 @@ export default async function Moderation({
         <div className="resumen-moderacion">
           {(
             [
-              ["avisos", "Avisos de usuarios", nReports],
+              ["avisos", "Denuncias de usuarios", nReports],
               ["reclamaciones", "Fichas reclamadas", nClaims],
               ["organizadores", "Organizadores", nOrganizers],
               ["gimnasios", "Gimnasios sin sello", nSinSello],
@@ -461,89 +459,7 @@ export default async function Moderation({
         </div>
       </section>
 
-      <section aria-labelledby="titulo-estado-app" style={{ margin: "20px 0" }}>
-        <h2 id="titulo-estado-app">Estado de la aplicación</h2>
-        <div className="resumen-moderacion">
-          <Link
-            href="/moderacion/fallos"
-            className={nFallos > 0 ? "dato con-pendientes" : "dato"}
-            aria-label={`Fallos de la aplicación sin resolver: ${nFallos}`}
-          >
-            <span className="clave">Fallos sin resolver</span>
-            <strong>{nFallos}</strong>
-          </Link>
-          <Link
-            href="/moderacion/noticias"
-            className={nFuentesKo > 0 ? "dato con-pendientes" : "dato"}
-            aria-label={`Fuentes de noticias que fallan: ${nFuentesKo}`}
-          >
-            <span className="clave">Fuentes de noticias que fallan</span>
-            <strong>{nFuentesKo}</strong>
-          </Link>
-        </div>
-        <p className="mut">
-          Versión de la aplicación: <strong>{VERSION}</strong>
-          {commitDesplegado() ? ` (commit ${commitDesplegado()})` : ""}. Qué
-          trae cada versión: <code>CHANGELOG.md</code> del repositorio.
-        </p>
-      </section>
-
-      <section
-        aria-labelledby="titulo-herramientas"
-        style={{ margin: "20px 0" }}
-      >
-        <h2 id="titulo-herramientas">Herramientas</h2>
-        <ul className="lista herramientas-moderacion">
-          <li>
-            <Link href="/respaldar">Respaldar resultados y títulos</Link>
-            <span className="mut">
-              Comprobar un resultado o un título con una prueba.
-            </span>
-          </li>
-          <li>
-            <Link href="/moderacion/acreditaciones">
-              Gestionar acreditaciones
-            </Link>
-            <span className="mut">
-              Quién puede respaldar resultados (entrenadores, federaciones).
-            </span>
-          </li>
-          <li>
-            <Link href="/moderacion/historial">
-              Ver el historial de cambios
-            </Link>
-            <span className="mut">
-              Todo lo que se ha cambiado, quién y cuándo.
-            </span>
-          </li>
-          <li>
-            <Link href="/moderacion/fallos">Fallos de la aplicación</Link>
-            <span className="mut">
-              Lo que ha fallado, cuántas veces y qué se hizo.
-            </span>
-          </li>
-          <li>
-            <Link href="/moderacion/noticias">Fuentes de noticias</Link>
-            <span className="mut">
-              Qué fuentes funcionan, añadir y ocultar titulares.
-            </span>
-          </li>
-          <li>
-            <Link href="/moderacion/veladas">Autorizar veladas pasadas</Link>
-            <span className="mut">
-              Revisar y decidir sobre eventos con fecha anterior a hoy.
-            </span>
-          </li>
-          {esCreador(user) && (
-            <li>
-              <Link href="/moderacion/usuarios">
-                Administración: cuentas y moderadores
-              </Link>
-              <span className="mut">Solo la cuenta del creador.</span>
-            </li>
-          )}
-        </ul>
-      </section>
+      {/* El estado de la aplicación (fallos, fuentes de noticias, versión) y las herramientas están en «Hoy»: aquí solo van las colas, sin duplicados. */}
 
       <h2 id="colas" className="sr-only">
         Colas de moderación
@@ -683,7 +599,7 @@ export default async function Moderation({
             <li key={`report-${r.id}`} data-prioridad="4">
               <article className="tarjeta" data-cola="avisos">
                 {i === 0 && <span id="avisos" />}
-                <span className="pildora">Aviso de usuario</span>
+                <span className="pildora">Denuncia de usuario</span>
                 <div>
                   <strong>
                     {lookup(REPORT_REASONS, r.reason) ?? "Motivo no reconocido"}

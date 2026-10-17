@@ -555,3 +555,8 @@ Avisos personales con retención de doce meses y exportación; vídeos del públ
 ## 17-10-2026: T-009 integrado con invitaciones y logotipos
 
 Se integra por merge la principal 0.23.1 (#102 y #103), conservando los escenarios, sus aserciones y los cambios de Claude. Candidata 0.23.3 para no ocupar la 0.23.2 del arreglo de Render. El CI verde anterior acredita 317dc28, no esta nueva combinación: comprobaciones completas pendientes del nuevo CI. Los avisos React#418 siguen abiertos. No se modifica el arranque de Render ni la carpeta de Claude. Sin fusión.
+
+
+## 17-10-2026: entrega para el prototipo del cliente (Codex)
+
+Integra principal0.24.0 y el arranque de Render; candidata0.24.1 con banners de gimnasio desde su imagen propia o logo hallado, prioridad del banner subido, T-009 y actualización al recuperar foco. Recorridos locales de logos y datos vivos correctos;18 vistas de cabecera sin desbordes ni solapes. Tipos y1047 unitarias correctos; documentación33/34 por EPERM Windows, caso intacto. CI final pendiente. Se entrega inventario completo y auditoría de datos vivos; React#418 sigue abierto. Hallazgos de Astra en #106 enviados a Claude. No se modifica su carpeta ni se fusiona.

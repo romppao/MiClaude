@@ -83,7 +83,11 @@ async function recorrer(papel, p, semillas) {
     vistas.add(ruta);
     if (OMITIR.some((r) => r.test(ruta))) continue;
     let respuesta;
-    try { respuesta = await p.goto(origen + ruta, { waitUntil: "load" }); } catch (e) { anotar(papel, ruta, `no se pudo abrir (${e.message.split("\n")[0]})`); continue; }
+    try { respuesta = await p.goto(origen + ruta, { waitUntil: "load" }); } catch (e) {
+      // Una descarga (por ejemplo, «Añadir al calendario») no es un enlace roto: el navegador la empieza en vez de abrir una pantalla.
+      if (!/Download is starting/.test(e.message)) anotar(papel, ruta, `no se pudo abrir (${e.message.split("\n")[0]})`);
+      continue;
+    }
     n++;
     // Una pantalla privada sin permiso redirige a «Entrar» con un aviso: es lo esperado, no un enlace roto.
     const h1 = (await p.locator("h1").first().innerText().catch(() => "")).trim();

@@ -35,7 +35,8 @@ check("y el archivo del logotipo se sirve como imagen", estatico.status() === 20
 check("sin logotipo hallado ni propio, no hay imagen (quedan las iniciales)", (await pedir(`logo-nada-${rnd}`)).status() === 204);
 const propio = await pedir(`logo-propio-${rnd}`);
 check("el que sube el propio gimnasio manda sobre el hallado", propio.status() === 200 && propio.headers()["content-type"] === "image/webp");
-check("el banner nunca se rellena con el logotipo hallado", (await ctx.request.get(`${B}/imagenes/gimnasio/logo-hallado-${rnd}/banner`, { maxRedirects: 0 })).status() === 204);
+// La cabecera presenta el logo como banner sin fingir que el gimnasio ha subido uno.
+check("la ruta del banner sin subir sigue vacía: el logo se presenta desde su fuente", (await ctx.request.get(`${B}/imagenes/gimnasio/logo-hallado-${rnd}/banner`, { maxRedirects: 0 })).status() === 204);
 
 // En la lista: el logotipo se ve en la tarjeta, grande; sin logotipo salen las iniciales.
 await p.goto(`${B}/gimnasios?q=${nombre}`);
@@ -45,6 +46,10 @@ check("salen los tres gimnasios", (await p.locator(".lista-completa .cartel-gimn
 const imagenCargada = (img) => img.evaluate((i) => (i.complete ? i.naturalWidth > 0 : new Promise((r) => { i.onload = () => r(i.naturalWidth > 0); i.onerror = () => r(false); })));
 const cargada = async (texto) => { const img = tarjeta(texto).locator(".cartel-logo img").first(); return (await seen(img)) && (await imagenCargada(img)); };
 check("la tarjeta con logotipo hallado lo muestra cargado", await cargada(`Cima ${nombre}`));
+// La imagen es diferida: se entra en su zona de carga y se espera el fallback.
+// Se conserva la comprobación de ausencia de imagen rota y de las iniciales.
+await tarjeta(`Sin Logo ${nombre}`).scrollIntoViewIfNeeded();
+await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo img").first().waitFor({ state: "detached", timeout: 10000 }).catch(() => undefined);
 check("la tarjeta sin logotipo no deja una imagen rota: quedan las iniciales", (await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo img").count()) === 0 && (await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo").innerText()).trim() === "SL");
 const caja = await tarjeta(`Cima ${nombre}`).locator(".cartel-logo").boundingBox();
 check("el logotipo es grande (más de 90 píxeles) y no se sale de la tarjeta", !!caja && caja.width >= 90 && caja.width <= 120);
@@ -54,7 +59,22 @@ await axe(p, "Lista de gimnasios con logotipos");
 // En la ficha del gimnasio.
 await p.goto(`${B}/gimnasios/${SLUG_CON_LOGO}`);
 check("la ficha del gimnasio muestra su logotipo", await seen(p.locator(".profile-avatar img")) && await imagenCargada(p.locator(".profile-avatar img")));
+const banner = p.locator(".profile-banner");
+check("su banner también muestra el logotipo hallado y está cargado", await seen(banner) && await imagenCargada(banner) && await banner.getAttribute("src") === `/gimnasios/logos/${SLUG_CON_LOGO}.webp`);
+check("el logo del banner se muestra entero, sin recortarlo", await banner.evaluate(i => getComputedStyle(i).objectFit === "contain"));
+const cajaBanner = await banner.boundingBox(), cajaIdentidad = await p.locator(".profile-identity").boundingBox();
+check("el nombre y los controles no se superponen al logotipo del banner", !!cajaBanner && !!cajaIdentidad && cajaBanner.y + cajaBanner.height <= cajaIdentidad.y);
 await axe(p, "Ficha de gimnasio con logotipo");
+
+await p.goto(`${B}/gimnasios/logo-propio-${rnd}`);
+check("sin banner subido, la imagen propia tiene prioridad como banner", await seen(p.locator(".profile-banner-logo")) && (await p.locator(".profile-banner-logo").getAttribute("src")).startsWith(`/imagenes/gimnasio/logo-propio-${rnd}/avatar`) && await imagenCargada(p.locator(".profile-banner-logo")));
+await p.goto(`${B}/gimnasios/logo-nada-${rnd}`);
+check("sin logo ni imagen propia se conserva el nombre y las iniciales, sin banner roto", await p.locator(".profile-banner").count() === 0 && (await p.locator(".profile-avatar").innerText()).trim() === "SL");
+
+// En el gimnasio que sí tiene logo hallado, el banner que sube su titular manda.
+await db.profile.create({ data: { kind: "gimnasio", entityId: `logo-hallado-${rnd}`, hasBanner: true, banner: pixel } });
+await p.goto(`${B}/gimnasios/${SLUG_CON_LOGO}`);
+check("un banner subido manda sobre el logotipo hallado", await seen(p.locator(".profile-banner:not(.profile-banner-logo)")) && (await p.locator(".profile-banner").getAttribute("src")).startsWith(`/imagenes/gimnasio/logo-hallado-${rnd}/banner`) && await imagenCargada(p.locator(".profile-banner")));
 
 await terminarDiagnosticos();
 await db.$disconnect();

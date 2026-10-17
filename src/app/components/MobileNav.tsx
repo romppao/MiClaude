@@ -17,9 +17,13 @@ const ICONO = {
   miFicha: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M18 2H6v7a6 6 0 0 0 12 0V2Z",
   orgVeladas: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM9 16l2 2 4-4",
   clases: "M12 2 2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5",
+  hoy: "m9 11 3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11",
+  bandeja: "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z",
+  historial: "M12 6v6l4 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z",
+  cuenta: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
 };
 
-type Pestana = { href: string; label: string; icon: string; tambien?: string[] };
+type Pestana = { href: string; label: string; icon: string; tambien?: string[]; excepto?: string[] };
 const INICIO: Pestana = { href: "/", label: "Inicio", icon: ICONO.inicio };
 const PELEADORES: Pestana = { href: "/peleadores", label: "Peleadores", icon: ICONO.peleadores, tambien: ["/ranking"] };
 const VELADAS: Pestana = { href: "/veladas", label: "Veladas", icon: ICONO.veladas };
@@ -27,7 +31,16 @@ const VELADAS: Pestana = { href: "/veladas", label: "Veladas", icon: ICONO.velad
 const PANEL: Pestana = { href: "/mi-panel", label: "Mi panel", icon: ICONO.panel, tambien: ["/siguiendo", "/compartir"] };
 const MIS_VELADAS: Pestana = { href: "/organizador", label: "Mis veladas", icon: ICONO.orgVeladas };
 
+// Moderación: la bandeja es `/moderacion` y sus pantallas hijas; «Hoy» e «Historial» tienen la suya y no la encienden a la vez.
+const MODERADOR: Pestana[] = [
+  { href: "/moderacion/hoy", label: "Hoy", icon: ICONO.hoy },
+  { href: "/moderacion", label: "Bandeja", icon: ICONO.bandeja, excepto: ["/moderacion/hoy", "/moderacion/historial"] },
+  { href: "/moderacion/historial", label: "Historial", icon: ICONO.historial },
+  { href: "/mi-cuenta", label: "Cuenta", icon: ICONO.cuenta },
+];
+
 const PESTANAS: Record<Papel, Pestana[]> = {
+  moderador: MODERADOR,
   visitante: [INICIO, PELEADORES, VELADAS, { href: "/gimnasios", label: "Gimnasios", icon: ICONO.gimnasios }],
   usuario: [INICIO, PELEADORES, VELADAS, PANEL],
   peleador: [INICIO, VELADAS, PANEL, { href: "/mi-ficha", label: "Mi ficha", icon: ICONO.miFicha }],
@@ -44,7 +57,7 @@ export default function MobileNav({ papel = "visitante" }: { papel?: Papel }) {
   // Como en el diseño v3, la bienvenida, el acceso y el registro van sin barra inferior: la persona se centra en terminar ese paso.
   if (SIN_BARRA.some((r) => dentro(pathname, r))) return null;
   return <nav className="mobile-nav" aria-label="Navegación móvil">
-    {PESTANAS[papel].map(({ href, label, icon, tambien }) => <Link key={href} href={href} aria-current={[href, ...(tambien ?? [])].some((h) => dentro(pathname, h)) ? "page" : undefined}>
+    {PESTANAS[papel].map(({ href, label, icon, tambien, excepto }) => <Link key={href} href={href} aria-current={[href, ...(tambien ?? [])].some((h) => dentro(pathname, h)) && !(excepto ?? []).some((h) => dentro(pathname, h)) ? "page" : undefined}>
       <svg aria-hidden="true" className="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={icon}/></svg><span>{label}</span>
     </Link>)}
   </nav>;

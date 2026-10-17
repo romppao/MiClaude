@@ -1,5 +1,10 @@
 [
   {
+    "path": "tests/e2e/datos-vivos.mjs",
+    "purpose": "Comprueba el refresco de una lista al recuperar foco o visibilidad y la conservación del filtro sin enviar, con cambios desde otra conexión al servidor.",
+    "guide": "docs/pruebas/auditoria-actualizacion-datos-2026-10-17.md"
+  },
+  {
     "path": ".env.example",
     "purpose": "Plantilla de nombres y significado de variables, sin credenciales reales; punto de partida para configuración local/producción.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -1120,6 +1125,11 @@
     "guide": "docs/mantenimiento/FLUJOS.md"
   },
   {
+    "path": "src/app/moderacion/hoy/page.tsx",
+    "purpose": "«Hoy» de moderación: cuánto trabajo hay de cada tipo, agrupado, y un botón con la siguiente tarea. Es el «Mi panel» del moderador.",
+    "guide": "docs/mantenimiento/FLUJOS.md"
+  },
+  {
     "path": "src/app/moderacion/noticias/page.tsx",
     "purpose": "Moderación de fuentes de noticias: estado de lectura de cada una, alta de fuentes nuevas y últimos titulares para ocultar.",
     "guide": "docs/mantenimiento/FLUJOS.md"
@@ -1635,6 +1645,16 @@
     "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
+    "path": "src/lib/community/moderacion-contadores.ts",
+    "purpose": "Cuenta cuánto trabajo hay de cada tipo de moderación con los mismos criterios que las colas de la bandeja.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
+    "path": "src/lib/community/moderacion-tareas.ts",
+    "purpose": "Reglas puras de «Hoy»: tipos de trabajo de moderación, orden de atención, siguiente tarea y agrupación.",
+    "guide": "docs/mantenimiento/MODULOS.md"
+  },
+  {
     "path": "src/lib/community/notifications.ts",
     "purpose": "Productores internos de avisos idempotentes por destinatario y hecho, agrupación diaria de aura y exclusión de resultados o fichas no publicables.",
     "guide": "docs/AVISOS.md"
@@ -2050,6 +2070,11 @@
     "guide": "docs/mantenimiento/OPERACION.md"
   },
   {
+    "path": "tests/e2e/moderador.mjs",
+    "purpose": "Recorrido del moderador: «Mi panel» es «Hoy», barra inferior y menú propios, un número por tipo de trabajo, la siguiente tarea y los avisos de decisión.",
+    "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
     "path": "tests/e2e/movil.mjs",
     "purpose": "Mide desbordes, tamaño de texto, zonas táctiles y navegación en emulaciones móviles; no acredita iOS/Android físicos.",
     "guide": "docs/mantenimiento/OPERACION.md"
@@ -2313,6 +2338,11 @@
     "path": "tests/unit/middleware.test.ts",
     "purpose": "Prueba limpieza de parámetros duplicados, claves peligrosas y caracteres no admitidos de URL.",
     "guide": "docs/mantenimiento/OPERACION.md"
+  },
+  {
+    "path": "tests/unit/moderacion-tareas.test.ts",
+    "purpose": "Tareas de moderación de «Hoy»: orden de atención, agrupación y que nunca se invente trabajo.",
+    "guide": "docs/mantenimiento/MODULOS.md"
   },
   {
     "path": "tests/unit/multimedia.test.ts",
