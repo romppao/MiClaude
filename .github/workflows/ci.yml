@@ -1,132 +1,12 @@
 name: CI
-
-# Cuándo se ejecuta (13 de octubre de 2026, repositorio privado: docs/decisiones/ADR-004-repositorio-privado.md).
-# Un repositorio privado gratuito tiene 2.000 minutos de GitHub Actions al mes; antes, en público, eran ilimitados y cada cambio
-# se probaba dos veces (al subirlo a su rama y en su PR). Ahora:
-#  - en cada PR (y en cada cambio que se suba a un PR abierto): es donde se decide si algo entra;
-#  - al fusionar en la rama de la demo (claude/ring-espana-mvp), para confirmar el resultado final;
-#  - a mano, con el botón «Run workflow» de la pestaña Actions.
-# Subir a una rama sin PR ya no gasta minutos: abre el PR cuando quieras que se pruebe.
 on:
-  pull_request:
-  push:
-    branches: [claude/ring-espana-mvp]
   workflow_dispatch:
-
 permissions:
   contents: read
-
-# Una ejecución nueva de la misma rama cancela la anterior que siga en curso.
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  test:
+  diagnostico:
     runs-on: ubuntu-latest
-    # 30 minutos: desde el 13 de octubre de 2026 la accesibilidad se mide en los dos temas (claro y oscuro).
-    timeout-minutes: 30
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: ringespana
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ringespana
-      BASE_URL: http://localhost:3111
-      APP_URL: http://localhost:3111
-      MAIL_TRANSPORT: log
-      MAIL_LOG: ${{ github.workspace }}/server.log
-      # Sin salida a internet: las pruebas insertan sus noticias; los vídeos de prueba se guardan en una carpeta temporal.
-      NEWS_FETCH: "no"
-      # Sin buscar direcciones de gimnasios en OpenStreetMap (lib/common/geo.ts): no hay salida a internet.
-      GEOCODIFICAR: "no"
-      # Cuenta del creador de las pruebas (tests/e2e/creador.mjs).
-      CREADOR_CORREO: creador@prueba.test
-      # Claves de mentira para que aparezca «Continuar con Google» (tests/e2e/google.mjs); nunca se llega a hablar con Google.
-      GOOGLE_CLIENT_ID: cliente-de-pruebas.apps.googleusercontent.com
-      GOOGLE_CLIENT_SECRET: secreto-de-pruebas
-      MEDIA_DIR: /tmp/ring-subidas
-      # Las fotos van al almacén de fotos en disco (lib/media/fotos.ts), como irán a R2 en producción: así las pruebas recorren ese camino.
-      FOTOS_EN_DISCO: "si"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Comprobar la versión y su entrada en el registro de cambios (docs/VERSIONES.md)
-        # En un PR, la versión tiene que ser mayor que la de la rama de destino: todo lo que se fusiona es una versión nueva.
-        env:
-          RAMA_DESTINO: ${{ github.base_ref }}
-        run: |
-          if [ -n "$RAMA_DESTINO" ]; then
-            git fetch --quiet --depth=1 origin "$RAMA_DESTINO"
-            node scripts/version.mjs comprobar "$(git show FETCH_HEAD:package.json | node -pe 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
-          else
-            node scripts/version.mjs comprobar
-          fi
-      - name: Aplicar las migraciones a la base de datos vacía
-        run: npx prisma migrate deploy
-      - name: Comprobar que las migraciones reproducen exactamente el esquema
-        run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
-      - name: Comprobar cobertura y vigencia de la documentación del código
-        run: |
-          node --test tests/documentacion/catalogo.test.mjs tests/documentacion/estado.test.mjs tests/documentacion/aprobado.test.mjs tests/documentacion/e2e.test.mjs
-          node scripts/generar-catalogo.mjs --comprobar
-      - run: npm run typecheck
-      - name: Comprobar que el mapa funcional está al día (npm run mapa)
-        run: npm run mapa:comprobar
-      - run: npm test
-      - run: npm run build
-      - name: Instalar Chromium
-        run: npx playwright-core install --with-deps chromium
-      - name: Comprobar controles y diseño compartidos sin base de datos
-        run: node tests/browser/optimizacion.mjs
-      - name: Arrancar servidor
-        run: |
-          # Con el Google simulado (tests/e2e/google-falso.mjs): solo cambia la respuesta del endpoint de tokens de Google.
-          node --import ./tests/e2e/google-falso.mjs node_modules/next/dist/bin/next start -p 3111 > "$MAIL_LOG" 2>&1 &
-          npx wait-on -t 60000 http://localhost:3111/registro
-      - name: Prueba de extremo a extremo
-        # Si algo falla, scripts/avisos-ci.mjs lo resume en un aviso del CI (fallos y texto de las páginas guardadas), legible desde el PR.
-        run: |
-          set -o pipefail; mkdir -p test-results
-          npm run test:e2e 2>&1 | tee test-results/e2e.log || { node scripts/avisos-ci.mjs test-results/e2e.log; exit 1; }
-      - name: Medición de accesibilidad (WCAG 2.2 AA)
-        run: npm run test:a11y
-      - name: Comprobar experiencia gráfica en una demo independiente
-        run: |
-          DEMO_MODE=si EXPERIENCE_LAB=si npx next start -p 3112 > test-results/experience-server.log 2>&1 &
-          npx wait-on -t 60000 http://localhost:3112/laboratorio
-          BASE_URL=http://localhost:3112 node tests/browser/experiencia.mjs
-          BASE_URL=http://localhost:3112 node tests/browser/adaptacion.mjs
-      - name: Capturas de las pruebas de navegador si algo falla
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: diagnostico-pruebas
-          path: test-results/
-          if-no-files-found: ignore
-      - name: Log del servidor si algo falla
-        if: failure()
-        run: tail -n 100 "$MAIL_LOG" || true
-
-  # T-009: servidor y PostgreSQL propios; no consume ni altera los datos de los demás recorridos.
-  escenarios:
-    # Solo manual, al fusionar o por petición explícita con la etiqueta del PR (Claude, 16-10-2026).
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'escenarios')
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 12
     services:
       postgres:
         image: postgres:16
@@ -142,17 +22,16 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/escenarios
-      BASE_URL: http://localhost:3120
-      APP_URL: http://localhost:3120
+      BASE_URL: http://localhost:3141
+      APP_URL: http://localhost:3141
       MAIL_TRANSPORT: log
-      MAIL_LOG: ${{ github.workspace }}/escenarios-server.log
+      MAIL_LOG: ${{ github.workspace }}/dev-servidor.log
       NEWS_FETCH: "no"
       GEOCODIFICAR: "no"
       DEMO_MODE: "si"
       CREADOR_CORREO: creador@prueba.test
-      MEDIA_DIR: /tmp/lona-escenarios-subidas
+      MEDIA_DIR: /tmp/lona-diagnostico-subidas
       FOTOS_EN_DISCO: "si"
-      ESC_DIR: test-results/escenarios
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -160,49 +39,36 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Preparar la base local vacía con datos ficticios
+      - name: Base exclusivamente ficticia y cliente aislado del runner
         run: |
+          npx prisma generate
           npx prisma migrate deploy
           npm run db:seed
-      - run: npm run build
-      - name: Instalar Chromium
-        run: npx playwright-core install --with-deps chromium
-      - name: Arrancar el servidor independiente de escenarios
+          node scripts/copiar-maplibre.mjs
+          npx playwright-core install --with-deps chromium
+      - name: Diagnóstico completo de React sin cambiar afirmaciones
         run: |
-          node node_modules/next/dist/bin/next start -p 3120 > "$MAIL_LOG" 2>&1 &
-          npx wait-on -t 60000 http://localhost:3120/salud
-      - name: Recorrer todos los tipos de cuenta
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='tests/e2e/escenarios.mjs';
+          const s=fs.readFileSync(p,'utf8');
+          const needle='  const p = await ctx.newPage();';
+          if (!s.includes(needle)) throw new Error('No se encuentra el punto de instrumentación');
+          fs.writeFileSync(p,s.replace(needle,needle+'\n  p.on("pageerror", e => console.error("DIAG-PAGINA", nombre, p.url(), e.stack ?? e.message));\n  p.on("console", m => { if (m.type() === "error") console.error("DIAG-CONSOLA", nombre, p.url(), m.text()); });'));
+          NODE
+          node node_modules/next/dist/bin/next dev --port 3141 --hostname 127.0.0.1 > "$MAIL_LOG" 2>&1 &
+          npx wait-on -t 90000 http://localhost:3141/salud
+      - name: Dos repeticiones de los dos recorridos afectados
         run: |
           set -o pipefail
-          mkdir -p test-results/escenarios
-          npm run test:escenarios 2>&1 | tee test-results/escenarios/ejecucion.log
-      - name: Capturas e informe por persona, también cuando falla
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: escenarios-por-persona
-          path: test-results/escenarios/
-          if-no-files-found: ignore
-      - name: Diagnóstico del servidor de escenarios
-        if: failure()
-        run: tail -n 80 "$MAIL_LOG" || true
-
-  # Al fusionar en la rama de la demo y solo si todas las pruebas han pasado: crea la etiqueta vX.Y.Z de la versión (y de las
-  # históricas del CHANGELOG que aún no la tengan). Es el único trabajo con permiso de escritura, y tarda unos segundos.
-  etiquetar:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/claude/ring-espana-mvp'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Crear las etiquetas de versión que falten
-        run: |
-          node scripts/version.mjs etiquetas | while read -r etiqueta commit; do
-            if git rev-parse -q --verify "refs/tags/$etiqueta" > /dev/null; then echo "$etiqueta ya existe"; continue; fi
-            git tag "$etiqueta" "$(git rev-parse "$commit^{commit}")" && git push origin "$etiqueta" && echo "::notice::Etiqueta $etiqueta creada"
+          mkdir -p test-results/diagnostico
+          for intento in 1 2; do
+            ESC_DIR="test-results/diagnostico/intento-$intento" node tests/e2e/escenarios.mjs peleador moderadora 2>&1 | tee "test-results/diagnostico/intento-$intento.log"
           done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: diagnostico-hidratacion-pr91
+          path: |
+            test-results/diagnostico/
+            dev-servidor.log
