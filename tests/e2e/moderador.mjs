@@ -29,7 +29,7 @@ check("la siguiente tarea son las denuncias, que van antes que nada", (await sig
 check("los tres grupos de trabajo", (await mod.p.locator("main h2").allInnerTexts()).filter((t) => ["Personas", "Contenido", "Datos y sistema"].includes(t)).length === 3);
 const tarjeta = (texto) => mod.p.locator(".hoy-tareas a", { hasText: texto });
 check("«Gimnasios por revisar» cuenta el que acabo de crear", Number((await tarjeta("Gimnasios por revisar").locator("strong").innerText()).trim()) >= 1);
-check("lo que no tiene trabajo dice «Al día», no un cero mudo", (await mod.p.locator(".hoy-tareas .al-dia-texto").count()) >= 1);
+check("lo que no tiene trabajo se resume en «Al día», sin tarjetas vacías", (await mod.p.locator(".al-dia-lista").count()) >= 1 && (await mod.p.locator(".hoy-tareas .dato", { hasText: /^[^0-9]*$/ }).count()) === 0);
 check("cada número lleva a su cola", (await mod.p.locator(".hoy-tareas a").evaluateAll((as) => as.every((a) => a.getAttribute("href")?.startsWith("/moderacion")))));
 
 // 3) Barra inferior propia: Hoy · Bandeja · Historial · Cuenta, con una sola pestaña activa.
@@ -38,6 +38,7 @@ check("la barra inferior es la de moderación", (await barra.locator("a").allInn
 check("en «Hoy», solo «Hoy» está activa", (await barra.locator("a[aria-current=page]").allInnerTexts()).map((t) => t.trim()).join("|") === "Hoy");
 check("sin «Mi panel», «Peleadores» ni «Veladas» de aficionado", (await barra.getByText(/Mi panel|Peleadores|Veladas|Inicio/).count()) === 0);
 await axe(mod.p, "Hoy");
+if (process.env.CAPTURA_HOY) await mod.p.screenshot({ path: process.env.CAPTURA_HOY, fullPage: true });
 
 // 4) La bandeja sigue siendo la de siempre y la barra la marca a ella, no a «Hoy».
 await barra.getByRole("link", { name: "Bandeja" }).click();

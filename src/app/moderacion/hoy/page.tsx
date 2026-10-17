@@ -40,19 +40,27 @@ export default async function Hoy() {
         <p className="notice notice-ok" role="status">Todo al día. Cuando llegue algo nuevo, aparecerá aquí.</p>
       )}
 
-      {agrupar(contadores).map(({ grupo, tareas }) => (
-        <section key={grupo} aria-labelledby={`hoy-${grupo}`} style={{ margin: "24px 0" }}>
-          <h2 id={`hoy-${grupo}`}>{grupo}</h2>
-          <div className="resumen-moderacion hoy-tareas">
-            {tareas.map((t) => (
-              <Link key={t.clave} href={t.href} className={t.n > 0 ? "dato con-pendientes" : "dato al-dia"} aria-label={`${t.texto}: ${t.n > 0 ? t.n : "al día"}`}>
-                <span className="clave">{t.texto}</span>
-                {t.n > 0 ? <strong>{t.n}</strong> : <span className="al-dia-texto">Al día</span>}
-              </Link>
-            ))}
-          </div>
-        </section>
-      ))}
+      {/* Solo ocupan sitio las tareas con trabajo; lo que está al día se resume en una línea por grupo (menos scroll). */}
+      {agrupar(contadores).map(({ grupo, tareas }) => {
+        const conTrabajo = tareas.filter((t) => t.n > 0);
+        const alDia = tareas.filter((t) => t.n === 0);
+        return (
+          <section key={grupo} aria-labelledby={`hoy-${grupo}`} style={{ margin: "24px 0" }}>
+            <h2 id={`hoy-${grupo}`}>{grupo}</h2>
+            {conTrabajo.length > 0 && (
+              <div className="resumen-moderacion hoy-tareas">
+                {conTrabajo.map((t) => (
+                  <Link key={t.clave} href={t.href} className="dato con-pendientes" aria-label={`${t.texto}: ${t.n}`}>
+                    <span className="clave">{t.texto}</span>
+                    <strong>{t.n}</strong>
+                  </Link>
+                ))}
+              </div>
+            )}
+            {alDia.length > 0 && <p className="al-dia-lista"><strong>Al día:</strong> {alDia.map((t) => t.texto).join(", ")}.</p>}
+          </section>
+        );
+      })}
 
       <section aria-labelledby="hoy-herramientas" style={{ margin: "24px 0" }}>
         <h2 id="hoy-herramientas">Herramientas</h2>
