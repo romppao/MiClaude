@@ -67,10 +67,14 @@ jobs:
           npx prisma migrate deploy
 
       - name: Publicar en Cloud Run
+        env:
+          # La app funciona con su propia cuenta (lona-web), que solo puede leer sus claves; sin la variable, la de por defecto del proyecto.
+          CUENTA_APP: ${{ vars.GCP_RUN_SA }}
         run: |
           gcloud run deploy lona \
             --project "$PROYECTO" --region "$REGION" \
             --image "$IMAGEN:$(git rev-parse --short HEAD)" \
+            ${CUENTA_APP:+--service-account "$CUENTA_APP"} \
             --min-instances 0 --max-instances 2 --memory 512Mi --cpu 1 --cpu-throttling \
             --concurrency 40 --timeout 60 --allow-unauthenticated --quiet
 

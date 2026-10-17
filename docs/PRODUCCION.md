@@ -39,15 +39,15 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
    - **no tocar** MX, SPF, `_dmarc` ni los TXT de verificación (Google, Search Console): el buzón info@ sigue funcionando.
    - La demo sigue en https://ring-espana-demo.onrender.com/ y, desde la 0.15.1, pide a los buscadores que no la muestren (`noindex` y sin mapa del sitio).
 1. **Proyecto y facturación.**
-   - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación y poner una alerta de presupuesto de 1 €.
+   - Vincular `lona-511614` (cuenta info@lonaclub.es) a la cuenta de facturación (**hecho el 17-10-2026**) y poner una alerta de presupuesto de **10 €** (avisa al 50, 90 y 100 %; el fundador quiere «todo gratis o un máximo de 10 €»). Es un aviso, no un corte: el tope real son `--max-instances 2` y `--cpu-throttling` (sin visitas, 0 €).
    - Activar Cloud Run, Artifact Registry, Secret Manager e IAM Credentials.
-2. **Repositorio de imágenes:** Artifact Registry `lona` (Docker) en `europe-west1`.
+2. **Repositorio de imágenes:** Artifact Registry `lona` (Docker) en `europe-west1`, con limpieza automática que guarda solo las 2 últimas imágenes (para no pasar de los 0,5 GB gratuitos).
 3. **Cuenta de servicio para desplegar** (`desplegar-lona@…`), con los roles:
    - Cloud Run Admin;
    - Artifact Registry Writer;
-   - Service Account User sobre la cuenta de ejecución.
+   - Service Account User sobre la cuenta de ejecución **`lona-web@…`**, con la que funciona la app (solo puede leer sus propios secretos, que se le dan uno a uno).
 4. **Workload Identity Federation para GitHub**, limitado al repositorio `romppao/MiClaude`.
-   - Variables del repositorio: `GCP_PROJECT_ID`, `GCP_REGION=europe-west1`, `GCP_WIF_PROVIDER` y `GCP_DEPLOY_SA`.
+   - Variables del repositorio: `GCP_PROJECT_ID`, `GCP_REGION=europe-west1`, `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA` y `GCP_RUN_SA` (la cuenta de ejecución `lona-web`; si falta, Cloud Run usa la de por defecto del proyecto).
    - Entorno de GitHub `produccion` con aprobación del fundador.
 5. **Secretos de GitHub:**
    - `PROD_DATABASE_URL_DIRECT`;
