@@ -17,7 +17,8 @@ async function registrar(correo, nombre) {
   await p.goto(B + "/registro?tipo=usuario");
   await p.fill("[name=name]", nombre); await p.fill("[name=email]", correo); await p.fill("[name=password]", "contraseña123");
   await btn(p, "Crear mi cuenta");
-  await p.waitForLoadState();
+  // Espera a que el servidor responda: o pasa al siguiente paso del registro o vuelve con el motivo (crear la cuenta tarda más en el CI).
+  await p.waitForURL((u) => u.pathname !== "/registro" || u.searchParams.has("problema"), { timeout: 20000 });
   return p;
 }
 
