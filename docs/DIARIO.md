@@ -2512,3 +2512,21 @@ El fundador pide rehacer sobre la demo y entregar cada punto por separado. Se re
 **Arreglo (0.23.2):** migrar por la conexión directa (el mismo servidor sin «-pooler»; solo se cambia el nombre del servidor, nunca la contraseña) y, si aun así hay un bloqueo colgado en el servidor, reintentar una vez con `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. La revisión de Codex señaló tres cosas que se corrigieron antes de fusionar: la sustitución debe tocar solo el servidor, quitar el bloqueo siempre permite carreras (por eso solo es el reintento) y desactivarlo no libera un bloqueo ya colgado, solo lo sortea. No se tocó ningún ajuste ni clave de Render.
 
 **Lección:** «/salud en verde» no prueba que el último despliegue funcione: hay que mirar los eventos de Render. Una demo que no se actualiza en silencio es peor que un fallo a la vista.
+
+## 17 de octubre de 2026, noche — Moderador con papel propio y pantalla «Hoy» (Claude Code)
+
+**Petición del fundador:** «cuando entro como moderador, las pantallas son muy confusas». Plan aprobado: papel propio, barra inferior propia y pantalla de trabajo; después, dividir la bandeja.
+
+**Qué había:** `papelDe` daba a moderación el papel de aficionado («todavía no sigues a ningún peleador»), la barra inferior no tenía «Moderación» y todo el trabajo estaba en `/moderacion` (más de mil líneas), con avisos y combates mezclados y trabajo sin contador (veladas por autorizar, gimnasios reclamados).
+
+**Qué se hizo (0.24.0):** el papel `moderador` y su menú, su barra (Hoy · Bandeja · Historial · Cuenta) y «Mi panel» que lleva a «Hoy». «Hoy» cuenta once tipos de trabajo con los mismos criterios que las colas y propone la siguiente tarea. La bandeja de siempre queda intacta como segunda pestaña: así las pruebas de navegador que la usan siguen valiendo y el cambio es pequeño y fácil de revisar.
+
+**Decisiones:** «Hoy» vive en `/moderacion/hoy` y no en `/moderacion` (el plan decía lo segundo) para no mover una página con decenas de enlaces, anclas y pruebas de otros recorridos; el cambio de sitio, si se quiere, es del PR de la bandeja. Las piezas de «Hoy» van en `lib/community`: una carpeta nueva en `src/lib` no pasa la prueba de arquitectura.
+
+**Qué salió mal:** (1) la prueba de arquitectura rechazó la carpeta `lib/moderation`; (2) dos recorridos antiguos (`menu` y `paneles`) daban por bueno que moderación fuera un aficionado y se corrigieron; (3) el recorrido `enlaces` falló por dos cosas ajenas a este cambio que solo salen con pocos datos: una descarga de calendario tomada por enlace roto y los botones «Completar», que apuntaban a la misma pantalla con la ruta completa (arreglados los dos).
+
+**Lección:** con un subconjunto de recorridos (`--solo`) el rastreo de enlaces ve páginas que en la ejecución completa no alcanza por el tope de 90; conviene pasar `enlaces` junto a `cuenta` antes de dar un cambio por bueno.
+
+**Ampliación del mismo PR:** la bandeja deja de repetir el estado y las herramientas (están en «Hoy») y «Avisos de usuarios» pasa a «Denuncias de usuarios»; cada decisión de moderación (combates, ficha reclamada, organizador, sello de gimnasio, velada pasada) avisa dentro de la app al afectado con el motivo. `fallos.mjs`, que pedía el estado y las herramientas en la bandeja, mira ahora «Hoy» y comprueba que la bandeja ya no los repite.
+
+**Pendiente:** dividir la bandeja en secciones por tipo y la denuncia de invitaciones con suspensión de envío (PR3; #102 ya está fusionado).

@@ -1,15 +1,20 @@
 /**
  * A dónde lleva el acceso y la confirmación del correo (una sola regla para toda la aplicación). Decisión del fundador (8 de octubre de 2026):
- * después de entrar, todas las personas ven la misma portada con la actualidad; lo propio de cada cuenta está en «Mi panel». Moderación va a su cola.
+ * después de entrar, todas las personas ven la misma portada con la actualidad; lo propio de cada cuenta está en «Mi panel». Moderación va
+ * a «Hoy», su pantalla de trabajo (17 de octubre de 2026: «cuando entro como moderador las pantallas son muy confusas»).
  */
 export function landingFor(role: string): string {
-  return role === "ADMIN" ? "/moderacion" : "/";
+  return role === "ADMIN" ? "/moderacion/hoy" : "/";
 }
 
-/** Papel con el que se eligen el menú, la barra inferior y «Mi panel». Una entidad pendiente de aprobar funciona como un usuario. */
-export type Papel = "visitante" | "usuario" | "peleador" | "entrenador" | "entidad";
+/**
+ * Papel con el que se eligen el menú, la barra inferior y «Mi panel». Una entidad pendiente de aprobar funciona como un usuario.
+ * Moderación tiene el suyo (17 de octubre de 2026): antes era un «aficionado» con un enlace más y veía «todavía no sigues a ningún peleador».
+ */
+export type Papel = "visitante" | "usuario" | "peleador" | "entrenador" | "entidad" | "moderador";
 export function papelDe(user: { role: string; fighter?: unknown } | null): Papel {
   if (!user) return "visitante";
+  if (user.role === "ADMIN") return "moderador";
   if (user.role === "ORGANIZER") return "entidad";
   if (user.role === "TRAINER") return "entrenador";
   if (user.role === "FIGHTER" || user.fighter) return "peleador";

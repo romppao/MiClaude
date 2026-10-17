@@ -45,6 +45,8 @@ check("salen los tres gimnasios", (await p.locator(".lista-completa .cartel-gimn
 const imagenCargada = (img) => img.evaluate((i) => (i.complete ? i.naturalWidth > 0 : new Promise((r) => { i.onload = () => r(i.naturalWidth > 0); i.onerror = () => r(false); })));
 const cargada = async (texto) => { const img = tarjeta(texto).locator(".cartel-logo img").first(); return (await seen(img)) && (await imagenCargada(img)); };
 check("la tarjeta con logotipo hallado lo muestra cargado", await cargada(`Cima ${nombre}`));
+// La imagen vacía (204) desaparece al fallar su carga: se espera a que se vaya antes de comprobar (en el CI tarda más que en local).
+await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo img").first().waitFor({ state: "detached", timeout: 10000 }).catch(() => undefined);
 check("la tarjeta sin logotipo no deja una imagen rota: quedan las iniciales", (await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo img").count()) === 0 && (await tarjeta(`Sin Logo ${nombre}`).locator(".cartel-logo").innerText()).trim() === "SL");
 const caja = await tarjeta(`Cima ${nombre}`).locator(".cartel-logo").boundingBox();
 check("el logotipo es grande (más de 90 píxeles) y no se sale de la tarjeta", !!caja && caja.width >= 90 && caja.width <= 120);

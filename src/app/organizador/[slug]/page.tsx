@@ -86,7 +86,7 @@ export default async function ManageEvent({ params, searchParams }: { params: Pr
       {event.status === "CANCELLED" && <p className="notice notice-bad" role="note">Esta velada está cancelada. Sigue visible con esa etiqueta y sus combates no cuentan. Puedes volver a activarla abajo.</p>}
       <p><Link href="/organizador">← Volver a mis veladas</Link></p>
 
-      <PreparacionVelada event={event} asistentes={audiencia.asistentes} seguidores={audiencia.seguidores} />
+      <PreparacionVelada event={event} asistentes={audiencia.asistentes} seguidores={audiencia.seguidores} aqui />
       <h2 id="datos">Datos de la velada</h2>
       <details>
         <summary>Corregir los datos de la velada — nombre, fecha, lugar, promotor y entradas</summary>

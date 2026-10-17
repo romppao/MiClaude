@@ -7,7 +7,7 @@ describe("aterrizaje por papel", () => {
     expect(landingFor("FIGHTER")).toBe("/");
     expect(landingFor("TRAINER")).toBe("/");
     expect(landingFor("ORGANIZER")).toBe("/");
-    expect(landingFor("ADMIN")).toBe("/moderacion");
+    expect(landingFor("ADMIN")).toBe("/moderacion/hoy");
   });
   it("un papel desconocido va al inicio", () => {
     expect(landingFor("")).toBe("/");
@@ -57,7 +57,9 @@ describe("papel de la cuenta y permiso para organizar", () => {
     expect(papelDe({ role: "FIGHTER", fighter: null })).toBe("peleador");
     expect(papelDe({ role: "TRAINER", fighter: { id: "x" } })).toBe("entrenador");
     expect(papelDe({ role: "ORGANIZER" })).toBe("entidad");
-    expect(papelDe({ role: "ADMIN" })).toBe("usuario");
+    expect(papelDe({ role: "ADMIN" })).toBe("moderador");
+    // El papel de moderación manda sobre una ficha vinculada (el creador también es peleador en la demo).
+    expect(papelDe({ role: "ADMIN", fighter: { id: "x" } })).toBe("moderador");
   });
   it("los entrenadores organizan veladas e interclubs sin aprobación previa; aficionados y peleadores no", () => {
     expect(["ORGANIZER", "TRAINER", "ADMIN"].every(puedeOrganizar)).toBe(true);

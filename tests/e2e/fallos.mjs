@@ -41,11 +41,14 @@ check("quien no modera no puede ver los fallos", !curioso.p.url().includes("/mod
 const mod = await newUser("Moderafallos");
 hacerAdmin(mod.email);
 await mod.p.goto(B + "/moderacion");
-check("el panel muestra «Pendiente de revisar»", await seen(mod.p.getByRole("heading", { name: "Pendiente de revisar" })));
-check("el panel muestra «Estado de la aplicación» con los fallos sin resolver", await seen(mod.p.getByRole("link", { name: /Fallos de la aplicación sin resolver: \d+/ })));
+check("la bandeja muestra «Pendiente de revisar»", await seen(mod.p.getByRole("heading", { name: "Pendiente de revisar" })));
+// El estado de la aplicación, la versión y las herramientas están en «Hoy» (17-10-2026), sin repetirse en la bandeja.
+check("la bandeja ya no repite el estado ni las herramientas", (await mod.p.getByRole("heading", { name: "Estado de la aplicación" }).count()) === 0 && (await mod.p.getByRole("heading", { name: "Herramientas" }).count()) === 0);
+await mod.p.goto(B + "/moderacion/hoy");
+check("«Hoy» muestra los fallos sin resolver", await seen(mod.p.getByRole("link", { name: /Fallos sin resolver: \d+/ })));
 check("el panel dice qué versión de la aplicación está en marcha", await seen(mod.p.getByText(`Versión de la aplicación: ${JSON.parse(readFileSync("package.json", "utf8")).version}`)));
 check("el panel muestra las herramientas, sin perder ninguna", await seen(mod.p.getByRole("heading", { name: "Herramientas" })) && await seen(mod.p.getByRole("link", { name: "Ver el historial de cambios" })) && await seen(mod.p.getByRole("link", { name: "Gestionar acreditaciones" })) && await seen(mod.p.getByRole("link", { name: "Respaldar resultados y títulos" })));
-await axe(mod.p, "Panel de moderación");
+await axe(mod.p, "Hoy de moderación");
 await mod.p.getByRole("link", { name: "Fallos de la aplicación", exact: true }).click();
 await mod.p.waitForURL("**/moderacion/fallos");
 check("la lista de fallos muestra el fallo registrado", await seen(mod.p.getByRole("link", { name: new RegExp(`Fallo de prueba ${marca}`) })));

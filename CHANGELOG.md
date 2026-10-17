@@ -11,6 +11,26 @@ control de versiones. La línea «Fusión» indica el commit de cada una: el CI 
 
 ## [Sin publicar]
 
+## [0.24.0] — 2026-10-17
+
+PR de Claude Code: **moderador con papel propio** (aviso del fundador, 17-10-2026: «cuando entro como moderador, las pantallas son muy confusas»). Hasta ahora una cuenta de moderación se trataba como la de un aficionado: su «Mi panel» decía «todavía no sigues a ningún peleador», la barra inferior no tenía «Moderación» y todo el trabajo estaba en una sola página de más de mil líneas, con avisos mezclados con combates y trabajo escondido sin contador.
+
+### Añadido
+- **«Hoy»** (`/moderacion/hoy`), la primera pantalla de moderación: un número por tipo de trabajo (denuncias, veladas por autorizar, combates con señales, fallos, fichas reclamadas, organizaciones, gimnasios…), agrupado en Personas, Contenido y Datos y sistema, y un botón grande con la **siguiente tarea** (las denuncias de usuarios siempre van primero). Lo que no tiene trabajo dice «Al día».
+- **Barra inferior propia** para moderación: Hoy · Bandeja · Historial · Cuenta, con una sola pestaña activa cada vez.
+- **Menú propio**: «Trabajo de moderación» y «Personas y datos» (y «Cuentas y moderadores» solo para el creador), sin nada de aficionado.
+- **Aviso dentro de la app a la persona afectada por cada decisión de moderación, con el motivo**: combates (verificado, puesto en revisión o devuelto a «declarado», a los dos peleadores), reclamación de ficha, organizador, sello de gimnasio (concedido o retirado, a quien lleva el gimnasio) y velada pasada. Antes solo había correo en algunas decisiones, y en los combates y los sellos, nada.
+- Recorrido de navegador `moderador.mjs` y pruebas unitarias de las reglas de «Hoy».
+
+### Cambiado
+- Una cuenta de moderación tiene su **propio papel**: «Mi panel» lleva a «Hoy», entrar lleva a «Hoy» y la cabecera dice «Hoy» en vez de «Mi panel».
+- La **bandeja** (`/moderacion`) es la segunda pestaña de la barra y ya no repite el estado de la aplicación ni las herramientas (están en «Hoy»). «Avisos de usuarios» pasa a **«Denuncias de usuarios»** para no confundirse con la campana de avisos.
+- «Hoy» reúne todas las herramientas de moderación con los nombres de siempre (historial de cambios, acreditaciones, fallos, fuentes de noticias, veladas pasadas, respaldo).
+
+### Corregido
+- Los botones «Completar» de la preparación de una velada, dentro de la propia pantalla de la velada, llevan solo al apartado (`#datos`) en vez de a la misma ruta completa, que parecía un enlace que no hace nada.
+- El recorrido `enlaces.mjs` ya no toma una descarga («Añadir al calendario») por un enlace roto.
+
 ## [0.23.2] — 2026-10-17
 
 PR de Claude Code: **arreglo urgente del arranque de la demo en Render**. Los despliegues de la 0.21.0, 0.22.0, 0.22.1, 0.22.2 y 0.23.1 fallaban al arrancar («Exited with status 1») y la demo se quedaba en una versión anterior; el registro de Render decía `P1002: Timed out trying to acquire a postgres advisory lock`.

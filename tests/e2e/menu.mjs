@@ -120,11 +120,11 @@ hacerAdmin(admin.email);
 await admin.p.goto(B + "/");
 await admin.p.getByRole("button", { name: "Menú", exact: true }).click();
 check(
-  "moderación dispone de sus accesos y respaldo",
+  "moderación dispone de su trabajo (Hoy y la bandeja) y del respaldo",
   (await seen(
     admin.p
       .getByRole("dialog")
-      .getByRole("link", { name: "Moderación", exact: true }),
+      .getByRole("link", { name: "Hoy: lo que espera", exact: true }),
   )) &&
     (await seen(
       admin.p
