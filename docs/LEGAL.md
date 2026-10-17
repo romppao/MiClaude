@@ -43,7 +43,7 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 
 ## Logotipos de gimnasios (0.23.1, 17 de octubre de 2026)
 - **Qué se muestra:** el logotipo del propio gimnasio, tomado de su página de inicio y solo para enseñar su ficha. No es una foto de personas ni de instalaciones.
-- **De dónde sale:** de su web oficial (una petición a la página de inicio, con identificación y respetando `robots.txt`); nunca de Instagram ni de otras redes. Cada logotipo anota su origen en `docs/datos/gimnasios-logos.json`.
+- **De dónde sale:** de su web oficial (una petición a la página de inicio, con identificación y respetando `robots.txt`); nunca de Instagram ni de otras redes. Cada logotipo anota su origen en `src/lib/common/gimnasios-logos.json`.
 - **Control del gimnasio:** el que sube el propio gimnasio (al reclamar su ficha) sustituye siempre al hallado. Si un gimnasio pide retirarlo: se quita su fila del registro y su archivo de `public/gimnasios/logos/`.
 - **Para el abogado:** uso de un logotipo ajeno (marca y derechos de autor) para identificar a su titular en un directorio, y si hace falta aviso previo o consentimiento antes de lanzar. Hasta entonces, solo en la demo.
 

@@ -1,7 +1,7 @@
 // Busca el logotipo de cada gimnasio de la lista investigada en SU PROPIA web y lo deja listo para la tarjeta.
 // Petición del fundador (17-10-2026): «los logos de los gimnasios se pueden encontrar muy fácil… luego mejorar las imágenes».
 //
-//   npx tsx scripts/logos-gimnasios.ts                → prueba con todos los que tienen web y escribe public/gimnasios/logos y docs/datos/gimnasios-logos.json
+//   npx tsx scripts/logos-gimnasios.ts                → prueba con todos los que tienen web y escribe public/gimnasios/logos y src/lib/common/gimnasios-logos.json
 //   npx tsx scripts/logos-gimnasios.ts --solo texto   → solo los que contengan «texto» en el nombre (para repetir uno)
 //   npx tsx scripts/logos-gimnasios.ts --reprocesar   → vuelve a tratar las imágenes ya encontradas (sin releer las páginas)
 //   npx tsx scripts/logos-gimnasios.ts --web slug=https://…   → fija a mano la web de un gimnasio que no la tenía en la lista
@@ -9,7 +9,7 @@
 // Reglas (ver docs/LEGAL.md, «Logotipos de gimnasios»):
 //  - Solo se lee la página de inicio del gimnasio (una petición por web, con identificación clara y pausa entre peticiones) y se respeta robots.txt.
 //  - Nunca Instagram ni redes: exigen sesión y sus condiciones no permiten leerlas de forma automática.
-//  - Se guarda de dónde salió cada logotipo (docs/datos/gimnasios-logos.json) para poder retirarlo si el gimnasio lo pide.
+//  - Se guarda de dónde salió cada logotipo (src/lib/common/gimnasios-logos.json) para poder retirarlo si el gimnasio lo pide.
 //  - El logotipo que sube el propio gimnasio (perfil reclamado) siempre manda sobre este.
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -21,7 +21,7 @@ type Entrada = { archivo: string; origen: string; pagina: string; fecha: string 
 
 const UA = "Lona-directorio/1.0 (directorio de gimnasios de deportes de contacto; https://lonaclub.es)";
 const SALIDA = resolve(process.cwd(), "public/gimnasios/logos");
-const MANIFIESTO = resolve(process.cwd(), "docs/datos/gimnasios-logos.json");
+const MANIFIESTO = resolve(process.cwd(), "src/lib/common/gimnasios-logos.json");
 const MAX_BYTES = 4 * 1024 * 1024;
 /** Gimnasios cuya web da una imagen que NO es su logotipo (revisado a ojo el 17-10-2026): se prefiere no mostrar nada antes que mostrar otra marca. */
 const EXCLUIR: Record<string, string> = {

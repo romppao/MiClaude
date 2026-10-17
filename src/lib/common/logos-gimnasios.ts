@@ -1,9 +1,9 @@
-import manifiesto from "../../../docs/datos/gimnasios-logos.json";
+import manifiesto from "./gimnasios-logos.json";
 import { lookup } from "./safe";
 
 /**
  * Logotipos de gimnasios encontrados en su propia web (scripts/logos-gimnasios.ts, 17-10-2026, petición del fundador). Cada uno anota de dónde salió
- * en docs/datos/gimnasios-logos.json para poder retirarlo si el gimnasio lo pide. El logotipo que sube el propio gimnasio siempre manda sobre este.
+ * en src/lib/common/gimnasios-logos.json (junto al código: la imagen de producción no incluye docs/) para poder retirarlo si el gimnasio lo pide. El logotipo que sube el propio gimnasio siempre manda sobre este.
  */
 const LOGOS: Record<string, { archivo: string }> = manifiesto;
 
