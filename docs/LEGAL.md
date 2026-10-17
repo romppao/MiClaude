@@ -47,6 +47,12 @@ Enlazadas desde el pie (`layout.tsx`), el registro, «Continuar con Google» en 
 - **Control del gimnasio:** el que sube el propio gimnasio (al reclamar su ficha) sustituye siempre al hallado. Si un gimnasio pide retirarlo: se quita su fila del registro y su archivo de `public/gimnasios/logos/`.
 - **Para el abogado:** uso de un logotipo ajeno (marca y derechos de autor) para identificar a su titular en un directorio, y si hace falta aviso previo o consentimiento antes de lanzar. Hasta entonces, solo en la demo.
 
+## Denuncia de invitaciones y pausa del envío (0.25.0, 17 de octubre de 2026)
+- **Quién denuncia:** solo el peleador que recibe la invitación. Al hacerlo, la invitación se cierra y no se comparte ningún contacto.
+- **Pausa automática:** con denuncias abiertas de tres personas distintas sobre una misma cuenta, su envío de invitaciones queda en pausa y se retiran las pendientes hasta que lo revise moderación. No se comunica a quien envía quién denunció.
+- **Decisión de moderación:** suspender el envío exige un motivo, que se comunica a la persona afectada por aviso y por correo, con cómo reclamar (mismo criterio que la retirada de contenido, DSA arts. 16 y 17). Moderación puede levantar la pausa con otro aviso. Todo queda en el registro de actividad.
+- **Para el abogado:** si la pausa automática, sin revisión humana previa, es proporcionada; plazo en que moderación debe revisarla; y si hace falta un procedimiento de reclamación propio para cuentas pausadas.
+
 ## Pendiente en la app (programación)
 1. T-013, aviso al salir hacia enlaces externos: implementado en 0.17.1 (rama de Codex, pendiente de revisión e integración). Reglamentos, moderación y autoría del mapa anuncian la pestaña nueva; los vídeos externos lo avisan visiblemente y condiciones/privacidad explican la salida. `tests/e2e/enlaces.mjs` vigila el aviso y `rel` en las pantallas recorridas.
 2. T-014, menores. El proyecto de ley de menores (121/000052), en tramitación, subiría la edad a 16 años y exigiría verificarla.

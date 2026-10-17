@@ -26,7 +26,7 @@ export default async function Invitar({ params, searchParams }: { params: Promis
   const nombre = publicFighterName(destino);
   const { tipo: tipoPedido, velada } = await searchParams;
   const hoy = todayMadrid();
-  const permiso = user ? puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt }) : null;
+  const permiso = user ? puedeInvitar({ role: user.role, emailVerifiedAt: user.emailVerifiedAt, invitacionesSuspendidas: !!user.invitationsSuspendedAt }) : null;
   const disponible = destinoDisponible({ listed: destino.listed, hiddenAt: destino.hiddenAt, userId: destino.userId, acceptsInvitations: destino.acceptsInvitations, birthDate: destino.birthDate }, hoy);
   // La ficha propia cuenta como no disponible (nadie se invita a sí mismo).
   const bloqueo = user ? destino.userId === user.id || (await hayBloqueo(user.id, destino.userId)) : false;
@@ -50,6 +50,8 @@ export default async function Invitar({ params, searchParams }: { params: Promis
         <div className="tarjeta"><p style={{ margin: 0 }}>Para invitar a un peleador entra con tu cuenta de organización o de entrenador.</p><Link className="btn btn-grande" href={`/entrar?next=${encodeURIComponent(`/peleadores/${destino.slug}/invitar`)}`}>Entrar</Link></div>
       ) : !user.emailVerifiedAt ? (
         <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Primero <Link href="/verificar">confirma tu correo electrónico</Link>.</div>
+      ) : permiso?.ok === false && permiso.problema === "invitacion_suspendida" ? (
+        <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>El envío de invitaciones de tu cuenta está en pausa mientras moderación revisa avisos. Si crees que es un error, cuéntanoslo desde «Avisar de un contenido» (al pie de cualquier pantalla).</div>
       ) : !permiso?.ok ? (
         <div className="notice notice-bad"><span aria-hidden="true">⚠ </span>Solo pueden invitar a peleadores las organizaciones aprobadas (promotoras, federaciones y clubes) y los entrenadores. {user.role === "FAN" && <>Si organizas veladas, <Link href="/organizador">pide ser organizador</Link>.</>}</div>
       ) : !disponible.ok || bloqueo ? (
