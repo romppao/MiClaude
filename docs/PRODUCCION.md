@@ -32,6 +32,8 @@ Decisión y motivos: [ADR-005](decisiones/ADR-005-alojamiento-cloud-run.md).
 **Nunca:** `DEMO_MODE` ni `MAIL_TRANSPORT=log`.
 
 ## Puesta en marcha (una sola vez)
+
+> **Estado a 17-10-2026 (Claude Code, con el «sí» del fundador; inventario previo de solo lectura):** pasos **1 a 5 hechos**. Facturación vinculada (EUR) y alerta «Lona 10 EUR» (50/90/100 %); servicios Cloud Run, Artifact Registry, Secret Manager, IAM Credentials, STS y presupuestos activados; registro `lona` en `europe-west1` con limpieza (2 últimas imágenes); cuentas `desplegar-lona` (Cloud Run Admin, escritura en `lona`, puede actuar como `lona-web`) y `lona-web` (ejecución; sin permisos todavía: se le da acceso a cada secreto al crearlo); grupo y proveedor de Workload Identity `github` limitado a `romppao/MiClaude`; entorno de GitHub `produccion` con aprobación obligatoria de `romppao` y variables `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_DEPLOY_SA`, `GCP_RUN_SA`, `GCP_WIF_PROVIDER` y `PROD_URL`. **No se recrean.** Falta: secretos de GitHub (`PROD_DATABASE_URL_DIRECT`, `BACKUP_R2_*`, `PROD_CRON_SECRET`), secretos del servicio (Resend, R2, Google, creador…), primer despliegue y dominio.
 0. **Separar ya lonaclub.es de la demo** (petición del fundador, 15-10-2026: «quiero separar la aplicación web de la demo de render… ya»). Hasta que la versión real esté montada, lonaclub.es no debe enseñar la demo:
    - **Seguir [`DOMINIO.md`](DOMINIO.md), sección 3, al pie de la letra** (orden seguro, cómo comprobarlo y cómo deshacerlo). Resumen:
    - primero Infomaniak → zona DNS de lonaclub.es → borrar el registro A `216.24.57.1` y el CNAME `www → ring-espana-demo.onrender.com`;
