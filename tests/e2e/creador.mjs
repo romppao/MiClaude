@@ -88,7 +88,7 @@ check("en la base solo se guardan sus huellas, no los códigos", !consulta(`sele
 await cr.getByRole("link", { name: "Ya los he guardado: continuar" }).click(); await cr.waitForURL("**/moderacion/usuarios");
 check("ya dentro: Administración", await seen(cr.getByRole("heading", { name: "Administración", level: 1 })));
 await accesible(cr, "Administración");
-check("es moderador, con todo lo de moderación", consulta(`select role from "User" where email='${CORREO}'`) === "ADMIN" && (await (await cr.goto(B + "/moderacion")).url()).endsWith("/moderacion") && await seen(cr.getByRole("link", { name: "Administración: cuentas y moderadores" })));
+check("es moderador, con todo lo de moderación", consulta(`select role from "User" where email='${CORREO}'`) === "ADMIN" && (await (await cr.goto(B + "/moderacion/hoy")).url()).endsWith("/moderacion/hoy") && await seen(cr.getByRole("link", { name: "Administración: cuentas y moderadores" })));
 await cr.getByRole("button", { name: "Menú" }).click();
 check("y su menú lleva «Administración»", await seen(cr.locator("#navigation-menu").getByRole("link", { name: "Administración" })));
 await cr.getByRole("button", { name: "Cerrar menú" }).click();

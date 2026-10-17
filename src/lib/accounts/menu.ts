@@ -48,7 +48,7 @@ export function menuDe(papel: Papel, x: ExtrasMenu = {}): SeccionMenu[] {
         { href: "/moderacion/acreditaciones", texto: "Acreditaciones" },
         { href: "/moderacion/gimnasios", texto: "Gimnasios" },
         { href: "/moderacion/noticias", texto: "Fuentes de noticias" },
-        ...(x.creador ? [{ href: "/moderacion/usuarios", texto: "Cuentas y moderadores" }] : []),
+        ...(x.creador ? [{ href: "/moderacion/usuarios", texto: "Administración: cuentas y moderadores" }] : []),
       ],
     });
   } else if (papel === "usuario") {
